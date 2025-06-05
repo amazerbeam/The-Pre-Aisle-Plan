@@ -156,3 +156,31 @@ footer#planner-footer {
   background-color: #e3fce3; /* light green */
   border-color: #a3d9a3;
 }
+
+.tabs-wrapper {
+  position: sticky;
+  top: 0;
+  background: #fff;
+  z-index: 20;
+  padding: 10px 0;
+  border-bottom: 1px solid #ddd;
+}
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+@media (max-width: 480px) {
+  .tabs {
+    justify-content: center;
+  }
+  .tab {
+    flex: 1 0 30%;
+    text-align: center;
+  }
+}
+
