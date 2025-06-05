@@ -184,3 +184,13 @@ footer#planner-footer {
   }
 }
 
+
+#calendar {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  max-height: 200px; /* or whatever limit you want */
+  overflow-y: auto;
+  padding-right: 10px; /* for scroll bar spacing */
+}
+
