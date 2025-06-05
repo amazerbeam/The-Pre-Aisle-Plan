@@ -56,6 +56,8 @@ if (cached) {
 
 
 function addToPlanner(recipeId, mealType, parentElement) {
+	console.log("addToPlanner");
+
   if (parentElement.querySelector('.day-select')) return;
 
   const wrapper = document.createElement('div');
@@ -98,7 +100,9 @@ function addToPlanner(recipeId, mealType, parentElement) {
 
     entry[mealType] = { id: recipeId, servings: currentServings };
     renderCalendar();
-    localStorage.setItem('mealPlanner', JSON.stringify(planner));
+	console.log("Saving planner to localStorage:", planner);
+	localStorage.setItem('mealPlanner', JSON.stringify(planner));
+
 
   };
 
@@ -289,7 +293,9 @@ function assignRecipeToDay(recipeId, day, mealType) {
   renderCalendar();
 
     // ✅ Save to localStorage
-  localStorage.setItem('mealPlanner', JSON.stringify(planner));
+console.log("Saving planner to localStorage:", planner);
+localStorage.setItem('mealPlanner', JSON.stringify(planner));
+
 }
 
 
@@ -315,6 +321,7 @@ function addCopyButton(section, entry) {
   copyBtn.style.cursor = 'pointer';
 
   copyBtn.onclick = () => {
+
     const useGlobal = document.getElementById('apply-all-servings').checked;
     const servings = useGlobal
       ? parseFloat(document.getElementById('all-servings').value || 1)
@@ -444,35 +451,42 @@ function renderRecipes(meal) {
         const btn = document.createElement('button');
         btn.textContent = day;
         btn.className = getDayButtonClass(entry.id, day.toLowerCase(), meal); // ⬅️ use `meal` argument
-        btn.onclick = () => {
-          const servingsToAssign = useGlobal
-            ? globalServings
-            : localServingsMap.get(entry.id) || parseFloat(servingsInput.value || 1);
+		btn.onclick = () => {
+		  console.log(`📅 Clicked ${day} for ${meal} -> Recipe ID: ${entry.id}`);
 
-          let entryForDay = planner.find(p => p.day === day.toLowerCase());
-          if (!entryForDay) {
-            entryForDay = { day: day.toLowerCase() };
-            planner.push(entryForDay);
-          }
+		  const servingsToAssign = useGlobal
+			? globalServings
+			: localServingsMap.get(entry.id) || parseFloat(servingsInput.value || 1);
 
-          const current = entryForDay[meal];
-          if (current?.id === entry.id) {
-            delete entryForDay[meal];
-          } else {
-            entryForDay[meal] = {
-              id: entry.id,
-              servings: servingsToAssign
-            };
-          }
+		  let entryForDay = planner.find(p => p.day === day.toLowerCase());
+		  if (!entryForDay) {
+			entryForDay = { day: day.toLowerCase() };
+			planner.push(entryForDay);
+		  }
 
-          if (Object.keys(entryForDay).length === 1 && entryForDay.day) {
-            const index = planner.indexOf(entryForDay);
-            if (index !== -1) planner.splice(index, 1);
-          }
+		  const current = entryForDay[meal];
+		  if (current?.id === entry.id) {
+			delete entryForDay[meal];
+		  } else {
+			entryForDay[meal] = {
+			  id: entry.id,
+			  servings: servingsToAssign
+			};
+		  }
 
-          renderRecipes(meal);
-          renderCalendar();
-        };
+		  if (Object.keys(entryForDay).length === 1 && entryForDay.day) {
+			const index = planner.indexOf(entryForDay);
+			if (index !== -1) planner.splice(index, 1);
+		  }
+
+		  renderRecipes(meal);
+		  renderCalendar();
+
+		  // ✅ Add this block to persist
+		  console.log("📦 Saving to localStorage:", planner);
+		  localStorage.setItem('mealPlanner', JSON.stringify(planner));
+		};
+
         buttonContainer.appendChild(btn);
       });
 
