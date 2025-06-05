@@ -511,11 +511,26 @@ const recipeData = [
     "Toss in zucchini noodles and cook 2–3 minutes.",
     "Serve warm."
   ]
+},
+
+
+
+
+{
+  "id": 30,
+  "meal": ["snacks"],
+  "recipe": "Celery and Hummus",
+  "defaultServings": 2,
+  "ingredients": [
+    { "name": "Celery sticks", "quantity": 6, "unit": "pieces" },
+    { "name": "Hummus", "quantity": 4, "unit": "tbsp" }
+  ],
+  "steps": [
+    "Wash and cut celery into sticks (about 3 pieces per serving).",
+    "Portion 2 tbsp of hummus into a small bowl for each person.",
+    "Serve celery with hummus for dipping."
+  ]
 }
-
-
-
-
 
 
 
