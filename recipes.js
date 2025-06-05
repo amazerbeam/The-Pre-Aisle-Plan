@@ -416,7 +416,104 @@ const recipeData = [
     "Bake for 12–15 minutes until crust is golden and cheese is bubbly.",
     "Slice and serve hot."
   ]
+},
+
+{
+  "id": 24,
+  "meal": ["dinner"],
+  "recipe": "Turkey Stuffed Peppers",
+  "defaultServings": 2,
+  "ingredients": [
+    { "name": "Bell peppers", "quantity": 2, "unit": "pieces" },
+    { "name": "Turkey mince", "quantity": 300, "unit": "g" },
+    { "name": "Onion", "quantity": 1, "unit": "piece" },
+    { "name": "Garlic", "quantity": 1, "unit": "clove" },
+    { "name": "Tomato paste", "quantity": 1, "unit": "tbsp" },
+    { "name": "Paprika", "quantity": 0.5, "unit": "tsp" },
+    { "name": "Salt", "quantity": 0.5, "unit": "tsp" },
+    { "name": "Olive oil", "quantity": 1, "unit": "tsp" }
+  ],
+  "steps": [
+    "Preheat oven to 190°C.",
+    "Slice tops off peppers and remove seeds.",
+    "Sauté onion and garlic in oil, then add turkey mince.",
+    "Cook until browned, stir in tomato paste and paprika.",
+    "Stuff mixture into peppers and bake for 25–30 minutes."
+  ]
+},
+{
+  "id": 25,
+  "meal": ["dinner"],
+  "recipe": "Chickpea & Veg Curry",
+  "defaultServings": 2,
+  "ingredients": [
+    { "name": "Chickpeas (cooked or canned)", "quantity": 240, "unit": "g" },
+    { "name": "Onion", "quantity": 1, "unit": "piece" },
+    { "name": "Garlic", "quantity": 2, "unit": "cloves" },
+    { "name": "Carrots", "quantity": 2, "unit": "pieces" },
+    { "name": "Red pepper", "quantity": 1, "unit": "piece" },
+    { "name": "Chopped tomatoes", "quantity": 200, "unit": "g" },
+    { "name": "Curry powder", "quantity": 1, "unit": "tbsp" },
+    { "name": "Olive oil", "quantity": 1, "unit": "tbsp" },
+    { "name": "Salt", "quantity": 0.5, "unit": "tsp" },
+    { "name": "Black pepper", "quantity": 0.25, "unit": "tsp" }
+  ],
+  "steps": [
+    "Chop onion, garlic, carrots, and pepper.",
+    "Heat olive oil in a pan, sauté onion and garlic until soft.",
+    "Add carrots and peppers, cook for 5 minutes.",
+    "Stir in curry powder and toast for 30 seconds.",
+    "Add chickpeas and chopped tomatoes.",
+    "Simmer for 10–15 minutes until thickened and veggies are tender.",
+    "Season with salt and pepper, serve hot."
+  ]
+},
+
+{
+  "id": 27,
+  "meal": ["dinner"],
+  "recipe": "Veggie-Packed Omelette",
+  "defaultServings": 2,
+  "ingredients": [
+    { "name": "Eggs", "quantity": 4, "unit": "medium" },
+    { "name": "Spinach", "quantity": 50, "unit": "g" },
+    { "name": "Tomatoes", "quantity": 1, "unit": "piece" },
+    { "name": "Mushrooms", "quantity": 100, "unit": "g" },
+    { "name": "Onion", "quantity": 0.5, "unit": "piece" },
+    { "name": "Olive oil", "quantity": 1, "unit": "tsp" },
+    { "name": "Salt", "quantity": 0.25, "unit": "tsp" }
+  ],
+  "steps": [
+    "Whisk eggs with salt.",
+    "Sauté chopped onion, tomato, spinach, and mushrooms.",
+    "Pour in eggs, cook until set, then fold and serve."
+  ]
+},
+
+{
+  "id": 29,
+  "meal": ["dinner"],
+  "recipe": "Zucchini Noodles with Tomato Sauce",
+  "defaultServings": 2,
+  "ingredients": [
+    { "name": "Zucchini", "quantity": 2, "unit": "medium" },
+    { "name": "Tomato passata", "quantity": 200, "unit": "ml" },
+    { "name": "Garlic", "quantity": 1, "unit": "clove" },
+    { "name": "Olive oil", "quantity": 1, "unit": "tbsp" },
+    { "name": "Basil", "quantity": 1, "unit": "tbsp" },
+    { "name": "Salt", "quantity": 0.5, "unit": "tsp" },
+    { "name": "Black pepper", "quantity": 0.25, "unit": "tsp" }
+  ],
+  "steps": [
+    "Spiralize the zucchini to make noodles.",
+    "Sauté garlic in olive oil, add tomato passata, basil, salt, and pepper.",
+    "Simmer sauce for 5 minutes.",
+    "Toss in zucchini noodles and cook 2–3 minutes.",
+    "Serve warm."
+  ]
 }
+
+
 
 
 
