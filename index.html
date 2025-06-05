@@ -372,7 +372,7 @@ function renderRecipes(meal) {
       addCopyButton(section, entry);
 
       const title = document.createElement('h2');
-      title.textContent = entry.recipe;
+      title.textContent = entry.isCheat ? entry.recipe + " (Cheat)" : entry.recipe;
       section.appendChild(title);
 
       const servingsWrapper = document.createElement('div');
@@ -465,14 +465,33 @@ function renderRecipes(meal) {
 		  }
 
 		  const current = entryForDay[meal];
-		  if (current?.id === entry.id) {
-			delete entryForDay[meal];
-		  } else {
-			entryForDay[meal] = {
-			  id: entry.id,
-			  servings: servingsToAssign
-			};
-		  }
+			const isCheat = entry.isCheat;
+
+			// ❌ Check if there's already a cheat meal for this meal type
+			if (isCheat) {
+			  const existingCheat = planner.some(p => {
+				const r = p[meal];
+				if (!r) return false;
+				const recipe = recipeData.find(d => d.id === r.id);
+				return recipe?.isCheat;
+			  });
+
+			  if (existingCheat && (!current || current.id !== entry.id))
+ {
+				alert(`You've already assigned a cheat ${meal} this week.`);
+				return;
+			  }
+			}
+
+			if (current?.id === entry.id) {
+			  delete entryForDay[meal];
+			} else {
+			  entryForDay[meal] = {
+				id: entry.id,
+				servings: servingsToAssign
+			  };
+			}
+
 
 		  if (Object.keys(entryForDay).length === 1 && entryForDay.day) {
 			const index = planner.indexOf(entryForDay);
