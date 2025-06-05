@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recipe Viewer</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="recipes.js"></script>
+
+</head>
+<body>
+  <h1>Recipe Viewer</h1>
+  <div class="tabs" id="tabs"></div>
+  <div style="text-align: center; margin-bottom: 10px;">
+  <label for="all-servings">All Servings:</label>
+  <input type="number" id="all-servings" value="2" min="1" style="width: 60px; padding: 4px; text-align: center;">
+  <label style="margin-left: 10px;">
+    <input type="checkbox" id="apply-all-servings">
+    Apply to all
+  </label>
+</div>
+
+  <div id="recipe-container"></div>
+
+<footer id="planner-footer">
+  <div>
+    <h2>Your Meal Plan</h2>
+    <div id="calendar"></div>
+  </div>
+</footer>
+
+
+
+<script>
+
+const localServingsMap = new Map(); // Tracks manual servings per recipe
+
+let planner = [];
+
+const cached = localStorage.getItem('mealPlanner');
+if (cached) {
+  try {
+    planner = JSON.parse(cached);
+    renderCalendar(); // ✅ Restore the UI
+  } catch (e) {
+    console.error("Failed to parse cached planner", e);
+  }
+}
+
+
+
+function addToPlanner(recipeId, mealType, parentElement) {
+  if (parentElement.querySelector('.day-select')) return;
+
+  const wrapper = document.createElement('div');
+  wrapper.style.marginTop = '10px';
+
+  const select = document.createElement('select');
+  select.className = 'day-select';
+
+  const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+  const defaultOption = document.createElement('option');
+  defaultOption.textContent = 'Choose a day';
+  defaultOption.disabled = true;
+  defaultOption.selected = true;
+  select.appendChild(defaultOption);
+
+  days.forEach(day => {
+    const option = document.createElement('option');
+    option.value = day.toLowerCase();
+    option.textContent = day;
+    select.appendChild(option);
+  });
+
+  const confirmButton = document.createElement('button');
+  confirmButton.textContent = 'Add to Day';
+  confirmButton.className = 'add-button';
+  confirmButton.style.marginLeft = '10px';
+
+  confirmButton.onclick = () => {
+    const selectedDay = select.value;
+    if (!selectedDay) return;
+
+    let entry = planner.find(p => p.day === selectedDay);
+    if (!entry) {
+      entry = { day: selectedDay };
+      planner.push(entry);
+    }
+
+    const servingsInput = document.querySelector(`input[data-recipe-id="${recipeId}"]`);
+    const currentServings = parseFloat(servingsInput?.value || 1);
+
+    entry[mealType] = { id: recipeId, servings: currentServings };
+    renderCalendar();
+    localStorage.setItem('mealPlanner', JSON.stringify(planner));
+
+  };
+
+  wrapper.appendChild(select);
+  wrapper.appendChild(confirmButton);
+  parentElement.appendChild(wrapper);
+}
+
+
+function renderCalendar() {
+  const calendar = document.getElementById('calendar');
+  calendar.innerHTML = '';
+
+  const daysOfWeek = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+
+  daysOfWeek.forEach(day => {
+    const entry = planner.find(p => p.day === day);
+    const box = document.createElement('div');
+    const hasAllMeals = entry &&
+      ['breakfast', 'lunch', 'dinner', 'snacks'].every(meal => entry[meal]);
+    box.className = hasAllMeals ? 'day-box full-day' : 'day-box';
+
+
+    const heading = document.createElement('h3');
+    heading.textContent = day.charAt(0).toUpperCase() + day.slice(1);
+    box.appendChild(heading);
+
+    const list = document.createElement('ul');
+    ['breakfast', 'lunch', 'dinner', 'snacks'].forEach(mealType => {
+      if (entry && entry[mealType]) {
+        const recipeObj = entry[mealType];
+        const recipe = recipeData.find(r => r.id === (recipeObj?.id || recipeObj));
+        const servings = recipeObj?.servings || 1;
+        if (recipe) {
+          const li = document.createElement('li');
+          li.textContent = `${mealType}: ${recipe.recipe} (x${servings})`;
+          list.appendChild(li);
+        }
+      }
+    });
+
+    box.appendChild(list);
+    calendar.appendChild(box);
+  });
+}
+
+
+    function renderTabs() {
+      const meals = [...new Set(recipeData.flatMap(r => r.meal))];
+      const tabsContainer = document.getElementById('tabs');
+      tabsContainer.innerHTML = '';
+
+      [...meals, 'shopping list'].forEach(meal => {
+        const tab = document.createElement('div');
+        tab.className = 'tab';
+        tab.textContent = meal.charAt(0).toUpperCase() + meal.slice(1);
+        tab.onclick = () => {
+          if (meal === 'shopping list') {
+            renderShoppingList();
+          } else {
+            selectMeal(meal);
+          }
+        };
+        if (meal === 'breakfast') tab.classList.add('active');
+        tabsContainer.appendChild(tab);
+      });
+    }
+
+
+
+function renderShoppingList() {
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.classList.remove('active');
+  });
+  const shoppingTab = [...document.querySelectorAll('.tab')].find(tab => tab.textContent === 'Shopping List');
+  if (shoppingTab) shoppingTab.classList.add('active');
+
+  const container = document.getElementById('recipe-container');
+  container.innerHTML = '';
+
+  const ingredientMap = new Map();
+
+  planner.forEach(entry => {
+    ['breakfast', 'lunch', 'dinner', 'snacks'].forEach(meal => {
+      const recipeObj = entry[meal];
+      const recipe = recipeData.find(r => r.id === (recipeObj?.id || recipeObj));
+      if (recipe) {
+        const servings = recipeObj?.servings || 1;
+        const factor = servings / (recipe.defaultServings || 1);
+        recipe.ingredients.forEach(({ name, quantity, unit }) => {
+          const key = `${name}|${unit}`;
+          const current = ingredientMap.get(key) || 0;
+          ingredientMap.set(key, current + quantity * factor);
+        });
+      }
+    });
+  });
+
+  const section = document.createElement('div');
+  section.classList.add('section');
+
+  const title = document.createElement('h2');
+  title.textContent = 'Total Shopping List';
+  section.appendChild(title);
+
+  const ul = document.createElement('ul');
+  [...ingredientMap.entries()].forEach(([key, total]) => {
+    const [name, unit] = key.split('|');
+    const li = document.createElement('li');
+    const rounded = Number.isInteger(total) ? total : total.toFixed(1);
+    li.textContent = `${rounded} ${unit} ${name}`;
+    ul.appendChild(li);
+  });
+
+  section.appendChild(ul);
+
+  // ✅ Add the copy button *after* ul and ingredientMap exist
+  const copyBtn = document.createElement('button');
+  copyBtn.textContent = '📋 Copy List';
+  copyBtn.style.float = 'right';
+  copyBtn.style.marginTop = '-10px';
+  copyBtn.style.marginRight = '-10px';
+  copyBtn.style.background = '#e2d8f5';
+  copyBtn.style.border = 'none';
+  copyBtn.style.padding = '5px 10px';
+  copyBtn.style.borderRadius = '6px';
+  copyBtn.style.cursor = 'pointer';
+
+  copyBtn.onclick = () => {
+    const lines = [];
+    lines.push(`🛒 *Shopping List*`);
+    [...ingredientMap.entries()].forEach(([key, total]) => {
+      const [name, unit] = key.split('|');
+      const rounded = Number.isInteger(total) ? total : total.toFixed(1);
+      lines.push(`- ${rounded} ${unit} ${name}`);
+    });
+
+    const formatted = lines.join('\n');
+
+    navigator.clipboard.writeText(formatted)
+      .then(() => {
+        copyBtn.textContent = '✅ Copied!';
+        setTimeout(() => (copyBtn.textContent = '📋 Copy List'), 2000);
+      })
+      .catch(() => alert("Failed to copy to clipboard."));
+  };
+
+  section.appendChild(copyBtn);
+  container.appendChild(section);
+}
+
+
+
+
+    function selectMeal(meal) {
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.classList.toggle('active', tab.textContent.toLowerCase() === meal);
+      });
+      renderRecipes(meal);
+    }
+
+function assignRecipeToDay(recipeId, day, mealType) {
+  const servingsInput = document.querySelector(`input[data-recipe-id="${recipeId}"]`);
+  const currentServings = parseFloat(servingsInput?.value || 1);
+
+  let entry = planner.find(p => p.day === day);
+  if (!entry) {
+    entry = { day };
+    planner.push(entry);
+  }
+
+  const current = entry[mealType];
+
+  if (current?.id === recipeId) {
+    // Clicking selected again → unassign
+    delete entry[mealType];
+  } else {
+    // Assign new recipe with servings
+    entry[mealType] = { id: recipeId, servings: currentServings };
+  }
+
+  // Remove empty planner entries
+  if (Object.keys(entry).length === 1 && entry.day) {
+    const index = planner.indexOf(entry);
+    if (index !== -1) planner.splice(index, 1);
+  }
+
+  renderCalendar();
+
+    // ✅ Save to localStorage
+  localStorage.setItem('mealPlanner', JSON.stringify(planner));
+}
+
+
+function getDayButtonClass(recipeId, day, mealType) {
+  const entry = planner.find(p => p.day === day);
+  if (!entry) return 'unselected';
+  if (entry[mealType]?.id === recipeId) return 'selected';
+  if (entry[mealType]) return 'already-selected';
+  return 'unselected';
+}
+
+
+function addCopyButton(section, entry) {
+  const copyBtn = document.createElement('button');
+  copyBtn.textContent = '📋 Copy';
+  copyBtn.style.float = 'right';
+  copyBtn.style.marginTop = '-10px';
+  copyBtn.style.marginRight = '-10px';
+  copyBtn.style.background = '#e2d8f5';
+  copyBtn.style.border = 'none';
+  copyBtn.style.padding = '5px 10px';
+  copyBtn.style.borderRadius = '6px';
+  copyBtn.style.cursor = 'pointer';
+
+  copyBtn.onclick = () => {
+    const useGlobal = document.getElementById('apply-all-servings').checked;
+    const servings = useGlobal
+      ? parseFloat(document.getElementById('all-servings').value || 1)
+      : localServingsMap.get(entry.id) || entry.defaultServings || 1;
+
+    const factor = servings / (entry.defaultServings || 1);
+
+    const lines = [];
+    lines.push(`📋 *${entry.recipe}* (Serves: ${servings})\n`);
+    lines.push(`🧾 *Ingredients:*`);
+    entry.ingredients.forEach(ing => {
+      const qty = ing.quantity * factor;
+      const displayQty = Number.isInteger(qty) ? qty : qty.toFixed(1);
+      lines.push(`- ${displayQty} ${ing.unit} ${ing.name}`);
+    });
+
+    lines.push(`\n🧑‍🍳 *Steps:*`);
+    entry.steps.forEach((step, i) => {
+      lines.push(`${i + 1}. ${step}`);
+    });
+
+    const formatted = lines.join('\n');
+
+    navigator.clipboard.writeText(formatted)
+      .then(() => {
+        copyBtn.textContent = '✅ Copied!';
+        setTimeout(() => (copyBtn.textContent = '📋 Copy'), 2000);
+      })
+      .catch(() => alert("Failed to copy to clipboard."));
+  };
+
+  section.appendChild(copyBtn);
+}
+
+
+function renderRecipes(meal) {
+  const recipeContainer = document.getElementById('recipe-container');
+  recipeContainer.innerHTML = '';
+
+  const useGlobal = document.getElementById('apply-all-servings').checked;
+  const globalServings = parseFloat(document.getElementById('all-servings').value || 1);
+
+  recipeData
+    .filter(entry => entry.meal.includes(meal)) // ⬅️ support multiple meals
+    .forEach(entry => {
+      const section = document.createElement('div');
+      section.classList.add('section');
+      addCopyButton(section, entry);
+
+      const title = document.createElement('h2');
+      title.textContent = entry.recipe;
+      section.appendChild(title);
+
+      const servingsWrapper = document.createElement('div');
+      servingsWrapper.style.marginBottom = '10px';
+
+      const servingsLabel = document.createElement('label');
+      servingsLabel.textContent = 'Serves: ';
+      servingsWrapper.appendChild(servingsLabel);
+
+      const servingsInput = document.createElement('input');
+      servingsInput.type = 'number';
+      servingsInput.min = 1;
+      const saved = localServingsMap.get(entry.id);
+      servingsInput.value = saved || entry.defaultServings || 1;
+      servingsInput.style.width = '50px';
+      servingsInput.style.marginLeft = '6px';
+      servingsInput.dataset.recipeId = entry.id;
+      servingsInput.disabled = useGlobal;
+
+      servingsWrapper.appendChild(servingsInput);
+      section.appendChild(servingsWrapper);
+
+      const ingredientsHeader = document.createElement('h3');
+      ingredientsHeader.textContent = 'Ingredients';
+      section.appendChild(ingredientsHeader);
+
+      const ul = document.createElement('ul');
+      ul.classList.add('ingredient-list');
+      section.appendChild(ul);
+
+      function renderIngredients(servings) {
+        ul.innerHTML = '';
+        const factor = servings / (entry.defaultServings || 1);
+        entry.ingredients.forEach(ing => {
+          const li = document.createElement('li');
+          const scaled = ing.quantity * factor;
+          const displayQuantity = Number.isInteger(scaled) ? scaled : scaled.toFixed(1);
+          li.textContent = `${displayQuantity} ${ing.unit} ${ing.name}`;
+          ul.appendChild(li);
+        });
+      }
+
+      function updateIngredients() {
+        const local = parseFloat(servingsInput.value || 1);
+        const finalServings = useGlobal ? globalServings : local;
+        renderIngredients(finalServings);
+      }
+
+      servingsInput.addEventListener('input', () => {
+        const val = parseFloat(servingsInput.value);
+        if (!isNaN(val) && val > 0) {
+          localServingsMap.set(entry.id, val);
+          updateIngredients();
+        }
+      });
+
+      updateIngredients();
+
+      const stepsHeader = document.createElement('h3');
+      stepsHeader.textContent = 'Steps';
+      section.appendChild(stepsHeader);
+
+      const ol = document.createElement('ol');
+      entry.steps.forEach(step => {
+        const li = document.createElement('li');
+        li.textContent = step;
+        ol.appendChild(li);
+      });
+      section.appendChild(ol);
+
+      const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+      const buttonContainer = document.createElement('div');
+      buttonContainer.className = 'day-buttons';
+
+      daysOfWeek.forEach(day => {
+        const btn = document.createElement('button');
+        btn.textContent = day;
+        btn.className = getDayButtonClass(entry.id, day.toLowerCase(), meal); // ⬅️ use `meal` argument
+        btn.onclick = () => {
+          const servingsToAssign = useGlobal
+            ? globalServings
+            : localServingsMap.get(entry.id) || parseFloat(servingsInput.value || 1);
+
+          let entryForDay = planner.find(p => p.day === day.toLowerCase());
+          if (!entryForDay) {
+            entryForDay = { day: day.toLowerCase() };
+            planner.push(entryForDay);
+          }
+
+          const current = entryForDay[meal];
+          if (current?.id === entry.id) {
+            delete entryForDay[meal];
+          } else {
+            entryForDay[meal] = {
+              id: entry.id,
+              servings: servingsToAssign
+            };
+          }
+
+          if (Object.keys(entryForDay).length === 1 && entryForDay.day) {
+            const index = planner.indexOf(entryForDay);
+            if (index !== -1) planner.splice(index, 1);
+          }
+
+          renderRecipes(meal);
+          renderCalendar();
+        };
+        buttonContainer.appendChild(btn);
+      });
+
+      section.appendChild(buttonContainer);
+      recipeContainer.appendChild(section);
+    });
+
+  const allInput = document.getElementById('all-servings');
+  const allToggle = document.getElementById('apply-all-servings');
+
+  allInput.oninput = () => {
+    if (allToggle.checked) renderRecipes(meal);
+  };
+
+  allToggle.onchange = () => {
+    renderRecipes(meal);
+  };
+}
+
+
+
+
+    renderTabs();
+    renderRecipes('breakfast');
+  </script>
+</body>
+</html>
