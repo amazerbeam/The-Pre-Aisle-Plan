@@ -9,7 +9,7 @@
 
 </head>
 <body>
-	<h1>Recipe Viewer v.1.4</h1>
+	<h1>Recipe Viewer v.1.2</h1>
 
 	<div style="text-align: center; margin-bottom: 10px;">
 	  <label for="all-servings">All Servings:</label>
@@ -114,32 +114,6 @@ function showMealPopup(entry) {
 
 function closeMealPopup() {
   document.getElementById('meal-popup').style.display = 'none';
-}
-
-function enableSwipeToClose(targetId, closeFn) {
-  const target = document.getElementById(targetId);
-  let startY = null;
-
-  target.addEventListener('touchstart', (e) => {
-    if (e.touches.length === 1) {
-      startY = e.touches[0].clientY;
-    }
-  });
-
-  target.addEventListener('touchmove', (e) => {
-    if (!startY) return;
-    const currentY = e.touches[0].clientY;
-    const diffY = currentY - startY;
-
-    if (diffY > 80) { // Swipe down threshold
-      closeFn();
-      startY = null; // prevent repeat triggers
-    }
-  });
-
-  target.addEventListener('touchend', () => {
-    startY = null;
-  });
 }
 
 
@@ -731,11 +705,6 @@ function renderRecipes(meal) {
 
     renderTabs();
     renderRecipes('breakfast');
-	enableSwipeToClose('fullscreen-recipe', closeFullscreen);
-enableSwipeToClose('full-meal-plan', () => {
-  document.getElementById('full-meal-plan').classList.remove('show');
-});
-
   </script>
 </body>
 </html>
