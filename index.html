@@ -67,6 +67,14 @@
 
 <script>
 
+document.getElementById('full-meal-plan').addEventListener('transitionend', (e) => {
+  if (e.target.classList.contains('show')) {
+    requestWakeLock();
+  } else {
+    releaseWakeLock();
+  }
+});
+
 const localServingsMap = new Map(); // Tracks manual servings per recipe
 
 let planner = [];
@@ -80,6 +88,30 @@ if (cached) {
     console.error("Failed to parse cached planner", e);
   }
 }
+
+let wakeLock = null;
+
+async function requestWakeLock() {
+  try {
+    if ('wakeLock' in navigator) {
+      wakeLock = await navigator.wakeLock.request('screen');
+      console.log('🔒 Wake lock active');
+      wakeLock.addEventListener('release', () => {
+        console.log('🔓 Wake lock released');
+      });
+    }
+  } catch (err) {
+    console.warn('Wake Lock error:', err);
+  }
+}
+
+function releaseWakeLock() {
+  if (wakeLock) {
+    wakeLock.release();
+    wakeLock = null;
+  }
+}
+
 
 function showMealPopup(entry) {
   const popup = document.getElementById('meal-popup');
@@ -124,6 +156,7 @@ function toggleFullMealPlan() {
 }
 
 function openFullscreen(entry) {
+ requestWakeLock(); // 🟢 prevent sleep
   document.getElementById('fullscreen-title').textContent = entry.recipe;
   const container = document.getElementById('fullscreen-content');
   container.innerHTML = '';
@@ -160,6 +193,8 @@ function openFullscreen(entry) {
 }
 
 function closeFullscreen() {
+  releaseWakeLock(); // 🔴 allow sleep again
+
   document.getElementById('fullscreen-recipe').style.display = 'none';
 }
 
