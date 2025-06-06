@@ -531,7 +531,67 @@ const recipeData = [
     "Portion 2 tbsp of hummus into a small bowl for each person.",
     "Serve celery with hummus for dipping."
   ]
+},
+
+{
+  "id": 30,
+  "meal": ["breakfast", "lunch"],
+  "isCheat": "false",
+  "recipe": "Arepa with Oats, Egg & Cheese",
+  "defaultServings": 2,
+  "ingredients": [
+    { "name": "Harina PAN", "quantity": 60, "unit": "g" },
+    { "name": "Rolled oats", "quantity": 60, "unit": "g" },
+    { "name": "Water", "quantity": 140, "unit": "ml" },
+    { "name": "Salt", "quantity": 0.5, "unit": "tsp" },
+    { "name": "Olive oil", "quantity": 1, "unit": "tbsp" },
+    { "name": "Eggs", "quantity": 2, "unit": "medium" },
+    { "name": "Cheese", "quantity": 40, "unit": "g" },
+    { "name": "Avocado (optional)", "quantity": 0.5, "unit": "piece" }
+  ],
+  "steps": [
+    "Grind the oats slightly if needed to make them finer.",
+    "Mix Harina PAN, oats, water, and salt to form a soft dough. Let it rest for 5 minutes.",
+    "Shape into small flat patties.",
+    "Heat olive oil in a pan over medium heat and cook arepas for 4–5 minutes per side until golden and cooked through.",
+    "While cooking, fry or scramble the eggs.",
+    "Slice cheese and optional avocado.",
+    "Split arepas and fill each with egg, cheese, and optional avocado. Serve warm."
+  ]
+},
+{
+  "id": 31,
+  "meal": "dinner",
+  "isCheat": "false",
+  "recipe": "Overnight Boiled Chicken with Gravy & Corn",
+  "defaultServings": 2,
+  "ingredients": [
+    { "name": "Chicken thighs", "quantity": 2, "unit": "pieces" },
+    { "name": "Chicken stock", "quantity": 500, "unit": "ml" },
+    { "name": "Garlic", "quantity": 1, "unit": "clove" },
+    { "name": "Onion", "quantity": 1, "unit": "small" },
+    { "name": "Thyme", "quantity": 1, "unit": "sprig" },
+    { "name": "Butter", "quantity": 1, "unit": "tbsp" },
+    { "name": "Flour", "quantity": 1, "unit": "tbsp" },
+    { "name": "Carrots", "quantity": 2, "unit": "pieces" },
+    { "name": "Green beans", "quantity": 100, "unit": "g" },
+    { "name": "Olive oil", "quantity": 1, "unit": "tsp" },
+    { "name": "Corn on the cob", "quantity": 2, "unit": "pieces" },
+    { "name": "Butter (for corn)", "quantity": 2, "unit": "tsp" }
+  ],
+  "steps": [
+    "In a pot, combine chicken, stock, garlic, onion, thyme, salt and pepper. Simmer 30 minutes until cooked.",
+    "Let cool and refrigerate overnight in the liquid.",
+    "Next day, reheat chicken gently in the same stock.",
+    "Steam or boil carrots and green beans. Season and toss with olive oil.",
+    "Boil corn for 7–10 minutes. Add 1 tsp butter and salt to each.",
+    "Melt butter in a pan, stir in flour, cook 1 minute.",
+    "Slowly whisk in chicken stock (~150 ml) until thickened into gravy.",
+    "Serve chicken with veg, corn, and gravy."
+  ]
 }
+
+
 
 
 
