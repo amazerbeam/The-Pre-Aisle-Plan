@@ -199,18 +199,19 @@ footer#planner-footer {
   bottom: -100%;
   left: 0;
   right: 0;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.4); /* dim background */
+  background: white;
+  height: 100dvh;
   z-index: 999;
-  display: flex;
-  justify-content: center;
-  align-items: flex-end;
+  overflow-y: auto;
   transition: bottom 0.4s ease;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2);
 }
 
+/* Show only when .show is applied */
 #full-meal-plan.show {
   bottom: 0;
 }
+
 
 #full-meal-plan .panel {
   background: white;
@@ -236,6 +237,11 @@ footer#planner-footer {
   align-items: center;
   border-bottom: 1px solid #ccc;
 }
+
+#full-meal-plan .top-bar {
+  padding: env(safe-area-inset-top, 20px) 16px 12px;
+}
+
 
 #full-meal-plan .close-btn {
   font-size: 20px;
