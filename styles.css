@@ -265,3 +265,30 @@ footer#planner-footer {
   margin-bottom: 12px;
 }
 
+#fullscreen-recipe {
+  position: fixed;
+  inset: 0;
+  background: white;
+  z-index: 9999;
+  overflow-y: auto;
+  display: none;
+}
+
+#fullscreen-recipe .top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #5e4b8b;
+  color: white;
+  padding: 10px 20px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+#fullscreen-recipe .close-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+}

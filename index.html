@@ -9,7 +9,7 @@
 
 </head>
 <body>
-	<h1>Recipe Viewer v.1.1</h1>
+	<h1>Recipe Viewer v.1.2</h1>
 
 	<div style="text-align: center; margin-bottom: 10px;">
 	  <label for="all-servings">All Servings:</label>
@@ -42,8 +42,16 @@
   </div>
 </div>
 
-
-
+<!-- hidden full-screen recipe view -->
+<div id="fullscreen-recipe" style="display: none;">
+  <div class="panel">
+    <div class="top-bar">
+      <span id="fullscreen-title"></span>
+      <button class="close-btn" onclick="closeFullscreen()">✖</button>
+    </div>
+    <div id="fullscreen-content" style="padding: 20px;"></div>
+  </div>
+</div>
 
 
 
@@ -70,6 +78,47 @@ function toggleFullMealPlan() {
   panel.classList.toggle('show');
   renderFullCalendar();
 }
+
+function openFullscreen(entry) {
+  document.getElementById('fullscreen-title').textContent = entry.recipe;
+  const container = document.getElementById('fullscreen-content');
+  container.innerHTML = '';
+
+  const servings = localServingsMap.get(entry.id) || entry.defaultServings || 1;
+  const factor = servings / (entry.defaultServings || 1);
+
+  const ingHeader = document.createElement('h3');
+  ingHeader.textContent = 'Ingredients';
+  container.appendChild(ingHeader);
+
+  const ul = document.createElement('ul');
+  entry.ingredients.forEach(ing => {
+    const qty = ing.quantity * factor;
+    const li = document.createElement('li');
+    li.textContent = `${Number.isInteger(qty) ? qty : qty.toFixed(1)} ${ing.unit} ${ing.name}`;
+    ul.appendChild(li);
+  });
+  container.appendChild(ul);
+
+  const stepHeader = document.createElement('h3');
+  stepHeader.textContent = 'Steps';
+  container.appendChild(stepHeader);
+
+  const ol = document.createElement('ol');
+  entry.steps.forEach(step => {
+    const li = document.createElement('li');
+    li.textContent = step;
+    ol.appendChild(li);
+  });
+  container.appendChild(ol);
+
+  document.getElementById('fullscreen-recipe').style.display = 'block';
+}
+
+function closeFullscreen() {
+  document.getElementById('fullscreen-recipe').style.display = 'none';
+}
+
 
 function renderFullCalendar() {
   const calendar = document.getElementById('calendar-full');
@@ -424,9 +473,25 @@ function renderRecipes(meal) {
       section.classList.add('section');
       addCopyButton(section, entry);
 
-      const title = document.createElement('h2');
-      title.textContent = entry.isCheat ? entry.recipe + " (Cheat)" : entry.recipe;
-      section.appendChild(title);
+
+		// ⛶ Maximize button
+		const maximizeBtn = document.createElement('button');
+		maximizeBtn.textContent = '⛶ Maximize';
+		maximizeBtn.style.float = 'right';
+		maximizeBtn.style.marginTop = '-10px';
+		maximizeBtn.style.marginRight = '10px';
+		maximizeBtn.style.background = '#ccc';
+		maximizeBtn.style.border = 'none';
+		maximizeBtn.style.padding = '5px 10px';
+		maximizeBtn.style.borderRadius = '6px';
+		maximizeBtn.style.cursor = 'pointer';
+		maximizeBtn.onclick = () => openFullscreen(entry);
+		section.appendChild(maximizeBtn);
+
+		// Recipe title
+		const title = document.createElement('h2');
+		title.textContent = entry.isCheat ? entry.recipe + " (Cheat)" : entry.recipe;
+		section.appendChild(title);
 
       const servingsWrapper = document.createElement('div');
       servingsWrapper.style.marginBottom = '10px';
@@ -505,7 +570,6 @@ function renderRecipes(meal) {
         btn.textContent = day;
         btn.className = getDayButtonClass(entry.id, day.toLowerCase(), meal); // ⬅️ use `meal` argument
 		btn.onclick = () => {
-		  console.log(`📅 Clicked ${day} for ${meal} -> Recipe ID: ${entry.id}`);
 
 		  const servingsToAssign = useGlobal
 			? globalServings
