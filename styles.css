@@ -200,23 +200,31 @@ footer#planner-footer {
   left: 0;
   right: 0;
   height: 100vh;
-  background: white;
+  background: rgba(0, 0, 0, 0.4); /* dim background */
   z-index: 999;
   display: flex;
-  flex-direction: column;
+  justify-content: center;
+  align-items: flex-end;
   transition: bottom 0.4s ease;
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2);
-  border-top-left-radius: 12px;
-  border-top-right-radius: 12px;
-  overflow: hidden;
 }
 
-/* Show animation */
 #full-meal-plan.show {
   bottom: 0;
 }
 
-/* Top bar */
+#full-meal-plan .panel {
+  background: white;
+  width: 100%;
+  max-width: 600px;
+  height: 100vh;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
 #full-meal-plan .top-bar {
   background: #f4f4f4;
   padding: 12px 20px;
@@ -229,7 +237,6 @@ footer#planner-footer {
   border-bottom: 1px solid #ccc;
 }
 
-/* Close button */
 #full-meal-plan .close-btn {
   font-size: 20px;
   cursor: pointer;
@@ -238,10 +245,18 @@ footer#planner-footer {
   color: #666;
 }
 
-/* Scrollable content */
 #calendar-full {
   padding: 20px;
   overflow-y: auto;
   flex: 1;
+}
+
+/* Optional: Rounded boxes inside calendar */
+#calendar-full .day-box {
+  background: #fafafa;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 12px;
 }
 
