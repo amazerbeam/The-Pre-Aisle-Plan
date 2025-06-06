@@ -1,166 +1,57 @@
-
-    body {
-      font-family: sans-serif;
-      padding: 20px;
-      max-width: 700px;
-      margin: auto;
-      background-color: #fff;
-      color: #333;
-    }
-    h1 {
-      color: #5e4b8b;
-      text-align: center;
-    }
-    h2 {
-      color: #444;
-      border-bottom: 2px solid #dcdcdc;
-      padding-bottom: 4px;
-    }
-    h3 {
-      color: #666;
-      margin-top: 1.5em;
-    }
-    ul, ol {
-      margin-left: 20px;
-    }
-    .section {
-      background: #f9f9fc;
-      padding: 15px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      margin-bottom: 20px;
-    }
-    .tabs {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-      justify-content: center;
-    }
-    .tab {
-      cursor: pointer;
-      padding: 10px 20px;
-      background: #eee;
-      border-radius: 20px;
-      border: 1px solid #ccc;
-      color: #444;
-      transition: background 0.3s, color 0.3s;
-    }
-    .tab:hover {
-      background: #e2d8f5;
-      color: #333;
-    }
-    .tab.active {
-      background: #5e4b8b;
-      color: #fff;
-      font-weight: bold;
-    }
-    .add-button {
-      margin-top: 10px;
-      padding: 6px 12px;
-      border: none;
-      background-color: #5e4b8b;
-      color: white;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    .day-select {
-      margin-left: 10px;
-    }
-
-  .day-select {
-    padding: 6px 10px;
-    border-radius: 4px;
-    margin-top: 10px;
-    font-size: 14px;
-  }
-
-footer#planner-footer {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  background: #f9f9fc;
-  border-top: 1px solid #ddd;
-  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
-  z-index: 10;
-  left:0;
-}
-
-#planner-footer > div {
-  margin: auto;
-  padding: 10px 20px;
-  font-size: 14px;
-}
-
-
-#planner-footer h2 {
-  font-size: 16px;
-  color: #5e4b8b;
-  margin: 0 0 5px;
-}
-
-#calendar {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.day-box {
-  background: white;
-  border: 1px solid #ccc;
-  padding: 8px 10px;
-  border-radius: 6px;
-  margin-left: auto;
-  margin-right: auto;
-}
-.day-box h3 {
-  margin: 0 0 5px;
-  font-size: 14px;
-  color: #444;
-}
-.day-box ul {
+/* Base */
+body {
+  font-family: 'Segoe UI', Roboto, sans-serif;
+  background-color: #f4f6f8;
+  color: #2d2d2d;
   margin: 0;
-  padding-left: 18px;
+  padding: 20px;
+  max-width: 800px;
+  margin: auto;
 }
 
-.day-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 10px;
+/* Headings */
+h1 {
+  color: #4a3f80;
+  text-align: center;
+  font-size: 28px;
+  margin-bottom: 20px;
 }
-.day-buttons button {
-  padding: 6px 12px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-.day-buttons .unselected {
-  background-color: #eee;
+
+h2 {
   color: #333;
-}
-.day-buttons .selected {
-  background-color: #5e4b8b;
-  color: white;
-  font-weight: bold;
-}
-.day-buttons .already-selected {
-  background-color: #ccc;
-  color: #666;
+  font-size: 20px;
+  border-bottom: 2px solid #e0e0e0;
+  padding-bottom: 6px;
+  margin-top: 20px;
 }
 
-#recipe-container{
-  margin-bottom: 50vh;
+h3 {
+  color: #555;
+  font-size: 18px;
+  margin-top: 20px;
 }
 
-.day-box.full-day {
-  background-color: #e3fce3; /* light green */
-  border-color: #a3d9a3;
+/* Lists */
+ul, ol {
+  margin-left: 20px;
 }
 
+/* Recipe Section Cards */
+.section {
+  background: #ffffff;
+  padding: 20px;
+  border: 1px solid #e3e3e3;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  position: relative;
+}
+
+/* Tabs */
 .tabs-wrapper {
   position: sticky;
   top: 0;
-  background: #fff;
+  background: #f4f6f8;
   z-index: 20;
   padding: 10px 0;
   border-bottom: 1px solid #ddd;
@@ -174,43 +65,173 @@ footer#planner-footer {
   margin-bottom: 10px;
 }
 
-@media (max-width: 480px) {
-  .tabs {
-    justify-content: center;
-  }
-  .tab {
-    flex: 1 0 30%;
-    text-align: center;
-  }
+.tab {
+  cursor: pointer;
+  padding: 10px 18px;
+  background: #e9e9f0;
+  border-radius: 20px;
+  border: 1px solid #ccc;
+  color: #555;
+  font-weight: 500;
+  transition: background 0.3s, color 0.3s;
 }
 
+.tab:hover {
+  background: #d6ccf7;
+  color: #333;
+}
 
+.tab.active {
+  background: #4a3f80;
+  color: white;
+  font-weight: bold;
+}
+
+/* Add Button */
+.add-button {
+  margin-top: 10px;
+  padding: 8px 14px;
+  border: none;
+  background-color: #4a3f80;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.add-button:hover {
+  background-color: #3d336d;
+}
+
+/* Day Selector */
+.day-select {
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  margin-top: 10px;
+  margin-left: 10px;
+}
+
+/* Planner Footer */
+footer#planner-footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background: #ffffff;
+  border-top: 1px solid #ddd;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.04);
+  z-index: 10;
+  left: 0;
+}
+
+#planner-footer > div {
+  margin: auto;
+  padding: 10px 20px;
+  font-size: 14px;
+}
+
+#planner-footer h2 {
+  font-size: 16px;
+  color: #4a3f80;
+  margin: 0 0 5px;
+}
+
+/* Calendar Planner View */
 #calendar {
   display: flex;
   gap: 12px;
   flex-wrap: wrap;
-  max-height: 200px; /* or whatever limit you want */
+  max-height: 200px;
   overflow-y: auto;
-  padding-right: 10px; /* for scroll bar spacing */
+  padding-right: 10px;
 }
+
+.day-box {
+  background: white;
+  border: 1px solid #ccc;
+  padding: 12px 16px;
+  border-radius: 8px;
+  width: 100%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: box-shadow 0.2s ease;
+}
+
+.day-box:hover {
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.07);
+}
+
+.day-box.full-day {
+  background-color: #e3fce3;
+  border-color: #a3d9a3;
+}
+
+.day-box h3 {
+  margin: 0 0 5px;
+  font-size: 16px;
+  color: #444;
+}
+
+.day-box ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+/* Day Selection Buttons */
+.day-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.day-buttons button {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 13px;
+}
+
+.day-buttons .unselected {
+  background-color: #eee;
+  color: #333;
+}
+
+.day-buttons .selected {
+  background-color: #4a3f80;
+  color: white;
+  font-weight: bold;
+}
+
+.day-buttons .already-selected {
+  background-color: #ccc;
+  color: #666;
+}
+
+/* Recipe container spacing */
+#recipe-container {
+  margin-bottom: 50vh;
+}
+
+/* Meal Plan Popup */
 #full-meal-plan {
   position: fixed;
-  bottom: -100%; /* hides it by default */
+  bottom: -100%;
   left: 0;
   right: 0;
   background: white;
-  height: 100dvh; /* better for mobile viewports */
+  height: 100dvh;
   z-index: 999;
   overflow-y: auto;
   transition: bottom 0.4s ease;
   box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2);
 }
 
-/* Only show when .show is toggled */
 #full-meal-plan.show {
   bottom: 0;
 }
-
 
 #full-meal-plan .panel {
   background: white;
@@ -226,8 +247,8 @@ footer#planner-footer {
 }
 
 #full-meal-plan .top-bar {
-  background: #f4f4f4;
-  padding: 12px 20px;
+  background: #f0f0f0;
+  padding: 14px 20px;
   font-size: 18px;
   font-weight: bold;
   color: #333;
@@ -235,12 +256,8 @@ footer#planner-footer {
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid #ccc;
+  padding-top: env(safe-area-inset-top, 20px);
 }
-
-#full-meal-plan .top-bar {
-  padding: env(safe-area-inset-top, 20px) 16px 12px;
-}
-
 
 #full-meal-plan .close-btn {
   font-size: 20px;
@@ -256,15 +273,15 @@ footer#planner-footer {
   flex: 1;
 }
 
-/* Optional: Rounded boxes inside calendar */
 #calendar-full .day-box {
   background: #fafafa;
   border: 1px solid #ddd;
   border-radius: 8px;
-  padding: 10px;
+  padding: 14px;
   margin-bottom: 12px;
 }
 
+/* Fullscreen recipe view */
 #fullscreen-recipe {
   position: fixed;
   inset: 0;
@@ -278,9 +295,9 @@ footer#planner-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #5e4b8b;
+  background: #4a3f80;
   color: white;
-  padding: 10px 20px;
+  padding: 12px 20px;
   font-size: 18px;
   font-weight: bold;
 }
@@ -291,4 +308,47 @@ footer#planner-footer {
   color: white;
   font-size: 24px;
   cursor: pointer;
+}
+
+/* Popup (meal selection) */
+#meal-popup {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 10000;
+  align-items: center;
+  justify-content: center;
+}
+
+#meal-popup > div {
+  background: white;
+  padding: 25px 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  max-width: 300px;
+  text-align: center;
+}
+
+#meal-buttons button {
+  padding: 10px 14px;
+  font-size: 15px;
+  border: none;
+  border-radius: 6px;
+  background-color: #5e4b8b;
+  color: white;
+  margin-top: 5px;
+  cursor: pointer;
+}
+
+#meal-buttons button:hover {
+  background-color: #483e6c;
+}
+
+/* Responsive tabs for small devices */
+@media (max-width: 480px) {
+  .tab {
+    flex: 1 0 30%;
+    text-align: center;
+  }
 }
