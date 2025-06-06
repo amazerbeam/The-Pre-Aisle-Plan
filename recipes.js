@@ -134,6 +134,7 @@ const recipeData = [
     "id": 10,
     "meal": ["breakfast"],
     "recipe": "Pancakes and Bacon",
+	"isCheat": true, 
     "defaultServings": 2,
     "ingredients": [
       { "name": "Plain flour", "quantity": 100, "unit": "g" },

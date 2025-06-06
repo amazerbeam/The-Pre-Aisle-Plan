@@ -28,12 +28,21 @@
 
   <div id="recipe-container"></div>
 
-<footer id="planner-footer">
-  <div>
-    <h2>Your Meal Plan</h2>
-    <div id="calendar"></div>
+
+
+
+<!-- hidden full-screen view -->
+<div id="full-meal-plan">
+  <div class="top-bar">
+    <span>Weekly Meal Plan</span>
+    <button class="close-btn" onclick="toggleFullMealPlan()">✖</button>
   </div>
-</footer>
+  <div id="calendar-full"></div>
+</div>
+
+
+
+
 
 
 
@@ -53,6 +62,44 @@ if (cached) {
   }
 }
 
+function toggleFullMealPlan() {
+  const panel = document.getElementById('full-meal-plan');
+  panel.classList.toggle('show');
+  renderFullCalendar();
+}
+
+function renderFullCalendar() {
+  const calendar = document.getElementById('calendar-full');
+  calendar.innerHTML = '';
+  const daysOfWeek = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+
+  daysOfWeek.forEach(day => {
+    const entry = planner.find(p => p.day === day);
+    const box = document.createElement('div');
+    box.className = 'day-box';
+
+    const heading = document.createElement('h3');
+    heading.textContent = day.charAt(0).toUpperCase() + day.slice(1);
+    box.appendChild(heading);
+
+    const list = document.createElement('ul');
+    ['breakfast', 'lunch', 'dinner', 'snacks'].forEach(mealType => {
+      if (entry && entry[mealType]) {
+        const recipeObj = entry[mealType];
+        const recipe = recipeData.find(r => r.id === (recipeObj?.id || recipeObj));
+        const servings = recipeObj?.servings || 1;
+        if (recipe) {
+          const li = document.createElement('li');
+          li.textContent = `${mealType}: ${recipe.recipe} (x${servings})`;
+          list.appendChild(li);
+        }
+      }
+    });
+
+    box.appendChild(list);
+    calendar.appendChild(box);
+  });
+}
 
 
 function addToPlanner(recipeId, mealType, parentElement) {
@@ -150,26 +197,29 @@ function renderCalendar() {
 }
 
 
-    function renderTabs() {
-      const meals = [...new Set(recipeData.flatMap(r => r.meal))];
-      const tabsContainer = document.getElementById('tabs');
-      tabsContainer.innerHTML = '';
+	function renderTabs() {
+	  const meals = [...new Set(recipeData.flatMap(r => r.meal))];
+	  const tabsContainer = document.getElementById('tabs');
+	  tabsContainer.innerHTML = '';
 
-      [...meals, 'shopping list'].forEach(meal => {
-        const tab = document.createElement('div');
-        tab.className = 'tab';
-        tab.textContent = meal.charAt(0).toUpperCase() + meal.slice(1);
-        tab.onclick = () => {
-          if (meal === 'shopping list') {
-            renderShoppingList();
-          } else {
-            selectMeal(meal);
-          }
-        };
-        if (meal === 'breakfast') tab.classList.add('active');
-        tabsContainer.appendChild(tab);
-      });
-    }
+	  [...meals, 'shopping list', 'meal plan'].forEach(meal => {
+		const tab = document.createElement('div');
+		tab.className = 'tab';
+		tab.textContent = meal.charAt(0).toUpperCase() + meal.slice(1);
+		tab.onclick = () => {
+		  if (meal === 'shopping list') {
+			renderShoppingList();
+		  } else if (meal === 'meal plan') {
+			toggleFullMealPlan();
+		  } else {
+			selectMeal(meal);
+		  }
+		};
+		if (meal === 'breakfast') tab.classList.add('active');
+		tabsContainer.appendChild(tab);
+	  });
+	}
+
 
 
 
