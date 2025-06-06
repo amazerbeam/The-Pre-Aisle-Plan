@@ -9,7 +9,7 @@
 
 </head>
 <body>
-	<h1>Recipe Viewer v.1.2</h1>
+	<h1>Recipe Viewer v.1.3</h1>
 
 	<div style="text-align: center; margin-bottom: 10px;">
 	  <label for="all-servings">All Servings:</label>
@@ -54,7 +54,15 @@
 </div>
 
 
-
+<!-- Meal selection popup -->
+<div id="meal-popup" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 10000; align-items: center; justify-content: center;">
+  <div style="background: white; padding: 20px 30px; border-radius: 10px; max-width: 300px; text-align: center;">
+    <h3>Which meal do you want to view?</h3>
+    <div id="meal-buttons" style="margin-top: 15px; display: flex; flex-direction: column; gap: 10px;"></div>
+    <button onclick="closeMealPopup()" style="margin-top: 15px; padding: 6px 12px;">Cancel</button>
+  </div>
+</div>
+	
 
 
 <script>
@@ -72,6 +80,42 @@ if (cached) {
     console.error("Failed to parse cached planner", e);
   }
 }
+
+function showMealPopup(entry) {
+  const popup = document.getElementById('meal-popup');
+  const buttonContainer = document.getElementById('meal-buttons');
+  buttonContainer.innerHTML = '';
+
+  const meals = ['breakfast', 'lunch', 'dinner', 'snacks'];
+  meals.forEach(mealType => {
+    if (!entry[mealType]) return;
+
+    const btn = document.createElement('button');
+    btn.textContent = mealType.charAt(0).toUpperCase() + mealType.slice(1);
+    btn.style.padding = '8px 12px';
+    btn.style.borderRadius = '6px';
+    btn.style.border = '1px solid #ccc';
+    btn.style.cursor = 'pointer';
+    btn.onclick = () => {
+      const recipeId = entry[mealType].id || entry[mealType];
+      const recipe = recipeData.find(r => r.id === recipeId);
+      if (recipe) {
+        closeMealPopup();
+        openFullscreen(recipe);
+      } else {
+        alert("Recipe not found.");
+      }
+    };
+    buttonContainer.appendChild(btn);
+  });
+
+  popup.style.display = 'flex';
+}
+
+function closeMealPopup() {
+  document.getElementById('meal-popup').style.display = 'none';
+}
+
 
 function toggleFullMealPlan() {
   const panel = document.getElementById('full-meal-plan');
@@ -128,7 +172,14 @@ function renderFullCalendar() {
   daysOfWeek.forEach(day => {
     const entry = planner.find(p => p.day === day);
     const box = document.createElement('div');
-    box.className = 'day-box';
+	
+	box.className = 'day-box';
+	box.style.cursor = 'pointer';
+	box.onclick = () => {
+	  if (entry) showMealPopup(entry);
+	};
+
+
 
     const heading = document.createElement('h3');
     heading.textContent = day.charAt(0).toUpperCase() + day.slice(1);
@@ -142,8 +193,15 @@ function renderFullCalendar() {
         const servings = recipeObj?.servings || 1;
         if (recipe) {
           const li = document.createElement('li');
-          li.textContent = `${mealType}: ${recipe.recipe} (x${servings})`;
-          list.appendChild(li);
+			li.textContent = `${mealType}: ${recipe.recipe} (x${servings})`;
+			li.style.cursor = 'pointer';
+			li.onclick = () => {
+			  const confirm = confirm(`View full recipe for ${mealType}?`);
+			  if (confirm) {
+				openFullscreen(recipe); // Reuse the maximize function
+			  }
+			};
+		  list.appendChild(li);
         }
       }
     });
