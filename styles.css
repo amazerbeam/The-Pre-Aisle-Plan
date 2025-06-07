@@ -250,7 +250,8 @@ footer#planner-footer {
 #full-meal-plan .top-bar {
   background: #f0f0f0;
   padding: 14px 20px;
-  padding-top: max(env(safe-area-inset-top, 0px), 14px); /* ✅ ensures at least 14px */
+  padding-top: max(env(safe-area-inset-top, 0px), 14px);
+  /* ✅ ensures at least 14px */
   font-size: 18px;
   font-weight: bold;
   color: #333;
@@ -355,9 +356,11 @@ footer#planner-footer {
 }
 
 #recipe-container ul li {
-  font-size: 18px;      /* larger font */
+  font-size: 18px;
+  /* larger font */
   line-height: 1.6;
-  cursor: pointer;      /* pointer when hovering */
+  cursor: pointer;
+  /* pointer when hovering */
 }
 
 li.checked {

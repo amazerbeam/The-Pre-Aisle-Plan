@@ -63,32 +63,34 @@
   </div>
 
   <div id="uncheck-popup"
-     style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 10000; align-items: center; justify-content: center;">
-  <div style="background: white; padding: 20px 30px; border-radius: 10px; max-width: 300px; text-align: center;">
-    <h3>Are you sure you want to uncheck everything?</h3>
-    <div style="margin-top: 15px; display: flex; justify-content: center; gap: 10px;">
-      <button id="confirm-uncheck" style="padding: 6px 12px; background-color: #4a3f80; color: white; border: none; border-radius: 6px;">Yes</button>
-      <button onclick="closeUncheckPopup()" style="padding: 6px 12px;">Cancel</button>
+    style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 10000; align-items: center; justify-content: center;">
+    <div style="background: white; padding: 20px 30px; border-radius: 10px; max-width: 300px; text-align: center;">
+      <h3>Are you sure you want to uncheck everything?</h3>
+      <div style="margin-top: 15px; display: flex; justify-content: center; gap: 10px;">
+        <button id="confirm-uncheck"
+          style="padding: 6px 12px; background-color: #4a3f80; color: white; border: none; border-radius: 6px;">Yes</button>
+        <button onclick="closeUncheckPopup()" style="padding: 6px 12px;">Cancel</button>
+      </div>
     </div>
   </div>
-</div>
 
-<div id="message-popup"
-     style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 10000; align-items: center; justify-content: center;">
-  <div style="background: white; padding: 20px 30px; border-radius: 10px; max-width: 300px; text-align: center;">
-    <h3 id="message-popup-title" style="margin-bottom: 20px;">Message</h3>
-    <button onclick="closeMessagePopup()" style="padding: 8px 16px; background-color: #4a3f80; color: white; border: none; border-radius: 6px;">OK</button>
+  <div id="message-popup"
+    style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 10000; align-items: center; justify-content: center;">
+    <div style="background: white; padding: 20px 30px; border-radius: 10px; max-width: 300px; text-align: center;">
+      <h3 id="message-popup-title" style="margin-bottom: 20px;">Message</h3>
+      <button onclick="closeMessagePopup()"
+        style="padding: 8px 16px; background-color: #4a3f80; color: white; border: none; border-radius: 6px;">OK</button>
+    </div>
   </div>
-</div>
 
 
-<div id="fullscreen-recipe">
-  <div class="top-bar">
-    <span id="fullscreen-title">Recipe Title</span>
-    <button class="close-btn" onclick="closeFullscreen()">✖</button>
+  <div id="fullscreen-recipe">
+    <div class="top-bar">
+      <span id="fullscreen-title">Recipe Title</span>
+      <button class="close-btn" onclick="closeFullscreen()">✖</button>
+    </div>
+    <div id="fullscreen-content" style="padding: 20px;"></div>
   </div>
-  <div id="fullscreen-content" style="padding: 20px;"></div>
-</div>
 
 
 
@@ -173,27 +175,27 @@
     }
 
     function showMessagePopup(text) {
-  document.getElementById('message-popup-title').textContent = text;
-  document.getElementById('message-popup').style.display = 'flex';
-}
+      document.getElementById('message-popup-title').textContent = text;
+      document.getElementById('message-popup').style.display = 'flex';
+    }
 
-function closeMessagePopup() {
-  document.getElementById('message-popup').style.display = 'none';
-}
+    function closeMessagePopup() {
+      document.getElementById('message-popup').style.display = 'none';
+    }
 
 
     function showUncheckPopup(callback) {
-  document.getElementById('uncheck-popup').style.display = 'flex';
-  const confirmBtn = document.getElementById('confirm-uncheck');
-  confirmBtn.onclick = () => {
-    callback(); // Run the uncheck logic
-    closeUncheckPopup();
-  };
-}
+      document.getElementById('uncheck-popup').style.display = 'flex';
+      const confirmBtn = document.getElementById('confirm-uncheck');
+      confirmBtn.onclick = () => {
+        callback(); // Run the uncheck logic
+        closeUncheckPopup();
+      };
+    }
 
-function closeUncheckPopup() {
-  document.getElementById('uncheck-popup').style.display = 'none';
-}
+    function closeUncheckPopup() {
+      document.getElementById('uncheck-popup').style.display = 'none';
+    }
 
 
     function releaseWakeLock() {
@@ -334,7 +336,7 @@ function closeUncheckPopup() {
               li.textContent = mealType + ": " + recipe.recipe + " (x" + servings + ")";
 
               li.style.cursor = 'pointer';
-                li.onclick = () => openFullscreen(recipe);
+              li.onclick = () => openFullscreen(recipe);
 
               list.appendChild(li);
             }
@@ -498,30 +500,30 @@ function closeUncheckPopup() {
       });
 
       const uncheckBtn = document.createElement('button');
-        uncheckBtn.textContent = 'Uncheck All';
-        uncheckBtn.style.marginTop = '10px';
-        uncheckBtn.style.background = '#f2cfcf';
-        uncheckBtn.style.border = 'none';
-        uncheckBtn.style.padding = '5px 10px';
-        uncheckBtn.style.borderRadius = '6px';
-        uncheckBtn.style.cursor = 'pointer';
+      uncheckBtn.textContent = 'Uncheck All';
+      uncheckBtn.style.marginTop = '10px';
+      uncheckBtn.style.background = '#f2cfcf';
+      uncheckBtn.style.border = 'none';
+      uncheckBtn.style.padding = '5px 10px';
+      uncheckBtn.style.borderRadius = '6px';
+      uncheckBtn.style.cursor = 'pointer';
 
-        uncheckBtn.onclick = () => {
-          showUncheckPopup(() => {
-            for (const key of shoppingListState.keys()) {
-              shoppingListState.set(key, false);
-            }
-            localStorage.setItem('shoppingListState', JSON.stringify([...shoppingListState.entries()]));
-            renderListItems();
-          });
-        };
+      uncheckBtn.onclick = () => {
+        showUncheckPopup(() => {
+          for (const key of shoppingListState.keys()) {
+            shoppingListState.set(key, false);
+          }
+          localStorage.setItem('shoppingListState', JSON.stringify([...shoppingListState.entries()]));
+          renderListItems();
+        });
+      };
 
 
 
 
       const section = document.createElement('div');
       section.classList.add('section');
-     section.appendChild(uncheckBtn);
+      section.appendChild(uncheckBtn);
 
       const title = document.createElement('h2');
       title.textContent = 'Total Shopping List';
@@ -531,65 +533,65 @@ function closeUncheckPopup() {
       ul.className = 'shopping-list';
 
 
-const storedState = localStorage.getItem('shoppingListState');
-const shoppingListState = storedState ? new Map(JSON.parse(storedState)) : new Map();
+      const storedState = localStorage.getItem('shoppingListState');
+      const shoppingListState = storedState ? new Map(JSON.parse(storedState)) : new Map();
 
-function renderListItems() {
-  ul.innerHTML = '';
+      function renderListItems() {
+        ul.innerHTML = '';
 
-  const items = [...ingredientMap.entries()].map(([key, total]) => {
-    const [name, unit] = key.split('|');
-    const rounded = Number.isInteger(total) ? total : total.toFixed(1);
-    return {
-      key,
-      label: `${rounded} ${unit} ${name}`,
-      checked: shoppingListState.get(key) || false
-    };
-  });
+        const items = [...ingredientMap.entries()].map(([key, total]) => {
+          const [name, unit] = key.split('|');
+          const rounded = Number.isInteger(total) ? total : total.toFixed(1);
+          return {
+            key,
+            label: `${rounded} ${unit} ${name}`,
+            checked: shoppingListState.get(key) || false
+          };
+        });
 
-  // Sort: unchecked first, then checked
-  items.sort((a, b) => a.checked - b.checked);
+        // Sort: unchecked first, then checked
+        items.sort((a, b) => a.checked - b.checked);
 
-  items.forEach(({ key, label, checked }) => {
-    const li = document.createElement('li');
-    li.className = checked ? 'checked' : '';
+        items.forEach(({ key, label, checked }) => {
+          const li = document.createElement('li');
+          li.className = checked ? 'checked' : '';
 
-    const checkbox = document.createElement('input');
-    checkbox.type = 'checkbox';
-    checkbox.checked = checked;
-    checkbox.style.marginRight = '8px';
+          const checkbox = document.createElement('input');
+          checkbox.type = 'checkbox';
+          checkbox.checked = checked;
+          checkbox.style.marginRight = '8px';
 
-    checkbox.addEventListener('change', () => {
-      shoppingListState.set(key, checkbox.checked);
-      localStorage.setItem('shoppingListState', JSON.stringify([...shoppingListState.entries()]));
+          checkbox.addEventListener('change', () => {
+            shoppingListState.set(key, checkbox.checked);
+            localStorage.setItem('shoppingListState', JSON.stringify([...shoppingListState.entries()]));
 
-      renderListItems(); // Rerender to re-sort and apply styles
-    });
+            renderListItems(); // Rerender to re-sort and apply styles
+          });
 
-const labelSpan = document.createElement('span');
-labelSpan.textContent = label;
-labelSpan.style.flex = '1';
+          const labelSpan = document.createElement('span');
+          labelSpan.textContent = label;
+          labelSpan.style.flex = '1';
 
-li.appendChild(checkbox);
-li.appendChild(labelSpan);
+          li.appendChild(checkbox);
+          li.appendChild(labelSpan);
 
-// Make entire list item clickable
-li.addEventListener('click', (e) => {
-  // Avoid double toggling if clicking directly on checkbox
-  if (e.target.tagName.toLowerCase() === 'input') return;
+          // Make entire list item clickable
+          li.addEventListener('click', (e) => {
+            // Avoid double toggling if clicking directly on checkbox
+            if (e.target.tagName.toLowerCase() === 'input') return;
 
-  checkbox.checked = !checkbox.checked;
-  shoppingListState.set(key, checkbox.checked);
-  localStorage.setItem('shoppingListState', JSON.stringify([...shoppingListState.entries()]));
-  renderListItems();
-});
+            checkbox.checked = !checkbox.checked;
+            shoppingListState.set(key, checkbox.checked);
+            localStorage.setItem('shoppingListState', JSON.stringify([...shoppingListState.entries()]));
+            renderListItems();
+          });
 
 
-    ul.appendChild(li);
-  });
-}
+          ul.appendChild(li);
+        });
+      }
 
-renderListItems(); // Initial render
+      renderListItems(); // Initial render
 
 
       section.appendChild(ul);
@@ -904,7 +906,7 @@ renderListItems(); // Initial render
 
       const allInput = document.getElementById('all-servings');
       const allToggle = document.getElementById('apply-all-servings');
-      
+
       allInput.oninput = () => {
         if (allToggle.checked) renderRecipes(meal);
       };
