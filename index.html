@@ -82,6 +82,15 @@
 </div>
 
 
+<div id="fullscreen-recipe">
+  <div class="top-bar">
+    <span id="fullscreen-title">Recipe Title</span>
+    <button class="close-btn" onclick="closeFullscreen()">✖</button>
+  </div>
+  <div id="fullscreen-content" style="padding: 20px;"></div>
+</div>
+
+
 
   <script>
 
@@ -322,14 +331,11 @@ function closeUncheckPopup() {
             const servings = recipeObj?.servings || 1;
             if (recipe) {
               const li = document.createElement('li');
-              li.textContent = `${mealType}: ${recipe.recipe} (x${servings})`;
+              li.textContent = mealType + ": " + recipe.recipe + " (x" + servings + ")";
+
               li.style.cursor = 'pointer';
-              li.onclick = () => {
-                const confirm = confirm(`View full recipe for ${mealType}?`);
-                if (confirm) {
-                  openFullscreen(recipe); // Reuse the maximize function
-                }
-              };
+                li.onclick = () => openFullscreen(recipe);
+
               list.appendChild(li);
             }
           }
@@ -424,7 +430,8 @@ function closeUncheckPopup() {
             const servings = recipeObj?.servings || 1;
             if (recipe) {
               const li = document.createElement('li');
-              li.textContent = `${mealType}: ${recipe.recipe} (x${servings})`;
+              li.textContent = mealType + ": " + recipe.recipe + " (x" + servings + ")";
+
               list.appendChild(li);
             }
           }
