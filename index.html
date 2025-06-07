@@ -48,27 +48,7 @@
   </div>
 
 
-  <!-- hidden full-screen recipe view -->
-  <!-- hidden full-screen view -->
-  <div id="full-meal-plan">
-    <div class="panel">
-      <div class="top-bar" style="
-      display: flex; 
-      justify-content: space-between; 
-      align-items: center; 
-      padding: 14px 20px; 
-      background: #f0f0f0; 
-      border-bottom: 1px solid #ccc;
-    ">
-        <button onclick="generateShareURL()"
-          style="background: #4a3f80; color: white; padding: 8px 14px; border-radius: 6px; border: none; cursor: pointer;">
-          🔗 Share Weekly Meal Plan
-        </button>
-        <button class="close-btn" onclick="toggleFullMealPlan()">✖</button>
-      </div>
-      <div id="calendar-full"></div>
-    </div>
-  </div>
+
 
 
 
@@ -474,13 +454,69 @@
       section.appendChild(title);
 
       const ul = document.createElement('ul');
-      [...ingredientMap.entries()].forEach(([key, total]) => {
-        const [name, unit] = key.split('|');
-        const li = document.createElement('li');
-        const rounded = Number.isInteger(total) ? total : total.toFixed(1);
-        li.textContent = `${rounded} ${unit} ${name}`;
-        ul.appendChild(li);
-      });
+      ul.className = 'shopping-list';
+
+
+const storedState = localStorage.getItem('shoppingListState');
+const shoppingListState = storedState ? new Map(JSON.parse(storedState)) : new Map();
+
+function renderListItems() {
+  ul.innerHTML = '';
+
+  const items = [...ingredientMap.entries()].map(([key, total]) => {
+    const [name, unit] = key.split('|');
+    const rounded = Number.isInteger(total) ? total : total.toFixed(1);
+    return {
+      key,
+      label: `${rounded} ${unit} ${name}`,
+      checked: shoppingListState.get(key) || false
+    };
+  });
+
+  // Sort: unchecked first, then checked
+  items.sort((a, b) => a.checked - b.checked);
+
+  items.forEach(({ key, label, checked }) => {
+    const li = document.createElement('li');
+    li.className = checked ? 'checked' : '';
+
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.checked = checked;
+    checkbox.style.marginRight = '8px';
+
+    checkbox.addEventListener('change', () => {
+      shoppingListState.set(key, checkbox.checked);
+      localStorage.setItem('shoppingListState', JSON.stringify([...shoppingListState.entries()]));
+
+      renderListItems(); // Rerender to re-sort and apply styles
+    });
+
+const labelSpan = document.createElement('span');
+labelSpan.textContent = label;
+labelSpan.style.flex = '1';
+
+li.appendChild(checkbox);
+li.appendChild(labelSpan);
+
+// Make entire list item clickable
+li.addEventListener('click', (e) => {
+  // Avoid double toggling if clicking directly on checkbox
+  if (e.target.tagName.toLowerCase() === 'input') return;
+
+  checkbox.checked = !checkbox.checked;
+  shoppingListState.set(key, checkbox.checked);
+  localStorage.setItem('shoppingListState', JSON.stringify([...shoppingListState.entries()]));
+  renderListItems();
+});
+
+
+    ul.appendChild(li);
+  });
+}
+
+renderListItems(); // Initial render
+
 
       section.appendChild(ul);
 
@@ -794,7 +830,7 @@
 
       const allInput = document.getElementById('all-servings');
       const allToggle = document.getElementById('apply-all-servings');
-
+      
       allInput.oninput = () => {
         if (allToggle.checked) renderRecipes(meal);
       };
