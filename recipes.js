@@ -152,7 +152,7 @@ const recipeData = [
     "defaultServings": 2,
     "ingredients": [
       { "name": "Plain flour", "quantity": 100, "unit": "g" },
-      { "name": "Eggs", "quantity": 2, "unit": "medium" },
+      { "name": "Eggs", "quantity": 2, "unit": "small" },
       { "name": "Milk", "quantity": 300, "unit": "ml" },
       { "name": "Butter", "quantity": 10, "unit": "g" },
       { "name": "Streaky bacon", "quantity": 12, "unit": "slices" },
@@ -223,7 +223,7 @@ const recipeData = [
     "recipe": "Tuna & Egg Patties",
     "defaultServings": 2,
     "ingredients": [
-      { "name": "Tuna", "quantity": 120, "unit": "g" },
+      { "name": "Tuna", "quantity": 110, "unit": "g" },
       { "name": "Eggs", "quantity": 4, "unit": "small" },
       { "name": "Salt", "quantity": 0.25, "unit": "tsp" },
       { "name": "Black pepper", "quantity": 0.25, "unit": "tsp" },
