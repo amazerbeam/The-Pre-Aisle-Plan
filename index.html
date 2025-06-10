@@ -262,11 +262,11 @@
 
     function openFullscreen(entry) {
       requestWakeLock(); // 🟢 prevent sleep
-      document.getElementById('fullscreen-title').textContent = entry.recipe;
+      const servings = localServingsMap.get(entry.id) || entry.defaultServings || 1;
+      document.getElementById('fullscreen-title').textContent = `${entry.recipe} (Serves: ${servings})`;
       const container = document.getElementById('fullscreen-content');
       container.innerHTML = '';
 
-      const servings = localServingsMap.get(entry.id) || entry.defaultServings || 1;
       const factor = servings / (entry.defaultServings || 1);
 
       const ingHeader = document.createElement('h3');
