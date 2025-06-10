@@ -11,7 +11,7 @@ const recipeData = [
       { "name": "Berries", "quantity": 100, "unit": "g" },
       { "name": "Chia seeds", "quantity": 1, "unit": "tsp" },
       { "name": "Honey", "quantity": 1, "unit": "tsp" },
-      { "name": "Cinnamon", "quantity": 1, "unit": "pinch" }
+      { "name": "Cinnamon", "quantity": 0.25, "unit": "tsp" }
     ],
     "steps": [
       "Combine oats, yogurt, milk, and chia seeds.",
@@ -26,13 +26,11 @@ const recipeData = [
     "recipe": "Scrambled Eggs",
     "defaultServings": 2,
     "ingredients": [
-      { "name": "Eggs", "quantity": 6, "unit": "small" },
-      { "name": "Butter", "quantity": 1, "unit": "tsp" },
-      { "name": "Salt", "quantity": 1, "unit": "pinch" },
-      { "name": "Pepper", "quantity": 1, "unit": "pinch" }
+      { "name": "Eggs", "quantity": 8, "unit": "small" },
+      { "name": "Butter", "quantity": 1, "unit": "tsp" }
     ],
     "steps": [
-      "Whisk eggs with salt and pepper.",
+      "Whisk eggs with salt to taste.",
       "Heat butter in a pan and pour in eggs.",
       "Stir continuously until softly scrambled.",
       "Serve hot."
@@ -92,16 +90,26 @@ const recipeData = [
     "defaultServings": 2,
     "ingredients": [
       { "name": "Chicken breast", "quantity": 200, "unit": "g" },
-      { "name": "Bell peppers", "quantity": 2, "unit": "pieces" },
-      { "name": "Soy sauce", "quantity": 1, "unit": "tbsp" },
+      { "name": "Green bell pepper", "quantity": 1, "unit": "piece" },
+      { "name": "Red bell pepper", "quantity": 1, "unit": "piece" },
+      { "name": "Onion", "quantity": 1, "unit": "piece" },
+      { "name": "Olive oil", "quantity": 1, "unit": "tbsp" }, // For marinating
+      { "name": "Salt", "quantity": 0.25, "unit": "tsp" },    // For marinating
+      { "name": "Soy sauce", "quantity": 0.5, "unit": "tbsp" },
+      { "name": "Worcestershire sauce", "quantity": 0.5, "unit": "tbsp" },
       { "name": "Ginger", "quantity": 1, "unit": "tsp" },
-      { "name": "Garlic", "quantity": 1, "unit": "clove" }
+      { "name": "Garlic", "quantity": 1, "unit": "clove" },
+      { "name": "Corn flour", "quantity": 1, "unit": "tsp" } // For thickening
     ],
     "steps": [
-      "Slice chicken and peppers.",
-      "Stir-fry garlic and ginger.",
-      "Add chicken, cook thoroughly.",
-      "Add peppers and soy sauce, cook for 5 minutes."
+      "Slice the chicken breast, green pepper, red pepper, and onion into strips.",
+      "In the morning or the night before, toss the sliced chicken, peppers, and onion with olive oil and salt. Cover and refrigerate to marinate.",
+      "When ready to cook, heat a pan or wok over medium-high heat.",
+      "Add the marinated chicken and vegetables and stir-fry for 3–4 minutes until the chicken is nearly cooked and the vegetables are just softened.",
+      "Add garlic and ginger, stir-fry for 1 minute until fragrant.",
+      "Add soy sauce and Worcestershire sauce, stir to combine.",
+      "Mix corn flour with a splash of water to make a slurry, then add to the pan and stir until the sauce thickens.",
+      "Serve hot."
     ]
   },
 
@@ -140,13 +148,12 @@ const recipeData = [
       { "name": "Plain flour", "quantity": 100, "unit": "g" },
       { "name": "Eggs", "quantity": 2, "unit": "medium" },
       { "name": "Milk", "quantity": 300, "unit": "ml" },
-      { "name": "Salt", "quantity": 1, "unit": "pinch" },
       { "name": "Butter", "quantity": 10, "unit": "g" },
       { "name": "Streaky bacon", "quantity": 12, "unit": "slices" },
       { "name": "Maple syrup", "quantity": 2, "unit": "tbsp" }
     ],
     "steps": [
-      "Whisk flour and salt in a bowl.",
+      "Whisk flour and salt to taste in a bowl.",
       "Crack in the eggs and add the milk. Whisk until smooth and lump-free.",
       "Heat a non-stick pan and melt a little butter.",
       "Pour in batter to form pancakes; cook until golden on one side, then flip.",
@@ -211,7 +218,7 @@ const recipeData = [
     "defaultServings": 2,
     "ingredients": [
       { "name": "Tuna", "quantity": 120, "unit": "g" },
-      { "name": "Eggs", "quantity": 2, "unit": "medium" },
+      { "name": "Eggs", "quantity": 4, "unit": "small" },
       { "name": "Salt", "quantity": 0.25, "unit": "tsp" },
       { "name": "Black pepper", "quantity": 0.25, "unit": "tsp" },
       { "name": "Onion powder", "quantity": 0.5, "unit": "tsp" },
@@ -330,14 +337,14 @@ const recipeData = [
       { "name": "Greek yogurt", "quantity": 200, "unit": "g" },
       { "name": "Honey", "quantity": 2, "unit": "tsp" },
       { "name": "Chia seeds", "quantity": 2, "unit": "tsp" },
-      { "name": "Cinnamon", "quantity": 1, "unit": "pinch" }
+      { "name": "Cinnamon", "quantity": 0.25, "unit": "tsp" }
     ],
     "steps": [
       "Wash and slice the peaches into thin wedges.",
       "Divide the yogurt into two bowls.",
       "Top each bowl with peach slices.",
       "Drizzle 1 tsp honey over each serving.",
-      "Sprinkle chia seeds and a pinch of cinnamon.",
+      "Sprinkle chia seeds and cinnamon.",
       "Serve immediately or chill briefly before serving."
     ]
   },
@@ -476,7 +483,7 @@ const recipeData = [
     "recipe": "Veggie-Packed Omelette",
     "defaultServings": 2,
     "ingredients": [
-      { "name": "Eggs", "quantity": 4, "unit": "medium" },
+      { "name": "Eggs", "quantity": 8, "unit": "small" },
       { "name": "Spinach", "quantity": 50, "unit": "g" },
       { "name": "Tomatoes", "quantity": 1, "unit": "piece" },
       { "name": "Mushrooms", "quantity": 100, "unit": "g" },
@@ -485,7 +492,7 @@ const recipeData = [
       { "name": "Salt", "quantity": 0.25, "unit": "tsp" }
     ],
     "steps": [
-      "Whisk eggs with salt.",
+      "Whisk eggs with salt to taste.",
       "Sauté chopped onion, tomato, spinach, and mushrooms.",
       "Pour in eggs, cook until set, then fold and serve."
     ]
@@ -545,7 +552,7 @@ const recipeData = [
       { "name": "Water", "quantity": 140, "unit": "ml" },
       { "name": "Salt", "quantity": 0.5, "unit": "tsp" },
       { "name": "Olive oil", "quantity": 1, "unit": "tbsp" },
-      { "name": "Eggs", "quantity": 2, "unit": "medium" },
+      { "name": "Eggs", "quantity": 4, "unit": "small" },
       { "name": "Cheese", "quantity": 40, "unit": "g" },
       { "name": "Avocado (optional)", "quantity": 0.5, "unit": "piece" }
     ],
@@ -559,6 +566,7 @@ const recipeData = [
       "Split arepas and fill each with egg, cheese, and optional avocado. Serve warm."
     ]
   },
+
   {
     "id": 31,
     "meal": "dinner",
