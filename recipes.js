@@ -317,8 +317,8 @@ const recipeData = [
       { "name": "Fresh parsley or coriander", "quantity": 1, "unit": "small bunch" },
       { "name": "Garlic", "quantity": 1, "unit": "clove" },
       { "name": "Olive oil", "quantity": 1, "unit": "tsp" },
-      { "name": "Salt", "quantity": 1, "unit": "pinch" },
-      { "name": "Pepper", "quantity": 1, "unit": "pinch" }
+      { "name": "Salt", "quantity": 0.25, "unit": "tsp" },
+      { "name": "Pepper", "quantity": 0.25, "unit": "tsp" }
     ],
     "steps": [
       "Heat olive oil in a pan over medium heat.",
