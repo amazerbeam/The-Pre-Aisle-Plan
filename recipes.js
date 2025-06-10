@@ -603,9 +603,44 @@ const recipeData = [
       "Slowly whisk in chicken stock (~150 ml) until thickened into gravy.",
       "Serve chicken with veg, corn, and gravy."
     ]
-  }
+  },
 
-
+  {
+    "id": 32,
+    "meal": ["dinner"],
+    "recipe": "Tuscan Turkey Meatballs & Lentil Florentine",
+    "defaultServings": 2,
+    "ingredients": [
+      { "name": "Turkey mince", "quantity": 300, "unit": "g" },
+      { "name": "Brown lentils", "quantity": 100, "unit": "g" },
+      { "name": "Tinned tomatoes", "quantity": 400, "unit": "g" },
+      { "name": "Onion", "quantity": 1, "unit": "piece" },
+      { "name": "Garlic", "quantity": 3, "unit": "cloves" },
+      { "name": "Celery", "quantity": 2, "unit": "sticks" },
+      { "name": "Carrot", "quantity": 1, "unit": "piece" },
+      { "name": "Spinach", "quantity": 60, "unit": "g" },
+      { "name": "Fresh basil (leaves or granules)", "quantity": 1, "unit": "tbsp" },
+      { "name": "Capers", "quantity": 1, "unit": "tbsp" },
+      { "name": "Olive oil", "quantity": 2, "unit": "tbsp" },
+      { "name": "Salt", "quantity": 1.5, "unit": "tsp" },
+      { "name": "Black pepper", "quantity": 0.25, "unit": "tsp" },
+      { "name": "Italian seasoning herbs", "quantity": 1, "unit": "tsp" }
+    ],
+    "steps": [
+        "Finely chop half the onion, 1 clove garlic, and half the basil (if using leaves). In a bowl, mix with turkey mince, salt, and pepper.",
+      "Form the turkey mixture into small meatballs (about 12).",
+      "Finely chop the remaining onion, celery, carrot, and garlic.",
+      "Heat 1 tbsp olive oil in a large pan over medium heat. Add the chopped onion, celery, carrot, and a pinch of salt. Fry for 5–7 minutes until softened and lightly golden. Remove the veg from the pan and set aside.",
+      "Add a little more olive oil if needed, then fry the meatballs in the same pan until browned on all sides. Remove and set aside.",
+      "In a saucepan, heat 1 tbsp olive oil over medium heat. Add the remaining garlic and sauté for 30 seconds until fragrant.",
+      "Add the capers and cook for another minute.",
+      "Add the tinned tomatoes, 1 tsp salt, and Italian seasoning herbs. Stir and bring to a simmer.",
+      "Return the fried vegetables and meatballs to the sauce, along with the lentils. Stir to combine.",
+      "Cover and simmer everything together for 30 minutes on low heat.",
+      "Stir in the spinach and remaining basil (if using leaves) until wilted.",
+      "Taste and adjust seasoning if needed. Serve hot."
+    ]
+  },
 
 
 
