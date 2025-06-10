@@ -67,20 +67,27 @@ const recipeData = [
   {
     "id": 5,
     "meal": ["dinner"],
-    "recipe": "Baked Salmon with Veggies",
+    "recipe": "Baked Salmon",
     "defaultServings": 2,
     "ingredients": [
       { "name": "Salmon fillet", "quantity": 2, "unit": "pieces" },
       { "name": "Broccoli", "quantity": 1, "unit": "head" },
       { "name": "Carrots", "quantity": 2, "unit": "pieces" },
-      { "name": "Olive oil", "quantity": 1, "unit": "tbsp" },
-      { "name": "Garlic", "quantity": 2, "unit": "cloves" }
+      { "name": "Salad leaves", "quantity": 2, "unit": "handfuls" },
+      { "name": "Lemon", "quantity": 1, "unit": "piece" },
+      { "name": "Olive oil", "quantity": 2, "unit": "tbsp" },
+      { "name": "Salt", "quantity": 0.5, "unit": "tsp" }
     ],
     "steps": [
       "Preheat oven to 180°C.",
-      "Place salmon and veggies on tray.",
-      "Drizzle with oil and minced garlic.",
-      "Bake for 20 minutes and serve."
+      "Cut broccoli into florets and toss with 1 tbsp olive oil and a pinch of salt.",
+      "Spread broccoli on a baking tray and roast for 10 minutes.",
+      "After 10 minutes, push broccoli to the sides and place salmon fillets in the center. Drizzle salmon with a little olive oil and a pinch of salt.",
+      "Return tray to oven and bake for another 20 minutes, until salmon is cooked through and broccoli is tender and slightly crispy (broccoli total cook time: 30 minutes).",
+      "While the salmon and broccoli cook, spiralize the carrots.",
+      "In a bowl, combine salad leaves and spiralized carrots.",
+      "Squeeze over the juice of 1 lemon, add 1 tbsp olive oil and a pinch of salt. Toss to coat.",
+      "Serve the baked salmon with the roasted broccoli and carrot salad on the side."
     ]
   },
   {
@@ -94,8 +101,7 @@ const recipeData = [
       { "name": "Red bell pepper", "quantity": 1, "unit": "piece" },
       { "name": "Onion", "quantity": 1, "unit": "piece" },
       { "name": "Olive oil", "quantity": 1, "unit": "tbsp" }, // For marinating
-      { "name": "Salt", "quantity": 0.25, "unit": "tsp" },    // For marinating
-      { "name": "Soy sauce", "quantity": 0.5, "unit": "tbsp" },
+      { "name": "Soy sauce", "quantity": 1, "unit": "tbsp" },
       { "name": "Worcestershire sauce", "quantity": 0.5, "unit": "tbsp" },
       { "name": "Ginger", "quantity": 1, "unit": "tsp" },
       { "name": "Garlic", "quantity": 1, "unit": "clove" },
