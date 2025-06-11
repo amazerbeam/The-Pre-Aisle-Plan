@@ -126,7 +126,7 @@ const recipeData = [
 
   {
     "id": 9,
-    "meal": ["lunch", "dinner"],
+    "meal": ["dinner"],
     "recipe": "Tofu Stir-Fry",
     "defaultServings": 2,
 
