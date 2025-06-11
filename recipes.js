@@ -100,22 +100,26 @@ const recipeData = [
       { "name": "Green bell pepper", "quantity": 1, "unit": "piece" },
       { "name": "Red bell pepper", "quantity": 1, "unit": "piece" },
       { "name": "Onion", "quantity": 1, "unit": "piece" },
+      { "name": "Pak choi", "quantity": 300, "unit": "g" },
+      { "name": "Salt", "quantity": 0.5, "unit": "tsp" },
       { "name": "Olive oil", "quantity": 1, "unit": "tbsp" }, // For marinating
       { "name": "Soy sauce", "quantity": 1, "unit": "tbsp" },
       { "name": "Worcestershire sauce", "quantity": 0.5, "unit": "tbsp" },
       { "name": "Ginger", "quantity": 1, "unit": "tsp" },
       { "name": "Garlic", "quantity": 1, "unit": "clove" },
-      { "name": "Corn flour", "quantity": 1, "unit": "tsp" } // For thickening
+      { "name": "Corn flour", "quantity": 1, "unit": "tsp" },
+      { "name": "Sesame seeds", "quantity": 1, "unit": "tsp" }
+
     ],
     "steps": [
       "Slice the chicken breast, green pepper, red pepper, and onion into strips.",
-      "In the morning or the night before, toss the sliced chicken, peppers, and onion with olive oil and salt. Cover and refrigerate to marinate.",
+      "In the morning or the night before, toss the sliced chicken, peppers, onion and Pak choi with olive oil and salt. Cover and refrigerate to marinate.",
       "When ready to cook, heat a pan or wok over medium-high heat.",
       "Add the marinated chicken and vegetables and stir-fry for 3–4 minutes until the chicken is nearly cooked and the vegetables are just softened.",
       "Add garlic and ginger, stir-fry for 1 minute until fragrant.",
       "Add soy sauce and Worcestershire sauce, stir to combine.",
       "Mix corn flour with a splash of water to make a slurry, then add to the pan and stir until the sauce thickens.",
-      "Serve hot."
+      "Sprinkle sesame seeds before serving."
     ]
   },
 
