@@ -101,6 +101,7 @@ const recipeData = [
       { "name": "Red bell pepper", "quantity": 1, "unit": "piece" },
       { "name": "Onion", "quantity": 1, "unit": "piece" },
       { "name": "Pak choi", "quantity": 300, "unit": "g" },
+      { "name": "Celery", "quantity": 2, "unit": "pieces" },
       { "name": "Salt", "quantity": 0.5, "unit": "tsp" },
       { "name": "Olive oil", "quantity": 1, "unit": "tbsp" }, // For marinating
       { "name": "Soy sauce", "quantity": 1, "unit": "tbsp" },
@@ -113,7 +114,7 @@ const recipeData = [
     ],
     "steps": [
       "Slice the chicken breast, green pepper, red pepper, and onion into strips.",
-      "In the morning or the night before, toss the sliced chicken, peppers, onion and Pak choi with olive oil and salt. Cover and refrigerate to marinate.",
+      "In the morning or the night before, toss the sliced chicken, peppers, onion, celery and pak choi with olive oil and salt. Cover and refrigerate to marinate.",
       "When ready to cook, heat a pan or wok over medium-high heat.",
       "Add the marinated chicken and vegetables and stir-fry for 3–4 minutes until the chicken is nearly cooked and the vegetables are just softened.",
       "Add garlic and ginger, stir-fry for 1 minute until fragrant.",
@@ -531,9 +532,6 @@ const recipeData = [
     ]
   },
 
-
-
-
   {
     "id": 30,
     "meal": ["snacks"],
@@ -553,8 +551,7 @@ const recipeData = [
   {
     "id": 30,
     "meal": ["breakfast", "lunch"],
-    "isCheat": "false",
-    "recipe": "Arepa with Oats, Egg & Cheese",
+    "recipe": "Arepa with Avocado & Egg",
     "defaultServings": 2,
     "ingredients": [
       { "name": "Harina PAN", "quantity": 60, "unit": "g" },
@@ -563,7 +560,6 @@ const recipeData = [
       { "name": "Salt", "quantity": 0.5, "unit": "tsp" },
       { "name": "Olive oil", "quantity": 1, "unit": "tbsp" },
       { "name": "Eggs", "quantity": 4, "unit": "small" },
-      { "name": "Cheese", "quantity": 40, "unit": "g" },
       { "name": "Avocado (optional)", "quantity": 0.5, "unit": "piece" }
     ],
     "steps": [
@@ -710,7 +706,7 @@ const recipeData = [
   },
   // ...existing code...
   , {
-    "id": 18,
+    "id": 0,
     "meal": ["breakfast", "lunch", "dinner", "snacks"],
     "recipe": "Skip",
     "defaultServings": 2,
