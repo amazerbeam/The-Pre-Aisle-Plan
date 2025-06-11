@@ -11,7 +11,7 @@
 </head>
 
 <body>
-  <h1>Recipe Viewer v.2.2.3</h1>
+  <h1>Recipe Viewer v.2.2.4</h1>
 
   <div style="text-align: center; margin-bottom: 10px;">
     <label for="all-servings">All Servings:</label>
@@ -26,6 +26,7 @@
   <div class="tabs-wrapper">
     <div class="tabs" id="tabs"></div>
   </div>
+  
 
 
   <div id="recipe-container"></div>
@@ -128,6 +129,11 @@
     const localServingsMap = new Map(); // Tracks manual servings per recipe
 
     let planner = [];
+
+    // Add this:
+    const storedState = localStorage.getItem('shoppingListState');
+    const shoppingListState = storedState ? new Map(JSON.parse(storedState)) : new Map();
+
 
 
     if (encoded) {
@@ -329,7 +335,7 @@
         ['breakfast', 'lunch', 'dinner', 'snacks'].forEach(mealType => {
           if (entry && entry[mealType]) {
             const recipeObj = entry[mealType];
-            const recipe = recipeData.find(r => r.id === (recipeObj?.id || recipeObj));
+            const recipe = recipeData.find(r => r && r.id === (recipeObj?.id || recipeObj));
             const servings = recipeObj?.servings || 1;
             if (recipe) {
               const li = document.createElement('li');
@@ -406,7 +412,7 @@
     }
 
 
-    function renderCalendar() {
+    /*function renderCalendar() {
       const calendar = document.getElementById('calendar');
       calendar.innerHTML = '';
 
@@ -428,7 +434,7 @@
         ['breakfast', 'lunch', 'dinner', 'snacks'].forEach(mealType => {
           if (entry && entry[mealType]) {
             const recipeObj = entry[mealType];
-            const recipe = recipeData.find(r => r.id === (recipeObj?.id || recipeObj));
+            const recipe = recipeData.find(r => r && r.id === (recipeObj?.id || recipeObj));
             const servings = recipeObj?.servings || 1;
             if (recipe) {
               const li = document.createElement('li');
@@ -442,7 +448,7 @@
         box.appendChild(list);
         calendar.appendChild(box);
       });
-    }
+    }*/
 
 
     function renderTabs() {
@@ -483,10 +489,12 @@
 
       const ingredientMap = new Map();
 
+      debugger;
+
       planner.forEach(entry => {
         ['breakfast', 'lunch', 'dinner', 'snacks'].forEach(meal => {
           const recipeObj = entry[meal];
-          const recipe = recipeData.find(r => r.id === (recipeObj?.id || recipeObj));
+          const recipe = recipeData.find(r => r && r.id === (recipeObj?.id || recipeObj));
           if (recipe) {
             const servings = recipeObj?.servings || 1;
             const factor = servings / (recipe.defaultServings || 1);
@@ -532,9 +540,6 @@
       const ul = document.createElement('ul');
       ul.className = 'shopping-list';
 
-
-      const storedState = localStorage.getItem('shoppingListState');
-      const shoppingListState = storedState ? new Map(JSON.parse(storedState)) : new Map();
 
       function renderListItems() {
         ul.innerHTML = '';
