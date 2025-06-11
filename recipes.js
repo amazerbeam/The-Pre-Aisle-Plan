@@ -182,22 +182,22 @@ const recipeData = [
       "Portion the almonds into two servings (15g each).",
       "Serve one apple and 15g of almonds per person."
     ]
-  },
-  {
+  }, {
     "id": 12,
     "meal": ["snacks"],
-    "recipe": "Cottage Cheese and Pineapple",
+    "recipe": "Pineapple & Cashew Snack",
     "defaultServings": 2,
     "ingredients": [
-      { "name": "Cottage cheese", "quantity": 200, "unit": "g" },
-      { "name": "Pineapple chunks", "quantity": 100, "unit": "g" }
+      { "name": "Pineapple chunks", "quantity": 150, "unit": "g" },
+      { "name": "Cashews", "quantity": 30, "unit": "g" }
     ],
     "steps": [
-      "Portion 100g of cottage cheese into two bowls.",
-      "Top each with 50g of pineapple chunks.",
-      "Serve chilled."
+      "Portion 75g of pineapple chunks into two bowls.",
+      "Add 15g of cashews to each bowl.",
+      "Serve chilled or at room temperature."
     ]
-  }, {
+  }
+  , {
     "id": 13,
     "meal": ["breakfast", "snacks"],
     "recipe": "Banana Chia Pudding",
@@ -627,7 +627,7 @@ const recipeData = [
       { "name": "Italian seasoning herbs", "quantity": 1, "unit": "tsp" }
     ],
     "steps": [
-        "Finely chop half the onion, 1 clove garlic, and half the basil (if using leaves). In a bowl, mix with turkey mince, salt, and pepper.",
+      "Finely chop half the onion, 1 clove garlic, and half the basil (if using leaves). In a bowl, mix with turkey mince, salt, and pepper.",
       "Form the turkey mixture into small meatballs (about 12).",
       "Finely chop the remaining onion, celery, carrot, and garlic.",
       "Heat 1 tbsp olive oil in a large pan over medium heat. Add the chopped onion, celery, carrot, and a pinch of salt. Fry for 5–7 minutes until softened and lightly golden. Remove the veg from the pan and set aside.",
@@ -642,69 +642,69 @@ const recipeData = [
     ]
   },
 
-{
-  "id": 33,
-  "meal": ["snacks"],
-  "isCheat": true,
-  "recipe": "Olive Oil & Himalayan Pink Salt Crisps",
-  "defaultServings": 2,
-  "ingredients": [
-    { "name": "Crisps", "quantity": 135, "unit": "g" },
-  ],
-  "steps": [
-    "Divide and eat the crisps as a snack.",
-  ]
-},
-{
-  "id": 34,
-  "meal": ["lunch"],
-  "isCheat": true,
-  "recipe": "Argentine Beef Empanada Bites",
-  "defaultServings": 2,
-  "ingredients": [
-    // Pastry
-    { "name": "Plain flour", "quantity": 300, "unit": "g" },
-    { "name": "Salt", "quantity": 1, "unit": "tsp" },
-    { "name": "Butter or lard (cold, cubed)", "quantity": 75, "unit": "g" },
-    { "name": "Warm water", "quantity": 120, "unit": "ml" },
-    // Filling
-    { "name": "Olive oil", "quantity": 1, "unit": "tbsp" },
-    { "name": "Onion", "quantity": 1, "unit": "medium, finely chopped" },
-    { "name": "Red bell pepper", "quantity": 0.5, "unit": "piece, finely chopped" },
-    { "name": "Garlic", "quantity": 2, "unit": "cloves, minced" },
-    { "name": "Ground beef", "quantity": 400, "unit": "g" },
-    { "name": "Paprika", "quantity": 1, "unit": "tsp" },
-    { "name": "Ground cumin", "quantity": 1, "unit": "tsp" },
-    { "name": "Chili flakes (optional)", "quantity": 0.5, "unit": "tsp" },
-    { "name": "Salt", "quantity": 0.5, "unit": "tsp" },
-    { "name": "Black pepper", "quantity": 0.25, "unit": "tsp" },
-    { "name": "Hard-boiled eggs", "quantity": 2, "unit": "pieces, chopped" },
-    { "name": "Green olives (optional)", "quantity": 50, "unit": "g, chopped" },
-    { "name": "Fresh parsley (optional)", "quantity": 1, "unit": "tbsp, chopped" }
-  ],
-  "steps": [
-    // Pastry
-    "Mix flour and salt in a large bowl.",
-    "Rub in the cold butter or lard with your fingers until the mixture resembles breadcrumbs.",
-    "Add warm water a little at a time, mixing until a dough forms.",
-    "Knead for about 5 minutes until smooth. Cover and let rest for 30 minutes.",
-    "Roll out dough to 2–3mm thick and cut into 12cm circles. Keep covered until ready to fill.",
-    // Filling
-    "Heat olive oil in a pan over medium heat.",
-    "Add onion and red pepper, cook until softened (5–7 minutes).",
-    "Add garlic, cook for 1 minute.",
-    "Add ground beef, break up and cook until browned.",
-    "Stir in paprika, cumin, chili flakes, salt, and pepper. Cook 2–3 minutes.",
-    "Remove from heat and let cool slightly.",
-    "Mix in chopped boiled eggs, olives, and parsley if using.",
-    // Assembly
-    "Place a spoonful of filling in the center of each dough circle. Fold over and seal the edges.",
-    "Place on a baking tray, brush with beaten egg if desired.",
-    "Bake at 200°C (392°F) for 18–22 minutes until golden.",
-    "Serve warm."
-  ]
-},
-// ...existing code...
+  {
+    "id": 33,
+    "meal": ["snacks"],
+    "isCheat": true,
+    "recipe": "Olive Oil & Himalayan Pink Salt Crisps",
+    "defaultServings": 2,
+    "ingredients": [
+      { "name": "Crisps", "quantity": 135, "unit": "g" },
+    ],
+    "steps": [
+      "Divide and eat the crisps as a snack.",
+    ]
+  },
+  {
+    "id": 34,
+    "meal": ["lunch"],
+    "isCheat": true,
+    "recipe": "Argentine Beef Empanada Bites",
+    "defaultServings": 2,
+    "ingredients": [
+      // Pastry
+      { "name": "Plain flour", "quantity": 300, "unit": "g" },
+      { "name": "Salt", "quantity": 1, "unit": "tsp" },
+      { "name": "Butter or lard (cold, cubed)", "quantity": 75, "unit": "g" },
+      { "name": "Warm water", "quantity": 120, "unit": "ml" },
+      // Filling
+      { "name": "Olive oil", "quantity": 1, "unit": "tbsp" },
+      { "name": "Onion", "quantity": 1, "unit": "medium, finely chopped" },
+      { "name": "Red bell pepper", "quantity": 0.5, "unit": "piece, finely chopped" },
+      { "name": "Garlic", "quantity": 2, "unit": "cloves, minced" },
+      { "name": "Ground beef", "quantity": 400, "unit": "g" },
+      { "name": "Paprika", "quantity": 1, "unit": "tsp" },
+      { "name": "Ground cumin", "quantity": 1, "unit": "tsp" },
+      { "name": "Chili flakes (optional)", "quantity": 0.5, "unit": "tsp" },
+      { "name": "Salt", "quantity": 0.5, "unit": "tsp" },
+      { "name": "Black pepper", "quantity": 0.25, "unit": "tsp" },
+      { "name": "Hard-boiled eggs", "quantity": 2, "unit": "pieces, chopped" },
+      { "name": "Green olives (optional)", "quantity": 50, "unit": "g, chopped" },
+      { "name": "Fresh parsley (optional)", "quantity": 1, "unit": "tbsp, chopped" }
+    ],
+    "steps": [
+      // Pastry
+      "Mix flour and salt in a large bowl.",
+      "Rub in the cold butter or lard with your fingers until the mixture resembles breadcrumbs.",
+      "Add warm water a little at a time, mixing until a dough forms.",
+      "Knead for about 5 minutes until smooth. Cover and let rest for 30 minutes.",
+      "Roll out dough to 2–3mm thick and cut into 12cm circles. Keep covered until ready to fill.",
+      // Filling
+      "Heat olive oil in a pan over medium heat.",
+      "Add onion and red pepper, cook until softened (5–7 minutes).",
+      "Add garlic, cook for 1 minute.",
+      "Add ground beef, break up and cook until browned.",
+      "Stir in paprika, cumin, chili flakes, salt, and pepper. Cook 2–3 minutes.",
+      "Remove from heat and let cool slightly.",
+      "Mix in chopped boiled eggs, olives, and parsley if using.",
+      // Assembly
+      "Place a spoonful of filling in the center of each dough circle. Fold over and seal the edges.",
+      "Place on a baking tray, brush with beaten egg if desired.",
+      "Bake at 200°C (392°F) for 18–22 minutes until golden.",
+      "Serve warm."
+    ]
+  },
+  // ...existing code...
   , {
     "id": 18,
     "meal": ["breakfast", "lunch", "dinner", "snacks"],
