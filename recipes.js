@@ -278,7 +278,7 @@ const recipeData = [
     "id": 16,
     "meal": "dinner",
     isCheat: "true",
-    "recipe": "Crispy Chicken Wings with Beef Fat Fries",
+    "recipe": "Crispy Chicken Wings with Fries ",
     "defaultServings": 2,
     "ingredients": [
       { "name": "Chicken wings", "quantity": 750, "unit": "g" },
@@ -288,25 +288,24 @@ const recipeData = [
       { "name": "Franks hot sauce", "quantity": 1, "unit": "tbsp" },
       { "name": "Garlic powder", "quantity": 1, "unit": "tsp" },
       { "name": "Onion powder", "quantity": 0.5, "unit": "tsp" },
+      { "name": "Corn Flour", "quantity": 0.5, "unit": "tbsp" },
       { "name": "Salt", "quantity": 2, "unit": "tsp" },
       { "name": "Olive oil", "quantity": 1, "unit": "tbsp" },
       { "name": "Potatoes", "quantity": 1000, "unit": "g" },
-      { "name": "Beef fat", "quantity": 3, "unit": "tbsp" }
     ],
     "steps": [
       "Preheat oven to 215°C (419°F).",
       "In a large bowl, mix soy sauce, Worcestershire sauce, hot sauce, olive oil, garlic powder, onion powder, and salt.",
-      "Add the chicken wings and toss to coat. Let marinate for 10–15 minutes.",
+      "Add the chicken wings and toss to coat. Add the Corn Flour and Let marinate for 10–15 minutes.",
       "Coat wings evenly with breadcrumbs, pressing gently to stick.",
       "Place wings on a lined baking tray in a single layer.",
       "Bake wings for 25 minutes, flip, and bake another 10 minutes until crispy and golden.",
-      "Slice potatoes into fries (~1–1.5 cm thick).",
+      "For perfect potatoes. Slice potatoes into fries (~1–1.5 cm thick).",
       "Boil a kettle and pour the boiling water into a large pot.",
       "Add the fries and repeat with 2 more kettles (total ~3 kettles).",
       "Boil fries for 6–7 minutes, then drain and let steam off until dry.",
-      "Heat beef fat in a deep tray or pan.",
-      "Add fries in a single layer and roast at 215°C for 30–35 minutes, flipping once, until crisp and golden.",
-      "Serve the wings with the beef fat fries hot."
+      "Deep fry fries.",
+      "Serve the wings with the fries hot."
     ]
   },
   {
@@ -712,7 +711,41 @@ const recipeData = [
       "Serve warm."
     ]
   },
-  // ...existing code...
+// ...existing code...
+,
+{
+  "id": 35,
+  "meal": ["dinner"],
+  "isCheat": true,
+  "recipe": "Steak and Chips",
+  "defaultServings": 2,
+  "ingredients": [
+    { "name": "Ribeye or sirloin steak", "quantity": 2, "unit": "pieces (200-250g each)" },
+    { "name": "Potatoes", "quantity": 600, "unit": "g" },
+    { "name": "Vegetable oil", "quantity": 500, "unit": "ml (for frying)" },
+    { "name": "Salt", "quantity": 1, "unit": "tsp" },
+    { "name": "Black pepper", "quantity": 0.5, "unit": "tsp" },
+    { "name": "Butter", "quantity": 20, "unit": "g" },
+    { "name": "Garlic", "quantity": 2, "unit": "cloves" },
+    { "name": "Fresh thyme or rosemary", "quantity": 2, "unit": "sprigs (optional)" },
+    { "name": "Pearl onions", "quantity": 8, "unit": "pieces" },
+    // Pepper sauce
+    { "name": "Double cream", "quantity": 100, "unit": "ml" },
+    { "name": "Rum", "quantity": 1, "unit": "tbsp" },
+    { "name": "Black peppercorns, crushed", "quantity": 1, "unit": "tsp" }
+  ],
+  "steps": [
+    "Peel and cut the potatoes into chips (fries).",
+    "Fry the chips in hot oil at 180°C (356°F) until golden and crispy. Drain and season with salt.",
+    "Blanch the pearl onions in boiling water for 2 minutes, then peel. Sauté in a little butter until golden and tender. Set aside.",
+    "Pat steaks dry and season both sides with salt and black pepper.",
+    "Heat a heavy pan over high heat. Add a little oil, then the steaks. Sear for 2–3 minutes per side for medium-rare, or to your liking.",
+    "During the last minute, add butter, garlic, and herbs to the pan. Spoon the melted butter over the steaks.",
+    "Rest the steaks for 5 minutes before serving.",
+    "For the pepper sauce: In the same pan used for the steaks, add crushed black peppercorns and rum. Let the alcohol cook off for 30 seconds. Add double cream and simmer for 2–3 minutes, scraping up any pan juices, until slightly thickened. Season with salt to taste.",
+    "Serve the steaks hot with the chips, sautéed pearl onions, and drizzle with pepper sauce."
+  ]
+}
   , {
     "id": 0,
     "meal": ["breakfast", "lunch", "dinner", "snacks"],
