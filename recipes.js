@@ -508,29 +508,38 @@ const recipeData = [
       "Pour in eggs, cook until set, then fold and serve."
     ]
   },
-
   {
     "id": 29,
     "meal": ["dinner"],
-    "recipe": "Zucchini Noodles with Tomato Sauce",
+    "recipe": "Turkey Bolognese with Zucchini Noodles",
     "defaultServings": 2,
     "ingredients": [
       { "name": "Zucchini", "quantity": 2, "unit": "medium" },
-      { "name": "Tomato passata", "quantity": 200, "unit": "ml" },
-      { "name": "Garlic", "quantity": 1, "unit": "clove" },
+      { "name": "Turkey mince", "quantity": 300, "unit": "g" },
+      { "name": "Tinned tomatoes", "quantity": 1, "unit": "can (400g)" },
+      { "name": "Garlic", "quantity": 2, "unit": "cloves" },
       { "name": "Olive oil", "quantity": 1, "unit": "tbsp" },
-      { "name": "Basil", "quantity": 1, "unit": "tbsp" },
-      { "name": "Salt", "quantity": 0.5, "unit": "tsp" },
-      { "name": "Black pepper", "quantity": 0.25, "unit": "tsp" }
+      { "name": "Onion", "quantity": 1, "unit": "medium" },
+      { "name": "Green olives", "quantity": 40, "unit": "g" },
+      { "name": "Italian seasoning", "quantity": 1, "unit": "tsp" },
+      { "name": "Salt", "quantity": 1, "unit": "tsp" },
+      { "name": "Black pepper", "quantity": 0.25, "unit": "tsp" },
+      { "name": "Pesto or Capers", "quantity": 1, "unit": "tbsp" },
+      { "name": "Basil (optional garnish)", "quantity": 1, "unit": "tbsp" }
     ],
     "steps": [
-      "Spiralize the zucchini to make noodles.",
-      "Sauté garlic in olive oil, add tomato passata, basil, salt, and pepper.",
-      "Simmer sauce for 5 minutes.",
-      "Toss in zucchini noodles and cook 2–3 minutes.",
-      "Serve warm."
+      "Spiralize the zucchini to make noodles and set aside.",
+      "Heat half the olive oil in a pan. Add chopped garlic and sauté for 30 seconds until fragrant.",
+      "Add chopped onion and cook until soft.",
+      "Add turkey mince, breaking it apart, and cook until fully browned.",
+      "Heat the rest of the olive oil in a saucepan. Add chopped garlic and capers sauté for 30 seconds until fragrant.",
+      "Add tinned tomatoes, Italian seasoning, salt, black pepper and pesto (now if using pesto) . Stir well.",
+      "Add chopped green olives. Simmer sauce for 10–15 minutes, stirring occasionally.",
+      "Add zucchini noodles and toss gently, cooking for 2–3 minutes until just tender.",
+      "Serve warm, topped with fresh basil if desired."
     ]
-  },
+  }
+  ,
 
   {
     "id": 30,
