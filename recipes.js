@@ -585,7 +585,6 @@ const recipeData = [
   {
     "id": 31,
     "meal": "dinner",
-    "isCheat": "false",
     "recipe": "Overnight Boiled Chicken with Gravy & Corn",
     "defaultServings": 2,
     "ingredients": [
