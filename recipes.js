@@ -644,7 +644,7 @@ const recipeData = [
 
 {
   "id": 33,
-  "meal": ["lunch"],
+  "meal": ["snacks"],
   "isCheat": true,
   "recipe": "Olive Oil & Himalayan Pink Salt Crisps",
   "defaultServings": 2,
