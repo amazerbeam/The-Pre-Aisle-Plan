@@ -38,10 +38,16 @@
   <div id="full-meal-plan">
     <div class="panel">
       <div class="top-bar" style="display: flex; justify-content: space-between; align-items: center;">
-        <button onclick="generateShareURL()"
-          style="background: #4a3f80; color: white; padding: 8px 14px; border-radius: 6px; border: none; cursor: pointer;">
-          🔗 Share Weekly Meal Plan
-        </button>
+        <div>
+          <button onclick="generateShareURL()"
+            style="background: #4a3f80; color: white; padding: 8px 14px; border-radius: 6px; border: none; cursor: pointer;">
+            🔗 Share Weekly Meal Plan
+          </button>
+          <button id="clear-data-btn"
+            style="background: #e74c3c; color: white; padding: 8px 14px; border-radius: 6px; border: none; cursor: pointer; margin-left: 10px;">
+            🗑️ Clear
+          </button>
+        </div>
         <button class="close-btn" onclick="toggleFullMealPlan()">✖</button>
       </div>
       <div id="calendar-full"></div>
@@ -926,6 +932,31 @@
 
     renderTabs();
     renderRecipes('breakfast');
+  </script>
+
+  <!-- Add this modal for confirmation, just before </body> -->
+  <div id="clear-confirm-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:10001; align-items:center; justify-content:center;">
+    <div style="background:white; padding:24px 32px; border-radius:10px; max-width:320px; text-align:center;">
+      <h3>Are you sure you want to clear all data?</h3>
+      <div style="margin-top:18px;">
+        <button id="confirm-clear-btn" style="background:#e74c3c; color:white; border:none; border-radius:6px; padding:8px 18px; margin-right:10px;">Yes, Clear</button>
+        <button onclick="document.getElementById('clear-confirm-modal').style.display='none'" style="padding:8px 18px; border-radius:6px;">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  // Add this script after your other scripts or at the end of the body
+
+  document.getElementById('clear-data-btn').onclick = function() {
+    document.getElementById('clear-confirm-modal').style.display = 'flex';
+  };
+
+  document.getElementById('confirm-clear-btn').onclick = function() {
+    localStorage.clear();
+    document.getElementById('clear-confirm-modal').style.display = 'none';
+    location.reload();
+  };
   </script>
 </body>
 
