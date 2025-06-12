@@ -26,7 +26,7 @@
   <div class="tabs-wrapper">
     <div class="tabs" id="tabs"></div>
   </div>
-  
+
 
 
   <div id="recipe-container"></div>
@@ -328,7 +328,20 @@
         box.className = 'day-box';
         box.style.cursor = 'pointer';
         box.onclick = () => {
-          if (entry) showMealPopup(entry);
+          if (!entry) return;
+          // Count how many meals are assigned for this day
+          const meals = ['breakfast', 'lunch', 'dinner', 'snacks'].filter(meal => entry[meal]);
+          if (meals.length === 1) {
+            // Only one meal assigned, open it directly
+            const recipeId = entry[meals[0]].id || entry[meals[0]];
+            const recipe = recipeData.find(r => r.id === recipeId);
+            if (recipe) {
+              openFullscreen(recipe);
+            }
+          } else if (meals.length > 1) {
+            // Multiple meals, show the meal selection popup
+            showMealPopup(entry);
+          }
         };
 
 
@@ -347,8 +360,8 @@
               const li = document.createElement('li');
               li.textContent = mealType + ": " + recipe.recipe + " (x" + servings + ")";
 
-              li.style.cursor = 'pointer';
-              li.onclick = () => openFullscreen(recipe);
+              // li.style.cursor = 'pointer';
+// li.onclick = () => openFullscreen(recipe);
 
               list.appendChild(li);
             }
@@ -935,28 +948,32 @@
   </script>
 
   <!-- Add this modal for confirmation, just before </body> -->
-  <div id="clear-confirm-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:10001; align-items:center; justify-content:center;">
+  <div id="clear-confirm-modal"
+    style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:10001; align-items:center; justify-content:center;">
     <div style="background:white; padding:24px 32px; border-radius:10px; max-width:320px; text-align:center;">
       <h3>Are you sure you want to clear all data?</h3>
       <div style="margin-top:18px;">
-        <button id="confirm-clear-btn" style="background:#e74c3c; color:white; border:none; border-radius:6px; padding:8px 18px; margin-right:10px;">Yes, Clear</button>
-        <button onclick="document.getElementById('clear-confirm-modal').style.display='none'" style="padding:8px 18px; border-radius:6px;">Cancel</button>
+        <button id="confirm-clear-btn"
+          style="background:#e74c3c; color:white; border:none; border-radius:6px; padding:8px 18px; margin-right:10px;">Yes,
+          Clear</button>
+        <button onclick="document.getElementById('clear-confirm-modal').style.display='none'"
+          style="padding:8px 18px; border-radius:6px;">Cancel</button>
       </div>
     </div>
   </div>
 
   <script>
-  // Add this script after your other scripts or at the end of the body
+    // Add this script after your other scripts or at the end of the body
 
-  document.getElementById('clear-data-btn').onclick = function() {
-    document.getElementById('clear-confirm-modal').style.display = 'flex';
-  };
+    document.getElementById('clear-data-btn').onclick = function () {
+      document.getElementById('clear-confirm-modal').style.display = 'flex';
+    };
 
-  document.getElementById('confirm-clear-btn').onclick = function() {
-    localStorage.clear();
-    document.getElementById('clear-confirm-modal').style.display = 'none';
-    location.reload();
-  };
+    document.getElementById('confirm-clear-btn').onclick = function () {
+      localStorage.clear();
+      document.getElementById('clear-confirm-modal').style.display = 'none';
+      location.reload();
+    };
   </script>
 </body>
 
