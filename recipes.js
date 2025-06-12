@@ -51,7 +51,7 @@ const recipeData = [
       { "name": "Olive oil", "quantity": 1, "unit": "tbsp" }
     ],
     "steps": [
-      "Season the chicken breast with salt and pepper (optional), then grill or pan-fry until fully cooked. Let it rest and slice into strips.",
+      "Boil the chicken breast in stock and rest for and hour or overnight.",
       "Wash and dry the salad leaves, then place them in a large mixing bowl.",
       "Peel and grate the carrots using a coarse grater.",
       "Slice the cucumber into thin rounds or half-moons.",
