@@ -96,7 +96,7 @@ const recipeData = [
     "recipe": "Stir-Fried Chicken & Peppers",
     "defaultServings": 2,
     "ingredients": [
-      { "name": "Chicken breast", "quantity": 200, "unit": "g" },
+      { "name": "Chicken breast", "quantity": 240, "unit": "g" },
       { "name": "Green bell pepper", "quantity": 1, "unit": "piece" },
       { "name": "Red bell pepper", "quantity": 1, "unit": "piece" },
       { "name": "Onion", "quantity": 1, "unit": "piece" },
@@ -201,8 +201,7 @@ const recipeData = [
       "Add 15g of cashews to each bowl.",
       "Serve chilled or at room temperature."
     ]
-  }
-  , {
+  }, {
     "id": 13,
     "meal": ["breakfast", "snacks"],
     "recipe": "Banana Chia Pudding",
@@ -244,10 +243,7 @@ const recipeData = [
       "Fry for 2–3 minutes per side until golden brown.",
       "Serve hot, optionally with salad or dipping sauce."
     ]
-  },
-
-
-  {
+  },{
     "id": 15,
     "meal": ["lunch"],
     "recipe": "Crispy Spiced Chicken Wings",
@@ -379,8 +375,8 @@ const recipeData = [
     "recipe": "Breaded Chicken with Garlic Veggies",
     "defaultServings": 2,
     "ingredients": [
-      { "name": "Chicken breasts", "quantity": 2, "unit": "pieces" },
-      { "name": "Breadcrumbs", "quantity": 0.5, "unit": "cup" },
+      { "name": "Chicken breasts", "quantity": 240, "unit": "g" },
+      { "name": "Breadcrumbs", "quantity": 0.25, "unit": "cup" },
       { "name": "Garlic powder", "quantity": 1, "unit": "tsp" },
       { "name": "Onion powder", "quantity": 0.5, "unit": "tsp" },
       { "name": "Paprika", "quantity": 0.5, "unit": "tsp" },
@@ -399,7 +395,7 @@ const recipeData = [
       "Brush chicken breasts with olive oil or spray lightly.",
       "Coat chicken in the breadcrumb mixture and place on a baking sheet.",
       "Bake chicken for 25 minutes, flipping halfway, until golden and cooked through.",
-      "Meanwhile, cut broccoli into florets and slice carrots.",
+      "Meanwhile, cut broccoli into florets and slice carrots into chips.",
       "Toss vegetables with 1 tsp olive oil, minced garlic, and a pinch of salt.",
       "Roast vegetables for 20–25 minutes in the oven alongside the chicken.",
       "Serve chicken with garlic veggies hot."
