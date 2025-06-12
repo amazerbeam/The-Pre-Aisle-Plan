@@ -741,8 +741,43 @@ const recipeData = [
     "For the pepper sauce: In the same pan used for the steaks, add crushed black peppercorns and rum. Let the alcohol cook off for 30 seconds. Add double cream and simmer for 2–3 minutes, scraping up any pan juices, until slightly thickened. Season with salt to taste.",
     "Serve the steaks hot with the chips, sautéed pearl onions, and drizzle with pepper sauce."
   ]
-}
-  , {
+},
+{
+  "id": 36,
+  "meal": ["dinner"],
+  "recipe": "Satay Chicken",
+  "defaultServings": 2,
+  "ingredients": [
+    { "name": "Chicken breast", "quantity": 240, "unit": "g" },
+    { "name": "Green bell pepper", "quantity": 1, "unit": "piece" },
+    { "name": "Red bell pepper", "quantity": 1, "unit": "piece" },
+    { "name": "Onion", "quantity": 1, "unit": "piece" },
+    { "name": "Pak choi", "quantity": 300, "unit": "g" },
+    { "name": "Celery", "quantity": 2, "unit": "pieces" },
+    { "name": "Salt", "quantity": 0.5, "unit": "tsp" },
+    { "name": "Olive oil", "quantity": 1, "unit": "tbsp" },
+    { "name": "Soy sauce", "quantity": 1, "unit": "tbsp" },
+    { "name": "Peanutbutter", "quantity": 2, "unit": "tbsp" },
+    { "name": "Coconut Milk", "quantity": 100, "unit": "ml" },
+    { "name": "Worcestershire sauce", "quantity": 0.5, "unit": "tbsp" },
+    { "name": "Garlic", "quantity": 1, "unit": "clove" },
+    { "name": "Corn flour", "quantity": 1, "unit": "tsp" },
+    { "name": "Water (for slurry)", "quantity": 1, "unit": "tbsp" },
+    { "name": "Lime Juice", "quantity": 0.5, "unit": "tsp" },
+    { "name": "Ground Cumin", "quantity": 0.25, "unit": "tsp" }
+  ],
+  "steps": [
+    "Chop the chicken breast and vegetables (peppers, onion, celery, pak choi).",
+    "In the morning or the night before, toss the sliced chicken, peppers, onion, celery, and pak choi with olive oil and salt. Cover and refrigerate to marinate.",
+    "Heat a large pan or wok over medium-high heat.",
+    "Add the marinated chicken and vegetables to the pan and stir-fry for about 5-7 minutes until the chicken is mostly cooked.",
+    "Stir in the peanut butter and mix well to coat the chicken and vegetables.",
+    "Add the soy sauce, coconut milk, Worcestershire sauce, minced garlic, lime juice, and ground cumin. Stir everything together and let simmer for a few minutes.",
+    "In a small bowl, mix the corn flour with 1 tablespoon of water to create a slurry.",
+    "Pour the slurry into the pan, stirring constantly, and cook for another 1-2 minutes until the sauce thickens.",
+    "Serve hot. Optionally, garnish with lime or chopped peanuts."
+  ]
+}, {
     "id": 0,
     "meal": ["breakfast", "lunch", "dinner", "snacks"],
     "recipe": "Skip",
