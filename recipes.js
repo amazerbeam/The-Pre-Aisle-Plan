@@ -784,7 +784,42 @@ const recipeData = [
     "defaultServings": 2,
     "ingredients": [],
     "steps": []
-  }
+  },
+  {
+  "id": 37,
+  "meal": ["lunch"],
+  "recipe": "Lentils with Pak Choi",
+  "defaultServings": 4,
+  "ingredients": [
+    { "name": "Brown lentils", "quantity": 400, "unit": "g" },
+    { "name": "Onion", "quantity": 1, "unit": "piece" },
+    { "name": "Garlic", "quantity": 3, "unit": "cloves" },
+    { "name": "Carrots", "quantity": 2, "unit": "pieces" },
+    { "name": "Celery", "quantity": 2, "unit": "sticks" },
+    { "name": "Tomatoes", "quantity": 2, "unit": "pieces" },
+    { "name": "Pak choi", "quantity": 300, "unit": "g" },
+    { "name": "Bay leaf", "quantity": 1, "unit": "piece" },
+    { "name": "Broth", "quantity": 1500, "unit": "ml" },
+    { "name": "Ground paprika", "quantity": 1, "unit": "tsp" },
+    { "name": "Ground cumin", "quantity": 1, "unit": "tsp" },
+    { "name": "Salt", "quantity": 1, "unit": "tsp" },
+    { "name": "Pepper", "quantity": 1, "unit": "to taste" },
+    { "name": "Capers (optional)", "quantity": 2, "unit": "tbsp" },
+    { "name": "Red bell pepper (optional)", "quantity": 1, "unit": "piece" }
+  ],
+  "steps": [
+    "Dice the onion, garlic, carrots, and celery.",
+    "Rinse the lentils under cold water and set aside.",
+    "In a large pot, heat olive oil over medium heat. Add the diced onion, garlic, carrots, and celery. Sauté for about 5-7 minutes until softened. Add salt.",
+    "Chop the pak choi stems (reserve the leaves for later) and add to the pot. Cook for another 3-4 minutes until softened.",
+    "Stir in ground cumin and paprika, and cook for 1 minute until fragrant.",
+    "Add the diced tomatoes (or substitute with 1 can of tomatoes if using). Cook for another 3 minutes.",
+    "Add lentils, bay leaf, and broth. Bring to a boil, then reduce heat to low, cover, and simmer for 25-30 minutes until lentils are tender, stirring occasionally.",
+    "When lentils are nearly cooked, add the pak choi leaves. Simmer for an additional 5 minutes until wilted.",
+    "Once lentils are tender, season with salt and pepper to taste."
+  ]
+}
+
 
 
 
