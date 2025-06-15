@@ -889,6 +889,8 @@ const recipeData = [
     "recipe": "Skip",
     "defaultServings": 2,
     "ingredients": [],
+        "calories": 0,
+
     "steps": []
   }
 

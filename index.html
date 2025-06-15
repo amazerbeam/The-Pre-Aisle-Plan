@@ -240,7 +240,8 @@
         if (!entry[mealType]) return;
 
         const btn = document.createElement('button');
-        btn.textContent = mealType.charAt(0).toUpperCase() + mealType.slice(1);
+        const caloriesPerServing = (entry.calories / (entry.defaultServings || 1)).toFixed(0);
+        btn.textContent = `${mealType.charAt(0).toUpperCase() + mealType.slice(1)} — ${caloriesPerServing} kcal per serving`;
         btn.style.padding = '8px 12px';
         btn.style.borderRadius = '6px';
         btn.style.border = '1px solid #ccc';
@@ -275,7 +276,10 @@
     function openFullscreen(entry) {
       requestWakeLock(); // 🟢 prevent sleep
       const servings = localServingsMap.get(entry.id) || entry.defaultServings || 1;
-      document.getElementById('fullscreen-title').textContent = `${entry.recipe} (Serves: ${servings})`;
+      const caloriesPerServing = (entry.calories / (entry.defaultServings || 1)).toFixed(0);
+      document.getElementById('fullscreen-title').textContent = `${entry.recipe} — ${caloriesPerServing} kcal per serving (Serves: ${servings})`;
+
+
       const container = document.getElementById('fullscreen-content');
       container.innerHTML = '';
 
@@ -338,22 +342,36 @@
         box.appendChild(heading);
 
         const list = document.createElement('ul');
+        let totalCalories = 0;  // add this before the loop
+
         ['breakfast', 'lunch', 'dinner', 'snacks'].forEach(mealType => {
           if (entry && entry[mealType]) {
             const recipeObj = entry[mealType];
             const recipe = recipeData.find(r => r && r.id === (recipeObj?.id || recipeObj));
             const servings = recipeObj?.servings || 1;
             if (recipe) {
-              const li = document.createElement('li');
-              li.textContent = mealType + ": " + recipe.recipe + " (x" + servings + ")";
+              const caloriesPerServing = (recipe.calories / (recipe.defaultServings || 1));
+              totalCalories += caloriesPerServing * servings;
 
+              const li = document.createElement('li');
+              li.textContent = `${mealType}: ${recipe.recipe} (${caloriesPerServing.toFixed(0)} kcal per serving) (x${servings})`;
               li.style.cursor = 'pointer';
               li.onclick = () => openFullscreen(recipe);
-
               list.appendChild(li);
             }
           }
         });
+
+        // ✅ After all meals have been processed, display total calories:
+        const totalCaloriesText = document.createElement('div');
+        totalCaloriesText.style.marginTop = "5px";
+        totalCaloriesText.style.fontWeight = "bold";
+        totalCaloriesText.textContent = `Total Calories: ${totalCalories.toFixed(0)} kcal`;
+
+        box.appendChild(list);
+        box.appendChild(totalCaloriesText);
+        calendar.appendChild(box);
+
 
         box.appendChild(list);
         calendar.appendChild(box);
@@ -774,11 +792,16 @@
           maximizeBtn.onclick = () => openFullscreen(entry);
           section.appendChild(maximizeBtn);
 
-          // Recipe title + calories
           const title = document.createElement('h2');
+
+
+          // Recipe title + calories
+          const caloriesPerServing = (entry.calories / (entry.defaultServings || 1)).toFixed(0);
           title.textContent = entry.isCheat
-            ? `${entry.recipe} (Cheat) — ${entry.calories} kcal`
-            : `${entry.recipe} — ${entry.calories} kcal`;
+            ? `${entry.recipe} (Cheat) — ${caloriesPerServing} kcal per serving`
+            : `${entry.recipe} — ${caloriesPerServing} kcal per serving`;
+
+
           section.appendChild(title);
 
           section.appendChild(title);
