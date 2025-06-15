@@ -777,14 +777,7 @@ const recipeData = [
     "Pour the slurry into the pan, stirring constantly, and cook for another 1-2 minutes until the sauce thickens.",
     "Serve hot. Optionally, garnish with lime or chopped peanuts."
   ]
-}, {
-    "id": 0,
-    "meal": ["breakfast", "lunch", "dinner", "snacks"],
-    "recipe": "Skip",
-    "defaultServings": 2,
-    "ingredients": [],
-    "steps": []
-  },
+}, 
   {
   "id": 37,
   "meal": ["lunch"],
@@ -818,8 +811,56 @@ const recipeData = [
     "When lentils are nearly cooked, add the pak choi leaves. Simmer for an additional 5 minutes until wilted.",
     "Once lentils are tender, season with salt and pepper to taste."
   ]
-}
+},
 
+{
+  "id": 38,
+  "meal": ["breakfast"],
+  "isCheat": true,
+  "recipe": "Hash Browns & Bacon Sandwich",
+  "defaultServings": 2,
+  "ingredients": [
+    { "name": "Streaky bacon", "quantity": 12, "unit": "slices" },
+    { "name": "Bread", "quantity": 4, "unit": "slices" },
+    { "name": "Potatoes", "quantity": 500, "unit": "g" },
+    { "name": "Onion", "quantity": 70, "unit": "g" },
+    { "name": "Salt", "quantity": 1, "unit": "tsp" },
+    { "name": "Butter", "quantity": 20, "unit": "g" }
+  ],
+  "steps": [
+    "Peel and grate the potatoes and onion. Combine with salt.",
+    "Place mixture in a clean towel and squeeze out as much water as possible.",
+    "Form into hash browns (about 100g each).",
+    "Heat butter in a pan and fry hash browns until golden and crisp on both sides. Freeze extras.",
+    "Fry bacon until crispy.",
+    "Toast the bread slices.",
+    "Assemble each sandwich with 1 hash brown and 3 slices of bacon between 2 slices of bread. Serve hot."
+  ]
+},
+{
+  "id": 39,
+  "meal": ["snacks"],
+  "isCheat": true,
+  "recipe": "Toast and Butter",
+  "defaultServings": 2,
+  "ingredients": [
+    { "name": "Bread", "quantity": 4, "unit": "slices" },
+    { "name": "Butter", "quantity": 20, "unit": "g" }
+  ],
+  "steps": [
+    "Toast the bread slices.",
+    "Spread butter on each slice.",
+    "Serve warm."
+  ]
+},
 
+{
+    "id": 0,
+    "meal": ["breakfast", "lunch", "dinner", "snacks"],
+    "recipe": "Skip",
+    "defaultServings": 2,
+    "ingredients": [],
+    "steps": []
+  },
 
 ];
