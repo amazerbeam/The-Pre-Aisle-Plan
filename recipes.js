@@ -583,7 +583,7 @@ const recipeData = [
     "recipe": "Overnight Boiled Chicken with Gravy & Corn",
     "defaultServings": 2,
     "ingredients": [
-      { "name": "Chicken thighs", "quantity": 2, "unit": "pieces" },
+      { "name": "Chicken breasts", "quantity": 240, "unit": "g" },
       { "name": "Chicken stock", "quantity": 500, "unit": "ml" },
       { "name": "Garlic", "quantity": 1, "unit": "clove" },
       { "name": "Onion", "quantity": 1, "unit": "small" },
