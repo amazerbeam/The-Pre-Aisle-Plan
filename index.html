@@ -247,6 +247,7 @@
         btn.style.cursor = 'pointer';
         btn.onclick = () => {
           const recipeId = entry[mealType].id || entry[mealType];
+          debugger;
           const recipe = recipeData.find(r => r.id === recipeId);
           if (recipe) {
             closeMealPopup();
