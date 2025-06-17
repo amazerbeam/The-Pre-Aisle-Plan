@@ -103,7 +103,7 @@ const recipeData = [
       { "name": "Pak choi", "quantity": 300, "unit": "g" },
       { "name": "Celery", "quantity": 2, "unit": "pieces" },
       { "name": "Salt", "quantity": 0.5, "unit": "tsp" },
-      { "name": "Olive oil", "quantity": 1, "unit": "tbsp" }, // For marinating
+      { "name": "Olive oil", "quantity": 1, "unit": "tbsp" },
       { "name": "Soy sauce", "quantity": 1, "unit": "tbsp" },
       { "name": "Worcestershire sauce", "quantity": 0.5, "unit": "tbsp" },
       { "name": "Ginger", "quantity": 1, "unit": "tsp" },
@@ -665,12 +665,10 @@ const recipeData = [
     "recipe": "Argentine Beef Empanada Bites",
     "defaultServings": 2,
     "ingredients": [
-      // Pastry
       { "name": "Plain flour", "quantity": 300, "unit": "g" },
       { "name": "Salt", "quantity": 1, "unit": "tsp" },
       { "name": "Butter or lard (cold, cubed)", "quantity": 75, "unit": "g" },
       { "name": "Warm water", "quantity": 120, "unit": "ml" },
-      // Filling
       { "name": "Olive oil", "quantity": 1, "unit": "tbsp" },
       { "name": "Onion", "quantity": 1, "unit": "medium, finely chopped" },
       { "name": "Red bell pepper", "quantity": 0.5, "unit": "piece, finely chopped" },
@@ -686,13 +684,11 @@ const recipeData = [
       { "name": "Fresh parsley (optional)", "quantity": 1, "unit": "tbsp, chopped" }
     ],
     "steps": [
-      // Pastry
       "Mix flour and salt in a large bowl.",
       "Rub in the cold butter or lard with your fingers until the mixture resembles breadcrumbs.",
       "Add warm water a little at a time, mixing until a dough forms.",
       "Knead for about 5 minutes until smooth. Cover and let rest for 30 minutes.",
       "Roll out dough to 2–3mm thick and cut into 12cm circles. Keep covered until ready to fill.",
-      // Filling
       "Heat olive oil in a pan over medium heat.",
       "Add onion and red pepper, cook until softened (5–7 minutes).",
       "Add garlic, cook for 1 minute.",
@@ -700,15 +696,13 @@ const recipeData = [
       "Stir in paprika, cumin, chili flakes, salt, and pepper. Cook 2–3 minutes.",
       "Remove from heat and let cool slightly.",
       "Mix in chopped boiled eggs, olives, and parsley if using.",
-      // Assembly
       "Place a spoonful of filling in the center of each dough circle. Fold over and seal the edges.",
       "Place on a baking tray, brush with beaten egg if desired.",
       "Bake at 200°C (392°F) for 18–22 minutes until golden.",
       "Serve warm."
     ]
   },
-  // ...existing code...
-  ,
+  
   {
     "id": 35,
     "meal": ["dinner"],
@@ -725,7 +719,6 @@ const recipeData = [
       { "name": "Garlic", "quantity": 2, "unit": "cloves" },
       { "name": "Fresh thyme or rosemary", "quantity": 2, "unit": "sprigs (optional)" },
       { "name": "Pearl onions", "quantity": 8, "unit": "pieces" },
-      // Pepper sauce
       { "name": "Double cream", "quantity": 100, "unit": "ml" },
       { "name": "Rum", "quantity": 1, "unit": "tbsp" },
       { "name": "Black peppercorns, crushed", "quantity": 1, "unit": "tsp" }
