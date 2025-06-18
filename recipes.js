@@ -880,8 +880,49 @@ const recipeData = [
     "Drain on kitchen paper and serve hot."
   ]
 },
-
-  {
+{
+  "id": 41,
+  "meal": ["lunch"],
+  "isCheat": true,
+  "recipe": "Airport Burrito",
+  "defaultServings": 4,
+  "ingredients": [
+    { "name": "Beef roast (chuck or topside)", "quantity": 1000, "unit": "g" },
+    { "name": "Salt", "quantity": 1, "unit": "tsp" },
+    { "name": "Black pepper", "quantity": 0.5, "unit": "tsp" },
+    { "name": "Oil", "quantity": 1, "unit": "tbsp" },
+    { "name": "Onion", "quantity": 2, "unit": "medium" },
+    { "name": "Garlic", "quantity": 2, "unit": "cloves" },
+    { "name": "Cumin", "quantity": 1, "unit": "tsp" },
+    { "name": "Smoked paprika", "quantity": 1, "unit": "tsp" },
+    { "name": "Beef stock", "quantity": 500, "unit": "ml" },
+    { "name": "Butter", "quantity": 2, "unit": "tbsp" },
+    { "name": "Plain flour", "quantity": 2, "unit": "tbsp" },
+    { "name": "Worcestershire sauce", "quantity": 1, "unit": "tsp" },
+    { "name": "Frank’s Hot Sauce", "quantity": 2, "unit": "tsp" },
+    { "name": "Uncooked rice", "quantity": 0.33, "unit": "cups" },
+    { "name": "Avocados", "quantity": 2, "unit": "pieces" },
+    { "name": "Halloumi", "quantity": 200, "unit": "g" },
+    { "name": "Jalapeños", "quantity": 4, "unit": "tbsp (sliced)" },
+    { "name": "Flour tortillas", "quantity": 4, "unit": "large" }
+  ],
+  "steps": [
+    "Season beef with salt and pepper.",
+    "Sear beef in oil until browned on all sides, then remove and set aside.",
+    "Sauté sliced onions and minced garlic until soft and golden.",
+    "Add cumin and smoked paprika, stir well.",
+    "Return beef to the pot and pour in beef stock. Simmer covered at 160°C for about 2.5 hours, until tender.",
+    "Remove beef and shred with forks. Strain the stock if desired.",
+    "In a saucepan, melt butter and whisk in flour to make a roux.",
+    "Gradually add hot beef stock, whisking until thickened. Stir in Worcestershire sauce and Frank’s Hot Sauce.",
+    "Add shredded beef and cooked onions back into the gravy. Mix well.",
+    "Cook rice according to package instructions.",
+    "Slice halloumi and pan-fry until golden on both sides.",
+    "Warm the tortillas.",
+    "Assemble each burrito with cooked rice, shredded beef in gravy, sliced or mashed avocado, fried halloumi, and jalapeños.",
+    "Roll the burritos tightly and toast seam-side down in a dry pan until golden and warm."
+  ]
+},  {
     "id": 0,
     "meal": ["breakfast", "lunch", "dinner", "snacks"],
     "recipe": "Skip",
