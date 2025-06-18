@@ -845,7 +845,43 @@ const recipeData = [
       "Spread butter on each slice.",
       "Serve warm."
     ]
-  }, {
+  }, 
+  
+  {
+  "id": 40,
+  "meal": ["lunch"],
+  "isCheat" : true,
+  "recipe": "Cheese & Bacon Arancini",
+  "defaultServings": 2,
+  "ingredients": [
+    { "name": "Risotto rice", "quantity": 300, "unit": "g" },
+    { "name": "Stock", "quantity": 700, "unit": "ml" },
+    { "name": "Onion", "quantity": 1, "unit": "small" },
+    { "name": "Olive oil", "quantity": 2, "unit": "tbsp" },
+    { "name": "Bacon", "quantity": 100, "unit": "g" },
+    { "name": "Mozzarella", "quantity": 100, "unit": "g" },
+    { "name": "Parmesan", "quantity": 40, "unit": "g" },
+    { "name": "Egg", "quantity": 1, "unit": "piece" },
+    { "name": "Breadcrumbs", "quantity": 80, "unit": "g" },
+    { "name": "Breadcrumbs", "quantity": 40, "unit": "g (for coating)" },
+    { "name": "Salt", "quantity": 0.5, "unit": "tsp" },
+    { "name": "Pepper", "quantity": 0.25, "unit": "tsp" },
+  ],
+  "steps": [
+    "Heat olive oil and sauté chopped onion until soft.",
+    "Add chopped bacon and cook until crispy.",
+    "Stir in risotto rice, toast for 1–2 minutes.",
+    "Gradually add stock while stirring until rice is cooked and creamy (about 20 minutes).",
+    "Stir in grated Parmesan, season with salt and pepper, and let cool completely.",
+    "Mix in beaten egg and 80g breadcrumbs.",
+    "Form golf-ball-sized balls, inserting a cube of mozzarella in the center of each.",
+    "Roll each ball in the remaining breadcrumbs to coat.",
+    "Heat oil to 170–180°C and deep-fry arancini in batches until golden (3–4 minutes).",
+    "Drain on kitchen paper and serve hot."
+  ]
+},
+
+  {
     "id": 0,
     "meal": ["breakfast", "lunch", "dinner", "snacks"],
     "recipe": "Skip",
