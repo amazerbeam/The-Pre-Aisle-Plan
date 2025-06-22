@@ -418,7 +418,7 @@ li.checked {
   border-bottom: 1px solid #ddd;
 }
 
-#recipe-container {
+/*#recipe-container {
   scroll-snap-type: y mandatory;
   overflow-y: scroll;
   scroll-behavior: smooth;
@@ -428,4 +428,4 @@ li.checked {
   scroll-snap-align: start;
   padding: 20px;
   border-bottom: 1px solid #ddd;
-}
+}*/
