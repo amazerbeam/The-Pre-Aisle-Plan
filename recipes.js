@@ -108,7 +108,7 @@ const recipeData = [
       { "name": "Pak choi", "quantity": 300, "unit": "g" },
       { "name": "Celery", "quantity": 2, "unit": "pieces" },
       { "name": "Salt", "quantity": 0.5, "unit": "tsp" },
-      { "name": "Olive oil", "quantity": 1, "unit": "tbsp" }, // For marinating
+      { "name": "Olive oil", "quantity": 1, "unit": "tbsp" },
       { "name": "Soy sauce", "quantity": 1, "unit": "tbsp" },
       { "name": "Worcestershire sauce", "quantity": 0.5, "unit": "tbsp" },
       { "name": "Ginger", "quantity": 1, "unit": "tsp" },
@@ -650,9 +650,11 @@ const recipeData = [
       { "name": "Fresh basil (leaves or granules)", "quantity": 1, "unit": "tbsp" },
       { "name": "Capers", "quantity": 1, "unit": "tbsp" },
       { "name": "Olive oil", "quantity": 2, "unit": "tbsp" },
-      { "name": "Salt", "quantity": 1.5, "unit": "tsp" },
+      { "name": "Salt", "quantity": 1, "unit": "tsp" },
+      { "name": "Sugar", "quantity": 1, "unit": "tsp" },
       { "name": "Black pepper", "quantity": 0.25, "unit": "tsp" },
-      { "name": "Italian seasoning herbs", "quantity": 1, "unit": "tsp" }
+      { "name": "Italian seasoning herbs", "quantity": 1, "unit": "tsp" },
+      { "name": "Stock", "quantity": 1, "unit": "cup" },
     ],
     "steps": [
       "Finely chop half the onion, 1 clove garlic, and half the basil (if using leaves). In a bowl, mix with turkey mince, salt, and pepper.",
@@ -662,8 +664,9 @@ const recipeData = [
       "Add a little more olive oil if needed, then fry the meatballs in the same pan until browned on all sides. Remove and set aside.",
       "In a saucepan, heat 1 tbsp olive oil over medium heat. Add the remaining garlic and sauté for 30 seconds until fragrant.",
       "Add the capers and cook for another minute.",
-      "Add the tinned tomatoes, 1 tsp salt, and Italian seasoning herbs. Stir and bring to a simmer.",
+      "Add the tinned tomatoes, 1 tsp salt,  1 tsp sugar and Italian seasoning herbs. Stir and bring to a simmer.",
       "Return the fried vegetables and meatballs to the sauce, along with the lentils. Stir to combine.",
+      "Add the stock and bring to a gentle simmer.",
       "Cover and simmer everything together for 30 minutes on low heat.",
       "Stir in the spinach and remaining basil (if using leaves) until wilted.",
       "Taste and adjust seasoning if needed. Serve hot."
@@ -692,12 +695,10 @@ const recipeData = [
     "defaultServings": 2,
     "calories": 900,
     "ingredients": [
-      // Pastry
       { "name": "Plain flour", "quantity": 300, "unit": "g" },
       { "name": "Salt", "quantity": 1, "unit": "tsp" },
       { "name": "Butter or lard (cold, cubed)", "quantity": 75, "unit": "g" },
       { "name": "Warm water", "quantity": 120, "unit": "ml" },
-      // Filling
       { "name": "Olive oil", "quantity": 1, "unit": "tbsp" },
       { "name": "Onion", "quantity": 1, "unit": "medium, finely chopped" },
       { "name": "Red bell pepper", "quantity": 0.5, "unit": "piece, finely chopped" },
@@ -713,13 +714,11 @@ const recipeData = [
       { "name": "Fresh parsley (optional)", "quantity": 1, "unit": "tbsp, chopped" }
     ],
     "steps": [
-      // Pastry
       "Mix flour and salt in a large bowl.",
       "Rub in the cold butter or lard with your fingers until the mixture resembles breadcrumbs.",
       "Add warm water a little at a time, mixing until a dough forms.",
       "Knead for about 5 minutes until smooth. Cover and let rest for 30 minutes.",
       "Roll out dough to 2–3mm thick and cut into 12cm circles. Keep covered until ready to fill.",
-      // Filling
       "Heat olive oil in a pan over medium heat.",
       "Add onion and red pepper, cook until softened (5–7 minutes).",
       "Add garlic, cook for 1 minute.",
@@ -727,14 +726,13 @@ const recipeData = [
       "Stir in paprika, cumin, chili flakes, salt, and pepper. Cook 2–3 minutes.",
       "Remove from heat and let cool slightly.",
       "Mix in chopped boiled eggs, olives, and parsley if using.",
-      // Assembly
       "Place a spoonful of filling in the center of each dough circle. Fold over and seal the edges.",
       "Place on a baking tray, brush with beaten egg if desired.",
       "Bake at 200°C (392°F) for 18–22 minutes until golden.",
       "Serve warm."
     ]
   },
-  // ...existing code...
+
   {
     "id": 35,
     "meal": ["dinner"],
@@ -752,7 +750,6 @@ const recipeData = [
       { "name": "Garlic", "quantity": 2, "unit": "cloves" },
       { "name": "Fresh thyme or rosemary", "quantity": 2, "unit": "sprigs (optional)" },
       { "name": "Pearl onions", "quantity": 8, "unit": "pieces" },
-      // Pepper sauce
       { "name": "Double cream", "quantity": 100, "unit": "ml" },
       { "name": "Rum", "quantity": 1, "unit": "tbsp" },
       { "name": "Black peppercorns, crushed", "quantity": 1, "unit": "tsp" }
@@ -882,6 +879,85 @@ const recipeData = [
       "Toast the bread slices.",
       "Spread butter on each slice.",
       "Serve warm."
+    ]
+  },
+
+  {
+    "id": 40,
+    "meal": ["lunch"],
+    "isCheat": true,
+    "recipe": "Cheese & Bacon Arancini",
+    "defaultServings": 2,
+    "ingredients": [
+      { "name": "Risotto rice", "quantity": 300, "unit": "g" },
+      { "name": "Stock", "quantity": 700, "unit": "ml" },
+      { "name": "Onion", "quantity": 1, "unit": "small" },
+      { "name": "Olive oil", "quantity": 2, "unit": "tbsp" },
+      { "name": "Bacon", "quantity": 100, "unit": "g" },
+      { "name": "Mozzarella", "quantity": 100, "unit": "g" },
+      { "name": "Parmesan", "quantity": 40, "unit": "g" },
+      { "name": "Egg", "quantity": 1, "unit": "piece" },
+      { "name": "Breadcrumbs", "quantity": 80, "unit": "g" },
+      { "name": "Breadcrumbs", "quantity": 40, "unit": "g (for coating)" },
+      { "name": "Salt", "quantity": 0.5, "unit": "tsp" },
+      { "name": "Pepper", "quantity": 0.25, "unit": "tsp" },
+    ],
+    "steps": [
+      "Heat olive oil and sauté chopped onion until soft.",
+      "Add chopped bacon and cook until crispy.",
+      "Stir in risotto rice, toast for 1–2 minutes.",
+      "Gradually add stock while stirring until rice is cooked and creamy (about 20 minutes).",
+      "Stir in grated Parmesan, season with salt and pepper, and let cool completely.",
+      "Mix in beaten egg and 80g breadcrumbs.",
+      "Form golf-ball-sized balls, inserting a cube of mozzarella in the center of each.",
+      "Roll each ball in the remaining breadcrumbs to coat.",
+      "Heat oil to 170–180°C and deep-fry arancini in batches until golden (3–4 minutes).",
+      "Drain on kitchen paper and serve hot."
+    ]
+  },
+  {
+    "id": 41,
+    "meal": ["lunch"],
+    "isCheat": true,
+    "recipe": "Airport Burrito",
+    "defaultServings": 4,
+    "ingredients": [
+      { "name": "Beef roast (chuck or topside)", "quantity": 1000, "unit": "g" },
+      { "name": "Salt", "quantity": 1, "unit": "tsp" },
+      { "name": "Black pepper", "quantity": 0.5, "unit": "tsp" },
+      { "name": "Oil", "quantity": 1, "unit": "tbsp" },
+      { "name": "Onion", "quantity": 2, "unit": "medium" },
+      { "name": "Garlic", "quantity": 2, "unit": "cloves" },
+      { "name": "Cumin", "quantity": 1, "unit": "tsp" },
+      { "name": "Smoked paprika", "quantity": 1, "unit": "tsp" },
+      { "name": "Beef stock", "quantity": 500, "unit": "ml" },
+      { "name": "Butter", "quantity": 2, "unit": "tbsp" },
+      { "name": "Plain flour", "quantity": 2, "unit": "tbsp" },
+      { "name": "Worcestershire sauce", "quantity": 1, "unit": "tsp" },
+      { "name": "Frank’s Hot Sauce", "quantity": 2, "unit": "tsp" },
+      { "name": "Uncooked rice", "quantity": 0.33, "unit": "cups" },
+      { "name": "Avocados", "quantity": 2, "unit": "pieces" },
+      { "name": "Halloumi", "quantity": 200, "unit": "g" },
+      { "name": "Jalapeños", "quantity": 4, "unit": "tbsp (sliced)" },
+      { "name": "Flour tortillas", "quantity": 4, "unit": "large" },
+      { "name": "Mozzarella", "quantity": 100, "unit": "g" },
+      { "name": "Parmesan", "quantity": 40, "unit": "g" },
+    ],
+    "steps": [
+      "Season beef with salt and pepper.",
+      "Sear beef in oil until browned on all sides, then remove and set aside.",
+      "Sauté sliced onions and minced garlic until soft and golden.",
+      "Add cumin and smoked paprika, stir well.",
+      "Return beef to the pot and pour in beef stock. Simmer covered at 160°C for about 2.5 hours, until tender.",
+      "Remove beef and shred with forks. Strain the stock if desired.",
+      "In a saucepan, melt butter and whisk in flour to make a roux.",
+      "Gradually add hot beef stock, whisking until thickened. Stir in Worcestershire sauce and Frank’s Hot Sauce.",
+      "Add shredded beef and cooked onions back into the gravy. Mix well.",
+      "Cook rice according to package instructions.",
+      "Slice halloumi and pan-fry until golden on both sides.",
+      "Warm the tortillas.",
+      "Assemble each burrito with cooked rice, shredded beef in gravy, sliced or mashed avocado, fried halloumi, mozzarella, parmesan and jalapeños.",
+      "Roll the burritos tightly and toast seam-side down in a dry pan until golden and warm."
     ]
   }, {
     "id": 0,
