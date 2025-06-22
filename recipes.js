@@ -887,6 +887,8 @@ const recipeData = [
     "meal": ["lunch"],
     "isCheat": true,
     "recipe": "Cheese & Bacon Arancini",
+        "calories": 974 ,
+
     "defaultServings": 2,
     "ingredients": [
       { "name": "Risotto rice", "quantity": 300, "unit": "g" },
@@ -921,6 +923,8 @@ const recipeData = [
     "isCheat": true,
     "recipe": "Airport Burrito",
     "defaultServings": 4,
+        "calories": 1,266,
+
     "ingredients": [
       { "name": "Beef roast (chuck or topside)", "quantity": 1000, "unit": "g" },
       { "name": "Salt", "quantity": 1, "unit": "tsp" },
