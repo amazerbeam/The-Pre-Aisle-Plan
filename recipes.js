@@ -923,8 +923,7 @@ const recipeData = [
     "isCheat": true,
     "recipe": "Airport Burrito",
     "defaultServings": 4,
-        "calories": 1,266,
-
+        "calories": 1266,
     "ingredients": [
       { "name": "Beef roast (chuck or topside)", "quantity": 1000, "unit": "g" },
       { "name": "Salt", "quantity": 1, "unit": "tsp" },
