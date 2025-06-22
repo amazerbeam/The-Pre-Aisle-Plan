@@ -405,3 +405,27 @@ li.checked {
   opacity: 0.6;
   background-color: #f4f4f4;
 }
+
+#recipe-container {
+  scroll-snap-type: y mandatory;
+  overflow-y: scroll;
+  max-height: calc(100vh - 100px); /* adjust to leave room for header etc */
+}
+
+.section {
+  scroll-snap-align: start;
+  padding: 20px;
+  border-bottom: 1px solid #ddd;
+}
+
+#recipe-container {
+  scroll-snap-type: y mandatory;
+  overflow-y: scroll;
+  scroll-behavior: smooth;
+  max-height: calc(100vh - 100px);
+}
+.section {
+  scroll-snap-align: start;
+  padding: 20px;
+  border-bottom: 1px solid #ddd;
+}
