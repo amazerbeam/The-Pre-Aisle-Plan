@@ -100,6 +100,15 @@
     <div id="fullscreen-content" style="padding: 20px;"></div>
   </div>
 
+  <button id="floating-menu-button">☰</button>
+
+<footer id="bottom-nav">
+  <button id="btn-mealplan"><span>📅</span><label>Meal Plan</label></button>
+  <button id="btn-shopping"><span>🛒</span><label>Shopping</label></button>
+</footer>
+
+
+
 
 
   <script>
@@ -132,6 +141,13 @@
         releaseWakeLock();
       }
     });
+
+    document.getElementById("btn-shopping").onclick = () => {
+      renderShoppingList();
+    };
+    document.getElementById("btn-mealplan").onclick = () => {
+      toggleFullMealPlan();
+    };
 
     const localServingsMap = new Map(); // Tracks manual servings per recipe
 
@@ -438,43 +454,7 @@
     }
 
 
-    /*function renderCalendar() {
-      const calendar = document.getElementById('calendar');
-      calendar.innerHTML = '';
 
-      const daysOfWeek = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
-
-      daysOfWeek.forEach(day => {
-        const entry = planner.find(p => p.day === day);
-        const box = document.createElement('div');
-        const hasAllMeals = entry &&
-          ['breakfast', 'lunch', 'dinner', 'snacks'].every(meal => entry[meal]);
-        box.className = hasAllMeals ? 'day-box full-day' : 'day-box';
-
-
-        const heading = document.createElement('h3');
-        heading.textContent = day.charAt(0).toUpperCase() + day.slice(1);
-        box.appendChild(heading);
-
-        const list = document.createElement('ul');
-        ['breakfast', 'lunch', 'dinner', 'snacks'].forEach(mealType => {
-          if (entry && entry[mealType]) {
-            const recipeObj = entry[mealType];
-            const recipe = recipeData.find(r => r && r.id === (recipeObj?.id || recipeObj));
-            const servings = recipeObj?.servings || 1;
-            if (recipe) {
-              const li = document.createElement('li');
-              li.textContent = mealType + ": " + recipe.recipe + " (x" + servings + ")";
-
-              list.appendChild(li);
-            }
-          }
-        });
-
-        box.appendChild(list);
-        calendar.appendChild(box);
-      });
-    }*/
 
 
     function renderTabs() {
@@ -482,7 +462,7 @@
       const tabsContainer = document.getElementById('tabs');
       tabsContainer.innerHTML = '';
 
-      [...meals, 'shopping list', 'meal plan'].forEach(meal => {
+      [...meals].forEach(meal => {
         const tab = document.createElement('div');
         tab.className = 'tab';
         tab.textContent = meal.charAt(0).toUpperCase() + meal.slice(1);
