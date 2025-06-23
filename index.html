@@ -100,7 +100,7 @@
     <div id="fullscreen-content" style="padding: 20px;"></div>
   </div>
 
-  <button id="floating-menu-button">☰</button>
+  <!-- <button id="floating-menu-button">☰</button> -->
 
   <footer id="bottom-nav">
     <button id="btn-mealplan"><span>📅</span><label>Meal Plan</label></button>
@@ -125,7 +125,6 @@
           if (confirm("This page includes a shared meal plan. Do you want to save it?")) {
             planner = sharedPlanner;
             localStorage.setItem('mealPlanner', JSON.stringify(planner));
-            renderCalendar();
           }
         }
       } catch (e) {
@@ -168,7 +167,6 @@
           if (confirm("This page includes a shared meal plan. Do you want to save it?")) {
             planner = sharedPlanner;
             localStorage.setItem('mealPlanner', JSON.stringify(planner));
-            renderCalendar();
           }
         }
       } catch (e) {
@@ -179,7 +177,6 @@
       if (cached) {
         try {
           planner = JSON.parse(cached);
-          renderCalendar(); // ✅ Restore the UI
         } catch (e) {
           console.error("Failed to parse cached planner", e);
         }
@@ -441,7 +438,6 @@
         const currentServings = parseFloat(servingsInput?.value || 1);
 
         entry[mealType] = { id: recipeId, servings: currentServings };
-        renderCalendar();
         console.log("Saving planner to localStorage:", planner);
         localStorage.setItem('mealPlanner', JSON.stringify(planner));
 
@@ -678,11 +674,10 @@
         if (index !== -1) planner.splice(index, 1);
       }
 
-      renderCalendar();
 
       // ✅ Save to localStorage
       console.log("Saving planner to localStorage:", planner);
-      localStorage.setItem('mealPlanner', JSON.stringify(planner));
+
 
     }
 
@@ -926,8 +921,13 @@
         if (index !== -1) planner.splice(index, 1);
       }
 
-      renderCalendar();
       localStorage.setItem('mealPlanner', JSON.stringify(planner));
+
+      // 🔁 re-render the current meal tab to update button states
+      const selectedMeal = document.querySelector(".tab.active")?.textContent.toLowerCase();
+      if (selectedMeal) {
+        renderRecipes(selectedMeal);
+      }
     }
 
     function setupGlobalServingTriggers(meal) {
