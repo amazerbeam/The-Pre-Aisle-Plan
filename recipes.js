@@ -4,6 +4,7 @@ const recipeData = [
     "meal": ["breakfast"],
     "recipe": "Overnight Oats",
     "defaultServings": 2,
+    "calories": 352,
     "ingredients": [
       { "name": "Rolled oats", "quantity": 40, "unit": "g" },
       { "name": "Greek yogurt", "quantity": 100, "unit": "g" },
@@ -25,6 +26,7 @@ const recipeData = [
     "meal": ["breakfast"],
     "recipe": "Scrambled Eggs",
     "defaultServings": 2,
+    "calories": 476,
     "ingredients": [
       { "name": "Eggs", "quantity": 8, "unit": "small" },
       { "name": "Butter", "quantity": 1, "unit": "tsp" }
@@ -41,6 +43,7 @@ const recipeData = [
     "meal": ["lunch"],
     "recipe": "Grilled Chicken Salad",
     "defaultServings": 2,
+    "calories": 420,
     "ingredients": [
       { "name": "Chicken breast", "quantity": 240, "unit": "g" },
       { "name": "Salad leaves", "quantity": 2, "unit": "handfuls" },
@@ -69,6 +72,7 @@ const recipeData = [
     "meal": ["dinner"],
     "recipe": "Baked Salmon",
     "defaultServings": 2,
+    "calories": 670,
     "ingredients": [
       { "name": "Salmon fillet", "quantity": 2, "unit": "pieces" },
       { "name": "Broccoli", "quantity": 1, "unit": "head" },
@@ -95,6 +99,7 @@ const recipeData = [
     "meal": ["dinner"],
     "recipe": "Stir-Fried Chicken & Peppers",
     "defaultServings": 2,
+    "calories": 410,
     "ingredients": [
       { "name": "Chicken breast", "quantity": 240, "unit": "g" },
       { "name": "Green bell pepper", "quantity": 1, "unit": "piece" },
@@ -129,7 +134,7 @@ const recipeData = [
     "meal": ["dinner"],
     "recipe": "Tofu Stir-Fry",
     "defaultServings": 2,
-
+    "calories": 420,
     "ingredients": [
       { "name": "Firm tofu", "quantity": 300, "unit": "g" },
       { "name": "Olive oil or ghee", "quantity": 2, "unit": "tbsp" },
@@ -155,6 +160,7 @@ const recipeData = [
     "recipe": "Pancakes and Bacon",
     "isCheat": true,
     "defaultServings": 2,
+    "calories": 900,
     "ingredients": [
       { "name": "Plain flour", "quantity": 100, "unit": "g" },
       { "name": "Eggs", "quantity": 2, "unit": "small" },
@@ -178,6 +184,7 @@ const recipeData = [
     "meal": ["snacks"],
     "recipe": "Apple and Almond Nuts",
     "defaultServings": 2,
+    "calories": 210,
     "ingredients": [
       { "name": "Apple", "quantity": 2, "unit": "medium" },
       { "name": "Almonds", "quantity": 30, "unit": "g" }
@@ -192,6 +199,7 @@ const recipeData = [
     "meal": ["snacks"],
     "recipe": "Pineapple & Cashew Snack",
     "defaultServings": 2,
+    "calories": 170,
     "ingredients": [
       { "name": "Pineapple chunks", "quantity": 150, "unit": "g" },
       { "name": "Cashews", "quantity": 30, "unit": "g" }
@@ -206,6 +214,7 @@ const recipeData = [
     "meal": ["breakfast", "snacks"],
     "recipe": "Banana Chia Pudding",
     "defaultServings": 2,
+    "calories": 210,
     "ingredients": [
       { "name": "Chia seeds", "quantity": 4, "unit": "tbsp" },
       { "name": "Milk", "quantity": 160, "unit": "ml" },
@@ -226,6 +235,7 @@ const recipeData = [
     "meal": "lunch",
     "recipe": "Tuna & Egg Patties",
     "defaultServings": 2,
+    "calories": 320,
     "ingredients": [
       { "name": "Tuna", "quantity": 110, "unit": "g" },
       { "name": "Eggs", "quantity": 4, "unit": "small" },
@@ -249,6 +259,7 @@ const recipeData = [
     "recipe": "Crispy Spiced Chicken Wings",
     "defaultServings": 2,
     "isCheat": true,
+    "calories": 1100,
     "ingredients": [
       { "name": "Chicken wings", "quantity": 750, "unit": "g" },
       { "name": "Breadcrumbs", "quantity": 1, "unit": "cup" },
@@ -276,6 +287,7 @@ const recipeData = [
     isCheat: "true",
     "recipe": "Crispy Chicken Wings with Fries ",
     "defaultServings": 2,
+    "calories": 1800,
     "ingredients": [
       { "name": "Chicken wings", "quantity": 750, "unit": "g" },
       { "name": "Breadcrumbs", "quantity": 1, "unit": "cup" },
@@ -309,6 +321,7 @@ const recipeData = [
     "meal": ["lunch"],
     "recipe": "Turkey Lettuce Cups",
     "defaultServings": 2,
+    "calories": 350,
     "ingredients": [
       { "name": "Turkey mince", "quantity": 300, "unit": "g" },
       { "name": "Lettuce leaves", "quantity": 8, "unit": "pieces" },
@@ -338,6 +351,7 @@ const recipeData = [
     "meal": ["snacks"],
     "recipe": "Peach Yogurt Bowl",
     "defaultServings": 2,
+    "calories": 220,
     "ingredients": [
       { "name": "Peaches", "quantity": 2, "unit": "medium" },
       { "name": "Greek yogurt", "quantity": 200, "unit": "g" },
@@ -360,6 +374,7 @@ const recipeData = [
     "recipe": "Olive Oil Crackers with Pesto",
     "defaultServings": 2,
     "isCheat": true,
+    "calories": 340,
     "ingredients": [
       { "name": "Olive oil crackers", "quantity": 60, "unit": "g" },
       { "name": "Pesto", "quantity": 2, "unit": "tbsp" }
@@ -374,6 +389,7 @@ const recipeData = [
     "meal": ["dinner"],
     "recipe": "Breaded Chicken with Garlic Veggies",
     "defaultServings": 2,
+    "calories": 520,
     "ingredients": [
       { "name": "Chicken breasts", "quantity": 240, "unit": "g" },
       { "name": "Breadcrumbs", "quantity": 0.25, "unit": "cup" },
@@ -407,6 +423,7 @@ const recipeData = [
     "meal": ["dinner"],
     "recipe": "Chorizo Pizza",
     "defaultServings": 2,
+    "calories": 1800,
     "ingredients": [
       { "name": "Flour", "quantity": 450, "unit": "g" },
       { "name": "Water", "quantity": 240, "unit": "ml" },
@@ -437,6 +454,7 @@ const recipeData = [
     "meal": ["dinner"],
     "recipe": "Turkey Stuffed Peppers",
     "defaultServings": 2,
+    "calories": 350,
     "ingredients": [
       { "name": "Bell peppers", "quantity": 2, "unit": "pieces" },
       { "name": "Turkey mince", "quantity": 300, "unit": "g" },
@@ -460,6 +478,7 @@ const recipeData = [
     "meal": ["dinner"],
     "recipe": "Chickpea & Veg Curry",
     "defaultServings": 2,
+    "calories": 380,
     "ingredients": [
       { "name": "Chickpeas (cooked or canned)", "quantity": 240, "unit": "g" },
       { "name": "Onion", "quantity": 1, "unit": "piece" },
@@ -488,6 +507,7 @@ const recipeData = [
     "meal": ["dinner"],
     "recipe": "Veggie-Packed Omelette",
     "defaultServings": 2,
+    "calories": 340,
     "ingredients": [
       { "name": "Eggs", "quantity": 8, "unit": "small" },
       { "name": "Spinach", "quantity": 50, "unit": "g" },
@@ -508,6 +528,7 @@ const recipeData = [
     "meal": ["dinner"],
     "recipe": "Turkey Bolognese with Zucchini Noodles",
     "defaultServings": 2,
+    "calories": 420,
     "ingredients": [
       { "name": "Zucchini", "quantity": 2, "unit": "medium" },
       { "name": "Turkey mince", "quantity": 300, "unit": "g" },
@@ -541,6 +562,7 @@ const recipeData = [
     "meal": ["snacks"],
     "recipe": "Celery and Hummus",
     "defaultServings": 2,
+    "calories": 120,
     "ingredients": [
       { "name": "Celery sticks", "quantity": 6, "unit": "pieces" },
       { "name": "Hummus", "quantity": 4, "unit": "tbsp" }
@@ -557,6 +579,7 @@ const recipeData = [
     "meal": ["breakfast", "lunch"],
     "recipe": "Arepa with Avocado & Egg",
     "defaultServings": 2,
+    "calories": 420,
     "ingredients": [
       { "name": "Harina PAN", "quantity": 60, "unit": "g" },
       { "name": "Rolled oats", "quantity": 60, "unit": "g" },
@@ -582,6 +605,7 @@ const recipeData = [
     "meal": "dinner",
     "recipe": "Overnight Boiled Chicken with Gravy & Corn",
     "defaultServings": 2,
+    "calories": 600,
     "ingredients": [
       { "name": "Chicken breasts", "quantity": 240, "unit": "g" },
       { "name": "Chicken stock", "quantity": 500, "unit": "ml" },
@@ -613,6 +637,7 @@ const recipeData = [
     "meal": ["dinner"],
     "recipe": "Tuscan Turkey Meatballs & Lentil Florentine",
     "defaultServings": 2,
+    "calories": 520,
     "ingredients": [
       { "name": "Turkey mince", "quantity": 300, "unit": "g" },
       { "name": "Brown lentils", "quantity": 1, "unit": "tin" },
@@ -654,6 +679,7 @@ const recipeData = [
     "isCheat": true,
     "recipe": "Olive Oil & Himalayan Pink Salt Crisps",
     "defaultServings": 2,
+    "calories": 700,
     "ingredients": [
       { "name": "Crisps", "quantity": 135, "unit": "g" },
     ],
@@ -667,6 +693,7 @@ const recipeData = [
     "isCheat": true,
     "recipe": "Argentine Beef Empanada Bites",
     "defaultServings": 2,
+    "calories": 900,
     "ingredients": [
       { "name": "Plain flour", "quantity": 300, "unit": "g" },
       { "name": "Salt", "quantity": 1, "unit": "tsp" },
@@ -712,6 +739,7 @@ const recipeData = [
     "isCheat": true,
     "recipe": "Steak and Chips",
     "defaultServings": 2,
+    "calories": 1600,
     "ingredients": [
       { "name": "Ribeye or sirloin steak", "quantity": 2, "unit": "pieces (200-250g each)" },
       { "name": "Potatoes", "quantity": 600, "unit": "g" },
@@ -743,6 +771,7 @@ const recipeData = [
     "meal": ["dinner"],
     "recipe": "Satay Chicken",
     "defaultServings": 2,
+    "calories": 600,
     "ingredients": [
       { "name": "Chicken breast", "quantity": 240, "unit": "g" },
       { "name": "Green bell pepper", "quantity": 1, "unit": "piece" },
@@ -779,6 +808,7 @@ const recipeData = [
     "meal": ["lunch"],
     "recipe": "Lentils with Pak Choi",
     "defaultServings": 4,
+    "calories": 700,
     "ingredients": [
       { "name": "Brown lentils", "quantity": 1, "unit": "tin" },
       { "name": "Onion", "quantity": 1, "unit": "piece" },
@@ -815,6 +845,7 @@ const recipeData = [
     "isCheat": true,
     "recipe": "Hash Browns & Bacon Sandwich",
     "defaultServings": 2,
+    "calories": 1843,
     "ingredients": [
       { "name": "Streaky bacon", "quantity": 12, "unit": "slices" },
       { "name": "Bread", "quantity": 4, "unit": "slices" },
@@ -839,6 +870,7 @@ const recipeData = [
     "isCheat": true,
     "recipe": "Toast and Butter",
     "defaultServings": 2,
+    "calories": 470,
     "ingredients": [
       { "name": "Bread", "quantity": 4, "unit": "slices" },
       { "name": "Butter", "quantity": 20, "unit": "g" }
@@ -855,6 +887,8 @@ const recipeData = [
     "meal": ["lunch"],
     "isCheat": true,
     "recipe": "Cheese & Bacon Arancini",
+        "calories": 974 ,
+
     "defaultServings": 2,
     "ingredients": [
       { "name": "Risotto rice", "quantity": 300, "unit": "g" },
@@ -889,6 +923,7 @@ const recipeData = [
     "isCheat": true,
     "recipe": "Airport Burrito",
     "defaultServings": 4,
+        "calories": 1266,
     "ingredients": [
       { "name": "Beef roast (chuck or topside)", "quantity": 1000, "unit": "g" },
       { "name": "Salt", "quantity": 1, "unit": "tsp" },
@@ -933,6 +968,8 @@ const recipeData = [
     "recipe": "Skip",
     "defaultServings": 2,
     "ingredients": [],
+        "calories": 0,
+
     "steps": []
   }
 

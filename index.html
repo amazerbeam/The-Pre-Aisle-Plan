@@ -11,7 +11,8 @@
 </head>
 
 <body>
-  <h1>Recipe Viewer v.2.2.6</h1>
+  <h1>Recipe Viewer v.4.0.0</h1>
+
 
   <div style="text-align: center; margin-bottom: 10px;">
     <label for="all-servings">All Servings:</label>
@@ -26,7 +27,7 @@
   <div class="tabs-wrapper">
     <div class="tabs" id="tabs"></div>
   </div>
-  
+
 
 
   <div id="recipe-container"></div>
@@ -99,6 +100,15 @@
     <div id="fullscreen-content" style="padding: 20px;"></div>
   </div>
 
+  <!-- <button id="floating-menu-button">☰</button> -->
+
+  <footer id="bottom-nav">
+    <button id="btn-mealplan"><span>📅</span><label>Meal Plan</label></button>
+    <button id="btn-shopping"><span>🛒</span><label>Shopping</label></button>
+  </footer>
+
+
+
 
 
   <script>
@@ -115,7 +125,6 @@
           if (confirm("This page includes a shared meal plan. Do you want to save it?")) {
             planner = sharedPlanner;
             localStorage.setItem('mealPlanner', JSON.stringify(planner));
-            renderCalendar();
           }
         }
       } catch (e) {
@@ -131,6 +140,13 @@
         releaseWakeLock();
       }
     });
+
+    document.getElementById("btn-shopping").onclick = () => {
+      renderShoppingList();
+    };
+    document.getElementById("btn-mealplan").onclick = () => {
+      toggleFullMealPlan();
+    };
 
     const localServingsMap = new Map(); // Tracks manual servings per recipe
 
@@ -151,7 +167,6 @@
           if (confirm("This page includes a shared meal plan. Do you want to save it?")) {
             planner = sharedPlanner;
             localStorage.setItem('mealPlanner', JSON.stringify(planner));
-            renderCalendar();
           }
         }
       } catch (e) {
@@ -162,7 +177,6 @@
       if (cached) {
         try {
           planner = JSON.parse(cached);
-          renderCalendar(); // ✅ Restore the UI
         } catch (e) {
           console.error("Failed to parse cached planner", e);
         }
@@ -241,7 +255,8 @@
         if (!entry[mealType]) return;
 
         const btn = document.createElement('button');
-        btn.textContent = mealType.charAt(0).toUpperCase() + mealType.slice(1);
+        const caloriesPerServing = (entry.calories / (entry.defaultServings || 1)).toFixed(0);
+        btn.textContent = `${mealType.charAt(0).toUpperCase() + mealType.slice(1)} — ${caloriesPerServing} kcal per serving`;
         btn.style.padding = '8px 12px';
         btn.style.borderRadius = '6px';
         btn.style.border = '1px solid #ccc';
@@ -276,7 +291,10 @@
     function openFullscreen(entry) {
       requestWakeLock(); // 🟢 prevent sleep
       const servings = localServingsMap.get(entry.id) || entry.defaultServings || 1;
-      document.getElementById('fullscreen-title').textContent = `${entry.recipe} (Serves: ${servings})`;
+      const caloriesPerServing = (entry.calories / (entry.defaultServings || 1)).toFixed(0);
+      document.getElementById('fullscreen-title').textContent = `${entry.recipe} — ${caloriesPerServing} kcal per serving (Serves: ${servings})`;
+
+
       const container = document.getElementById('fullscreen-content');
       container.innerHTML = '';
 
@@ -339,22 +357,36 @@
         box.appendChild(heading);
 
         const list = document.createElement('ul');
+        let totalCalories = 0;  // add this before the loop
+
         ['breakfast', 'lunch', 'dinner', 'snacks'].forEach(mealType => {
           if (entry && entry[mealType]) {
             const recipeObj = entry[mealType];
             const recipe = recipeData.find(r => r && r.id === (recipeObj?.id || recipeObj));
             const servings = recipeObj?.servings || 1;
             if (recipe) {
-              const li = document.createElement('li');
-              li.textContent = mealType + ": " + recipe.recipe + " (x" + servings + ")";
+              const caloriesPerServing = (recipe.calories / (recipe.defaultServings || 1));
+              totalCalories += caloriesPerServing * servings;
 
+              const li = document.createElement('li');
+              li.textContent = `${mealType}: ${recipe.recipe} (${caloriesPerServing.toFixed(0)} kcal per serving) (x${servings})`;
               li.style.cursor = 'pointer';
               li.onclick = () => openFullscreen(recipe);
-
               list.appendChild(li);
             }
           }
         });
+
+        // ✅ After all meals have been processed, display total calories:
+        const totalCaloriesText = document.createElement('div');
+        totalCaloriesText.style.marginTop = "5px";
+        totalCaloriesText.style.fontWeight = "bold";
+        totalCaloriesText.textContent = `Total Calories: ${totalCalories.toFixed(0)} kcal`;
+
+        box.appendChild(list);
+        box.appendChild(totalCaloriesText);
+        calendar.appendChild(box);
+
 
         box.appendChild(list);
         calendar.appendChild(box);
@@ -406,7 +438,6 @@
         const currentServings = parseFloat(servingsInput?.value || 1);
 
         entry[mealType] = { id: recipeId, servings: currentServings };
-        renderCalendar();
         console.log("Saving planner to localStorage:", planner);
         localStorage.setItem('mealPlanner', JSON.stringify(planner));
 
@@ -419,43 +450,7 @@
     }
 
 
-    /*function renderCalendar() {
-      const calendar = document.getElementById('calendar');
-      calendar.innerHTML = '';
 
-      const daysOfWeek = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
-
-      daysOfWeek.forEach(day => {
-        const entry = planner.find(p => p.day === day);
-        const box = document.createElement('div');
-        const hasAllMeals = entry &&
-          ['breakfast', 'lunch', 'dinner', 'snacks'].every(meal => entry[meal]);
-        box.className = hasAllMeals ? 'day-box full-day' : 'day-box';
-
-
-        const heading = document.createElement('h3');
-        heading.textContent = day.charAt(0).toUpperCase() + day.slice(1);
-        box.appendChild(heading);
-
-        const list = document.createElement('ul');
-        ['breakfast', 'lunch', 'dinner', 'snacks'].forEach(mealType => {
-          if (entry && entry[mealType]) {
-            const recipeObj = entry[mealType];
-            const recipe = recipeData.find(r => r && r.id === (recipeObj?.id || recipeObj));
-            const servings = recipeObj?.servings || 1;
-            if (recipe) {
-              const li = document.createElement('li');
-              li.textContent = mealType + ": " + recipe.recipe + " (x" + servings + ")";
-
-              list.appendChild(li);
-            }
-          }
-        });
-
-        box.appendChild(list);
-        calendar.appendChild(box);
-      });
-    }*/
 
 
     function renderTabs() {
@@ -463,7 +458,7 @@
       const tabsContainer = document.getElementById('tabs');
       tabsContainer.innerHTML = '';
 
-      [...meals, 'shopping list', 'meal plan'].forEach(meal => {
+      [...meals].forEach(meal => {
         const tab = document.createElement('div');
         tab.className = 'tab';
         tab.textContent = meal.charAt(0).toUpperCase() + meal.slice(1);
@@ -679,11 +674,10 @@
         if (index !== -1) planner.splice(index, 1);
       }
 
-      renderCalendar();
 
       // ✅ Save to localStorage
       console.log("Saving planner to localStorage:", planner);
-      localStorage.setItem('mealPlanner', JSON.stringify(planner));
+
 
     }
 
@@ -754,175 +748,195 @@
       const globalServings = parseFloat(document.getElementById('all-servings').value || 1);
 
       recipeData
-        .filter(entry => entry.meal.includes(meal)) // ⬅️ support multiple meals
+        .filter(entry => entry.meal.includes(meal))
         .forEach(entry => {
           const section = document.createElement('div');
           section.classList.add('section');
-          addCopyButton(section, entry);
 
+          const servingsInput = createServingsInput(entry, useGlobal, globalServings);
+          const headerBar = createHeaderBar(entry, servingsInput);
+          const toggleBtn = createToggleButton();
+          const collapsibleContent = createCollapsibleContent(entry, servingsInput, useGlobal, globalServings, meal);
+          const dayButtons = createDayButtons(entry, meal, servingsInput, useGlobal, globalServings);
 
-          // ⛶ Maximize button
-          const maximizeBtn = document.createElement('button');
-          maximizeBtn.textContent = '⛶ Maximize';
-          maximizeBtn.style.float = 'right';
-          maximizeBtn.style.marginTop = '-10px';
-          maximizeBtn.style.marginRight = '10px';
-          maximizeBtn.style.background = '#ccc';
-          maximizeBtn.style.border = 'none';
-          maximizeBtn.style.padding = '5px 10px';
-          maximizeBtn.style.borderRadius = '6px';
-          maximizeBtn.style.cursor = 'pointer';
-          maximizeBtn.onclick = () => openFullscreen(entry);
-          section.appendChild(maximizeBtn);
+          section.appendChild(headerBar);
+          section.appendChild(toggleBtn);
+          section.appendChild(collapsibleContent);
+          section.appendChild(dayButtons);
 
-          // Recipe title
-          const title = document.createElement('h2');
-          title.textContent = entry.isCheat ? entry.recipe + " (Cheat)" : entry.recipe;
-          section.appendChild(title);
-
-          const servingsWrapper = document.createElement('div');
-          servingsWrapper.style.marginBottom = '10px';
-
-          const servingsLabel = document.createElement('label');
-          servingsLabel.textContent = 'Serves: ';
-          servingsWrapper.appendChild(servingsLabel);
-
-          const servingsInput = document.createElement('input');
-          servingsInput.type = 'number';
-          servingsInput.min = 1;
-          const saved = localServingsMap.get(entry.id);
-          servingsInput.value = saved || entry.defaultServings || 1;
-          servingsInput.style.width = '50px';
-          servingsInput.style.marginLeft = '6px';
-          servingsInput.dataset.recipeId = entry.id;
-          servingsInput.disabled = useGlobal;
-
-          servingsWrapper.appendChild(servingsInput);
-          section.appendChild(servingsWrapper);
-
-          const ingredientsHeader = document.createElement('h3');
-          ingredientsHeader.textContent = 'Ingredients';
-          section.appendChild(ingredientsHeader);
-
-          const ul = document.createElement('ul');
-          ul.classList.add('ingredient-list');
-          section.appendChild(ul);
-
-          function renderIngredients(servings) {
-            ul.innerHTML = '';
-            const factor = servings / (entry.defaultServings || 1);
-            entry.ingredients.forEach(ing => {
-              const li = document.createElement('li');
-              const scaled = ing.quantity * factor;
-              const displayQuantity = Number.isInteger(scaled) ? scaled : scaled.toFixed(1);
-              li.textContent = `${displayQuantity} ${ing.unit} ${ing.name}`;
-              ul.appendChild(li);
-            });
-          }
-
-          function updateIngredients() {
-            const local = parseFloat(servingsInput.value || 1);
-            const finalServings = useGlobal ? globalServings : local;
-            renderIngredients(finalServings);
-          }
-
-          servingsInput.addEventListener('input', () => {
-            const val = parseFloat(servingsInput.value);
-            if (!isNaN(val) && val > 0) {
-              localServingsMap.set(entry.id, val);
-              updateIngredients();
-            }
-          });
-
-          updateIngredients();
-
-          const stepsHeader = document.createElement('h3');
-          stepsHeader.textContent = 'Steps';
-          section.appendChild(stepsHeader);
-
-          const ol = document.createElement('ol');
-          entry.steps.forEach(step => {
-            const li = document.createElement('li');
-            li.textContent = step;
-            ol.appendChild(li);
-          });
-          section.appendChild(ol);
-
-          const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-          const buttonContainer = document.createElement('div');
-          buttonContainer.className = 'day-buttons';
-
-          daysOfWeek.forEach(day => {
-            const btn = document.createElement('button');
-            btn.textContent = day;
-            btn.className = getDayButtonClass(entry.id, day.toLowerCase(), meal); // ⬅️ use `meal` argument
-            btn.onclick = () => {
-
-              const servingsToAssign = useGlobal
-                ? globalServings
-                : localServingsMap.get(entry.id) || parseFloat(servingsInput.value || 1);
-
-              let entryForDay = planner.find(p => p.day === day.toLowerCase());
-              if (!entryForDay) {
-                entryForDay = { day: day.toLowerCase() };
-                planner.push(entryForDay);
-              }
-
-              const current = entryForDay[meal];
-              const isCheat = entry.isCheat;
-
-              // ❌ Check if there's already a cheat meal for this meal type
-              if (isCheat) {
-                const existingCheat = planner.some(p => {
-                  const r = p[meal];
-                  if (!r) return false;
-                  const recipe = recipeData.find(d => d.id === r.id);
-                  return recipe?.isCheat;
-                });
-
-                if (existingCheat && (!current || current.id !== entry.id)) {
-                  alert(`You've already assigned a cheat ${meal} this week.`);
-                  return;
-                }
-              }
-
-              if (current?.id === entry.id) {
-                delete entryForDay[meal];
-              } else {
-                entryForDay[meal] = {
-                  id: entry.id,
-                  servings: servingsToAssign
-                };
-              }
-
-
-              if (Object.keys(entryForDay).length === 1 && entryForDay.day) {
-                const index = planner.indexOf(entryForDay);
-                if (index !== -1) planner.splice(index, 1);
-              }
-
-              renderRecipes(meal);
-              renderCalendar();
-
-              // ✅ Add this block to persist
-              console.log("📦 Saving to localStorage:", planner);
-              localStorage.setItem('mealPlanner', JSON.stringify(planner));
-            };
-
-            buttonContainer.appendChild(btn);
-          });
-
-          section.appendChild(buttonContainer);
           recipeContainer.appendChild(section);
         });
 
+      setupGlobalServingTriggers(meal);
+    }
+
+    function createServingsInput(entry, useGlobal, globalServings) {
+      const servingsInput = document.createElement('input');
+      servingsInput.type = 'number';
+      servingsInput.min = 1;
+      servingsInput.dataset.recipeId = entry.id;
+      servingsInput.value = localServingsMap.get(entry.id) || entry.defaultServings || 1;
+      servingsInput.disabled = useGlobal;
+      servingsInput.style.width = '50px';
+      servingsInput.style.marginLeft = '6px';
+
+      servingsInput.addEventListener('input', () => {
+        const val = parseFloat(servingsInput.value);
+        if (!isNaN(val) && val > 0) {
+          localServingsMap.set(entry.id, val);
+        }
+      });
+
+      return servingsInput;
+    }
+
+    function createHeaderBar(entry, servingsInput) {
+      const header = document.createElement("div");
+      header.className = "recipe-header";
+
+      // Title: "Recipe — kcal"
+      const title = document.createElement("h2");
+      const kcal = (entry.calories / (entry.defaultServings || 1)).toFixed(0);
+      title.textContent = `${entry.recipe} — ${kcal} kcal per serving`;
+      header.appendChild(title);
+
+      // Controls row (servings, maximize, copy)
+      const controlsRow = document.createElement("div");
+      controlsRow.className = "recipe-controls";
+
+      const servingsWrapper = document.createElement("div");
+      servingsWrapper.className = "servings-wrapper";
+      const servingsLabel = document.createElement("label");
+      servingsLabel.textContent = "Serves:";
+      servingsLabel.setAttribute("for", `servings-${entry.id}`);
+      servingsInput.id = `servings-${entry.id}`;
+      servingsWrapper.appendChild(servingsLabel);
+      servingsWrapper.appendChild(servingsInput);
+
+      const maximizeBtn = document.createElement("button");
+      maximizeBtn.textContent = "⛶ Maximize";
+      maximizeBtn.className = "maximize-btn";
+      maximizeBtn.onclick = () => openFullscreen(entry);
+
+      const copyBtn = document.createElement("button");
+      copyBtn.textContent = "📋 Copy";
+      copyBtn.className = "copy-btn";
+      copyBtn.onclick = () => copyRecipeToClipboard(entry);
+
+      controlsRow.appendChild(servingsWrapper);
+      controlsRow.appendChild(maximizeBtn);
+      controlsRow.appendChild(copyBtn);
+
+      header.appendChild(controlsRow);
+
+      return header;
+    }
+
+
+    function createToggleButton() {
+      const btn = document.createElement('button');
+      btn.textContent = 'Show Details';
+      btn.className = 'toggle-btn';
+      btn.onclick = () => {
+        const content = btn.nextSibling;
+        const visible = content.style.display !== 'none';
+        content.style.display = visible ? 'none' : 'block';
+        btn.textContent = visible ? 'Show Details' : 'Hide Details';
+      };
+      return btn;
+    }
+
+    function createCollapsibleContent(entry, servingsInput, useGlobal, globalServings, meal) {
+      const container = document.createElement('div');
+      container.style.display = 'none';
+
+      const servings = useGlobal ? globalServings : parseFloat(servingsInput.value || 1);
+      const factor = servings / (entry.defaultServings || 1);
+
+      const ingredientsHeader = document.createElement('h3');
+      ingredientsHeader.textContent = 'Ingredients';
+
+      const ul = document.createElement('ul');
+      entry.ingredients.forEach(ing => {
+        const qty = ing.quantity * factor;
+        const li = document.createElement('li');
+        li.textContent = `${Number.isInteger(qty) ? qty : qty.toFixed(1)} ${ing.unit} ${ing.name}`;
+        ul.appendChild(li);
+      });
+
+      const stepsHeader = document.createElement('h3');
+      stepsHeader.textContent = 'Steps';
+
+      const ol = document.createElement('ol');
+      entry.steps.forEach(step => {
+        const li = document.createElement('li');
+        li.textContent = step;
+        ol.appendChild(li);
+      });
+
+      container.appendChild(ingredientsHeader);
+      container.appendChild(ul);
+      container.appendChild(stepsHeader);
+      container.appendChild(ol);
+
+      return container;
+    }
+
+    function createDayButtons(entry, meal, servingsInput, useGlobal, globalServings) {
+      const container = document.createElement('div');
+      container.className = 'day-buttons';
+
+      const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+      daysOfWeek.forEach(day => {
+        const btn = document.createElement('button');
+        btn.textContent = day;
+        btn.className = getDayButtonClass(entry.id, day.toLowerCase(), meal);
+        btn.onclick = () => assignRecipeToDay(entry.id, day.toLowerCase(), meal, servingsInput, useGlobal, globalServings);
+        container.appendChild(btn);
+      });
+
+      return container;
+    }
+
+    function assignRecipeToDay(recipeId, day, mealType, servingsInput, useGlobal, globalServings) {
+      const servings = useGlobal
+        ? globalServings
+        : parseFloat(servingsInput.value || 1);
+
+      let entry = planner.find(p => p.day === day);
+      if (!entry) {
+        entry = { day };
+        planner.push(entry);
+      }
+
+      const current = entry[mealType];
+      if (current?.id === recipeId) {
+        delete entry[mealType];
+      } else {
+        entry[mealType] = { id: recipeId, servings };
+      }
+
+      if (Object.keys(entry).length === 1) {
+        const index = planner.indexOf(entry);
+        if (index !== -1) planner.splice(index, 1);
+      }
+
+      localStorage.setItem('mealPlanner', JSON.stringify(planner));
+
+      // 🔁 re-render the current meal tab to update button states
+      const selectedMeal = document.querySelector(".tab.active")?.textContent.toLowerCase();
+      if (selectedMeal) {
+        renderRecipes(selectedMeal);
+      }
+    }
+
+    function setupGlobalServingTriggers(meal) {
       const allInput = document.getElementById('all-servings');
       const allToggle = document.getElementById('apply-all-servings');
 
       allInput.oninput = () => {
         if (allToggle.checked) renderRecipes(meal);
       };
-
       allToggle.onchange = () => {
         renderRecipes(meal);
       };
@@ -936,28 +950,32 @@
   </script>
 
   <!-- Add this modal for confirmation, just before </body> -->
-  <div id="clear-confirm-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:10001; align-items:center; justify-content:center;">
+  <div id="clear-confirm-modal"
+    style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:10001; align-items:center; justify-content:center;">
     <div style="background:white; padding:24px 32px; border-radius:10px; max-width:320px; text-align:center;">
       <h3>Are you sure you want to clear all data?</h3>
       <div style="margin-top:18px;">
-        <button id="confirm-clear-btn" style="background:#e74c3c; color:white; border:none; border-radius:6px; padding:8px 18px; margin-right:10px;">Yes, Clear</button>
-        <button onclick="document.getElementById('clear-confirm-modal').style.display='none'" style="padding:8px 18px; border-radius:6px;">Cancel</button>
+        <button id="confirm-clear-btn"
+          style="background:#e74c3c; color:white; border:none; border-radius:6px; padding:8px 18px; margin-right:10px;">Yes,
+          Clear</button>
+        <button onclick="document.getElementById('clear-confirm-modal').style.display='none'"
+          style="padding:8px 18px; border-radius:6px;">Cancel</button>
       </div>
     </div>
   </div>
 
   <script>
-  // Add this script after your other scripts or at the end of the body
+    // Add this script after your other scripts or at the end of the body
 
-  document.getElementById('clear-data-btn').onclick = function() {
-    document.getElementById('clear-confirm-modal').style.display = 'flex';
-  };
+    document.getElementById('clear-data-btn').onclick = function () {
+      document.getElementById('clear-confirm-modal').style.display = 'flex';
+    };
 
-  document.getElementById('confirm-clear-btn').onclick = function() {
-    localStorage.clear();
-    document.getElementById('clear-confirm-modal').style.display = 'none';
-    location.reload();
-  };
+    document.getElementById('confirm-clear-btn').onclick = function () {
+      localStorage.clear();
+      document.getElementById('clear-confirm-modal').style.display = 'none';
+      location.reload();
+    };
   </script>
 </body>
 
