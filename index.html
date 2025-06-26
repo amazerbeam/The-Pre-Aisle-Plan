@@ -11,7 +11,7 @@
 </head>
 
 <body>
-  <h1>Recipe Viewer v.4.0.2</h1>
+  <h1>Recipe Viewer v.4.0.3</h1>
 
 
   <div style="text-align: center; margin-bottom: 10px;">
@@ -116,27 +116,45 @@
     const urlParams = new URLSearchParams(window.location.search);
     const encoded = urlParams.get('planner');
 
-    if (encoded) {
-      try {
-        const decoded = atob(encoded);
-        const sharedPlanner = JSON.parse(decoded);
 
-        if (Array.isArray(sharedPlanner)) {
-          if (confirm("This page includes a shared meal plan. Do you want to save it?")) {
-            planner = sharedPlanner;
-            localStorage.setItem('mealPlanner', JSON.stringify(planner));
-            toggleFullMealPlan(); // opens and triggers renderFullCalendar()
+    document.addEventListener('DOMContentLoaded', () => {
+      renderTabs();
 
+      const urlParams = new URLSearchParams(window.location.search);
+      const encoded = urlParams.get('planner');
 
-            // ✅ Re-render sorted recipes after planner is loaded
-            const activeMeal = document.querySelector('.tab.active')?.textContent.toLowerCase() || 'breakfast';
-            renderRecipes(activeMeal);
+      if (encoded) {
+        try {
+          const decoded = atob(encoded);
+          const sharedPlanner = JSON.parse(decoded);
+
+          if (Array.isArray(sharedPlanner)) {
+            if (confirm("This page includes a shared meal plan. Do you want to save it?")) {
+              planner = sharedPlanner;
+              localStorage.setItem('mealPlanner', JSON.stringify(planner));
+
+              toggleFullMealPlan();
+              renderRecipes('breakfast');
+              return;
+            }
           }
+        } catch (e) {
+          console.warn("❌ Failed to decode shared meal plan", e);
         }
-      } catch (e) {
-        console.warn("❌ Failed to decode shared meal plan", e);
       }
-    }
+
+      // fallback to saved planner
+      const cached = localStorage.getItem('mealPlanner');
+      if (cached) {
+        try {
+          planner = JSON.parse(cached);
+        } catch (e) {
+          console.error("⚠️ Failed to parse cached planner", e);
+        }
+      }
+
+      renderRecipes('breakfast');
+    });
 
 
     document.getElementById('full-meal-plan').addEventListener('transitionend', (e) => {
