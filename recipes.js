@@ -962,7 +962,43 @@ const recipeData = [
       "Assemble each burrito with cooked rice, shredded beef in gravy, sliced or mashed avocado, fried halloumi, mozzarella, parmesan and jalapeños.",
       "Roll the burritos tightly and toast seam-side down in a dry pan until golden and warm."
     ]
-  }, {
+  },
+  {
+  "id": 42,
+  "meal": ["lunch"],
+  "recipe": "Irish Turkey Stew",
+  "defaultServings": 2,
+  "calories": 320,
+  "ingredients": [
+    { "name": "Turkey breast", "quantity": 300, "unit": "g" },
+    { "name": "Olive oil", "quantity": 1, "unit": "tbsp" },
+    { "name": "Onion", "quantity": 1, "unit": "medium" },
+    { "name": "Garlic", "quantity": 2, "unit": "cloves" },
+    { "name": "Turnip", "quantity": 1, "unit": "small" },
+    { "name": "Carrots", "quantity": 2, "unit": "medium" },
+    { "name": "Celery", "quantity": 2, "unit": "stalks" },
+    { "name": "Mushrooms", "quantity": 150, "unit": "g" },
+    { "name": "Tomato paste", "quantity": 1, "unit": "tbsp" },
+    { "name": "Thyme (dried)", "quantity": 1, "unit": "tsp" },
+    { "name": "Rosemary (dried)", "quantity": 1, "unit": "tsp" },
+    { "name": "Bay leaf", "quantity": 1, "unit": "leaf" },
+    { "name": "Chicken stock (low-sodium)", "quantity": 500, "unit": "ml" },
+    { "name": "Salt", "quantity": 1, "unit": "tsp" },
+    { "name": "Black pepper", "quantity": 0.25, "unit": "tsp" },
+    { "name": "Parsley (fresh, optional garnish)", "quantity": 1, "unit": "tbsp" }
+  ],
+  "steps": [
+    "Pat the turkey dry and cut into 2–3 cm cubes. Season with salt and pepper.",
+    "Heat half the olive oil in a pot over medium-high heat. Sear turkey cubes until browned, then set aside.",
+    "Lower heat to medium. Add remaining olive oil, then sauté onion, garlic, and celery for 3–4 minutes.",
+    "Add mushrooms and cook until browned, about 5 minutes.",
+    "Stir in tomato paste, thyme, rosemary, and bay leaf. Cook for 1 minute.",
+    "Add the turkey back to the pot along with diced turnip and chopped carrots.",
+    "Pour in the stock and bring to a boil. Reduce heat and simmer covered for 25–30 minutes until tender.",
+    "Discard bay leaf, adjust seasoning, and garnish with parsley before serving."
+  ]
+},
+ {
     "id": 0,
     "meal": ["breakfast", "lunch", "dinner", "snacks"],
     "recipe": "Skip",
