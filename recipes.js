@@ -998,6 +998,54 @@ const recipeData = [
     "Discard bay leaf, adjust seasoning, and garnish with parsley before serving."
   ]
 },
+{
+  "id": 44,
+  "meal": ["breakfast"],
+  "recipe": "Boiled Eggs with Avocado & Cherry Tomatoes",
+  "defaultServings": 2,
+  "calories": 330,
+  "ingredients": [
+    { "name": "Eggs", "quantity": 4, "unit": "small" },
+    { "name": "Avocado", "quantity": 1, "unit": "medium" },
+    { "name": "Cherry tomatoes", "quantity": 10, "unit": "pieces" },
+    { "name": "Olive oil", "quantity": 1, "unit": "tsp" },
+    { "name": "Salt", "quantity": 0.25, "unit": "tsp" },
+    { "name": "Black pepper", "quantity": 0.25, "unit": "tsp" }
+  ],
+  "steps": [
+    "Place eggs in a saucepan, cover with cold water, and bring to a boil.",
+    "Once boiling, reduce heat and simmer for 8–9 minutes for firm yolks.",
+    "Drain hot water and cool eggs under cold running water or in a bowl of ice water. Peel.",
+    "Slice the avocado and halve the cherry tomatoes.",
+    "Arrange 2 boiled eggs, half an avocado, and 5 cherry tomatoes on each plate.",
+    "Drizzle with olive oil and season with salt and pepper. Serve immediately."
+  ]
+},
+{
+  "id": 45,
+  "meal": ["breakfast"],
+  "recipe": "Almond Flour Pancakes with Berries",
+  "defaultServings": 2,
+  "calories": 420,
+  "ingredients": [
+    { "name": "Almond flour", "quantity": 60, "unit": "g" },
+    { "name": "Eggs", "quantity": 2, "unit": "small" },
+    { "name": "Milk (or plant milk)", "quantity": 60, "unit": "ml" },
+    { "name": "Baking powder", "quantity": 0.5, "unit": "tsp" },
+    { "name": "Vanilla extract", "quantity": 0.5, "unit": "tsp" },
+    { "name": "Olive oil or butter (for cooking)", "quantity": 1, "unit": "tsp" },
+    { "name": "Mixed berries", "quantity": 60, "unit": "g" },
+    { "name": "Honey (optional)", "quantity": 1, "unit": "tsp" }
+  ],
+  "steps": [
+    "In a bowl, whisk eggs, milk, and vanilla extract.",
+    "Add almond flour and baking powder. Mix until smooth batter forms.",
+    "Heat a non-stick pan over medium heat and lightly grease with oil or butter.",
+    "Pour small portions of batter to form 4–6 mini pancakes.",
+    "Cook for 2–3 minutes until bubbles form, then flip and cook another 1–2 minutes.",
+    "Serve warm with berries and a light drizzle of honey if desired."
+  ]
+},
  {
     "id": 0,
     "meal": ["breakfast", "lunch", "dinner", "snacks"],
