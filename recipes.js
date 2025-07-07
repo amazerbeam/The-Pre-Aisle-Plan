@@ -1046,7 +1046,31 @@ const recipeData = [
     "Serve warm with berries and a light drizzle of honey if desired."
   ]
 },
- {
+{
+  "id": 46,
+  "meal": ["breakfast"],
+  "recipe": "Warm Oat Porridge with Berries & Chia",
+  "defaultServings": 2,
+  "calories": 360,
+  "ingredients": [
+    { "name": "Rolled oats", "quantity": 60, "unit": "g" },
+    { "name": "Milk or plant milk", "quantity": 250, "unit": "ml" },
+    { "name": "Water", "quantity": 150, "unit": "ml" },
+    { "name": "Chia seeds", "quantity": 1, "unit": "tbsp" },
+    { "name": "Mixed berries", "quantity": 80, "unit": "g" },
+    { "name": "Honey", "quantity": 1, "unit": "tsp" },
+    { "name": "Cinnamon", "quantity": 0.25, "unit": "tsp" },
+    { "name": "Salt", "quantity": 1, "unit": "pinch" }
+  ],
+  "steps": [
+    "In a small saucepan, combine oats, milk, water, salt, and cinnamon.",
+    "Bring to a gentle simmer over medium heat, stirring regularly.",
+    "Simmer for 5–7 minutes until thick and creamy.",
+    "Stir in chia seeds and cook for 1 more minute.",
+    "Divide into bowls and top with berries and a drizzle of honey.",
+    "Serve warm."
+  ]
+},{
     "id": 0,
     "meal": ["breakfast", "lunch", "dinner", "snacks"],
     "recipe": "Skip",
