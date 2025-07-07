@@ -1070,7 +1070,42 @@ const recipeData = [
     "Divide into bowls and top with berries and a drizzle of honey.",
     "Serve warm."
   ]
-},{
+},
+{
+  "id": 47,
+  "meal": ["lunch"],
+  "recipe": "Fish Cakes with Leafy Salad",
+  "defaultServings": 2,
+  "calories": 360,
+  "ingredients": [
+    { "name": "White fish (cod, haddock, or pollock)", "quantity": 250, "unit": "g" },
+    { "name": "Egg", "quantity": 1, "unit": "piece" },
+    { "name": "Garlic", "quantity": 1, "unit": "clove" },
+    { "name": "Spring onion or red onion", "quantity": 1, "unit": "small" },
+    { "name": "Parsley (fresh)", "quantity": 1, "unit": "tbsp" },
+    { "name": "Lemon zest", "quantity": 0.5, "unit": "tsp" },
+    { "name": "Almond flour", "quantity": 2, "unit": "tbsp" },
+    { "name": "Olive oil", "quantity": 1, "unit": "tbsp" },
+    { "name": "Salt", "quantity": 0.5, "unit": "tsp" },
+    { "name": "Black pepper", "quantity": 0.25, "unit": "tsp" },
+    { "name": "Mixed salad leaves", "quantity": 2, "unit": "handfuls" },
+    { "name": "Cucumber", "quantity": 0.5, "unit": "piece" },
+    { "name": "Cherry tomatoes", "quantity": 6, "unit": "pieces" },
+    { "name": "Lemon juice", "quantity": 1, "unit": "tbsp" },
+    { "name": "Olive oil (for dressing)", "quantity": 1, "unit": "tsp" }
+  ],
+  "steps": [
+    "Poach the fish in simmering water for 5–6 minutes or until cooked through. Drain and cool.",
+    "Flake the fish into a bowl. Add finely chopped onion, garlic, parsley, lemon zest, almond flour, and beaten egg.",
+    "Season with salt and pepper. Mix well and form into 4 small fish cakes.",
+    "Chill for 10–15 minutes if time allows to help them hold shape.",
+    "Heat olive oil in a non-stick pan over medium heat. Fry fish cakes for 3–4 minutes per side until golden and heated through.",
+    "Meanwhile, prepare the salad: toss mixed leaves with sliced cucumber and halved cherry tomatoes.",
+    "Dress salad with lemon juice and a teaspoon of olive oil.",
+    "Serve 2 fish cakes per person alongside the salad."
+  ]
+},
+{
     "id": 0,
     "meal": ["breakfast", "lunch", "dinner", "snacks"],
     "recipe": "Skip",
