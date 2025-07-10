@@ -374,7 +374,8 @@
             const servings = recipeObj?.servings || 1;
             if (recipe) {
               const caloriesPerServing = (recipe.calories / (recipe.defaultServings || 1));
-              totalCalories += caloriesPerServing * servings;
+              totalCalories += caloriesPerServing;
+
 
               const li = document.createElement('li');
               li.textContent = `${mealType}: ${recipe.recipe} (${caloriesPerServing.toFixed(0)} kcal per serving) (x${servings})`;
