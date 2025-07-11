@@ -256,27 +256,26 @@ const recipeData = [
   {
     "id": 11,
     "meal": "lunch",
-    "recipe": "Tuna & Egg Patties with Feta",
+    "recipe": "Tuna & Egg Patties",
     "defaultServings": 2,
-    "calories": 1480,
+    "calories": 1380,
     "ingredients": [
       { "name": "Tuna", "quantity": 220, "unit": "g" },
       { "name": "Eggs", "quantity": 8, "unit": "small" },
       { "name": "Salt", "quantity": 0.25, "unit": "tsp" },
       { "name": "Black pepper", "quantity": 0.25, "unit": "tsp" },
       { "name": "Onion powder", "quantity": 0.5, "unit": "tsp" },
-      { "name": "Olive oil", "quantity": 2, "unit": "tbsp" },
-      { "name": "Feta cheese", "quantity": 60, "unit": "g" }
+      { "name": "Butter", "quantity": 4, "unit": "tsp" }
     ],
     "steps": [
       "Whisk the eggs in a bowl and mix in the drained tuna.",
       "Season with salt, pepper, and onion powder.",
-      "Heat 1 tbsp olive oil in a non-stick pan over medium heat.",
+      "Heat 2 tsp of butter in a non-stick pan over medium heat.",
       "Scoop and flatten patties into the pan, fry 2–3 mins per side until golden.",
-      "Top hot patties with crumbled feta.",
-      "Drizzle or brush with remaining 1 tbsp olive oil before serving."
+      "Serve hot, optionally brushing with remaining melted butter if desired."
     ]
   }
+
   , {
     "id": 12,
     "meal": ["lunch"],
@@ -374,32 +373,32 @@ const recipeData = [
     ]
   }
   ,
- {
-  "id": 15,
-  "meal": ["snacks"],
-  "recipe": "Peach Yogurt Bowl with Almonds & Coconut",
-  "defaultServings": 2,
-  "calories": 520,
-  "ingredients": [
-    { "name": "Peach", "quantity": 1, "unit": "medium" },
-    { "name": "Greek yogurt", "quantity": 150, "unit": "g" },
-    { "name": "Honey", "quantity": 2, "unit": "tsp" },
-    { "name": "Chia seeds", "quantity": 2, "unit": "tsp" },
-    { "name": "Cinnamon", "quantity": 0.25, "unit": "tsp" },
-    { "name": "Almonds", "quantity": 15, "unit": "g" },
-    { "name": "Coconut flakes", "quantity": 5, "unit": "g" },
-    { "name": "Almond butter", "quantity": 1, "unit": "tbsp" }
-  ],
-  "steps": [
-    "Wash and slice the peach into thin wedges.",
-    "Divide the yogurt into two bowls.",
-    "Top each bowl with peach slices.",
-    "Drizzle 1 tsp honey over each serving.",
-    "Sprinkle chia seeds, cinnamon, chopped almonds, and coconut flakes.",
-    "Add 0.5 tbsp almond butter to each bowl.",
-    "Serve immediately or chill briefly before serving."
-  ]
-}
+  {
+    "id": 15,
+    "meal": ["snacks"],
+    "recipe": "Peach Yogurt Bowl with Almonds & Coconut",
+    "defaultServings": 2,
+    "calories": 520,
+    "ingredients": [
+      { "name": "Peach", "quantity": 1, "unit": "medium" },
+      { "name": "Greek yogurt", "quantity": 150, "unit": "g" },
+      { "name": "Honey", "quantity": 2, "unit": "tsp" },
+      { "name": "Chia seeds", "quantity": 2, "unit": "tsp" },
+      { "name": "Cinnamon", "quantity": 0.25, "unit": "tsp" },
+      { "name": "Almonds", "quantity": 15, "unit": "g" },
+      { "name": "Coconut flakes", "quantity": 5, "unit": "g" },
+      { "name": "Almond butter", "quantity": 1, "unit": "tbsp" }
+    ],
+    "steps": [
+      "Wash and slice the peach into thin wedges.",
+      "Divide the yogurt into two bowls.",
+      "Top each bowl with peach slices.",
+      "Drizzle 1 tsp honey over each serving.",
+      "Sprinkle chia seeds, cinnamon, chopped almonds, and coconut flakes.",
+      "Add 0.5 tbsp almond butter to each bowl.",
+      "Serve immediately or chill briefly before serving."
+    ]
+  }
   ,
   {
     "id": 16,
@@ -616,24 +615,24 @@ const recipeData = [
       "Serve warm, topped with turkey cubes and chives or scallions. Add a slice of warm wholemeal bread on the side."
     ]
   },
- {
-  "id": 23,
-  "meal": ["snacks"],
-  "recipe": "Celery and Hummus",
-  "defaultServings": 2,
-  "calories": 500,
-  "ingredients": [
-    { "name": "Celery sticks", "quantity": 8, "unit": "pieces" },
-    { "name": "Hummus", "quantity": 6, "unit": "tbsp" },
-    { "name": "Walnuts (optional)", "quantity": 15, "unit": "g" }
-  ],
-  "steps": [
-    "Wash and cut celery into sticks (about 4 pieces per serving).",
-    "Portion 3 tbsp of hummus into a small bowl for each person.",
-    "Serve celery with hummus for dipping.",
-    "Top each serving with a few chopped walnuts (optional) for extra calories and healthy fats."
-  ]
-},
+  {
+    "id": 23,
+    "meal": ["snacks"],
+    "recipe": "Celery and Hummus",
+    "defaultServings": 2,
+    "calories": 500,
+    "ingredients": [
+      { "name": "Celery sticks", "quantity": 8, "unit": "pieces" },
+      { "name": "Hummus", "quantity": 6, "unit": "tbsp" },
+      { "name": "Walnuts (optional)", "quantity": 15, "unit": "g" }
+    ],
+    "steps": [
+      "Wash and cut celery into sticks (about 4 pieces per serving).",
+      "Portion 3 tbsp of hummus into a small bowl for each person.",
+      "Serve celery with hummus for dipping.",
+      "Top each serving with a few chopped walnuts (optional) for extra calories and healthy fats."
+    ]
+  },
   {
     "id": 24,
     "meal": ["breakfast"],
@@ -1035,98 +1034,98 @@ const recipeData = [
     ]
   }
   ,
- 
-{
-  "id": 36,
-  "meal": ["breakfast"],
-  "recipe": "Almond Flour Pancakes",
-  "defaultServings": 2,
-  "calories": 880,
-  "ingredients": [
-    { "name": "Almond flour", "quantity": 60, "unit": "g" },
-    { "name": "Eggs", "quantity": 2, "unit": "small" },
-    { "name": "Milk (or plant milk)", "quantity": 60, "unit": "ml" },
-    { "name": "Baking powder", "quantity": 0.5, "unit": "tsp" },
-    { "name": "Vanilla extract", "quantity": 0.5, "unit": "tsp" },
-    { "name": "Olive oil or butter (for cooking)", "quantity": 1, "unit": "tsp" },
-    { "name": "Mixed berries", "quantity": 60, "unit": "g" },
-    { "name": "Honey (optional)", "quantity": 1, "unit": "tsp" },
-    { "name": "Greek yogurt", "quantity": 100, "unit": "g" },
-    { "name": "Banana", "quantity": 1, "unit": "small" }
-  ],
-  "steps": [
-    "In a bowl, whisk eggs, milk, and vanilla extract.",
-    "Add almond flour and baking powder. Mix until a smooth batter forms.",
-    "Heat a non-stick pan over medium heat and lightly grease with oil or butter.",
-    "Pour small portions of batter to form 4–6 mini pancakes.",
-    "Cook for 2–3 minutes until bubbles form, then flip and cook another 1–2 minutes.",
-    "Serve warm with berries, sliced banana, a dollop of Greek yogurt, and a drizzle of honey if desired."
-  ]
-}
-,
- {
-  "id": 37,
-  "meal": ["breakfast"],
-  "recipe": "Warm Oat Porridge with Berries, Chia & Nuts",
-  "defaultServings": 2,
-  "calories": 880,
-  "ingredients": [
-    { "name": "Rolled oats", "quantity": 60, "unit": "g" },
-    { "name": "Milk or plant milk", "quantity": 250, "unit": "ml" },
-    { "name": "Water", "quantity": 150, "unit": "ml" },
-    { "name": "Chia seeds", "quantity": 1, "unit": "tbsp" },
-    { "name": "Mixed berries", "quantity": 80, "unit": "g" },
-    { "name": "Honey", "quantity": 1, "unit": "tsp" },
-    { "name": "Cinnamon", "quantity": 0.25, "unit": "tsp" },
-    { "name": "Salt", "quantity": 1, "unit": "pinch" },
-    { "name": "Peanut butter", "quantity": 1, "unit": "tbsp" },
-    { "name": "Chopped nuts (almonds or walnuts)", "quantity": 20, "unit": "g" }
-  ],
-  "steps": [
-    "In a small saucepan, combine oats, milk, water, salt, and cinnamon.",
-    "Bring to a gentle simmer over medium heat, stirring regularly.",
-    "Simmer for 5–7 minutes until thick and creamy.",
-    "Stir in chia seeds and peanut butter, and cook for 1 more minute.",
-    "Divide into bowls and top with berries, chopped nuts, and a drizzle of honey.",
-    "Serve warm."
-  ]
-}
-,
+
   {
-  "id": 38,
-  "meal": ["lunch"],
-  "recipe": "Fish Cakes with Leafy Salad & Sweet Potato",
-  "defaultServings": 2,
-  "calories": 1220,
-  "ingredients": [
-    { "name": "White fish (cod, haddock, or pollock)", "quantity": 250, "unit": "g" },
-    { "name": "Egg", "quantity": 1, "unit": "piece" },
-    { "name": "Garlic", "quantity": 1, "unit": "clove" },
-    { "name": "Spring onion or red onion", "quantity": 1, "unit": "small" },
-    { "name": "Parsley (fresh)", "quantity": 1, "unit": "tbsp" },
-    { "name": "Lemon zest", "quantity": 0.5, "unit": "tsp" },
-    { "name": "Almond flour", "quantity": 2, "unit": "tbsp" },
-    { "name": "Olive oil", "quantity": 2, "unit": "tbsp" },
-    { "name": "Salt", "quantity": 0.5, "unit": "tsp" },
-    { "name": "Black pepper", "quantity": 0.25, "unit": "tsp" },
-    { "name": "Sweet potato", "quantity": 300, "unit": "g" },
-    { "name": "Mixed salad leaves", "quantity": 2, "unit": "handfuls" },
-    { "name": "Cucumber", "quantity": 0.5, "unit": "piece" },
-    { "name": "Cherry tomatoes", "quantity": 6, "unit": "pieces" },
-    { "name": "Lemon juice", "quantity": 1, "unit": "tbsp" }
-  ],
-  "steps": [
-    "Peel and cube the sweet potato. Roast in the oven at 200°C for 25–30 minutes with a bit of olive oil and salt.",
-    "Poach the fish in simmering water for 5–6 minutes or until cooked through. Drain and cool.",
-    "Flake the fish into a bowl. Add finely chopped onion, garlic, parsley, lemon zest, almond flour, and beaten egg.",
-    "Season with salt and pepper. Mix well and form into 4 small fish cakes.",
-    "Chill for 10–15 minutes if time allows to help them hold shape.",
-    "Heat 1 tbsp olive oil in a non-stick pan over medium heat. Fry fish cakes for 3–4 minutes per side until golden and heated through.",
-    "Meanwhile, prepare the salad: toss mixed leaves with sliced cucumber and halved cherry tomatoes. Dress with lemon juice and 1 tbsp olive oil.",
-    "Serve 2 fish cakes per person alongside the salad and roasted sweet potato."
-  ]
-}
-,
+    "id": 36,
+    "meal": ["breakfast"],
+    "recipe": "Almond Flour Pancakes",
+    "defaultServings": 2,
+    "calories": 880,
+    "ingredients": [
+      { "name": "Almond flour", "quantity": 60, "unit": "g" },
+      { "name": "Eggs", "quantity": 2, "unit": "small" },
+      { "name": "Milk (or plant milk)", "quantity": 60, "unit": "ml" },
+      { "name": "Baking powder", "quantity": 0.5, "unit": "tsp" },
+      { "name": "Vanilla extract", "quantity": 0.5, "unit": "tsp" },
+      { "name": "Olive oil or butter (for cooking)", "quantity": 1, "unit": "tsp" },
+      { "name": "Mixed berries", "quantity": 60, "unit": "g" },
+      { "name": "Honey (optional)", "quantity": 1, "unit": "tsp" },
+      { "name": "Greek yogurt", "quantity": 100, "unit": "g" },
+      { "name": "Banana", "quantity": 1, "unit": "small" }
+    ],
+    "steps": [
+      "In a bowl, whisk eggs, milk, and vanilla extract.",
+      "Add almond flour and baking powder. Mix until a smooth batter forms.",
+      "Heat a non-stick pan over medium heat and lightly grease with oil or butter.",
+      "Pour small portions of batter to form 4–6 mini pancakes.",
+      "Cook for 2–3 minutes until bubbles form, then flip and cook another 1–2 minutes.",
+      "Serve warm with berries, sliced banana, a dollop of Greek yogurt, and a drizzle of honey if desired."
+    ]
+  }
+  ,
+  {
+    "id": 37,
+    "meal": ["breakfast"],
+    "recipe": "Warm Oat Porridge with Berries, Chia & Nuts",
+    "defaultServings": 2,
+    "calories": 880,
+    "ingredients": [
+      { "name": "Rolled oats", "quantity": 60, "unit": "g" },
+      { "name": "Milk or plant milk", "quantity": 250, "unit": "ml" },
+      { "name": "Water", "quantity": 150, "unit": "ml" },
+      { "name": "Chia seeds", "quantity": 1, "unit": "tbsp" },
+      { "name": "Mixed berries", "quantity": 80, "unit": "g" },
+      { "name": "Honey", "quantity": 1, "unit": "tsp" },
+      { "name": "Cinnamon", "quantity": 0.25, "unit": "tsp" },
+      { "name": "Salt", "quantity": 1, "unit": "pinch" },
+      { "name": "Peanut butter", "quantity": 1, "unit": "tbsp" },
+      { "name": "Chopped nuts (almonds or walnuts)", "quantity": 20, "unit": "g" }
+    ],
+    "steps": [
+      "In a small saucepan, combine oats, milk, water, salt, and cinnamon.",
+      "Bring to a gentle simmer over medium heat, stirring regularly.",
+      "Simmer for 5–7 minutes until thick and creamy.",
+      "Stir in chia seeds and peanut butter, and cook for 1 more minute.",
+      "Divide into bowls and top with berries, chopped nuts, and a drizzle of honey.",
+      "Serve warm."
+    ]
+  }
+  ,
+  {
+    "id": 38,
+    "meal": ["lunch"],
+    "recipe": "Fish Cakes with Leafy Salad & Sweet Potato",
+    "defaultServings": 2,
+    "calories": 1220,
+    "ingredients": [
+      { "name": "White fish (cod, haddock, or pollock)", "quantity": 250, "unit": "g" },
+      { "name": "Egg", "quantity": 1, "unit": "piece" },
+      { "name": "Garlic", "quantity": 1, "unit": "clove" },
+      { "name": "Spring onion or red onion", "quantity": 1, "unit": "small" },
+      { "name": "Parsley (fresh)", "quantity": 1, "unit": "tbsp" },
+      { "name": "Lemon zest", "quantity": 0.5, "unit": "tsp" },
+      { "name": "Almond flour", "quantity": 2, "unit": "tbsp" },
+      { "name": "Olive oil", "quantity": 2, "unit": "tbsp" },
+      { "name": "Salt", "quantity": 0.5, "unit": "tsp" },
+      { "name": "Black pepper", "quantity": 0.25, "unit": "tsp" },
+      { "name": "Sweet potato", "quantity": 300, "unit": "g" },
+      { "name": "Mixed salad leaves", "quantity": 2, "unit": "handfuls" },
+      { "name": "Cucumber", "quantity": 0.5, "unit": "piece" },
+      { "name": "Cherry tomatoes", "quantity": 6, "unit": "pieces" },
+      { "name": "Lemon juice", "quantity": 1, "unit": "tbsp" }
+    ],
+    "steps": [
+      "Peel and cube the sweet potato. Roast in the oven at 200°C for 25–30 minutes with a bit of olive oil and salt.",
+      "Poach the fish in simmering water for 5–6 minutes or until cooked through. Drain and cool.",
+      "Flake the fish into a bowl. Add finely chopped onion, garlic, parsley, lemon zest, almond flour, and beaten egg.",
+      "Season with salt and pepper. Mix well and form into 4 small fish cakes.",
+      "Chill for 10–15 minutes if time allows to help them hold shape.",
+      "Heat 1 tbsp olive oil in a non-stick pan over medium heat. Fry fish cakes for 3–4 minutes per side until golden and heated through.",
+      "Meanwhile, prepare the salad: toss mixed leaves with sliced cucumber and halved cherry tomatoes. Dress with lemon juice and 1 tbsp olive oil.",
+      "Serve 2 fish cakes per person alongside the salad and roasted sweet potato."
+    ]
+  }
+  ,
   {
     "id": 0,
     "meal": ["breakfast", "lunch", "dinner", "snacks"],
