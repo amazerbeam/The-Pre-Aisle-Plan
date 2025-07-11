@@ -374,33 +374,32 @@ const recipeData = [
     ]
   }
   ,
-  {
-    "id": 15,
-    "meal": ["snacks"],
-    "recipe": "Peach Yogurt Bowl with Almonds & Coconut",
-    "defaultServings": 2,
-    "calories": 740,
-    "ingredients": [
-      { "name": "Peaches", "quantity": 2, "unit": "medium" },
-      { "name": "Greek yogurt", "quantity": 200, "unit": "g" },
-      { "name": "Honey", "quantity": 2, "unit": "tsp" },
-      { "name": "Chia seeds", "quantity": 3, "unit": "tsp" },
-      { "name": "Cinnamon", "quantity": 0.25, "unit": "tsp" },
-      { "name": "Almonds", "quantity": 30, "unit": "g" },
-      { "name": "Coconut flakes (unsweetened)", "quantity": 10, "unit": "g" },
-      { "name": "Almond butter", "quantity": 2, "unit": "tbsp" }
-    ],
-    "steps": [
-      "Wash and slice the peaches into thin wedges.",
-      "Divide the yogurt into two bowls.",
-      "Top each bowl with peach slices.",
-      "Drizzle 1 tsp honey over each serving.",
-      "Sprinkle chia seeds, cinnamon, chopped almonds, and coconut flakes.",
-      "Add 1 tbsp almond butter to each bowl.",
-      "Serve immediately or chill briefly before serving."
-    ]
-  }
-
+ {
+  "id": 15,
+  "meal": ["snacks"],
+  "recipe": "Peach Yogurt Bowl with Almonds & Coconut",
+  "defaultServings": 2,
+  "calories": 520,
+  "ingredients": [
+    { "name": "Peach", "quantity": 1, "unit": "medium" },
+    { "name": "Greek yogurt", "quantity": 150, "unit": "g" },
+    { "name": "Honey", "quantity": 2, "unit": "tsp" },
+    { "name": "Chia seeds", "quantity": 2, "unit": "tsp" },
+    { "name": "Cinnamon", "quantity": 0.25, "unit": "tsp" },
+    { "name": "Almonds", "quantity": 15, "unit": "g" },
+    { "name": "Coconut flakes", "quantity": 5, "unit": "g" },
+    { "name": "Almond butter", "quantity": 1, "unit": "tbsp" }
+  ],
+  "steps": [
+    "Wash and slice the peach into thin wedges.",
+    "Divide the yogurt into two bowls.",
+    "Top each bowl with peach slices.",
+    "Drizzle 1 tsp honey over each serving.",
+    "Sprinkle chia seeds, cinnamon, chopped almonds, and coconut flakes.",
+    "Add 0.5 tbsp almond butter to each bowl.",
+    "Serve immediately or chill briefly before serving."
+  ]
+}
   ,
   {
     "id": 16,
@@ -617,24 +616,24 @@ const recipeData = [
       "Serve warm, topped with turkey cubes and chives or scallions. Add a slice of warm wholemeal bread on the side."
     ]
   },
-
-  {
-    "id": 23,
-    "meal": ["snacks"],
-    "recipe": "Celery and Hummus",
-    "defaultServings": 2,
-    "calories": 120,
-    "ingredients": [
-      { "name": "Celery sticks", "quantity": 6, "unit": "pieces" },
-      { "name": "Hummus", "quantity": 4, "unit": "tbsp" }
-    ],
-    "steps": [
-      "Wash and cut celery into sticks (about 3 pieces per serving).",
-      "Portion 2 tbsp of hummus into a small bowl for each person.",
-      "Serve celery with hummus for dipping."
-    ]
-  },
-
+ {
+  "id": 23,
+  "meal": ["snacks"],
+  "recipe": "Celery and Hummus",
+  "defaultServings": 2,
+  "calories": 500,
+  "ingredients": [
+    { "name": "Celery sticks", "quantity": 8, "unit": "pieces" },
+    { "name": "Hummus", "quantity": 6, "unit": "tbsp" },
+    { "name": "Walnuts (optional)", "quantity": 15, "unit": "g" }
+  ],
+  "steps": [
+    "Wash and cut celery into sticks (about 4 pieces per serving).",
+    "Portion 3 tbsp of hummus into a small bowl for each person.",
+    "Serve celery with hummus for dipping.",
+    "Top each serving with a few chopped walnuts (optional) for extra calories and healthy fats."
+  ]
+},
   {
     "id": 24,
     "meal": ["breakfast"],
