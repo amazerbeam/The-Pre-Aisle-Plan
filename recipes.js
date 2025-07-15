@@ -8,7 +8,7 @@ const recipeData = [
     "ingredients": [
       { "name": "Rolled oats", "quantity": 40, "unit": "g" },
       { "name": "Greek yogurt", "quantity": 100, "unit": "g" },
-      { "name": "Milk", "quantity": 100, "unit": "ml" },
+      { "name": "Milk", "quantity": 200, "unit": "ml" },
       { "name": "Berries", "quantity": 100, "unit": "g" },
       { "name": "Chia seeds", "quantity": 2, "unit": "tsp" },
       { "name": "Honey", "quantity": 0.5, "unit": "tsp" },
