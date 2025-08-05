@@ -1124,8 +1124,45 @@ const recipeData = [
       "Meanwhile, prepare the salad: toss mixed leaves with sliced cucumber and halved cherry tomatoes. Dress with lemon juice and 1 tbsp olive oil.",
       "Serve 2 fish cakes per person alongside the salad and roasted sweet potato."
     ]
-  }
-  ,
+  }  ,
+
+  {
+  "id": 39,
+  "meal": ["dinner"],
+  "recipe": "Chicken & Pork Paella",
+  "defaultServings": 4,
+  "calories": 1200,
+  "ingredients": [
+    { "name": "Olive oil", "quantity": 50, "unit": "ml" },
+    { "name": "Chicken", "quantity": 8, "unit": "pieces" },
+    { "name": "Pork belly", "quantity": 150, "unit": "g" },
+    { "name": "Chorizo", "quantity": 50, "unit": "g" },
+    { "name": "Red pepper", "quantity": 1, "unit": "piece" },
+    { "name": "Green pepper", "quantity": 1, "unit": "piece" },
+    { "name": "Flat beans", "quantity": 50, "unit": "g" },
+    { "name": "Butter beans", "quantity": 1, "unit": "tin" },
+    { "name": "Garlic", "quantity": 2, "unit": "cloves" },
+    { "name": "Paprika", "quantity": 1, "unit": "tsp" },
+    { "name": "Turmeric", "quantity": 0.5, "unit": "tsp" },
+    { "name": "Tomato sauce", "quantity": 400, "unit": "g" },
+    { "name": "Paella rice", "quantity": 400, "unit": "g" },
+    { "name": "Water", "quantity": 900, "unit": "ml" },
+    { "name": "Rosemary sprig", "quantity": 1, "unit": "piece" },
+    { "name": "Salt", "quantity": 1, "unit": "to taste" }
+  ],
+  "steps": [
+    "Pour the olive oil into a paella pan and when hot, add all the meat and cook until browned.",
+    "Add the garlic (crushed or sliced) and the red and green peppers. Cook for 2 minutes and stir.",
+    "Add the tomato sauce and stir well.",
+    "Pour in the rice and stir to coat with the sauce.",
+    "Pour the water and stir very gently on high heat. Season with paprika, turmeric, and salt.",
+    "Once it starts to boil, stop stirring and add the green beans, butter beans, and rosemary to the middle of the pan.",
+    "Let the water absorb and keep the paella on the hob until fully cooked. Adjust seasoning.",
+    "Let it rest for 3–5 minutes. Before serving, 'break' the paella by loosening the rice with a spoon.",
+    "If the rice is undercooked, cover with foil and bake at 200°C for 5–10 min to finish cooking."
+  ]
+}
+,
   {
     "id": 0,
     "meal": ["breakfast", "lunch", "dinner", "snacks"],
