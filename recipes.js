@@ -516,7 +516,7 @@ const recipeData = [
   {
     "id": 20,
     "meal": ["dinner"],
-    "recipe": "Chickpea, Tofu & Veg Curry",
+    "recipe": "Chickpea & Tofu Curry",
     "defaultServings": 2,
     "calories": 1340,
     "ingredients": [
@@ -527,11 +527,13 @@ const recipeData = [
       { "name": "Carrots", "quantity": 2, "unit": "pieces" },
       { "name": "Red pepper", "quantity": 1, "unit": "piece" },
       { "name": "Tinned tomatoes", "quantity": 1, "unit": "tin" },
-      { "name": "Curry powder", "quantity": 1, "unit": "tbsp" },
+      { "name": "Curry powder", "quantity": 2, "unit": "tbsp" },
       { "name": "Olive oil", "quantity": 2.5, "unit": "tbsp" },
       { "name": "Sweet potato", "quantity": 400, "unit": "g" },
       { "name": "Cashews", "quantity": 20, "unit": "g" },
       { "name": "Salt", "quantity": 0.5, "unit": "tsp" },
+      { "name": "Stock", "quantity": 1, "unit": "cup" },
+
       { "name": "Black pepper", "quantity": 0.25, "unit": "tsp" }
     ],
     "steps": [
@@ -542,7 +544,7 @@ const recipeData = [
       "In the same pan, sauté onion and garlic until soft.",
       "Add carrots and red pepper, cook for 5 minutes.",
       "Stir in curry powder and toast for 30 seconds.",
-      "Add chickpeas and tinned tomatoes. Simmer 10–15 minutes.",
+      "Add chickpeas, tinned tomatoes and stock. Simmer 10–15 minutes.",
       "Add tofu back to the curry and heat through. Season with salt and pepper.",
       "Serve hot with sweet potato and top with chopped nuts."
     ]
