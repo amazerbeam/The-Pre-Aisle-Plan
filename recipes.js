@@ -1085,11 +1085,11 @@ const recipeData = [
 
     ],
     "steps": [
-      "In a small saucepan, combine oats, milk, water, salt, and cinnamon.",
+      "In a small saucepan, combine oats, milk, water & salt.",
       "Bring to a gentle simmer over medium heat, stirring regularly.",
-      "Simmer for 5–7 minutes until thick and creamy.",
-      "Stir in chia seeds and peanut butter, and cook for 1 more minute.",
-      "Divide into bowls and top with berries, chopped nuts, and a drizzle of honey.",
+      "Simmer for 5 minutes until thick and creamy.",
+      "Stir in peanut butter, and cook for 1 more minute.",
+      "Divide into bowls and top with  peanut butter, berries, chopped nuts, and a drizzle of honey.",
       "Serve warm."
     ]
   }
