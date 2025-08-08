@@ -1068,20 +1068,21 @@ const recipeData = [
   {
     "id": 37,
     "meal": ["breakfast"],
-    "recipe": "Warm Oat Porridge with Berries, Chia & Nuts",
+    "recipe": "Warm Oat Porridge with Berries & Nuts",
     "defaultServings": 2,
     "calories": 880,
     "ingredients": [
       { "name": "Rolled oats", "quantity": 60, "unit": "g" },
-      { "name": "Milk or plant milk", "quantity": 250, "unit": "ml" },
+      { "name": "Milk", "quantity": 250, "unit": "ml" },
       { "name": "Water", "quantity": 150, "unit": "ml" },
-      { "name": "Chia seeds", "quantity": 1, "unit": "tbsp" },
       { "name": "Mixed berries", "quantity": 80, "unit": "g" },
       { "name": "Honey", "quantity": 1, "unit": "tsp" },
-      { "name": "Cinnamon", "quantity": 0.25, "unit": "tsp" },
       { "name": "Salt", "quantity": 1, "unit": "pinch" },
       { "name": "Peanut butter", "quantity": 1, "unit": "tbsp" },
-      { "name": "Chopped nuts (almonds or walnuts)", "quantity": 20, "unit": "g" }
+      { "name": "Almonds", "quantity": 10, "unit": "g" },
+      { "name": "Walnuts", "quantity": 10, "unit": "g" },
+
+
     ],
     "steps": [
       "In a small saucepan, combine oats, milk, water, salt, and cinnamon.",
