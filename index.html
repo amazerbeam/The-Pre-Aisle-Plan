@@ -6,14 +6,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Recipe Viewer</title>
   <link rel="stylesheet" href="styles.css">
-  <script src="recipes.js"></script>
 
 
 
 </head>
 
 <body>
-  <h1>Recipe Viewer v.6.2.2</h1>
+  <h1>Recipe Viewer v.6.2.3</h1>
 
 
   <div style="text-align: center; margin-bottom: 10px;">
@@ -110,7 +109,7 @@
   </footer>
 
 
-
+<script src="recipes.js"></script>
 
 
   <script>
@@ -963,37 +962,7 @@
       return container;
     }
 
-    /* function assignRecipeToDay(recipeId, day, mealType, servingsInput, useGlobal, globalServings) {
-       const servings = useGlobal
-         ? globalServings
-         : parseFloat(servingsInput.value || 1);
- 
-       let entry = planner.find(p => p.day === day);
-       if (!entry) {
-         entry = { day };
-         planner.push(entry);
-       }
- 
-       const current = entry[mealType];
-       if (current?.id === recipeId) {
-         delete entry[mealType];
-       } else {
-         entry[mealType] = { id: recipeId, servings };
-       }
- 
-       if (Object.keys(entry).length === 1) {
-         const index = planner.indexOf(entry);
-         if (index !== -1) planner.splice(index, 1);
-       }
- 
-       localStorage.setItem('mealPlanner', JSON.stringify(planner));
- 
-       // 🔁 re-render the current meal tab to update button states
-       const selectedMeal = document.querySelector(".tab.active")?.textContent.toLowerCase();
-       if (selectedMeal) {
-         renderRecipes(selectedMeal);
-       }
-     }*/
+
 
     function setupGlobalServingTriggers(meal) {
       const allInput = document.getElementById('all-servings');
