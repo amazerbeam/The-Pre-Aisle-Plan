@@ -1119,7 +1119,7 @@ const recipeData = [
       N("CARROT", 2, "medium"),
       N("CELERY", 2, "stalks"),
       N("MUSHROOMS", 150, "g"),
-      N("SWEET_POTATOE", 200, "g"),
+      N("SWEET_POTATO", 200, "g"),
       N("TOMATO_PASTE", 1, "tbsp"),
       N("THYME", 1, "tsp"),
       N("ROSEMARY", 1, "tsp"),
