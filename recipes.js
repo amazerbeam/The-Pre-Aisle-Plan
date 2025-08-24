@@ -8,190 +8,213 @@
  */
 
 const AISLE = {
-  VEG:               { name: "Veg",                order: 1 },
-  FRUIT:             { name: "Fruit",              order: 2 },
-  HERBS_SPICES:      { name: "Herbs & Spices",     order: 3 },
-  DAIRY:             { name: "Dairy",              order: 4 },
-  MEAT:              { name: "Meat",               order: 5 },
-  POULTRY:           { name: "Poultry",            order: 6 },
-  FISH:              { name: "Fish",               order: 7 },
-  BAKERY:            { name: "Bakery",             order: 8 },
-  GRAINS_PASTA:      { name: "Grains & Pasta",     order: 9 },
-  LEGUMES:           { name: "Legumes",            order: 10 },
-  NUTS:              { name: "Nuts",               order: 11 },
-  SEEDS:             { name: "Seeds",              order: 12 },
-  OILS:              { name: "Oils & Fats",        order: 13 },
-  CONDIMENTS:        { name: "Condiments & Sauces",order: 14 },
-  TINS_JARS:         { name: "Tins & Jars",        order: 15 },
-  FROZEN:            { name: "Frozen",             order: 16 },
-  BEVERAGES:         { name: "Beverages",          order: 17 },
-  MISC:              { name: "Misc",               order: 18 }
+  MEAT: { name: "Meat", order: 1 },
+  POULTRY: { name: "Poultry", order: 2 },
+
+  VEG: { name: "Veg", order: 3 },
+  FRUIT: { name: "Fruit", order: 4 },
+  FISH: { name: "Fish", order: 5 },
+  DAIRY: { name: "Dairy", order: 6 },
+  FROZEN: { name: "Frozen", order: 7 },
+
+  HERBS_SPICES: { name: "Herbs & Spices", order: 8 },
+  OILS: { name: "Oils & Fats", order: 9 },
+  TINS_JARS: { name: "Tins & Jars", order: 10 },
+    GRAINS_PASTA: { name: "Grains & Pasta", order: 11 },
+  CONDIMENTS: { name: "Condiments & Sauces", order: 12 },
+
+
+  BAKERY: { name: "Bakery", order: 13 },
+  NUTS: { name: "Nuts", order: 14 },
+  SEEDS: { name: "Seeds", order: 15 },
+  BEVERAGES: { name: "Beverages", order: 16 },
+  MISC: { name: "Misc", order: 17},
+
+
+
 };
 
 const INGREDIENTS = {
   // Grains / bakery / flours
-  ROLLED_OATS:             { name: "Rolled oats", aisle: AISLE.GRAINS_PASTA },
-  PLAIN_FLOUR:             { name: "Plain flour", aisle: AISLE.BAKERY },
-  ALMOND_FLOUR:            { name: "Almond flour", aisle: AISLE.GRAINS_PASTA },
-  PAELLA_RICE:             { name: "Paella rice", aisle: AISLE.GRAINS_PASTA },
-  BREAD:                   { name: "Bread", aisle: AISLE.BAKERY },
-  WHOLEMEAL_BREAD:         { name: "Wholemeal bread", aisle: AISLE.BAKERY },
-  FLOUR_TORTILLAS:         { name: "Flour tortillas", aisle: AISLE.BAKERY },
+  ROLLED_OATS: { name: "Rolled oats", aisle: AISLE.GRAINS_PASTA },
+  PLAIN_FLOUR: { name: "Plain flour", aisle: AISLE.BAKERY },
+  ALMOND_FLOUR: { name: "Almond flour", aisle: AISLE.BAKERY },
+  PAELLA_RICE: { name: "Paella rice", aisle: AISLE.GRAINS_PASTA },
+  BREAD: { name: "Bread", aisle: AISLE.BAKERY },
+  WHOLEMEAL_BREAD: { name: "Wholemeal bread", aisle: AISLE.BAKERY },
+  FLOUR_TORTILLAS: { name: "Flour tortillas", aisle: AISLE.BAKERY },
 
   // Dairy & eggs
-  GREEK_YOGURT:            { name: "Greek yogurt", aisle: AISLE.DAIRY },
-  WHOLE_MILK:              { name: "Whole milk", aisle: AISLE.DAIRY },
-  MILK:                    { name: "Milk", aisle: AISLE.DAIRY },
-  BUTTER:                  { name: "Butter", aisle: AISLE.DAIRY },
-  DOUBLE_CREAM:            { name: "Double cream", aisle: AISLE.DAIRY },
-  CHEESE:                  { name: "Cheese", aisle: AISLE.DAIRY },
-  MOZZARELLA:              { name: "Mozzarella", aisle: AISLE.DAIRY },
-  PARMESAN_CHEESE:         { name: "Parmesan", aisle: AISLE.DAIRY },
-  FETA_CHEESE:             { name: "Feta cheese", aisle: AISLE.DAIRY },
-  HALLOUMI:                { name: "Halloumi", aisle: AISLE.DAIRY },
-  EGGS:                    { name: "Eggs", aisle: AISLE.DAIRY },
+  GREEK_YOGURT: { name: "Greek yogurt", aisle: AISLE.DAIRY },
+  WHOLE_MILK: { name: "Whole milk", aisle: AISLE.DAIRY },
+  MILK: { name: "Milk", aisle: AISLE.DAIRY },
+  BUTTER: { name: "Butter", aisle: AISLE.DAIRY },
+  DOUBLE_CREAM: { name: "Double cream", aisle: AISLE.DAIRY },
+  CHEESE: { name: "Cheese", aisle: AISLE.DAIRY },
+  MOZZARELLA: { name: "Mozzarella", aisle: AISLE.DAIRY },
+  PARMESAN_CHEESE: { name: "Parmesan", aisle: AISLE.DAIRY },
+  FETA_CHEESE: { name: "Feta cheese", aisle: AISLE.DAIRY },
+  HALLOUMI: { name: "Halloumi", aisle: AISLE.DAIRY },
+  EGGS: { name: "Eggs", aisle: AISLE.BAKERY },
 
   // Meat / poultry / fish
-  CHICKEN_BREAST:          { name: "Chicken breast", aisle: AISLE.POULTRY },
-  CHICKEN_WINGS:           { name: "Chicken wings", aisle: AISLE.POULTRY },
-  TURKEY_BREAST:           { name: "Turkey breast", aisle: AISLE.POULTRY },
-  TURKEY_MINCE:            { name: "Turkey mince", aisle: AISLE.POULTRY },
-  STREAKY_BACON:           { name: "Streaky bacon", aisle: AISLE.MEAT },
-  GROUND_BEEF:             { name: "Ground beef", aisle: AISLE.MEAT },
-  BEEF_ROAST:              { name: "Beef roast", aisle: AISLE.MEAT },
-  PORK_BELLY:              { name: "Pork belly", aisle: AISLE.MEAT },
-  SALMON_FILLET:           { name: "Salmon fillet", aisle: AISLE.FISH },
-  WHITE_FISH:              { name: "White fish", aisle: AISLE.FISH },
+  CHICKEN_BREAST: { name: "Chicken breast", aisle: AISLE.POULTRY },
+  CHICKEN_WINGS: { name: "Chicken wings", aisle: AISLE.POULTRY },
+  TURKEY_BREAST: { name: "Turkey breast", aisle: AISLE.POULTRY },
+  TURKEY_MINCE: { name: "Turkey mince", aisle: AISLE.POULTRY },
+  STREAKY_BACON: { name: "Streaky bacon", aisle: AISLE.MEAT },
+  GROUND_BEEF: { name: "Ground beef", aisle: AISLE.MEAT },
+  BEEF_ROAST: { name: "Beef roast", aisle: AISLE.MEAT },
+  PORK_BELLY: { name: "Pork belly", aisle: AISLE.MEAT },
+  SALMON_FILLET: { name: "Salmon fillet", aisle: AISLE.FISH },
+  WHITE_FISH: { name: "White fish", aisle: AISLE.FISH },
 
   // Veg
-  GREEN_BELL_PEPPER:       { name: "Green bell pepper", aisle: AISLE.VEG },
-  RED_BELL_PEPPER:         { name: "Red bell pepper", aisle: AISLE.VEG },
-  ONION:                   { name: "Onion", aisle: AISLE.VEG },
-  RED_ONION:               { name: "Red onion", aisle: AISLE.VEG },
-  SPRING_ONION:            { name: "Spring onion", aisle: AISLE.VEG },
-  PAK_CHOI:                { name: "Pak choi", aisle: AISLE.VEG },
-  CELERY:                  { name: "Celery", aisle: AISLE.VEG },
-  CARROT:                  { name: "Carrot", aisle: AISLE.VEG },
-  CUCUMBER:                { name: "Cucumber", aisle: AISLE.VEG },
-  CHERRY_TOMATOES:         { name: "Cherry tomatoes", aisle: AISLE.VEG },
-  TOMATO_PASTE:            { name: "Tomato paste", aisle: AISLE.TINS_JARS },
-  TINNED_TOMATOES:         { name: "Tinned tomatoes", aisle: AISLE.TINS_JARS },
-  TOMATO_SAUCE:            { name: "Tomato sauce", aisle: AISLE.TINS_JARS },
-  BROCCOLI:                { name: "Broccoli", aisle: AISLE.VEG },
-  GREEN_BEANS:             { name: "Green beans", aisle: AISLE.VEG },
-  TURNIP:                  { name: "Turnip", aisle: AISLE.VEG },
-  LETTUCE_LEAVES:          { name: "Lettuce leaves", aisle: AISLE.VEG },
-  SALAD_LEAVES:            { name: "Salad leaves", aisle: AISLE.VEG },
-  SPINACH:                 { name: "Spinach", aisle: AISLE.VEG },
-  ZUCCHINI:                { name: "Zucchini", aisle: AISLE.VEG },
-  GARLIC:                  { name: "Garlic", aisle: AISLE.VEG },
-  GINGER:                  { name: "Ginger", aisle: AISLE.VEG },
-  LEMON:                   { name: "Lemon", aisle: AISLE.FRUIT },
-  LEMON_JUICE:             { name: "Lemon juice", aisle: AISLE.CONDIMENTS },
-  LIME_JUICE:              { name: "Lime juice", aisle: AISLE.CONDIMENTS },
-  BASIL:                   { name: "Basil", aisle: AISLE.HERBS_SPICES },
-  PARSLEY:                 { name: "Parsley", aisle: AISLE.HERBS_SPICES },
-  THYME:                   { name: "Thyme (dried)", aisle: AISLE.HERBS_SPICES },
-  ROSEMARY:                { name: "Rosemary (dried)", aisle: AISLE.HERBS_SPICES },
-  BAY_LEAF:                { name: "Bay leaf", aisle: AISLE.HERBS_SPICES },
-  CHIVES:                  { name: "Chives", aisle: AISLE.HERBS_SPICES },
-  SCALLIONS:               { name: "Scallions", aisle: AISLE.VEG },
+  BROCCOLI: { name: "Broccoli", aisle: AISLE.VEG },
+  GREEN_BEANS: { name: "Green beans", aisle: AISLE.FROZEN },
+  TURNIP: { name: "Turnip", aisle: AISLE.VEG },
+  LETTUCE_LEAVES: { name: "Lettuce leaves", aisle: AISLE.VEG },
+  SALAD_LEAVES: { name: "Salad leaves", aisle: AISLE.VEG },
+  SPINACH: { name: "Spinach", aisle: AISLE.VEG },
+  ZUCCHINI: { name: "Zucchini", aisle: AISLE.VEG },
+  GARLIC: { name: "Garlic", aisle: AISLE.VEG },
+  GINGER: { name: "Ginger", aisle: AISLE.VEG },
+  GREEN_BELL_PEPPER: { name: "Green bell pepper", aisle: AISLE.VEG },
+  RED_BELL_PEPPER: { name: "Red bell pepper", aisle: AISLE.VEG },
+  ONION: { name: "Onion", aisle: AISLE.VEG },
+  RED_ONION: { name: "Red onion", aisle: AISLE.VEG },
+  SPRING_ONION: { name: "Spring onion", aisle: AISLE.VEG },
+  PAK_CHOI: { name: "Pak choi", aisle: AISLE.VEG },
+  CELERY: { name: "Celery", aisle: AISLE.VEG },
+  CARROT: { name: "Carrot", aisle: AISLE.VEG },
+  CUCUMBER: { name: "Cucumber", aisle: AISLE.VEG },
+  CHERRY_TOMATOES: { name: "Cherry tomatoes", aisle: AISLE.VEG },
+  SCALLIONS: { name: "Scallions", aisle: AISLE.VEG },
+  POTATOES: { name: "Potatoes", aisle: AISLE.VEG },
+  SWEET_POTATO: { name: "Sweet potato", aisle: AISLE.VEG },
+
+  TOMATO_PASTE: { name: "Tomato paste", aisle: AISLE.TINS_JARS },
+  TINNED_TOMATOES: { name: "Tinned tomatoes", aisle: AISLE.TINS_JARS },
+  TOMATO_SAUCE: { name: "Tomato sauce", aisle: AISLE.TINS_JARS },
+
+
+
+  BASIL: { name: "Basil", aisle: AISLE.HERBS_SPICES },
+  PARSLEY: { name: "Parsley", aisle: AISLE.HERBS_SPICES },
+  THYME: { name: "Thyme (dried)", aisle: AISLE.HERBS_SPICES },
+  ROSEMARY: { name: "Rosemary (dried)", aisle: AISLE.HERBS_SPICES },
+  BAY_LEAF: { name: "Bay leaf", aisle: AISLE.HERBS_SPICES },
+  CHIVES: { name: "Chives", aisle: AISLE.HERBS_SPICES },
 
   // Fruit
-  BANANA:                  { name: "Banana", aisle: AISLE.FRUIT },
-  APPLE:                   { name: "Apple", aisle: AISLE.FRUIT },
-  PEACH:                   { name: "Peach", aisle: AISLE.FRUIT },
-  AVOCADO:                 { name: "Avocado", aisle: AISLE.FRUIT },
-  MIXED_BERRIES:           { name: "Mixed berries", aisle: AISLE.FRUIT },
-  PINEAPPLE_CHUNKS:        { name: "Pineapple chunks", aisle: AISLE.TINS_JARS },
-  LEMON_ZEST:              { name: "Lemon zest", aisle: AISLE.HERBS_SPICES },
+  LEMON: { name: "Lemon", aisle: AISLE.FRUIT },
+  LEMON_JUICE: { name: "Lemon juice", aisle: AISLE.FRUIT },
+  LIME_JUICE: { name: "Lime juice", aisle: AISLE.FRUIT },
+  BANANA: { name: "Banana", aisle: AISLE.FRUIT },
+  APPLE: { name: "Apple", aisle: AISLE.FRUIT },
+  PEACH: { name: "Peach", aisle: AISLE.FRUIT },
+  AVOCADO: { name: "Avocado", aisle: AISLE.FRUIT },
+  MIXED_BERRIES: { name: "Mixed berries", aisle: AISLE.FRUIT },
+  PINEAPPLE_CHUNKS: { name: "Pineapple chunks", aisle: AISLE.TINS_JARS },
+  LEMON_ZEST: { name: "Lemon zest", aisle: AISLE.HERBS_SPICES },
 
   // Legumes / tins
-  CHICKPEAS:               { name: "Chickpeas", aisle: AISLE.LEGUMES },
-  BUTTER_BEANS:            { name: "Butter beans", aisle: AISLE.TINS_JARS },
-  BROWN_LENTILS:           { name: "Brown lentils", aisle: AISLE.TINS_JARS },
-  HUMMUS:                  { name: "Hummus", aisle: AISLE.TINS_JARS },
-  CAPERS:                  { name: "Capers", aisle: AISLE.TINS_JARS },
-  GREEN_OLIVES:            { name: "Green olives", aisle: AISLE.TINS_JARS },
+  CHICKPEAS: { name: "Chickpeas", aisle: AISLE.TINS_JARS },
+  BUTTER_BEANS: { name: "Butter beans", aisle: AISLE.TINS_JARS },
+  BROWN_LENTILS: { name: "Brown lentils", aisle: AISLE.TINS_JARS },
+  HUMMUS: { name: "Hummus", aisle: AISLE.TINS_JARS },
+  CAPERS: { name: "Capers", aisle: AISLE.TINS_JARS },
+  GREEN_OLIVES: { name: "Green olives", aisle: AISLE.TINS_JARS },
 
   // Nuts & seeds
-  ALMONDS:                 { name: "Almonds", aisle: AISLE.NUTS },
-  CASHEWS:                 { name: "Cashews", aisle: AISLE.NUTS },
-  WALNUTS:                 { name: "Walnuts", aisle: AISLE.NUTS },
-  ALMOND_BUTTER:           { name: "Almond butter", aisle: AISLE.NUTS },
-  PEANUT_BUTTER:           { name: "Peanut butter", aisle: AISLE.NUTS },
-  COCONUT_FLAKES:          { name: "Coconut flakes", aisle: AISLE.NUTS },
-  SESAME_SEEDS:            { name: "Sesame seeds", aisle: AISLE.SEEDS },
-  CHIA_SEEDS:              { name: "Chia seeds", aisle: AISLE.SEEDS },
+  ALMONDS: { name: "Almonds", aisle: AISLE.NUTS },
+  CASHEWS: { name: "Cashews", aisle: AISLE.NUTS },
+  WALNUTS: { name: "Walnuts", aisle: AISLE.NUTS },
+  ALMOND_BUTTER: { name: "Almond butter", aisle: AISLE.NUTS },
+  PEANUT_BUTTER: { name: "Peanut butter", aisle: AISLE.NUTS },
+  COCONUT_FLAKES: { name: "Coconut flakes", aisle: AISLE.BAKERY },
+  SESAME_SEEDS: { name: "Sesame seeds", aisle: AISLE.SEEDS },
+  CHIA_SEEDS: { name: "Chia seeds", aisle: AISLE.SEEDS },
 
   // Oils / condiments / sauces
-  OLIVE_OIL:               { name: "Olive oil", aisle: AISLE.OILS },
-  PESTO:                   { name: "Pesto", aisle: AISLE.CONDIMENTS },
-  SOY_SAUCE:               { name: "Soy sauce", aisle: AISLE.CONDIMENTS },
-  WORCESTERSHIRE_SAUCE:    { name: "Worcestershire sauce", aisle: AISLE.CONDIMENTS },
-  FRANKS_HOT_SAUCE:        { name: "Frank’s Hot Sauce", aisle: AISLE.CONDIMENTS },
-  MAPLE_SYRUP:             { name: "Maple syrup", aisle: AISLE.CONDIMENTS },
-  VANILLA_EXTRACT:         { name: "Vanilla extract", aisle: AISLE.CONDIMENTS },
-  COCONUT_WATER:           { name: "Coconut water", aisle: AISLE.BEVERAGES },
+  OLIVE_OIL: { name: "Olive oil", aisle: AISLE.OILS },
+  PESTO: { name: "Pesto", aisle: AISLE.CONDIMENTS },
+  SOY_SAUCE: { name: "Soy sauce", aisle: AISLE.CONDIMENTS },
+  WORCESTERSHIRE_SAUCE: { name: "Worcestershire sauce", aisle: AISLE.CONDIMENTS },
+  FRANKS_HOT_SAUCE: { name: "Frank’s Hot Sauce", aisle: AISLE.CONDIMENTS },
+  MAPLE_SYRUP: { name: "Maple syrup", aisle: AISLE.BAKERY },
+  VANILLA_EXTRACT: { name: "Vanilla extract", aisle: AISLE.BAKERY },
+  COCONUT_WATER: { name: "Coconut water", aisle: AISLE.FRUIT },
 
   // Stocks / broth
-  STOCK:                   { name: "Stock", aisle: AISLE.MISC },
+  STOCK: { name: "Stock", aisle: AISLE.MISC },
 
   // Seasoning
-  SALT:                    { name: "Salt", aisle: AISLE.HERBS_SPICES },
-  BLACK_PEPPER:            { name: "Black pepper", aisle: AISLE.HERBS_SPICES },
-  SMOKED_PAPRIKA:          { name: "Smoked paprika", aisle: AISLE.HERBS_SPICES },
-  CHILI_FLAKES:            { name: "Chili flakes", aisle: AISLE.HERBS_SPICES },
-  ITALIAN_SEASONING:       { name: "Italian seasoning", aisle: AISLE.HERBS_SPICES },
-  CUMIN:                   { name: "Cumin", aisle: AISLE.HERBS_SPICES },
-  CINNAMON:                { name: "Cinnamon", aisle: AISLE.HERBS_SPICES },
-  SUGAR:                   { name: "Sugar", aisle: AISLE.BAKERY },
+  SALT: { name: "Salt", aisle: AISLE.HERBS_SPICES },
+  BLACK_PEPPER: { name: "Black pepper", aisle: AISLE.HERBS_SPICES },
+  SMOKED_PAPRIKA: { name: "Smoked paprika", aisle: AISLE.HERBS_SPICES },
+  CHILI_FLAKES: { name: "Chili flakes", aisle: AISLE.HERBS_SPICES },
+  ITALIAN_SEASONING: { name: "Italian seasoning", aisle: AISLE.HERBS_SPICES },
+  CUMIN: { name: "Cumin", aisle: AISLE.HERBS_SPICES },
+  CINNAMON: { name: "Cinnamon", aisle: AISLE.HERBS_SPICES },
+  SUGAR: { name: "Sugar", aisle: AISLE.BAKERY },
 
   // Starches & odds
-  POTATOES:                { name: "Potatoes", aisle: AISLE.VEG },
-  SWEET_POTATO:            { name: "Sweet potato", aisle: AISLE.VEG },
-  BREADCRUMBS:             { name: "Breadcrumbs", aisle: AISLE.BAKERY },
-  BAKING_POWDER:           { name: "Baking powder", aisle: AISLE.BAKERY },
-  CORN_FLOUR:              { name: "Corn flour", aisle: AISLE.BAKERY },
-  CRISPS:                  { name: "Crisps", aisle: AISLE.MISC },
-  AREPA_FLOUR_HARINA_PAN:  { name: "Harina PAN", aisle: AISLE.GRAINS_PASTA },
-  WATER:                   { name: "Water", aisle: AISLE.BEVERAGES },
-  LIME_JUICE_KEY:          { name: "Lime juice", aisle: AISLE.CONDIMENTS }, // alias-safe
-  RUM:                     { name: "Rum", aisle: AISLE.BEVERAGES },
-  PEAS_PETIT_POIS:         { name: "Petit pois", aisle: AISLE.FROZEN },
-  GREEN_BEANS_FROZEN:      { name: "Green beans", aisle: AISLE.FROZEN },
-  ROSEMARY_SPRIG:          { name: "Rosemary sprig", aisle: AISLE.HERBS_SPICES },
 
-    // Sweeteners
-  HONEY:                  { name: "Honey", aisle: AISLE.CONDIMENTS },
+  BREADCRUMBS: { name: "Breadcrumbs", aisle: AISLE.BAKERY },
+  BAKING_POWDER: { name: "Baking powder", aisle: AISLE.BAKERY },
+  CORN_FLOUR: { name: "Corn flour", aisle: AISLE.BAKERY },
+  CRISPS: { name: "Crisps", aisle: AISLE.MISC },
+  AREPA_FLOUR_HARINA_PAN: { name: "Harina PAN", aisle: AISLE.MISC },
+  WATER: { name: "Water", aisle: AISLE.BEVERAGES },
+  LIME_JUICE: { name: "Lime juice", aisle: AISLE.FRUIT }, // alias-safe
+  RUM: { name: "Rum", aisle: AISLE.BEVERAGES },
+  PEAS_PETIT_POIS: { name: "Petit pois", aisle: AISLE.FROZEN },
+  GREEN_BEANS_FROZEN: { name: "Green beans", aisle: AISLE.FROZEN },
+  ROSEMARY_SPRIG: { name: "Rosemary sprig", aisle: AISLE.VEG },
+
+  // Sweeteners
+  HONEY: { name: "Honey", aisle: AISLE.BAKERY },
 
   // Extra veg & proteins
-  MUSHROOMS:              { name: "Mushrooms", aisle: AISLE.VEG },
-  FIRM_TOFU:              { name: "Firm tofu", aisle: AISLE.MEAT },
+  MUSHROOMS: { name: "Mushrooms", aisle: AISLE.VEG },
+  FIRM_TOFU: { name: "Firm tofu", aisle: AISLE.MEAT },
 
   // Seasonings & powders
-  ONION_POWDER:           { name: "Onion powder", aisle: AISLE.HERBS_SPICES },
-  GARLIC_POWDER:          { name: "Garlic powder", aisle: AISLE.HERBS_SPICES },
-  CURRY_POWDER:           { name: "Curry powder", aisle: AISLE.HERBS_SPICES },
-  TURMERIC:               { name: "Turmeric", aisle: AISLE.HERBS_SPICES },
+  ONION_POWDER: { name: "Onion powder", aisle: AISLE.HERBS_SPICES },
+  GARLIC_POWDER: { name: "Garlic powder", aisle: AISLE.HERBS_SPICES },
+  CURRY_POWDER: { name: "Curry powder", aisle: AISLE.HERBS_SPICES },
+  TURMERIC: { name: "Turmeric", aisle: AISLE.HERBS_SPICES },
 
   // Baking & dough
-  DRY_YEAST:              { name: "Dry yeast", aisle: AISLE.BAKERY },
+  DRY_YEAST: { name: "Dry yeast", aisle: AISLE.BAKERY },
 
   // Meats
-  CHORIZO:                { name: "Chorizo", aisle: AISLE.MEAT },
+  CHORIZO: { name: "Chorizo", aisle: AISLE.MEAT },
 
   // Grains
-  RISOTTO_RICE:           { name: "Risotto rice", aisle: AISLE.GRAINS_PASTA },
+  RISOTTO_RICE: { name: "Risotto rice", aisle: AISLE.GRAINS_PASTA },
 
   // Condiments & extras
-  JALAPENOS:              { name: "Jalapeños", aisle: AISLE.CONDIMENTS },
-  TUNA:                   { name: "Tuna", aisle: AISLE.FISH },
-  RICE_UNCOOKED:          { name: "Uncooked rice", aisle: AISLE.GRAINS_PASTA },
+  JALAPENOS: { name: "Jalapeños", aisle: AISLE.CONDIMENTS },
+  TUNA: { name: "Tuna", aisle: AISLE.TINS_JARS },
+  RICE_UNCOOKED: { name: "Uncooked rice", aisle: AISLE.GRAINS_PASTA },
 
 };
 
 
+// --- Aisle helpers for shopping list sorting & styling ---
+const AISLE_OBJ_TO_KEY = new Map(Object.entries(AISLE).map(([k, obj]) => [obj, k]));
+const NAME_TO_ING = new Map(
+  Object.entries(INGREDIENTS).map(([key, v]) => [v.name, { key, aisleObj: v.aisle }])
+);
+function getAisleInfoByName(name) {
+  const inf = NAME_TO_ING.get(name);
+  if (!inf) return { key: 'MISC', order: 999, cssKey: 'misc', name: 'Misc' };
+  const aisleObj = inf.aisleObj;
+  const cssKey = (AISLE_OBJ_TO_KEY.get(aisleObj) || 'MISC').toLowerCase();
+  return { key: cssKey.toUpperCase(), order: aisleObj.order ?? 999, cssKey, name: aisleObj.name };
+}
 
 
 // Tiny helper to keep arrays tidy
@@ -862,8 +885,8 @@ const recipeData = [
     recipe: "Olive Oil & Himalayan Pink Salt Crisps",
     defaultServings: 2,
     calories: 700,
-    ingredients: [ N("CRISPS", 135, "g") ],
-    steps: [ "Divide and eat the crisps as a snack." ]
+    ingredients: [N("CRISPS", 135, "g")],
+    steps: ["Divide and eat the crisps as a snack."]
   },
   {
     id: 27,
@@ -1018,7 +1041,7 @@ const recipeData = [
       N("BREAD", 4, "slices"),
       N("BUTTER", 20, "g")
     ],
-    steps: [ "Toast bread, butter, serve warm." ]
+    steps: ["Toast bread, butter, serve warm."]
   },
   {
     id: 33,

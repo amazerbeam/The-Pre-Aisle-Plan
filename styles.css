@@ -527,3 +527,30 @@ li.checked {
 .toggle-btn:hover {
   background-color: #d6ccf7;
 }
+
+
+/* Aisle-colored borders for shopping list */
+.shopping-list li {
+  border: 1px solid #ddd;
+  border-left-width: 6px;            /* thicker colored stripe */
+}
+
+/* pick colors you like; these are readable in light UI */
+.shopping-list li.aisle-veg { border-left-color: #2ecc71; }        /* green */
+.shopping-list li.aisle-fruit { border-left-color: #27ae60; }      /* darker green */
+.shopping-list li.aisle-herbs_spices { border-left-color: #9b59b6; }/* purple */
+.shopping-list li.aisle-dairy { border-left-color: #8e44ad; }      /* violet */
+.shopping-list li.aisle-meat { border-left-color: #e74c3c; }       /* red */
+.shopping-list li.aisle-poultry { border-left-color: #e67e22; }    /* orange */
+.shopping-list li.aisle-fish { border-left-color: #3498db; }       /* blue */
+.shopping-list li.aisle-bakery { border-left-color: #d35400; }     /* brown/orange */
+.shopping-list li.aisle-grains_pasta { border-left-color: #f1c40f; }/* yellow */
+.shopping-list li.aisle-legumes { border-left-color: #16a085; }    /* teal */
+.shopping-list li.aisle-nuts { border-left-color: #a0522d; }       /* sienna */
+.shopping-list li.aisle-seeds { border-left-color: #7f8c8d; }      /* gray */
+.shopping-list li.aisle-oils { border-left-color: #f39c12; }       /* gold */
+.shopping-list li.aisle-condiments { border-left-color: #ff8ba7; } /* pink */
+.shopping-list li.aisle-tins_jars { border-left-color: #95a5a6; }  /* slate */
+.shopping-list li.aisle-frozen { border-left-color: #1abc9c; }     /* aqua */
+.shopping-list li.aisle-beverages { border-left-color: #34495e; }  /* navy */
+.shopping-list li.aisle-misc { border-left-color: #bdc3c7; }       /* light gray */

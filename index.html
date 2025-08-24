@@ -5,8 +5,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Recipe Viewer</title>
-<link rel="stylesheet" href="styles.css">
-<script src="recipes.js"></script>
+  <link rel="stylesheet" href="styles.css">
+  <script src="recipes.js"></script>
 
 
 
@@ -557,22 +557,30 @@
       function renderListItems() {
         ul.innerHTML = '';
 
+        // build array with aisle info for sorting & styling
         const items = [...ingredientMap.entries()].map(([key, total]) => {
           const [name, unit] = key.split('|');
           const rounded = Number.isInteger(total) ? total : total.toFixed(1);
+          const checked = shoppingListState.get(key) || false;
+          const aisle = getAisleInfoByName(name); // <- uses helpers from recipes.js
           return {
             key,
             label: `${rounded} ${unit} ${name}`,
-            checked: shoppingListState.get(key) || false
+            checked,
+            aisleOrder: aisle.order,
+            aisleCss: aisle.cssKey,
+            aisleName: aisle.name,
+            name
           };
         });
 
-        // Sort: unchecked first, then checked
-        items.sort((a, b) => a.checked - b.checked);
+        // Sort: unchecked first → by AISLE.order → by ingredient name
+        items.sort((a, b) => (a.checked - b.checked) || (a.aisleOrder - b.aisleOrder) || a.name.localeCompare(b.name));
 
-        items.forEach(({ key, label, checked }) => {
+        items.forEach(({ key, label, checked, aisleCss }) => {
           const li = document.createElement('li');
           li.className = checked ? 'checked' : '';
+          li.classList.add(`aisle-${aisleCss}`);            // <-- color the border by aisle
 
           const checkbox = document.createElement('input');
           checkbox.type = 'checkbox';
@@ -582,8 +590,7 @@
           checkbox.addEventListener('change', () => {
             shoppingListState.set(key, checkbox.checked);
             localStorage.setItem('shoppingListState', JSON.stringify([...shoppingListState.entries()]));
-
-            renderListItems(); // Rerender to re-sort and apply styles
+            renderListItems(); // Re-render to re-sort and apply styles
           });
 
           const labelSpan = document.createElement('span');
@@ -595,19 +602,17 @@
 
           // Make entire list item clickable
           li.addEventListener('click', (e) => {
-            // Avoid double toggling if clicking directly on checkbox
             if (e.target.tagName.toLowerCase() === 'input') return;
-
             checkbox.checked = !checkbox.checked;
             shoppingListState.set(key, checkbox.checked);
             localStorage.setItem('shoppingListState', JSON.stringify([...shoppingListState.entries()]));
             renderListItems();
           });
 
-
           ul.appendChild(li);
         });
       }
+
 
       renderListItems(); // Initial render
 
