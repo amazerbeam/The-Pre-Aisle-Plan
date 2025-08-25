@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Recipe Viewer</title>
+  <title>Pre Aisle Plan</title>
   <link rel="stylesheet" href="styles.css">
 
 
@@ -12,7 +12,7 @@
 </head>
 
 <body>
-  <h1>Recipe Viewer v.6.2.3</h1>
+  <h1>Recipe Viewer v.6.3.2</h1>
 
 
   <div style="text-align: center; margin-bottom: 10px;">
@@ -109,7 +109,7 @@
   </footer>
 
 
-<script src="recipes.js"></script>
+  <script src="recipes.js"></script>
 
 
   <script>
@@ -667,61 +667,78 @@
       const recipe = recipeData.find(r => r.id === recipeId);
       const isCheat = recipe?.isCheat === true || recipe?.isCheat === "true";
 
-      if (isCheat) {
-        let count = 0;
-        planner.forEach(entry => {
-          const meal = entry[mealType];
-          if (!meal) return;
-          const rec = recipeData.find(r => r.id === (meal.id || meal));
-          if (rec?.isCheat === true || rec?.isCheat === "true") count++;
-        });
-
-        if (count >= (allowCheatMeals[mealType] || 0)) {
-          alert(`You can only select ${allowCheatMeals[mealType]} cheat ${mealType} recipe${allowCheatMeals[mealType] > 1 ? 's' : ''} per week.`);
-          return; // prevent assignment
-        }
-      }
-
-
-
-      const servingsInput = document.querySelector(`input[data-recipe-id="${recipeId}"]`);
-      const currentServings = parseFloat(servingsInput?.value || 1);
-
+      // ensure entry exists / locate current selection first
       let entry = planner.find(p => p.day === day);
       if (!entry) {
         entry = { day };
         planner.push(entry);
       }
-
       const current = entry[mealType];
 
+      // ✅ 1) If clicking the same selected recipe again → unassign immediately (always allowed)
       if (current?.id === recipeId) {
-        // Clicking selected again → unassign
         delete entry[mealType];
-      } else {
-        // Assign new recipe with servings
-        entry[mealType] = { id: recipeId, servings: currentServings };
+
+        // remove empty day rows
+        if (Object.keys(entry).length === 1 && entry.day) {
+          const idx = planner.indexOf(entry);
+          if (idx !== -1) planner.splice(idx, 1);
+        }
+
+        localStorage.setItem('mealPlanner', JSON.stringify(planner));
+        const selectedMeal = document.querySelector(".tab.active")?.textContent.toLowerCase();
+        if (selectedMeal) renderRecipes(selectedMeal);
+        return;
       }
 
-      // Remove empty planner entries
+      // ✅ 2) Only now enforce cheat limits if assigning a new cheat recipe
+      if (isCheat) {
+        // count existing cheats for this mealType, excluding the current slot (we're replacing it)
+        let count = 0;
+        planner.forEach(p => {
+          if (p.day === day) return; // exclude this day; we’re replacing it anyway
+          const meal = p[mealType];
+          if (!meal) return;
+          const rec = recipeData.find(r => r.id === (meal.id || meal));
+          if (rec?.isCheat === true || rec?.isCheat === "true") count++;
+        });
+
+        // if the slot we’re replacing was already a cheat, it doesn’t increase count
+        const currentWasCheat = (() => {
+          if (!current) return false;
+          const rec = recipeData.find(r => r.id === (current.id || current));
+          return rec?.isCheat === true || rec?.isCheat === "true";
+        })();
+
+        const effectiveCheats = count + (currentWasCheat ? 0 : 0); // just for clarity
+
+        if (effectiveCheats >= (allowCheatMeals[mealType] || 0)) {
+          alert(`You can only select ${allowCheatMeals[mealType]} cheat ${mealType} recipe${allowCheatMeals[mealType] > 1 ? 's' : ''} per week.`);
+          return;
+        }
+      }
+
+      // figure servings at assign-time
+      const servingsInput = document.querySelector(`input[data-recipe-id="${recipeId}"]`);
+      const currentServings = parseFloat(servingsInput?.value || 1);
+
+      // assign new
+      entry[mealType] = { id: recipeId, servings: currentServings };
+
+      // clean empty entries (not strictly needed here, but kept for symmetry)
       if (Object.keys(entry).length === 1 && entry.day) {
         const index = planner.indexOf(entry);
         if (index !== -1) planner.splice(index, 1);
       }
 
-
-      // ✅ Save to localStorage
-      console.log("Saving planner to localStorage:", planner);
-
-      // 🔁 Re-render the current meal tab to update button states
+      // persist & refresh UI
+      localStorage.setItem('mealPlanner', JSON.stringify(planner));
       const selectedMeal = document.querySelector(".tab.active")?.textContent.toLowerCase();
       if (selectedMeal) {
         renderRecipes(selectedMeal);
       }
-
-
-
     }
+
 
 
     function getDayButtonClass(recipeId, day, mealType) {
