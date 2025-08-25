@@ -7,6 +7,49 @@
  * Load this BEFORE recipes.js in index.html.
  */
 
+const UNIT = {
+  // Weight
+  GRAM: "g",
+  KILOGRAM: "kg",
+  OUNCE: "oz",
+  POUND: "lb",
+
+  // Volume (metric)
+  MILLILITER: "ml",
+  LITER: "l",
+
+  // Volume (imperial/US style)
+  TEASPOON: "tsp",
+  TABLESPOON: "tbsp",
+  CUP: "cup",
+  
+  // Count / size
+  PIECES: "piece",    // plural-safe option
+  SLICES: "slice",
+  HANDFUL: "handful",
+  SMALL:  "small",      // e.g., 2 small eggs
+  MEDIUM: "medium",
+  LARGE: "large",
+
+  // Cans / tins / packs
+  TIN: "tin",
+  CAN: "can",
+  PACK: "pack",
+
+  // Cooking measures
+  PINCH: "pinch",
+  DASH: "dash",
+  SPRIG: "sprig",
+  CLOVE: "clove",
+  LEAF: "leaf",
+
+  // Special
+  HEAD: "head",  // e.g., 1 head of broccoli
+  STALK: "stalk",   // e.g., 2 stalks of celery
+  NONE: ""                     // for when you don’t want a unit
+};
+
+
 const AISLE = {
   MEAT: { name: "Meat", order: 1 },
   POULTRY: { name: "Poultry", order: 2 },
@@ -235,15 +278,15 @@ const recipeData = [
     defaultServings: 2,
     calories: 880,
     ingredients: [
-      N("ROLLED_OATS", 40, "g"),
-      N("GREEK_YOGURT", 100, "g"),
-      N("MILK", 200, "ml"),
-      N("MIXED_BERRIES", 100, "g"),
-      N("CHIA_SEEDS", 2, "tsp"),
-      N("HONEY", 0.5, "tsp"),
-      N("PEANUT_BUTTER", 1, "tbsp"),
-      N("BANANA", 1, "medium"),
-      N("CINNAMON", 0.25, "tsp")
+      N("ROLLED_OATS", 40, UNIT.GRAM),
+      N("GREEK_YOGURT", 100, UNIT.GRAM),
+      N("MILK", 200, UNIT.MILLILITER),
+      N("MIXED_BERRIES", 100, UNIT.GRAM),
+      N("CHIA_SEEDS", 2, UNIT.TEASPOON),
+      N("HONEY", 0.5, UNIT.TEASPOON),
+      N("PEANUT_BUTTER", 1, UNIT.TABLESPOON),
+      N("BANANA", 1, UNIT.PIECES),
+      N("CINNAMON", 0.25, UNIT.TEASPOON)
     ],
     steps: [
       "Combine oats, yogurt, milk, chia seeds, and peanut butter.",
@@ -258,10 +301,10 @@ const recipeData = [
     defaultServings: 2,
     calories: 734,
     ingredients: [
-      N("EGGS", 8, "small"),
-      N("BUTTER", 1, "tsp"),
-      N("SPINACH", 60, "g"),
-      N("AVOCADO", 1, "medium")
+      N("EGGS", 8, UNIT.SMALL),
+      N("BUTTER", 1, UNIT.TEASPOON),
+      N("SPINACH", 60, UNIT.GRAM),
+      N("AVOCADO", 1, UNIT.MEDIUM)
     ],
     steps: [
       "Slice or mash avocado and set aside.",
@@ -278,16 +321,16 @@ const recipeData = [
     defaultServings: 2,
     calories: 1210,
     ingredients: [
-      N("CHICKEN_BREAST", 240, "g"),
-      N("SALAD_LEAVES", 2, "handfuls"),
-      N("CUCUMBER", 1, "piece"),
-      N("CHERRY_TOMATOES", 10, "pieces"),
-      N("CARROT", 2, "pieces"),
-      N("LEMON", 1, "piece"),
-      N("OLIVE_OIL", 2, "tbsp"),
-      N("AVOCADO", 1, "medium"),
-      N("CHICKPEAS", 150, "g"),
-      N("FETA_CHEESE", 40, "g")
+      N("CHICKEN_BREAST", 240, UNIT.GRAM),
+      N("SALAD_LEAVES", 2, UNIT.HANDFUL),
+      N("CUCUMBER", 1, UNIT.PIECES),
+      N("CHERRY_TOMATOES", 10, UNIT.PIECES),
+      N("CARROT", 2, UNIT.PIECES),
+      N("LEMON", 1, UNIT.PIECES),
+      N("OLIVE_OIL", 2, UNIT.TABLESPOON),
+      N("AVOCADO", 1, UNIT.MEDIUM),
+      N("CHICKPEAS", 150, UNIT.GRAM),
+      N("FETA_CHEESE", 40, UNIT.GRAM)
     ],
     steps: [
       "Cook and slice the chicken breast. Let rest if made in advance.",
@@ -306,15 +349,15 @@ const recipeData = [
     defaultServings: 2,
     calories: 1200,
     ingredients: [
-      N("SALMON_FILLET", 2, "pieces (~150g each)"),
-      N("BROCCOLI", 1, "head"),
-      N("CARROT", 2, "pieces"),
-      N("SALAD_LEAVES", 2, "handfuls"),
-      N("LEMON", 1, "piece"),
-      N("OLIVE_OIL", 3, "tbsp"),
-      N("AVOCADO", 1, "medium"),
-      N("ALMONDS", 30, "g"),
-      N("SALT", 0.5, "tsp")
+      N("SALMON_FILLET", 2, UNIT.PIECES),
+      N("BROCCOLI", 1, UNIT.HEAD),
+      N("CARROT", 2, UNIT.PIECES),
+      N("SALAD_LEAVES", 2, UNIT.HANDFUL),
+      N("LEMON", 1, UNIT.PIECES),
+      N("OLIVE_OIL", 3, UNIT.TABLESPOON),
+      N("AVOCADO", 1, UNIT.MEDIUM),
+      N("ALMONDS", 30, UNIT.GRAM),
+      N("SALT", 0.5, UNIT.TEASPOON)
     ],
     steps: [
       "Preheat oven to 180°C.",
@@ -334,24 +377,24 @@ const recipeData = [
     defaultServings: 2,
     calories: 1180,
     ingredients: [
-      N("CHICKEN_BREAST", 240, "g"),
-      N("GREEN_BELL_PEPPER", 1, "piece"),
-      N("RED_BELL_PEPPER", 1, "piece"),
-      N("ONION", 1, "piece"),
-      N("PAK_CHOI", 300, "g"),
-      N("CELERY", 2, "pieces"),
-      N("MUSHROOMS", 100, "g"),
-      N("FIRM_TOFU", 100, "g"),
-      N("EGGS", 2, "small"),
-      N("CASHEWS", 30, "g"),
-      N("OLIVE_OIL", 2, "tbsp"),
-      N("SOY_SAUCE", 1, "tbsp"),
-      N("WORCESTERSHIRE_SAUCE", 0.5, "tbsp"),
-      N("GINGER", 1, "tsp"),
-      N("GARLIC", 1, "clove"),
-      N("CORN_FLOUR", 1, "tsp"),
-      N("SESAME_SEEDS", 1, "tsp"),
-      N("SALT", 0.5, "tsp")
+      N("CHICKEN_BREAST", 240, UNIT.GRAM),
+      N("GREEN_BELL_PEPPER", 1, UNIT.PIECES),
+      N("RED_BELL_PEPPER", 1, UNIT.PIECES),
+      N("ONION", 1, UNIT.PIECES),
+      N("PAK_CHOI", 300, UNIT.GRAM),
+      N("CELERY", 2, UNIT.PIECES),
+      N("MUSHROOMS", 100, UNIT.GRAM),
+      N("FIRM_TOFU", 100, UNIT.GRAM),
+      N("EGGS", 2,  UNIT.SMALL),
+      N("CASHEWS", 30, UNIT.GRAM),
+      N("OLIVE_OIL", 2, UNIT.TABLESPOON),
+      N("SOY_SAUCE", 1, UNIT.TABLESPOON),
+      N("WORCESTERSHIRE_SAUCE", 0.5, UNIT.TABLESPOON),
+      N("GINGER", 1, UNIT.TEASPOON),
+      N("GARLIC", 1, UNIT.CLOVE),
+      N("CORN_FLOUR", 1, UNIT.TEASPOON),
+      N("SESAME_SEEDS", 1, UNIT.TEASPOON),
+      N("SALT", 0.5, UNIT.TEASPOON)
     ],
     steps: [
       "Slice chicken, peppers, onion, celery, pak choi, and mushrooms.",
@@ -373,16 +416,16 @@ const recipeData = [
     defaultServings: 2,
     calories: 1180,
     ingredients: [
-      N("FIRM_TOFU", 400, "g"),
-      N("OLIVE_OIL", 3, "tbsp"),
-      N("GARLIC", 1, "clove"),
-      N("RED_BELL_PEPPER", 1, "piece"),
-      N("ONION", 1, "piece"),
-      N("MUSHROOMS", 150, "g"),
-      N("SOY_SAUCE", 2, "tbsp"),
-      N("SMOKED_PAPRIKA", 0.5, "tsp"),
-      N("CHILI_FLAKES", 0.5, "tsp"),
-      N("CASHEWS", 30, "g")
+      N("FIRM_TOFU", 400, UNIT.GRAM),
+      N("OLIVE_OIL", 3, UNIT.TABLESPOON),
+      N("GARLIC", 1, UNIT.CLOVE),
+      N("RED_BELL_PEPPER", 1, UNIT.PIECES),
+      N("ONION", 1, UNIT.PIECES),
+      N("MUSHROOMS", 150, UNIT.GRAM),
+      N("SOY_SAUCE", 2, UNIT.TABLESPOON),
+      N("SMOKED_PAPRIKA", 0.5, UNIT.TEASPOON),
+      N("CHILI_FLAKES", 0.5, UNIT.TEASPOON),
+      N("CASHEWS", 30, UNIT.GRAM)
     ],
     steps: [
       "Press tofu for ~15 minutes and cut into cubes.",
@@ -402,12 +445,12 @@ const recipeData = [
     defaultServings: 2,
     calories: 900,
     ingredients: [
-      N("PLAIN_FLOUR", 100, "g"),
-      N("EGGS", 2, "small"),
-      N("MILK", 300, "ml"),
-      N("BUTTER", 10, "g"),
-      N("STREAKY_BACON", 12, "slices"),
-      N("MAPLE_SYRUP", 2, "tbsp")
+      N("PLAIN_FLOUR", 100, UNIT.GRAM),
+      N("EGGS", 2,  UNIT.SMALL),
+      N("MILK", 300, UNIT.MILLILITER),
+      N("BUTTER", 10, UNIT.GRAM),
+      N("STREAKY_BACON", 12, UNIT.SLICES),
+      N("MAPLE_SYRUP", 2, UNIT.TABLESPOON)
     ],
     steps: [
       "Whisk flour and salt to taste in a bowl.",
@@ -426,9 +469,9 @@ const recipeData = [
     defaultServings: 2,
     calories: 450,
     ingredients: [
-      N("APPLE", 2, "medium"),
-      N("ALMONDS", 30, "g"),
-      N("GREEK_YOGURT", 150, "g")
+      N("APPLE", 2, UNIT.MEDIUM),
+      N("ALMONDS", 30, UNIT.GRAM),
+      N("GREEK_YOGURT", 150, UNIT.GRAM)
     ],
     steps: [
       "Slice each apple into wedges or bite-sized pieces.",
@@ -444,10 +487,10 @@ const recipeData = [
     defaultServings: 2,
     calories: 540,
     ingredients: [
-      N("PINEAPPLE_CHUNKS", 150, "g"),
-      N("CASHEWS", 30, "g"),
-      N("GREEK_YOGURT", 150, "g"),
-      N("CHIA_SEEDS", 2, "tsp")
+      N("PINEAPPLE_CHUNKS", 150, UNIT.GRAM),
+      N("CASHEWS", 30, UNIT.GRAM),
+      N("GREEK_YOGURT", 150, UNIT.GRAM),
+      N("CHIA_SEEDS", 2, UNIT.TEASPOON)
     ],
     steps: [
       "Divide pineapple chunks into two bowls (75g each).",
@@ -464,14 +507,14 @@ const recipeData = [
     defaultServings: 2,
     calories: 660,
     ingredients: [
-      N("CHIA_SEEDS", 4, "tbsp"),
-      N("WHOLE_MILK", 160, "ml"),
-      N("BANANA", 1, "piece"),
-      N("HONEY", 1, "tsp"),
-      N("VANILLA_EXTRACT", 0.5, "tsp"),
-      N("PEANUT_BUTTER", 2, "tbsp"),
-      N("GREEK_YOGURT", 150, "g"),
-      N("MIXED_BERRIES", 100, "g")
+      N("CHIA_SEEDS", 4, UNIT.TABLESPOON),
+      N("WHOLE_MILK", 160, UNIT.MILLILITER),
+      N("BANANA", 1, UNIT.PIECES),
+      N("HONEY", 1, UNIT.TEASPOON),
+      N("VANILLA_EXTRACT", 0.5, UNIT.TEASPOON),
+      N("PEANUT_BUTTER", 2, UNIT.TABLESPOON),
+      N("GREEK_YOGURT", 150, UNIT.GRAM),
+      N("MIXED_BERRIES", 100, UNIT.GRAM)
     ],
     steps: [
       "Mash the banana in a bowl or jar.",
@@ -489,12 +532,12 @@ const recipeData = [
     defaultServings: 2,
     calories: 1380,
     ingredients: [
-      N("TUNA", 220, "g"),
-      N("EGGS", 8, "small"),
-      N("SALT", 0.25, "tsp"),
-      N("BLACK_PEPPER", 0.25, "tsp"),
-      N("ONION_POWDER", 0.5, "tsp"),
-      N("BUTTER", 4, "tsp")
+      N("TUNA", 220, UNIT.GRAM),
+      N("EGGS", 8,  UNIT.SMALL),
+      N("SALT", 0.25, UNIT.TEASPOON),
+      N("BLACK_PEPPER", 0.25, UNIT.TEASPOON),
+      N("ONION_POWDER", 0.5, UNIT.TEASPOON),
+      N("BUTTER", 4, UNIT.TEASPOON)
     ],
     steps: [
       "Whisk the eggs in a bowl and mix in the drained tuna.",
@@ -513,15 +556,15 @@ const recipeData = [
     defaultServings: 2,
     calories: 1100,
     ingredients: [
-      N("CHICKEN_WINGS", 750, "g"),
-      N("BREADCRUMBS", 1, "cup"),
-      N("SOY_SAUCE", 1, "tbsp"),
-      N("WORCESTERSHIRE_SAUCE", 0.5, "tbsp"),
-      N("FRANKS_HOT_SAUCE", 1, "tbsp"),
-      N("GARLIC_POWDER", 1, "tsp"),
-      N("ONION_POWDER", 0.5, "tsp"),
-      N("SALT", 2, "tsp"),
-      N("OLIVE_OIL", 1, "tbsp")
+      N("CHICKEN_WINGS", 750, UNIT.GRAM),
+      N("BREADCRUMBS", 1, UNIT.CUP),
+      N("SOY_SAUCE", 1, UNIT.TABLESPOON),
+      N("WORCESTERSHIRE_SAUCE", 0.5, UNIT.TABLESPOON),
+      N("FRANKS_HOT_SAUCE", 1, UNIT.TABLESPOON),
+      N("GARLIC_POWDER", 1, UNIT.TEASPOON),
+      N("ONION_POWDER", 0.5, UNIT.TEASPOON),
+      N("SALT", 2, UNIT.TEASPOON),
+      N("OLIVE_OIL", 1, UNIT.TABLESPOON)
     ],
     steps: [
       "Preheat oven to 215°C (419°F).",
@@ -542,17 +585,17 @@ const recipeData = [
     defaultServings: 2,
     calories: 1800,
     ingredients: [
-      N("CHICKEN_WINGS", 750, "g"),
-      N("BREADCRUMBS", 1, "cup"),
-      N("SOY_SAUCE", 1, "tbsp"),
-      N("WORCESTERSHIRE_SAUCE", 0.5, "tbsp"),
-      N("FRANKS_HOT_SAUCE", 1, "tbsp"),
-      N("GARLIC_POWDER", 1, "tsp"),
-      N("ONION_POWDER", 0.5, "tsp"),
-      N("CORN_FLOUR", 0.5, "tbsp"),
-      N("SALT", 2, "tsp"),
-      N("OLIVE_OIL", 1, "tbsp"),
-      N("POTATOES", 1000, "g")
+      N("CHICKEN_WINGS", 750, UNIT.GRAM),
+      N("BREADCRUMBS", 1, UNIT.CUP),
+      N("SOY_SAUCE", 1, UNIT.TABLESPOON),
+      N("WORCESTERSHIRE_SAUCE", 0.5, UNIT.TABLESPOON),
+      N("FRANKS_HOT_SAUCE", 1, UNIT.TABLESPOON),
+      N("GARLIC_POWDER", 1, UNIT.TEASPOON),
+      N("ONION_POWDER", 0.5, UNIT.TEASPOON),
+      N("CORN_FLOUR", 0.5, UNIT.TABLESPOON),
+      N("SALT", 2, UNIT.TEASPOON),
+      N("OLIVE_OIL", 1, UNIT.TABLESPOON),
+      N("POTATOES", 1000, UNIT.GRAM)
     ],
     steps: [
       "Preheat oven to 215°C (419°F).",
@@ -573,19 +616,19 @@ const recipeData = [
     defaultServings: 2,
     calories: 1280,
     ingredients: [
-      N("TURKEY_MINCE", 400, "g"),
-      N("LETTUCE_LEAVES", 8, "pieces"),
-      N("RED_BELL_PEPPER", 2, "pieces"),
-      N("GARLIC", 1, "clove"),
-      N("OLIVE_OIL", 3, "tbsp"),
-      N("SALT", 0.25, "tsp"),
-      N("BLACK_PEPPER", 0.25, "tsp"),
-      N("CUCUMBER", 0.5, "piece"),
-      N("CHERRY_TOMATOES", 6, "pieces"),
-      N("RED_ONION", 0.25, "piece"),
-      N("FETA_CHEESE", 40, "g"),
-      N("ALMONDS", 20, "g"),
-      N("LEMON_JUICE", 1, "tbsp")
+      N("TURKEY_MINCE", 400, UNIT.GRAM),
+      N("LETTUCE_LEAVES", 8, UNIT.PIECES),
+      N("RED_BELL_PEPPER", 2, UNIT.PIECES),
+      N("GARLIC", 1, UNIT.CLOVE),
+      N("OLIVE_OIL", 3, UNIT.TABLESPOON),
+      N("SALT", 0.25, UNIT.TEASPOON),
+      N("BLACK_PEPPER", 0.25, UNIT.TEASPOON),
+      N("CUCUMBER", 0.5, UNIT.PIECES),
+      N("CHERRY_TOMATOES", 6, UNIT.PIECES),
+      N("RED_ONION", 0.25, UNIT.PIECES),
+      N("FETA_CHEESE", 40, UNIT.GRAM),
+      N("ALMONDS", 20, UNIT.GRAM),
+      N("LEMON_JUICE", 1, UNIT.TABLESPOON)
     ],
     steps: [
       "Heat 1 tbsp olive oil in a pan over medium heat.",
@@ -605,14 +648,14 @@ const recipeData = [
     defaultServings: 2,
     calories: 520,
     ingredients: [
-      N("PEACH", 1, "medium"),
-      N("GREEK_YOGURT", 150, "g"),
-      N("HONEY", 2, "tsp"),
-      N("CHIA_SEEDS", 2, "tsp"),
-      N("CINNAMON", 0.25, "tsp"),
-      N("ALMONDS", 15, "g"),
-      N("COCONUT_FLAKES", 5, "g"),
-      N("ALMOND_BUTTER", 1, "tbsp")
+      N("PEACH", 1, UNIT.MEDIUM),
+      N("GREEK_YOGURT", 150, UNIT.GRAM),
+      N("HONEY", 2, UNIT.TEASPOON),
+      N("CHIA_SEEDS", 2, UNIT.TEASPOON),
+      N("CINNAMON", 0.25, UNIT.TEASPOON),
+      N("ALMONDS", 15, UNIT.GRAM),
+      N("COCONUT_FLAKES", 5, UNIT.GRAM),
+      N("ALMOND_BUTTER", 1, UNIT.TABLESPOON)
     ],
     steps: [
       "Wash and slice the peach.",
@@ -629,8 +672,8 @@ const recipeData = [
     defaultServings: 2,
     calories: 340,
     ingredients: [
-      N("CRISPS", 60, "g"), // assuming your “olive oil crackers” are a packaged snack—keep as CRISPS or add a CRACKERS item if you prefer
-      N("PESTO", 2, "tbsp")
+      N("CRISPS", 60, UNIT.GRAM), // assuming your “olive oil crackers” are a packaged snack—keep as CRISPS or add a CRACKERS item if you prefer
+      N("PESTO", 2, UNIT.TABLESPOON)
     ],
     steps: [
       "Portion into two servings.",
@@ -645,20 +688,20 @@ const recipeData = [
     defaultServings: 2,
     calories: 1195,
     ingredients: [
-      N("CHICKEN_BREAST", 340, "g"),
-      N("BREADCRUMBS", 0.25, "cup"),
-      N("GARLIC_POWDER", 1, "tsp"),
-      N("ONION_POWDER", 0.5, "tsp"),
-      N("SMOKED_PAPRIKA", 0.5, "tsp"),
-      N("SALT", 0.75, "tsp"),
-      N("BLACK_PEPPER", 0.25, "tsp"),
-      N("OLIVE_OIL", 2, "tbsp"),
+      N("CHICKEN_BREAST", 340, UNIT.GRAM),
+      N("BREADCRUMBS", 0.25, UNIT.CUP),
+      N("GARLIC_POWDER", 1, UNIT.TEASPOON),
+      N("ONION_POWDER", 0.5, UNIT.TEASPOON),
+      N("SMOKED_PAPRIKA", 0.5, UNIT.TEASPOON),
+      N("SALT", 0.75, UNIT.TEASPOON),
+      N("BLACK_PEPPER", 0.25, UNIT.TEASPOON),
+      N("OLIVE_OIL", 2, UNIT.TABLESPOON),
       N("BROCCOLI", 1, "head"),
-      N("CARROT", 2, "pieces"),
-      N("GARLIC", 1, "clove"),
-      N("AVOCADO", 1, "medium"),
-      N("ALMONDS", 20, "g"),
-      N("SESAME_SEEDS", 1, "tsp")
+      N("CARROT", 2, UNIT.PIECES),
+      N("GARLIC", 1, UNIT.CLOVE),
+      N("AVOCADO", 1, UNIT.MEDIUM),
+      N("ALMONDS", 20, UNIT.GRAM),
+      N("SESAME_SEEDS", 1, UNIT.TEASPOON)
     ],
     steps: [
       "Preheat oven to 200°C.",
@@ -677,14 +720,14 @@ const recipeData = [
     defaultServings: 2,
     calories: 1800,
     ingredients: [
-      N("PLAIN_FLOUR", 450, "g"),
-      N("WATER", 240, "ml"),
-      N("DRY_YEAST", 1, "tsp"),
-      N("OLIVE_OIL", 4, "tbsp"),
-      N("SALT", 2, "tsp"),
-      N("TOMATO_SAUCE", 100, "g"),
-      N("CHEESE", 300, "g"),
-      N("CHORIZO", 100, "g")
+      N("PLAIN_FLOUR", 450, UNIT.GRAM),
+      N("WATER", 240, UNIT.MILLILITER),
+      N("DRY_YEAST", 1, UNIT.TEASPOON),
+      N("OLIVE_OIL", 4, UNIT.TABLESPOON),
+      N("SALT", 2, UNIT.TEASPOON),
+      N("TOMATO_SAUCE", 100, UNIT.GRAM),
+      N("CHEESE", 300, UNIT.GRAM),
+      N("CHORIZO", 100, UNIT.GRAM)
     ],
     steps: [
       "Mix flour, yeast, and salt.",
@@ -700,16 +743,16 @@ const recipeData = [
     defaultServings: 2,
     calories: 1020,
     ingredients: [
-      N("RED_BELL_PEPPER", 2, "pieces"),
-      N("TURKEY_MINCE", 300, "g"),
-      N("ONION", 1, "piece"),
-      N("GARLIC", 1, "clove"),
-      N("TOMATO_PASTE", 1, "tbsp"),
-      N("SMOKED_PAPRIKA", 0.5, "tsp"),
-      N("SALT", 0.5, "tsp"),
-      N("OLIVE_OIL", 2.5, "tbsp"),
-      N("SWEET_POTATO", 400, "g"),
-      N("ALMONDS", 20, "g")
+      N("RED_BELL_PEPPER", 2, UNIT.PIECES),
+      N("TURKEY_MINCE", 300, UNIT.GRAM),
+      N("ONION", 1, UNIT.PIECES),
+      N("GARLIC", 1, UNIT.CLOVE),
+      N("TOMATO_PASTE", 1, UNIT.TABLESPOON),
+      N("SMOKED_PAPRIKA", 0.5, UNIT.TEASPOON),
+      N("SALT", 0.5, UNIT.TEASPOON),
+      N("OLIVE_OIL", 2.5, UNIT.TABLESPOON),
+      N("SWEET_POTATO", 400, UNIT.GRAM),
+      N("ALMONDS", 20, UNIT.GRAM)
     ],
     steps: [
       "Roast sweet potatoes 25–30 min at 190°C.",
@@ -725,20 +768,20 @@ const recipeData = [
     defaultServings: 2,
     calories: 1340,
     ingredients: [
-      N("CHICKPEAS", 240, "g"),
-      N("FIRM_TOFU", 150, "g"),
-      N("ONION", 1, "piece"),
-      N("GARLIC", 2, "cloves"),
-      N("CARROT", 2, "pieces"),
-      N("RED_BELL_PEPPER", 1, "piece"),
-      N("TINNED_TOMATOES", 1, "tin"),
-      N("CURRY_POWDER", 2, "tbsp"),
-      N("OLIVE_OIL", 2.5, "tbsp"),
-      N("SWEET_POTATO", 400, "g"),
-      N("CASHEWS", 20, "g"),
-      N("SALT", 0.5, "tsp"),
-      N("STOCK", 1, "cup"),
-      N("BLACK_PEPPER", 0.25, "tsp")
+      N("CHICKPEAS", 240, UNIT.GRAM),
+      N("FIRM_TOFU", 150, UNIT.GRAM),
+      N("ONION", 1, UNIT.PIECES),
+      N("GARLIC", 2, UNIT.CLOVE),
+      N("CARROT", 2, UNIT.PIECES),
+      N("RED_BELL_PEPPER", 1, UNIT.PIECES),
+      N("TINNED_TOMATOES", 1, UNIT.TIN),
+      N("CURRY_POWDER", 2, UNIT.TABLESPOON),
+      N("OLIVE_OIL", 2.5, UNIT.TABLESPOON),
+      N("SWEET_POTATO", 400, UNIT.GRAM),
+      N("CASHEWS", 20, UNIT.GRAM),
+      N("SALT", 0.5, UNIT.TEASPOON),
+      N("STOCK", 1, UNIT.CUP),
+      N("BLACK_PEPPER", 0.25, UNIT.TEASPOON)
     ],
     steps: [
       "Roast sweet potato 25–30 min at 200°C.",
@@ -755,20 +798,20 @@ const recipeData = [
     defaultServings: 2,
     calories: 1240,
     ingredients: [
-      N("ZUCCHINI", 2, "medium"),
-      N("TURKEY_MINCE", 300, "g"),
-      N("TINNED_TOMATOES", 1, "tin"),
-      N("GARLIC", 2, "cloves"),
-      N("OLIVE_OIL", 1.5, "tbsp"),
-      N("ONION", 1, "medium"),
-      N("GREEN_OLIVES", 40, "g"),
-      N("ITALIAN_SEASONING", 1, "tsp"),
-      N("SALT", 1, "tsp"),
-      N("BLACK_PEPPER", 0.25, "tsp"),
-      N("PESTO", 1, "tbsp"),
-      N("BASIL", 1, "tbsp"),
-      N("SWEET_POTATO", 300, "g"),
-      N("PARMESAN_CHEESE", 30, "g")
+      N("ZUCCHINI", 2, UNIT.MEDIUM),
+      N("TURKEY_MINCE", 300, UNIT.GRAM),
+      N("TINNED_TOMATOES", 1, UNIT.TIN),
+      N("GARLIC", 2, UNIT.CLOVE),
+      N("OLIVE_OIL", 1.5, UNIT.TABLESPOON),
+      N("ONION", 1, UNIT.MEDIUM),
+      N("GREEN_OLIVES", 40, UNIT.GRAM),
+      N("ITALIAN_SEASONING", 1, UNIT.TEASPOON),
+      N("SALT", 1, UNIT.TEASPOON),
+      N("BLACK_PEPPER", 0.25, UNIT.TEASPOON),
+      N("PESTO", 1, UNIT.TABLESPOON),
+      N("BASIL", 1, UNIT.TABLESPOON),
+      N("SWEET_POTATO", 300, UNIT.GRAM),
+      N("PARMESAN_CHEESE", 30, UNIT.GRAM)
     ],
     steps: [
       "Roast sweet potato 25–30 min at 200°C.",
@@ -785,19 +828,19 @@ const recipeData = [
     defaultServings: 2,
     calories: 1260,
     ingredients: [
-      N("ZUCCHINI", 2, "medium"),
-      N("TURKEY_MINCE", 200, "g"),
-      N("ALMONDS", 1, "tbsp"),
-      N("CASHEWS", 60, "g"),
-      N("MILK", 100, "ml"),
-      N("EGGS", 1, "medium"),
-      N("PARMESAN_CHEESE", 30, "g"),
-      N("GARLIC", 1, "clove"),
-      N("OLIVE_OIL", 2, "tsp"),
-      N("SALT", 1, "tsp"),
-      N("BLACK_PEPPER", 0.25, "tsp"),
-      N("WHOLEMEAL_BREAD", 2, "slices (40g each)"),
-      N("CHIVES", 1, "tbsp")
+      N("ZUCCHINI", 2, UNIT.MEDIUM),
+      N("TURKEY_MINCE", 200, UNIT.GRAM),
+      N("ALMONDS", 1, UNIT.TABLESPOON),
+      N("CASHEWS", 60, UNIT.GRAM),
+      N("MILK", 100, UNIT.MILLILITER),
+      N("EGGS", 1, UNIT.SMALL),
+      N("PARMESAN_CHEESE", 30, UNIT.GRAM),
+      N("GARLIC", 1, UNIT.CLOVE),
+      N("OLIVE_OIL", 2, UNIT.TEASPOON),
+      N("SALT", 1, UNIT.TEASPOON),
+      N("BLACK_PEPPER", 0.25, UNIT.TEASPOON),
+      N("WHOLEMEAL_BREAD", 2, UNIT.SLICES),
+      N("CHIVES", 1, UNIT.TABLESPOON)
     ],
     steps: [
       "Warm milk and soak cashews 30 min.",
@@ -814,9 +857,9 @@ const recipeData = [
     defaultServings: 2,
     calories: 500,
     ingredients: [
-      N("CELERY", 8, "pieces"),
-      N("HUMMUS", 6, "tbsp"),
-      N("WALNUTS", 15, "g")
+      N("CELERY", 8, UNIT.PIECES),
+      N("HUMMUS", 6, UNIT.TABLESPOON),
+      N("WALNUTS", 15, UNIT.GRAM)
     ],
     steps: [
       "Prep celery sticks, portion hummus.",
@@ -830,14 +873,14 @@ const recipeData = [
     defaultServings: 2,
     calories: 715,
     ingredients: [
-      N("AREPA_FLOUR_HARINA_PAN", 60, "g"),
-      N("ROLLED_OATS", 60, "g"),
-      N("WATER", 140, "ml"),
-      N("SALT", 0.5, "tsp"),
-      N("OLIVE_OIL", 1, "tbsp"),
-      N("EGGS", 2, "small"),
-      N("AVOCADO", 1, "piece"),
-      N("CHICKEN_BREAST", 100, "g")
+      N("AREPA_FLOUR_HARINA_PAN", 60, UNIT.GRAM),
+      N("ROLLED_OATS", 60, UNIT.GRAM),
+      N("WATER", 140, UNIT.MILLILITER),
+      N("SALT", 0.5, UNIT.TEASPOON),
+      N("OLIVE_OIL", 1, UNIT.TABLESPOON),
+      N("EGGS", 2,  UNIT.SMALL),
+      N("AVOCADO", 1, UNIT.PIECES),
+      N("CHICKEN_BREAST", 100, UNIT.GRAM)
     ],
     steps: [
       "Mix Harina PAN, oats, water, and salt; rest 5 min.",
@@ -852,23 +895,23 @@ const recipeData = [
     defaultServings: 2,
     calories: 1584,
     ingredients: [
-      N("TURKEY_MINCE", 300, "g"),
-      N("BROWN_LENTILS", 1, "tin"),
-      N("TINNED_TOMATOES", 1, "tin"),
-      N("ONION", 1, "piece"),
-      N("GARLIC", 3, "cloves"),
-      N("CELERY", 2, "sticks"),
-      N("CARROT", 1, "piece"),
-      N("SPINACH", 60, "g"),
-      N("BASIL", 1, "tbsp"),
-      N("CAPERS", 1, "tbsp"),
-      N("OLIVE_OIL", 2, "tbsp"),
-      N("SALT", 1, "tsp"),
-      N("SUGAR", 1, "tsp"),
-      N("BLACK_PEPPER", 0.25, "tsp"),
-      N("ITALIAN_SEASONING", 1, "tsp"),
-      N("STOCK", 1, "cup"),
-      N("SWEET_POTATO", 300, "g")
+      N("TURKEY_MINCE", 300, UNIT.GRAM),
+      N("BROWN_LENTILS", 1, UNIT.TIN),
+      N("TINNED_TOMATOES", 1, UNIT.TIN),
+      N("ONION", 1, UNIT.PIECES),
+      N("GARLIC", 3, UNIT.CLOVE),
+      N("CELERY", 2, UNIT.STALK),
+      N("CARROT", 1, UNIT.PIECES),
+      N("SPINACH", 60, UNIT.GRAM),
+      N("BASIL", 1, UNIT.TABLESPOON),
+      N("CAPERS", 1, UNIT.TABLESPOON),
+      N("OLIVE_OIL", 2, UNIT.TABLESPOON),
+      N("SALT", 1, UNIT.TEASPOON),
+      N("SUGAR", 1, UNIT.TEASPOON),
+      N("BLACK_PEPPER", 0.25, UNIT.TEASPOON),
+      N("ITALIAN_SEASONING", 1, UNIT.TEASPOON),
+      N("STOCK", 1, UNIT.CUP),
+      N("SWEET_POTATO", 300, UNIT.GRAM)
     ],
     steps: [
       "Roast sweet potato 25–30 min at 200°C.",
@@ -885,7 +928,7 @@ const recipeData = [
     recipe: "Olive Oil & Himalayan Pink Salt Crisps",
     defaultServings: 2,
     calories: 700,
-    ingredients: [N("CRISPS", 135, "g")],
+    ingredients: [N("CRISPS", 135, UNIT.GRAM)],
     steps: ["Divide and eat the crisps as a snack."]
   },
   {
@@ -896,23 +939,23 @@ const recipeData = [
     defaultServings: 2,
     calories: 900,
     ingredients: [
-      N("PLAIN_FLOUR", 300, "g"),
-      N("SALT", 1, "tsp"),
-      N("BUTTER", 75, "g"),
-      N("WATER", 120, "ml"),
-      N("OLIVE_OIL", 1, "tbsp"),
-      N("ONION", 1, "medium"),
-      N("RED_BELL_PEPPER", 0.5, "piece"),
-      N("GARLIC", 2, "cloves"),
-      N("GROUND_BEEF", 400, "g"),
-      N("SMOKED_PAPRIKA", 1, "tsp"),
-      N("CUMIN", 1, "tsp"),
-      N("SALT", 0.5, "tsp"),
-      N("BLACK_PEPPER", 0.25, "tsp"),
-      N("TOMATO_PASTE", 1.5, "tbsp"),
-      N("STOCK", 60, "ml"),
-      N("EGGS", 2, "pieces"),
-      N("GREEN_OLIVES", 50, "g")
+      N("PLAIN_FLOUR", 300, UNIT.GRAM),
+      N("SALT", 1, UNIT.TEASPOON),
+      N("BUTTER", 75, UNIT.GRAM),
+      N("WATER", 120, UNIT.MILLILITER),
+      N("OLIVE_OIL", 1, UNIT.TABLESPOON),
+      N("ONION", 1, UNIT.PIECES),
+      N("RED_BELL_PEPPER", 0.5, UNIT.PIECES),
+      N("GARLIC", 2, UNIT.CLOVE),
+      N("GROUND_BEEF", 400, UNIT.GRAM),
+      N("SMOKED_PAPRIKA", 1, UNIT.TEASPOON),
+      N("CUMIN", 1, UNIT.TEASPOON),
+      N("SALT", 0.5, UNIT.TEASPOON),
+      N("BLACK_PEPPER", 0.25, UNIT.TEASPOON),
+      N("TOMATO_PASTE", 1.5, UNIT.TABLESPOON),
+      N("STOCK", 60, UNIT.MILLILITER),
+      N("EGGS", 2, UNIT.SMALL),
+      N("GREEN_OLIVES", 50, UNIT.GRAM)
     ],
     steps: [
       "Make dough; rest 30 min; cut circles.",
@@ -928,16 +971,16 @@ const recipeData = [
     defaultServings: 2,
     calories: 1600,
     ingredients: [
-      N("BEEF_ROAST", 2, "pieces (200-250g each)"), // normalized to a single cut
-      N("POTATOES", 600, "g"),
-      N("SALT", 1, "tsp"),
-      N("BLACK_PEPPER", 0.5, "tsp"),
-      N("BUTTER", 20, "g"),
-      N("GARLIC", 2, "cloves"),
+      N("BEEF_ROAST", 2, UNIT.PIECES), // normalized to a single cut
+      N("POTATOES", 600, UNIT.GRAM),
+      N("SALT", 1, UNIT.TEASPOON),
+      N("BLACK_PEPPER", 0.5, UNIT.TEASPOON),
+      N("BUTTER", 20, UNIT.GRAM),
+      N("GARLIC", 2, UNIT.CLOVE),
       N("ROSEMARY", 2, "sprigs"),
-      N("DOUBLE_CREAM", 100, "ml"),
-      N("RUM", 1, "tbsp"),
-      N("BLACK_PEPPER", 1, "tsp")
+      N("DOUBLE_CREAM", 100, UNIT.MILLILITER),
+      N("RUM", 1, UNIT.TABLESPOON),
+      N("BLACK_PEPPER", 1, UNIT.TEASPOON)
     ],
     steps: [
       "Fry chips at 180°C; drain & season.",
@@ -954,22 +997,22 @@ const recipeData = [
     defaultServings: 2,
     calories: 1140,
     ingredients: [
-      N("CHICKEN_BREAST", 350, "g"),
-      N("GREEN_BELL_PEPPER", 1, "piece"),
-      N("RED_BELL_PEPPER", 1, "piece"),
-      N("ONION", 1, "piece"),
-      N("PAK_CHOI", 300, "g"),
-      N("CELERY", 2, "pieces"),
-      N("SALT", 0.5, "tsp"),
-      N("SOY_SAUCE", 1, "tbsp"),
-      N("PEANUT_BUTTER", 3.5, "tbsp"),
-      N("COCONUT_WATER", 100, "ml"),
-      N("WORCESTERSHIRE_SAUCE", 0.5, "tbsp"),
-      N("GARLIC", 1, "clove"),
-      N("CORN_FLOUR", 1, "tsp"),
-      N("WATER", 1, "tbsp"),
-      N("LIME_JUICE", 0.5, "tsp"),
-      N("CUMIN", 0.25, "tsp")
+      N("CHICKEN_BREAST", 350, UNIT.GRAM),
+      N("GREEN_BELL_PEPPER", 1, UNIT.PIECES),
+      N("RED_BELL_PEPPER", 1, UNIT.PIECES),
+      N("ONION", 1, UNIT.PIECES),
+      N("PAK_CHOI", 300, UNIT.GRAM),
+      N("CELERY", 2, UNIT.PIECES),
+      N("SALT", 0.5, UNIT.TEASPOON),
+      N("SOY_SAUCE", 1, UNIT.TABLESPOON),
+      N("PEANUT_BUTTER", 3.5, UNIT.TABLESPOON),
+      N("COCONUT_WATER", 100, UNIT.MILLILITER),
+      N("WORCESTERSHIRE_SAUCE", 0.5, UNIT.TABLESPOON),
+      N("GARLIC", 1, UNIT.CLOVE),
+      N("CORN_FLOUR", 1, UNIT.TEASPOON),
+      N("WATER", 1, UNIT.TABLESPOON),
+      N("LIME_JUICE", 0.5, UNIT.TEASPOON),
+      N("CUMIN", 0.25, UNIT.TEASPOON)
     ],
     steps: [
       "Marinate sliced chicken & veg with salt.",
@@ -985,21 +1028,21 @@ const recipeData = [
     defaultServings: 4,
     calories: 700,
     ingredients: [
-      N("BROWN_LENTILS", 1, "tin"),
-      N("ONION", 1, "piece"),
-      N("GARLIC", 3, "cloves"),
-      N("CARROT", 2, "pieces"),
-      N("CELERY", 2, "sticks"),
-      N("TINNED_TOMATOES", 1, "tin"),
-      N("PAK_CHOI", 300, "g"),
-      N("BAY_LEAF", 1, "piece"),
-      N("STOCK", 1500, "ml"),
-      N("SMOKED_PAPRIKA", 1, "tsp"),
-      N("CUMIN", 1, "tsp"),
-      N("SALT", 1, "tsp"),
-      N("BLACK_PEPPER", 1, "to taste"),
-      N("CAPERS", 2, "tbsp"),
-      N("RED_BELL_PEPPER", 1, "piece")
+      N("BROWN_LENTILS", 1, UNIT.TIN),
+      N("ONION", 1, UNIT.PIECES),
+      N("GARLIC", 3, UNIT.CLOVE),
+      N("CARROT", 2, UNIT.PIECES),
+      N("CELERY", 2, UNIT.ST),
+      N("TINNED_TOMATOES", 1, UNIT.TIN),
+      N("PAK_CHOI", 300, UNIT.GRAM),
+      N("BAY_LEAF", 1, UNIT.PIECES),
+      N("STOCK", 1500, UNIT.MILLILITER),
+      N("SMOKED_PAPRIKA", 1, UNIT.TEASPOON),
+      N("CUMIN", 1, UNIT.TEASPOON),
+      N("SALT", 1, UNIT.TEASPOON),
+      N("BLACK_PEPPER", 1, UNIT.TEASPOON),
+      N("CAPERS", 2, UNIT.TABLESPOON),
+      N("RED_BELL_PEPPER", 1, UNIT.PIECES)
     ],
     steps: [
       "Sauté onion/garlic/carrots/celery with salt.",
@@ -1017,12 +1060,12 @@ const recipeData = [
     defaultServings: 2,
     calories: 1843,
     ingredients: [
-      N("STREAKY_BACON", 12, "slices"),
-      N("BREAD", 4, "slices"),
-      N("POTATOES", 500, "g"),
-      N("ONION", 70, "g"),
-      N("SALT", 1, "tsp"),
-      N("BUTTER", 20, "g")
+      N("STREAKY_BACON", 12, UNIT.SLICES),
+      N("BREAD", 4, UNIT.SLICES),
+      N("POTATOES", 500, UNIT.GRAM),
+      N("ONION", 70, UNIT.GRAM),
+      N("SALT", 1, UNIT.TEASPOON),
+      N("BUTTER", 20, UNIT.GRAM)
     ],
     steps: [
       "Grate potatoes & onion; salt; squeeze water.",
@@ -1038,8 +1081,8 @@ const recipeData = [
     defaultServings: 2,
     calories: 470,
     ingredients: [
-      N("BREAD", 4, "slices"),
-      N("BUTTER", 20, "g")
+      N("BREAD", 4, UNIT.SLICES),
+      N("BUTTER", 20, UNIT.GRAM)
     ],
     steps: ["Toast bread, butter, serve warm."]
   },
@@ -1051,18 +1094,18 @@ const recipeData = [
     calories: 974,
     defaultServings: 2,
     ingredients: [
-      N("RISOTTO_RICE", 300, "g"),
-      N("STOCK", 700, "ml"),
-      N("ONION", 1, "small"),
-      N("OLIVE_OIL", 2, "tbsp"),
-      N("STREAKY_BACON", 100, "g"),
-      N("MOZZARELLA", 100, "g"),
-      N("PARMESAN_CHEESE", 40, "g"),
-      N("EGGS", 1, "piece"),
-      N("BREADCRUMBS", 80, "g"),
-      N("BREADCRUMBS", 40, "g (for coating)"),
-      N("SALT", 0.5, "tsp"),
-      N("BLACK_PEPPER", 0.25, "tsp")
+      N("RISOTTO_RICE", 300, UNIT.GRAM),
+      N("STOCK", 700, UNIT.MILLILITER),
+      N("ONION", 1,  UNIT.PIECES),
+      N("OLIVE_OIL", 2, UNIT.TABLESPOON),
+      N("STREAKY_BACON", 100, UNIT.GRAM),
+      N("MOZZARELLA", 100, UNIT.GRAM),
+      N("PARMESAN_CHEESE", 40, UNIT.GRAM),
+      N("EGGS", 1, UNIT.SMALL),
+      N("BREADCRUMBS", 80, UNIT.GRAM),
+      N("BREADCRUMBS", 40, UNIT.GRAM),
+      N("SALT", 0.5, UNIT.TEASPOON),
+      N("BLACK_PEPPER", 0.25, UNIT.TEASPOON)
     ],
     steps: [
       "Make risotto with onions and stock; cool.",
@@ -1078,25 +1121,25 @@ const recipeData = [
     defaultServings: 4,
     calories: 1266,
     ingredients: [
-      N("BEEF_ROAST", 1000, "g"),
-      N("SALT", 1, "tsp"),
-      N("BLACK_PEPPER", 0.5, "tsp"),
-      N("ONION", 2, "medium"),
-      N("GARLIC", 2, "cloves"),
-      N("CUMIN", 1, "tsp"),
-      N("SMOKED_PAPRIKA", 1, "tsp"),
-      N("STOCK", 500, "ml"),
-      N("BUTTER", 2, "tbsp"),
-      N("PLAIN_FLOUR", 2, "tbsp"),
-      N("WORCESTERSHIRE_SAUCE", 1, "tsp"),
-      N("FRANKS_HOT_SAUCE", 2, "tsp"),
-      N("RICE_UNCOOKED", 0.33, "cups"),
-      N("AVOCADO", 2, "pieces"),
-      N("HALLOUMI", 200, "g"),
-      N("JALAPENOS", 4, "tbsp"),
-      N("FLOUR_TORTILLAS", 4, "large"),
-      N("MOZZARELLA", 100, "g"),
-      N("PARMESAN_CHEESE", 40, "g")
+      N("BEEF_ROAST", 1000, UNIT.GRAM),
+      N("SALT", 1, UNIT.TEASPOON),
+      N("BLACK_PEPPER", 0.5, UNIT.TEASPOON),
+      N("ONION", 2, UNIT.PIECES),
+      N("GARLIC", 2, UNIT.CLOVE),
+      N("CUMIN", 1, UNIT.TEASPOON),
+      N("SMOKED_PAPRIKA", 1, UNIT.TEASPOON),
+      N("STOCK", 500, UNIT.MILLILITER),
+      N("BUTTER", 2, UNIT.TABLESPOON),
+      N("PLAIN_FLOUR", 2, UNIT.TABLESPOON),
+      N("WORCESTERSHIRE_SAUCE", 1, UNIT.TEASPOON),
+      N("FRANKS_HOT_SAUCE", 2, UNIT.TEASPOON),
+      N("RICE_UNCOOKED", 0.33, UNIT.CUP),
+      N("AVOCADO", 2, UNIT.PIECES),
+      N("HALLOUMI", 200, UNIT.GRAM),
+      N("JALAPENOS", 4, UNIT.TABLESPOON),
+      N("FLOUR_TORTILLAS", 4, UNIT.LARGE),
+      N("MOZZARELLA", 100, UNIT.GRAM),
+      N("PARMESAN_CHEESE", 40, UNIT.GRAM)
     ],
     steps: [
       "Sear beef; sauté onions/garlic; add spices & stock; braise at 160°C ~2.5h; shred.",
@@ -1111,24 +1154,24 @@ const recipeData = [
     defaultServings: 2,
     calories: 1200,
     ingredients: [
-      N("TURKEY_BREAST", 300, "g"),
-      N("OLIVE_OIL", 2, "tbsp"),
-      N("ONION", 1, "medium"),
-      N("GARLIC", 2, "cloves"),
-      N("TURNIP", 1, "small"),
-      N("CARROT", 2, "medium"),
-      N("CELERY", 2, "stalks"),
-      N("MUSHROOMS", 150, "g"),
-      N("SWEET_POTATO", 200, "g"),
-      N("TOMATO_PASTE", 1, "tbsp"),
-      N("THYME", 1, "tsp"),
-      N("ROSEMARY", 1, "tsp"),
-      N("BAY_LEAF", 1, "leaf"),
-      N("STOCK", 500, "ml"),
-      N("SALT", 1, "tsp"),
-      N("BLACK_PEPPER", 0.25, "tsp"),
-      N("PARSLEY", 1, "tbsp"),
-      N("WHOLEMEAL_BREAD", 2, "slices")
+      N("TURKEY_BREAST", 300, UNIT.GRAM),
+      N("OLIVE_OIL", 2, UNIT.TABLESPOON),
+      N("ONION", 1, UNIT.PIECES),
+      N("GARLIC", 2, UNIT.CLOVE),
+      N("TURNIP", 1,  UNIT.SMALL),
+      N("CARROT", 2, UNIT.PIECES),
+      N("CELERY", 2, UNIT.STALK),
+      N("MUSHROOMS", 150, UNIT.GRAM),
+      N("SWEET_POTATO", 200, UNIT.GRAM),
+      N("TOMATO_PASTE", 1, UNIT.TABLESPOON),
+      N("THYME", 1, UNIT.TEASPOON),
+      N("ROSEMARY", 1, UNIT.TEASPOON),
+      N("BAY_LEAF", 1, UNIT.LEAF,
+      N("STOCK", 500, UNIT.MILLILITER),
+      N("SALT", 1, UNIT.TEASPOON),
+      N("BLACK_PEPPER", 0.25, UNIT.TEASPOON),
+      N("PARSLEY", 1, UNIT.TABLESPOON),
+      N("WHOLEMEAL_BREAD", 2, UNIT.SLICES)
     ],
     steps: [
       "Sear turkey; remove.",
@@ -1144,16 +1187,16 @@ const recipeData = [
     defaultServings: 2,
     calories: 880,
     ingredients: [
-      N("ALMOND_FLOUR", 60, "g"),
-      N("EGGS", 2, "small"),
-      N("MILK", 60, "ml"),
-      N("BAKING_POWDER", 0.5, "tsp"),
-      N("VANILLA_EXTRACT", 0.5, "tsp"),
-      N("OLIVE_OIL", 1, "tsp"),
-      N("MIXED_BERRIES", 60, "g"),
-      N("HONEY", 1, "tsp"),
-      N("GREEK_YOGURT", 100, "g"),
-      N("BANANA", 1, "small")
+      N("ALMOND_FLOUR", 60, UNIT.GRAM),
+      N("EGGS", 2,  UNIT.SMALL),
+      N("MILK", 60, UNIT.MILLILITER),
+      N("BAKING_POWDER", 0.5, UNIT.TEASPOON),
+      N("VANILLA_EXTRACT", 0.5, UNIT.TEASPOON),
+      N("OLIVE_OIL", 1, UNIT.TEASPOON),
+      N("MIXED_BERRIES", 60, UNIT.GRAM),
+      N("HONEY", 1, UNIT.TEASPOON),
+      N("GREEK_YOGURT", 100, UNIT.GRAM),
+      N("BANANA", 1,  UNIT.PIECES)
     ],
     steps: [
       "Whisk eggs, milk, vanilla; add almond flour & baking powder.",
@@ -1167,15 +1210,15 @@ const recipeData = [
     defaultServings: 2,
     calories: 880,
     ingredients: [
-      N("ROLLED_OATS", 60, "g"),
-      N("MILK", 250, "ml"),
-      N("WATER", 150, "ml"),
-      N("MIXED_BERRIES", 80, "g"),
-      N("HONEY", 1, "tsp"),
-      N("SALT", 1, "pinch"),
-      N("PEANUT_BUTTER", 1, "tbsp"),
-      N("ALMONDS", 10, "g"),
-      N("WALNUTS", 10, "g")
+      N("ROLLED_OATS", 60, UNIT.GRAM),
+      N("MILK", 250, UNIT.MILLILITER),
+      N("WATER", 150, UNIT.MILLILITER),
+      N("MIXED_BERRIES", 80, UNIT.GRAM),
+      N("HONEY", 1, UNIT.TEASPOON),
+      N("SALT", 1, UNIT.PINCH),
+      N("PEANUT_BUTTER", 1, UNIT.TABLESPOON),
+      N("ALMONDS", 10, UNIT.GRAM),
+      N("WALNUTS", 10, UNIT.GRAM)
     ],
     steps: [
       "Simmer oats with milk, water & salt 5 min.",
@@ -1189,21 +1232,21 @@ const recipeData = [
     defaultServings: 2,
     calories: 1220,
     ingredients: [
-      N("WHITE_FISH", 250, "g"),
-      N("EGGS", 1, "piece"),
-      N("GARLIC", 1, "clove"),
-      N("SPRING_ONION", 1, "small"),
-      N("PARSLEY", 1, "tbsp"),
-      N("LEMON_ZEST", 0.5, "tsp"),
-      N("ALMOND_FLOUR", 2, "tbsp"),
-      N("OLIVE_OIL", 2, "tbsp"),
-      N("SALT", 0.5, "tsp"),
-      N("BLACK_PEPPER", 0.25, "tsp"),
-      N("SWEET_POTATO", 300, "g"),
-      N("SALAD_LEAVES", 2, "handfuls"),
-      N("CUCUMBER", 0.5, "piece"),
-      N("CHERRY_TOMATOES", 6, "pieces"),
-      N("LEMON_JUICE", 1, "tbsp")
+      N("WHITE_FISH", 250, UNIT.GRAM),
+      N("EGGS", 1, UNIT.SMALL),
+      N("GARLIC", 1, UNIT.CLOVE),
+      N("SPRING_ONION", 1,  UNIT.SMALL),
+      N("PARSLEY", 1, UNIT.TABLESPOON),
+      N("LEMON_ZEST", 0.5, UNIT.TEASPOON),
+      N("ALMOND_FLOUR", 2, UNIT.TABLESPOON),
+      N("OLIVE_OIL", 2, UNIT.TABLESPOON),
+      N("SALT", 0.5, UNIT.TEASPOON),
+      N("BLACK_PEPPER", 0.25, UNIT.TEASPOON),
+      N("SWEET_POTATO", 300, UNIT.GRAM),
+      N("SALAD_LEAVES", 2, UNIT.HANDFUL),
+      N("CUCUMBER", 0.5, UNIT.PIECES),
+      N("CHERRY_TOMATOES", 6, UNIT.PIECES),
+      N("LEMON_JUICE", 1, UNIT.TABLESPOON)
     ],
     steps: [
       "Roast sweet potato at 200°C 25–30 min.",
@@ -1220,21 +1263,21 @@ const recipeData = [
     defaultServings: 4,
     calories: 1200,
     ingredients: [
-      N("OLIVE_OIL", 50, "ml"),
-      N("CHICKEN_WINGS", 8, "pieces"),
-      N("PORK_BELLY", 8, "oz"),
-      N("RED_BELL_PEPPER", 1, "piece"),
-      N("GREEN_BELL_PEPPER", 1, "piece"),
-      N("PEAS_PETIT_POIS", 50, "g"),
-      N("GREEN_BEANS_FROZEN", 150, "g"),
-      N("BUTTER_BEANS", 1, "tin"),
-      N("GARLIC", 2, "cloves"),
-      N("SMOKED_PAPRIKA", 1, "tsp"),
-      N("TURMERIC", 0.5, "tsp"),
-      N("TOMATO_SAUCE", 400, "g"),
-      N("PAELLA_RICE", 400, "g"),
-      N("WATER", 900, "ml"),
-      N("ROSEMARY_SPRIG", 1, "piece")
+      N("OLIVE_OIL", 50, UNIT.MILLILITER),
+      N("CHICKEN_WINGS", 8, UNIT.PIECES),
+      N("PORK_BELLY", 8, UNIT.OUNCE),
+      N("RED_BELL_PEPPER", 1, UNIT.PIECES),
+      N("GREEN_BELL_PEPPER", 1, UNIT.PIECES),
+      N("PEAS_PETIT_POIS", 50, UNIT.GRAM),
+      N("GREEN_BEANS_FROZEN", 150, UNIT.GRAM),
+      N("BUTTER_BEANS", 1, UNIT.TIN),
+      N("GARLIC", 2, UNIT.CLOVE),
+      N("SMOKED_PAPRIKA", 1, UNIT.TEASPOON),
+      N("TURMERIC", 0.5, UNIT.TEASPOON),
+      N("TOMATO_SAUCE", 400, UNIT.GRAM),
+      N("PAELLA_RICE", 400, UNIT.GRAM),
+      N("WATER", 900, UNIT.MILLILITER),
+      N("ROSEMARY_SPRIG", 1, UNIT.PIECES)
     ],
     steps: [
       "Brown meats in oil; add garlic & peppers.",
