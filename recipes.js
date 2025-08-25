@@ -497,7 +497,7 @@ const recipeData = [
       "Add 15g of cashews to each bowl.",
       "Spoon 75g of Greek yogurt into each bowl.",
       "Top each with 1 tsp of chia seeds.",
-      "Serve chilled."
+      "Serve chilled." 
     ]
   },
   {
