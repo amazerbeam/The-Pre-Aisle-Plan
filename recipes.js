@@ -22,12 +22,12 @@ const UNIT = {
   TEASPOON: "tsp",
   TABLESPOON: "tbsp",
   CUP: "cup",
-  
+
   // Count / size
   PIECES: "piece",    // plural-safe option
   SLICES: "slice",
   HANDFUL: "handful",
-  SMALL:  "small",      // e.g., 2 small eggs
+  SMALL: "small",      // e.g., 2 small eggs
   MEDIUM: "medium",
   LARGE: "large",
 
@@ -63,7 +63,7 @@ const AISLE = {
   HERBS_SPICES: { name: "Herbs & Spices", order: 8 },
   OILS: { name: "Oils & Fats", order: 9 },
   TINS_JARS: { name: "Tins & Jars", order: 10 },
-    GRAINS_PASTA: { name: "Grains & Pasta", order: 11 },
+  GRAINS_PASTA: { name: "Grains & Pasta", order: 11 },
   CONDIMENTS: { name: "Condiments & Sauces", order: 12 },
 
 
@@ -71,7 +71,7 @@ const AISLE = {
   NUTS: { name: "Nuts", order: 14 },
   SEEDS: { name: "Seeds", order: 15 },
   BEVERAGES: { name: "Beverages", order: 16 },
-  MISC: { name: "Misc", order: 17},
+  MISC: { name: "Misc", order: 17 },
 
 
 
@@ -385,7 +385,7 @@ const recipeData = [
       N("CELERY", 2, UNIT.PIECES),
       N("MUSHROOMS", 100, UNIT.GRAM),
       N("FIRM_TOFU", 100, UNIT.GRAM),
-      N("EGGS", 2,  UNIT.SMALL),
+      N("EGGS", 2, UNIT.SMALL),
       N("CASHEWS", 30, UNIT.GRAM),
       N("OLIVE_OIL", 2, UNIT.TABLESPOON),
       N("SOY_SAUCE", 1, UNIT.TABLESPOON),
@@ -446,7 +446,7 @@ const recipeData = [
     calories: 900,
     ingredients: [
       N("PLAIN_FLOUR", 100, UNIT.GRAM),
-      N("EGGS", 2,  UNIT.SMALL),
+      N("EGGS", 2, UNIT.SMALL),
       N("MILK", 300, UNIT.MILLILITER),
       N("BUTTER", 10, UNIT.GRAM),
       N("STREAKY_BACON", 12, UNIT.SLICES),
@@ -533,7 +533,7 @@ const recipeData = [
     calories: 1380,
     ingredients: [
       N("TUNA", 220, UNIT.GRAM),
-      N("EGGS", 8,  UNIT.SMALL),
+      N("EGGS", 8, UNIT.SMALL),
       N("SALT", 0.25, UNIT.TEASPOON),
       N("BLACK_PEPPER", 0.25, UNIT.TEASPOON),
       N("ONION_POWDER", 0.5, UNIT.TEASPOON),
@@ -878,7 +878,7 @@ const recipeData = [
       N("WATER", 140, UNIT.MILLILITER),
       N("SALT", 0.5, UNIT.TEASPOON),
       N("OLIVE_OIL", 1, UNIT.TABLESPOON),
-      N("EGGS", 2,  UNIT.SMALL),
+      N("EGGS", 2, UNIT.SMALL),
       N("AVOCADO", 1, UNIT.PIECES),
       N("CHICKEN_BREAST", 100, UNIT.GRAM)
     ],
@@ -1096,7 +1096,7 @@ const recipeData = [
     ingredients: [
       N("RISOTTO_RICE", 300, UNIT.GRAM),
       N("STOCK", 700, UNIT.MILLILITER),
-      N("ONION", 1,  UNIT.PIECES),
+      N("ONION", 1, UNIT.PIECES),
       N("OLIVE_OIL", 2, UNIT.TABLESPOON),
       N("STREAKY_BACON", 100, UNIT.GRAM),
       N("MOZZARELLA", 100, UNIT.GRAM),
@@ -1158,7 +1158,7 @@ const recipeData = [
       N("OLIVE_OIL", 2, UNIT.TABLESPOON),
       N("ONION", 1, UNIT.PIECES),
       N("GARLIC", 2, UNIT.CLOVE),
-      N("TURNIP", 1,  UNIT.SMALL),
+      N("TURNIP", 1, UNIT.SMALL),
       N("CARROT", 2, UNIT.PIECES),
       N("CELERY", 2, UNIT.STALK),
       N("MUSHROOMS", 150, UNIT.GRAM),
@@ -1188,7 +1188,7 @@ const recipeData = [
     calories: 880,
     ingredients: [
       N("ALMOND_FLOUR", 60, UNIT.GRAM),
-      N("EGGS", 2,  UNIT.SMALL),
+      N("EGGS", 2, UNIT.SMALL),
       N("MILK", 60, UNIT.MILLILITER),
       N("BAKING_POWDER", 0.5, UNIT.TEASPOON),
       N("VANILLA_EXTRACT", 0.5, UNIT.TEASPOON),
@@ -1196,7 +1196,7 @@ const recipeData = [
       N("MIXED_BERRIES", 60, UNIT.GRAM),
       N("HONEY", 1, UNIT.TEASPOON),
       N("GREEK_YOGURT", 100, UNIT.GRAM),
-      N("BANANA", 1,  UNIT.PIECES)
+      N("BANANA", 1, UNIT.PIECES)
     ],
     steps: [
       "Whisk eggs, milk, vanilla; add almond flour & baking powder.",
@@ -1215,14 +1215,14 @@ const recipeData = [
       N("WATER", 150, UNIT.MILLILITER),
       N("MIXED_BERRIES", 80, UNIT.GRAM),
       N("HONEY", 1, UNIT.TEASPOON),
-      N("SALT", 1, UNIT.PINCH),
+      N("SALT", .5, UNIT.TEASPOON),
       N("PEANUT_BUTTER", 1, UNIT.TABLESPOON),
       N("ALMONDS", 10, UNIT.GRAM),
       N("WALNUTS", 10, UNIT.GRAM)
     ],
     steps: [
-      "Simmer oats with milk, water & salt 5 min.",
-      "Stir in peanut butter; serve topped with berries, nuts, honey."
+      "Set heat to 7/9. Bring milk, water, salt to boil.",
+      "Transfer oats to bowl. Add honey, peanut butter, nuts, and berries in that order.",
     ]
   },
   {
@@ -1233,9 +1233,9 @@ const recipeData = [
     calories: 1220,
     ingredients: [
       N("WHITE_FISH", 250, UNIT.GRAM),
-      N("EGGS", 1, UNIT.SMALL),
+      N("EGGS", 2, UNIT.SMALL),
       N("GARLIC", 1, UNIT.CLOVE),
-      N("SPRING_ONION", 1,  UNIT.SMALL),
+      N("SPRING_ONION", 1, UNIT.SMALL),
       N("PARSLEY", 1, UNIT.TABLESPOON),
       N("LEMON_ZEST", 0.5, UNIT.TEASPOON),
       N("ALMOND_FLOUR", 2, UNIT.TABLESPOON),
@@ -1249,11 +1249,18 @@ const recipeData = [
       N("LEMON_JUICE", 1, UNIT.TABLESPOON)
     ],
     steps: [
-      "Roast sweet potato at 200°C 25–30 min.",
-      "Poach fish; flake and mix with aromatics, flour, egg; form cakes; chill.",
-      "Pan-fry cakes 3–4 min/side.",
-      "Make salad; serve 2 cakes per person with salad and sweet potato."
+      "Heat oven to 200°C (fan 180°C). Peel and cut the sweet potato into 2–3 cm chunks. Toss on a baking tray with 1 tbsp olive oil, a pinch of salt and black pepper. Roast 25–30 min, turning halfway, until tender and lightly browned.",
+      "While the potato roasts, place the white fish in a shallow pan and add cold water to just cover. Bring to a bare simmer over medium heat, then turn off the heat, cover, and leave 8–10 min until the fish is opaque and flakes easily.",
+      "Lift out the fish, drain well, and pat dry with kitchen paper. Flake into a large bowl, discarding any bones/skin.",
+      "Finely chop the spring onion and parsley; mince the garlic; zest the lemon (for the listed zest).",
+      "Add to the bowl: flaked fish, spring onion, parsley, garlic, lemon zest, almond flour, the small egg (lightly beaten), 1/4 tsp salt, and a few grinds of black pepper. Gently fold to combine—don’t mash completely; leave some flakes.",
+      "If the mix feels too wet, rest it 5–10 min so the almond flour hydrates; then add up to 1 tsp extra almond flour only if still needed. If too dry to bind, add 1–2 tsp lemon juice from the listed amount.",
+      "Divide into 4 patties (~6–7 cm wide, ~2 cm thick). Place on a plate, cover, and chill 10–15 min to firm up.",
+      "Warm a non-stick pan over medium heat with 1 tbsp olive oil. Fry the fish cakes 3–4 min per side until deep golden with crisp edges. Move to a warm plate to rest 1–2 min.",
+      "Make the salad: halve the cherry tomatoes and slice the cucumber. Toss with the salad leaves, 1 tbsp lemon juice, a small pinch of salt, and black pepper.",
+      "Serve: 2 fish cakes per person with the roasted sweet potato and the leafy salad."
     ]
+
   },
   {
     id: 39,
