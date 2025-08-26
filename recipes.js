@@ -1222,6 +1222,7 @@ const recipeData = [
     ],
     steps: [
       "Set heat to 7/9. Bring milk, water, salt to boil.",
+      "Chop and salt the nuts.",
       "Transfer oats to bowl. Add honey, peanut butter, nuts, and berries in that order.",
     ]
   },
