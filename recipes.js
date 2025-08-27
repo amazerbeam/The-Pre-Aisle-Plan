@@ -1295,6 +1295,25 @@ const recipeData = [
     ]
   },
   {
+    id: 40,
+    meal: ["breakfast"],
+    isCheat: true,
+    recipe: "Monkey Moo",
+    defaultServings: 4,
+    calories: 1200,
+    ingredients: [
+      N("BANANA", 50, UNIT.GRAM),
+      N("CHICKEN_WINGS", 260, UNIT.MILLILITER),
+      N("PEANUT_BUTTER", 30, UNIT.GRAM),
+    ],
+    steps: [
+      "Brown meats in oil; add garlic & peppers.",
+      "Add tomato sauce; stir in rice.",
+      "Add water, seasonings; stop stirring once boiling.",
+      "Add beans & rosemary; cook until liquid absorbed; rest; finish in oven if needed."
+    ]
+  },
+  {
     id: 0,
     meal: ["breakfast", "lunch", "dinner", "snacks"],
     recipe: "Skip",
