@@ -255,7 +255,6 @@
 
 
     function showMealPopup(entry) {
-      debugger;
       const popup = document.getElementById('meal-popup');
       const buttonContainer = document.getElementById('meal-buttons');
       buttonContainer.innerHTML = '';
@@ -271,10 +270,12 @@
         btn.style.border = '1px solid #ccc';
         btn.style.cursor = 'pointer';
         btn.onclick = () => {
+          debugger;
           const recipeId = entry[mealType].id || entry[mealType];
           const recipe = recipeData.find(r => r.id === recipeId);
           if (recipe) {
             closeMealPopup();
+            debugger;
             openFullscreen(recipe);
           } else {
             alert("Recipe not found.");
@@ -298,6 +299,7 @@
     }
 
     function openFullscreen(entry) {
+      debugger; 
       requestWakeLock(); // 🟢 prevent sleep
       const servings = localServingsMap.get(entry.id) || entry.defaultServings || 1;
       const caloriesPerServing = (entry.calories / (entry.defaultServings || 1)).toFixed(0);
@@ -381,7 +383,7 @@
               const li = document.createElement('li');
               li.textContent = `${mealType}: ${recipe.recipe} (${caloriesPerServing.toFixed(0)} kcal per serving) (x${servings})`;
               li.style.cursor = 'pointer';
-              li.onclick = () => openFullscreen(recipe);
+    
               list.appendChild(li);
             }
           }
@@ -501,7 +503,6 @@
 
       const ingredientMap = new Map();
 
-      debugger;
 
       planner.forEach(entry => {
         ['breakfast', 'lunch', 'dinner', 'snacks'].forEach(meal => {
