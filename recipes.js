@@ -428,8 +428,7 @@ const recipeData = [
       N("CASHEWS", 30, UNIT.GRAM)
     ],
     steps: [
-      "Press tofu for ~15 minutes and cut into cubes.",
-      "Heat 1 tbsp olive oil or ghee in a pan and fry tofu until golden. Set aside.",
+      "Heat 1 tbsp olive oil or ghee in a pan and fry tofu until golden, about 20 minutes. Set aside.",
       "Add 1 tbsp more oil to the pan, sauté garlic for 30 seconds.",
       "Add red pepper, onion, and mushrooms. Stir-fry for 4–5 minutes.",
       "Return tofu to the pan. Add soy sauce, smoked paprika, and chili flakes.",
@@ -600,11 +599,14 @@ const recipeData = [
     steps: [
       "Preheat oven to 215°C (419°F).",
       "In a large bowl, mix soy sauce, Worcestershire sauce, hot sauce, olive oil, garlic powder, onion powder, and salt.",
-      "Add the chicken wings and toss to coat. Add the corn flour and let marinate for 10–15 minutes.",
+      "Add the chicken wings and toss to coat. Add the Corn Flour and Let marinate for 10–15 minutes.",
       "Coat wings evenly with breadcrumbs, pressing gently to stick.",
       "Place wings on a lined baking tray in a single layer.",
       "Bake wings for 25 minutes, flip, and bake another 10 minutes until crispy and golden.",
-      "Slice potatoes into fries (~1–1.5 cm thick). Parboil 6–7 minutes, drain and dry.",
+      "For perfect potatoes. Slice potatoes into fries (~1–1.5 cm thick).",
+      "Boil a kettle and pour the boiling water into a large pot.",
+      "Add the fries and repeat with 2 more kettles (total ~3 kettles).",
+      "Boil fries for 6–7 minutes, then drain and let steam off until dry.",
       "Deep fry fries.",
       "Serve the wings with the fries hot."
     ]
@@ -637,8 +639,9 @@ const recipeData = [
       "Add diced bell peppers, cook for 2–3 minutes. Season with salt and pepper.",
       "Let mixture cool slightly. Wash and dry lettuce leaves.",
       "Spoon the turkey mixture into the lettuce leaves.",
-      "Make the salad, toss cucumber, cherry tomatoes, red onion, 2 tbsp olive oil, lemon juice, chopped almonds, and crumbled feta.",
-      "Serve the lettuce cups with the salad."
+      "To make the salad, slice cucumber, cherry tomatoes, and red onion.",
+      "Toss with 2 tbsp olive oil, lemon juice, chopped almonds, and crumbled feta.",
+      "Serve the lettuce cups with the salad on the side."
     ]
   },
   {
@@ -658,10 +661,13 @@ const recipeData = [
       N("ALMOND_BUTTER", 1, UNIT.TABLESPOON)
     ],
     steps: [
-      "Wash and slice the peach.",
+      "Wash and slice the peach into thin wedges.",
       "Divide the yogurt into two bowls.",
-      "Top with peach slices, honey, chia, cinnamon, almonds, coconut, and almond butter.",
-      "Serve."
+      "Top each bowl with peach slices.",
+      "Drizzle 1 tsp honey over each serving.",
+      "Sprinkle chia seeds, cinnamon, chopped almonds, and coconut flakes.",
+      "Add 0.5 tbsp almond butter to each bowl.",
+      "Serve immediately or chill briefly before serving."
     ]
   },
   {
@@ -704,12 +710,17 @@ const recipeData = [
       N("SESAME_SEEDS", 1, UNIT.TEASPOON)
     ],
     steps: [
-      "Preheat oven to 200°C.",
-      "Mix breadcrumbs and spices.",
-      "Brush chicken with oil and coat in crumbs.",
-      "Bake 25 minutes, flipping halfway.",
-      "Toss broccoli & carrots with oil and garlic; roast 20–25 minutes.",
-      "Slice avocado; plate with veg and chicken. Sprinkle nuts & seeds."
+      "Preheat oven to 200°C (392°F).",
+      "Mix breadcrumbs, garlic powder, onion powder, paprika, salt, and pepper.",
+      "Brush chicken breasts with 1 tbsp olive oil.",
+      "Coat chicken in breadcrumb mixture and place on a baking sheet.",
+      "Bake chicken for 25 minutes, flipping halfway.",
+      "Cut broccoli into florets and slice carrots.",
+      "Toss vegetables with 1 tbsp olive oil, minced garlic, and a pinch of salt.",
+      "Roast veggies for 20–25 minutes with the chicken.",
+      "Slice avocado and divide between plates.",
+      "Top roasted vegetables with chopped nuts and sesame seeds.",
+      "Serve chicken with garlic veggies and avocado slices on the side."
     ]
   },
   {
@@ -755,10 +766,15 @@ const recipeData = [
       N("ALMONDS", 20, UNIT.GRAM)
     ],
     steps: [
-      "Roast sweet potatoes 25–30 min at 190°C.",
-      "Prep peppers; sauté onion & garlic; brown turkey.",
-      "Stir in tomato paste & paprika; stuff peppers; bake 25–30 min.",
-      "Serve with roasted sweet potato; sprinkle nuts."
+      "Preheat oven to 190°C.",
+      "Peel and cube sweet potatoes. Toss with 1.5 tbsp olive oil and a pinch of salt.",
+      "Roast sweet potatoes on a tray for 25–30 minutes, flipping halfway.",
+      "Slice tops off peppers and remove seeds.",
+      "Sauté onion and garlic in 1 tbsp olive oil, then add turkey mince.",
+      "Cook until browned, then stir in tomato paste, paprika, and salt.",
+      "Stuff mixture into peppers and bake for 25–30 minutes.",
+      "Serve the stuffed peppers with roasted sweet potato.",
+      "Sprinkle chopped nuts over the sweet potato just before serving."
     ]
   },
   {
@@ -784,11 +800,16 @@ const recipeData = [
       N("BLACK_PEPPER", 0.25, UNIT.TEASPOON)
     ],
     steps: [
-      "Roast sweet potato 25–30 min at 200°C.",
-      "Brown tofu; remove.",
-      "Sauté onion/garlic; add veg; toast curry powder.",
-      "Add chickpeas, tomatoes, stock; simmer 10–15 min.",
-      "Return tofu; season; serve with sweet potato and nuts."
+      "Preheat oven to 200°C.",
+      "Peel and cube sweet potatoes. Toss with 1.5 tbsp olive oil and roast for 25–30 minutes until golden.",
+      "Press tofu for 10 minutes and cube.",
+      "Heat 1 tbsp olive oil in a pan, sauté tofu cubes until lightly browned, then remove and set aside.",
+      "In the same pan, sauté onion and garlic until soft.",
+      "Add carrots and red pepper, cook for 5 minutes.",
+      "Stir in curry powder and toast for 30 seconds.",
+      "Add chickpeas, tinned tomatoes and stock. Simmer 10–15 minutes.",
+      "Add tofu back to the curry and heat through. Season with salt and pepper.",
+      "Serve hot with sweet potato and top with chopped nuts."
     ]
   },
   {
@@ -814,11 +835,15 @@ const recipeData = [
       N("PARMESAN_CHEESE", 30, UNIT.GRAM)
     ],
     steps: [
-      "Roast sweet potato 25–30 min at 200°C.",
-      "Spiralize zucchini.",
-      "Sauté onion/garlic; brown turkey; add tomatoes, seasoning, olives, pesto.",
-      "Simmer 10–15 min. Toss in zucchini 2–3 min.",
-      "Serve topped with sweet potato and parmesan."
+      "Preheat oven to 200°C.",
+      "Peel and cube sweet potatoes. Toss with 1 tbsp olive oil and roast 25–30 minutes.",
+      "Spiralize the zucchini and set aside.",
+      "Heat 0.5 tbsp olive oil in a pan. Add chopped garlic and onion. Sauté until soft.",
+      "Add turkey mince, breaking it apart, and cook until browned.",
+      "Add tinned tomatoes, Italian seasoning, salt, pepper, olives, and pesto or capers.",
+      "Simmer sauce 10–15 minutes, stirring occasionally.",
+      "Add zucchini noodles and toss gently for 2–3 minutes until just tender.",
+      "Serve warm, topped with roasted sweet potato and grated parmesan. Garnish with basil if desired."
     ]
   },
   {
@@ -843,11 +868,15 @@ const recipeData = [
       N("CHIVES", 1, UNIT.TABLESPOON)
     ],
     steps: [
-      "Warm milk and soak cashews 30 min.",
-      "Sear turkey (mixed with ground almonds, seasoning).",
-      "Blend cashews + milk → cashew cream; mix with egg & parmesan.",
-      "Sauté garlic; cook zucchini 2–3 min.",
-      "Off heat, stir in sauce; top with turkey and chives. Serve with bread."
+      "Preheat the oven to 40°C and warm the milk to the same temperature.",
+      "Soak the cashews in the warm milk for 30 minutes.",
+      "In a bowl, mix turkey mince with ground almonds, salt and pepper. Shape into small cubes or patties.",
+      "Heat 1 tsp olive oil in a pan and sear the turkey nut cubes until golden and fully cooked. Set aside.",
+      "Blend the soaked cashews and milk until smooth to form a cashew cream.",
+      "Mix the cashew cream with the egg and parmesan in a bowl to make the sauce.",
+      "Spiralize the zucchini. Heat 1 tsp olive oil in a pan, sauté the garlic, then add the zucchini noodles. Cook for 2–3 minutes until just tender.",
+      "Remove the pan from heat and stir in the sauce quickly to avoid scrambling the egg.",
+      "Serve warm, topped with turkey cubes and chives or scallions. Add a slice of warm wholemeal bread on the side."
     ]
   },
   {
@@ -862,8 +891,10 @@ const recipeData = [
       N("WALNUTS", 15, UNIT.GRAM)
     ],
     steps: [
-      "Prep celery sticks, portion hummus.",
-      "Serve with walnuts."
+      "Wash and cut celery into sticks (about 4 pieces per serving).",
+      "Portion 3 tbsp of hummus into a small bowl for each person.",
+      "Serve celery with hummus for dipping.",
+      "Top each serving with a few chopped walnuts (optional) for extra calories and healthy fats."
     ]
   },
   {
@@ -883,9 +914,14 @@ const recipeData = [
       N("CHICKEN_BREAST", 100, UNIT.GRAM)
     ],
     steps: [
-      "Mix Harina PAN, oats, water, and salt; rest 5 min.",
-      "Cook patties 4–5 min/side in oil.",
-      "Add cooked chicken, egg, avocado to split arepas."
+      "Grind the oats slightly if needed to make them finer.",
+      "Mix Harina PAN, oats, water, and salt to form a soft dough. Let it rest for 5 minutes.",
+      "Shape into small flat patties.",
+      "Heat olive oil in a pan over medium heat and cook arepas for 4–5 minutes per side until golden and cooked through.",
+      "Boil or shred cooked chicken breast if not already prepared.",
+      "Fry or scramble the eggs.",
+      "Slice the avocado.",
+      "Split arepas and fill each with chicken, egg, and avocado. Serve warm."
     ]
   },
   {
@@ -914,11 +950,20 @@ const recipeData = [
       N("SWEET_POTATO", 300, UNIT.GRAM)
     ],
     steps: [
-      "Roast sweet potato 25–30 min at 200°C.",
-      "Make meatballs with turkey, onion, garlic, basil, salt & pepper.",
-      "Sauté mirepoix; brown meatballs.",
-      "Build tomato sauce with capers, seasoning, sugar; add lentils, stock, veg & meatballs; simmer 30 min.",
-      "Stir in spinach and serve with sweet potato."
+      "Preheat oven to 200°C (390°F). Peel and cube the sweet potatoes. Toss with a pinch of salt and 1 tsp olive oil. Roast for 25–30 minutes until tender and golden. Set aside.",
+      "Finely chop half the onion, 1 clove garlic, and half the basil (if using leaves). In a bowl, mix with turkey mince, salt, and pepper.",
+      "Form the turkey mixture into small meatballs (about 12).",
+      "Finely chop the remaining onion, celery, carrot, and garlic.",
+      "Heat 1 tbsp olive oil in a large pan over medium heat. Add the chopped onion, celery, carrot, and a pinch of salt. Fry for 5–7 minutes until softened and lightly golden. Remove the veg from the pan and set aside.",
+      "Add a little more olive oil if needed, then fry the meatballs in the same pan until browned on all sides. Remove and set aside.",
+      "In a saucepan, heat 1 tbsp olive oil over medium heat. Add the remaining garlic and sauté for 30 seconds until fragrant.",
+      "Add the capers and cook for another minute.",
+      "Add the tinned tomatoes, 1 tsp salt,  1 tsp sugar and Italian seasoning herbs. Stir and bring to a simmer.",
+      "Return the fried vegetables and meatballs to the sauce, along with the lentils. Stir to combine.",
+      "Add the stock and bring to a gentle simmer.",
+      "Cover and simmer everything together for 30 minutes on low heat.",
+      "Stir in the spinach and remaining basil (if using leaves) until wilted.",
+      "Serve the lentil and meatball stew hot with a portion of roasted sweet potatoes on the side or stirred through."
     ]
   },
   {
@@ -958,9 +1003,23 @@ const recipeData = [
       N("GREEN_OLIVES", 50, UNIT.GRAM)
     ],
     steps: [
-      "Make dough; rest 30 min; cut circles.",
-      "Cook filling with veg, beef, spices, tomato paste, stock; cool; add egg & olives.",
-      "Fill, seal, egg-wash and bake 200°C ~20–22 min."
+      "Mix flour and salt in a large bowl.",
+      "Rub in the cold butter or lard with your fingers until the mixture resembles breadcrumbs.",
+      "Add warm water a little at a time, mixing until a dough forms.",
+      "Knead for about 5 minutes until smooth. Cover and let rest for 30 minutes.",
+      "Roll out dough to 2–3mm thick and cut into 12cm circles. Keep covered until ready to fill.",
+      "Heat olive oil in a pan over medium heat.",
+      "Add onion and red pepper, cook until softened (5–7 minutes).",
+      "Add garlic, cook for 1 minute.",
+      "Add ground beef, break up and cook until browned.",
+      "Stir in paprika, cumin, salt, and pepper. Cook 1–2 minutes.",
+      "Add tomato paste and beef stock, stir well, and simmer for 5 minutes until slightly thickened but still moist.",
+      "Remove from heat and let cool slightly.",
+      "Mix in chopped boiled eggs and olives.",
+      "Place a spoonful of filling in the center of each dough circle. Fold over and seal the edges.",
+      "Place on a baking tray, brush with beaten egg.",
+      "Bake at 200°C for 20–22 minutes until golden.",
+      "Serve warm."
     ]
   },
   {
@@ -1015,10 +1074,15 @@ const recipeData = [
       N("CUMIN", 0.25, UNIT.TEASPOON)
     ],
     steps: [
-      "Marinate sliced chicken & veg with salt.",
-      "Stir-fry chicken & veg 5–7 min.",
-      "Add peanut butter, soy, coconut water, Worcestershire, garlic, lime, cumin.",
-      "Add cornflour slurry; thicken and serve."
+      "Chop the chicken breast and vegetables (peppers, onion, celery, pak choi).",
+      "In the morning or the night before, toss the sliced chicken, peppers, onion, celery, and pak choi with salt. Cover and refrigerate to marinate.",
+      "Heat a large pan or wok over medium-high heat.",
+      "Add the marinated chicken and vegetables to the pan and stir-fry for about 5-7 minutes until the chicken is mostly cooked.",
+      "Stir in the peanut butter and mix well to coat the chicken and vegetables.",
+      "Add the soy sauce, coconut water, Worcestershire sauce, minced garlic, lime juice, and ground cumin. Stir everything together and let simmer for a few minutes.",
+      "In a small bowl, mix the corn flour with 1 tablespoon of water to create a slurry.",
+      "Pour the slurry into the pan, stirring constantly, and cook for another 1-2 minutes until the sauce thickens.",
+      "Serve hot. Optionally, garnish with lime or chopped peanuts."
     ]
   },
   {
@@ -1045,11 +1109,15 @@ const recipeData = [
       N("RED_BELL_PEPPER", 1, UNIT.PIECES)
     ],
     steps: [
-      "Sauté onion/garlic/carrots/celery with salt.",
-      "Add pak choi stems; cook 3–4 min.",
-      "Add spices; then tomatoes.",
-      "Add lentils, bay leaf, stock; simmer 25–30 min.",
-      "Add pak choi leaves and finish; season."
+      "Dice the onion, garlic, carrots, and celery.",
+      "Rinse the lentils under cold water and set aside.",
+      "In a large pot, heat olive oil over medium heat. Add the diced onion, garlic, carrots, and celery. Sauté for about 5-7 minutes until softened. Add salt.",
+      "Chop the pak choi stems (reserve the leaves for later) and add to the pot. Cook for another 3-4 minutes until softened.",
+      "Stir in ground cumin and paprika, and cook for 1 minute until fragrant.",
+      "Add the diced tomatoes (or substitute with 1 can of tomatoes if using). Cook for another 3 minutes.",
+      "Add lentils, bay leaf, and broth. Bring to a boil, then reduce heat to low, cover, and simmer for 25-30 minutes until lentils are tender, stirring occasionally.",
+      "When lentils are nearly cooked, add the pak choi leaves. Simmer for an additional 5 minutes until wilted.",
+      "Once lentils are tender, season with salt and pepper to taste."
     ]
   },
   {
@@ -1068,9 +1136,13 @@ const recipeData = [
       N("BUTTER", 20, UNIT.GRAM)
     ],
     steps: [
-      "Grate potatoes & onion; salt; squeeze water.",
-      "Form patties; fry in butter until crisp. Freeze extras.",
-      "Fry bacon; toast bread; assemble."
+      "Peel and grate the potatoes and onion. Combine with salt.",
+      "Place mixture in a clean towel and squeeze out as much water as possible.",
+      "Form into hash browns (about 100g each).",
+      "Heat butter in a pan and fry hash browns until golden and crisp on both sides. Freeze extras.",
+      "Fry bacon until crispy.",
+      "Toast the bread slices.",
+      "Assemble each sandwich with 1 hash brown and 3 slices of bacon between 2 slices of bread. Serve hot."
     ]
   },
   {
@@ -1108,9 +1180,16 @@ const recipeData = [
       N("BLACK_PEPPER", 0.25, UNIT.TEASPOON)
     ],
     steps: [
-      "Make risotto with onions and stock; cool.",
-      "Stir in parmesan, egg, breadcrumbs; form balls with mozzarella centers.",
-      "Coat in crumbs; deep-fry 170–180°C 3–4 min."
+      "Heat olive oil and sauté chopped onion until soft.",
+      "Add chopped bacon and cook until crispy.",
+      "Stir in risotto rice, toast for 1–2 minutes.",
+      "Gradually add stock while stirring until rice is cooked and creamy (about 20 minutes).",
+      "Stir in grated Parmesan, season with salt and pepper, and let cool completely.",
+      "Mix in beaten egg and 80g breadcrumbs.",
+      "Form golf-ball-sized balls, inserting a cube of mozzarella in the center of each.",
+      "Roll each ball in the remaining breadcrumbs to coat.",
+      "Heat oil to 170–180°C and deep-fry arancini in batches until golden (3–4 minutes).",
+      "Drain on kitchen paper and serve hot."
     ]
   },
   {
@@ -1142,9 +1221,20 @@ const recipeData = [
       N("PARMESAN_CHEESE", 40, UNIT.GRAM)
     ],
     steps: [
-      "Sear beef; sauté onions/garlic; add spices & stock; braise at 160°C ~2.5h; shred.",
-      "Make gravy with roux + braising liquid; add sauces; combine with beef.",
-      "Cook rice; fry halloumi; warm tortillas; assemble with beef, rice, avocado, cheeses, jalapeños."
+      "Season beef with salt and pepper.",
+      "Sear beef in oil until browned on all sides, then remove and set aside.",
+      "Sauté sliced onions and minced garlic until soft and golden.",
+      "Add cumin and smoked paprika, stir well.",
+      "Return beef to the pot and pour in beef stock. Simmer covered at 160°C for about 2.5 hours, until tender.",
+      "Remove beef and shred with forks. Strain the stock if desired.",
+      "In a saucepan, melt butter and whisk in flour to make a roux.",
+      "Gradually add hot beef stock, whisking until thickened. Stir in Worcestershire sauce and Frank’s Hot Sauce.",
+      "Add shredded beef and cooked onions back into the gravy. Mix well.",
+      "Cook rice according to package instructions.",
+      "Slice halloumi and pan-fry until golden on both sides.",
+      "Warm the tortillas.",
+      "Assemble each burrito with cooked rice, shredded beef in gravy, sliced or mashed avocado, fried halloumi, mozzarella, parmesan and jalapeños.",
+      "Roll the burritos tightly and toast seam-side down in a dry pan until golden and warm."
     ]
   },
   {
@@ -1174,10 +1264,15 @@ const recipeData = [
       N("WHOLEMEAL_BREAD", 2, UNIT.SLICES)
     ],
     steps: [
-      "Sear turkey; remove.",
-      "Sauté onions/garlic/celery; add mushrooms.",
-      "Add tomato paste, herbs, stock; return turkey and root veg; simmer 25–30 min.",
-      "Adjust seasoning; serve with bread."
+      "Pat the turkey dry and cut into 2–3 cm cubes. Season with salt and pepper.",
+      "Heat 1 tbsp olive oil in a pot over medium-high heat. Sear turkey cubes until browned, then set aside.",
+      "Lower heat to medium. Add remaining olive oil, then sauté onion, garlic, and celery for 3–4 minutes.",
+      "Add mushrooms and cook until browned, about 5 minutes.",
+      "Stir in tomato paste, thyme, rosemary, and bay leaf. Cook for 1 minute.",
+      "Add the turkey back to the pot along with diced turnip, sweet potatoes, and chopped carrots.",
+      "Pour in the stock and bring to a boil. Reduce heat and simmer covered for 25–30 minutes until tender.",
+      "Discard bay leaf, adjust seasoning, and garnish with parsley.",
+      "Serve hot with a slice of wholemeal bread on the side."
     ]
   },
   {
@@ -1199,8 +1294,12 @@ const recipeData = [
       N("BANANA", 1, UNIT.PIECES)
     ],
     steps: [
-      "Whisk eggs, milk, vanilla; add almond flour & baking powder.",
-      "Cook small pancakes; serve with berries, banana, yogurt, honey."
+      "In a bowl, whisk eggs, milk, and vanilla extract.",
+      "Add almond flour and baking powder. Mix until a smooth batter forms.",
+      "Heat a non-stick pan over medium heat and lightly grease with oil or butter.",
+      "Pour small portions of batter to form 4–6 mini pancakes.",
+      "Cook for 2–3 minutes until bubbles form, then flip and cook another 1–2 minutes.",
+      "Serve warm with berries, sliced banana, a dollop of Greek yogurt, and a drizzle of honey if desired."
     ]
   },
   {
@@ -1250,16 +1349,14 @@ const recipeData = [
       N("LEMON_JUICE", 1, UNIT.TABLESPOON)
     ],
     steps: [
-      "Heat oven to 200°C (fan 180°C). Peel and cut the sweet potato into 2–3 cm chunks. Toss on a baking tray with 1 tbsp olive oil, a pinch of salt and black pepper. Roast 25–30 min, turning halfway, until tender and lightly browned.",
-      "While the potato roasts, place the white fish in a shallow pan and add cold water to just cover. Bring to a bare simmer over medium heat, then turn off the heat, cover, and leave 8–10 min until the fish is opaque and flakes easily.",
-      "Lift out the fish, drain well, and pat dry with kitchen paper. Flake into a large bowl, discarding any bones/skin.",
-      "Finely chop the spring onion and parsley; mince the garlic; zest the lemon (for the listed zest).",
-      "Add to the bowl: flaked fish, spring onion, parsley, garlic, lemon zest, almond flour, the small egg (lightly beaten), 1/4 tsp salt, and a few grinds of black pepper. Gently fold to combine—don’t mash completely; leave some flakes.",
-      "If the mix feels too wet, rest it 5–10 min so the almond flour hydrates; then add up to 1 tsp extra almond flour only if still needed. If too dry to bind, add 1–2 tsp lemon juice from the listed amount.",
-      "Divide into 4 patties (~6–7 cm wide, ~2 cm thick). Place on a plate, cover, and chill 10–15 min to firm up.",
-      "Warm a non-stick pan over medium heat with 1 tbsp olive oil. Fry the fish cakes 3–4 min per side until deep golden with crisp edges. Move to a warm plate to rest 1–2 min.",
-      "Make the salad: halve the cherry tomatoes and slice the cucumber. Toss with the salad leaves, 1 tbsp lemon juice, a small pinch of salt, and black pepper.",
-      "Serve: 2 fish cakes per person with the roasted sweet potato and the leafy salad."
+      "Peel and cube the sweet potato. Roast in the oven at 200°C for 25–30 minutes with a bit of olive oil and salt.",
+      "Poach the fish in simmering water for 5–6 minutes or until cooked through. Drain and cool.",
+      "Flake the fish into a bowl. Add finely chopped onion, garlic, parsley, lemon zest, almond flour, and beaten egg.",
+      "Season with salt and pepper. Mix well and form into 4 small fish cakes.",
+      "Chill for 10–15 minutes if time allows to help them hold shape.",
+      "Heat 1 tbsp olive oil in a non-stick pan over medium heat. Fry fish cakes for 3–4 minutes per side until golden and heated through.",
+      "Meanwhile, prepare the salad: toss mixed leaves with sliced cucumber and halved cherry tomatoes. Dress with lemon juice and 1 tbsp olive oil.",
+      "Serve 2 fish cakes per person alongside the salad and roasted sweet potato."
     ]
 
   },
@@ -1288,10 +1385,15 @@ const recipeData = [
       N("ROSEMARY_SPRIG", 1, UNIT.PIECES)
     ],
     steps: [
-      "Brown meats in oil; add garlic & peppers.",
-      "Add tomato sauce; stir in rice.",
-      "Add water, seasonings; stop stirring once boiling.",
-      "Add beans & rosemary; cook until liquid absorbed; rest; finish in oven if needed."
+      "Pour the olive oil into a paella pan and when hot, add all the meat and cook until browned.",
+      "Add the garlic (crushed or sliced) and the red and green peppers. Cook for 2 minutes and stir.",
+      "Add the tomato sauce and stir well.",
+      "Pour in the rice and stir to coat with the sauce.",
+      "Pour the water and stir very gently on high heat. Season with paprika, turmeric, and salt.",
+      "Once it starts to boil, stop stirring and add the green beans, butter beans, and rosemary to the middle of the pan.",
+      "Let the water absorb and keep the paella on the hob until fully cooked. Adjust seasoning.",
+      "Let it rest for 3–5 minutes. Before serving, 'break' the paella by loosening the rice with a spoon.",
+      "If the rice is undercooked, cover with foil and bake at 200°C for 5–10 min to finish cooking."
     ]
   },
   {
@@ -1307,10 +1409,8 @@ const recipeData = [
       N("PEANUT_BUTTER", 30, UNIT.GRAM),
     ],
     steps: [
-      "Brown meats in oil; add garlic & peppers.",
-      "Add tomato sauce; stir in rice.",
-      "Add water, seasonings; stop stirring once boiling.",
-      "Add beans & rosemary; cook until liquid absorbed; rest; finish in oven if needed."
+      "Freeze Banana.",
+      "Blend everything until smooth.",
     ]
   },
   {
