@@ -925,7 +925,7 @@ const recipeData = [
     calories: 1584,
     ingredients: [
       N(INGREDIENTS.TURKEY_MINCE.key, 300, UNIT.GRAM),
-      N(INGREDIENTS.BROWN_LENTILS, 1, UNIT.TIN),
+      N(INGREDIENTS.BROWN_LENTILS.key, 1, UNIT.TIN),
       N(INGREDIENTS.TINNED_TOMATOES.key, 1, UNIT.TIN),
       N(INGREDIENTS.ONION.key, 1, UNIT.PIECES),
       N(INGREDIENTS.GARLIC.key, 3, UNIT.CLOVE),
@@ -1387,13 +1387,12 @@ const recipeData = [
   {
     id: 40,
     meal: ["breakfast"],
-    isCheat: true,
     recipe: "Monkey Moo",
     defaultServings: 4,
-    calories: 1200,
+    calories: 513,
     ingredients: [
-      N(INGREDIENTS.BANANA.key, 50, UNIT.GRAM),
-      N(INGREDIENTS.CHICKEN_BREAST.key, 260, UNIT.MILLILITER),
+      N(INGREDIENTS.BANANA.key, 200, UNIT.GRAM),
+      N(INGREDIENTS.MILK.key, 260, UNIT.MILLILITER),
       N(INGREDIENTS.PEANUT_BUTTER.key, 30, UNIT.GRAM),
     ],
     steps: [
