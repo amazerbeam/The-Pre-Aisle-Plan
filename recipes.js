@@ -1417,7 +1417,7 @@ const recipeData = [
   meal: ["dinner"],
   recipe: "Black Pepper Beef Stir Fry",
   defaultServings: 2,
-  calories: 0, // You can fill this in if needed
+  calories: 575, // You can fill this in if needed
   ingredients: [
     // Beef
     N(INGREDIENTS.SIRLOIN_STEAK.key, 250, UNIT.GRAM), // flank or sirloin
