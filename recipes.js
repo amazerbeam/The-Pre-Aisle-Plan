@@ -1450,7 +1450,45 @@ const recipeData = [
     "Stir in the cornstarch slurry (1 tsp cornstarch mixed with 1 tbsp water). Cook 30 sec until the sauce thickens and coats the beef and vegetables.",
     "Serve hot with 1 cup cooked jasmine rice."
   ]
+},
+{
+  id: 302,
+  meal: ["lunch"],
+  recipe: "Whole Chicken Soup with Leek, Sweet Potato & Rosemary",
+  defaultServings: 6,
+  calories: 335,
+  ingredients: [
+    // Base
+    N(INGREDIENTS.CHICKEN_WHOLE.key, 1, UNIT.PIECES), // ~1.5–2 kg
+    N(INGREDIENTS.WATER.key, 3000, UNIT.MILLILITER),
+
+    // Vegetables
+    N(INGREDIENTS.LEEK.key, 2, UNIT.PIECES),
+    N(INGREDIENTS.SWEET_POTATO.key, 2, UNIT.MEDIUM),
+    N(INGREDIENTS.SPINACH.key, 150, UNIT.GRAM),
+    N(INGREDIENTS.ONION.key, 1, UNIT.PIECES),
+    N(INGREDIENTS.CARROT.key, 2, UNIT.MEDIUM),
+    N(INGREDIENTS.CELERY.key, 2, UNIT.STALK),
+    N(INGREDIENTS.GARLIC.key, 4, UNIT.CLOVE),
+    N(INGREDIENTS.GINGER.key, 20, UNIT.GRAM),
+
+    // Herbs & seasoning
+    N(INGREDIENTS.BAY_LEAF.key, 2, UNIT.LEAF),
+    N(INGREDIENTS.THYMES.key, 2, UNIT.SPRIG),
+    N(INGREDIENTS.ROSEMARY_SPRIG.key, 1, UNIT.SPRIG),
+    N(INGREDIENTS.SALT.key, 2, UNIT.TEASPOON),
+    N(INGREDIENTS.BLACK_PEPPER.key, 1, UNIT.TEASPOON),
+    N(INGREDIENTS.OLIVE_OIL.key, 1, UNIT.TABLESPOON)
+  ],
+  steps: [
+    "Place whole chicken in a large pot, cover with water, and add onion, carrot, celery, leek, garlic, ginger, bay, thyme, and rosemary.",
+    "Bring to a boil, skim foam, then simmer gently for 1.5–2 hours until chicken is tender.",
+    "Remove chicken, shred meat, discard bones and skin. Strain broth if you want it clear.",
+    "Add cubed sweet potato to broth and simmer 15 minutes until soft.",
+    "Return shredded chicken to the pot, stir in spinach to wilt, season with salt and pepper, and drizzle with olive oil before serving."
+  ]
 }
+
 ];
 
 // Export if you ever switch to modules:
