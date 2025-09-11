@@ -1161,7 +1161,7 @@ const recipeData = [
     calories: 974,
     defaultServings: 2,
     ingredients: [
-      N(INGREDIENTS.RISOTTO_RICE,key, 300, UNIT.GRAM),
+      N(INGREDIENTS.RISOTTO_RICE.key, 300, UNIT.GRAM),
       N(INGREDIENTS.STOCK.key, 700, UNIT.MILLILITER),
       N(INGREDIENTS.ONION.key, 1, UNIT.PIECES),
       N(INGREDIENTS.OLIVE_OIL.key, 2, UNIT.TABLESPOON),
