@@ -136,6 +136,7 @@ const INGREDIENTS = {
   SCALLIONS: { name: "Scallions", aisle: AISLE.VEG, key: "SCALLIONS" },
   POTATOES: { name: "Potatoes", aisle: AISLE.VEG, key: "POTATOES" },
   SWEET_POTATO: { name: "Sweet potato", aisle: AISLE.VEG, key: "SWEET_POTATO" },
+  LEEK: { name: "Leek", aisle: AISLE.VEG, key: "LEEK" },
 
   TOMATO_PASTE: { name: "Tomato paste", aisle: AISLE.TINS_JARS, key: "TOMATO_PASTE" },
   TINNED_TOMATOES: { name: "Tinned tomatoes", aisle: AISLE.TINS_JARS, key: "TINNED_TOMATOES" },
@@ -1475,7 +1476,7 @@ const recipeData = [
 
     // Herbs & seasoning
     N(INGREDIENTS.BAY_LEAF.key, 2, UNIT.LEAF),
-    N(INGREDIENTS.THYMES.key, 2, UNIT.SPRIG),
+    N(INGREDIENTS.THYME.key, 2, UNIT.SPRIG),
     N(INGREDIENTS.ROSEMARY_SPRIG.key, 1, UNIT.SPRIG),
     N(INGREDIENTS.SALT.key, 2, UNIT.TEASPOON),
     N(INGREDIENTS.BLACK_PEPPER.key, 1, UNIT.TEASPOON),
