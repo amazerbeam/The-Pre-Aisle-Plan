@@ -110,6 +110,8 @@ const INGREDIENTS = {
   PORK_BELLY: { name: "Pork belly", aisle: AISLE.MEAT, key: "PORK_BELLY" },
   SALMON_FILLET: { name: "Salmon fillet", aisle: AISLE.FISH, key: "SALMON_FILLET" },
   WHITE_FISH: { name: "White fish", aisle: AISLE.FISH, key: "WHITE_FISH" },
+  SIRLOIN_STEAK: { name: "Sirloin  Steak", aisle: AISLE.MEAT, key: "SIRLOIN_STEAK" },
+
 
   // Veg
   BROCCOLI: { name: "Broccoli", aisle: AISLE.VEG, key: "BROCCOLI" },
@@ -230,6 +232,7 @@ const INGREDIENTS = {
 
   // Grains
   RISOTTO_RICE: { name: "Risotto rice", aisle: AISLE.GRAINS_PASTA, key: "RISOTTO_RICE" },
+  JASMINE_RICE: { name: "Jasmine rice", aisle: AISLE.GRAINS_PASTA, key: "JASMINE_RICE" },
 
   // Condiments & extras
   JALAPENOS: { name: "Jalapeños", aisle: AISLE.CONDIMENTS, key: "JALAPENOS" },
@@ -925,7 +928,7 @@ const recipeData = [
     calories: 1584,
     ingredients: [
       N(INGREDIENTS.TURKEY_MINCE.key, 300, UNIT.GRAM),
-      N(INGREDIENTS.BROWN_LENTILS, 1, UNIT.TIN),
+      N(INGREDIENTS.BROWN_LENTILS.key, 1, UNIT.TIN),
       N(INGREDIENTS.TINNED_TOMATOES.key, 1, UNIT.TIN),
       N(INGREDIENTS.ONION.key, 1, UNIT.PIECES),
       N(INGREDIENTS.GARLIC.key, 3, UNIT.CLOVE),
@@ -1083,7 +1086,7 @@ const recipeData = [
     defaultServings: 4,
     calories: 700,
     ingredients: [
-      N(INGREDIENTS.BROWN_LENTILS, 1, UNIT.TIN),
+      N(INGREDIENTS.BROWN_LENTILS.key, 1, UNIT.TIN),
       N(INGREDIENTS.ONION.key, 1, UNIT.PIECES),
       N(INGREDIENTS.GARLIC.key, 3, UNIT.CLOVE),
       N(INGREDIENTS.CARROT.key, 2, UNIT.PIECES),
@@ -1409,7 +1412,46 @@ const recipeData = [
     ingredients: [],
     calories: 0,
     steps: []
-  }
+  },
+  {
+  id: 41,
+  meal: ["dinner"],
+  recipe: "Black Pepper Beef Stir Fry",
+  defaultServings: 2,
+  calories: 0, // You can fill this in if needed
+  ingredients: [
+    // Beef
+    N(INGREDIENTS.SIRLOIN_STEAK.key, 250, UNIT.GRAM), // flank or sirloin
+    
+    // Sauce
+    N(INGREDIENTS.BLACK_PEPPER.key, 1, UNIT.TABLESPOON),
+    N(INGREDIENTS.SOY_SAUCE.key, 1, UNIT.TABLESPOON),
+    N(INGREDIENTS.WORCESTERSHIRE_SAUCE.key, 0.5, UNIT.TABLESPOON),
+    N(INGREDIENTS.SUGAR.key, 0.5, UNIT.TEASPOON),
+    N(INGREDIENTS.WATER.key, 1, UNIT.TABLESPOON),
+    N(INGREDIENTS.CORN_FLOUR.key, 1, UNIT.TEASPOON), // to mix with water at the end
+    
+    // Vegetables
+    N(INGREDIENTS.ONION.key, 0.5, UNIT.PIECES), // sliced
+    N(INGREDIENTS.GARLIC.key, 2, UNIT.CLOVE),
+    N(INGREDIENTS.RED_BELL_PEPPER.key, 1, UNIT.PIECES),
+    N(INGREDIENTS.GREEN_BELL_PEPPER.key, 1, UNIT.PIECES),
+    N(INGREDIENTS.OLIVE_OIL.key, 1, UNIT.TABLESPOON),
+
+    // Side
+    N(INGREDIENTS.JASMINE_RICE.key, 1, UNIT.CUP)
+  ],
+  steps: [
+    "Marinate the beef and leave it to rest for at least 15 min.",
+    "Prepare the sauce: mix black pepper, soy sauce, Worcestershire sauce, sugar, and 1 tbsp water. Set aside.",
+    "Heat 1 tbsp olive oil in a wok over high heat. Add the beef and stir-fry 1–2 min until browned. Remove and set aside.",
+    "In the same wok, add sliced onion and minced garlic. Stir-fry until fragrant. Add more oil if needed.",
+    "Add sliced red and green peppers. Stir-fry for 1 min.",
+    "Return the beef to the wok. Pour in the prepared sauce and mix well.",
+    "Stir in the cornstarch slurry (1 tsp cornstarch mixed with 1 tbsp water). Cook 30 sec until the sauce thickens and coats the beef and vegetables.",
+    "Serve hot with 1 cup cooked jasmine rice."
+  ]
+}
 ];
 
 // Export if you ever switch to modules:
