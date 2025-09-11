@@ -111,6 +111,7 @@ const INGREDIENTS = {
   SALMON_FILLET: { name: "Salmon fillet", aisle: AISLE.FISH, key: "SALMON_FILLET" },
   WHITE_FISH: { name: "White fish", aisle: AISLE.FISH, key: "WHITE_FISH" },
   SIRLOIN_STEAK: { name: "Sirloin  Steak", aisle: AISLE.MEAT, key: "SIRLOIN_STEAK" },
+  CHICKEN_WHOLE: { name: "Whole Chicken", aisle: AISLE.POULTRY, key: "CHICKEN_WHOLE" },
 
 
   // Veg
@@ -1459,7 +1460,7 @@ const recipeData = [
   calories: 335,
   ingredients: [
     // Base
-    N(INGREDIENTS.CHICKEN_WHOLE.key, 1, UNIT.PIECES), // ~1.5–2 kg
+    N(INGREDIENTS.CHICKEN_WHOLE.key, 1300, UNIT.GRAM), // ~1.5–2 kg
     N(INGREDIENTS.WATER.key, 3000, UNIT.MILLILITER),
 
     // Vegetables
