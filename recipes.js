@@ -111,7 +111,8 @@ const INGREDIENTS = {
   SALMON_FILLET: { name: "Salmon fillet", aisle: AISLE.FISH, key: "SALMON_FILLET" },
   WHITE_FISH: { name: "White fish", aisle: AISLE.FISH, key: "WHITE_FISH" },
   SIRLOIN_STEAK: { name: "Sirloin  Steak", aisle: AISLE.MEAT, key: "SIRLOIN_STEAK" },
-  CHICKEN_WHOLE: { name: "Whole Chicken", aisle: AISLE.POULTRY, key: "CHICKEN_WHOLE" },
+  CHICKEN_WHOLE: { name: "Whole chicken", aisle: AISLE.POULTRY, key: "CHICKEN_WHOLE" },
+
 
 
   // Veg
@@ -200,6 +201,8 @@ const INGREDIENTS = {
   CUMIN: { name: "Cumin", aisle: AISLE.HERBS_SPICES, key: "CUMIN" },
   CINNAMON: { name: "Cinnamon", aisle: AISLE.HERBS_SPICES, key: "CINNAMON" },
   SUGAR: { name: "Sugar", aisle: AISLE.BAKERY, key: "SUGAR" },
+  ANISE_STAR: { name: "Star anise", aisle: AISLE.HERBS_SPICES, key: "ANISE_STAR" },
+  MSG: { name: "MSG", aisle: AISLE.HERBS_SPICES, key: "MSG" },
 
   // Starches & odds
   BREADCRUMBS: { name: "Breadcrumbs", aisle: AISLE.BAKERY, key: "BREADCRUMBS" },
@@ -315,7 +318,7 @@ const recipeData = [
   {
     id: 3,
     meal: ["lunch"],
-    recipe: "Grilled Chicken Salad with Avocado, Chickpeas & Feta",
+    recipe: "Grilled Chicken Salad",
     defaultServings: 2,
     calories: 1210,
     ingredients: [
@@ -325,8 +328,8 @@ const recipeData = [
       N(INGREDIENTS.CHERRY_TOMATOES.key, 10, UNIT.PIECES),
       N(INGREDIENTS.CARROT.key, 2, UNIT.PIECES),
       N(INGREDIENTS.LEMON.key, 1, UNIT.PIECES),
-      N(INGREDIENTS.OLIVE_OIL.key, 2, UNIT.TABLESPOON),
-      N(INGREDIENTS.AVOCADO.key, 1, UNIT.MEDIUM),
+      N(INGREDIENTS.OLIVE_OIL.key, 1, UNIT.TABLESPOON),
+      N(INGREDIENTS.AVOCADO.key, .5, UNIT.MEDIUM),
       N(INGREDIENTS.CHICKPEAS.key, 150, UNIT.GRAM),
       N(INGREDIENTS.FETA_CHEESE.key, 40, UNIT.GRAM)
     ],
@@ -335,7 +338,7 @@ const recipeData = [
       "Wash and prep the salad leaves, cucumber, tomatoes, and carrots.",
       "Slice avocado and drain chickpeas.",
       "Crumble feta over the vegetables.",
-      "In a small bowl, mix lemon juice and 2 tbsp olive oil for dressing.",
+      "In a small bowl, mix lemon juice and 1 tbsp olive oil for dressing.",
       "Combine all ingredients in a large bowl and toss with dressing.",
       "Top with grilled chicken and serve."
     ]
@@ -355,7 +358,9 @@ const recipeData = [
       N(INGREDIENTS.OLIVE_OIL.key, 3, UNIT.TABLESPOON),
       N(INGREDIENTS.AVOCADO.key, 1, UNIT.MEDIUM),
       N(INGREDIENTS.GINGER.key, 30, UNIT.GRAM),
-      N(INGREDIENTS.SALT.key, 0.5, UNIT.TEASPOON)
+      N(INGREDIENTS.SALT.key, 0.5, UNIT.TEASPOON),
+      N(INGREDIENTS.ALMONDS.key, 20, UNIT.GRAM),
+
     ],
     steps: [
       "Preheat oven to 180°C.",
@@ -494,7 +499,7 @@ const recipeData = [
       "Add 15g of cashews to each bowl.",
       "Spoon 75g of Greek yogurt into each bowl.",
       "Top each with 1 tsp of chia seeds.",
-      "Serve chilled." 
+      "Serve chilled."
     ]
   },
   {
@@ -534,46 +539,18 @@ const recipeData = [
       N(INGREDIENTS.SALT.key, 0.25, UNIT.TEASPOON),
       N(INGREDIENTS.BLACK_PEPPER.key, 0.25, UNIT.TEASPOON),
       N(INGREDIENTS.ONION_POWDER.key, 0.5, UNIT.TEASPOON),
-      N(INGREDIENTS.GREEK_YOGURT.key, 4, UNIT.TEASPOON)
+      N(INGREDIENTS.OLIVE_OIL.key, 2, UNIT.TEASPOON)
     ],
     steps: [
       "Whisk the eggs in a bowl and mix in the drained tuna.",
       "Season with salt, pepper, and onion powder.",
-      "Heat 2 tsp of butter in a non-stick pan over medium heat.",
+      "Heat 1 tsp of Olive Oil in a non-stick pan over medium heat.",
       "Scoop and flatten patties into the pan, fry 2–3 mins per side until golden.",
       "Serve hot, optionally brushing with remaining melted butter if desired."
     ]
   },
 
-  {
-    id: 12,
-    meal: ["lunch"],
-    isCheat: true,
-    recipe: "Crispy Spiced Chicken Wings",
-    defaultServings: 2,
-    calories: 1100,
-    ingredients: [
-      N(INGREDIENTS.CHICKEN_WINGS.key, 750, UNIT.GRAM),
-      N(INGREDIENTS.BREADCRUMBS.key, 1, UNIT.CUP),
-      N(INGREDIENTS.SOY_SAUCE.key, 1, UNIT.TABLESPOON),
-      N(INGREDIENTS.WORCESTERSHIRE_SAUCE.key, 0.5, UNIT.TABLESPOON),
-      N(INGREDIENTS.FRANKS_HOT_SAUCE.key, 1, UNIT.TABLESPOON),
-      N(INGREDIENTS.GARLIC_POWDER.key, 1, UNIT.TEASPOON),
-      N(INGREDIENTS.ONION_POWDER.key, 0.5, UNIT.TEASPOON),
-      N(INGREDIENTS.SALT.key, 2, UNIT.TEASPOON),
-      N(INGREDIENTS.OLIVE_OIL.key, 1, UNIT.TABLESPOON)
-    ],
-    steps: [
-      "Preheat oven to 215°C (419°F).",
-      "In a large bowl, mix soy sauce, Worcestershire sauce, hot sauce, olive oil, garlic powder, onion powder, and salt.",
-      "Add the chicken wings and toss to coat. Let marinate for 10–15 minutes.",
-      "Coat wings evenly with breadcrumbs, pressing gently to stick.",
-      "Place wings on a lined baking tray in a single layer.",
-      "Bake for 25 minutes.",
-      "Flip wings and bake for another 10 minutes until crispy and golden.",
-      "Serve hot."
-    ]
-  },
+
   {
     id: 13,
     meal: "dinner",
@@ -582,7 +559,7 @@ const recipeData = [
     defaultServings: 2,
     calories: 1800,
     ingredients: [
-      N(INGREDIENTS.CHICKEN_BREAST.key, 750, UNIT.GRAM),
+      N(INGREDIENTS.CHICKEN_WINGS.key, 750, UNIT.GRAM),
       N(INGREDIENTS.BREADCRUMBS.key, 1, UNIT.CUP),
       N(INGREDIENTS.SOY_SAUCE.key, 1, UNIT.TABLESPOON),
       N(INGREDIENTS.WORCESTERSHIRE_SAUCE.key, 0.5, UNIT.TABLESPOON),
@@ -704,8 +681,9 @@ const recipeData = [
       N(INGREDIENTS.CARROT.key, 2, UNIT.PIECES),
       N(INGREDIENTS.GARLIC.key, 1, UNIT.CLOVE),
       N(INGREDIENTS.AVOCADO.key, 1, UNIT.MEDIUM),
-      N(INGREDIENTS.GINGER.key, 20, UNIT.GRAM),
-      N(INGREDIENTS.SESAME_SEEDS.key, 1, UNIT.TEASPOON)
+      N(INGREDIENTS.SESAME_SEEDS.key, 1, UNIT.TEASPOON),
+      N(INGREDIENTS.ALMONDS.key, 15, UNIT.GRAM),
+
     ],
     steps: [
       "Preheat oven to 200°C (392°F).",
@@ -746,135 +724,65 @@ const recipeData = [
     ]
   },
   {
-    id: 19,
-    meal: ["dinner"],
-    recipe: "Turkey Stuffed Peppers with Roasted Sweet Potato & Nuts",
-    defaultServings: 2,
-    calories: 1020,
-    ingredients: [
-      N(INGREDIENTS.RED_BELL_PEPPER.key, 2, UNIT.PIECES),
-      N(INGREDIENTS.TURKEY_MINCE.key, 300, UNIT.GRAM),
-      N(INGREDIENTS.ONION.key, 1, UNIT.PIECES),
-      N(INGREDIENTS.GARLIC.key, 1, UNIT.CLOVE),
-      N(INGREDIENTS.TOMATO_PASTE.key, 1, UNIT.TABLESPOON),
-      N(INGREDIENTS.SMOKED_PAPRIKA.key, 0.5, UNIT.TEASPOON),
-      N(INGREDIENTS.SALT.key, 0.5, UNIT.TEASPOON),
-      N(INGREDIENTS.OLIVE_OIL.key, 2.5, UNIT.TABLESPOON),
-      N(INGREDIENTS.SWEET_POTATO.key, 400, UNIT.GRAM),
-      N(INGREDIENTS.GINGER.key, 20, UNIT.GRAM)
-    ],
-    steps: [
-      "Preheat oven to 190°C.",
-      "Peel and cube sweet potatoes. Toss with 1.5 tbsp olive oil and a pinch of salt.",
-      "Roast sweet potatoes on a tray for 25–30 minutes, flipping halfway.",
-      "Slice tops off peppers and remove seeds.",
-      "Sauté onion and garlic in 1 tbsp olive oil, then add turkey mince.",
-      "Cook until browned, then stir in tomato paste, paprika, and salt.",
-      "Stuff mixture into peppers and bake for 25–30 minutes.",
-      "Serve the stuffed peppers with roasted sweet potato.",
-      "Sprinkle chopped nuts over the sweet potato just before serving."
-    ]
-  },
-  {
     id: 20,
     meal: ["dinner"],
-    recipe: "Chickpea & Tofu Curry",
+    recipe: "Chickpea & Tofu Chinese Curry",
     defaultServings: 2,
     calories: 1340,
     ingredients: [
+      // Protein & legumes
       N(INGREDIENTS.CHICKPEAS.key, 240, UNIT.GRAM),
       N(INGREDIENTS.FIRM_TOFU.key, 150, UNIT.GRAM),
-      N(INGREDIENTS.ONION.key, 1, UNIT.PIECES),
-      N(INGREDIENTS.GARLIC.key, 2, UNIT.CLOVE),
-      N(INGREDIENTS.CARROT.key, 2, UNIT.PIECES),
-      N(INGREDIENTS.RED_BELL_PEPPER.key, 1, UNIT.PIECES),
-      N(INGREDIENTS.TINNED_TOMATOES.key, 1, UNIT.TIN),
-      N(INGREDIENTS.CURRY_POWDER.key, 2, UNIT.TABLESPOON),
-      N(INGREDIENTS.OLIVE_OIL.key, 2.5, UNIT.TABLESPOON),
+
+      // Vegetables for curry base
+      N(INGREDIENTS.ONION.key, 1, UNIT.LARGE),
+      N(INGREDIENTS.GARLIC.key, 3, UNIT.CLOVE),
+      N(INGREDIENTS.GINGER.key, 5, UNIT.GRAM),
+      N(INGREDIENTS.BANANA.key, 1, UNIT.MEDIUM),
+
+      // Seasonings & flavourings
+      N(INGREDIENTS.SOY_SAUCE.key, 2, UNIT.TEASPOON),
+      N(INGREDIENTS.TOMATO_PASTE.key, 1, UNIT.TABLESPOON),
+      N(INGREDIENTS.SUGAR.key, 1, UNIT.TEASPOON),
+      N(INGREDIENTS.SALT.key, 1, UNIT.TEASPOON),
+      N(INGREDIENTS.TURMERIC.key, 0.5, UNIT.TEASPOON),
+      N(INGREDIENTS.CUMIN.key, 0.5, UNIT.TEASPOON),
+      N(INGREDIENTS.CINNAMON.key, 0.25, UNIT.TEASPOON),
+      N(INGREDIENTS.ANISE_STAR.key, 1, UNIT.PIECES),
+      N(INGREDIENTS.MSG.key, 1, UNIT.PINCH),
+
+
+      // Liquids & thickeners
+      N(INGREDIENTS.STOCK.key, 480, UNIT.MILLILITER),
+      N(INGREDIENTS.CORN_FLOUR.key, 1.5, UNIT.TABLESPOON),
+      N(INGREDIENTS.OLIVE_OIL.key, 2, UNIT.TABLESPOON),
+
+      // Sides & toppings
       N(INGREDIENTS.SWEET_POTATO.key, 400, UNIT.GRAM),
       N(INGREDIENTS.CASHEWS.key, 20, UNIT.GRAM),
-      N(INGREDIENTS.SALT.key, 0.5, UNIT.TEASPOON),
-      N(INGREDIENTS.STOCK.key, 1, UNIT.CUP),
       N(INGREDIENTS.BLACK_PEPPER.key, 0.25, UNIT.TEASPOON)
     ],
     steps: [
+      // --- Roast sweet potatoes ---
       "Preheat oven to 200°C.",
-      "Peel and cube sweet potatoes. Toss with 1.5 tbsp olive oil and roast for 25–30 minutes until golden.",
-      "Press tofu for 10 minutes and cube.",
-      "Heat 1 tbsp olive oil in a pan, sauté tofu cubes until lightly browned, then remove and set aside.",
-      "In the same pan, sauté onion and garlic until soft.",
-      "Add carrots and red pepper, cook for 5 minutes.",
-      "Stir in curry powder and toast for 30 seconds.",
-      "Add chickpeas, tinned tomatoes and stock. Simmer 10–15 minutes.",
-      "Add tofu back to the curry and heat through. Season with salt and pepper.",
-      "Serve hot with sweet potato and top with chopped nuts."
-    ]
-  },
-  {
-    id: 21,
-    meal: ["dinner"],
-    recipe: "Turkey Bolognese",
-    defaultServings: 2,
-    calories: 1240,
-    ingredients: [
-      N(INGREDIENTS.ZUCCHINI.key, 2, UNIT.MEDIUM),
-      N(INGREDIENTS.TURKEY_MINCE.key, 300, UNIT.GRAM),
-      N(INGREDIENTS.TINNED_TOMATOES.key, 1, UNIT.TIN),
-      N(INGREDIENTS.GARLIC.key, 2, UNIT.CLOVE),
-      N(INGREDIENTS.OLIVE_OIL.key, 1.5, UNIT.TABLESPOON),
-      N(INGREDIENTS.ONION.key, 1, UNIT.MEDIUM),
-      N(INGREDIENTS.GREEN_OLIVES.key, 40, UNIT.GRAM),
-      N(INGREDIENTS.ITALIAN_SEASONING.key, 1, UNIT.TEASPOON),
-      N(INGREDIENTS.SALT.key, 1, UNIT.TEASPOON),
-      N(INGREDIENTS.BLACK_PEPPER.key, 0.25, UNIT.TEASPOON),
-      N(INGREDIENTS.PESTO.key, 1, UNIT.TABLESPOON),
-      N(INGREDIENTS.BASIL.key, 1, UNIT.TABLESPOON),
-      N(INGREDIENTS.SWEET_POTATO.key, 300, UNIT.GRAM),
-      N(INGREDIENTS.PARMESAN_CHEESE.key, 30, UNIT.GRAM)
-    ],
-    steps: [
-      "Preheat oven to 200°C.",
-      "Peel and cube sweet potatoes. Toss with 1 tbsp olive oil and roast 25–30 minutes.",
-      "Spiralize the zucchini and set aside.",
-      "Heat 0.5 tbsp olive oil in a pan. Add chopped garlic and onion. Sauté until soft.",
-      "Add turkey mince, breaking it apart, and cook until browned.",
-      "Add tinned tomatoes, Italian seasoning, salt, pepper, olives, and pesto or capers.",
-      "Simmer sauce 10–15 minutes, stirring occasionally.",
-      "Add zucchini noodles and toss gently for 2–3 minutes until just tender.",
-      "Serve warm, topped with roasted sweet potato and grated parmesan. Garnish with basil if desired."
-    ]
-  },
-  {
-    id: 22,
-    meal: ["dinner"],
-    recipe: "Cashew Carbonara",
-    defaultServings: 2,
-    calories: 1260,
-    ingredients: [
-      N(INGREDIENTS.ZUCCHINI.key, 2, UNIT.MEDIUM),
-      N(INGREDIENTS.TURKEY_MINCE.key, 200, UNIT.GRAM),
-      N(INGREDIENTS.GINGER.key, 1, UNIT.TABLESPOON),
-      N(INGREDIENTS.CASHEWS.key, 60, UNIT.GRAM),
-      N(INGREDIENTS.MILK.key, 100, UNIT.MILLILITER),
-      N(INGREDIENTS.EGGS.key, 1, UNIT.SMALL),
-      N(INGREDIENTS.GREEK_YOGURT.key, 30, UNIT.GRAM),
-      N(INGREDIENTS.GARLIC.key, 1, UNIT.CLOVE),
-      N(INGREDIENTS.OLIVE_OIL.key, 2, UNIT.TEASPOON),
-      N(INGREDIENTS.SALT.key, 1, UNIT.TEASPOON),
-      N(INGREDIENTS.BLACK_PEPPER.key, 0.25, UNIT.TEASPOON),
-      N(INGREDIENTS.WHOLEMEAL_BREAD.key, 2, UNIT.SLICES),
-      N(INGREDIENTS.CHIVES.key, 1, UNIT.TABLESPOON)
-    ],
-    steps: [
-      "Preheat the oven to 40°C and warm the milk to the same temperature.",
-      "Soak the cashews in the warm milk for 30 minutes.",
-      "In a bowl, mix turkey mince with ground almonds, salt and pepper. Shape into small cubes or patties.",
-      "Heat 1 tsp olive oil in a pan and sear the turkey nut cubes until golden and fully cooked. Set aside.",
-      "Blend the soaked cashews and milk until smooth to form a cashew cream.",
-      "Mix the cashew cream with the egg and parmesan in a bowl to make the sauce.",
-      "Spiralize the zucchini. Heat 1 tsp olive oil in a pan, sauté the garlic, then add the zucchini noodles. Cook for 2–3 minutes until just tender.",
-      "Remove the pan from heat and stir in the sauce quickly to avoid scrambling the egg.",
-      "Serve warm, topped with turkey cubes and chives or scallions. Add a slice of warm wholemeal bread on the side."
+      "Peel and cube the sweet potatoes. Toss with 1 tbsp olive oil and a pinch of salt.",
+      "Roast for 25–30 minutes until golden and soft.",
+
+      // --- Prepare tofu ---
+      "Press tofu for 10 minutes to remove excess water. Cube it.",
+      "Heat 1 tsp olive oil in a non-stick pan and fry the tofu cubes until golden on all sides. Set aside.",
+
+      // --- Make homemade Chinese curry sauce ---
+      "In a saucepan, heat 1 tbsp olive oil over medium heat. Add sliced onion and a pinch of salt; fry 5 minutes until softened.",
+      "Add minced garlic and grated ginger; cook 30 seconds.",
+      "Add banana, soy sauce, tomato purée, sugar, salt, turmeric, cumin, cinnamon, star anise, MSG, and stock.",
+      "Simmer for 15 minutes until onions and banana are soft. Remove star anise and blend until smooth.",
+      "Return to pan. Mix cornflour with 2 tbsp cold water, stir into the sauce, and simmer 2 minutes until thickened.",
+
+      // --- Combine and finish ---
+      "Add the chickpeas and fried tofu into the curry sauce. Simmer together for 5 minutes.",
+      "Taste and adjust salt or soy if needed. Add black pepper to finish.",
+      "Serve hot with the roasted sweet potatoes and sprinkle with chopped cashews."
     ]
   },
   {
@@ -1092,7 +1000,7 @@ const recipeData = [
       N(INGREDIENTS.ONION.key, 1, UNIT.PIECES),
       N(INGREDIENTS.GARLIC.key, 3, UNIT.CLOVE),
       N(INGREDIENTS.CARROT.key, 2, UNIT.PIECES),
-      N(INGREDIENTS.CELERY.key, 2, UNIT.ST),
+      N(INGREDIENTS.CELERY.key, 2, UNIT.STALK),
       N(INGREDIENTS.TINNED_TOMATOES.key, 1, UNIT.TIN),
       N(INGREDIENTS.PAK_CHOI.key, 300, UNIT.GRAM),
       N(INGREDIENTS.BAY_LEAF.key, 1, UNIT.PIECES),
@@ -1180,7 +1088,7 @@ const recipeData = [
       "Add chopped bacon and cook until crispy.",
       "Stir in risotto rice, toast for 1–2 minutes.",
       "Gradually add stock while stirring until rice is cooked and creamy (about 20 minutes).",
-      "Stir in grated Parmesan, season with salt and pepper, and let cool completely.",
+      "Season with salt and pepper, and let cool completely.",
       "Mix in beaten egg and 80g breadcrumbs.",
       "Form golf-ball-sized balls, inserting a cube of mozzarella in the center of each.",
       "Roll each ball in the remaining breadcrumbs to coat.",
@@ -1208,7 +1116,7 @@ const recipeData = [
       N(INGREDIENTS.PLAIN_FLOUR.key, 2, UNIT.TABLESPOON),
       N(INGREDIENTS.WORCESTERSHIRE_SAUCE.key, 1, UNIT.TEASPOON),
       N(INGREDIENTS.FRANKS_HOT_SAUCE.key, 2, UNIT.TEASPOON),
-      N(INGREDIENTS.RICE_UNCOOKED, 0.33, UNIT.CUP),
+      N(INGREDIENTS.RICE_UNCOOKED.key, 0.33, UNIT.CUP),
       N(INGREDIENTS.AVOCADO.key, 2, UNIT.PIECES),
       N(INGREDIENTS.HALLOUMI.key, 200, UNIT.GRAM),
       N(INGREDIENTS.JALAPENOS.key, 4, UNIT.TABLESPOON),
@@ -1338,7 +1246,7 @@ const recipeData = [
       N(INGREDIENTS.SWEET_POTATO.key, 300, UNIT.GRAM),
       N(INGREDIENTS.SALAD_LEAVES.key, 2, UNIT.HANDFUL),
       N(INGREDIENTS.CUCUMBER.key, 0.5, UNIT.PIECES),
-      N(INGREDIENTS.CUCUMBER.key, 6, UNIT.PIECES),
+      N(INGREDIENTS.CHERRY_TOMATOES.key, 6, UNIT.PIECES),
       N(INGREDIENTS.LEMON_JUICE.key, 1, UNIT.TABLESPOON)
     ],
     steps: [
@@ -1366,7 +1274,7 @@ const recipeData = [
       N(INGREDIENTS.PORK_BELLY.key, 8, UNIT.OUNCE),
       N(INGREDIENTS.RED_BELL_PEPPER.key, 1, UNIT.PIECES),
       N(INGREDIENTS.GREEN_BELL_PEPPER.key, 1, UNIT.PIECES),
-      N(INGREDIENTS.PEAS_PETIT_POIS, 50, UNIT.GRAM),
+      N(INGREDIENTS.PEAS_PETIT_POIS.key, 50, UNIT.GRAM),
       N(INGREDIENTS.GREEN_BEANS_FROZEN.key, 150, UNIT.GRAM),
       N(INGREDIENTS.BUTTER_BEANS.key, 1, UNIT.TIN),
       N(INGREDIENTS.GARLIC.key, 2, UNIT.CLOVE),
@@ -1375,7 +1283,7 @@ const recipeData = [
       N(INGREDIENTS.TOMATO_SAUCE.key, 400, UNIT.GRAM),
       N(INGREDIENTS.PAELLA_RICE.key, 400, UNIT.GRAM),
       N(INGREDIENTS.WATER.key, 900, UNIT.MILLILITER),
-      N(INGREDIENTS.ROSEMARY, 1, UNIT.PIECES)
+      N(INGREDIENTS.ROSEMARY_SPRIG.key, 1, UNIT.PIECES)
     ],
     steps: [
       "Pour the olive oil into a paella pan and when hot, add all the meat and cook until browned.",
@@ -1392,17 +1300,19 @@ const recipeData = [
   {
     id: 40,
     meal: ["breakfast"],
+    isCheat: false,
     recipe: "Monkey Moo",
-    defaultServings: 4,
-    calories: 513,
+    defaultServings: 2,
+    calories: 1200,
     ingredients: [
-      N(INGREDIENTS.BANANA.key, 200, UNIT.GRAM),
-      N(INGREDIENTS.MILK.key, 260, UNIT.MILLILITER),
-      N(INGREDIENTS.PEANUT_BUTTER.key, 30, UNIT.GRAM),
+      N(INGREDIENTS.BANANA.key, 400, UNIT.GRAM),
+      N(INGREDIENTS.MILK.key, 520, UNIT.MILLILITER),
+      N(INGREDIENTS.PEANUT_BUTTER.key, 60, UNIT.GRAM),
     ],
     steps: [
       "Freeze Banana.",
       "Blend everything until smooth.",
+      "Pinch of salt to enhance flavor.",
     ]
   },
   {
@@ -1415,81 +1325,82 @@ const recipeData = [
     steps: []
   },
   {
-  id: 41,
-  meal: ["dinner"],
-  recipe: "Black Pepper Beef Stir Fry",
-  defaultServings: 2,
-  calories: 575, // You can fill this in if needed
-  ingredients: [
-    // Beef
-    N(INGREDIENTS.SIRLOIN_STEAK.key, 250, UNIT.GRAM), // flank or sirloin
-    
-    // Sauce
-    N(INGREDIENTS.BLACK_PEPPER.key, 1, UNIT.TABLESPOON),
-    N(INGREDIENTS.SOY_SAUCE.key, 1, UNIT.TABLESPOON),
-    N(INGREDIENTS.WORCESTERSHIRE_SAUCE.key, 0.5, UNIT.TABLESPOON),
-    N(INGREDIENTS.SUGAR.key, 0.5, UNIT.TEASPOON),
-    N(INGREDIENTS.WATER.key, 1, UNIT.TABLESPOON),
-    N(INGREDIENTS.CORN_FLOUR.key, 1, UNIT.TEASPOON), // to mix with water at the end
-    
-    // Vegetables
-    N(INGREDIENTS.ONION.key, 0.5, UNIT.PIECES), // sliced
-    N(INGREDIENTS.GARLIC.key, 2, UNIT.CLOVE),
-    N(INGREDIENTS.RED_BELL_PEPPER.key, 1, UNIT.PIECES),
-    N(INGREDIENTS.GREEN_BELL_PEPPER.key, 1, UNIT.PIECES),
-    N(INGREDIENTS.OLIVE_OIL.key, 1, UNIT.TABLESPOON),
+    id: 41,
+    meal: ["dinner"],
+    isCheat: true,
+    recipe: "Black Pepper Beef Stir Fry",
+    defaultServings: 2,
+    calories:1000, // You can fill this in if needed
+    ingredients: [
+      // Beef
+      N(INGREDIENTS.SIRLOIN_STEAK.key, 250, UNIT.GRAM), // flank or sirloin
 
-    // Side
-    N(INGREDIENTS.JASMINE_RICE.key, 1, UNIT.CUP)
-  ],
-  steps: [
-    "Marinate the beef and leave it to rest for at least 15 min.",
-    "Prepare the sauce: mix black pepper, soy sauce, Worcestershire sauce, sugar, and 1 tbsp water. Set aside.",
-    "Heat 1 tbsp olive oil in a wok over high heat. Add the beef and stir-fry 1–2 min until browned. Remove and set aside.",
-    "In the same wok, add sliced onion and minced garlic. Stir-fry until fragrant. Add more oil if needed.",
-    "Add sliced red and green peppers. Stir-fry for 1 min.",
-    "Return the beef to the wok. Pour in the prepared sauce and mix well.",
-    "Stir in the cornstarch slurry (1 tsp cornstarch mixed with 1 tbsp water). Cook 30 sec until the sauce thickens and coats the beef and vegetables.",
-    "Serve hot with 1 cup cooked jasmine rice."
-  ]
-},
-{
-  id: 302,
-  meal: ["lunch"],
-  recipe: "Whole Chicken Soup with Leek, Sweet Potato & Rosemary",
-  defaultServings: 6,
-  calories: 335,
-  ingredients: [
-    // Base
-    N(INGREDIENTS.CHICKEN_WHOLE.key, 1300, UNIT.GRAM), // ~1.5–2 kg
-    N(INGREDIENTS.WATER.key, 3000, UNIT.MILLILITER),
+      // Sauce
+      N(INGREDIENTS.BLACK_PEPPER.key, 1, UNIT.TABLESPOON),
+      N(INGREDIENTS.SOY_SAUCE.key, 1, UNIT.TABLESPOON),
+      N(INGREDIENTS.WORCESTERSHIRE_SAUCE.key, 0.5, UNIT.TABLESPOON),
+      N(INGREDIENTS.SUGAR.key, 0.5, UNIT.TEASPOON),
+      N(INGREDIENTS.WATER.key, 1, UNIT.TABLESPOON),
+      N(INGREDIENTS.CORN_FLOUR.key, 1, UNIT.TEASPOON), // to mix with water at the end
 
-    // Vegetables
-    N(INGREDIENTS.LEEK.key, 2, UNIT.PIECES),
-    N(INGREDIENTS.SWEET_POTATO.key, 2, UNIT.MEDIUM),
-    N(INGREDIENTS.SPINACH.key, 150, UNIT.GRAM),
-    N(INGREDIENTS.ONION.key, 1, UNIT.PIECES),
-    N(INGREDIENTS.CARROT.key, 2, UNIT.MEDIUM),
-    N(INGREDIENTS.CELERY.key, 2, UNIT.STALK),
-    N(INGREDIENTS.GARLIC.key, 4, UNIT.CLOVE),
-    N(INGREDIENTS.GINGER.key, 20, UNIT.GRAM),
+      // Vegetables
+      N(INGREDIENTS.ONION.key, 0.5, UNIT.PIECES), // sliced
+      N(INGREDIENTS.GARLIC.key, 2, UNIT.CLOVE),
+      N(INGREDIENTS.RED_BELL_PEPPER.key, 1, UNIT.PIECES),
+      N(INGREDIENTS.GREEN_BELL_PEPPER.key, 1, UNIT.PIECES),
+      N(INGREDIENTS.OLIVE_OIL.key, 1, UNIT.TABLESPOON),
 
-    // Herbs & seasoning
-    N(INGREDIENTS.BAY_LEAF.key, 2, UNIT.LEAF),
-    N(INGREDIENTS.THYME.key, 2, UNIT.SPRIG),
-    N(INGREDIENTS.ROSEMARY_SPRIG.key, 1, UNIT.SPRIG),
-    N(INGREDIENTS.SALT.key, 2, UNIT.TEASPOON),
-    N(INGREDIENTS.BLACK_PEPPER.key, 1, UNIT.TEASPOON),
-    N(INGREDIENTS.OLIVE_OIL.key, 1, UNIT.TABLESPOON)
-  ],
-  steps: [
-    "Place whole chicken in a large pot, cover with water, and add onion, carrot, celery, leek, garlic, ginger, bay, thyme, and rosemary.",
-    "Bring to a boil, skim foam, then simmer gently for 1.5–2 hours until chicken is tender.",
-    "Remove chicken, shred meat, discard bones and skin. Strain broth if you want it clear.",
-    "Add cubed sweet potato to broth and simmer 15 minutes until soft.",
-    "Return shredded chicken to the pot, stir in spinach to wilt, season with salt and pepper, and drizzle with olive oil before serving."
-  ]
-}
+      // Side
+      N(INGREDIENTS.JASMINE_RICE.key, 1, UNIT.CUP)
+    ],
+    steps: [
+      "Marinate the beef and leave it to rest for at least 15 min.",
+      "Prepare the sauce: mix black pepper, soy sauce, Worcestershire sauce, sugar, and 1 tbsp water. Set aside.",
+      "Heat 1 tbsp olive oil in a wok over high heat. Add the beef and stir-fry 1–2 min until browned. Remove and set aside.",
+      "In the same wok, add sliced onion and minced garlic. Stir-fry until fragrant. Add more oil if needed.",
+      "Add sliced red and green peppers. Stir-fry for 1 min.",
+      "Return the beef to the wok. Pour in the prepared sauce and mix well.",
+      "Stir in the cornstarch slurry (1 tsp cornstarch mixed with 1 tbsp water). Cook 30 sec until the sauce thickens and coats the beef and vegetables.",
+      "Serve hot with 1 cup cooked jasmine rice."
+    ]
+  },
+  {
+    id: 302,
+    meal: ["lunch"],
+    recipe: "Whole Chicken Soup with Leek, Sweet Potato & Rosemary",
+    defaultServings: 6,
+    calories: 335,
+    ingredients: [
+      // Base
+      N(INGREDIENTS.CHICKEN_WHOLE.key, 1, UNIT.PIECES), // ~1.5–2 kg
+      N(INGREDIENTS.WATER.key, 3000, UNIT.MILLILITER),
+
+      // Vegetables
+      N(INGREDIENTS.LEEK.key, 2, UNIT.PIECES),
+      N(INGREDIENTS.SWEET_POTATO.key, 2, UNIT.MEDIUM),
+      N(INGREDIENTS.SPINACH.key, 150, UNIT.GRAM),
+      N(INGREDIENTS.ONION.key, 1, UNIT.PIECES),
+      N(INGREDIENTS.CARROT.key, 2, UNIT.MEDIUM),
+      N(INGREDIENTS.CELERY.key, 2, UNIT.STALK),
+      N(INGREDIENTS.GARLIC.key, 4, UNIT.CLOVE),
+      N(INGREDIENTS.GINGER.key, 20, UNIT.GRAM),
+
+      // Herbs & seasoning
+      N(INGREDIENTS.BAY_LEAF.key, 2, UNIT.LEAF),
+      N(INGREDIENTS.THYME.key, 2, UNIT.SPRIG),
+      N(INGREDIENTS.ROSEMARY_SPRIG.key, 1, UNIT.SPRIG),
+      N(INGREDIENTS.SALT.key, 2, UNIT.TEASPOON),
+      N(INGREDIENTS.BLACK_PEPPER.key, 1, UNIT.TEASPOON),
+      N(INGREDIENTS.OLIVE_OIL.key, 1, UNIT.TABLESPOON)
+    ],
+    steps: [
+      "Place whole chicken in a large pot, cover with water, and add onion, carrot, celery, leek, garlic, ginger, bay, thyme, and rosemary.",
+      "Bring to a boil, skim foam, then simmer gently for 1.5–2 hours until chicken is tender.",
+      "Remove chicken, shred meat, discard bones and skin. Strain broth if you want it clear.",
+      "Add cubed sweet potato to broth and simmer 15 minutes until soft.",
+      "Return shredded chicken to the pot, stir in spinach to wilt, season with salt and pepper, and drizzle with olive oil before serving."
+    ]
+  }
 
 ];
 
