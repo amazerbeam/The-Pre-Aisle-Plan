@@ -12,17 +12,14 @@
 </head>
 
 <body>
-  <h1>Recipe Viewer v.8.0.1</h1>
+  <h1>Recipe Viewer v.8.0.2</h1>
 
 
   <div style="text-align: center; margin-bottom: 10px;">
-    <label for="all-servings">All Servings:</label>
-    <input type="number" id="all-servings" value="2" min="1" style="width: 60px; padding: 4px; text-align: center;">
-    <label style="margin-left: 10px;">
-      <input type="checkbox" id="apply-all-servings">
-      Apply to all
-    </label>
+    <input type="text" id="recipe-search" placeholder="🔍 Search recipes..."
+      style="width: 80%; max-width: 400px; padding: 8px 12px; border-radius: 6px; border: 1px solid #ccc; text-align: center;">
   </div>
+
 
   <!-- ⬇️ Move this below All Servings -->
   <div class="tabs-wrapper">
@@ -116,6 +113,60 @@
 
     const urlParams = new URLSearchParams(window.location.search);
     const encoded = urlParams.get('planner');
+
+    // 🔎 Simple recipe search
+    document.getElementById('recipe-search').addEventListener('input', (e) => {
+      const term = e.target.value.toLowerCase().trim();
+
+      if (term === "") {
+        // Reset to the currently active tab
+        const activeMeal = document.querySelector('.tab.active')?.textContent.toLowerCase() || 'breakfast';
+        renderRecipes(activeMeal);
+        return;
+      }
+
+      // Find matching recipes
+      const filtered = recipeData.filter(r => r.recipe.toLowerCase().includes(term));
+
+      const container = document.getElementById('recipe-container');
+      container.innerHTML = '';
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<p style="text-align:center; color:#666;">No recipes found for "${term}".</p>`;
+        return;
+      }
+
+      // Reuse the rendering logic for the found recipes
+      filtered.forEach(entry => {
+        const section = document.createElement('div');
+        section.classList.add('section');
+
+        const servingsInput = document.createElement('input');
+        servingsInput.type = 'number';
+        servingsInput.value = entry.defaultServings || 1;
+        servingsInput.style.width = '50px';
+        servingsInput.disabled = true;
+
+        const header = document.createElement('div');
+        header.className = 'recipe-header';
+        const title = document.createElement('h2');
+        const kcal = (entry.calories / (entry.defaultServings || 1)).toFixed(0);
+        title.textContent = `${entry.recipe} — ${kcal} kcal per serving`;
+        header.appendChild(title);
+        section.appendChild(header);
+
+        const btn = document.createElement('button');
+        btn.textContent = '⛶ View';
+        btn.style.padding = '6px 12px';
+        btn.style.borderRadius = '6px';
+        btn.style.cursor = 'pointer';
+        btn.onclick = () => openFullscreen(entry);
+        section.appendChild(btn);
+
+        container.appendChild(section);
+      });
+    });
+
 
 
     document.addEventListener('DOMContentLoaded', () => {
