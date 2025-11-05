@@ -90,6 +90,7 @@ const INGREDIENTS = {
   // Dairy & eggs
   GREEK_YOGURT: { name: "Greek yogurt", aisle: AISLE.DAIRY, key: "GREEK_YOGURT" },
   MILK: { name: "Milk", aisle: AISLE.DAIRY, key: "MILK" },
+  CREME_FRAINCHE: { name: "Crème Fraîche", aisle: AISLE.BAKERY, key: "CREME_FRAINCHE" },
   BUTTER: { name: "Butter", aisle: AISLE.DAIRY, key: "BUTTER" },
   DOUBLE_CREAM: { name: "Double cream", aisle: AISLE.DAIRY, key: "DOUBLE_CREAM" },
   CHEESE: { name: "Cheese", aisle: AISLE.DAIRY, key: "CHEESE" },
@@ -203,7 +204,7 @@ const INGREDIENTS = {
   SUGAR: { name: "Sugar", aisle: AISLE.BAKERY, key: "SUGAR" },
   ANISE_STAR: { name: "Star anise", aisle: AISLE.HERBS_SPICES, key: "ANISE_STAR" },
   MSG: { name: "MSG", aisle: AISLE.HERBS_SPICES, key: "MSG" },
-
+  GARAM_MASALA: { name: "Garam Masala", aisle: AISLE.HERBS_SPICES, key: "GARAM_MASALA" },
   // Starches & odds
   BREADCRUMBS: { name: "Breadcrumbs", aisle: AISLE.BAKERY, key: "BREADCRUMBS" },
   BAKING_POWDER: { name: "Baking powder", aisle: AISLE.BAKERY, key: "BAKING_POWDER" },
@@ -757,7 +758,7 @@ const recipeData = [
 
       // Sides & toppings
       N(INGREDIENTS.SWEET_POTATO.key, 400, UNIT.GRAM),
-      N(INGREDIENTS.PEAS_PETIT_POIS.key, 20, UNIT.GRAM),
+      N(INGREDIENTS.PEAS_PETIT_POIS.key, 1, UNIT.CUP),
       N(INGREDIENTS.BLACK_PEPPER.key, 0.25, UNIT.TEASPOON)
     ],
     steps: [
@@ -765,7 +766,7 @@ const recipeData = [
       "Preheat oven to 200°C.",
       "Preheat 2 pans, one for tofu and one for curry sauce.",
       "Peel and cube the sweet potatoes. Toss with 1 tbsp olive oil and a pinch of salt.",
-      
+
 
       // --- Prepare tofu ---
       "Fry the tofu cubes until golden on all sides.",
@@ -1329,7 +1330,7 @@ const recipeData = [
     isCheat: true,
     recipe: "Black Pepper Beef Stir Fry",
     defaultServings: 2,
-    calories:1000, // You can fill this in if needed
+    calories: 1000, // You can fill this in if needed
     ingredients: [
       // Beef
       N(INGREDIENTS.SIRLOIN_STEAK.key, 250, UNIT.GRAM), // flank or sirloin
@@ -1363,6 +1364,116 @@ const recipeData = [
       "Serve hot with 1 cup cooked jasmine rice."
     ]
   },
+  {
+    id: 42,
+    meal: ["dinner"],
+    recipe: "Mild Chicken & Chickpea Tikka Masala",
+    defaultServings: 2,
+    calories: 640, // approx per serving
+    ingredients: [
+      // Protein & legumes
+      N(INGREDIENTS.CHICKEN_BREAST.key, 250, UNIT.GRAM),
+      N(INGREDIENTS.CHICKPEAS.key, 150, UNIT.GRAM), // cooked/drained weight
+      N(INGREDIENTS.PEAS_PETIT_POIS.key, 1, UNIT.CUP), // frozen peas
+
+      // Base sauce vegetables
+      N(INGREDIENTS.ONION.key, 1, UNIT.MEDIUM),
+      N(INGREDIENTS.GARLIC.key, 3, UNIT.CLOVE),
+      N(INGREDIENTS.GINGER.key, 10, UNIT.GRAM),
+
+      // Sauce liquid & dairy
+      N(INGREDIENTS.TOMATO_PASTE.key, 2, UNIT.TABLESPOON),
+      N(INGREDIENTS.STOCK.key, 300, UNIT.MILLILITER),
+      N(INGREDIENTS.GREEK_YOGURT.key, 50, UNIT.GRAM), // helps stop splitting
+      N(INGREDIENTS.CREME_FRAINCHE.key, 0, UNIT.NONE), // unused
+      // Using crème fraîche (not in your INGREDIENTS yet – add if needed)
+      // If added to ingredients.js:
+      // N(INGREDIENTS.CREME_FRAICHE.key, 100, UNIT.GRAM),
+
+      // Fats
+      N(INGREDIENTS.OLIVE_OIL.key, 1.5, UNIT.TABLESPOON),
+
+      // Mild tikka masala spices
+      N(INGREDIENTS.CUMIN.key, 1, UNIT.TEASPOON),
+      N(INGREDIENTS.TURMERIC.key, 0.5, UNIT.TEASPOON),
+      N(INGREDIENTS.SMOKED_PAPRIKA.key, 0.5, UNIT.TEASPOON),
+      N(INGREDIENTS.CINNAMON.key, 0.25, UNIT.TEASPOON),
+      N(INGREDIENTS.SALT.key, 1, UNIT.TEASPOON),
+      N(INGREDIENTS.BLACK_PEPPER.key, 0.25, UNIT.TEASPOON),
+      N(INGREDIENTS.HONEY.key, 0.5, UNIT.TEASPOON) // optional for sweetness
+    ],
+    steps: [
+      "Dice onion, mince garlic, grate the ginger.",
+      "Cube chicken breast into bite-sized pieces and season lightly with salt.",
+      "Heat 1 tbsp olive oil in a pan over medium heat. Add chicken, cook until lightly browned but not fully done. Remove and set aside.",
+      "In the same pan, add remaining 0.5 tbsp olive oil. Add onion and cook 5 minutes until soft.",
+      "Add garlic and ginger, stir for 30 seconds.",
+      "Add turmeric, cumin, smoked paprika, cinnamon. Cook spices for 30 seconds to bloom.",
+      "Add tomato paste and stir for 1 minute.",
+      "Pour in stock, stir well, then add chickpeas. Simmer for 10 minutes on low heat.",
+      "Stir in Greek yogurt to stabilise the sauce.",
+      "Return chicken to the pan. Simmer 5–7 minutes until cooked through.",
+      "Add frozen peas and simmer 3 more minutes.",
+      "Remove from heat and gently stir in crème fraîche (or Greek yogurt if replacing). Adjust salt, pepper, and sweetness with honey if desired.",
+      "Serve with roasted vegetables, cauliflower rice, or a small portion of basmati if calories allow."
+    ]
+  },
+
+  {
+    id: 43,
+    meal: ["dinner"],
+    recipe: "Mild Chicken & Chickpea Tikka Masala",
+    defaultServings: 2,
+    calories: 640, // approx per serving
+    ingredients: [
+      // Protein & legumes
+      N(INGREDIENTS.CHICKEN_BREAST.key, 250, UNIT.GRAM),
+      N(INGREDIENTS.CHICKPEAS.key, 150, UNIT.GRAM), // cooked/drained
+      N(INGREDIENTS.PEAS_PETIT_POIS.key, 1, UNIT.CUP), // frozen peas (~120g)
+
+      // Base sauce vegetables
+      N(INGREDIENTS.ONION.key, 1, UNIT.MEDIUM),
+      N(INGREDIENTS.GARLIC.key, 3, UNIT.CLOVE),
+      N(INGREDIENTS.GINGER.key, 10, UNIT.GRAM),
+
+      // Sauce liquid & dairy
+      N(INGREDIENTS.TOMATO_PASTE.key, 2, UNIT.TABLESPOON),
+      N(INGREDIENTS.STOCK.key, 300, UNIT.MILLILITER),
+      N(INGREDIENTS.GREEK_YOGURT.key, 50, UNIT.GRAM), // stabilises sauce
+      N(INGREDIENTS.CREME_FRAINCHE.key, 100, UNIT.GRAM), // crème fraîche
+
+      // Fats
+      N(INGREDIENTS.OLIVE_OIL.key, 1.5, UNIT.TABLESPOON),
+
+      // Mild tikka masala spices
+      N(INGREDIENTS.CUMIN.key, 1, UNIT.TEASPOON),
+      N(INGREDIENTS.TURMERIC.key, 0.5, UNIT.TEASPOON),
+      N(INGREDIENTS.SMOKED_PAPRIKA.key, 0.5, UNIT.TEASPOON),
+      N(INGREDIENTS.CINNAMON.key, 0.25, UNIT.TEASPOON),
+      N(INGREDIENTS.SALT.key, 1, UNIT.TEASPOON),
+      N(INGREDIENTS.BLACK_PEPPER.key, 0.25, UNIT.TEASPOON),
+      N(INGREDIENTS.HONEY.key, 0.5, UNIT.TEASPOON), // optional
+      N(INGREDIENTS.GARAM_MASALA.key, 1, UNIT.TEASPOON),
+
+    ],
+    steps: [
+      "Dice onion, mince garlic, and grate ginger.",
+      "Cut chicken into bite-sized pieces and season lightly with salt.",
+      "Heat 1 tbsp olive oil in a pan over medium heat. Add chicken, cook until lightly browned (not fully cooked). Remove and set aside.",
+      "In the same pan, add remaining 0.5 tbsp olive oil. Add onion and cook 5 minutes until softened.",
+      "Add garlic and ginger; cook for 30 seconds.",
+      "Add cumin, turmeric, smoked paprika, and cinnamon. Stir for 30 seconds to release flavour.",
+      "Add tomato paste and cook for 1 minute.",
+      "Pour in stock and stir well. Add chickpeas. Simmer gently for 10 minutes.",
+      "Remove from heat briefly. Stir in Greek yogurt to prevent splitting.",
+      "Return chicken to the pan. Simmer on low heat for 5–7 minutes until chicken is cooked through.",
+      "Add frozen peas and cook for 3 more minutes.",
+      "Turn off heat and gently stir in crème fraîche. Taste and adjust seasoning (salt, pepper, honey).",
+      "Serve with roasted vegetables, cauliflower rice, or a small portion of basmati rice if desired."
+    ]
+  },
+
+
   {
     id: 302,
     meal: ["lunch"],
