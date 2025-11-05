@@ -725,7 +725,7 @@ const recipeData = [
   {
     id: 20,
     meal: ["dinner"],
-    recipe: "Chickpea & Tofu Chinese Curry",
+    recipe: "Chinese Chickpea & Tofy Curry",
     defaultServings: 2,
     calories: 1340,
     ingredients: [
@@ -742,7 +742,7 @@ const recipeData = [
       // Seasonings & flavourings
       N(INGREDIENTS.SOY_SAUCE.key, 2, UNIT.TEASPOON),
       N(INGREDIENTS.TOMATO_PASTE.key, 1, UNIT.TABLESPOON),
-      N(INGREDIENTS.SUGAR.key, 1, UNIT.TEASPOON),
+      N(INGREDIENTS.HONEY.key, 1, UNIT.TEASPOON),
       N(INGREDIENTS.SALT.key, 1, UNIT.TEASPOON),
       N(INGREDIENTS.TURMERIC.key, 0.5, UNIT.TEASPOON),
       N(INGREDIENTS.CUMIN.key, 0.5, UNIT.TEASPOON),
@@ -753,35 +753,35 @@ const recipeData = [
 
       // Liquids & thickeners
       N(INGREDIENTS.STOCK.key, 480, UNIT.MILLILITER),
-      N(INGREDIENTS.CORN_FLOUR.key, 1.5, UNIT.TABLESPOON),
       N(INGREDIENTS.OLIVE_OIL.key, 2, UNIT.TABLESPOON),
 
       // Sides & toppings
       N(INGREDIENTS.SWEET_POTATO.key, 400, UNIT.GRAM),
-      N(INGREDIENTS.CASHEWS.key, 20, UNIT.GRAM),
+      N(INGREDIENTS.PEAS_PETIT_POIS.key, 20, UNIT.GRAM),
       N(INGREDIENTS.BLACK_PEPPER.key, 0.25, UNIT.TEASPOON)
     ],
     steps: [
       // --- Roast sweet potatoes ---
       "Preheat oven to 200°C.",
+      "Preheat 2 pans, one for tofu and one for curry sauce.",
       "Peel and cube the sweet potatoes. Toss with 1 tbsp olive oil and a pinch of salt.",
-      "Roast for 25–30 minutes until golden and soft.",
+      
 
       // --- Prepare tofu ---
-      "Press tofu for 10 minutes to remove excess water. Cube it.",
-      "Heat 1 tsp olive oil in a non-stick pan and fry the tofu cubes until golden on all sides. Set aside.",
+      "Fry the tofu cubes until golden on all sides.",
+      "Put sweet potatoes in the oven for 30 minutes.",
 
       // --- Make homemade Chinese curry sauce ---
       "In a saucepan, heat 1 tbsp olive oil over medium heat. Add sliced onion and a pinch of salt; fry 5 minutes until softened.",
       "Add minced garlic and grated ginger; cook 30 seconds.",
-      "Add banana, soy sauce, tomato purée, sugar, salt, turmeric, cumin, cinnamon, star anise, MSG, and stock.",
-      "Simmer for 15 minutes until onions and banana are soft. Remove star anise and blend until smooth.",
-      "Return to pan. Mix cornflour with 2 tbsp cold water, stir into the sauce, and simmer 2 minutes until thickened.",
-
+      "Add banana, soy sauce, tomato purée, sugar, salt, turmeric, cumin, cinnamon, MSG, and stock.",
+      "Remove sauce and blend until smooth.",
+      "Return to pan. Add Anise Star.",
+      "Add chickpeas to the sauce and simmer for 20 minutes.",
       // --- Combine and finish ---
-      "Add the chickpeas and fried tofu into the curry sauce. Simmer together for 5 minutes.",
-      "Taste and adjust salt or soy if needed. Add black pepper to finish.",
-      "Serve hot with the roasted sweet potatoes and sprinkle with chopped cashews."
+      "Add the chickpeas.",
+      "Add the fried tofu and peas to the curry sauce. Cook for another 5 minutes.",
+      "Serve hot with the roasted sweet potatoes."
     ]
   },
   {
