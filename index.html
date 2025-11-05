@@ -12,7 +12,7 @@
 </head>
 
 <body>
-  <h1>Recipe Viewer v.8.0.3</h1>
+  <h1>Recipe Viewer v.8.1.0</h1>
 
 
 
@@ -137,56 +137,27 @@
 
     // 🔎 Simple recipe search
     document.getElementById('recipe-search').addEventListener('input', (e) => {
-      const term = e.target.value.toLowerCase().trim();
+      const term = e.target.value.trim().toLowerCase();
 
-      if (term === "") {
-        // Reset to the currently active tab
+      if (term === '') {
         const activeMeal = document.querySelector('.tab.active')?.textContent.toLowerCase() || 'breakfast';
         renderRecipes(activeMeal);
         return;
       }
 
-      // Find matching recipes
-      const filtered = recipeData.filter(r => r.recipe.toLowerCase().includes(term));
+      const results = recipeData.filter(r => r.recipe.toLowerCase().includes(term));
 
-      const container = document.getElementById('recipe-container');
-      container.innerHTML = '';
-
-      if (filtered.length === 0) {
-        container.innerHTML = `<p style="text-align:center; color:#666;">No recipes found for "${term}".</p>`;
+      if (results.length === 0) {
+        const recipeContainer = document.getElementById('recipe-container');
+        recipeContainer.innerHTML = `<p style="text-align:center; color:#777; margin-top:20px;">No recipes found for "${term}".</p>`;
         return;
       }
 
-      // Reuse the rendering logic for the found recipes
-      filtered.forEach(entry => {
-        const section = document.createElement('div');
-        section.classList.add('section');
-
-        const servingsInput = document.createElement('input');
-        servingsInput.type = 'number';
-        servingsInput.value = entry.defaultServings || 1;
-        servingsInput.style.width = '50px';
-        servingsInput.disabled = true;
-
-        const header = document.createElement('div');
-        header.className = 'recipe-header';
-        const title = document.createElement('h2');
-        const kcal = (entry.calories / (entry.defaultServings || 1)).toFixed(0);
-        title.textContent = `${entry.recipe} — ${kcal} kcal per serving`;
-        header.appendChild(title);
-        section.appendChild(header);
-
-        const btn = document.createElement('button');
-        btn.textContent = '⛶ View';
-        btn.style.padding = '6px 12px';
-        btn.style.borderRadius = '6px';
-        btn.style.cursor = 'pointer';
-        btn.onclick = () => openFullscreen(entry);
-        section.appendChild(btn);
-
-        container.appendChild(section);
-      });
+      renderRecipeList(results, 'search');
     });
+
+
+
 
 
 
@@ -269,8 +240,42 @@
     const shoppingListState = storedState ? new Map(JSON.parse(storedState)) : new Map();
 
 
+    function updateFooterButtons(view) {
+      const searchBtn = document.getElementById('btn-search');
+      //if View is shopping or mealplan, hide search button
+      if (view === 'shopping' || view === 'mealplan') {
+        searchBtn.style.display = 'none';
+      } else {
+        searchBtn.style.display = 'flex';
+      }
+    }
 
 
+    function renderRecipeList(recipesToRender, meal) {
+      const recipeContainer = document.getElementById('recipe-container');
+      recipeContainer.innerHTML = '';
+
+      const useGlobal = false;
+      const globalServings = null;
+
+      recipesToRender.forEach(entry => {
+        const section = document.createElement('div');
+        section.classList.add('section');
+
+        const servingsInput = createServingsInput(entry, useGlobal, globalServings);
+        const headerBar = createHeaderBar(entry, servingsInput);
+        const toggleBtn = createToggleButton();
+        const collapsibleContent = createCollapsibleContent(entry, servingsInput, useGlobal, globalServings, meal);
+        const dayButtons = createDayButtons(entry, meal, servingsInput, useGlobal, globalServings);
+
+        section.appendChild(headerBar);
+        section.appendChild(toggleBtn);
+        section.appendChild(collapsibleContent);
+        section.appendChild(dayButtons);
+
+        recipeContainer.appendChild(section);
+      });
+    }
 
 
     let wakeLock = null;
@@ -372,6 +377,7 @@
 
 
     function toggleFullMealPlan() {
+      updateFooterButtons('mealplan');
       const panel = document.getElementById('full-meal-plan');
       panel.classList.toggle('show');
       renderFullCalendar();
@@ -571,6 +577,8 @@
 
 
     function renderShoppingList() {
+      updateFooterButtons('shopping');
+
       document.querySelectorAll('.tab').forEach(tab => {
         tab.classList.remove('active');
       });
@@ -756,6 +764,7 @@
       const current = entry[mealType];
 
       // ✅ 1) If clicking the same selected recipe again → unassign immediately (always allowed)
+      // ✅ 1) If clicking the same selected recipe again → unassign immediately (always allowed)
       if (current?.id === recipeId) {
         delete entry[mealType];
 
@@ -765,11 +774,25 @@
           if (idx !== -1) planner.splice(idx, 1);
         }
 
+        // persist changes
         localStorage.setItem('mealPlanner', JSON.stringify(planner));
-        const selectedMeal = document.querySelector(".tab.active")?.textContent.toLowerCase();
-        if (selectedMeal) renderRecipes(selectedMeal);
-        return;
+
+        // 🧭 Check if search is active
+        const searchInput = document.getElementById('recipe-search');
+        const term = searchInput?.value.trim().toLowerCase();
+
+        // 🟢 Keep filtered list if search active
+        if (term) {
+          const results = recipeData.filter(r => r.recipe.toLowerCase().includes(term));
+          renderRecipeList(results, 'search');
+        } else {
+          const selectedMeal = document.querySelector(".tab.active")?.textContent.toLowerCase();
+          if (selectedMeal) renderRecipes(selectedMeal);
+        }
+
+        return; // ✅ exit after handling both cases correctly
       }
+
 
       // ✅ 2) Only now enforce cheat limits if assigning a new cheat recipe
       if (isCheat) {
@@ -813,10 +836,21 @@
 
       // persist & refresh UI
       localStorage.setItem('mealPlanner', JSON.stringify(planner));
-      const selectedMeal = document.querySelector(".tab.active")?.textContent.toLowerCase();
-      if (selectedMeal) {
-        renderRecipes(selectedMeal);
+
+      // 🧭 Check if search is active
+      const searchInput = document.getElementById('recipe-search');
+      const term = searchInput?.value.trim().toLowerCase();
+
+      // 🟢 If search term active → re-render filtered list
+      if (term) {
+        const results = recipeData.filter(r => r.recipe.toLowerCase().includes(term));
+        renderRecipeList(results, 'search');
+      } else {
+        // 🔵 Otherwise re-render the active meal tab
+        const selectedMeal = document.querySelector(".tab.active")?.textContent.toLowerCase();
+        if (selectedMeal) renderRecipes(selectedMeal);
       }
+
     }
 
 
@@ -844,7 +878,7 @@
 
       copyBtn.onclick = () => {
 
-        const useGlobal = document.getElementById('apply-all-servings').checked;
+        // const useGlobal = document.getElementById('apply-all-servings').checked;
         const servings = useGlobal
           ? parseFloat(document.getElementById('all-servings').value || 1)
           : localServingsMap.get(entry.id) || entry.defaultServings || 1;
@@ -880,23 +914,15 @@
 
 
     function renderRecipes(meal) {
-      const recipeContainer = document.getElementById('recipe-container');
-      recipeContainer.innerHTML = '';
+      updateFooterButtons('recipes');
 
-      const useGlobal = document.getElementById('apply-all-servings').checked;
-      const globalServings = parseFloat(document.getElementById('all-servings').value || 1);
-
-      // 🧹 Separate and sort recipes
       const sortedRecipes = recipeData
         .filter(entry => entry.meal.includes(meal))
         .reduce(
           (acc, recipe) => {
             const isCheat = recipe.isCheat === true || recipe.isCheat === "true";
-            if (isCheat) {
-              acc.cheats.push(recipe);
-            } else {
-              acc.nonCheats.push(recipe);
-            }
+            if (isCheat) acc.cheats.push(recipe);
+            else acc.nonCheats.push(recipe);
             return acc;
           },
           { nonCheats: [], cheats: [] }
@@ -907,26 +933,9 @@
 
       const allSorted = [...sortedRecipes.nonCheats, ...sortedRecipes.cheats];
 
-      allSorted.forEach(entry => {
-        const section = document.createElement('div');
-        section.classList.add('section');
-
-        const servingsInput = createServingsInput(entry, useGlobal, globalServings);
-        const headerBar = createHeaderBar(entry, servingsInput);
-        const toggleBtn = createToggleButton();
-        const collapsibleContent = createCollapsibleContent(entry, servingsInput, useGlobal, globalServings, meal);
-        const dayButtons = createDayButtons(entry, meal, servingsInput, useGlobal, globalServings);
-
-        section.appendChild(headerBar);
-        section.appendChild(toggleBtn);
-        section.appendChild(collapsibleContent);
-        section.appendChild(dayButtons);
-
-        recipeContainer.appendChild(section);
-      });
-
-      setupGlobalServingTriggers(meal);
+      renderRecipeList(allSorted, meal);
     }
+
 
 
     function createServingsInput(entry, useGlobal, globalServings) {
@@ -1063,7 +1072,7 @@
 
     function setupGlobalServingTriggers(meal) {
       const allInput = document.getElementById('all-servings');
-      const allToggle = document.getElementById('apply-all-servings');
+      //const allToggle = document.getElementById('apply-all-servings');
 
       allInput.oninput = () => {
         if (allToggle.checked) renderRecipes(meal);
@@ -1139,43 +1148,9 @@
     });
 
     // --- Search functionality ---
-    searchInput.addEventListener('input', (e) => {
-      const term = e.target.value.toLowerCase().trim();
-      const container = document.getElementById('recipe-container');
-      container.innerHTML = '';
+    // --- Improved search that keeps full recipe rendering ---
 
-      if (term === '') {
-        const activeMeal = document.querySelector('.tab.active')?.textContent.toLowerCase() || 'breakfast';
-        renderRecipes(activeMeal);
-        return;
-      }
 
-      const matches = recipeData.filter(r => r.recipe.toLowerCase().includes(term));
-      if (matches.length === 0) {
-        container.innerHTML = `<p style="text-align:center; color:#666;">No recipes found for "${term}".</p>`;
-        return;
-      }
-
-      matches.forEach(entry => {
-        const section = document.createElement('div');
-        section.classList.add('section');
-        const title = document.createElement('h2');
-        const kcal = (entry.calories / (entry.defaultServings || 1)).toFixed(0);
-        title.textContent = `${entry.recipe} — ${kcal} kcal per serving`;
-        section.appendChild(title);
-
-        const btn = document.createElement('button');
-        btn.textContent = '⛶ View';
-        btn.style.padding = '6px 12px';
-        btn.style.borderRadius = '6px';
-        btn.style.border = '1px solid #ccc';
-        btn.style.cursor = 'pointer';
-        btn.onclick = () => openFullscreen(entry);
-
-        section.appendChild(btn);
-        container.appendChild(section);
-      });
-    });
 
 
   </script>

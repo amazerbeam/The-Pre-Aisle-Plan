@@ -574,3 +574,22 @@ li.checked {
   z-index: 5;
 }
 
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: #4a3f80; /* your accent color */
+  box-shadow: 0 0 3px rgba(74, 63, 128, 0.4);
+}
+
+
+#bottom-nav button {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+#bottom-nav button[style*="display: none"] {
+  opacity: 0;
+  transform: scale(0.8);
+}
+
