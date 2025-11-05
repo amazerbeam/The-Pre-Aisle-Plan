@@ -12,7 +12,7 @@
 </head>
 
 <body>
-  <h1>Recipe Viewer v.7.1.3</h1>
+  <h1>Recipe Viewer v.8.0.1</h1>
 
 
   <div style="text-align: center; margin-bottom: 10px;">
@@ -159,12 +159,19 @@
 
 
     document.getElementById('full-meal-plan').addEventListener('transitionend', (e) => {
-      if (e.target.classList.contains('show')) {
+      const panel = e.target;
+      if (panel.classList.contains('show')) {
+        // Panel just finished opening — keep wake lock if visible
         requestWakeLock();
       } else {
-        releaseWakeLock();
+        // Only release if fullscreen recipe view isn't open
+        const fullscreenVisible = document.getElementById('fullscreen-recipe').style.display === 'block';
+        if (!fullscreenVisible) {
+          releaseWakeLock();
+        }
       }
     });
+
 
     document.getElementById("btn-shopping").onclick = () => {
       renderShoppingList();
@@ -299,7 +306,7 @@
     }
 
     function openFullscreen(entry) {
-      debugger; 
+      debugger;
       requestWakeLock(); // 🟢 prevent sleep
       const servings = localServingsMap.get(entry.id) || entry.defaultServings || 1;
       const caloriesPerServing = (entry.calories / (entry.defaultServings || 1)).toFixed(0);
@@ -383,7 +390,7 @@
               const li = document.createElement('li');
               li.textContent = `${mealType}: ${recipe.recipe} (${caloriesPerServing.toFixed(0)} kcal per serving) (x${servings})`;
               li.style.cursor = 'pointer';
-    
+
               list.appendChild(li);
             }
           }
