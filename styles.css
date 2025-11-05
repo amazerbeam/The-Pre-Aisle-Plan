@@ -559,3 +559,18 @@ li.checked {
 .shopping-list li.aisle-frozen { border-left-color: #1abc9c; }     /* aqua */
 .shopping-list li.aisle-beverages { border-left-color: #34495e; }  /* navy */
 .shopping-list li.aisle-misc { border-left-color: #bdc3c7; }       /* light gray */
+
+#bottom-nav {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 10px 0;
+  background-color: #ffffff;
+  border-top: 1px solid #ddd;
+  box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  bottom: 0;
+  width: 100%;
+  z-index: 5;
+}
+

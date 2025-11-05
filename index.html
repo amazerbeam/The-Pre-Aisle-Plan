@@ -100,20 +100,30 @@
   <footer id="bottom-nav">
     <button id="btn-mealplan"><span>📅</span><label>Meal Plan</label></button>
 
-    <input type="text" id="recipe-search" placeholder="🔍 Search recipes..." style="
-      flex: 1;
-      max-width: 240px;
-      margin: 0 10px;
-      padding: 6px 10px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 14px;
-      text-align: center;
-      background-color: #fafafa;
-    ">
+    <button id="btn-search"
+      style="display:flex; flex-direction:column; align-items:center; border:none; background:none; color:#4a3f80; font-weight:bold; cursor:pointer;">
+      <span>🔍</span><label>Search</label>
+    </button>
 
     <button id="btn-shopping"><span>🛒</span><label>Shopping</label></button>
   </footer>
+
+  <!-- Hidden search bar overlay -->
+  <div id="bottom-search-bar" style="
+       position:fixed; bottom:0; left:0; right:0;
+       background:white; border-top:1px solid #ddd;
+       box-shadow:0 -1px 6px rgba(0,0,0,0.1);
+       display:flex; align-items:center; justify-content:center;
+       height:0; overflow:hidden;
+       transition:height 0.3s ease;
+       z-index:10;
+     ">
+    <input type="text" id="recipe-search" placeholder="Search recipes..." style="flex:1; max-width:400px; margin:0 10px; padding:8px 12px;
+                border:1px solid #ccc; border-radius:6px; font-size:15px;">
+    <button id="close-search" style="background:none; border:none; font-size:22px; color:#555;
+                 margin-right:12px; cursor:pointer;">✖</button>
+  </div>
+
 
 
 
@@ -1097,6 +1107,77 @@
       document.getElementById('clear-confirm-modal').style.display = 'none';
       location.reload();
     };
+
+
+    const footer = document.getElementById('bottom-nav');
+    const searchOverlay = document.getElementById('bottom-search-bar');
+    const searchBtn = document.getElementById('btn-search');
+    const closeSearchBtn = document.getElementById('close-search');
+    const searchInput = document.getElementById('recipe-search');
+
+    // --- Animate open ---
+    searchBtn.addEventListener('click', () => {
+      footer.style.transition = 'opacity 0.3s ease';
+      footer.style.opacity = '0';
+      setTimeout(() => {
+        footer.style.display = 'none';
+        searchOverlay.style.height = '60px'; // expand
+        searchInput.focus();
+      }, 250);
+    });
+
+    // --- Animate close ---
+    closeSearchBtn.addEventListener('click', () => {
+      searchOverlay.style.height = '0';
+      setTimeout(() => {
+        footer.style.display = 'flex';
+        footer.style.opacity = '1';
+      }, 250);
+      searchInput.value = '';
+      const activeMeal = document.querySelector('.tab.active')?.textContent.toLowerCase() || 'breakfast';
+      renderRecipes(activeMeal);
+    });
+
+    // --- Search functionality ---
+    searchInput.addEventListener('input', (e) => {
+      const term = e.target.value.toLowerCase().trim();
+      const container = document.getElementById('recipe-container');
+      container.innerHTML = '';
+
+      if (term === '') {
+        const activeMeal = document.querySelector('.tab.active')?.textContent.toLowerCase() || 'breakfast';
+        renderRecipes(activeMeal);
+        return;
+      }
+
+      const matches = recipeData.filter(r => r.recipe.toLowerCase().includes(term));
+      if (matches.length === 0) {
+        container.innerHTML = `<p style="text-align:center; color:#666;">No recipes found for "${term}".</p>`;
+        return;
+      }
+
+      matches.forEach(entry => {
+        const section = document.createElement('div');
+        section.classList.add('section');
+        const title = document.createElement('h2');
+        const kcal = (entry.calories / (entry.defaultServings || 1)).toFixed(0);
+        title.textContent = `${entry.recipe} — ${kcal} kcal per serving`;
+        section.appendChild(title);
+
+        const btn = document.createElement('button');
+        btn.textContent = '⛶ View';
+        btn.style.padding = '6px 12px';
+        btn.style.borderRadius = '6px';
+        btn.style.border = '1px solid #ccc';
+        btn.style.cursor = 'pointer';
+        btn.onclick = () => openFullscreen(entry);
+
+        section.appendChild(btn);
+        container.appendChild(section);
+      });
+    });
+
+
   </script>
 </body>
 
