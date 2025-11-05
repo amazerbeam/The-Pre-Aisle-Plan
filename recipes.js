@@ -1363,64 +1363,10 @@ const recipeData = [
       "Stir in the cornstarch slurry (1 tsp cornstarch mixed with 1 tbsp water). Cook 30 sec until the sauce thickens and coats the beef and vegetables.",
       "Serve hot with 1 cup cooked jasmine rice."
     ]
-  },
+  },  
+
   {
     id: 42,
-    meal: ["dinner"],
-    recipe: "Mild Chicken & Chickpea Tikka Masala",
-    defaultServings: 2,
-    calories: 640, // approx per serving
-    ingredients: [
-      // Protein & legumes
-      N(INGREDIENTS.CHICKEN_BREAST.key, 250, UNIT.GRAM),
-      N(INGREDIENTS.CHICKPEAS.key, 150, UNIT.GRAM), // cooked/drained weight
-      N(INGREDIENTS.PEAS_PETIT_POIS.key, 1, UNIT.CUP), // frozen peas
-
-      // Base sauce vegetables
-      N(INGREDIENTS.ONION.key, 1, UNIT.MEDIUM),
-      N(INGREDIENTS.GARLIC.key, 3, UNIT.CLOVE),
-      N(INGREDIENTS.GINGER.key, 10, UNIT.GRAM),
-
-      // Sauce liquid & dairy
-      N(INGREDIENTS.TOMATO_PASTE.key, 2, UNIT.TABLESPOON),
-      N(INGREDIENTS.STOCK.key, 300, UNIT.MILLILITER),
-      N(INGREDIENTS.GREEK_YOGURT.key, 50, UNIT.GRAM), // helps stop splitting
-      N(INGREDIENTS.CREME_FRAINCHE.key, 0, UNIT.NONE), // unused
-      // Using crème fraîche (not in your INGREDIENTS yet – add if needed)
-      // If added to ingredients.js:
-      // N(INGREDIENTS.CREME_FRAICHE.key, 100, UNIT.GRAM),
-
-      // Fats
-      N(INGREDIENTS.OLIVE_OIL.key, 1.5, UNIT.TABLESPOON),
-
-      // Mild tikka masala spices
-      N(INGREDIENTS.CUMIN.key, 1, UNIT.TEASPOON),
-      N(INGREDIENTS.TURMERIC.key, 0.5, UNIT.TEASPOON),
-      N(INGREDIENTS.SMOKED_PAPRIKA.key, 0.5, UNIT.TEASPOON),
-      N(INGREDIENTS.CINNAMON.key, 0.25, UNIT.TEASPOON),
-      N(INGREDIENTS.SALT.key, 1, UNIT.TEASPOON),
-      N(INGREDIENTS.BLACK_PEPPER.key, 0.25, UNIT.TEASPOON),
-      N(INGREDIENTS.HONEY.key, 0.5, UNIT.TEASPOON) // optional for sweetness
-    ],
-    steps: [
-      "Dice onion, mince garlic, grate the ginger.",
-      "Cube chicken breast into bite-sized pieces and season lightly with salt.",
-      "Heat 1 tbsp olive oil in a pan over medium heat. Add chicken, cook until lightly browned but not fully done. Remove and set aside.",
-      "In the same pan, add remaining 0.5 tbsp olive oil. Add onion and cook 5 minutes until soft.",
-      "Add garlic and ginger, stir for 30 seconds.",
-      "Add turmeric, cumin, smoked paprika, cinnamon. Cook spices for 30 seconds to bloom.",
-      "Add tomato paste and stir for 1 minute.",
-      "Pour in stock, stir well, then add chickpeas. Simmer for 10 minutes on low heat.",
-      "Stir in Greek yogurt to stabilise the sauce.",
-      "Return chicken to the pan. Simmer 5–7 minutes until cooked through.",
-      "Add frozen peas and simmer 3 more minutes.",
-      "Remove from heat and gently stir in crème fraîche (or Greek yogurt if replacing). Adjust salt, pepper, and sweetness with honey if desired.",
-      "Serve with roasted vegetables, cauliflower rice, or a small portion of basmati if calories allow."
-    ]
-  },
-
-  {
-    id: 43,
     meal: ["dinner"],
     recipe: "Mild Chicken & Chickpea Tikka Masala",
     defaultServings: 2,
