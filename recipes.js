@@ -135,6 +135,7 @@ const INGREDIENTS = {
   CARROT: { name: "Carrot", aisle: AISLE.VEG, key: "CARROT" },
   CUCUMBER: { name: "Cucumber", aisle: AISLE.VEG, key: "CUCUMBER" },
   CHERRY_TOMATOES: { name: "Cherry tomatoes", aisle: AISLE.VEG, key: "CHERRY_TOMATOES" },
+  TOMATOE: { name: "Tomatoe", aisle: AISLE.VEG, key: "TOMATOE" },
   SCALLIONS: { name: "Scallions", aisle: AISLE.VEG, key: "SCALLIONS" },
   POTATOES: { name: "Potatoes", aisle: AISLE.VEG, key: "POTATOES" },
   SWEET_POTATO: { name: "Sweet potato", aisle: AISLE.VEG, key: "SWEET_POTATO" },
@@ -1435,7 +1436,7 @@ const recipeData = [
       N(INGREDIENTS.RED_ONION.key, 0.5, UNIT.SMALL),
       N(INGREDIENTS.ONION.key, 0.5, UNIT.SMALL),
       N(INGREDIENTS.RED_BELL_PEPPER.key, 0.5, UNIT.PIECES),
-      N(INGREDIENTS.TINNED_TOMATOES.key, 1, UNIT.MEDIUM),
+      N(INGREDIENTS.TOMATOE.key, 1, UNIT.MEDIUM),
       N(INGREDIENTS.JALAPENOS.key, 0.25, UNIT.PIECES),
 
       // Fresh fillings
