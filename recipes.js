@@ -1370,7 +1370,7 @@ const recipeData = [
     meal: ["dinner"],
     recipe: "Mild Chicken & Chickpea Tikka Masala",
     defaultServings: 2,
-    calories: 640, // approx per serving
+    calories: 592, // approx per serving
     ingredients: [
       // Protein & legumes
       N(INGREDIENTS.CHICKEN_BREAST.key, 250, UNIT.GRAM),
