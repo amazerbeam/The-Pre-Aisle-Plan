@@ -1363,7 +1363,7 @@ const recipeData = [
       "Stir in the cornstarch slurry (1 tsp cornstarch mixed with 1 tbsp water). Cook 30 sec until the sauce thickens and coats the beef and vegetables.",
       "Serve hot with 1 cup cooked jasmine rice."
     ]
-  },  
+  },
 
   {
     id: 42,
@@ -1384,9 +1384,8 @@ const recipeData = [
 
       // Sauce liquid & dairy
       N(INGREDIENTS.TOMATO_PASTE.key, 2, UNIT.TABLESPOON),
-      N(INGREDIENTS.STOCK.key, 300, UNIT.MILLILITER),
-      N(INGREDIENTS.GREEK_YOGURT.key, 50, UNIT.GRAM), // stabilises sauce
-      N(INGREDIENTS.CREME_FRAINCHE.key, 100, UNIT.GRAM), // crème fraîche
+      N(INGREDIENTS.TINNED_TOMATOES.key, 1, UNIT.TIN),
+      N(INGREDIENTS.GREEK_YOGURT.key, 75, UNIT.GRAM), // stabilises sauce
 
       // Fats
       N(INGREDIENTS.OLIVE_OIL.key, 1.5, UNIT.TABLESPOON),
@@ -1403,20 +1402,19 @@ const recipeData = [
 
     ],
     steps: [
-      "Dice onion, mince garlic, and grate ginger.",
-      "Cut chicken into bite-sized pieces and season lightly with salt.",
-      "Heat 1 tbsp olive oil in a pan over medium heat. Add chicken, cook until lightly browned (not fully cooked). Remove and set aside.",
-      "In the same pan, add remaining 0.5 tbsp olive oil. Add onion and cook 5 minutes until softened.",
-      "Add garlic and ginger; cook for 30 seconds.",
-      "Add cumin, turmeric, smoked paprika, and cinnamon. Stir for 30 seconds to release flavour.",
-      "Add tomato paste and cook for 1 minute.",
-      "Pour in stock and stir well. Add chickpeas. Simmer gently for 10 minutes.",
-      "Remove from heat briefly. Stir in Greek yogurt to prevent splitting.",
-      "Return chicken to the pan. Simmer on low heat for 5–7 minutes until chicken is cooked through.",
-      "Add frozen peas and cook for 3 more minutes.",
-      "Turn off heat and gently stir in crème fraîche. Taste and adjust seasoning (salt, pepper, honey).",
+      "Dice the onion, mince the garlic, and grate the ginger.",
+      "Cut chicken into bite-sized pieces and season lightly with salt and pepper.",
+      "Heat olive oil in a pan over medium heat. Add the chicken and onion together. Cook for 5–7 minutes until the onions soften and the chicken is lightly browned.",
+      "Add garlic and ginger. Cook for 30 seconds until fragrant.",
+      "Sprinkle in cumin, turmeric, smoked paprika, and cinnamon. Stir and toast the spices for 30 seconds.",
+      "Add tomato paste and cook for 1 minute to deepen the flavour.",
+      "Pour in the tinned tomatoes. Stir and let the sauce simmer gently for 8–10 minutes until it thickens slightly.",
+      "Add chickpeas and frozen peas. Simmer for another 3 minutes.",
+      "Reduce heat to low. Stir in the Greek yogurt slowly to prevent it from splitting.",
+      "Turn off the heat and add garam masala and honey (optional). Taste and adjust salt, pepper, or sweetness.",
       "Serve with roasted vegetables, cauliflower rice, or a small portion of basmati rice if desired."
     ]
+
   },
 
 
