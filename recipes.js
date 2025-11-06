@@ -1423,7 +1423,7 @@ const recipeData = [
     meal: ["lunch"],
     recipe: "Chicken & Black Bean Burrito",
     defaultServings: 2,
-    calories: 0, // you can fill this later if needed
+    calories: 440, // you can fill this later if needed
     ingredients: [
       // Protein
       N(INGREDIENTS.CHICKEN_BREAST.key, 150, UNIT.GRAM),
