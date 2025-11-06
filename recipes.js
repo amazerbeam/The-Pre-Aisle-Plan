@@ -142,6 +142,8 @@ const INGREDIENTS = {
 
   TOMATO_PASTE: { name: "Tomato paste", aisle: AISLE.TINS_JARS, key: "TOMATO_PASTE" },
   TINNED_TOMATOES: { name: "Tinned tomatoes", aisle: AISLE.TINS_JARS, key: "TINNED_TOMATOES" },
+  BLACK_BEANS: { name: "Black Beans", aisle: AISLE.TINS_JARS, key: "BLACK_BEANS" },
+
   TOMATO_SAUCE: { name: "Tomato sauce", aisle: AISLE.TINS_JARS, key: "TOMATO_SAUCE" },
 
   BASIL: { name: "Basil", aisle: AISLE.HERBS_SPICES, key: "BASIL" },
@@ -1416,58 +1418,58 @@ const recipeData = [
     ]
 
   },
-{
-  id: 43,
-  meal: ["lunch"],
-  recipe: "Chicken & Black Bean Burrito",
-  defaultServings: 2,
-  calories: 0, // you can fill this later if needed
-  ingredients: [
-    // Protein
-    N(INGREDIENTS.CHICKEN_BREAST.key, 150, UNIT.GRAM),
+  {
+    id: 43,
+    meal: ["lunch"],
+    recipe: "Chicken & Black Bean Burrito",
+    defaultServings: 2,
+    calories: 0, // you can fill this later if needed
+    ingredients: [
+      // Protein
+      N(INGREDIENTS.CHICKEN_BREAST.key, 150, UNIT.GRAM),
 
-    // Beans
-    N(INGREDIENTS.BLACK_BEANS.key, 120, UNIT.GRAM),
+      // Beans
+      N(INGREDIENTS.BLACK_BEANS.key, 120, UNIT.GRAM),
 
-    // Vegetables (fried salsa)
-    N(INGREDIENTS.RED_ONION.key, 0.5, UNIT.SMALL),
-    N(INGREDIENTS.ONION.key, 0.5, UNIT.SMALL),
-    N(INGREDIENTS.RED_BELL_PEPPER.key, 0.5, UNIT.PIECES),
-    N(INGREDIENTS.TOMATO.key, 1, UNIT.MEDIUM),
-    N(INGREDIENTS.JALAPENOS.key, 0.25, UNIT.PIECES),
+      // Vegetables (fried salsa)
+      N(INGREDIENTS.RED_ONION.key, 0.5, UNIT.SMALL),
+      N(INGREDIENTS.ONION.key, 0.5, UNIT.SMALL),
+      N(INGREDIENTS.RED_BELL_PEPPER.key, 0.5, UNIT.PIECES),
+      N(INGREDIENTS.TINNED_TOMATOES.key, 1, UNIT.MEDIUM),
+      N(INGREDIENTS.JALAPENOS.key, 0.25, UNIT.PIECES),
 
-    // Fresh fillings
-    N(INGREDIENTS.LETTUCE_LEAVES.key, 2, UNIT.HANDFUL),
-    N(INGREDIENTS.AVOCADO.key, 0.5, UNIT.PIECES),
+      // Fresh fillings
+      N(INGREDIENTS.LETTUCE_LEAVES.key, 2, UNIT.HANDFUL),
+      N(INGREDIENTS.AVOCADO.key, 0.5, UNIT.PIECES),
 
-    // Sauce
-    N(INGREDIENTS.GREEK_YOGURT.key, 2, UNIT.TABLESPOON),
-    N(INGREDIENTS.GARLIC.key, 0.25, UNIT.CLOVE),
-    N(INGREDIENTS.LIME_JUICE.key, 2, UNIT.TEASPOON),
+      // Sauce
+      N(INGREDIENTS.GREEK_YOGURT.key, 2, UNIT.TABLESPOON),
+      N(INGREDIENTS.GARLIC.key, 0.25, UNIT.CLOVE),
+      N(INGREDIENTS.LIME_JUICE.key, 2, UNIT.TEASPOON),
 
-    // Spices / oils / seasoning
-    N(INGREDIENTS.OLIVE_OIL.key, 2, UNIT.TEASPOON),
-    N(INGREDIENTS.SMOKED_PAPRIKA.key, 1, UNIT.TEASPOON),
-    N(INGREDIENTS.CUMIN.key, 1, UNIT.TEASPOON),
-    N(INGREDIENTS.SALT.key, 1, UNIT.TEASPOON),
-    N(INGREDIENTS.BLACK_PEPPER.key, 0.25, UNIT.TEASPOON),
+      // Spices / oils / seasoning
+      N(INGREDIENTS.OLIVE_OIL.key, 2, UNIT.TEASPOON),
+      N(INGREDIENTS.SMOKED_PAPRIKA.key, 1, UNIT.TEASPOON),
+      N(INGREDIENTS.CUMIN.key, 1, UNIT.TEASPOON),
+      N(INGREDIENTS.SALT.key, 1, UNIT.TEASPOON),
+      N(INGREDIENTS.BLACK_PEPPER.key, 0.25, UNIT.TEASPOON),
 
-    // Flatbread (not calculated, but referenced)
-    // Use: 2 × 60 g flatbreads separately
-  ],
-  steps: [
-    "Preheat the George Foreman grill.",
-    "Slice the chicken breast in half, coat with 1 tsp olive oil, smoked paprika, cumin, salt and pepper. Grill 4–6 minutes until cooked. Let rest and slice.",
-    "Mash black beans with 1 tbsp lime juice, 1/4 tsp smoked paprika, 1/4 tsp cumin and a pinch of salt. Set aside.",
-    "Heat 1 tsp olive oil in a pan. Finely chop 1/2 red onion, 1/2 white onion and 1/2 red pepper. Fry on medium heat for 4–5 minutes until soft.",
-    "Remove from heat. Stir in diced tomato, chopped jalapeño, 1 tsp lime juice, a pinch of salt, 1/8 tsp cumin and 1/8 tsp smoked paprika.",
-    "In a small bowl, mix Greek yogurt with 1 tsp lime juice, grated garlic, salt and pepper.",
-    "Slice lettuce and avocado.",
-    "Warm 2 flatbreads (60g each).",
-    "Assemble each wrap: spread mashed beans, add sliced chicken, spoon on warm onion-pepper mix, add lettuce and avocado, drizzle yogurt sauce.",
-    "Fold and serve immediately."
-  ]
-},
+      // Flatbread (not calculated, but referenced)
+      // Use: 2 × 60 g flatbreads separately
+    ],
+    steps: [
+      "Preheat the George Foreman grill.",
+      "Slice the chicken breast in half, coat with 1 tsp olive oil, smoked paprika, cumin, salt and pepper. Grill 4–6 minutes until cooked. Let rest and slice.",
+      "Mash black beans with 1 tbsp lime juice, 1/4 tsp smoked paprika, 1/4 tsp cumin and a pinch of salt. Set aside.",
+      "Heat 1 tsp olive oil in a pan. Finely chop 1/2 red onion, 1/2 white onion and 1/2 red pepper. Fry on medium heat for 4–5 minutes until soft.",
+      "Remove from heat. Stir in diced tomato, chopped jalapeño, 1 tsp lime juice, a pinch of salt, 1/8 tsp cumin and 1/8 tsp smoked paprika.",
+      "In a small bowl, mix Greek yogurt with 1 tsp lime juice, grated garlic, salt and pepper.",
+      "Slice lettuce and avocado.",
+      "Warm 2 flatbreads (60g each).",
+      "Assemble each wrap: spread mashed beans, add sliced chicken, spoon on warm onion-pepper mix, add lettuce and avocado, drizzle yogurt sauce.",
+      "Fold and serve immediately."
+    ]
+  },
 
   {
     id: 44,
