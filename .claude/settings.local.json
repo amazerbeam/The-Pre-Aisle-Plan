@@ -2,7 +2,10 @@
   "permissions": {
     "allow": [
       "Bash(cat:*)",
-      "WebSearch"
+      "WebSearch",
+      "mcp__context7__resolve-library-id",
+      "mcp__context7__get-library-docs",
+      "Bash(dir /s /b \"C:\\Users\\jossd\\Documents\\MyWebSites\\FoodBytes\\agents\\*.md\")"
     ],
     "deny": [],
     "ask": []
