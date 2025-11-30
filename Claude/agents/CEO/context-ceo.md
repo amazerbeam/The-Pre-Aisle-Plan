@@ -1,6 +1,33 @@
 # CEO Orchestrator Context
 > Reference material for ceo-orchestrator-agent
 
+---
+
+## CRITICAL: MVP First
+
+**PRIORITY:** Build the MVP Phase 1 requirements FIRST before any full scope features.
+
+When reading `foodbytes-requirements.md`, you will see:
+1. **MVP Phase 1 section** (at the top) - BUILD THIS FIRST
+2. **Full Scope section** (below) - Build AFTER MVP is complete
+
+**MVP Scope (Build First):**
+- User login (Google OAuth) or continue as guest
+- Browse recipes by meal category (Breakfast, Lunch, Dinner, Snacks)
+- View recipe details and adjust servings
+- Search recipes
+- Footer navigation with "Coming soon" placeholders
+
+**NOT in MVP (Build Later):**
+- Meal planning functionality
+- Shopping list functionality
+- Date range selection
+- Day-of-week assignment buttons
+
+**MVP Database:** Only `users`, `recipes`, `recipe_meals`, `recipe_ingredients`, `recipe_steps` tables.
+
+---
+
 ## Section 1: Agent Registry
 
 ### Specialized Agents
@@ -472,7 +499,7 @@ These rules represent architectural decisions and constraints set by the project
 | SQL Agent | DO NOT store data in JSON format | Java Agent wanting JSON columns |
 | SQL Agent | DO use junction tables for many-to-many | Any agent suggesting embedded arrays |
 | UX Agent | DO NOT use white text on white background | React Agent proposing light theme |
-| UX Agent | DO use brand color #a689c6 | Any agent suggesting different colors |
+| UX Agent | DO use brand color #4a3f80 | Any agent suggesting different colors |
 | UX Agent | DO NOT offer GitHub login | Any agent suggesting multiple OAuth providers |
 | Auth Agent | DO NOT store passwords | Any agent suggesting local auth |
 | Auth Agent | Google OAuth only - no GitHub | Any agent suggesting GitHub login |
@@ -754,7 +781,7 @@ volumes:
 7. **Immutable audit** - Recipe changes logged forever
 8. **Context File DOs are LAW** - Cannot be vetoed by peer review
 9. **No JSON in database** - Use normalized tables with FKs
-10. **Brand color #a689c6** - Consistent throughout UI
+10. **Brand color #4a3f80** - Consistent throughout UI (deep purple)
 11. **All text must be visible** - No white-on-white or low contrast
 
 ### Error Prevention

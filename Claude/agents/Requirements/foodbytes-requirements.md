@@ -15,6 +15,219 @@
 
 ---
 
+# MVP Phase 1: Recipe Viewer with Authentication
+
+> **PRIORITY: Build this first.** Focus only on these requirements before moving to the full scope below.
+
+## MVP Overview
+
+A simplified recipe viewer that allows users to:
+- Sign in with Google or continue as guest
+- Browse recipes by meal category (Breakfast, Lunch, Dinner, Snacks)
+- View recipe details
+
+**NOT included in MVP:**
+- Meal planning functionality
+- Shopping list functionality
+- Date range selection
+- Day-of-week assignment
+
+---
+
+## MVP-FR-001: Sign In / Guest Access
+
+**Priority:** Critical (MVP)
+
+**Description:** Users can access the app by signing in with Google or continuing as a guest
+
+**User Story:** As a user, I want to choose between signing in with Google or browsing as a guest so that I can access recipes quickly.
+
+**Acceptance Criteria:**
+- Sign In button visible in **top right corner** of the header
+- Clicking Sign In shows modal with two options:
+  - **"Sign in with Google"** - Uses official Google branding/button
+  - **"Continue as Guest"** - Allows browsing without authentication
+- Signed-in users see benefits listed:
+  - "More recipes" (future feature)
+  - "Shopping List" (future feature)
+  - "Meal Plans" (future feature)
+- After sign-in, button changes to show user name/avatar with dropdown for logout
+- Guest users can browse all visible recipes
+- Session persists across browser sessions for signed-in users
+
+**UI Reference:** Keep the UI style from `/Legacy/index.html`
+
+---
+
+## MVP-FR-002: Browse Recipes by Meal Category
+
+**Priority:** Critical (MVP)
+
+**Description:** Users can browse recipes filtered by meal type using tab navigation
+
+**User Story:** As a user, I want to browse recipes by meal category so that I can find appropriate recipes for each meal.
+
+**Acceptance Criteria:**
+- **Four tab buttons:** [Breakfast] [Lunch] [Dinner] [Snacks]
+- **Breakfast loads by default** on page load
+- Clicking a tab filters and displays only recipes belonging to that meal type
+- Active tab is visually distinguished (uses brand color `#4a3f80`)
+- Each recipe card displays:
+  - Recipe name
+  - Calories per serving
+  - Servings control (adjustable)
+  - "Show Details" button (expandable)
+- **NO day-of-week buttons** (removed for MVP)
+- **NO meal plan assignment** (removed for MVP)
+
+**UI Reference:** Keep the UI style from `/Legacy/index.html`
+
+---
+
+## MVP-FR-003: View Recipe Details
+
+**Priority:** Critical (MVP)
+
+**Description:** Users can expand recipe cards to view ingredients and cooking steps
+
+**User Story:** As a user, I want to view complete recipe details so that I can prepare the meal.
+
+**Acceptance Criteria:**
+- Each recipe card has a collapsible details section
+- Details section shows:
+  - Complete ingredients list with quantities and units
+  - Numbered cooking steps
+- Toggle button switches between "Show Details" and "Hide Details"
+- Ingredient quantities scale based on current serving size
+
+---
+
+## MVP-FR-004: Adjust Serving Sizes
+
+**Priority:** High (MVP)
+
+**Description:** Users can adjust servings and see ingredient quantities recalculate
+
+**User Story:** As a user, I want to adjust serving size so that ingredient quantities scale automatically.
+
+**Acceptance Criteria:**
+- Each recipe displays a servings input control
+- Default value is 1 serving (or recipe's default)
+- Changing servings recalculates all ingredient quantities
+- Calorie display updates based on serving adjustment
+
+---
+
+## MVP-FR-005: Search Recipes
+
+**Priority:** Medium (MVP)
+
+**Description:** Users can search recipes by name
+
+**User Story:** As a user, I want to search recipes by name so that I can quickly find specific recipes.
+
+**Acceptance Criteria:**
+- Search bar accessible from bottom navigation (Search icon)
+- Search filters recipes case-insensitively by name
+- Results update as user types
+- "No recipes found" message when no results
+- Clearing search returns to previous meal category view
+
+---
+
+## MVP-FR-006: Footer Navigation
+
+**Priority:** High (MVP)
+
+**Description:** Bottom navigation with key actions
+
+**User Story:** As a user, I want easy access to main functions from the bottom of the screen.
+
+**Acceptance Criteria:**
+- Fixed footer at bottom with three buttons:
+  - **[Meal Plan]** - Shows message "Coming soon - Sign in to unlock!"
+  - **[Search]** - Opens search bar
+  - **[Shopping]** - Shows message "Coming soon - Sign in to unlock!"
+- For signed-in users, "Coming soon" buttons show "Feature coming soon!" instead
+- Uses brand color `#4a3f80` for active/highlighted elements
+
+---
+
+## MVP Database: Users Table
+
+**Priority:** Critical (MVP)
+
+**Description:** Store user accounts from Google OAuth
+
+**Table: `users`**
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | INT | PK, AUTO_INCREMENT | Unique user ID |
+| email | VARCHAR(255) | UNIQUE, NOT NULL | Email from Google |
+| name | VARCHAR(255) | NOT NULL | Display name from Google |
+| google_id | VARCHAR(255) | UNIQUE, NOT NULL | Google OAuth ID |
+| avatar_url | VARCHAR(500) | NULLABLE | Profile picture URL |
+| is_admin | BOOLEAN | DEFAULT FALSE | Admin flag for future use |
+| created_at | DATETIME | NOT NULL | Account creation time |
+| last_login | DATETIME | NULLABLE | Most recent login |
+
+---
+
+## MVP Database: Recipes Table
+
+**Priority:** Critical (MVP)
+
+**Description:** Store recipe data (migrated from recipes.js)
+
+**Table: `recipes`**
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | INT | PK, AUTO_INCREMENT | Unique recipe ID |
+| name | VARCHAR(255) | NOT NULL | Recipe name |
+| default_servings | INT | NOT NULL, DEFAULT 2 | Base serving count |
+| calories | INT | NOT NULL | Total calories for default servings |
+| is_cheat | BOOLEAN | DEFAULT FALSE | Cheat meal flag |
+| is_live | BOOLEAN | DEFAULT TRUE | Visibility flag |
+| created_at | DATETIME | NOT NULL | Creation time |
+| updated_at | DATETIME | NOT NULL | Last update time |
+
+**Table: `recipe_meals`** (junction table)
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| recipe_id | INT | FK → recipes.id | Recipe reference |
+| meal_type | ENUM | 'breakfast','lunch','dinner','snacks' | Meal category |
+
+**Table: `recipe_ingredients`**
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | INT | PK, AUTO_INCREMENT | Unique ID |
+| recipe_id | INT | FK → recipes.id | Recipe reference |
+| name | VARCHAR(255) | NOT NULL | Ingredient name |
+| quantity | DECIMAL(10,2) | NOT NULL | Amount |
+| unit | VARCHAR(50) | NOT NULL | Measurement unit |
+| sort_order | INT | NOT NULL | Display order |
+
+**Table: `recipe_steps`**
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | INT | PK, AUTO_INCREMENT | Unique ID |
+| recipe_id | INT | FK → recipes.id | Recipe reference |
+| step_number | INT | NOT NULL | Step order |
+| instruction | TEXT | NOT NULL | Step text |
+
+---
+
+# Full Scope (Future Phases)
+
+> The requirements below represent the full vision. Implement these AFTER MVP is complete.
+
+---
+
 # Functional Requirements
 
 ## Global Date Range

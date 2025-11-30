@@ -14,7 +14,9 @@
       "Bash(tree:*)",
       "Bash(mvn clean compile:*)",
       "Bash(where:*)",
-      "Bash(git -C \"C:\\Users\\jossd\\Documents\\MyWebSites\\FoodBytes\\client\" status --short)"
+      "Bash(git -C \"C:\\Users\\jossd\\Documents\\MyWebSites\\FoodBytes\\client\" status --short)",
+      "Bash(copy:*)",
+      "Bash(findstr:*)"
     ],
     "deny": [],
     "ask": []

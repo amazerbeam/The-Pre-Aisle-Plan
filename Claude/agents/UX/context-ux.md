@@ -5,7 +5,7 @@
 
 **Website Name:** The Pre-Aisle Plan
 
-**Brand Color:** `#a689c6` (lavender purple)
+**Brand Color:** `#4a3f80` (deep purple)
 
 ## DO / DO NOT
 
@@ -21,7 +21,7 @@
 - DO ensure all text is visible and readable
 - DO maintain WCAG 2.1 AA contrast ratios (4.5:1 minimum for text)
 - DO test text visibility on all background colors
-- DO use the brand color `#a689c6` consistently
+- DO use the brand color `#4a3f80` consistently
 - DO use dark text on light backgrounds OR light text on dark backgrounds
 - DO use the **official Google Sign-In button** with Google's branding guidelines
 
@@ -378,9 +378,9 @@ Use the official Google "G" logo SVG or the hosted image from Google's CDN.
 ```css
 :root {
   /* Primary Brand Color */
-  --brand-primary: #a689c6;        /* Lavender purple */
-  --brand-primary-dark: #8a6db0;   /* Darker shade for hover states */
-  --brand-primary-light: #c4b0d9;  /* Lighter shade for backgrounds */
+  --brand-primary: #4a3f80;        /* Deep purple */
+  --brand-primary-dark: #3a3266;   /* Darker shade for hover states */
+  --brand-primary-light: #6b5fa0;  /* Lighter shade for backgrounds */
 
   /* Text Colors - MUST be readable */
   --text-primary: #2c3e50;         /* Dark gray - use on light backgrounds */
@@ -409,7 +409,7 @@ Use the official Google "G" logo SVG or the hosted image from Google's CDN.
 |------------|------------|-------------|
 | White (`#ffffff`) | Dark (`#2c3e50`) | Main content |
 | Light gray (`#f8f9fa`) | Dark (`#2c3e50`) | Cards, sections |
-| Brand (`#a689c6`) | White (`#ffffff`) | Buttons, headers |
+| Brand (`#4a3f80`) | White (`#ffffff`) | Buttons, headers |
 | Dark (`#2c3e50`) | Light (`#f5f5f5`) | Footer, dark mode |
 
 **NEVER DO:**
