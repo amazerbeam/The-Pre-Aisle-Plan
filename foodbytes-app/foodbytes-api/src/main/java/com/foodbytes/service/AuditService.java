@@ -71,18 +71,18 @@ public class AuditService {
                 .collect(Collectors.toList());
     }
 
-    private RecipeAuditLogDTO convertToDTO(RecipeAuditLog log) {
+    private RecipeAuditLogDTO convertToDTO(RecipeAuditLog auditLog) {
         try {
             return RecipeAuditLogDTO.builder()
-                    .id(log.getId())
-                    .recipeId(log.getRecipe().getId())
-                    .recipeName(log.getRecipe().getName())
-                    .userId(log.getUser().getId())
-                    .userName(log.getUser().getName())
-                    .action(log.getAction())
-                    .oldValues(log.getOldValues() != null ? objectMapper.readTree(log.getOldValues()) : null)
-                    .newValues(log.getNewValues() != null ? objectMapper.readTree(log.getNewValues()) : null)
-                    .timestamp(log.getTimestamp())
+                    .id(auditLog.getId())
+                    .recipeId(auditLog.getRecipe().getId())
+                    .recipeName(auditLog.getRecipe().getName())
+                    .userId(auditLog.getUser().getId())
+                    .userName(auditLog.getUser().getName())
+                    .action(auditLog.getAction())
+                    .oldValues(auditLog.getOldValues() != null ? objectMapper.readTree(auditLog.getOldValues()) : null)
+                    .newValues(auditLog.getNewValues() != null ? objectMapper.readTree(auditLog.getNewValues()) : null)
+                    .timestamp(auditLog.getTimestamp())
                     .build();
         } catch (JsonProcessingException e) {
             log.error("Error converting audit log to DTO", e);

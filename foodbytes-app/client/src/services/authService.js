@@ -19,7 +19,8 @@ const authService = {
    * @param {string} provider - 'google' or 'github'
    */
   login(provider) {
-    window.location.href = `/api/auth/${provider}`;
+    // Spring Security OAuth2 uses /oauth2/authorization/{provider}
+    window.location.href = `/oauth2/authorization/${provider}`;
   },
 
   /**

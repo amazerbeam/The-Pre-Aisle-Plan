@@ -21,7 +21,7 @@ CREATE TABLE `users` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `email` VARCHAR(255) NOT NULL,
   `name` VARCHAR(255) NOT NULL,
-  `oauth_provider` ENUM('google', 'github') NOT NULL,
+  `oauth_provider` ENUM('GOOGLE', 'GITHUB') NOT NULL,
   `oauth_id` VARCHAR(255) NOT NULL,
   `is_admin` BOOLEAN NOT NULL DEFAULT FALSE,
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
