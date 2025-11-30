@@ -16,7 +16,8 @@
       "Bash(where:*)",
       "Bash(git -C \"C:\\Users\\jossd\\Documents\\MyWebSites\\FoodBytes\\client\" status --short)",
       "Bash(copy:*)",
-      "Bash(findstr:*)"
+      "Bash(findstr:*)",
+      "Bash(docker-compose restart:*)"
     ],
     "deny": [],
     "ask": []
