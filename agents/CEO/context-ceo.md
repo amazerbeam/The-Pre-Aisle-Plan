@@ -401,6 +401,88 @@ Examples:
 - But NO VETO power - majority still rules
 - Rejections from domain experts should be taken more seriously
 
+### Context File DO/DO NOT Rules - NON-NEGOTIABLE
+
+**CRITICAL: The DO and DO NOT rules in each agent's context file are NON-NEGOTIABLE and cannot be overridden by peer review votes.**
+
+These rules represent architectural decisions and constraints set by the project owner. No agent can veto or override another agent's context file rules through the peer review process.
+
+#### Rule Hierarchy
+```
+1. Context File DOs/DO NOTs  ← HIGHEST PRIORITY (cannot be vetoed)
+2. Requirements Document
+3. Peer Review Decisions
+4. Agent Suggestions
+```
+
+#### Examples of Non-Negotiable Rules
+
+| Agent | Context File Rule | Cannot Be Vetoed By |
+|-------|-------------------|---------------------|
+| SQL Agent | DO NOT store data in JSON format | Java Agent wanting JSON columns |
+| SQL Agent | DO use junction tables for many-to-many | Any agent suggesting embedded arrays |
+| UX Agent | DO NOT use white text on white background | React Agent proposing light theme |
+| UX Agent | DO use brand color #a689c6 | Any agent suggesting different colors |
+| Auth Agent | DO NOT store passwords | Any agent suggesting local auth |
+
+#### Conflict Resolution Process
+
+When an agent's design conflicts with another agent's context file rules:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│              CONTEXT FILE CONFLICT RESOLUTION               │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  1. DETECT CONFLICT                                         │
+│     └── Reviewer identifies design violates a context       │
+│         file DO/DO NOT rule                                 │
+│                                                             │
+│  2. CANNOT VETO THE RULE                                    │
+│     └── The reviewer CANNOT vote to override the rule       │
+│     └── The rule stands as written                          │
+│                                                             │
+│  3. FIND WORKAROUND                                         │
+│     └── The submitting agent MUST revise their design       │
+│         to comply with all context file rules               │
+│                                                             │
+│  4. IF NO WORKAROUND EXISTS                                 │
+│     └── ESCALATE TO USER                                    │
+│     └── CEO asks user to resolve the conflict               │
+│     └── User decides which rule takes precedence            │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+#### Example Conflict Scenario
+
+**Scenario**: Java Agent proposes storing recipe ingredients as a JSON column for simplicity.
+
+```
+SQL Agent Context Rule: "DO NOT store data in JSON format"
+
+Java Agent Proposal:
+  @Column(columnDefinition = "JSON")
+  private String ingredients;  // Store as JSON string
+
+RESOLUTION:
+  ✗ Java Agent CANNOT override SQL Agent's context rule
+  ✓ Java Agent MUST use normalized tables with FK relationships
+  ✓ Java Agent creates RecipeIngredient entity with @ManyToOne to Recipe
+```
+
+**If truly irreconcilable**: CEO escalates to user with:
+```
+CONFLICT DETECTED:
+- SQL Context: "DO NOT store data in JSON format"
+- Java Agent needs: [specific requirement]
+
+Please decide:
+1. Enforce SQL rule (Java must use normalized tables)
+2. Grant exception for this specific case
+3. Modify the context rule
+```
+
 ---
 
 ## Section 7: Docker Completion Criteria
@@ -617,9 +699,15 @@ volumes:
 4. **Mobile-first CSS** - Responsive design, not native components
 5. **6-month retention** - Rolling data retention for meal plans
 6. **Immutable audit** - Recipe changes logged forever
+7. **Context File DOs are LAW** - Cannot be vetoed by peer review
+8. **No JSON in database** - Use normalized tables with FKs
+9. **Brand color #a689c6** - Consistent throughout UI
+10. **All text must be visible** - No white-on-white or low contrast
 
 ### Error Prevention
 - Always read context files before invoking agents
 - Always log rejections even if design is approved
 - Always verify Docker health checks before declaring complete
 - Always test on mobile viewport before UX sign-off
+- **Always check for context file DO/DO NOT conflicts before approving designs**
+- **Always escalate unresolvable conflicts to user - never override context rules**
