@@ -10,7 +10,11 @@
       "Bash(curl:*)",
       "Bash(powershell:*)",
       "Bash(dir /s \"C:\\Users\\jossd\\Documents\\MyWebSites\\FoodBytes\\Legacy\")",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(tree:*)",
+      "Bash(mvn clean compile:*)",
+      "Bash(where:*)",
+      "Bash(git -C \"C:\\Users\\jossd\\Documents\\MyWebSites\\FoodBytes\\client\" status --short)"
     ],
     "deny": [],
     "ask": []

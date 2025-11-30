@@ -1,0 +1,84 @@
+:root {
+  /* Brand Color */
+  --color-primary: #a689c6;
+  --color-primary-dark: #8c6baa;
+  --color-primary-light: #c4b0dc;
+
+  /* Text Colors - MUST be readable */
+  --color-text-primary: #2c3e50;
+  --color-text-secondary: #5a6c7d;
+  --color-text-light: #95a5a6;
+  --color-text-white: #ffffff;
+  --color-text-on-primary: #ffffff;
+  --color-text-on-dark: #f5f5f5;
+
+  /* Background Colors */
+  --color-bg-primary: #ffffff;
+  --color-bg-secondary: #f8f9fa;
+  --color-bg-tertiary: #ecf0f1;
+  --color-bg-dark: #2c3e50;
+  --color-bg-overlay: rgba(0, 0, 0, 0.5);
+
+  /* Border Colors */
+  --color-border: #dee2e6;
+  --color-border-light: #e9ecef;
+
+  /* Status Colors */
+  --color-success: #27ae60;
+  --color-error: #e74c3c;
+  --color-warning: #f39c12;
+  --color-info: #3498db;
+
+  /* 17 Aisle Colors - Matching backend grocery aisles
+   * Backend uses aisle.key field (e.g., "meat", "dairy")
+   * Components reference as: var(--aisle-{key})
+   * Colors from context-ux.md */
+  --aisle-meat: #e74c3c;
+  --aisle-poultry: #e74c3c;
+  --aisle-veg: #27ae60;
+  --aisle-fruit: #27ae60;
+  --aisle-fish: #3498db;
+  --aisle-dairy: #3498db;
+  --aisle-frozen: #9b59b6;
+  --aisle-herbs: #c0392b;
+  --aisle-oils: #16a085;
+  --aisle-tins: #7f8c8d;
+  --aisle-grains: #d35400;
+  --aisle-condiments: #f1c40f;
+  --aisle-bakery: #f39c12;
+  --aisle-nuts: #95a5a6;
+  --aisle-seeds: #95a5a6;
+  --aisle-beverages: #1abc9c;
+  --aisle-misc: #bdc3c7;
+
+  /* Spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+
+  /* Border Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-normal: 300ms ease;
+
+  /* Touch Targets */
+  --touch-target-min: 44px;
+
+  /* Z-Index */
+  --z-modal: 1000;
+  --z-toast: 1100;
+  --z-header: 100;
+  --z-footer: 100;
+}
