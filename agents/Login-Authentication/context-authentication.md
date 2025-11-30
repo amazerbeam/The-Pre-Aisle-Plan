@@ -232,16 +232,41 @@ export default ProtectedRoute;
 ### Users Table
 ```sql
 CREATE TABLE users (
-  id INT AUTO_INCREMENT PRIMARY KEY,
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   email VARCHAR(255) UNIQUE NOT NULL,
   name VARCHAR(255) NOT NULL,
-  oauth_provider ENUM('google', 'github') NOT NULL,
+  oauth_provider ENUM('GOOGLE', 'GITHUB') NOT NULL,  -- MUST be uppercase to match Java enum
   oauth_id VARCHAR(255) NOT NULL,
   is_admin BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   last_login TIMESTAMP NULL,
   UNIQUE KEY unique_oauth (oauth_provider, oauth_id)
 );
+```
+
+### CRITICAL: ENUM Case Sensitivity
+The MySQL `oauth_provider` ENUM values **MUST** be uppercase (`'GOOGLE'`, `'GITHUB'`) to match the Java enum:
+
+```java
+// OAuthProvider.java
+public enum OAuthProvider {
+    GOOGLE,
+    GITHUB
+}
+```
+
+When Hibernate reads from the database with `@Enumerated(EnumType.STRING)`, it calls `OAuthProvider.valueOf(dbValue)`. If the database contains `'google'` but the enum is `GOOGLE`, you'll get:
+```
+No enum constant com.foodbytes.model.OAuthProvider.google
+```
+
+**Fix**: Ensure schema.sql and seed.sql use uppercase values:
+```sql
+-- schema.sql
+oauth_provider ENUM('GOOGLE', 'GITHUB') NOT NULL
+
+-- seed.sql (when inserting users)
+INSERT INTO users (..., oauth_provider, ...) VALUES (..., 'GOOGLE', ...);
 ```
 
 ## Security Requirements
@@ -267,7 +292,80 @@ JWT_EXPIRATION=7d
 FRONTEND_URL=http://localhost:3000
 ```
 
+## Docker/Nginx Proxy Configuration
+
+When running in Docker with nginx as a reverse proxy, OAuth redirects require special configuration to ensure the correct host and port are used in redirect URLs.
+
+### Problem
+The backend runs on port 8080 internally, but users access the app via nginx on port 3000. Without proper configuration, OAuth redirects will use `localhost:8080` instead of `localhost:3000`, causing `ERR_CONNECTION_REFUSED` errors.
+
+### Solution: Forward Headers Strategy
+
+#### 1. Spring Boot Configuration (application.yml)
+```yaml
+server:
+  port: ${SERVER_PORT:8080}
+  servlet:
+    context-path: /
+  forward-headers-strategy: framework  # REQUIRED for proxy setups
+```
+
+The `forward-headers-strategy: framework` tells Spring Boot to trust and use `X-Forwarded-*` headers from the proxy when constructing redirect URLs.
+
+#### 2. Nginx Configuration (nginx.conf)
+```nginx
+# OAuth2 authorization endpoint
+location /oauth2/ {
+    proxy_pass http://backend:8080/oauth2/;
+    proxy_http_version 1.1;
+    proxy_set_header Host $host:3000;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header X-Forwarded-Host $host:3000;
+    proxy_set_header X-Forwarded-Port 3000;
+}
+
+# OAuth2 login callback
+location /login/oauth2/ {
+    proxy_pass http://backend:8080/login/oauth2/;
+    proxy_http_version 1.1;
+    proxy_set_header Host $host:3000;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header X-Forwarded-Host $host:3000;
+    proxy_set_header X-Forwarded-Port 3000;
+}
+```
+
+**Key headers explained:**
+- `Host $host:3000` - Sets the Host header to include the frontend port
+- `X-Forwarded-Host $host:3000` - Tells Spring the original host requested
+- `X-Forwarded-Port 3000` - Tells Spring the original port requested
+- `X-Forwarded-Proto $scheme` - Preserves HTTP/HTTPS protocol
+
+#### 3. Google Cloud Console Configuration
+In the Google Cloud Console (APIs & Services > Credentials > OAuth 2.0 Client IDs), the **Authorized redirect URIs** must use the frontend port:
+
+```
+http://localhost:3000/login/oauth2/code/google
+```
+
+**NOT** `http://localhost:8080/login/oauth2/code/google`
+
+### Troubleshooting OAuth in Docker
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| `ERR_CONNECTION_REFUSED` after Google login | Redirect URL using wrong port (8080 vs 3000) | Add `forward-headers-strategy: framework` and configure nginx headers |
+| `No enum constant OAuthProvider.google` | MySQL ENUM lowercase, Java enum uppercase | Change ENUM to `'GOOGLE'`, `'GITHUB'` in schema.sql |
+| `redirect_uri_mismatch` from Google | Google Console URI doesn't match actual redirect | Update Google Console to use `http://localhost:3000/login/oauth2/code/google` |
+| OAuth works locally but not in Docker | Missing proxy headers | Ensure nginx passes all `X-Forwarded-*` headers |
+
 ## Testing Checklist
+
+### Core OAuth Flow
 - [ ] Google OAuth flow completes successfully
 - [ ] GitHub OAuth flow completes successfully
 - [ ] New user created on first login
@@ -279,3 +377,11 @@ FRONTEND_URL=http://localhost:3000
 - [ ] Admin routes reject non-admin users
 - [ ] Logout clears the httpOnly cookie
 - [ ] Token expiration handled gracefully (redirect to login)
+
+### Docker/Proxy Testing
+- [ ] OAuth redirects use correct port (3000, not 8080)
+- [ ] Google OAuth works when accessed via nginx proxy
+- [ ] GitHub OAuth works when accessed via nginx proxy
+- [ ] User record created with uppercase provider (GOOGLE/GITHUB)
+- [ ] No `ERR_CONNECTION_REFUSED` errors during OAuth flow
+- [ ] No `No enum constant` errors after OAuth callback

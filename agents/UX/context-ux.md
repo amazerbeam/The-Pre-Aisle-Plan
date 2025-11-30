@@ -1,6 +1,27 @@
 # UX Design Context
 > Reference material for ux-design-agent
 
+## Branding
+
+**Website Name:** The Pre-Aisle Plan
+
+**Brand Color:** `#a689c6` (lavender purple)
+
+## DO / DO NOT
+
+### DO NOT
+- Do NOT use white text on a white background
+- Do NOT use light text on light backgrounds
+- Do NOT create text that is hard to read or invisible
+- Do NOT ignore contrast requirements
+
+### DO
+- DO ensure all text is visible and readable
+- DO maintain WCAG 2.1 AA contrast ratios (4.5:1 minimum for text)
+- DO test text visibility on all background colors
+- DO use the brand color `#a689c6` consistently
+- DO use dark text on light backgrounds OR light text on dark backgrounds
+
 ## Design Principles
 
 ### 1. Mobile-First
@@ -132,7 +153,7 @@ Audit log entry created automatically
 ### Mobile Layout (< 480px)
 ```
 +---------------------------+
-| FoodBytes           [=]   |  <- Header (hamburger menu)
+| The Pre-Aisle Plan  [=]   |  <- Header (hamburger menu)
 +---------------------------+
 |                           |
 | +----------------------+  |
@@ -156,7 +177,7 @@ Audit log entry created automatically
 ### Tablet Layout (480px - 768px)
 ```
 +---------------------------------------+
-| FoodBytes  [Breakfast][Lunch][Dinner] |  <- Header with tabs
+| Pre-Aisle [Breakfast][Lunch][Dinner]  |  <- Header with tabs
 +---------------------------------------+
 |                                       |
 | +----------------+ +----------------+ |
@@ -177,7 +198,7 @@ Audit log entry created automatically
 ### Desktop Layout (> 1024px)
 ```
 +----------------------------------------------------------+
-| FoodBytes     [Breakfast] [Lunch] [Dinner] [Snacks]  [=] |
+| The Pre-Aisle Plan  [Breakfast] [Lunch] [Dinner] [Snacks]|
 +----------------------------------------------------------+
 |                                         |                 |
 | +------------+ +------------+ +-------+ | Calendar        |
@@ -293,6 +314,57 @@ Legend:
 - Desktop: Top navigation + sidebar
 - Back button always visible in modals
 
+## Color System
+
+### Brand Colors
+```css
+:root {
+  /* Primary Brand Color */
+  --brand-primary: #a689c6;        /* Lavender purple */
+  --brand-primary-dark: #8a6db0;   /* Darker shade for hover states */
+  --brand-primary-light: #c4b0d9;  /* Lighter shade for backgrounds */
+
+  /* Text Colors - MUST be readable */
+  --text-primary: #2c3e50;         /* Dark gray - use on light backgrounds */
+  --text-secondary: #5a6c7d;       /* Medium gray - secondary text */
+  --text-on-brand: #ffffff;        /* White - ONLY on brand color backgrounds */
+  --text-on-dark: #f5f5f5;         /* Light - use on dark backgrounds */
+
+  /* Background Colors */
+  --bg-primary: #ffffff;           /* White */
+  --bg-secondary: #f8f9fa;         /* Light gray */
+  --bg-dark: #2c3e50;              /* Dark */
+
+  /* Status Colors */
+  --success: #27ae60;
+  --warning: #f39c12;
+  --error: #e74c3c;
+  --info: #3498db;
+}
+```
+
+### Text Visibility Rules
+
+**CRITICAL: All text must be visible and readable.**
+
+| Background | Text Color | Example Use |
+|------------|------------|-------------|
+| White (`#ffffff`) | Dark (`#2c3e50`) | Main content |
+| Light gray (`#f8f9fa`) | Dark (`#2c3e50`) | Cards, sections |
+| Brand (`#a689c6`) | White (`#ffffff`) | Buttons, headers |
+| Dark (`#2c3e50`) | Light (`#f5f5f5`) | Footer, dark mode |
+
+**NEVER DO:**
+- White text on white background
+- Light gray text on white background
+- Dark text on dark background
+- Brand color text on brand color background
+
+**Contrast Requirements:**
+- Normal text: minimum 4.5:1 contrast ratio
+- Large text (18px+ bold or 24px+): minimum 3:1 contrast ratio
+- Use tools like WebAIM Contrast Checker to verify
+
 ## Aisle Color Coding
 ```css
 :root {
@@ -315,6 +387,8 @@ Legend:
   --aisle-other: #bdc3c7;
 }
 ```
+
+**Aisle Label Text:** Always use dark text (`#2c3e50`) on aisle color backgrounds for readability, except for dark aisles (international, spices) which should use light text.
 
 ## Accessibility Checklist
 - [ ] All images have alt text

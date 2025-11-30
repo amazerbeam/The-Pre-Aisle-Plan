@@ -1,8 +1,17 @@
--- FoodBytes Database Seed Data
--- Populates initial lookup tables and sample data
+-- FoodBytes Database Seed Data (Normalized)
+-- Populates lookup tables and sample data
 
 SET NAMES utf8mb4;
 SET CHARACTER SET utf8mb4;
+
+-- ===========================
+-- SEED MEALS (4 meal types)
+-- ===========================
+INSERT INTO `meals` (`key`, `name`, `display_order`) VALUES
+('BREAKFAST', 'Breakfast', 1),
+('LUNCH', 'Lunch', 2),
+('DINNER', 'Dinner', 3),
+('SNACKS', 'Snacks', 4);
 
 -- ===========================
 -- SEED AISLES (17 total)
@@ -71,10 +80,8 @@ INSERT INTO `units` (`key`, `value`) VALUES
 ('NONE', '');
 
 -- ===========================
--- SEED SAMPLE INGREDIENTS (50 common items)
--- ===========================
-
 -- Get aisle IDs for reference
+-- ===========================
 SET @aisle_meat = (SELECT id FROM aisles WHERE `key` = 'MEAT');
 SET @aisle_poultry = (SELECT id FROM aisles WHERE `key` = 'POULTRY');
 SET @aisle_veg = (SELECT id FROM aisles WHERE `key` = 'VEG');
@@ -93,6 +100,9 @@ SET @aisle_seeds = (SELECT id FROM aisles WHERE `key` = 'SEEDS');
 SET @aisle_beverages = (SELECT id FROM aisles WHERE `key` = 'BEVERAGES');
 SET @aisle_misc = (SELECT id FROM aisles WHERE `key` = 'MISC');
 
+-- ===========================
+-- SEED INGREDIENTS (Common items)
+-- ===========================
 INSERT INTO `ingredients` (`key`, `name`, `aisle_id`) VALUES
 -- Grains & Bakery
 ('ROLLED_OATS', 'Rolled oats', @aisle_grains),
@@ -123,11 +133,13 @@ INSERT INTO `ingredients` (`key`, `name`, `aisle_id`) VALUES
 ('CHICKEN_BREAST', 'Chicken breast', @aisle_poultry),
 ('BACON', 'Bacon', @aisle_meat),
 ('SAUSAGE', 'Sausage', @aisle_meat),
+('TURKEY_MINCE', 'Turkey mince', @aisle_poultry),
 
 -- Fish
 ('SALMON', 'Salmon', @aisle_fish),
 ('COD', 'Cod', @aisle_fish),
 ('PRAWNS', 'Prawns', @aisle_fish),
+('WHITE_FISH', 'White fish', @aisle_fish),
 
 -- Vegetables
 ('ONION', 'Onion', @aisle_veg),
@@ -140,12 +152,19 @@ INSERT INTO `ingredients` (`key`, `name`, `aisle_id`) VALUES
 ('MUSHROOM', 'Mushroom', @aisle_veg),
 ('POTATO', 'Potato', @aisle_veg),
 ('SWEET_POTATO', 'Sweet potato', @aisle_veg),
+('CUCUMBER', 'Cucumber', @aisle_veg),
+('LETTUCE', 'Lettuce', @aisle_veg),
+('CELERY', 'Celery', @aisle_veg),
+('PAK_CHOI', 'Pak choi', @aisle_veg),
+('CHERRY_TOMATOES', 'Cherry tomatoes', @aisle_veg),
+('AVOCADO', 'Avocado', @aisle_veg),
 
 -- Fruits
 ('BANANA', 'Banana', @aisle_fruit),
 ('APPLE', 'Apple', @aisle_fruit),
 ('LEMON', 'Lemon', @aisle_fruit),
 ('BLUEBERRY', 'Blueberry', @aisle_fruit),
+('MIXED_BERRIES', 'Mixed berries', @aisle_fruit),
 
 -- Herbs & Spices
 ('SALT', 'Salt', @aisle_herbs),
@@ -154,12 +173,36 @@ INSERT INTO `ingredients` (`key`, `name`, `aisle_id`) VALUES
 ('CUMIN', 'Cumin', @aisle_herbs),
 ('BASIL', 'Basil', @aisle_herbs),
 ('OREGANO', 'Oregano', @aisle_herbs),
+('GINGER', 'Ginger', @aisle_herbs),
+('TURMERIC', 'Turmeric', @aisle_herbs),
+('CINNAMON', 'Cinnamon', @aisle_herbs),
+('SMOKED_PAPRIKA', 'Smoked paprika', @aisle_herbs),
+('CHILI_FLAKES', 'Chili flakes', @aisle_herbs),
 
 -- Oils & Condiments
 ('OLIVE_OIL', 'Olive oil', @aisle_oils),
 ('VEGETABLE_OIL', 'Vegetable oil', @aisle_oils),
 ('SOY_SAUCE', 'Soy sauce', @aisle_condiments),
-('HONEY', 'Honey', @aisle_condiments);
+('HONEY', 'Honey', @aisle_condiments),
+('TOMATO_PASTE', 'Tomato paste', @aisle_condiments),
+
+-- Nuts & Seeds
+('ALMONDS', 'Almonds', @aisle_nuts),
+('CASHEWS', 'Cashews', @aisle_nuts),
+('WALNUTS', 'Walnuts', @aisle_nuts),
+('PEANUT_BUTTER', 'Peanut butter', @aisle_nuts),
+('CHIA_SEEDS', 'Chia seeds', @aisle_seeds),
+
+-- Tins & Jars
+('CHICKPEAS', 'Chickpeas', @aisle_tins),
+('TINNED_TOMATOES', 'Tinned tomatoes', @aisle_tins),
+('BROWN_LENTILS', 'Brown lentils', @aisle_tins),
+('BLACK_BEANS', 'Black beans', @aisle_tins),
+
+-- Other
+('FIRM_TOFU', 'Firm tofu', @aisle_misc),
+('VANILLA_EXTRACT', 'Vanilla extract', @aisle_misc),
+('STOCK', 'Stock', @aisle_misc);
 
 -- ===========================
 -- SEED SAMPLE ADMIN USER
@@ -167,211 +210,140 @@ INSERT INTO `ingredients` (`key`, `name`, `aisle_id`) VALUES
 INSERT INTO `users` (`email`, `name`, `oauth_provider`, `oauth_id`, `is_admin`, `created_at`, `last_login`) VALUES
 ('admin@foodbytes.app', 'Admin User', 'GOOGLE', 'admin-test-oauth-id-12345', TRUE, NOW(), NOW());
 
--- Get admin user ID for sample data
+-- Get admin user ID
 SET @admin_user_id = LAST_INSERT_ID();
 
 -- ===========================
--- SEED SAMPLE RECIPES (3 simple examples)
+-- Get unit IDs for reference
 -- ===========================
-
--- Recipe 1: Greek Yogurt Bowl (Breakfast, Live)
-INSERT INTO `recipes` (
-  `name`,
-  `meal_types`,
-  `default_servings`,
-  `calories`,
-  `ingredients`,
-  `steps`,
-  `is_cheat`,
-  `is_live`,
-  `is_deleted`
-) VALUES (
-  'Greek Yogurt Bowl',
-  JSON_ARRAY('breakfast'),
-  2,
-  350,
-  JSON_ARRAY(
-    JSON_OBJECT('name', 'Greek yogurt', 'quantity', 300, 'unit', 'g'),
-    JSON_OBJECT('name', 'Rolled oats', 'quantity', 50, 'unit', 'g'),
-    JSON_OBJECT('name', 'Honey', 'quantity', 2, 'unit', 'tbsp'),
-    JSON_OBJECT('name', 'Blueberry', 'quantity', 100, 'unit', 'g'),
-    JSON_OBJECT('name', 'Banana', 'quantity', 1, 'unit', 'piece')
-  ),
-  JSON_ARRAY(
-    'Place Greek yogurt in bowls',
-    'Top with rolled oats',
-    'Drizzle with honey',
-    'Add fresh blueberries and sliced banana',
-    'Serve immediately'
-  ),
-  FALSE,
-  TRUE,
-  FALSE
-);
-
--- Recipe 2: Chicken and Vegetable Stir Fry (Lunch/Dinner, Live)
-INSERT INTO `recipes` (
-  `name`,
-  `meal_types`,
-  `default_servings`,
-  `calories`,
-  `ingredients`,
-  `steps`,
-  `is_cheat`,
-  `is_live`,
-  `is_deleted`
-) VALUES (
-  'Chicken and Vegetable Stir Fry',
-  JSON_ARRAY('lunch', 'dinner'),
-  2,
-  480,
-  JSON_ARRAY(
-    JSON_OBJECT('name', 'Chicken breast', 'quantity', 300, 'unit', 'g'),
-    JSON_OBJECT('name', 'Bell pepper', 'quantity', 1, 'unit', 'piece'),
-    JSON_OBJECT('name', 'Broccoli', 'quantity', 200, 'unit', 'g'),
-    JSON_OBJECT('name', 'Carrot', 'quantity', 1, 'unit', 'piece'),
-    JSON_OBJECT('name', 'Onion', 'quantity', 1, 'unit', 'piece'),
-    JSON_OBJECT('name', 'Garlic', 'quantity', 2, 'unit', 'clove'),
-    JSON_OBJECT('name', 'Soy sauce', 'quantity', 3, 'unit', 'tbsp'),
-    JSON_OBJECT('name', 'Vegetable oil', 'quantity', 2, 'unit', 'tbsp'),
-    JSON_OBJECT('name', 'Rice', 'quantity', 200, 'unit', 'g')
-  ),
-  JSON_ARRAY(
-    'Cook rice according to package instructions',
-    'Cut chicken breast into bite-sized pieces',
-    'Chop all vegetables into similar-sized pieces',
-    'Heat oil in a large pan or wok over high heat',
-    'Add chicken and cook until browned (5-6 minutes)',
-    'Add garlic and onion, stir fry for 2 minutes',
-    'Add remaining vegetables and stir fry for 4-5 minutes',
-    'Add soy sauce and toss to coat',
-    'Serve immediately over cooked rice'
-  ),
-  FALSE,
-  TRUE,
-  FALSE
-);
-
--- Recipe 3: Cheese Pizza (Dinner, Cheat, Hidden - for testing admin visibility)
-INSERT INTO `recipes` (
-  `name`,
-  `meal_types`,
-  `default_servings`,
-  `calories`,
-  `ingredients`,
-  `steps`,
-  `is_cheat`,
-  `is_live`,
-  `is_deleted`
-) VALUES (
-  'Cheese Pizza',
-  JSON_ARRAY('dinner'),
-  2,
-  850,
-  JSON_ARRAY(
-    JSON_OBJECT('name', 'Plain flour', 'quantity', 300, 'unit', 'g'),
-    JSON_OBJECT('name', 'Mozzarella', 'quantity', 200, 'unit', 'g'),
-    JSON_OBJECT('name', 'Tomato', 'quantity', 400, 'unit', 'g'),
-    JSON_OBJECT('name', 'Olive oil', 'quantity', 2, 'unit', 'tbsp'),
-    JSON_OBJECT('name', 'Basil', 'quantity', 1, 'unit', 'handful'),
-    JSON_OBJECT('name', 'Salt', 'quantity', 1, 'unit', 'pinch')
-  ),
-  JSON_ARRAY(
-    'Prepare pizza dough with flour, water, salt, and olive oil',
-    'Let dough rest for 30 minutes',
-    'Roll out dough into pizza shape',
-    'Spread crushed tomatoes on dough',
-    'Add torn mozzarella on top',
-    'Bake in preheated oven at 220°C for 12-15 minutes',
-    'Top with fresh basil leaves before serving'
-  ),
-  TRUE,
-  FALSE,
-  FALSE
-);
+SET @unit_g = (SELECT id FROM units WHERE `key` = 'GRAM');
+SET @unit_ml = (SELECT id FROM units WHERE `key` = 'MILLILITER');
+SET @unit_tbsp = (SELECT id FROM units WHERE `key` = 'TABLESPOON');
+SET @unit_tsp = (SELECT id FROM units WHERE `key` = 'TEASPOON');
+SET @unit_piece = (SELECT id FROM units WHERE `key` = 'PIECES');
+SET @unit_handful = (SELECT id FROM units WHERE `key` = 'HANDFUL');
+SET @unit_medium = (SELECT id FROM units WHERE `key` = 'MEDIUM');
+SET @unit_cup = (SELECT id FROM units WHERE `key` = 'CUP');
+SET @unit_clove = (SELECT id FROM units WHERE `key` = 'CLOVE');
+SET @unit_head = (SELECT id FROM units WHERE `key` = 'HEAD');
 
 -- ===========================
--- SEED SAMPLE MEAL PLAN ENTRIES (Admin user, next 7 days)
+-- Get meal IDs for reference
 -- ===========================
-
--- Get recipe IDs
-SET @recipe_yogurt_id = (SELECT id FROM recipes WHERE name = 'Greek Yogurt Bowl');
-SET @recipe_stirfry_id = (SELECT id FROM recipes WHERE name = 'Chicken and Vegetable Stir Fry');
-
--- Next 7 days of meal planning for admin user
-INSERT INTO `meal_plan_entries` (`user_id`, `plan_date`, `meal_type`, `recipe_id`, `servings`) VALUES
--- Day 1
-(@admin_user_id, CURDATE(), 'breakfast', @recipe_yogurt_id, 2),
-(@admin_user_id, CURDATE(), 'lunch', @recipe_stirfry_id, 2),
-
--- Day 2
-(@admin_user_id, DATE_ADD(CURDATE(), INTERVAL 1 DAY), 'breakfast', @recipe_yogurt_id, 2),
-(@admin_user_id, DATE_ADD(CURDATE(), INTERVAL 1 DAY), 'dinner', @recipe_stirfry_id, 3),
-
--- Day 3
-(@admin_user_id, DATE_ADD(CURDATE(), INTERVAL 2 DAY), 'breakfast', @recipe_yogurt_id, 1),
-
--- Day 4
-(@admin_user_id, DATE_ADD(CURDATE(), INTERVAL 3 DAY), 'lunch', @recipe_stirfry_id, 2),
-
--- Day 5
-(@admin_user_id, DATE_ADD(CURDATE(), INTERVAL 4 DAY), 'breakfast', @recipe_yogurt_id, 2),
-(@admin_user_id, DATE_ADD(CURDATE(), INTERVAL 4 DAY), 'dinner', @recipe_stirfry_id, 2);
+SET @meal_breakfast = (SELECT id FROM meals WHERE `key` = 'BREAKFAST');
+SET @meal_lunch = (SELECT id FROM meals WHERE `key` = 'LUNCH');
+SET @meal_dinner = (SELECT id FROM meals WHERE `key` = 'DINNER');
+SET @meal_snacks = (SELECT id FROM meals WHERE `key` = 'SNACKS');
 
 -- ===========================
--- SEED SAMPLE AUDIT LOG ENTRIES
+-- SEED SAMPLE RECIPE: Grilled Chicken Salad
 -- ===========================
+INSERT INTO `recipes` (`name`, `default_servings`, `calories`, `is_cheat`, `is_live`) VALUES
+('Grilled Chicken Salad', 2, 1210, FALSE, TRUE);
 
--- CREATE action for Greek Yogurt Bowl
-INSERT INTO `recipe_audit_log` (`recipe_id`, `user_id`, `action`, `old_values`, `new_values`) VALUES
-(
-  @recipe_yogurt_id,
-  @admin_user_id,
-  'CREATE',
-  NULL,
-  JSON_OBJECT(
-    'name', 'Greek Yogurt Bowl',
-    'meal_types', JSON_ARRAY('breakfast'),
-    'default_servings', 2,
-    'calories', 350,
-    'is_cheat', FALSE,
-    'is_live', TRUE
-  )
-);
+SET @recipe_id = LAST_INSERT_ID();
 
--- CREATE action for Chicken Stir Fry
-INSERT INTO `recipe_audit_log` (`recipe_id`, `user_id`, `action`, `old_values`, `new_values`) VALUES
-(
-  @recipe_stirfry_id,
-  @admin_user_id,
-  'CREATE',
-  NULL,
-  JSON_OBJECT(
-    'name', 'Chicken and Vegetable Stir Fry',
-    'meal_types', JSON_ARRAY('lunch', 'dinner'),
-    'default_servings', 2,
-    'calories', 480,
-    'is_cheat', FALSE,
-    'is_live', TRUE
-  )
-);
+-- Link to meal types
+INSERT INTO `recipe_meals` (`recipe_id`, `meal_id`) VALUES
+(@recipe_id, @meal_lunch);
 
--- Sample UPDATE action (admin changed yogurt bowl calories)
-INSERT INTO `recipe_audit_log` (`recipe_id`, `user_id`, `action`, `old_values`, `new_values`) VALUES
-(
-  @recipe_yogurt_id,
-  @admin_user_id,
-  'UPDATE',
-  JSON_OBJECT('calories', 320),
-  JSON_OBJECT('calories', 350)
-);
+-- Add ingredients
+INSERT INTO `recipe_ingredients` (`recipe_id`, `ingredient_id`, `quantity`, `unit_id`, `display_order`) VALUES
+(@recipe_id, (SELECT id FROM ingredients WHERE `key` = 'CHICKEN_BREAST'), 240, @unit_g, 1),
+(@recipe_id, (SELECT id FROM ingredients WHERE `key` = 'LETTUCE'), 2, @unit_handful, 2),
+(@recipe_id, (SELECT id FROM ingredients WHERE `key` = 'CUCUMBER'), 1, @unit_piece, 3),
+(@recipe_id, (SELECT id FROM ingredients WHERE `key` = 'CHERRY_TOMATOES'), 10, @unit_piece, 4),
+(@recipe_id, (SELECT id FROM ingredients WHERE `key` = 'CARROT'), 2, @unit_piece, 5),
+(@recipe_id, (SELECT id FROM ingredients WHERE `key` = 'LEMON'), 1, @unit_piece, 6),
+(@recipe_id, (SELECT id FROM ingredients WHERE `key` = 'OLIVE_OIL'), 1, @unit_tbsp, 7),
+(@recipe_id, (SELECT id FROM ingredients WHERE `key` = 'AVOCADO'), 0.5, @unit_medium, 8),
+(@recipe_id, (SELECT id FROM ingredients WHERE `key` = 'CHICKPEAS'), 150, @unit_g, 9),
+(@recipe_id, (SELECT id FROM ingredients WHERE `key` = 'FETA_CHEESE'), 40, @unit_g, 10);
+
+-- Add steps
+INSERT INTO `recipe_steps` (`recipe_id`, `step_number`, `instruction`, `tip`) VALUES
+(@recipe_id, 1, 'Cook and slice the chicken breast. Let rest if made in advance.', 'Season with salt and pepper before cooking'),
+(@recipe_id, 2, 'Wash and prep the salad leaves, cucumber, tomatoes, and carrots.', NULL),
+(@recipe_id, 3, 'Slice avocado and drain chickpeas.', NULL),
+(@recipe_id, 4, 'Crumble feta over the vegetables.', NULL),
+(@recipe_id, 5, 'In a small bowl, mix lemon juice and 1 tbsp olive oil for dressing.', NULL),
+(@recipe_id, 6, 'Combine all ingredients in a large bowl and toss with dressing.', NULL),
+(@recipe_id, 7, 'Top with grilled chicken and serve.', NULL);
+
+-- ===========================
+-- SEED SAMPLE RECIPE: Banana Chia Pudding
+-- ===========================
+INSERT INTO `recipes` (`name`, `default_servings`, `calories`, `is_cheat`, `is_live`) VALUES
+('Banana Chia Pudding with Peanut Butter & Berries', 2, 660, FALSE, TRUE);
+
+SET @recipe_id = LAST_INSERT_ID();
+
+-- Link to meal types
+INSERT INTO `recipe_meals` (`recipe_id`, `meal_id`) VALUES
+(@recipe_id, @meal_breakfast);
+
+-- Add ingredients
+INSERT INTO `recipe_ingredients` (`recipe_id`, `ingredient_id`, `quantity`, `unit_id`, `display_order`) VALUES
+(@recipe_id, (SELECT id FROM ingredients WHERE `key` = 'CHIA_SEEDS'), 4, @unit_tbsp, 1),
+(@recipe_id, (SELECT id FROM ingredients WHERE `key` = 'MILK'), 160, @unit_ml, 2),
+(@recipe_id, (SELECT id FROM ingredients WHERE `key` = 'BANANA'), 1, @unit_piece, 3),
+(@recipe_id, (SELECT id FROM ingredients WHERE `key` = 'HONEY'), 1, @unit_tsp, 4),
+(@recipe_id, (SELECT id FROM ingredients WHERE `key` = 'VANILLA_EXTRACT'), 0.5, @unit_tsp, 5),
+(@recipe_id, (SELECT id FROM ingredients WHERE `key` = 'PEANUT_BUTTER'), 2, @unit_tbsp, 6),
+(@recipe_id, (SELECT id FROM ingredients WHERE `key` = 'GREEK_YOGURT'), 150, @unit_g, 7),
+(@recipe_id, (SELECT id FROM ingredients WHERE `key` = 'MIXED_BERRIES'), 100, @unit_g, 8);
+
+-- Add steps
+INSERT INTO `recipe_steps` (`recipe_id`, `step_number`, `instruction`, `tip`) VALUES
+(@recipe_id, 1, 'Mash the banana in a bowl or jar.', NULL),
+(@recipe_id, 2, 'Add milk, chia seeds, honey, and vanilla. Mix well.', NULL),
+(@recipe_id, 3, 'Let sit for 5 minutes, then stir again to break up clumps.', 'This prevents the chia seeds from clumping together'),
+(@recipe_id, 4, 'Cover and refrigerate for at least 2 hours or overnight.', 'Overnight gives the best texture'),
+(@recipe_id, 5, 'In the morning, stir in peanut butter and Greek yogurt.', NULL),
+(@recipe_id, 6, 'Top with fresh berries before serving.', NULL);
+
+-- ===========================
+-- SEED SAMPLE RECIPE: Spicy Tofu Stir-Fry
+-- ===========================
+INSERT INTO `recipes` (`name`, `default_servings`, `calories`, `is_cheat`, `is_live`) VALUES
+('Spicy Tofu Stir-Fry with Mushrooms & Nuts', 2, 1180, FALSE, TRUE);
+
+SET @recipe_id = LAST_INSERT_ID();
+
+-- Link to meal types
+INSERT INTO `recipe_meals` (`recipe_id`, `meal_id`) VALUES
+(@recipe_id, @meal_dinner);
+
+-- Add ingredients
+INSERT INTO `recipe_ingredients` (`recipe_id`, `ingredient_id`, `quantity`, `unit_id`, `display_order`) VALUES
+(@recipe_id, (SELECT id FROM ingredients WHERE `key` = 'FIRM_TOFU'), 400, @unit_g, 1),
+(@recipe_id, (SELECT id FROM ingredients WHERE `key` = 'OLIVE_OIL'), 3, @unit_tbsp, 2),
+(@recipe_id, (SELECT id FROM ingredients WHERE `key` = 'GARLIC'), 1, @unit_clove, 3),
+(@recipe_id, (SELECT id FROM ingredients WHERE `key` = 'BELL_PEPPER'), 1, @unit_piece, 4),
+(@recipe_id, (SELECT id FROM ingredients WHERE `key` = 'ONION'), 1, @unit_piece, 5),
+(@recipe_id, (SELECT id FROM ingredients WHERE `key` = 'MUSHROOM'), 150, @unit_g, 6),
+(@recipe_id, (SELECT id FROM ingredients WHERE `key` = 'SOY_SAUCE'), 2, @unit_tbsp, 7),
+(@recipe_id, (SELECT id FROM ingredients WHERE `key` = 'SMOKED_PAPRIKA'), 0.5, @unit_tsp, 8),
+(@recipe_id, (SELECT id FROM ingredients WHERE `key` = 'CHILI_FLAKES'), 0.5, @unit_tsp, 9),
+(@recipe_id, (SELECT id FROM ingredients WHERE `key` = 'CASHEWS'), 30, @unit_g, 10);
+
+-- Add steps
+INSERT INTO `recipe_steps` (`recipe_id`, `step_number`, `instruction`, `tip`) VALUES
+(@recipe_id, 1, 'Heat 1 tbsp olive oil or ghee in a pan and fry tofu until golden, about 20 minutes. Set aside.', 'Press tofu first to remove excess moisture'),
+(@recipe_id, 2, 'Add 1 tbsp more oil to the pan, sauté garlic for 30 seconds.', NULL),
+(@recipe_id, 3, 'Add red pepper, onion, and mushrooms. Stir-fry for 4-5 minutes.', NULL),
+(@recipe_id, 4, 'Return tofu to the pan. Add soy sauce, smoked paprika, and chili flakes.', 'Adjust chili to taste'),
+(@recipe_id, 5, 'Add final 1 tbsp of oil and the nuts. Stir well and cook for 1-2 more minutes.', NULL),
+(@recipe_id, 6, 'Serve hot.', NULL);
 
 -- ===========================
 -- VERIFY DATA
 -- ===========================
 
 -- Show counts
-SELECT 'Aisles' AS table_name, COUNT(*) AS row_count FROM aisles
+SELECT 'Meals' AS table_name, COUNT(*) AS row_count FROM meals
+UNION ALL
+SELECT 'Aisles', COUNT(*) FROM aisles
 UNION ALL
 SELECT 'Units', COUNT(*) FROM units
 UNION ALL
@@ -381,6 +353,8 @@ SELECT 'Users', COUNT(*) FROM users
 UNION ALL
 SELECT 'Recipes', COUNT(*) FROM recipes
 UNION ALL
-SELECT 'Meal Plan Entries', COUNT(*) FROM meal_plan_entries
+SELECT 'Recipe Meals', COUNT(*) FROM recipe_meals
 UNION ALL
-SELECT 'Audit Log', COUNT(*) FROM recipe_audit_log;
+SELECT 'Recipe Ingredients', COUNT(*) FROM recipe_ingredients
+UNION ALL
+SELECT 'Recipe Steps', COUNT(*) FROM recipe_steps;
