@@ -17,7 +17,8 @@
       "Bash(git -C \"C:\\Users\\jossd\\Documents\\MyWebSites\\FoodBytes\\client\" status --short)",
       "Bash(copy:*)",
       "Bash(findstr:*)",
-      "Bash(docker-compose restart:*)"
+      "Bash(docker-compose restart:*)",
+      "Bash(docker exec:*)"
     ],
     "deny": [],
     "ask": []
