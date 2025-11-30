@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: foodbytes-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: foodbytes
+      MYSQL_USER: ${MYSQL_USER:-foodbytes}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-foodbytes123}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./database/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-rootpassword}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - foodbytes-network
+
+  backend:
+    build:
+      context: ./foodbytes-api
+      dockerfile: Dockerfile
+    container_name: foodbytes-backend
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/foodbytes?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER:-foodbytes}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD:-foodbytes123}
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      APP_JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-key-that-is-at-least-256-bits-long}
+      APP_OAUTH2_AUTHORIZED_REDIRECT_URI: ${OAUTH_REDIRECT_URI:-http://localhost:3000}
+    ports:
+      - "8080:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - foodbytes-network
+
+  frontend:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: foodbytes-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - foodbytes-network
+
+volumes:
+  mysql-data:
+    name: foodbytes-mysql-data
+
+networks:
+  foodbytes-network:
+    driver: bridge
