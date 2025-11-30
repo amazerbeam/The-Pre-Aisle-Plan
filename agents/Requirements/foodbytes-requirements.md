@@ -587,9 +587,10 @@
 - Can add, remove, or modify ingredients (name, quantity, unit)
 - Can add, remove, or reorder cooking steps
 - Can toggle cheat meal flag
+- Can toggle recipe visibility (Live/Hidden) - see FR-028
 - Can assign recipe to meal categories
 - Delete recipe performs soft delete (preserves for audit)
-- Changes immediately visible to all users after save
+- Changes immediately visible to all users after save (for Live recipes)
 - Only admin users can access edit functionality
 
 **Source Evidence:**
@@ -619,6 +620,31 @@
 - `recipe_audit_log` table
 - Audit trigger on recipe modifications
 - Audit log viewer component
+
+---
+
+### FR-028: Recipe Visibility Toggle (Admin Only)
+**Priority:** High
+
+**Description:** Admin users can set recipes as Live (visible to all users) or Hidden (visible only to admins)
+
+**User Story:** As an admin, I want to hide recipes from regular users so that I can prepare and review recipes before making them publicly available.
+
+**Acceptance Criteria:**
+- Each recipe has a visibility status: Live (1) or Hidden (0)
+- All new recipes default to Hidden (0)
+- Only admin (GOD mode) users can toggle visibility status
+- Hidden recipes are NOT visible to regular users in any view (browse, search, meal plan assignment)
+- Hidden recipes ARE visible to admin users with a visual indicator (e.g., "Hidden" badge)
+- Admin users see a toggle/button to change visibility status on recipe cards and edit form
+- Visibility changes are logged in the audit trail (old_values/new_values includes is_live)
+- Admin recipe management view can filter by Live/Hidden status
+
+**Source Evidence:**
+- `is_live` column in recipes table
+- Admin-only visibility toggle UI component
+- Recipe query filters by `is_live=1` for non-admin users
+- Admin sees all recipes regardless of `is_live` value
 
 ---
 
@@ -872,6 +898,7 @@ A meal recipe with ingredients and cooking instructions
 | ingredients | array\<IngredientReference\> | required, non-empty | List of ingredients with quantities |
 | steps | array\<string\> | required, non-empty | Ordered cooking instructions |
 | isCheat | boolean | optional, default false | Flag for "cheat meal" recipes |
+| is_live | boolean | optional, default false | Visibility flag: true (1) = visible to all users, false (0) = visible to admin only |
 
 **Relationships:** Has many IngredientReference (via ingredients array)
 
