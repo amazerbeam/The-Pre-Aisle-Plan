@@ -557,26 +557,30 @@
 
 ## User Authentication
 
-### FR-023: User Registration and Login (OAuth)
+### FR-023: User Registration and Login (Google OAuth Only)
 **Priority:** High
 
-**Description:** Users can create accounts and log in using OAuth providers (Google/GitHub)
+**Description:** Users can create accounts and log in using Google OAuth only
 
-**User Story:** As a user, I want to log in with my Google or GitHub account so that I can save my meal plans and access them from any device.
+**User Story:** As a user, I want to log in with my Google account so that I can save my meal plans and access them from any device.
 
 **Acceptance Criteria:**
-- Login buttons displayed for Google and GitHub OAuth providers
-- New users automatically registered on first OAuth login
-- JWT tokens stored client-side for session management
-- User profile displays name and email from OAuth provider
+- **Google Sign-In button only** - no GitHub or other providers
+- **Use official Google branding** - official Google "G" logo and styling
+- Button text must be "Sign in with Google" (not "Login with Google")
+- Follow Google's Brand Guidelines for the sign-in button
+- New users automatically registered on first Google OAuth login
+- JWT tokens stored in httpOnly cookies for session management
+- User profile displays name and email from Google
 - Logout button clears session and returns user to guest mode
 - Guest users can browse recipes but cannot save meal plans
 - Session persists across browser sessions until explicit logout
 
 **Source Evidence:**
-- OAuth callback handlers
-- JWT token storage in localStorage
+- Google OAuth callback handlers
+- JWT token storage in httpOnly cookies
 - User session state management
+- Google Sign-In button component
 
 ---
 
@@ -589,7 +593,7 @@
 
 **Acceptance Criteria:**
 - Profile displays user name and email
-- Shows OAuth provider used (Google/GitHub)
+- Shows OAuth provider used (Google only)
 - Shows account creation date
 - Shows admin status if applicable
 - **Default Servings setting** allows user to set their preferred default serving size
@@ -1115,7 +1119,7 @@ A registered user account (created via OAuth)
 | id | integer | PK, auto-increment | Unique user identifier |
 | email | string | unique, required | User's email from OAuth provider |
 | name | string | required | Display name from OAuth provider |
-| oauth_provider | string | required, one of: GOOGLE/GITHUB | OAuth provider used for registration |
+| oauth_provider | string | required, value: GOOGLE only | OAuth provider (Google only - no GitHub) |
 | oauth_id | string | required | Provider's unique user identifier |
 | is_admin | boolean | default false | GOD mode flag for recipe editing |
 | default_servings | integer | default 1, range 1-10 | User's preferred default serving size for all recipes |

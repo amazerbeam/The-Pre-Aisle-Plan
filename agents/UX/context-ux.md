@@ -14,6 +14,8 @@
 - Do NOT use light text on light backgrounds
 - Do NOT create text that is hard to read or invisible
 - Do NOT ignore contrast requirements
+- Do NOT offer GitHub login - **Google OAuth only**
+- Do NOT create custom Google login buttons - use official branding
 
 ### DO
 - DO ensure all text is visible and readable
@@ -21,6 +23,7 @@
 - DO test text visibility on all background colors
 - DO use the brand color `#a689c6` consistently
 - DO use dark text on light backgrounds OR light text on dark backgrounds
+- DO use the **official Google Sign-In button** with Google's branding guidelines
 
 ## Design Principles
 
@@ -52,7 +55,7 @@
 ```
 Landing Page
     |
-    [View as Guest] --- or --- [Login with Google/GitHub]
+    [View as Guest] --- or --- [Sign in with Google]
     |
     v
 Recipe Browser
@@ -313,6 +316,61 @@ Legend:
 - Mobile: Bottom tab bar (thumb-friendly)
 - Desktop: Top navigation + sidebar
 - Back button always visible in modals
+
+## Google Sign-In Button
+
+**IMPORTANT:** Use the official Google Sign-In button. Do NOT create custom Google login buttons.
+
+### Requirements
+- Use the **official Google logo** (multi-color "G")
+- Follow Google's Brand Guidelines: https://developers.google.com/identity/branding-guidelines
+- Button text: "Sign in with Google" (not "Login with Google")
+- White background with Google logo on the left
+- No GitHub login option - **Google only**
+
+### Official Button Styling
+```css
+.google-signin-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 12px;
+  height: 40px;
+  background-color: #ffffff;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  font-family: 'Roboto', arial, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #3c4043;
+  cursor: pointer;
+  transition: background-color 0.2s, box-shadow 0.2s;
+}
+
+.google-signin-btn:hover {
+  background-color: #f7f8f8;
+  box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
+}
+
+.google-signin-btn:active {
+  background-color: #f1f3f4;
+}
+
+.google-signin-btn img {
+  width: 18px;
+  height: 18px;
+  margin-right: 8px;
+}
+```
+
+### Google Logo
+Use the official Google "G" logo SVG or the hosted image from Google's CDN.
+
+```html
+<button class="google-signin-btn">
+  <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo">
+  Sign in with Google
+</button>
+```
 
 ## Color System
 

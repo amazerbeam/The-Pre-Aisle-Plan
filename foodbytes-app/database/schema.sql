@@ -25,7 +25,7 @@ CREATE TABLE `users` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `email` VARCHAR(255) NOT NULL,
   `name` VARCHAR(255) NOT NULL,
-  `oauth_provider` ENUM('GOOGLE', 'GITHUB') NOT NULL,
+  `oauth_provider` ENUM('GOOGLE') NOT NULL COMMENT 'Google OAuth only - no GitHub',
   `oauth_id` VARCHAR(255) NOT NULL,
   `is_admin` BOOLEAN NOT NULL DEFAULT FALSE,
   `default_servings` TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT 'User preferred default serving size (1-10)',

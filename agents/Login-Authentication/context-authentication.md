@@ -5,12 +5,24 @@
 - **Frontend**: React (web) with responsive design
 - **Backend**: Java/Spring Boot
 - **Database**: MySQL
-- **Auth Providers**: Google OAuth 2.0, GitHub OAuth
+- **Auth Providers**: Google OAuth 2.0 **ONLY** (no GitHub)
 - **Token Management**: JWT stored in httpOnly cookies (NOT localStorage)
+
+## DO / DO NOT
+
+### DO NOT
+- Do NOT offer GitHub login - **Google OAuth only**
+- Do NOT create custom Google login buttons - use official Google branding
+- Do NOT store passwords (OAuth-only authentication)
+
+### DO
+- DO use the **official Google Sign-In button** with Google's branding guidelines
+- DO use button text "Sign in with Google" (not "Login with Google")
+- DO use the official Google "G" logo
 
 ## OAuth Flow
 ```
-User clicks "Login with Google/GitHub"
+User clicks "Sign in with Google"
     |
 Frontend redirects to /api/auth/{provider}
     |
@@ -61,11 +73,10 @@ Subsequent requests automatically include cookie
 ```
 GET  /api/auth/google          - Initiate Google OAuth
 GET  /api/auth/google/callback - Google OAuth callback
-GET  /api/auth/github          - Initiate GitHub OAuth
-GET  /api/auth/github/callback - GitHub OAuth callback
 GET  /api/auth/me              - Get current user (requires JWT cookie)
 POST /api/auth/logout          - Clear JWT cookie
 ```
+**Note:** No GitHub routes - Google OAuth only.
 
 ### JWT Payload Structure
 ```java
@@ -186,26 +197,55 @@ The JWT is stored in an httpOnly cookie managed by the server. The frontend:
 
 ### Login Component
 ```javascript
-// components/auth/LoginButton.jsx
+// components/auth/GoogleSignInButton.jsx
 import { useAuth } from '../../contexts/AuthContext';
-import styles from './LoginButton.module.css';
+import styles from './GoogleSignInButton.module.css';
 
-const LoginButton = () => {
+const GoogleSignInButton = () => {
   const { login } = useAuth();
 
   return (
-    <div className={styles.loginButtons}>
-      <button onClick={() => login('google')} className={styles.btnGoogle}>
-        Continue with Google
-      </button>
-      <button onClick={() => login('github')} className={styles.btnGithub}>
-        Continue with GitHub
-      </button>
-    </div>
+    <button onClick={() => login('google')} className={styles.googleSignInBtn}>
+      <img
+        src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+        alt="Google logo"
+      />
+      Sign in with Google
+    </button>
   );
 };
 
-export default LoginButton;
+export default GoogleSignInButton;
+```
+
+```css
+/* GoogleSignInButton.module.css - Official Google branding */
+.googleSignInBtn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 12px;
+  height: 40px;
+  background-color: #ffffff;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  font-family: 'Roboto', arial, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #3c4043;
+  cursor: pointer;
+  transition: background-color 0.2s, box-shadow 0.2s;
+}
+
+.googleSignInBtn:hover {
+  background-color: #f7f8f8;
+  box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
+}
+
+.googleSignInBtn img {
+  width: 18px;
+  height: 18px;
+  margin-right: 8px;
+}
 ```
 
 ### Protected Route Component

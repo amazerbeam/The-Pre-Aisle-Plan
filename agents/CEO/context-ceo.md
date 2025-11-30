@@ -423,7 +423,9 @@ These rules represent architectural decisions and constraints set by the project
 | SQL Agent | DO use junction tables for many-to-many | Any agent suggesting embedded arrays |
 | UX Agent | DO NOT use white text on white background | React Agent proposing light theme |
 | UX Agent | DO use brand color #a689c6 | Any agent suggesting different colors |
+| UX Agent | DO NOT offer GitHub login | Any agent suggesting multiple OAuth providers |
 | Auth Agent | DO NOT store passwords | Any agent suggesting local auth |
+| Auth Agent | Google OAuth only - no GitHub | Any agent suggesting GitHub login |
 
 #### Conflict Resolution Process
 
@@ -693,16 +695,17 @@ volumes:
 ## Section 10: Critical Constraints
 
 ### NEVER Forget
-1. **OAuth ONLY** - No password storage
-2. **MySQL** - Not PostgreSQL, not MongoDB
-3. **Java backend** - Spring Boot (sole backend, no Node.js)
-4. **Mobile-first CSS** - Responsive design, not native components
-5. **6-month retention** - Rolling data retention for meal plans
-6. **Immutable audit** - Recipe changes logged forever
-7. **Context File DOs are LAW** - Cannot be vetoed by peer review
-8. **No JSON in database** - Use normalized tables with FKs
-9. **Brand color #a689c6** - Consistent throughout UI
-10. **All text must be visible** - No white-on-white or low contrast
+1. **Google OAuth ONLY** - No GitHub, no password storage
+2. **Official Google branding** - Use official Google Sign-In button with Google logo
+3. **MySQL** - Not PostgreSQL, not MongoDB
+4. **Java backend** - Spring Boot (sole backend, no Node.js)
+5. **Mobile-first CSS** - Responsive design, not native components
+6. **6-month retention** - Rolling data retention for meal plans
+7. **Immutable audit** - Recipe changes logged forever
+8. **Context File DOs are LAW** - Cannot be vetoed by peer review
+9. **No JSON in database** - Use normalized tables with FKs
+10. **Brand color #a689c6** - Consistent throughout UI
+11. **All text must be visible** - No white-on-white or low contrast
 
 ### Error Prevention
 - Always read context files before invoking agents
