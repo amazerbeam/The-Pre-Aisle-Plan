@@ -7,7 +7,7 @@
 | Field | Value |
 |-------|-------|
 | **Name** | The Pre-Aisle Plan |
-| **Version** | 9.1.0 |
+| **Version** | 9.2.0 |
 | **Analyzed Date** | 2025-11-30 |
 | **Description** | Meal planning and recipe management application with date-based calendar, user authentication, and admin recipe management |
 | **Architecture** | Hybrid client-server (vanilla HTML/CSS/JS frontend, Node.js/Express backend, MySQL database) |
@@ -16,6 +16,36 @@
 ---
 
 # Functional Requirements
+
+## Global Date Range
+
+### FR-000: Shared Date Range Across All Views
+**Priority:** High
+
+**Description:** A single "From" and "To" date range controls all three main views: Recipes, Shopping List, and Meal Plan
+
+**User Story:** As a user, I want to set my date range once and have it apply everywhere so that my recipes, shopping list, and meal plan are always synchronized.
+
+**Acceptance Criteria:**
+- **"From" date picker** - start of the planning period
+- **"To" date picker** - end of the planning period
+- **Default range:** Current date (From) to current date + 6 days (To) = 7 days total
+- Date range is displayed prominently and accessible from all views
+- Changing the date range **immediately updates all three views:**
+  - **Recipes view:** Day buttons (Mon-Sun) reflect the selected week
+  - **Shopping List:** Only shows ingredients for recipes in the date range
+  - **Meal Plan:** Only shows days within the date range
+- End date must be on or after start date (validation)
+- Date range persists in user session
+- Authenticated users: date range preference saved to account
+- Guest users: date range stored in localStorage
+
+**Source Evidence:**
+- Global date range state
+- `dateFrom` and `dateTo` variables
+- Date picker components
+
+---
 
 ## Recipe Management
 
@@ -27,17 +57,26 @@
 **User Story:** As a user, I want to browse recipes by meal category (Breakfast, Lunch, Dinner, Snacks) so that I can quickly find appropriate recipes for each meal.
 
 **Acceptance Criteria:**
-- Tab buttons display for each meal category (Breakfast, Lunch, Dinner, Snacks)
+- **ONLY four tab buttons:** Breakfast, Lunch, Dinner, Snacks
+- **NO "All Recipes" tab** - users must select a specific meal category
+- Default tab on load is Breakfast
 - Clicking a tab filters and displays only recipes belonging to that meal type
+- **Each recipe MUST be assigned to at least one meal category** - recipes without a meal assignment will not display
 - Active tab is visually distinguished from inactive tabs
 - Recipes are sorted alphabetically within each category
 - Cheat meal recipes appear after regular recipes
+- Each recipe card displays:
+  - Recipe name
+  - Calories
+  - Servings control
+  - "View Details" button
+  - **Day-of-week assignment buttons** (see FR-007)
 
 **Source Evidence:**
 - `renderTabs()`
 - `selectMeal(meal)`
 - `renderRecipes(meal)`
-- `recipeData[].meal`
+- `recipe_meals` junction table (links recipes to meal types)
 
 ---
 
@@ -154,26 +193,30 @@
 
 ## Meal Planning
 
-### FR-007: Assign Recipes to Calendar Dates
+### FR-007: Assign Recipes to Days of the Week
 **Priority:** High
 
-**Description:** Users can assign recipes to specific calendar dates (YYYY-MM-DD format)
+**Description:** Users can assign recipes to specific days within the selected date range using day-of-week buttons (Mon-Sun)
 
-**User Story:** As a user, I want to assign recipes to specific calendar dates so that I can plan my meals for any date, not just the current week.
+**User Story:** As a user, I want to quickly assign recipes to days of the week so that I can easily plan my meals.
 
 **Acceptance Criteria:**
-- Each recipe card displays a date picker or calendar grid for assignment
-- Clicking a date assigns the recipe to that specific date
-- Visual indicator shows when a recipe is assigned to a date
+- Each recipe card displays **7 day buttons: Mon, Tue, Wed, Thu, Fri, Sat, Sun**
+- Day buttons correspond to the days within the **current date range** (from "From" date to "To" date)
+- Clicking a day button assigns the recipe to that specific date
+- **Clicking an already-assigned day removes the recipe** (toggle behavior)
+- Visual indicator shows which days the recipe is assigned to (highlighted/filled button)
 - Recipe's current serving size is saved with the assignment
-- Multiple recipes can be assigned to the same date (different meal types)
-- Dates persist indefinitely, not limited to a single week
+- Recipe is assigned to the meal type matching the current tab (e.g., if viewing Breakfast tab, assigns to Breakfast slot)
+- **Assigning a recipe automatically updates:**
+  - The Shopping List (ingredients added)
+  - The Meal Plan calendar view
 - Authenticated users' assignments sync to server database
 - Guest users can browse recipes but cannot save assignments
 
 **Source Evidence:**
-- `createDatePicker(entry, servings)`
-- `assignRecipeToDate()`
+- `createDayButtons(entry, servings)`
+- `assignRecipeToDay()`
 - `planner[]` variable (date-indexed)
 - Server API: meal plan endpoints
 
@@ -201,26 +244,25 @@
 ### FR-009: View Meal Plan Calendar
 **Priority:** High
 
-**Description:** Users can view their meal plan in a navigable calendar with week/month views and historical navigation
+**Description:** Users can view their meal plan for the selected date range showing all assigned recipes
 
-**User Story:** As a user, I want to view my meal plan as a calendar so that I can see what I've planned and review past meals.
+**User Story:** As a user, I want to view my meal plan so that I can see what I've planned for the week.
 
 **Acceptance Criteria:**
 - Meal Plan button in footer opens calendar view
-- Calendar displays current week by default with option for month view
-- Previous/Next navigation arrows to move between weeks
-- Jump to specific date via date picker
-- Current date is visually highlighted
-- Each date shows assigned recipes with meal type and serving size
+- **Uses the shared global date range** (same "From" and "To" as Recipes and Shopping List - see FR-000)
+- Displays all days within the date range
+- Current date is visually highlighted (if within range)
+- Each date shows assigned recipes organized by meal type (Breakfast, Lunch, Dinner, Snacks)
+- Each recipe entry shows: recipe name and serving size
 - Daily calorie total is displayed for each date
-- Navigate to previous weeks to view meal history (rolling 6 months)
-- Past dates show assigned recipes as read-only history
+- Can remove recipes directly from the meal plan view
 - Visual distinction between past, current, and future dates
+- Changing the global date range updates the meal plan view
 - Wake lock activates when calendar is visible (if supported)
 
 **Source Evidence:**
 - `renderCalendar()`
-- `navigateCalendar(direction)`
 - `#calendar-view` element
 - Server API: GET meal plan with date range
 
@@ -268,26 +310,25 @@
 
 ## Shopping List
 
-### FR-012: Generate Aggregated Shopping List with Date Range
+### FR-012: Generate Aggregated Shopping List
 **Priority:** High
 
-**Description:** System generates a unified shopping list from recipes in the meal plan, filtered by a selectable date range using start and end date pickers
+**Description:** System generates a unified shopping list from recipes in the meal plan using the shared global date range (see FR-000)
 
-**User Story:** As a user, I want a consolidated shopping list for a specific date range so that I can shop for only the meals I need.
+**User Story:** As a user, I want a consolidated shopping list for my planned meals so that I can shop efficiently.
 
 **Acceptance Criteria:**
 - Shopping List view accessible from bottom navigation
-- **Start Date picker** allows selecting the beginning of the date range
-- **End Date picker** allows selecting the end of the date range
+- **Uses the shared global date range** (same "From" and "To" as Recipes and Meal Plan views - see FR-000)
 - **NO preset buttons** (no "3 days", "1 week", "2 weeks" buttons)
-- Default start date is current date
-- Default end date is current date + 7 days
-- End date must be on or after start date (validation)
-- Only ingredients from recipes within selected date range (inclusive) are aggregated
+- **NO separate date pickers** - uses the global date range
+- Only ingredients from recipes within the global date range (inclusive) are aggregated
 - Same ingredients from multiple recipes are combined (quantities summed)
 - Quantities reflect recipe serving sizes from meal plan
-- List updates automatically when date range or meal plan changes
-- Date range preference persists for user convenience
+- List updates automatically when:
+  - Global date range changes
+  - Recipes are added/removed from meal plan
+  - Serving sizes are changed
 
 **Source Evidence:**
 - `renderShoppingList(dateFrom, dateTo)`
