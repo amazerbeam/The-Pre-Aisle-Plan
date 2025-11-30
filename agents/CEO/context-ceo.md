@@ -340,9 +340,13 @@ const REQUIRED_CONTEXT_FILES = [
   'agents/UX/context-ux.md',
   'agents/Java/context-java.md',
 
+  // Requirements
+  'agents/Requirements/foodbytes-requirements.md',  // Current requirements
+  'agents/Requirements/context-future-dev.md',      // Future development ideas (DO NOT implement)
+
   // Existing Codebase Reference
   'CLAUDE.md',
-  'recipes.js',  // Current recipe data structure
+  'recipes.js',  // Current recipe data structure (reference only)
 ];
 ```
 
@@ -350,10 +354,12 @@ const REQUIRED_CONTEXT_FILES = [
 
 | File | Key Information |
 |------|-----------------|
-| context-authentication.md | OAuth flow, JWT payload, Passport config, middleware examples |
+| foodbytes-requirements.md | Functional requirements, non-functional requirements, data entities |
+| context-future-dev.md | **Future ideas - DO NOT implement in current build** |
+| context-authentication.md | OAuth flow, JWT payload, httpOnly cookies, middleware examples |
 | context-react.md | Project structure, component patterns, responsive breakpoints |
-| context-system-architect.md | System diagram, directory structure, API endpoints |
-| context-sql.md | Complete schema, queries, indexes, triggers |
+| context-system-architect.md | System diagram, directory structure, API endpoints, platform constraints |
+| context-sql.md | Schema design guidance, data types, audit requirements |
 | context-ux.md | Wireframes, user flows, accessibility checklist |
 | context-java.md | Entity models, Spring config, controller examples |
 
