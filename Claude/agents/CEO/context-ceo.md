@@ -88,6 +88,9 @@ DESIGN BEING REVIEWED:
 DESIGN DOCUMENT:
 [DESIGN_CONTENT]
 
+REQUIREMENTS CLAIMED BY DESIGN:
+[List of FR-xxx and NFR-xxx this design claims to address]
+
 YOUR REVIEW TASK:
 1. Evaluate this design from your domain expertise perspective
 2. Check for:
@@ -95,11 +98,38 @@ YOUR REVIEW TASK:
    - Technical soundness
    - Integration concerns
    - Missing considerations
+3. VERIFY REQUIREMENTS COVERAGE:
+   - Does this design actually implement the claimed requirements?
+   - Are the acceptance criteria from foodbytes-requirements.md satisfiable with this design?
+   - Are any requirements missing from the claims?
 
 RESPOND WITH:
 - VERDICT: APPROVE or REJECT
 - REASON: Specific explanation (required for REJECT, optional for APPROVE)
+- REQUIREMENTS VERIFIED: [List FR/NFR IDs this design correctly implements]
+- REQUIREMENTS MISSING: [List any claimed requirements NOT actually implemented]
 - SUGGESTIONS: Optional improvements (even if approving)
+```
+
+### Design Submission Template
+
+All design submissions MUST include a "Requirements Addressed" section:
+
+```markdown
+## [DESIGN_NAME] - Phase [N]
+
+### Design Content
+[Technical design details...]
+
+### Requirements Addressed
+| Requirement | How Implemented |
+|-------------|-----------------|
+| FR-xxx | [Specific component/code that implements this] |
+| NFR-xxx | [How this is addressed] |
+
+### Requirements NOT Addressed in This Phase
+- FR-yyy: Will be addressed in Phase [N]
+- ...
 ```
 
 ---
@@ -197,6 +227,7 @@ Java agent's concern acknowledged - both backends will be implemented.
 | 7 | Integration | All Agents | All | End-to-end testing, API connections |
 | 8 | Docker | System Architect | All 5 | docker-compose, Dockerfiles, networking |
 | 9 | Testing | All Agents | Self | Domain-specific validation |
+| 10 | Requirements Verification | CEO | All 6 | RTM 100% verified, verification report |
 
 ### Phase Details
 
@@ -317,6 +348,25 @@ Contents:
   - Shopping list aggregates
   - Admin features work
   - Mobile responsive
+```
+
+#### Phase 10: Requirements Verification
+```
+Lead: CEO
+Input: Complete application, foodbytes-requirements.md
+Output: docs/verification/requirements-traceability-matrix.md (100% verified)
+Process:
+  1. Parse foodbytes-requirements.md for all FR-xxx and NFR-xxx dynamically
+  2. For each requirement in RTM:
+     - Verify implementation evidence exists
+     - Test against acceptance criteria
+     - Mark VERIFIED or identify gaps
+  3. If gaps found:
+     - Assign to appropriate agent
+     - Agent implements missing feature
+     - Re-verify requirement
+  4. Only proceed to "done" when 100% verified
+  5. Generate final verification report
 ```
 
 ---
@@ -714,3 +764,117 @@ volumes:
 - Always test on mobile viewport before UX sign-off
 - **Always check for context file DO/DO NOT conflicts before approving designs**
 - **Always escalate unresolvable conflicts to user - never override context rules**
+- **Always update RTM after each phase with implementation artifacts**
+- **Always verify 100% requirements coverage before declaring done**
+
+---
+
+## Section 11: Requirements Verification Protocol
+
+### Dynamic Requirements Parsing
+
+CEO MUST dynamically read ALL requirements from `agents/Requirements/foodbytes-requirements.md`. Do NOT hardcode requirement IDs in agent files.
+
+**Parsing Instructions:**
+1. Read the entire `foodbytes-requirements.md` file
+2. Find all sections matching pattern: `### FR-XXX:` (Functional Requirements)
+3. Find all sections matching pattern: `### NFR-XXX:` (Non-Functional Requirements)
+4. For each requirement, extract:
+   - ID (e.g., "FR-001", "NFR-005")
+   - Title (text after the colon)
+   - Priority (from **Priority:** line)
+   - Acceptance Criteria (bullet points under that header)
+5. Create RTM entry for each parsed requirement
+
+### Requirements Traceability Matrix (RTM)
+
+**Location:** `docs/verification/requirements-traceability-matrix.md`
+
+**RTM Entry Format:**
+```markdown
+### [REQ-ID]: [Title]
+**Status:** NOT_STARTED | IN_PROGRESS | IMPLEMENTED | VERIFIED | BLOCKED
+**Phase:** [Phase number where addressed]
+**Implementation:** [File paths, components, endpoints]
+**Evidence:** [Test results, screenshots, verification notes]
+**Acceptance Criteria:**
+- [ ] [Criterion 1 from requirements doc]
+- [ ] [Criterion 2 from requirements doc]
+```
+
+### Status Definitions
+
+| Status | Meaning |
+|--------|---------|
+| NOT_STARTED | Requirement not yet addressed by any phase |
+| IN_PROGRESS | Design approved, implementation underway |
+| IMPLEMENTED | Code complete, awaiting verification |
+| VERIFIED | All acceptance criteria confirmed working |
+| BLOCKED | Cannot implement - requires user decision |
+
+### Verification Workflow
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│              REQUIREMENTS VERIFICATION LOOP                  │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  1. PARSE REQUIREMENTS (Startup)                            │
+│     └── Read foodbytes-requirements.md                      │
+│     └── Extract all FR-xxx and NFR-xxx dynamically          │
+│     └── Create RTM with all requirements as NOT_STARTED     │
+│                                                             │
+│  2. UPDATE RTM (After Each Phase)                           │
+│     └── Add implementation artifacts to RTM entries         │
+│     └── Change status: NOT_STARTED → IN_PROGRESS/IMPLEMENTED│
+│     └── Report coverage percentage                          │
+│                                                             │
+│  3. VERIFY REQUIREMENTS (Phase 10)                          │
+│     └── For each requirement in RTM:                        │
+│         ├── Check implementation evidence exists            │
+│         ├── Test against acceptance criteria                │
+│         ├── Mark VERIFIED if all criteria pass              │
+│         └── Identify gaps if any criteria fail              │
+│                                                             │
+│  4. RESOLVE GAPS (If Any)                                   │
+│     └── List unverified requirements                        │
+│     └── Assign to appropriate agent                         │
+│     └── Agent implements missing feature                    │
+│     └── Re-verify (go to step 3)                           │
+│                                                             │
+│  5. COMPLETION (When 100% Verified)                         │
+│     └── Generate final verification report                  │
+│     └── Declare application DONE                            │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Halting Condition
+
+**CRITICAL:** CEO MUST NOT declare "done" until:
+- 100% of FR-xxx requirements = VERIFIED
+- 100% of NFR-xxx requirements = VERIFIED
+- OR user explicitly approves exceptions for specific requirements
+
+### Phase-by-Phase RTM Updates
+
+After each phase approval + implementation, CEO must:
+1. Update RTM with new implementation artifacts (file paths, components, endpoints)
+2. Change requirement status from NOT_STARTED to IN_PROGRESS or IMPLEMENTED
+3. Add file paths and component names as evidence
+4. Report: "Phase X complete. Coverage: Y% (A/B requirements addressed)"
+
+### Verification Evidence Types
+
+| Evidence Type | Description | Example |
+|--------------|-------------|---------|
+| CODE_REF | File path implementing the requirement | `client/src/components/DateRangePicker.jsx` |
+| API_ENDPOINT | REST endpoint providing the feature | `GET /api/meal-plan?from=&to=` |
+| TEST_RESULT | Automated or manual test passing | "Clicked day buttons, recipe assigned correctly" |
+| SCREENSHOT | Visual evidence of feature working | `docs/verification/screenshots/fr-009.png` |
+
+### RTM Template Location
+
+Use template at: `docs/verification/rtm-template.md`
+
+CEO populates this template dynamically by parsing requirements from `foodbytes-requirements.md` at startup.

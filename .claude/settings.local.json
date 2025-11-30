@@ -8,7 +8,9 @@
       "Bash(docker-compose down:*)",
       "Bash(timeout:*)",
       "Bash(curl:*)",
-      "Bash(powershell:*)"
+      "Bash(powershell:*)",
+      "Bash(dir /s \"C:\\Users\\jossd\\Documents\\MyWebSites\\FoodBytes\\Legacy\")",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": []
