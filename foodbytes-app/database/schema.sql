@@ -28,13 +28,15 @@ CREATE TABLE `users` (
   `oauth_provider` ENUM('GOOGLE', 'GITHUB') NOT NULL,
   `oauth_id` VARCHAR(255) NOT NULL,
   `is_admin` BOOLEAN NOT NULL DEFAULT FALSE,
+  `default_servings` TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT 'User preferred default serving size (1-10)',
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `last_login` TIMESTAMP NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `unique_email` (`email`),
   UNIQUE KEY `unique_oauth` (`oauth_provider`, `oauth_id`),
   INDEX `idx_is_admin` (`is_admin`),
-  INDEX `idx_last_login` (`last_login`)
+  INDEX `idx_last_login` (`last_login`),
+  CONSTRAINT `chk_default_servings` CHECK (`default_servings` BETWEEN 1 AND 10)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ===========================

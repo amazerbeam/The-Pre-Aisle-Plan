@@ -207,8 +207,8 @@ INSERT INTO `ingredients` (`key`, `name`, `aisle_id`) VALUES
 -- ===========================
 -- SEED SAMPLE ADMIN USER
 -- ===========================
-INSERT INTO `users` (`email`, `name`, `oauth_provider`, `oauth_id`, `is_admin`, `created_at`, `last_login`) VALUES
-('admin@foodbytes.app', 'Admin User', 'GOOGLE', 'admin-test-oauth-id-12345', TRUE, NOW(), NOW());
+INSERT INTO `users` (`email`, `name`, `oauth_provider`, `oauth_id`, `is_admin`, `default_servings`, `created_at`, `last_login`) VALUES
+('admin@foodbytes.app', 'Admin User', 'GOOGLE', 'admin-test-oauth-id-12345', TRUE, 2, NOW(), NOW());
 
 -- Get admin user ID
 SET @admin_user_id = LAST_INSERT_ID();

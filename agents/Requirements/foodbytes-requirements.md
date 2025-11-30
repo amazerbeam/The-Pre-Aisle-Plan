@@ -6,9 +6,9 @@
 
 | Field | Value |
 |-------|-------|
-| **Name** | FoodBytes |
-| **Version** | 9.0.0 |
-| **Analyzed Date** | 2025-11-29 |
+| **Name** | The Pre-Aisle Plan |
+| **Version** | 9.1.0 |
+| **Analyzed Date** | 2025-11-30 |
 | **Description** | Meal planning and recipe management application with date-based calendar, user authentication, and admin recipe management |
 | **Architecture** | Hybrid client-server (vanilla HTML/CSS/JS frontend, Node.js/Express backend, MySQL database) |
 | **Source Files** | recipes.js, index.html, styles.css, server/ (backend) |
@@ -93,15 +93,19 @@
 
 **Acceptance Criteria:**
 - Each recipe displays a servings input control
-- Default value matches recipe's defaultServings
+- **Default value is the user's Default Servings preference** (from profile, see FR-024)
+- If user has no preference set, default to 1 serving
+- Guest users default to 1 serving
 - Changing servings recalculates all ingredient quantities proportionally
 - Minimum serving size is 1
+- Maximum serving size is 10 (or reasonable max)
 - Scaled quantities show appropriate precision (whole numbers or 1 decimal)
 - Calorie display updates based on serving adjustment
 
 **Source Evidence:**
 - `createServingsInput(entry)`
 - `localServingsMap`
+- User's `default_servings` preference
 - Calculation: `quantity * (servings / defaultServings)`
 
 ---
@@ -267,16 +271,19 @@
 ### FR-012: Generate Aggregated Shopping List with Date Range
 **Priority:** High
 
-**Description:** System generates a unified shopping list from recipes in the meal plan, filtered by a selectable date range
+**Description:** System generates a unified shopping list from recipes in the meal plan, filtered by a selectable date range using start and end date pickers
 
 **User Story:** As a user, I want a consolidated shopping list for a specific date range so that I can shop for only the meals I need.
 
 **Acceptance Criteria:**
 - Shopping List view accessible from bottom navigation
-- Date range picker allows selecting start and end dates
-- Quick presets available: "Next 3 days", "Next 7 days", "Next 14 days"
-- Default date range is current date + 7 days
-- Only ingredients from recipes within selected date range are aggregated
+- **Start Date picker** allows selecting the beginning of the date range
+- **End Date picker** allows selecting the end of the date range
+- **NO preset buttons** (no "3 days", "1 week", "2 weeks" buttons)
+- Default start date is current date
+- Default end date is current date + 7 days
+- End date must be on or after start date (validation)
+- Only ingredients from recipes within selected date range (inclusive) are aggregated
 - Same ingredients from multiple recipes are combined (quantities summed)
 - Quantities reflect recipe serving sizes from meal plan
 - List updates automatically when date range or meal plan changes
@@ -286,7 +293,8 @@
 - `renderShoppingList(dateFrom, dateTo)`
 - `ingredientTotals` Map with key = `name|unit`
 - Calculation: `quantity * servings / defaultServings`
-- Date range filter UI component
+- Start date picker input
+- End date picker input
 
 ---
 
@@ -531,23 +539,29 @@
 
 ---
 
-### FR-024: View User Profile
+### FR-024: View and Edit User Profile
 **Priority:** Medium
 
-**Description:** Authenticated users can view their profile information
+**Description:** Authenticated users can view their profile information and configure preferences
 
-**User Story:** As a user, I want to see my profile so that I know which account I'm logged in with.
+**User Story:** As a user, I want to see my profile and configure my preferences so that I can personalize my experience.
 
 **Acceptance Criteria:**
 - Profile displays user name and email
 - Shows OAuth provider used (Google/GitHub)
 - Shows account creation date
 - Shows admin status if applicable
+- **Default Servings setting** allows user to set their preferred default serving size
+- Default Servings applies to all recipes when viewing (overrides recipe's defaultServings)
+- Default Servings can be set from 1 to 10 (or reasonable max)
+- Default Servings persists to user account in database
+- New users default to 1 serving
 - Logout option available from profile
 
 **Source Evidence:**
 - User profile component
 - Server API: GET current user
+- Server API: PUT user preferences
 
 ---
 
@@ -1060,9 +1074,10 @@ A registered user account (created via OAuth)
 | id | integer | PK, auto-increment | Unique user identifier |
 | email | string | unique, required | User's email from OAuth provider |
 | name | string | required | Display name from OAuth provider |
-| oauth_provider | string | required, one of: google/github | OAuth provider used for registration |
+| oauth_provider | string | required, one of: GOOGLE/GITHUB | OAuth provider used for registration |
 | oauth_id | string | required | Provider's unique user identifier |
 | is_admin | boolean | default false | GOD mode flag for recipe editing |
+| default_servings | integer | default 1, range 1-10 | User's preferred default serving size for all recipes |
 | created_at | datetime | required | Account creation timestamp |
 | last_login | datetime | nullable | Most recent login timestamp |
 
