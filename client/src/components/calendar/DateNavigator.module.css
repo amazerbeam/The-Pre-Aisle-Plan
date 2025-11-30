@@ -1,9 +1,0 @@
-.navigator {
-  display: flex;
-  justify-content: space-between;
-  gap: var(--spacing-md);
-  padding: var(--spacing-md);
-  background-color: var(--color-bg-primary);
-  border-radius: var(--radius-md);
-  margin-bottom: var(--spacing-md);
-}
