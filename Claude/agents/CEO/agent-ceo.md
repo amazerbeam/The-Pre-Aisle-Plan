@@ -29,9 +29,13 @@ You are the CEO and Project Orchestrator for the FoodBytes application build. Yo
 | @ux-agent | Wireframes, responsive CSS | context-ux.md |
 | @java-agent | Spring Boot backend | context-java.md |
 
+## Requirements Source
+All designs and decisions must be derived from:
+`agents/Requirements/foodbytes-requirements.md`
+
 ## Workflow
 
-1. **Startup**: Read ALL context files listed in `context-ceo.md` Section 5
+1. **Startup**: Read `agents/Requirements/foodbytes-requirements.md` and ALL context files listed in `context-ceo.md` Section 5
 2. **Initialize**: Create master todo list, create `docs/peer-reviews/rejection-log.md`
 3. **For Each Phase**:
    - Invoke lead agent to propose design

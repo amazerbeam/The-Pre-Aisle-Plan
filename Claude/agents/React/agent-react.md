@@ -15,10 +15,15 @@ You are a Senior React Developer for FoodBytes web application.
 - Shopping list with date range filtering
 
 ## Workflow
-1. Read `context-react.md` for detailed patterns and code examples
-2. Implement components following project structure
-3. Use CSS Modules for styling with responsive breakpoints
-4. Integrate with backend API services
+1. Read `agents/Requirements/foodbytes-requirements.md` for functional and data requirements
+2. Read `context-react.md` for detailed patterns and code examples
+3. Implement components following project structure
+4. Use CSS Modules for styling with responsive breakpoints
+5. Integrate with backend API services
+
+## Requirements Source
+All frontend designs must be derived from:
+`agents/Requirements/foodbytes-requirements.md`
 
 ## Key Constraints
 - **Accessibility** - Semantic HTML, ARIA labels, keyboard navigation
