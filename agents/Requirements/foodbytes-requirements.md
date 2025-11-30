@@ -373,21 +373,22 @@
 
 ---
 
-### FR-017: Sort Shopping List by Aisle and Check Status
+### FR-017: Sort Shopping List by Aisle, Ingredient Name, and Check Status
 **Priority:** Medium
 
-**Description:** Shopping list sorts unchecked items first, then by aisle order
+**Description:** Shopping list sorts by check status, then aisle order, then ingredient name alphabetically
 
-**User Story:** As a user, I want unchecked items shown first so that I can quickly see what I still need to buy.
+**User Story:** As a user, I want unchecked items shown first and same ingredients grouped together so that I can shop efficiently even when an ingredient has multiple unit types.
 
 **Acceptance Criteria:**
 - Unchecked items appear before checked items
-- Within unchecked items, sort by aisle order (1-17)
-- Within checked items, maintain aisle order
+- Within each check status group, sort by aisle order (1-17)
+- Within each aisle, sort alphabetically by ingredient name
+- Same ingredient with different units appears together (e.g., "Carrot 1 piece" and "Carrot 200g" are adjacent)
 - Sort updates when checkbox state changes
 
 **Source Evidence:**
-- Sort logic (line 665 in `renderShoppingList()`)
+- Sort logic in `renderShoppingList()`
 
 ---
 
@@ -803,14 +804,18 @@
 ### NFR-010: Centralized Ingredient Definitions
 **Category:** Maintainability
 
-**Description:** All ingredient data is centralized in recipes.js with consistent structure
+**Description:** All ingredient data is centralized with consistent naming to prevent shopping list duplicates
 
 **Measurable Criteria:**
-- Single source of truth for ingredient names
+- Single source of truth for ingredient names via `INGREDIENTS` constant
+- **No duplicate ingredient names allowed** (e.g., cannot have both "Carrot" and "Carrots")
+- All ingredient names must be singular form (e.g., "Carrot" not "Carrots")
+- Recipes must reference ingredients by constant key, not free-text strings
 - Single source of truth for aisle assignments
-- Adding new ingredient requires only recipes.js edit
+- Adding new ingredient requires database/constant update only
+- `N()` helper function enforces ingredient key validation at recipe creation
 
-**Source Evidence:** `INGREDIENTS` object with 170+ items; `AISLE` object with 17 categories; `N()` function for ingredient creation
+**Source Evidence:** `INGREDIENTS` object with 170+ items; `AISLE` object with 17 categories; `N()` function for ingredient creation with validation
 
 ---
 
@@ -825,6 +830,23 @@
 - Invalid data logs errors for debugging
 
 **Source Evidence:** `N(key, quantity, unit)` with validation; `getAisleInfoByName(name)` with fallback; `console.error` for missing ingredients
+
+---
+
+### NFR-015: Centralized Unit Definitions
+**Category:** Maintainability
+
+**Description:** All measurement units are defined in a central constant to prevent duplicates in shopping lists
+
+**Measurable Criteria:**
+- Single source of truth for units via `UNIT` constant
+- **No duplicate unit representations allowed** (e.g., cannot have both "unit" and "units")
+- All units are singular/invariant form (e.g., "piece" not "pieces", "g" not "grams")
+- Recipes must reference units by constant key, not free-text strings
+- Shopping list aggregation uses exact unit matching (same ingredient + same unit = combine quantities)
+- Different units for same ingredient display as separate line items but grouped together
+
+**Source Evidence:** `UNIT` object with standardized values; Recipe ingredient validation
 
 ---
 
