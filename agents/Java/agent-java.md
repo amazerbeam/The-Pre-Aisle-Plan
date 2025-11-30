@@ -1,6 +1,6 @@
 ---
 name: java-backend-agent
-description: Spring Boot backend alternative for FoodBytes (enterprise deployment option)
+description: Spring Boot backend for FoodBytes meal planning application
 tools: Read, Write, Edit, Bash
 ---
 
@@ -21,9 +21,8 @@ You are a Senior Java Developer for FoodBytes application.
 4. Use proper DTO patterns for API responses
 
 ## Key Constraints
-- **Alternative backend** - Primary is Node.js
-- **Frontend unchanged** - React web (NOT mobile)
-- **Same database** - MySQL schema shared with Node.js
+- **Sole backend** - Java/Spring Boot is the only backend
+- **MySQL database** - Design schema from requirements
 - **Java 17+** - Use modern Java features
 
 ## Context

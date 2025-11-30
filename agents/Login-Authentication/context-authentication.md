@@ -3,10 +3,10 @@
 
 ## Technology Stack
 - **Frontend**: React (web) with responsive design
-- **Backend**: Node.js + Express
+- **Backend**: Java/Spring Boot
 - **Database**: MySQL
 - **Auth Providers**: Google OAuth 2.0, GitHub OAuth
-- **Token Management**: JWT (JSON Web Tokens)
+- **Token Management**: JWT stored in httpOnly cookies (NOT localStorage)
 
 ## OAuth Flow
 ```
@@ -14,138 +14,113 @@ User clicks "Login with Google/GitHub"
     |
 Frontend redirects to /api/auth/{provider}
     |
-Express redirects to OAuth provider
+Backend redirects to OAuth provider
     |
 User authenticates with provider
     |
 Provider redirects to /api/auth/{provider}/callback
     |
-Express exchanges code for tokens
+Backend exchanges code for tokens
     |
-Express creates/updates user in MySQL
+Backend creates/updates user in MySQL
     |
-Express generates JWT
+Backend generates JWT
     |
-Frontend stores JWT in localStorage
+Backend sets JWT in httpOnly cookie (secure, SameSite=Strict)
     |
-Subsequent requests include JWT in Authorization header
+Frontend redirects to app (cookie automatically sent with requests)
+    |
+Subsequent requests automatically include cookie
 ```
 
-## Backend Implementation
+### Why httpOnly Cookies (NOT localStorage)
+- **XSS Protection**: JavaScript cannot access httpOnly cookies, preventing token theft via XSS attacks
+- **Automatic Transmission**: Browser automatically sends cookies with every request
+- **CSRF Protection**: Use SameSite=Strict and CSRF tokens for protection
 
-### Dependencies
-```json
-{
-  "passport": "^0.7.0",
-  "passport-google-oauth20": "^2.0.0",
-  "passport-github2": "^0.1.12",
-  "jsonwebtoken": "^9.0.0",
-  "express-session": "^1.17.3"
-}
+## Backend Implementation (Spring Boot)
+
+### Dependencies (pom.xml)
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-oauth2-client</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-security</artifactId>
+</dependency>
+<dependency>
+    <groupId>io.jsonwebtoken</groupId>
+    <artifactId>jjwt-api</artifactId>
+    <version>0.12.3</version>
+</dependency>
 ```
 
 ### Route Structure
 ```
-/api/auth/google          - Initiate Google OAuth
-/api/auth/google/callback - Google OAuth callback
-/api/auth/github          - Initiate GitHub OAuth
-/api/auth/github/callback - GitHub OAuth callback
-/api/auth/me              - Get current user (requires JWT)
-/api/auth/logout          - Clear session
+GET  /api/auth/google          - Initiate Google OAuth
+GET  /api/auth/google/callback - Google OAuth callback
+GET  /api/auth/github          - Initiate GitHub OAuth
+GET  /api/auth/github/callback - GitHub OAuth callback
+GET  /api/auth/me              - Get current user (requires JWT cookie)
+POST /api/auth/logout          - Clear JWT cookie
 ```
 
 ### JWT Payload Structure
-```javascript
+```java
+// Claims in JWT
 {
-  userId: number,
-  email: string,
-  name: string,
-  isAdmin: boolean,
-  iat: number,      // Issued at
-  exp: number       // Expiration (7 days)
+  "sub": "userId",           // Subject (user ID)
+  "email": "user@email.com",
+  "name": "User Name",
+  "isAdmin": false,
+  "iat": 1234567890,         // Issued at
+  "exp": 1235172690          // Expiration (7 days)
 }
 ```
 
-### Middleware Examples
-```javascript
-// authMiddleware.js - Verify JWT on protected routes
-const jwt = require('jsonwebtoken');
-
-const verifyToken = (req, res, next) => {
-  const token = req.headers.authorization?.split(' ')[1];
-  if (!token) return res.status(401).json({ error: 'No token provided' });
-
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded;
-    next();
-  } catch (err) {
-    return res.status(401).json({ error: 'Invalid token' });
-  }
-};
-
-// adminMiddleware.js - Verify admin role
-const verifyAdmin = (req, res, next) => {
-  if (!req.user?.isAdmin) {
-    return res.status(403).json({ error: 'Admin access required' });
-  }
-  next();
-};
-
-module.exports = { verifyToken, verifyAdmin };
+### Cookie Configuration
+```java
+// Setting JWT in httpOnly cookie after successful OAuth
+ResponseCookie cookie = ResponseCookie.from("jwt", token)
+    .httpOnly(true)
+    .secure(true)                    // HTTPS only in production
+    .sameSite("Strict")              // CSRF protection
+    .path("/")
+    .maxAge(Duration.ofDays(7))
+    .build();
+response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 ```
 
-### Passport Configuration
-```javascript
-// config/passport.js
-const passport = require('passport');
-const GoogleStrategy = require('passport-google-oauth20').Strategy;
-const GitHubStrategy = require('passport-github2').Strategy;
-const { findOrCreateUser } = require('../services/userService');
+### JWT Filter (extract from cookie)
+```java
+@Component
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-passport.use(new GoogleStrategy({
-    clientID: process.env.GOOGLE_CLIENT_ID,
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: '/api/auth/google/callback'
-  },
-  async (accessToken, refreshToken, profile, done) => {
-    try {
-      const user = await findOrCreateUser({
-        email: profile.emails[0].value,
-        name: profile.displayName,
-        oauthProvider: 'google',
-        oauthId: profile.id
-      });
-      done(null, user);
-    } catch (err) {
-      done(err, null);
+    @Override
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain chain) {
+        String token = extractTokenFromCookie(request);
+        if (token != null && jwtTokenProvider.validateToken(token)) {
+            Authentication auth = jwtTokenProvider.getAuthentication(token);
+            SecurityContextHolder.getContext().setAuthentication(auth);
+        }
+        chain.doFilter(request, response);
     }
-  }
-));
 
-passport.use(new GitHubStrategy({
-    clientID: process.env.GITHUB_CLIENT_ID,
-    clientSecret: process.env.GITHUB_CLIENT_SECRET,
-    callbackURL: '/api/auth/github/callback',
-    scope: ['user:email']
-  },
-  async (accessToken, refreshToken, profile, done) => {
-    try {
-      const email = profile.emails?.[0]?.value || `${profile.username}@github.local`;
-      const user = await findOrCreateUser({
-        email,
-        name: profile.displayName || profile.username,
-        oauthProvider: 'github',
-        oauthId: profile.id
-      });
-      done(null, user);
-    } catch (err) {
-      done(err, null);
+    private String extractTokenFromCookie(HttpServletRequest request) {
+        if (request.getCookies() != null) {
+            return Arrays.stream(request.getCookies())
+                .filter(c -> "jwt".equals(c.getName()))
+                .map(Cookie::getValue)
+                .findFirst()
+                .orElse(null);
+        }
+        return null;
     }
-  }
-));
-
-module.exports = passport;
+}
 ```
 
 ## Frontend Implementation
@@ -163,12 +138,9 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      fetchCurrentUser();
-    } else {
-      setLoading(false);
-    }
+    // Check if user is authenticated by calling /auth/me
+    // Cookie is automatically sent with the request
+    fetchCurrentUser();
   }, []);
 
   const fetchCurrentUser = async () => {
@@ -176,7 +148,8 @@ export const AuthProvider = ({ children }) => {
       const response = await api.get('/auth/me');
       setUser(response.data);
     } catch (err) {
-      localStorage.removeItem('token');
+      // Not authenticated or cookie expired
+      setUser(null);
     } finally {
       setLoading(false);
     }
@@ -186,9 +159,12 @@ export const AuthProvider = ({ children }) => {
     window.location.href = `/api/auth/${provider}`;
   };
 
-  const logout = () => {
-    localStorage.removeItem('token');
-    setUser(null);
+  const logout = async () => {
+    try {
+      await api.post('/auth/logout');  // Server clears the httpOnly cookie
+    } finally {
+      setUser(null);
+    }
   };
 
   return (
@@ -200,6 +176,13 @@ export const AuthProvider = ({ children }) => {
 
 export const useAuth = () => useContext(AuthContext);
 ```
+
+### Important: No localStorage for JWT
+The JWT is stored in an httpOnly cookie managed by the server. The frontend:
+- Does NOT store tokens in localStorage
+- Does NOT manually add Authorization headers
+- Relies on cookies being automatically sent with requests
+- Must configure Axios to send credentials (see below)
 
 ### Login Component
 ```javascript
@@ -266,9 +249,12 @@ CREATE TABLE users (
 1. **HTTPS**: Required in production
 2. **JWT Secret**: Strong, environment-variable stored secret (min 32 chars)
 3. **Token Expiration**: 7 days default, configurable
-4. **CORS**: Whitelist allowed origins
-5. **Rate Limiting**: Limit auth endpoints to prevent abuse
-6. **No Password Storage**: OAuth-only, no local passwords
+4. **httpOnly Cookies**: JWT stored in httpOnly cookies (NOT localStorage)
+5. **SameSite**: Cookie set to SameSite=Strict for CSRF protection
+6. **Secure Flag**: Cookie secure=true in production (HTTPS only)
+7. **CORS**: Whitelist allowed origins with credentials support
+8. **Rate Limiting**: Limit auth endpoints to prevent abuse
+9. **No Password Storage**: OAuth-only, no local passwords
 
 ## Environment Variables
 ```
@@ -287,7 +273,9 @@ FRONTEND_URL=http://localhost:3000
 - [ ] New user created on first login
 - [ ] Existing user updated on subsequent logins
 - [ ] JWT generated with correct payload
-- [ ] Protected routes reject invalid/missing tokens
+- [ ] JWT stored in httpOnly cookie (not accessible via JavaScript)
+- [ ] Cookie has secure and SameSite flags set correctly
+- [ ] Protected routes reject requests without valid cookie
 - [ ] Admin routes reject non-admin users
-- [ ] Logout clears session properly
-- [ ] Token expiration handled gracefully
+- [ ] Logout clears the httpOnly cookie
+- [ ] Token expiration handled gracefully (redirect to login)

@@ -21,7 +21,6 @@ You are a Senior Authentication Engineer for FoodBytes web application.
 4. Set up auth and admin middleware for protected routes
 
 ## Key Constraints
-- **Web app only** - React (NOT React Native)
 - **MySQL** for user storage
 - **No passwords** - OAuth-only authentication
 - **HTTPS** required in production

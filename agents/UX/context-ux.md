@@ -1,14 +1,6 @@
 # UX Design Context
 > Reference material for ux-design-agent
 
-## Platform
-
-**IMPORTANT:** This is a **responsive web application**, NOT a mobile app.
-- Runs in web browsers (Chrome, Safari, Firefox, Edge)
-- Works on desktop, tablet, and mobile devices via responsive design
-- NOT React Native, NOT a native app
-- Mobile support via mobile-first CSS and responsive layouts
-
 ## Design Principles
 
 ### 1. Mobile-First

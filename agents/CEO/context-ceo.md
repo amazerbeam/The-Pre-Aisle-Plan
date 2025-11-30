@@ -191,13 +191,12 @@ Java agent's concern acknowledged - both backends will be implemented.
 | 1 | Architecture | System Architect | All 5 | System design doc, API contracts |
 | 2 | Database | SQL Agent | All 5 | Schema, migrations, indexes |
 | 3 | Authentication | Auth Agent | All 5 | OAuth flows, JWT config, middleware |
-| 4 | Backend (Node) | System Architect | SQL, Auth, React | Express routes, controllers, services |
-| 5 | Backend (Java) | Java Agent | SQL, Auth, React | Spring Boot app, controllers, repos |
-| 6 | Frontend | React Agent | UX, Auth, Architect | Components, routing, state management |
-| 7 | UX Polish | UX Agent | React, Architect | Responsive CSS, accessibility fixes |
-| 8 | Integration | All Agents | All | End-to-end testing, API connections |
-| 9 | Docker | System Architect | All 5 | docker-compose, Dockerfiles, networking |
-| 10 | Testing | All Agents | Self | Domain-specific validation |
+| 4 | Backend (Java) | Java Agent | SQL, Auth, React | Spring Boot app, controllers, repos |
+| 5 | Frontend | React Agent | UX, Auth, Architect | Components, routing, state management |
+| 6 | UX Polish | UX Agent | React, Architect | Responsive CSS, accessibility fixes |
+| 7 | Integration | All Agents | All | End-to-end testing, API connections |
+| 8 | Docker | System Architect | All 5 | docker-compose, Dockerfiles, networking |
+| 9 | Testing | All Agents | Self | Domain-specific validation |
 
 ### Phase Details
 
@@ -241,20 +240,7 @@ Contents:
   - Admin middleware
 ```
 
-#### Phase 4: Backend (Node.js)
-```
-Lead: @system-architect
-Input: All previous phases
-Output: server/src/
-Contents:
-  - Express app setup
-  - Route definitions
-  - Controllers
-  - Services
-  - Database queries
-```
-
-#### Phase 5: Backend (Java)
+#### Phase 4: Backend (Java)
 ```
 Lead: @java-agent
 Input: All previous phases
@@ -267,7 +253,7 @@ Contents:
   - Security config
 ```
 
-#### Phase 6: Frontend
+#### Phase 5: Frontend
 ```
 Lead: @react-agent
 Input: API contracts, UX designs
@@ -280,7 +266,7 @@ Contents:
   - Routing setup
 ```
 
-#### Phase 7: UX Polish
+#### Phase 6: UX Polish
 ```
 Lead: @ux-agent
 Input: Frontend components
@@ -293,7 +279,7 @@ Contents:
   - Color scheme/theming
 ```
 
-#### Phase 8: Integration
+#### Phase 7: Integration
 ```
 Lead: All agents collaborate
 Input: All previous outputs
@@ -305,14 +291,13 @@ Contents:
   - Data persistence verification
 ```
 
-#### Phase 9: Docker
+#### Phase 8: Docker
 ```
 Lead: @system-architect
 Input: Complete application
 Output: docker-compose.yml, Dockerfiles
 Contents:
   - MySQL container
-  - Node.js API container
   - Java API container
   - React frontend container
   - Network configuration
@@ -320,7 +305,7 @@ Contents:
   - Health checks
 ```
 
-#### Phase 10: Testing
+#### Phase 9: Testing
 ```
 Lead: Each agent for their domain
 Input: Docker environment
@@ -421,7 +406,6 @@ Examples:
 
 ### Infrastructure Files
 - [ ] docker-compose.yml exists and is valid
-- [ ] Dockerfile for Node.js API
 - [ ] Dockerfile for Java API
 - [ ] Dockerfile for React frontend
 - [ ] .dockerignore files present
@@ -432,13 +416,6 @@ Examples:
 - [ ] Volume for data persistence
 - [ ] Init script runs schema.sql
 - [ ] Health check configured
-
-### Node.js API Container
-- [ ] Node 18+ image
-- [ ] npm install runs successfully
-- [ ] App starts on specified port
-- [ ] Connects to MySQL container
-- [ ] Health check endpoint responds
 
 ### Java API Container
 - [ ] Java 17+ image
@@ -498,28 +475,6 @@ services:
     networks:
       - foodbytes-network
 
-  api-node:
-    build:
-      context: ./server
-      dockerfile: Dockerfile
-    environment:
-      DB_HOST: mysql
-      DB_USER: ${DB_USER}
-      DB_PASSWORD: ${DB_PASSWORD}
-      DB_NAME: foodbytes
-      JWT_SECRET: ${JWT_SECRET}
-      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
-      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
-      GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}
-      GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET}
-    ports:
-      - "3001:3001"
-    depends_on:
-      mysql:
-        condition: service_healthy
-    networks:
-      - foodbytes-network
-
   api-java:
     build:
       context: ./foodbytes-api
@@ -544,7 +499,7 @@ services:
     ports:
       - "3000:80"
     depends_on:
-      - api-node
+      - api-java
     networks:
       - foodbytes-network
 
@@ -608,43 +563,37 @@ volumes:
 - [ ] Design approved/revised
 - [ ] Implementation complete
 
-### Phase 4: Backend (Node)
-- [ ] Express routes implemented
-- [ ] Controllers created
-- [ ] Services complete
-- [ ] Integration tested
-
-### Phase 5: Backend (Java)
+### Phase 4: Backend (Java)
 - [ ] Spring Boot setup
 - [ ] Controllers created
 - [ ] Repositories complete
 - [ ] Integration tested
 
-### Phase 6: Frontend
+### Phase 5: Frontend
 - [ ] React components created
 - [ ] State management setup
 - [ ] API integration complete
 - [ ] Routing configured
 
-### Phase 7: UX Polish
+### Phase 6: UX Polish
 - [ ] Responsive CSS applied
 - [ ] Accessibility verified
 - [ ] Mobile tested
 - [ ] Cross-browser tested
 
-### Phase 8: Integration
+### Phase 7: Integration
 - [ ] All APIs connected
 - [ ] Auth flows working
 - [ ] Data persistence verified
 - [ ] Error handling tested
 
-### Phase 9: Docker
+### Phase 8: Docker
 - [ ] docker-compose.yml created
 - [ ] All Dockerfiles created
 - [ ] Containers build successfully
 - [ ] docker-compose up works
 
-### Phase 10: Testing
+### Phase 9: Testing
 - [ ] Auth tests pass
 - [ ] CRUD tests pass
 - [ ] UI tests pass
@@ -656,13 +605,12 @@ volumes:
 ## Section 10: Critical Constraints
 
 ### NEVER Forget
-1. **Web app ONLY** - NOT React Native, NOT mobile apps
-2. **OAuth ONLY** - No password storage
-3. **MySQL** - Not PostgreSQL, not MongoDB
-4. **Both backends** - Node.js AND Java
-5. **Mobile-first CSS** - Responsive design, not native components
-6. **6-month retention** - Rolling data retention for meal plans
-7. **Immutable audit** - Recipe changes logged forever
+1. **OAuth ONLY** - No password storage
+2. **MySQL** - Not PostgreSQL, not MongoDB
+3. **Java backend** - Spring Boot (sole backend, no Node.js)
+4. **Mobile-first CSS** - Responsive design, not native components
+5. **6-month retention** - Rolling data retention for meal plans
+6. **Immutable audit** - Recipe changes logged forever
 
 ### Error Prevention
 - Always read context files before invoking agents

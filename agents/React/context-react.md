@@ -10,13 +10,6 @@
 - **HTTP Client**: Axios
 - **Date Handling**: date-fns
 
-## IMPORTANT: Web Application, Not Mobile App
-- DO NOT use React Native
-- DO NOT use Expo
-- DO NOT use native mobile components
-- DO use responsive CSS for mobile support
-- DO use mobile-first design principles
-
 ## Project Structure
 ```
 client/
@@ -255,24 +248,15 @@ import axios from 'axios';
 
 const api = axios.create({
   baseURL: '/api',
-  headers: { 'Content-Type': 'application/json' }
+  headers: { 'Content-Type': 'application/json' },
+  withCredentials: true  // IMPORTANT: Send cookies with requests
 });
 
-// Add JWT to requests
-api.interceptors.request.use(config => {
-  const token = localStorage.getItem('token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
-
-// Handle 401 errors
+// Handle 401 errors (redirect to login)
 api.interceptors.response.use(
   response => response,
   error => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('token');
       window.location.href = '/login';
     }
     return Promise.reject(error);
@@ -281,6 +265,12 @@ api.interceptors.response.use(
 
 export default api;
 ```
+
+### Important: Cookie-Based Authentication
+- JWT is stored in httpOnly cookie by the server (NOT localStorage)
+- `withCredentials: true` must be set on Axios for cookies to be sent
+- Frontend does NOT manually add Authorization headers
+- Cookies are automatically included in requests to same-origin API
 
 ## Key Features
 

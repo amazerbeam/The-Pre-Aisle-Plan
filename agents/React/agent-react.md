@@ -21,10 +21,8 @@ You are a Senior React Developer for FoodBytes web application.
 4. Integrate with backend API services
 
 ## Key Constraints
-- **Web app only** - React (NOT React Native)
-- **Mobile-first** - Use responsive CSS, not native components
 - **Accessibility** - Semantic HTML, ARIA labels, keyboard navigation
-- **Touch-friendly** - Minimum 44x44px tap targets
+- **Mobile-first** - Use responsive CSS (see context-system-architect.md for platform details)
 
 ## Context
 For code examples, component patterns, and configurations:

@@ -3,9 +3,18 @@
 
 ## System Type
 **Hybrid Client-Server Web Application**
-- NOT a mobile app (no React Native, no native apps)
-- Web application accessible via browsers on all devices
-- Responsive design for mobile browser support
+
+### CRITICAL: Web Application, NOT Mobile App
+This is the authoritative definition for all agents:
+- **DO NOT** use React Native
+- **DO NOT** use Expo
+- **DO NOT** use native mobile components
+- **DO NOT** build iOS or Android apps
+- **DO** use React (web) with responsive CSS
+- **DO** use mobile-first design principles
+- **DO** ensure touch-friendly interactions (44x44px minimum tap targets)
+
+The application runs in web browsers on all devices (desktop, tablet, mobile) via responsive design.
 
 ## Technology Stack
 
@@ -19,28 +28,21 @@
 | HTTP | Axios |
 | State | Context + useReducer |
 
-### Backend (Primary - Node.js)
-| Component | Technology |
-|-----------|------------|
-| Runtime | Node.js 18+ |
-| Framework | Express.js |
-| Auth | Passport.js |
-| Tokens | JWT |
-| Validation | Joi |
-
-### Backend (Alternative - Java)
+### Backend (Java Spring Boot)
 | Component | Technology |
 |-----------|------------|
 | Language | Java 17+ |
 | Framework | Spring Boot 3.x |
 | Security | Spring Security + OAuth2 |
 | ORM | Spring Data JPA |
+| Tokens | JWT |
+| Build | Maven |
 
 ### Database
 | Component | Technology |
 |-----------|------------|
 | RDBMS | MySQL 8+ |
-| Driver | mysql2 (Node) / mysql-connector-j (Java) |
+| Driver | mysql-connector-j |
 
 ## System Architecture Diagram
 
@@ -57,7 +59,7 @@
          +----------+----------+
          |                     |
    STATIC ASSETS          API SERVER
-   (React Build)          (Express/Spring)
+   (React Build)          (Spring Boot)
 
   - index.html           /api/auth/*
   - bundle.js            /api/recipes/*
@@ -94,39 +96,32 @@ foodbytes/
 │   ├── vite.config.js
 │   └── Dockerfile
 │
-├── server/                    # Express backend
-│   ├── src/
-│   │   ├── config/
-│   │   │   ├── database.js
-│   │   │   ├── passport.js
-│   │   │   └── env.js
-│   │   ├── controllers/
-│   │   │   ├── authController.js
-│   │   │   ├── recipeController.js
-│   │   │   ├── mealPlanController.js
-│   │   │   └── auditController.js
-│   │   ├── middleware/
-│   │   │   ├── auth.js
-│   │   │   ├── admin.js
-│   │   │   ├── validate.js
-│   │   │   └── errorHandler.js
-│   │   ├── models/
-│   │   ├── routes/
-│   │   │   ├── auth.js
-│   │   │   ├── recipes.js
-│   │   │   ├── mealPlan.js
-│   │   │   └── audit.js
-│   │   ├── services/
-│   │   │   ├── auditService.js
-│   │   │   └── archiveService.js
-│   │   └── app.js
-│   ├── package.json
-│   ├── .env.example
-│   └── Dockerfile
-│
-├── foodbytes-api/             # Spring Boot backend (alternative)
+├── foodbytes-api/             # Spring Boot backend
 │   ├── src/main/java/com/foodbytes/
+│   │   ├── FoodBytesApplication.java
+│   │   ├── config/
+│   │   │   ├── SecurityConfig.java
+│   │   │   ├── OAuth2Config.java
+│   │   │   └── JwtConfig.java
+│   │   ├── controller/
+│   │   │   ├── AuthController.java
+│   │   │   ├── RecipeController.java
+│   │   │   ├── MealPlanController.java
+│   │   │   └── AuditController.java
+│   │   ├── service/
+│   │   │   ├── UserService.java
+│   │   │   ├── RecipeService.java
+│   │   │   ├── MealPlanService.java
+│   │   │   └── AuditService.java
+│   │   ├── repository/
+│   │   ├── model/
+│   │   ├── dto/
+│   │   ├── security/
+│   │   └── exception/
 │   ├── src/main/resources/
+│   │   ├── application.yml
+│   │   └── application-dev.yml
+│   ├── src/test/
 │   ├── pom.xml
 │   └── Dockerfile
 │
@@ -190,9 +185,9 @@ GET /api/audit/recipes/:recipeId    - Audit log for recipe [Admin]
 5. Exchange code for tokens
 6. Create/update user in database
 7. Generate JWT with user info
-8. Return JWT to frontend
-9. Frontend stores in localStorage
-10. Include in Authorization header
+8. Set JWT in httpOnly cookie (secure, SameSite=Strict)
+9. Redirect frontend to app
+10. Cookie automatically sent with subsequent requests
 
 ### Authorization Levels
 | Level | Access |
@@ -203,12 +198,14 @@ GET /api/audit/recipes/:recipeId    - Audit log for recipe [Admin]
 
 ### Security Measures
 - HTTPS only in production
+- JWT stored in httpOnly cookies (NOT localStorage)
+- Cookie flags: secure=true, SameSite=Strict
 - JWT with expiration (7 days)
 - Rate limiting on auth endpoints
 - Input validation on all endpoints
-- SQL injection prevention (parameterized queries)
-- XSS prevention (React's built-in escaping)
-- CORS whitelist
+- SQL injection prevention (parameterized queries/JPA)
+- XSS prevention (React's built-in escaping, httpOnly cookies)
+- CORS whitelist with credentials support
 
 ## Data Flow
 
@@ -268,12 +265,12 @@ GITHUB_CLIENT_ID=your_github_client_id
 GITHUB_CLIENT_SECRET=your_github_client_secret
 
 # Server
-PORT=3001
-NODE_ENV=development
+SERVER_PORT=8080
+SPRING_PROFILES_ACTIVE=dev
 FRONTEND_URL=http://localhost:3000
 ```
 
 ## Monitoring & Logging
-- Application logs: Winston / Pino
+- Application logs: SLF4J + Logback
 - Error tracking: Sentry (optional)
-- Health check endpoint: GET /api/health
+- Health check endpoint: GET /api/health (Spring Actuator)

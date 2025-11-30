@@ -1,14 +1,12 @@
 # Java Backend Context
 > Reference material for java-backend-agent
 
-## Note on Architecture
+## Architecture
 
-The primary FoodBytes backend uses **Node.js + Express**. This Java agent provides:
-1. An alternative Spring Boot implementation
-2. Potential microservices for specific features
-3. Enterprise deployment option
-
-The **frontend remains React (web)** - NOT a mobile app.
+FoodBytes uses **Java Spring Boot** as its sole backend. The architecture is:
+- **Frontend**: React (web application)
+- **Backend**: Java 17+ / Spring Boot 3.x
+- **Database**: MySQL 8+
 
 ## Technology Stack
 
@@ -635,12 +633,3 @@ management:
 </project>
 ```
 
-## When to Use Java Backend
-
-| Scenario | Recommendation |
-|----------|----------------|
-| Startup/MVP | Use Node.js (faster development) |
-| Enterprise deployment | Consider Java (better tooling) |
-| Team expertise is Java | Use Java |
-| Need specific Java libraries | Use Java |
-| Microservices architecture | Mix both as needed |
