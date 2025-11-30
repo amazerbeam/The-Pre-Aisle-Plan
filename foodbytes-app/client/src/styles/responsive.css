@@ -1,0 +1,234 @@
+/* Mobile First - Base styles are for mobile */
+
+/* Small Tablets and Large Phones (480px and up) */
+@media (min-width: 480px) {
+  :root {
+    --font-size-base: 16px;
+  }
+
+  .container {
+    padding: 0 var(--spacing-lg);
+  }
+
+  .grid-2 {
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  }
+}
+
+/* Tablets (768px and up) */
+@media (min-width: 768px) {
+  :root {
+    --font-size-base: 16px;
+    --spacing-md: 20px;
+    --spacing-lg: 28px;
+    --spacing-xl: 40px;
+  }
+
+  .container {
+    padding: 0 var(--spacing-xl);
+  }
+
+  h1 {
+    font-size: 36px;
+  }
+
+  h2 {
+    font-size: 28px;
+  }
+
+  h3 {
+    font-size: 22px;
+  }
+
+  /* Grid adjustments */
+  .grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  /* Card adjustments */
+  .card {
+    padding: var(--spacing-lg);
+  }
+
+  /* Hide mobile navigation on tablet and up */
+  .mobile-nav {
+    display: none;
+  }
+}
+
+/* Desktop (1024px and up) */
+@media (min-width: 1024px) {
+  :root {
+    --spacing-xl: 48px;
+    --spacing-xxl: 64px;
+  }
+
+  .container {
+    padding: 0 var(--spacing-xxl);
+  }
+
+  h1 {
+    font-size: 40px;
+  }
+
+  h2 {
+    font-size: 32px;
+  }
+
+  /* Grid adjustments */
+  .grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .grid-4 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  /* Hover effects for desktop */
+  @media (hover: hover) {
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+    }
+
+    button:hover:not(:disabled) {
+      transform: translateY(-1px);
+    }
+  }
+}
+
+/* Large Desktop (1440px and up) */
+@media (min-width: 1440px) {
+  .container {
+    max-width: 1400px;
+  }
+}
+
+/* Print Styles */
+@media print {
+  body {
+    background: white;
+    color: black;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  a {
+    text-decoration: underline;
+  }
+
+  .card {
+    box-shadow: none;
+    border: 1px solid #ccc;
+    page-break-inside: avoid;
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  :root {
+    --color-border: #000000;
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.3);
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    border-width: 2px;
+  }
+}
+
+/* Landscape Orientation on Mobile */
+@media (max-height: 600px) and (orientation: landscape) {
+  :root {
+    --header-height: 48px;
+    --nav-height: 48px;
+  }
+}
+
+/* Responsive Typography */
+@media (min-width: 768px) {
+  body {
+    font-size: calc(var(--font-size-base) + 0.5px);
+  }
+}
+
+@media (min-width: 1024px) {
+  body {
+    font-size: calc(var(--font-size-base) + 1px);
+  }
+}
+
+/* Responsive Spacing Utilities */
+@media (min-width: 768px) {
+  .md-mb-0 { margin-bottom: 0; }
+  .md-mb-sm { margin-bottom: var(--spacing-sm); }
+  .md-mb-md { margin-bottom: var(--spacing-md); }
+  .md-mb-lg { margin-bottom: var(--spacing-lg); }
+
+  .md-mt-0 { margin-top: 0; }
+  .md-mt-sm { margin-top: var(--spacing-sm); }
+  .md-mt-md { margin-top: var(--spacing-md); }
+  .md-mt-lg { margin-top: var(--spacing-lg); }
+}
+
+@media (min-width: 1024px) {
+  .lg-mb-0 { margin-bottom: 0; }
+  .lg-mb-sm { margin-bottom: var(--spacing-sm); }
+  .lg-mb-md { margin-bottom: var(--spacing-md); }
+  .lg-mb-lg { margin-bottom: var(--spacing-lg); }
+
+  .lg-mt-0 { margin-top: 0; }
+  .lg-mt-sm { margin-top: var(--spacing-sm); }
+  .lg-mt-md { margin-top: var(--spacing-md); }
+  .lg-mt-lg { margin-top: var(--spacing-lg); }
+}
+
+/* Responsive Display */
+@media (max-width: 767px) {
+  .hide-mobile {
+    display: none !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .hide-tablet {
+    display: none !important;
+  }
+
+  .show-mobile {
+    display: none !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .hide-desktop {
+    display: none !important;
+  }
+}

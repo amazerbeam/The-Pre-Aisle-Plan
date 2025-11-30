@@ -1,0 +1,12 @@
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-surface);
+}
+
+.app__main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}

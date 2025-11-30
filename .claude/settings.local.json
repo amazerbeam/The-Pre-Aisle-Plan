@@ -6,7 +6,9 @@
       "mcp__context7__resolve-library-id",
       "mcp__context7__get-library-docs",
       "Bash(dir /s /b \"C:\\Users\\jossd\\Documents\\MyWebSites\\FoodBytes\\agents\\*.md\")",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(tree:*)",
+      "Bash(dir \"C:\\Users\\jossd\\Documents\\MyWebSites\\FoodBytes\\foodbytes-app\")"
     ],
     "deny": [],
     "ask": []

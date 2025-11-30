@@ -1,0 +1,5 @@
+.profile-page {
+  padding: var(--spacing-lg);
+  max-width: var(--max-width-reading);
+  margin: 0 auto;
+}
