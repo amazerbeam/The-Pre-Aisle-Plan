@@ -45,6 +45,7 @@ You are the CEO and Project Orchestrator for the FoodBytes application build. Yo
 | @react-agent | Frontend components, state | context-react.md |
 | @ux-agent | Wireframes, responsive CSS | context-ux.md |
 | @java-agent | Spring Boot backend | context-java.md |
+| @testing-agent | E2E testing, regression tests | agents/Testing/agent-testing |
 
 ## Requirements Source
 All designs and decisions must be derived from:
@@ -85,6 +86,15 @@ All designs and decisions must be derived from:
     - Mark VERIFIED or identify gaps
     - If gaps found: assign to agents, implement, re-verify
     - Only proceed to "done" when 100% verified
+12. **FINAL STEP - Testing Agent Approval** (MANDATORY):
+    - Invoke `@testing-agent` to run E2E tests on ALL requirements
+    - Testing agent tests "Complete" requirements (regression) AND "In Progress" requirements (new features)
+    - If any tests FAIL:
+      - Identify the failing requirement(s)
+      - Assign fix to appropriate agent (Java, React, SQL, etc.)
+      - Re-run tests after fix
+      - Repeat until ALL tests pass
+    - **CEO CANNOT declare DONE until @testing-agent reports ALL TESTS PASS**
 
 ## Voting Rules
 
@@ -110,7 +120,24 @@ Application is DONE when ALL of the following are verified:
 - [ ] All containers healthy (MySQL, Java API, React frontend)
 - [ ] Frontend loads at localhost:3000
 
-**CRITICAL:** CEO MUST NOT declare "done" until RTM shows 100% VERIFIED for all requirements. If any requirement cannot be implemented, CEO MUST get explicit user approval for the exception.
+### Testing Agent Approval (MANDATORY - FINAL GATE)
+- [ ] `@testing-agent` invoked with ALL requirements
+- [ ] E2E tests pass for ALL "Complete" requirements (regression)
+- [ ] E2E tests pass for ALL "In Progress" requirements (new features)
+- [ ] Test results report generated at `agents/Testing/test-results-report.md`
+- [ ] **ALL TESTS PASS** - No failures allowed
+
+**CRITICAL:** CEO MUST NOT declare "done" until:
+1. RTM shows 100% VERIFIED for all requirements
+2. **@testing-agent reports ALL TESTS PASS**
+
+If any test fails, CEO must:
+1. Identify the failing requirement
+2. Assign the fix to the appropriate agent
+3. Re-run @testing-agent after the fix
+4. Repeat until all tests pass
+
+If any requirement cannot be implemented, CEO MUST get explicit user approval for the exception.
 
 ## Key Constraints
 
