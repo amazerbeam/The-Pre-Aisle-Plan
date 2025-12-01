@@ -118,7 +118,7 @@
 - Each recipe displays a servings input control
 - Default value is 1 serving (or recipe's default)
 - Changing servings recalculates all ingredient quantities
-- Calorie display updates based on serving adjustment
+- Calorie display remains fixed (per-serving, does not scale) - see FR-036
 
 ---
 
@@ -258,18 +258,6 @@
 
 ---
 
-*No requirements in progress.*
-
----
-
-# Backlog
-
-> Future requirements to be implemented.
-
----
-
-# Functional Requirements
-
 ## Global Date Range
 
 ### FR-007: Shared Start Date with Fixed 7-Day Range
@@ -300,6 +288,110 @@
 - Single date picker component
 
 ---
+
+## Meal Planning
+
+### FR-014: Assign Recipes to Days of the Week
+**Priority:** High
+
+**Description:** Users can assign recipes to specific days within the 7-day planning window using day-of-week buttons (Mon-Sun)
+
+**User Story:** As a user, I want to quickly assign recipes to days of the week so that I can easily plan my meals.
+
+**Acceptance Criteria:**
+- Each recipe card displays **7 day buttons: Mon, Tue, Wed, Thu, Fri, Sat, Sun**
+- Day buttons correspond to the **7 days starting from the "From" date** (see FR-007)
+- Clicking a day button assigns the recipe to that specific date
+- **Clicking an already-assigned day removes the recipe** (toggle behavior)
+- Visual indicator shows which days the recipe is assigned to (highlighted/filled button)
+- Recipe's current serving size is saved with the assignment
+- Recipe is assigned to the meal type matching the current tab (e.g., if viewing Breakfast tab, assigns to Breakfast slot)
+- **Assigning a recipe automatically updates:**
+  - The Shopping List (ingredients added)
+  - The Meal Plan calendar view
+- Authenticated users' assignments sync to server database
+- Guest users can browse recipes but cannot save assignments
+
+**Source Evidence:**
+- `createDayButtons(entry, servings)`
+- `assignRecipeToDay()`
+- `planner[]` variable (date-indexed)
+- Server API: meal plan endpoints
+
+---
+
+### FR-015: Remove Recipes from Calendar
+**Priority:** High
+
+**Description:** Users can remove previously assigned recipes from a date
+
+**User Story:** As a user, I want to remove a recipe from my meal plan so that I can change my planned meals.
+
+**Acceptance Criteria:**
+- Clicking an already-assigned date removes the recipe from that date
+- Visual indicator updates to show the recipe is no longer assigned
+- Date entry is cleaned up if no recipes remain for that date
+- Change syncs to server database for authenticated users
+
+**Source Evidence:**
+- `assignRecipeToDate()` toggle behavior
+- Server API: DELETE meal plan endpoint
+
+---
+
+### FR-016: View Meal Plan Calendar
+**Priority:** High
+
+**Description:** Users can view their meal plan for the 7-day planning window showing all assigned recipes
+
+**User Story:** As a user, I want to view my meal plan so that I can see what I've planned for the week.
+
+**Acceptance Criteria:**
+- Meal Plan button in footer opens calendar view
+- **Uses the shared 7-day window** starting from "From" date (see FR-007)
+- Displays all 7 days in the planning window
+- Current date is visually highlighted (if within range)
+- Each date shows assigned recipes organized by meal type (Breakfast, Lunch, Dinner, Snacks)
+- Each recipe entry shows: recipe name and serving size
+- Daily calorie total is displayed for each date
+- Can remove recipes directly from the meal plan view
+- Visual distinction between past, current, and future dates
+- Changing the "From" date updates the meal plan view to show new 7-day window
+- Wake lock activates when calendar is visible (if supported)
+
+**Source Evidence:**
+- `renderCalendar()`
+- `#calendar-view` element
+- Server API: GET meal plan with start date (returns 7-day window)
+
+---
+
+### FR-017: Calculate Daily Calorie Totals
+**Priority:** Medium
+
+**Description:** System calculates and displays total calories for each day based on assigned recipes
+
+**User Story:** As a user, I want to see the total calories for each day so that I can track my nutritional intake.
+
+**Acceptance Criteria:**
+- Each day in meal plan shows sum of per-serving calories for all assigned recipes
+- Daily total assumes 1 serving per meal (does not multiply by servings) - see FR-036
+- Per-serving calorie info shows for individual recipes
+- Total updates automatically when recipes are added/removed
+
+**Source Evidence:**
+- Calculation: `entry.calories / entry.defaultServings` (per-serving, not scaled)
+- Day-box calorie totals in `renderFullCalendar()`
+
+---
+
+# Backlog
+
+> Future requirements to be implemented.
+
+---
+
+# Functional Requirements
 
 ## Recipe Management
 
@@ -393,13 +485,13 @@
 - Minimum serving size is 1
 - Maximum serving size is 10 (or reasonable max)
 - Scaled quantities show appropriate precision (whole numbers or 1 decimal)
-- Calorie display updates based on serving adjustment
+- Calorie display remains fixed (per-serving, does not scale) - see FR-036
 
 **Source Evidence:**
 - `createServingsInput(entry)`
 - `localServingsMap`
 - User's `default_servings` preference
-- Calculation: `quantity * (servings / defaultServings)`
+- Ingredient calculation: `quantity * (servings / defaultServings)`
 
 ---
 
@@ -432,7 +524,7 @@
 
 **Acceptance Criteria:**
 - Maximize button opens fullscreen recipe overlay
-- Fullscreen view displays recipe title, servings info, and calories
+- Fullscreen view displays recipe title, servings info, and per-serving calories (see FR-036)
 - Ingredients list shows scaled quantities
 - Cooking steps are numbered and clearly displayed
 - Close button (X) exits fullscreen mode
@@ -446,100 +538,6 @@
 ---
 
 ## Meal Planning
-
-### FR-014: Assign Recipes to Days of the Week
-**Priority:** High
-
-**Description:** Users can assign recipes to specific days within the 7-day planning window using day-of-week buttons (Mon-Sun)
-
-**User Story:** As a user, I want to quickly assign recipes to days of the week so that I can easily plan my meals.
-
-**Acceptance Criteria:**
-- Each recipe card displays **7 day buttons: Mon, Tue, Wed, Thu, Fri, Sat, Sun**
-- Day buttons correspond to the **7 days starting from the "From" date** (see FR-007)
-- Clicking a day button assigns the recipe to that specific date
-- **Clicking an already-assigned day removes the recipe** (toggle behavior)
-- Visual indicator shows which days the recipe is assigned to (highlighted/filled button)
-- Recipe's current serving size is saved with the assignment
-- Recipe is assigned to the meal type matching the current tab (e.g., if viewing Breakfast tab, assigns to Breakfast slot)
-- **Assigning a recipe automatically updates:**
-  - The Shopping List (ingredients added)
-  - The Meal Plan calendar view
-- Authenticated users' assignments sync to server database
-- Guest users can browse recipes but cannot save assignments
-
-**Source Evidence:**
-- `createDayButtons(entry, servings)`
-- `assignRecipeToDay()`
-- `planner[]` variable (date-indexed)
-- Server API: meal plan endpoints
-
----
-
-### FR-015: Remove Recipes from Calendar
-**Priority:** High
-
-**Description:** Users can remove previously assigned recipes from a date
-
-**User Story:** As a user, I want to remove a recipe from my meal plan so that I can change my planned meals.
-
-**Acceptance Criteria:**
-- Clicking an already-assigned date removes the recipe from that date
-- Visual indicator updates to show the recipe is no longer assigned
-- Date entry is cleaned up if no recipes remain for that date
-- Change syncs to server database for authenticated users
-
-**Source Evidence:**
-- `assignRecipeToDate()` toggle behavior
-- Server API: DELETE meal plan endpoint
-
----
-
-### FR-016: View Meal Plan Calendar
-**Priority:** High
-
-**Description:** Users can view their meal plan for the 7-day planning window showing all assigned recipes
-
-**User Story:** As a user, I want to view my meal plan so that I can see what I've planned for the week.
-
-**Acceptance Criteria:**
-- Meal Plan button in footer opens calendar view
-- **Uses the shared 7-day window** starting from "From" date (see FR-007)
-- Displays all 7 days in the planning window
-- Current date is visually highlighted (if within range)
-- Each date shows assigned recipes organized by meal type (Breakfast, Lunch, Dinner, Snacks)
-- Each recipe entry shows: recipe name and serving size
-- Daily calorie total is displayed for each date
-- Can remove recipes directly from the meal plan view
-- Visual distinction between past, current, and future dates
-- Changing the "From" date updates the meal plan view to show new 7-day window
-- Wake lock activates when calendar is visible (if supported)
-
-**Source Evidence:**
-- `renderCalendar()`
-- `#calendar-view` element
-- Server API: GET meal plan with start date (returns 7-day window)
-
----
-
-### FR-017: Calculate Daily Calorie Totals
-**Priority:** Medium
-
-**Description:** System calculates and displays total calories for each day based on assigned recipes
-
-**User Story:** As a user, I want to see the total calories for each day so that I can track my nutritional intake.
-
-**Acceptance Criteria:**
-- Each day in meal plan shows sum of all recipe calories
-- Calories are calculated based on recipe's calories and serving size
-- Per-serving calorie info shows for individual recipes
-- Total updates automatically when recipes are added/removed
-
-**Source Evidence:**
-- Calculation: `entry.calories / entry.defaultServings * servings`
-- Day-box calorie totals in `renderFullCalendar()`
-
----
 
 ### FR-018: Enforce Cheat Meal Limits
 **Priority:** Low
@@ -559,6 +557,29 @@
 - `allowCheatMeals` variable
 - `recipeData[].isCheat` property
 - Validation logic (lines 797-822)
+
+---
+
+### FR-036: Fixed Per-Serving Calorie Display
+**Priority:** High
+
+**Description:** Calorie displays always show per-serving values and do not scale when users adjust serving sizes
+
+**User Story:** As a user, I want to see calories per serving (fixed) so that I know my personal calorie intake regardless of how many people I'm cooking for.
+
+**Acceptance Criteria:**
+- Recipe cards display calories per serving (not total)
+- Adjusting servings does NOT change the calorie number displayed
+- Calorie display format remains as "X cal" (no label change needed)
+- Daily calorie totals in Meal Plan assume 1 serving per meal
+- Fullscreen recipe view shows per-serving calories
+
+**Rationale:** Scaling calories with servings is confusing - if cooking for 4 people, each person still eats 1 portion and their individual calorie intake remains the same.
+
+**Source Evidence:**
+- Recipe card calorie display
+- Fullscreen recipe view
+- Meal plan daily totals calculation
 
 ---
 
@@ -1228,7 +1249,7 @@ A meal recipe with ingredients and cooking instructions
 | meal | string \| array\<string\> | required, values: breakfast/lunch/dinner/snacks | Meal category or categories |
 | recipe | string | required, non-empty | Display name of the recipe |
 | defaultServings | integer | required, positive (typically 2-6) | Base number of servings |
-| calories | integer | required, positive | Total calories for all defaultServings |
+| calories | integer | required, positive | Total calories for all defaultServings (displayed as per-serving to users - see FR-036) |
 | ingredients | array\<IngredientReference\> | required, non-empty | List of ingredients with quantities |
 | steps | array\<string\> | required, non-empty | Ordered cooking instructions |
 | isCheat | boolean | optional, default false | Flag for "cheat meal" recipes |
