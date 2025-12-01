@@ -2,6 +2,7 @@
 -- Version: 2.0.0 (Normalized)
 
 -- Drop existing tables if they exist (for clean re-creation)
+DROP TABLE IF EXISTS meal_plan_entries;
 DROP TABLE IF EXISTS recipe_steps;
 DROP TABLE IF EXISTS recipe_ingredients;
 DROP TABLE IF EXISTS recipe_meals;
@@ -123,3 +124,30 @@ CREATE TABLE recipe_steps (
 -- Create indexes for common queries
 CREATE INDEX idx_recipe_meals_meal_id ON recipe_meals(meal_id);
 CREATE INDEX idx_ingredients_aisle_id ON ingredients(aisle_id);
+
+-- Meal Plan Entries table (FR-007, FR-014, FR-015, FR-016, FR-017)
+-- Stores user meal plan assignments: which recipe is assigned to which date/meal
+CREATE TABLE meal_plan_entries (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    plan_date DATE NOT NULL,
+    meal_id BIGINT NOT NULL,
+    recipe_id BIGINT NOT NULL,
+    servings INT NOT NULL DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    -- Prevent duplicate: same user can't assign same recipe to same date+meal twice
+    UNIQUE KEY unique_user_date_meal_recipe (user_id, plan_date, meal_id, recipe_id),
+
+    -- Foreign key constraints
+    CONSTRAINT fk_meal_plan_user FOREIGN KEY (user_id)
+        REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_meal_plan_meal FOREIGN KEY (meal_id)
+        REFERENCES meals(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT fk_meal_plan_recipe FOREIGN KEY (recipe_id)
+        REFERENCES recipes(id) ON DELETE CASCADE ON UPDATE CASCADE,
+
+    -- Index for efficient date range queries (7-day window lookup)
+    INDEX idx_user_date_range (user_id, plan_date)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

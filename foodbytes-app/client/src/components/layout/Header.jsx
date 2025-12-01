@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import LoginModal from '../auth/LoginModal'
+import DateRangePicker from '../common/DateRangePicker'
 import './Header.css'
 
 function Header() {
@@ -14,6 +15,9 @@ function Header() {
         <div className="logo">
           <h1>FoodBytes</h1>
         </div>
+
+        {/* FR-007: Date Range Picker - only shown to authenticated users */}
+        <DateRangePicker />
 
         <div className="header-right">
           {isAuthenticated ? (

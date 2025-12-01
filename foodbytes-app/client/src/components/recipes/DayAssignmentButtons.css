@@ -1,0 +1,94 @@
+/* DayAssignmentButtons - FR-014, FR-015: Day-of-week buttons for recipe assignment */
+
+.day-assignment-buttons {
+  display: flex;
+  gap: 4px;
+  margin: 12px 0;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+.day-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 8px;
+  min-width: 42px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background-color: #fff;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-size: 12px;
+}
+
+.day-button:hover:not(:disabled) {
+  border-color: var(--primary-color, #4a3f80);
+  background-color: rgba(74, 63, 128, 0.05);
+}
+
+.day-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.day-button.assigned {
+  background-color: var(--primary-color, #4a3f80);
+  border-color: var(--primary-color, #4a3f80);
+  color: #fff;
+}
+
+.day-button.assigned:hover:not(:disabled) {
+  background-color: #3d3469;
+}
+
+.day-button.today {
+  border-width: 2px;
+  border-color: var(--primary-color, #4a3f80);
+}
+
+.day-button.loading {
+  opacity: 0.7;
+  animation: pulse 0.8s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 0.5; }
+}
+
+.day-name {
+  font-weight: 500;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.day-indicator {
+  font-size: 10px;
+  line-height: 1;
+}
+
+.day-button.assigned .day-indicator {
+  color: #fff;
+}
+
+/* Mobile responsive */
+@media (max-width: 480px) {
+  .day-assignment-buttons {
+    justify-content: space-between;
+    gap: 2px;
+  }
+
+  .day-button {
+    min-width: 38px;
+    padding: 5px 6px;
+    flex: 1;
+    max-width: 50px;
+  }
+
+  .day-name {
+    font-size: 9px;
+  }
+}
