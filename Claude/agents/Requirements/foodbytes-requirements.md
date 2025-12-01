@@ -2,6 +2,23 @@
 
 > Extracted from codebase analysis following requirements-agent.yaml methodology
 
+---
+
+## Requirement Numbering Guidelines
+
+### DO:
+- Ensure requirement numbers are **unique** across the entire document
+- Pick the next increment when adding a new requirement (e.g., if FR-035 exists, next is FR-036)
+- Keep sequence numbers **contiguous** with no gaps
+- When moving a requirement between sections (Backlog → In Progress → Complete), **keep its original number**
+
+### DO NOT:
+- Reuse the same requirement number for different requirements
+- Leave gaps in the sequence (e.g., FR-001, FR-002, FR-005 is wrong)
+- Renumber requirements when moving between sections
+
+---
+
 ## Project Information
 
 | Field | Value |
@@ -15,28 +32,15 @@
 
 ---
 
-# MVP Phase 1: Recipe Viewer with Authentication
+# Complete
 
-> **PRIORITY: Build this first.** Focus only on these requirements before moving to the full scope below.
-
-## MVP Overview
-
-A simplified recipe viewer that allows users to:
-- Sign in with Google or continue as guest
-- Browse recipes by meal category (Breakfast, Lunch, Dinner, Snacks)
-- View recipe details
-
-**NOT included in MVP:**
-- Meal planning functionality
-- Shopping list functionality
-- Date range selection
-- Day-of-week assignment
+> Requirements that have been fully implemented and tested.
 
 ---
 
-## MVP-FR-001: Sign In / Guest Access
+## FR-001: Sign In / Guest Access
 
-**Priority:** Critical (MVP)
+**Priority:** Critical
 
 **Description:** Users can access the app by signing in with Google or continuing as a guest
 
@@ -59,9 +63,9 @@ A simplified recipe viewer that allows users to:
 
 ---
 
-## MVP-FR-002: Browse Recipes by Meal Category
+## FR-002: Browse Recipes by Meal Category
 
-**Priority:** Critical (MVP)
+**Priority:** Critical
 
 **Description:** Users can browse recipes filtered by meal type using tab navigation
 
@@ -77,16 +81,16 @@ A simplified recipe viewer that allows users to:
   - Calories per serving
   - Servings control (adjustable)
   - "Show Details" button (expandable)
-- **NO day-of-week buttons** (removed for MVP)
-- **NO meal plan assignment** (removed for MVP)
+- **NO day-of-week buttons** (see FR-014 in Backlog)
+- **NO meal plan assignment** (see FR-014 in Backlog)
 
 **UI Reference:** Keep the UI style from `/Legacy/index.html`
 
 ---
 
-## MVP-FR-003: View Recipe Details
+## FR-003: View Recipe Details
 
-**Priority:** Critical (MVP)
+**Priority:** Critical
 
 **Description:** Users can expand recipe cards to view ingredients and cooking steps
 
@@ -102,9 +106,9 @@ A simplified recipe viewer that allows users to:
 
 ---
 
-## MVP-FR-004: Adjust Serving Sizes
+## FR-004: Adjust Serving Sizes
 
-**Priority:** High (MVP)
+**Priority:** High
 
 **Description:** Users can adjust servings and see ingredient quantities recalculate
 
@@ -118,9 +122,9 @@ A simplified recipe viewer that allows users to:
 
 ---
 
-## MVP-FR-005: Search Recipes
+## FR-005: Search Recipes
 
-**Priority:** Medium (MVP)
+**Priority:** Medium
 
 **Description:** Users can search recipes by name
 
@@ -135,9 +139,9 @@ A simplified recipe viewer that allows users to:
 
 ---
 
-## MVP-FR-006: Footer Navigation
+## FR-006: Footer Navigation
 
-**Priority:** High (MVP)
+**Priority:** High
 
 **Description:** Bottom navigation with key actions
 
@@ -153,9 +157,9 @@ A simplified recipe viewer that allows users to:
 
 ---
 
-## MVP Database: Users Table
+## Database: Users Table
 
-**Priority:** Critical (MVP)
+**Priority:** Critical
 
 **Description:** Store user accounts from Google OAuth
 
@@ -174,9 +178,9 @@ A simplified recipe viewer that allows users to:
 
 ---
 
-## MVP Database: Recipes Table
+## Database: Recipes Table
 
-**Priority:** Critical (MVP)
+**Priority:** Critical
 
 **Description:** Store recipe data (migrated from recipes.js)
 
@@ -222,9 +226,19 @@ A simplified recipe viewer that allows users to:
 
 ---
 
-# Full Scope (Future Phases)
+# In Progress
 
-> The requirements below represent the full vision. Implement these AFTER MVP is complete.
+> Requirements currently being implemented.
+
+---
+
+*No requirements in progress.*
+
+---
+
+# Backlog
+
+> Future requirements to be implemented.
 
 ---
 
@@ -232,7 +246,7 @@ A simplified recipe viewer that allows users to:
 
 ## Global Date Range
 
-### FR-000: Shared Date Range Across All Views
+### FR-007: Shared Date Range Across All Views
 **Priority:** High
 
 **Description:** A single "From" and "To" date range controls all three main views: Recipes, Shopping List, and Meal Plan
@@ -262,7 +276,7 @@ A simplified recipe viewer that allows users to:
 
 ## Recipe Management
 
-### FR-001: Browse Recipes by Meal Category
+### FR-008: Browse Recipes by Meal Category
 **Priority:** High
 
 **Description:** Users can browse recipes filtered by meal type using tab navigation
@@ -283,7 +297,7 @@ A simplified recipe viewer that allows users to:
   - Calories
   - Servings control
   - "View Details" button
-  - **Day-of-week assignment buttons** (see FR-007)
+  - **Day-of-week assignment buttons** (see FR-014)
 
 **Source Evidence:**
 - `renderTabs()`
@@ -293,7 +307,7 @@ A simplified recipe viewer that allows users to:
 
 ---
 
-### FR-002: Search Recipes by Name
+### FR-009: Search Recipes by Name
 **Priority:** Medium
 
 **Description:** Users can search for recipes using a text search input
@@ -314,7 +328,7 @@ A simplified recipe viewer that allows users to:
 
 ---
 
-### FR-003: View Recipe Details
+### FR-010: View Recipe Details
 **Priority:** High
 
 **Description:** Users can expand recipe cards to view full ingredients list and cooking steps
@@ -336,7 +350,7 @@ A simplified recipe viewer that allows users to:
 
 ---
 
-### FR-004: Adjust Serving Sizes with Ingredient Scaling
+### FR-011: Adjust Serving Sizes with Ingredient Scaling
 **Priority:** High
 
 **Description:** Users can adjust the number of servings and see ingredient quantities automatically recalculated
@@ -345,7 +359,7 @@ A simplified recipe viewer that allows users to:
 
 **Acceptance Criteria:**
 - Each recipe displays a servings input control
-- **Default value is the user's Default Servings preference** (from profile, see FR-024)
+- **Default value is the user's Default Servings preference** (from profile, see FR-031)
 - If user has no preference set, default to 1 serving
 - Guest users default to 1 serving
 - Changing servings recalculates all ingredient quantities proportionally
@@ -362,7 +376,7 @@ A simplified recipe viewer that allows users to:
 
 ---
 
-### FR-005: Copy Recipe to Clipboard
+### FR-012: Copy Recipe to Clipboard
 **Priority:** Medium
 
 **Description:** Users can copy a formatted recipe (title, ingredients, steps) to their clipboard
@@ -382,7 +396,7 @@ A simplified recipe viewer that allows users to:
 
 ---
 
-### FR-006: Fullscreen Recipe View
+### FR-013: Fullscreen Recipe View
 **Priority:** Medium
 
 **Description:** Users can view a recipe in fullscreen mode for distraction-free cooking
@@ -406,7 +420,7 @@ A simplified recipe viewer that allows users to:
 
 ## Meal Planning
 
-### FR-007: Assign Recipes to Days of the Week
+### FR-014: Assign Recipes to Days of the Week
 **Priority:** High
 
 **Description:** Users can assign recipes to specific days within the selected date range using day-of-week buttons (Mon-Sun)
@@ -435,7 +449,7 @@ A simplified recipe viewer that allows users to:
 
 ---
 
-### FR-008: Remove Recipes from Calendar
+### FR-015: Remove Recipes from Calendar
 **Priority:** High
 
 **Description:** Users can remove previously assigned recipes from a date
@@ -454,7 +468,7 @@ A simplified recipe viewer that allows users to:
 
 ---
 
-### FR-009: View Meal Plan Calendar
+### FR-016: View Meal Plan Calendar
 **Priority:** High
 
 **Description:** Users can view their meal plan for the selected date range showing all assigned recipes
@@ -463,7 +477,7 @@ A simplified recipe viewer that allows users to:
 
 **Acceptance Criteria:**
 - Meal Plan button in footer opens calendar view
-- **Uses the shared global date range** (same "From" and "To" as Recipes and Shopping List - see FR-000)
+- **Uses the shared global date range** (same "From" and "To" as Recipes and Shopping List - see FR-007)
 - Displays all days within the date range
 - Current date is visually highlighted (if within range)
 - Each date shows assigned recipes organized by meal type (Breakfast, Lunch, Dinner, Snacks)
@@ -481,7 +495,7 @@ A simplified recipe viewer that allows users to:
 
 ---
 
-### FR-010: Calculate Daily Calorie Totals
+### FR-017: Calculate Daily Calorie Totals
 **Priority:** Medium
 
 **Description:** System calculates and displays total calories for each day based on assigned recipes
@@ -500,7 +514,7 @@ A simplified recipe viewer that allows users to:
 
 ---
 
-### FR-011: Enforce Cheat Meal Limits
+### FR-018: Enforce Cheat Meal Limits
 **Priority:** Low
 
 **Description:** System limits users to one cheat meal recipe per meal type per week
@@ -523,16 +537,16 @@ A simplified recipe viewer that allows users to:
 
 ## Shopping List
 
-### FR-012: Generate Aggregated Shopping List
+### FR-019: Generate Aggregated Shopping List
 **Priority:** High
 
-**Description:** System generates a unified shopping list from recipes in the meal plan using the shared global date range (see FR-000)
+**Description:** System generates a unified shopping list from recipes in the meal plan using the shared global date range (see FR-007)
 
 **User Story:** As a user, I want a consolidated shopping list for my planned meals so that I can shop efficiently.
 
 **Acceptance Criteria:**
 - Shopping List view accessible from bottom navigation
-- **Uses the shared global date range** (same "From" and "To" as Recipes and Meal Plan views - see FR-000)
+- **Uses the shared global date range** (same "From" and "To" as Recipes and Meal Plan views - see FR-007)
 - **NO preset buttons** (no "3 days", "1 week", "2 weeks" buttons)
 - **NO separate date pickers** - uses the global date range
 - Only ingredients from recipes within the global date range (inclusive) are aggregated
@@ -552,7 +566,7 @@ A simplified recipe viewer that allows users to:
 
 ---
 
-### FR-013: Group Ingredients by Grocery Aisle
+### FR-020: Group Ingredients by Grocery Aisle
 **Priority:** High
 
 **Description:** Shopping list items are organized by grocery store aisle
@@ -573,7 +587,7 @@ A simplified recipe viewer that allows users to:
 
 ---
 
-### FR-014: Check Off Purchased Items
+### FR-021: Check Off Purchased Items
 **Priority:** Medium
 
 **Description:** Users can mark shopping list items as purchased
@@ -594,7 +608,7 @@ A simplified recipe viewer that allows users to:
 
 ---
 
-### FR-015: Uncheck All Shopping Items
+### FR-022: Uncheck All Shopping Items
 **Priority:** Low
 
 **Description:** Users can reset all shopping list checkboxes at once
@@ -615,7 +629,7 @@ A simplified recipe viewer that allows users to:
 
 ---
 
-### FR-016: Copy Shopping List to Clipboard
+### FR-023: Copy Shopping List to Clipboard
 **Priority:** Medium
 
 **Description:** Users can copy the entire shopping list formatted for sharing
@@ -635,7 +649,7 @@ A simplified recipe viewer that allows users to:
 
 ---
 
-### FR-017: Sort Shopping List by Aisle, Ingredient Name, and Check Status
+### FR-024: Sort Shopping List by Aisle, Ingredient Name, and Check Status
 **Priority:** Medium
 
 **Description:** Shopping list sorts by check status, then aisle order, then ingredient name alphabetically
@@ -656,7 +670,7 @@ A simplified recipe viewer that allows users to:
 
 ## Data Persistence & Sharing
 
-### FR-018: Persist Meal Plan to Server Database
+### FR-025: Persist Meal Plan to Server Database
 **Priority:** High
 
 **Description:** System automatically saves authenticated users' meal plans to the server database
@@ -679,7 +693,7 @@ A simplified recipe viewer that allows users to:
 
 ---
 
-### FR-019: Persist Shopping List State to Local Storage
+### FR-026: Persist Shopping List State to Local Storage
 **Priority:** Medium
 
 **Description:** System saves shopping list checkbox states to localStorage
@@ -698,7 +712,7 @@ A simplified recipe viewer that allows users to:
 
 ---
 
-### FR-020: Generate Shareable Meal Plan URL
+### FR-027: Generate Shareable Meal Plan URL
 **Priority:** Low
 
 **Description:** Users can generate a URL that encodes a date range of their meal plan for sharing
@@ -720,7 +734,7 @@ A simplified recipe viewer that allows users to:
 
 ---
 
-### FR-021: Import Meal Plan from Shared URL
+### FR-028: Import Meal Plan from Shared URL
 **Priority:** Low
 
 **Description:** System loads a shared meal plan when URL contains encoded planner data with dates
@@ -746,7 +760,7 @@ A simplified recipe viewer that allows users to:
 
 ## Mobile Features
 
-### FR-022: Screen Wake Lock During Cooking
+### FR-029: Screen Wake Lock During Cooking
 **Priority:** Low
 
 **Description:** System keeps screen awake when viewing meal plan or fullscreen recipe
@@ -770,7 +784,7 @@ A simplified recipe viewer that allows users to:
 
 ## User Authentication
 
-### FR-023: User Registration and Login (Google OAuth Only)
+### FR-030: User Registration and Login (Google OAuth Only)
 **Priority:** High
 
 **Description:** Users can create accounts and log in using Google OAuth only
@@ -797,7 +811,7 @@ A simplified recipe viewer that allows users to:
 
 ---
 
-### FR-024: View and Edit User Profile
+### FR-031: View and Edit User Profile
 **Priority:** Medium
 
 **Description:** Authenticated users can view their profile information and configure preferences
@@ -825,7 +839,7 @@ A simplified recipe viewer that allows users to:
 
 ## Admin Features
 
-### FR-025: GOD Mode Admin Access
+### FR-032: GOD Mode Admin Access
 **Priority:** High
 
 **Description:** Designated admin user(s) have elevated privileges to manage recipes
@@ -847,7 +861,7 @@ A simplified recipe viewer that allows users to:
 
 ---
 
-### FR-026: Recipe Editing (Admin Only)
+### FR-033: Recipe Editing (Admin Only)
 **Priority:** High
 
 **Description:** Admin users can create, update, and delete recipes
@@ -860,7 +874,7 @@ A simplified recipe viewer that allows users to:
 - Can add, remove, or modify ingredients (name, quantity, unit)
 - Can add, remove, or reorder cooking steps
 - Can toggle cheat meal flag
-- Can toggle recipe visibility (Live/Hidden) - see FR-028
+- Can toggle recipe visibility (Live/Hidden) - see FR-035
 - Can assign recipe to meal categories
 - Delete recipe performs soft delete (preserves for audit)
 - Changes immediately visible to all users after save (for Live recipes)
@@ -873,7 +887,7 @@ A simplified recipe viewer that allows users to:
 
 ---
 
-### FR-027: Recipe Edit Audit Trail
+### FR-034: Recipe Edit Audit Trail
 **Priority:** High
 
 **Description:** All recipe modifications are logged to an audit table with full change history
@@ -896,7 +910,7 @@ A simplified recipe viewer that allows users to:
 
 ---
 
-### FR-028: Recipe Visibility Toggle (Admin Only)
+### FR-035: Recipe Visibility Toggle (Admin Only)
 **Priority:** High
 
 **Description:** Admin users can set recipes as Live (visible to all users) or Hidden (visible only to admins)
