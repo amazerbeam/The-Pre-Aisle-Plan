@@ -111,7 +111,16 @@ Always use foreign keys to reference existing tables. This ensures data integrit
 **Example: Recipe ingredients reference the ingredients and units lookup tables**
 
 ```sql
--- Lookup tables (must exist first)
+-- Lookup tables (must exist first, in dependency order)
+CREATE TABLE `aisles` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `key` VARCHAR(50) NOT NULL,
+  `name` VARCHAR(100) NOT NULL,
+  `display_order` TINYINT UNSIGNED NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unique_key` (`key`)
+);
+
 CREATE TABLE `units` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `key` VARCHAR(50) NOT NULL,
@@ -126,6 +135,8 @@ CREATE TABLE `ingredients` (
   `name` VARCHAR(255) NOT NULL,
   `aisle_id` INT UNSIGNED NOT NULL,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `unique_key` (`key`),
+  UNIQUE KEY `unique_name` (`name`),
   CONSTRAINT `fk_ingredients_aisle` FOREIGN KEY (`aisle_id`)
     REFERENCES `aisles` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE
 );

@@ -18,7 +18,12 @@
       "Bash(copy:*)",
       "Bash(findstr:*)",
       "Bash(docker-compose restart:*)",
-      "Bash(docker exec:*)"
+      "Bash(docker exec:*)",
+      "mcp__sequential-thinking__sequentialthinking",
+      "mcp__context7__resolve-library-id",
+      "mcp__context7__get-library-docs",
+      "Bash(del \"C:\\Users\\jossd\\Documents\\MyWebSites\\FoodBytes\\foodbytes-app\\foodbytes-api\\src\\main\\java\\com\\foodbytes\\model\\MealType.java\")",
+      "Bash(docker-compose:*)"
     ],
     "deny": [],
     "ask": []

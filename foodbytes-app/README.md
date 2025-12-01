@@ -104,14 +104,14 @@ foodbytes-app/
 └── .env.example
 ```
 
-## MVP Requirements Implemented
+## Requirements Implemented
 
-- [x] MVP-FR-001: Sign In / Guest Access
-- [x] MVP-FR-002: Browse Recipes by Meal Category
-- [x] MVP-FR-003: View Recipe Details
-- [x] MVP-FR-004: Adjust Serving Sizes
-- [x] MVP-FR-005: Search Recipes
-- [x] MVP-FR-006: Footer Navigation
+- [x] FR-001: Sign In / Guest Access
+- [x] FR-002: Browse Recipes by Meal Category
+- [x] FR-003: View Recipe Details
+- [x] FR-004: Adjust Serving Sizes
+- [x] FR-005: Search Recipes
+- [x] FR-006: Footer Navigation
 
 ## Brand Color
 

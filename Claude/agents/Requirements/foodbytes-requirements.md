@@ -204,16 +204,42 @@
 | recipe_id | INT | FK → recipes.id | Recipe reference |
 | meal_type | ENUM | 'breakfast','lunch','dinner','snacks' | Meal category |
 
-**Table: `recipe_ingredients`**
+**Table: `aisles`** (lookup table)
 
 | Column | Type | Constraints | Description |
 |--------|------|-------------|-------------|
-| id | INT | PK, AUTO_INCREMENT | Unique ID |
-| recipe_id | INT | FK → recipes.id | Recipe reference |
-| name | VARCHAR(255) | NOT NULL | Ingredient name |
+| id | INT UNSIGNED | PK, AUTO_INCREMENT | Unique aisle ID |
+| key | VARCHAR(50) | UNIQUE, NOT NULL | Constant key (e.g., "DAIRY") |
+| name | VARCHAR(100) | NOT NULL | Display name (e.g., "Dairy") |
+| display_order | TINYINT UNSIGNED | NOT NULL | Sort order for shopping list (1-17) |
+
+**Table: `units`** (lookup table)
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | INT UNSIGNED | PK, AUTO_INCREMENT | Unique unit ID |
+| key | VARCHAR(50) | UNIQUE, NOT NULL | Constant key (e.g., "GRAM") |
+| value | VARCHAR(20) | NOT NULL | Display value (e.g., "g") |
+
+**Table: `ingredients`** (lookup table)
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | INT UNSIGNED | PK, AUTO_INCREMENT | Unique ingredient ID |
+| key | VARCHAR(100) | UNIQUE, NOT NULL | Constant key (e.g., "ROLLED_OATS") |
+| name | VARCHAR(255) | UNIQUE, NOT NULL | Display name (e.g., "Rolled oats") |
+| aisle_id | INT UNSIGNED | FK → aisles.id, NOT NULL | Grocery aisle reference |
+
+**Table: `recipe_ingredients`** (junction table)
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | INT UNSIGNED | PK, AUTO_INCREMENT | Unique ID |
+| recipe_id | INT UNSIGNED | FK → recipes.id | Recipe reference |
+| ingredient_id | INT UNSIGNED | FK → ingredients.id | Ingredient reference |
 | quantity | DECIMAL(10,2) | NOT NULL | Amount |
-| unit | VARCHAR(50) | NOT NULL | Measurement unit |
-| sort_order | INT | NOT NULL | Display order |
+| unit_id | INT UNSIGNED | FK → units.id | Unit reference |
+| sort_order | SMALLINT UNSIGNED | NOT NULL, DEFAULT 0 | Display order |
 
 **Table: `recipe_steps`**
 

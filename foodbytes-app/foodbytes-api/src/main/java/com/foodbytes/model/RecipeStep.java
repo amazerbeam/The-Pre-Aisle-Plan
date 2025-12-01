@@ -24,4 +24,7 @@ public class RecipeStep {
 
     @Column(columnDefinition = "TEXT", nullable = false)
     private String instruction;
+
+    @Column(columnDefinition = "TEXT")
+    private String tip;
 }

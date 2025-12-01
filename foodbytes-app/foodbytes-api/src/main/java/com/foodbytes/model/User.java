@@ -31,6 +31,9 @@ public class User {
     @Column(name = "is_admin")
     private Boolean isAdmin = false;
 
+    @Column(name = "default_servings")
+    private Integer defaultServings = 1;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 

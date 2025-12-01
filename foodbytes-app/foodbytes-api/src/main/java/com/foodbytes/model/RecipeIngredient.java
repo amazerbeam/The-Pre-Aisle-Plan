@@ -20,14 +20,16 @@ public class RecipeIngredient {
     @JoinColumn(name = "recipe_id", nullable = false)
     private Recipe recipe;
 
-    @Column(nullable = false)
-    private String name;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ingredient_id", nullable = false)
+    private Ingredient ingredient;
 
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal quantity;
 
-    @Column(nullable = false)
-    private String unit;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "unit_id", nullable = false)
+    private Unit unit;
 
     @Column(name = "sort_order")
     private Integer sortOrder = 0;

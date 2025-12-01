@@ -75,17 +75,141 @@ foodbytes-api/
 
 ## Entity Models
 
+### Lookup Entities
+
+#### Aisle.java
+```java
+package com.foodbytes.model;
+
+import jakarta.persistence.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+
+@Entity
+@Table(name = "aisles")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Aisle {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "`key`", unique = true, nullable = false, length = 50)
+    private String key;
+
+    @Column(nullable = false, length = 100)
+    private String name;
+
+    @Column(name = "display_order", nullable = false)
+    private Short displayOrder;
+}
+```
+
+#### Unit.java
+```java
+package com.foodbytes.model;
+
+import jakarta.persistence.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+
+@Entity
+@Table(name = "units")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Unit {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "`key`", unique = true, nullable = false, length = 50)
+    private String key;
+
+    @Column(nullable = false, length = 20)
+    private String value;
+}
+```
+
+#### Meal.java
+```java
+package com.foodbytes.model;
+
+import jakarta.persistence.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+
+@Entity
+@Table(name = "meals")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Meal {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "`key`", unique = true, nullable = false, length = 50)
+    private String key;
+
+    @Column(nullable = false, length = 100)
+    private String name;
+
+    @Column(name = "display_order", nullable = false)
+    private Short displayOrder;
+}
+```
+
+#### Ingredient.java
+```java
+package com.foodbytes.model;
+
+import jakarta.persistence.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+
+@Entity
+@Table(name = "ingredients")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Ingredient {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "`key`", unique = true, nullable = false, length = 100)
+    private String key;
+
+    @Column(unique = true, nullable = false)
+    private String name;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "aisle_id", nullable = false)
+    private Aisle aisle;
+}
+```
+
 ### User.java
 ```java
 package com.foodbytes.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "users")
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -97,15 +221,17 @@ public class User {
     @Column(nullable = false)
     private String name;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "oauth_provider", nullable = false)
-    private OAuthProvider oauthProvider;
+    @Column(name = "google_id", unique = true, nullable = false)
+    private String googleId;
 
-    @Column(name = "oauth_id", nullable = false)
-    private String oauthId;
+    @Column(name = "avatar_url")
+    private String avatarUrl;
 
     @Column(name = "is_admin")
     private Boolean isAdmin = false;
+
+    @Column(name = "default_servings")
+    private Integer defaultServings = 1;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -118,10 +244,6 @@ public class User {
         createdAt = LocalDateTime.now();
     }
 }
-
-public enum OAuthProvider {
-    GOOGLE, GITHUB
-}
 ```
 
 ### Recipe.java
@@ -130,12 +252,18 @@ package com.foodbytes.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "recipes")
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Recipe {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -144,34 +272,35 @@ public class Recipe {
     @Column(nullable = false)
     private String name;
 
-    @Column(name = "meal_types", columnDefinition = "JSON")
-    @Convert(converter = JsonListConverter.class)
-    private List<String> mealTypes;
-
     @Column(name = "default_servings")
     private Integer defaultServings = 2;
 
     private Integer calories;
 
-    @Column(columnDefinition = "JSON")
-    @Convert(converter = IngredientListConverter.class)
-    private List<Ingredient> ingredients;
-
-    @Column(columnDefinition = "JSON")
-    @Convert(converter = JsonListConverter.class)
-    private List<String> steps;
-
     @Column(name = "is_cheat")
     private Boolean isCheat = false;
 
-    @Column(name = "is_deleted")
-    private Boolean isDeleted = false;
+    @Column(name = "is_live")
+    private Boolean isLive = true;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<RecipeMeal> meals = new ArrayList<>();
+
+    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OrderBy("sortOrder ASC")
+    @BatchSize(size = 20)
+    private List<RecipeIngredient> ingredients = new ArrayList<>();
+
+    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OrderBy("stepNumber ASC")
+    @BatchSize(size = 20)
+    private List<RecipeStep> steps = new ArrayList<>();
 
     @PrePersist
     protected void onCreate() {
@@ -183,6 +312,109 @@ public class Recipe {
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
+}
+```
+
+### RecipeIngredient.java (Junction)
+```java
+package com.foodbytes.model;
+
+import jakarta.persistence.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import java.math.BigDecimal;
+
+@Entity
+@Table(name = "recipe_ingredients")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class RecipeIngredient {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "recipe_id", nullable = false)
+    private Recipe recipe;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ingredient_id", nullable = false)
+    private Ingredient ingredient;
+
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal quantity;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "unit_id", nullable = false)
+    private Unit unit;
+
+    @Column(name = "sort_order")
+    private Integer sortOrder = 0;
+}
+```
+
+### RecipeStep.java (Child)
+```java
+package com.foodbytes.model;
+
+import jakarta.persistence.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+
+@Entity
+@Table(name = "recipe_steps")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class RecipeStep {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "recipe_id", nullable = false)
+    private Recipe recipe;
+
+    @Column(name = "step_number", nullable = false)
+    private Integer stepNumber;
+
+    @Column(columnDefinition = "TEXT", nullable = false)
+    private String instruction;
+
+    @Column(columnDefinition = "TEXT")
+    private String tip;
+}
+```
+
+### RecipeMeal.java (Junction)
+```java
+package com.foodbytes.model;
+
+import jakarta.persistence.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+
+@Entity
+@Table(name = "recipe_meals")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class RecipeMeal {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "recipe_id", nullable = false)
+    private Recipe recipe;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "meal_id", nullable = false)
+    private Meal meal;
 }
 ```
 

@@ -6,20 +6,18 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
 @Entity
-@Table(name = "recipe_meals")
+@Table(name = "units")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class RecipeMeal {
+public class Unit {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "recipe_id", nullable = false)
-    private Recipe recipe;
+    @Column(name = "`key`", unique = true, nullable = false, length = 50)
+    private String key;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "meal_id", nullable = false)
-    private Meal meal;
+    @Column(nullable = false, length = 20)
+    private String value;
 }

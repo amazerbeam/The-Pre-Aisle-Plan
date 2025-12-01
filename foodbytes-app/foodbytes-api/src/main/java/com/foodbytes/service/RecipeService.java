@@ -3,7 +3,6 @@ package com.foodbytes.service;
 import com.foodbytes.dto.RecipeDTO;
 import com.foodbytes.dto.IngredientDTO;
 import com.foodbytes.model.Recipe;
-import com.foodbytes.model.MealType;
 import com.foodbytes.repository.RecipeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,8 +25,7 @@ public class RecipeService {
 
     @Transactional(readOnly = true)
     public List<RecipeDTO> getRecipesByMealType(String mealType) {
-        MealType type = MealType.valueOf(mealType.toLowerCase());
-        return recipeRepository.findByMealType(type).stream()
+        return recipeRepository.findByMealKey(mealType.toLowerCase()).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
@@ -55,11 +53,14 @@ public class RecipeService {
         dto.setIsCheat(recipe.getIsCheat());
 
         dto.setMealTypes(recipe.getMeals().stream()
-                .map(m -> m.getMealType().name())
+                .map(m -> m.getMeal().getKey())
                 .collect(Collectors.toList()));
 
         dto.setIngredients(recipe.getIngredients().stream()
-                .map(i -> new IngredientDTO(i.getName(), i.getQuantity(), i.getUnit()))
+                .map(i -> new IngredientDTO(
+                    i.getIngredient().getName(),
+                    i.getQuantity(),
+                    i.getUnit().getValue()))
                 .collect(Collectors.toList()));
 
         dto.setSteps(recipe.getSteps().stream()
