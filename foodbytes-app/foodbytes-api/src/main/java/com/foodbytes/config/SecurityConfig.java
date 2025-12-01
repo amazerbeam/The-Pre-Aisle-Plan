@@ -1,24 +1,25 @@
 package com.foodbytes.config;
 
+import com.foodbytes.repository.UserRepository;
 import com.foodbytes.security.CustomOAuth2UserService;
 import com.foodbytes.security.JwtAuthenticationFilter;
-import com.foodbytes.security.OAuth2SuccessHandler;
+import com.foodbytes.security.JwtTokenProvider;
+import com.foodbytes.security.OAuth2AuthenticationSuccessHandler;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
-import java.util.Arrays;
 import java.util.List;
 
 @Configuration
@@ -27,47 +28,59 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    private final CustomOAuth2UserService customOAuth2UserService;
-    private final OAuth2SuccessHandler oAuth2SuccessHandler;
-
-    @Value("${cors.allowed-origins}")
-    private String allowedOrigins;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final UserRepository userRepository;
+    private final CustomOAuth2UserService oAuth2UserService;
+    private final OAuth2AuthenticationSuccessHandler oAuth2SuccessHandler;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    @Order(1)
+    public SecurityFilterChain apiSecurityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable)
+                .securityMatcher("/api/**")
+                .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // Public endpoints
-                        .requestMatchers(
-                                "/",
-                                "/error",
-                                "/api-docs/**",
-                                "/swagger-ui/**",
-                                "/swagger-ui.html",
-                                "/actuator/health",
-                                "/oauth2/**",
-                                "/login/oauth2/**",
-                                "/api/public/**"
-                        ).permitAll()
-                        // Admin-only endpoints
-                        .requestMatchers("/api/recipes/**").hasRole("ADMIN")
-                        .requestMatchers("/api/audit/**").hasRole("ADMIN")
-                        // Authenticated endpoints
-                        .requestMatchers("/api/auth/me", "/api/auth/logout").authenticated()
-                        .requestMatchers("/api/meal-plan/**").authenticated()
+                        // Public API endpoints
+                        .requestMatchers("/api/health").permitAll()
+                        .requestMatchers("/api/auth/status").permitAll()
+                        .requestMatchers("/api/auth/logout").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/recipes/**").permitAll()
+                        // Protected endpoints
+                        .requestMatchers("/api/auth/me").authenticated()
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
-                .oauth2Login(oauth2 -> oauth2
-                        .userInfoEndpoint(userInfo -> userInfo
-                                .userService(customOAuth2UserService))
-                        .successHandler(oAuth2SuccessHandler)
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.setContentType("application/json");
+                            response.getWriter().write("{\"error\":\"Unauthorized\"}");
+                        })
                 )
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthenticationFilter(),
+                        UsernamePasswordAuthenticationFilter.class);
+
+        return http.build();
+    }
+
+    @Bean
+    @Order(2)
+    public SecurityFilterChain oauthSecurityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .securityMatcher("/oauth2/**", "/login/oauth2/**")
+                .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .authorizeHttpRequests(auth -> auth
+                        .anyRequest().permitAll()
+                )
+                .oauth2Login(oauth2 -> oauth2
+                        .userInfoEndpoint(userInfo ->
+                                userInfo.userService(oAuth2UserService))
+                        .successHandler(oAuth2SuccessHandler)
+                );
 
         return http.build();
     }
@@ -75,14 +88,18 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList(allowedOrigins.split(",")));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:5173"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
-        configuration.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
+    }
+
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter() {
+        return new JwtAuthenticationFilter(jwtTokenProvider, userRepository);
     }
 }

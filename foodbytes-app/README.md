@@ -1,131 +1,80 @@
-# FoodBytes Application
+# FoodBytes MVP
 
-A meal planning and recipe management web application built with React, Spring Boot, and MySQL.
+A recipe viewer application with Google OAuth authentication.
 
-## Architecture
+## Features (MVP)
 
-```
-┌─────────────┐     ┌─────────────┐     ┌─────────────┐
-│   Frontend  │────▶│   Backend   │────▶│   MySQL     │
-│   (React)   │     │(Spring Boot)│     │  Database   │
-│   :3000     │     │   :8080     │     │   :3306     │
-└─────────────┘     └─────────────┘     └─────────────┘
-```
+- **Sign In / Guest Access** - Sign in with Google or continue as guest
+- **Browse Recipes** - View recipes by meal category (Breakfast, Lunch, Dinner, Snacks)
+- **Recipe Details** - Expandable cards with ingredients and cooking steps
+- **Serving Adjustment** - Scale ingredient quantities based on servings
+- **Search** - Find recipes by name
+- **Footer Navigation** - Quick access to features
 
-## Quick Start with Docker
+## Tech Stack
+
+- **Frontend**: React 18 + Vite
+- **Backend**: Java 17 + Spring Boot 3.2
+- **Database**: MySQL 8.0
+- **Authentication**: Google OAuth 2.0 with JWT (httpOnly cookies)
+- **Deployment**: Docker + Docker Compose
+
+## Quick Start
 
 ### Prerequisites
 
-- Docker Desktop installed and running
-- OAuth credentials from Google and/or GitHub
+- Docker and Docker Compose
+- Google OAuth credentials (see setup below)
 
-### Setup
+### Setup Google OAuth
 
-1. **Copy environment template:**
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Create a new project or select existing
+3. Navigate to APIs & Services > Credentials
+4. Create OAuth 2.0 Client ID (Web application)
+5. Add authorized redirect URI: `http://localhost:3000/login/oauth2/code/google`
+6. Copy Client ID and Client Secret
+
+### Run the Application
+
+1. Copy environment template:
    ```bash
    cp .env.example .env
    ```
 
-2. **Configure environment variables:**
-   Edit `.env` and fill in your values:
-   - Database credentials (can use defaults for development)
-   - Google OAuth credentials (from [Google Cloud Console](https://console.developers.google.com/))
-   - GitHub OAuth credentials (from [GitHub Developer Settings](https://github.com/settings/developers))
-   - JWT secret (generate with `openssl rand -base64 32`)
+2. Edit `.env` with your Google OAuth credentials:
+   ```
+   GOOGLE_CLIENT_ID=your-client-id
+   GOOGLE_CLIENT_SECRET=your-client-secret
+   ```
 
-3. **Start the application:**
+3. Start with Docker Compose:
    ```bash
    docker-compose up --build
    ```
 
-4. **Access the application:**
-   - Frontend: http://localhost:3000
-   - API: http://localhost:8080/api
-   - API Docs: http://localhost:8080/swagger-ui.html
-
-### OAuth Configuration
-
-#### Google OAuth Setup
-1. Go to [Google Cloud Console](https://console.developers.google.com/)
-2. Create a new project or select existing
-3. Enable Google+ API
-4. Create OAuth 2.0 credentials (Web application)
-5. Add authorized redirect URI: `http://localhost:8080/login/oauth2/code/google`
-6. Copy Client ID and Client Secret to `.env`
-
-#### GitHub OAuth Setup
-1. Go to [GitHub Developer Settings](https://github.com/settings/developers)
-2. Click "New OAuth App"
-3. Set Homepage URL: `http://localhost:3000`
-4. Set Authorization callback URL: `http://localhost:8080/login/oauth2/code/github`
-5. Copy Client ID and Client Secret to `.env`
-
-## Services
-
-| Service | Port | Description |
-|---------|------|-------------|
-| frontend | 3000 | React web application (served via nginx) |
-| backend | 8080 | Spring Boot REST API |
-| mysql | 3306 | MySQL 8.0 database |
-
-## Commands
-
-### Start services
-```bash
-docker-compose up -d
-```
-
-### Stop services
-```bash
-docker-compose down
-```
-
-### View logs
-```bash
-docker-compose logs -f            # All services
-docker-compose logs -f backend    # Backend only
-docker-compose logs -f frontend   # Frontend only
-docker-compose logs -f mysql      # Database only
-```
-
-### Rebuild after code changes
-```bash
-docker-compose up --build
-```
-
-### Reset database (destructive)
-```bash
-docker-compose down -v
-docker-compose up --build
-```
+4. Open http://localhost:3000 in your browser
 
 ## Development
 
-### Local Development (without Docker)
+### Run Frontend (Dev Mode)
 
-#### Backend
-```bash
-cd foodbytes-api
-./mvnw spring-boot:run
-```
-
-#### Frontend
 ```bash
 cd client
 npm install
 npm run dev
 ```
 
+### Run Backend (Dev Mode)
+
+```bash
+cd foodbytes-api
+./mvnw spring-boot:run
+```
+
 ### Database
 
-The database is automatically initialized with:
-- `schema.sql` - Table definitions
-- `seed.sql` - Initial data (aisles, units, sample ingredients, recipes)
-
-Default credentials:
-- User: `foodbytes_user`
-- Password: `foodbytes_pass` (change in production!)
-- Database: `foodbytes`
+The database is automatically initialized with schema and seed data when Docker starts.
 
 ## Project Structure
 
@@ -134,76 +83,36 @@ foodbytes-app/
 ├── client/                 # React frontend
 │   ├── src/
 │   │   ├── components/     # React components
-│   │   ├── contexts/       # React Context providers
-│   │   ├── hooks/          # Custom hooks
-│   │   ├── pages/          # Page components
+│   │   ├── contexts/       # React contexts
 │   │   ├── services/       # API services
 │   │   └── styles/         # CSS files
-│   ├── Dockerfile
-│   └── nginx.conf
-├── foodbytes-api/          # Spring Boot backend
-│   ├── src/main/java/
-│   │   └── com/foodbytes/
-│   │       ├── config/     # Security, CORS config
-│   │       ├── controller/ # REST controllers
-│   │       ├── dto/        # Data transfer objects
-│   │       ├── model/      # JPA entities
-│   │       ├── repository/ # Spring Data repositories
-│   │       ├── security/   # JWT, OAuth handlers
-│   │       └── service/    # Business logic
 │   └── Dockerfile
-├── database/
+├── foodbytes-api/          # Spring Boot backend
+│   ├── src/main/java/com/foodbytes/
+│   │   ├── config/         # Configuration
+│   │   ├── controller/     # REST controllers
+│   │   ├── dto/            # Data transfer objects
+│   │   ├── model/          # JPA entities
+│   │   ├── repository/     # JPA repositories
+│   │   ├── security/       # Security/JWT
+│   │   └── service/        # Business logic
+│   └── Dockerfile
+├── database/               # SQL scripts
 │   ├── schema.sql          # Database schema
-│   └── seed.sql            # Initial data
+│   └── seed.sql            # Sample data
 ├── docker-compose.yml
 └── .env.example
 ```
 
-## Features
+## Requirements Implemented
 
-- **Authentication**: Google and GitHub OAuth2 login
-- **Recipe Management**: Browse, create, edit recipes (admin)
-- **Meal Planning**: Calendar-based meal scheduling
-- **Shopping List**: Aggregated ingredients with aisle organization
-- **Recipe Visibility**: Admin can toggle recipes Live/Hidden
-- **Audit Trail**: All recipe changes are logged
+- [x] FR-001: Sign In / Guest Access
+- [x] FR-002: Browse Recipes by Meal Category
+- [x] FR-003: View Recipe Details
+- [x] FR-004: Adjust Serving Sizes
+- [x] FR-005: Search Recipes
+- [x] FR-006: Footer Navigation
 
-## API Endpoints
+## Brand Color
 
-### Authentication
-- `GET /api/auth/me` - Get current user
-- `POST /api/auth/logout` - Logout
-
-### Recipes
-- `GET /api/recipes` - List all recipes (respects visibility)
-- `GET /api/recipes/{id}` - Get recipe details
-- `POST /api/recipes` - Create recipe (admin)
-- `PUT /api/recipes/{id}` - Update recipe (admin)
-- `DELETE /api/recipes/{id}` - Soft delete recipe (admin)
-
-### Meal Plan
-- `GET /api/meal-plan?from=DATE&to=DATE` - Get entries in date range
-- `POST /api/meal-plan` - Create entry
-- `PUT /api/meal-plan/{id}` - Update entry
-- `DELETE /api/meal-plan/{id}` - Delete entry
-
-### Audit (Admin)
-- `GET /api/audit/recipes` - List all audit logs
-- `GET /api/audit/recipes/{recipeId}` - Audit log for recipe
-
-## Troubleshooting
-
-### Container won't start
-1. Check Docker Desktop is running
-2. Check port 3000, 8080, 3306 are available
-3. Run `docker-compose logs` to see error messages
-
-### Database connection error
-1. Wait 30 seconds for MySQL to initialize
-2. Check MySQL container health: `docker-compose ps`
-3. Verify credentials in `.env` match
-
-### OAuth not working
-1. Verify callback URLs match exactly
-2. Check client ID/secret are correct
-3. Ensure cookies are enabled in browser
+Primary: `#4a3f80` (Deep Purple)

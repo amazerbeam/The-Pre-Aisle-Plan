@@ -1,98 +1,135 @@
 .recipe-card {
   background: white;
-  border: 1px solid var(--color-border);
-  border-radius: var(--border-radius-lg);
-  padding: var(--spacing-lg);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+}
+
+.recipe-header {
+  margin-bottom: var(--spacing-md);
+}
+
+.recipe-title-row {
   display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-  transition: all var(--transition-base);
-  position: relative;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-xs);
 }
 
-.recipe-card:hover {
-  box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
-}
-
-.recipe-card__hidden-badge {
-  position: absolute;
-  top: var(--spacing-sm);
-  right: var(--spacing-sm);
-}
-
-.recipe-card__header {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xs);
-}
-
-.recipe-card__title {
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-bold);
-  color: var(--color-text-primary);
-  margin: 0;
-}
-
-.recipe-card__meta {
-  display: flex;
-  gap: var(--spacing-md);
-  align-items: center;
-}
-
-.recipe-card__calories {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
-  font-weight: var(--font-weight-medium);
-}
-
-.recipe-card__body {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
+.recipe-name {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary);
   flex: 1;
 }
 
-.recipe-card__servings {
+.cheat-badge {
+  background: var(--cheat-badge);
+  color: white;
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.recipe-meta {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+.calories {
+  font-weight: 500;
+}
+
+.servings-control {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
 }
 
-.recipe-card__servings label {
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-  margin: 0;
+.servings-control label {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
 }
 
-.recipe-card__servings-input {
-  width: 80px;
+.servings-control input {
+  width: 60px;
+  text-align: center;
   padding: var(--spacing-xs) var(--spacing-sm);
-  border: 1px solid var(--color-border);
-  border-radius: var(--border-radius-md);
-  font-size: var(--font-size-base);
 }
 
-.recipe-card__tags {
+.details-toggle {
+  width: 100%;
+  padding: var(--spacing-sm);
+  background: var(--bg-secondary);
+  color: var(--brand-primary);
+  font-weight: 500;
+  border-radius: var(--radius-sm);
+}
+
+.details-toggle:hover {
+  background: var(--border-color);
+}
+
+.recipe-details {
+  margin-top: var(--spacing-md);
+  padding-top: var(--spacing-md);
+  border-top: 1px solid var(--border-color);
+}
+
+.ingredients-section,
+.steps-section {
+  margin-bottom: var(--spacing-md);
+}
+
+.ingredients-section h4,
+.steps-section h4 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: var(--spacing-sm);
+  color: var(--brand-primary);
+}
+
+.ingredients-list {
+  list-style: none;
+  padding: 0;
+}
+
+.ingredients-list li {
+  padding: var(--spacing-xs) 0;
+  font-size: 0.875rem;
   display: flex;
-  flex-wrap: wrap;
   gap: var(--spacing-xs);
 }
 
-.recipe-card__tag {
-  text-transform: capitalize;
+.quantity {
+  font-weight: 500;
+  min-width: 40px;
 }
 
-.recipe-card__footer {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-  padding-top: var(--spacing-md);
-  border-top: 1px solid var(--color-border);
+.unit {
+  color: var(--text-secondary);
+  min-width: 40px;
 }
 
-@media (min-width: 768px) {
-  .recipe-card__footer {
-    flex-direction: row;
-  }
+.ingredient-name {
+  flex: 1;
+}
+
+.steps-list {
+  padding-left: var(--spacing-lg);
+}
+
+.steps-list li {
+  padding: var(--spacing-xs) 0;
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+.steps-list li::marker {
+  color: var(--brand-primary);
+  font-weight: 600;
 }

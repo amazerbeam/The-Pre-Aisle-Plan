@@ -1,63 +1,47 @@
 package com.foodbytes.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
+import lombok.AllArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "users", indexes = {
-    @Index(name = "idx_email", columnList = "email"),
-    @Index(name = "idx_oauth", columnList = "oauthProvider,oauthId")
-})
-@EntityListeners(AuditingEntityListener.class)
+@Table(name = "users")
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 255)
+    @Column(unique = true, nullable = false)
     private String email;
 
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false)
     private String name;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
-    private OAuthProvider oauthProvider;
+    @Column(name = "google_id", unique = true, nullable = false)
+    private String googleId;
 
-    @Column(nullable = false, length = 255)
-    private String oauthId;
+    @Column(name = "avatar_url")
+    private String avatarUrl;
 
-    @Column(nullable = false)
-    @Builder.Default
+    @Column(name = "is_admin")
     private Boolean isAdmin = false;
 
-    @CreatedDate
-    @Column(nullable = false, updatable = false)
+    @Column(name = "default_servings")
+    private Integer defaultServings = 1;
+
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    @Column
+    @Column(name = "last_login")
     private LocalDateTime lastLogin;
 
     @PrePersist
     protected void onCreate() {
-        if (createdAt == null) {
-            createdAt = LocalDateTime.now();
-        }
-    }
-
-    public void updateLastLogin() {
-        this.lastLogin = LocalDateTime.now();
+        createdAt = LocalDateTime.now();
     }
 }

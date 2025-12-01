@@ -3,10 +3,20 @@
 .env.local
 .env.*.local
 
+# Dependencies
+node_modules/
+client/node_modules/
+
+# Build outputs
+client/dist/
+foodbytes-api/target/
+
 # IDE
 .idea/
-.vscode/
 *.iml
+.vscode/
+*.swp
+*.swo
 
 # OS
 .DS_Store
@@ -16,10 +26,5 @@ Thumbs.db
 *.log
 logs/
 
-# Dependencies (managed by Docker)
-node_modules/
-target/
-
-# Build outputs
-dist/
-build/
+# Docker volumes (local)
+mysql_data/

@@ -1,64 +1,72 @@
-import { createContext, useState, useEffect } from 'react';
-import authService from '../services/authService';
+import { createContext, useState, useEffect, useContext } from 'react'
+import api from '../services/api'
 
-export const AuthContext = createContext(null);
+const AuthContext = createContext()
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [user, setUser] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [isGuest, setIsGuest] = useState(false)
 
-  // Check if user is authenticated on mount
   useEffect(() => {
-    checkAuth();
-  }, []);
+    checkAuthStatus()
+  }, [])
 
-  const checkAuth = async () => {
+  const checkAuthStatus = async () => {
     try {
-      setLoading(true);
-      const userData = await authService.getCurrentUser();
-      setUser(userData);
-      setError(null);
+      const response = await api.get('/auth/me')
+      setUser(response.data)
+      setIsGuest(false)
     } catch (err) {
-      // User is not authenticated
-      setUser(null);
-      if (err.response?.status !== 401) {
-        setError(err.message);
-      }
+      setUser(null)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
-  const login = (provider) => {
-    // Redirect to OAuth endpoint
-    authService.login(provider);
-  };
+  const loginWithGoogle = () => {
+    window.location.href = '/oauth2/authorization/google'
+  }
+
+  const continueAsGuest = () => {
+    setIsGuest(true)
+    setUser(null)
+  }
 
   const logout = async () => {
     try {
-      await authService.logout();
-      setUser(null);
-      setError(null);
-    } catch (err) {
-      setError(err.message);
-      throw err;
+      await api.post('/auth/logout')
+    } finally {
+      setUser(null)
+      setIsGuest(false)
     }
-  };
-
-  const isAdmin = () => {
-    return user?.is_admin === true;
-  };
+  }
 
   const value = {
     user,
     loading,
-    error,
-    login,
+    isGuest,
+    isAuthenticated: !!user,
+    isAdmin: user?.isAdmin || false,
+    loginWithGoogle,
+    continueAsGuest,
     logout,
-    isAdmin,
-    checkAuth,
-  };
+    checkAuthStatus
+  }
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-};
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  )
+}
+
+export const useAuth = () => {
+  const context = useContext(AuthContext)
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider')
+  }
+  return context
+}
+
+export default AuthContext

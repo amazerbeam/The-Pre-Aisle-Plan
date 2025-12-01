@@ -1,79 +1,61 @@
 package com.foodbytes.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Type;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
+import lombok.AllArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-@Table(name = "recipes", indexes = {
-    @Index(name = "idx_is_live", columnList = "isLive"),
-    @Index(name = "idx_is_deleted", columnList = "isDeleted")
-})
-@EntityListeners(AuditingEntityListener.class)
+@Table(name = "recipes")
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Recipe {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false)
     private String name;
 
-    @Column(columnDefinition = "JSON")
-    private String mealTypes;  // JSON array of meal types
+    @Column(name = "default_servings")
+    private Integer defaultServings = 2;
 
-    @Column(nullable = false)
-    private Integer defaultServings;
-
-    @Column(nullable = false)
     private Integer calories;
 
-    @Column(columnDefinition = "JSON", nullable = false)
-    private String ingredients;  // JSON array of ingredients
-
-    @Column(columnDefinition = "JSON", nullable = false)
-    private String steps;  // JSON array of steps
-
-    @Column(nullable = false)
-    @Builder.Default
+    @Column(name = "is_cheat")
     private Boolean isCheat = false;
 
-    @Column(nullable = false)
-    @Builder.Default
-    private Boolean isLive = false;
+    @Column(name = "is_live")
+    private Boolean isLive = true;
 
-    @Column(nullable = false)
-    @Builder.Default
-    private Boolean isDeleted = false;
-
-    @CreatedDate
-    @Column(nullable = false, updatable = false)
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    @LastModifiedDate
-    @Column(nullable = false)
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<RecipeMeal> meals = new ArrayList<>();
+
+    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OrderBy("sortOrder ASC")
+    @BatchSize(size = 20)
+    private List<RecipeIngredient> ingredients = new ArrayList<>();
+
+    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OrderBy("stepNumber ASC")
+    @BatchSize(size = 20)
+    private List<RecipeStep> steps = new ArrayList<>();
 
     @PrePersist
     protected void onCreate() {
-        if (createdAt == null) {
-            createdAt = LocalDateTime.now();
-        }
-        if (updatedAt == null) {
-            updatedAt = LocalDateTime.now();
-        }
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
     }
 
     @PreUpdate

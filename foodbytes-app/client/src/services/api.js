@@ -1,37 +1,23 @@
-import axios from 'axios';
+import axios from 'axios'
 
-// Create axios instance with default config
 const api = axios.create({
   baseURL: '/api',
   headers: {
     'Content-Type': 'application/json',
   },
-  withCredentials: true, // Always send cookies with requests
-});
+  withCredentials: true, // Important: Send cookies with requests
+})
 
-// Request interceptor
-api.interceptors.request.use(
-  (config) => {
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
-
-// Response interceptor
+// Response interceptor for handling errors
 api.interceptors.response.use(
-  (response) => {
-    return response;
-  },
+  (response) => response,
   (error) => {
-    // Handle 401 Unauthorized errors
     if (error.response?.status === 401) {
-      // Clear any auth state and redirect to login
-      window.location.href = '/login';
+      // Unauthorized - user may need to log in
+      console.log('Unauthorized - authentication required')
     }
-    return Promise.reject(error);
+    return Promise.reject(error)
   }
-);
+)
 
-export default api;
+export default api

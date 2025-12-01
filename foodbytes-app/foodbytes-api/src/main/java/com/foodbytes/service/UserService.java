@@ -1,59 +1,47 @@
 package com.foodbytes.service;
 
-import com.foodbytes.model.OAuthProvider;
+import com.foodbytes.dto.UserDTO;
 import com.foodbytes.model.User;
 import com.foodbytes.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class UserService {
 
     private final UserRepository userRepository;
 
     @Transactional
-    public User findOrCreateFromOAuth(String email, String name, OAuthProvider provider, String oauthId) {
-        return userRepository.findByOauthProviderAndOauthId(provider, oauthId)
+    public User findOrCreateUser(String googleId, String email, String name, String avatarUrl) {
+        return userRepository.findByGoogleId(googleId)
                 .map(user -> {
                     // Update last login
-                    user.updateLastLogin();
-                    // Update email/name if changed
-                    if (!user.getEmail().equals(email)) {
-                        user.setEmail(email);
-                    }
-                    if (!user.getName().equals(name)) {
-                        user.setName(name);
-                    }
-                    User savedUser = userRepository.save(user);
-                    log.info("Existing user logged in: {} (ID: {})", email, savedUser.getId());
-                    return savedUser;
+                    user.setLastLogin(LocalDateTime.now());
+                    user.setAvatarUrl(avatarUrl);
+                    return userRepository.save(user);
                 })
                 .orElseGet(() -> {
-                    User newUser = User.builder()
-                            .email(email)
-                            .name(name)
-                            .oauthProvider(provider)
-                            .oauthId(oauthId)
-                            .isAdmin(false)
-                            .build();
-                    newUser.updateLastLogin();
-                    User savedUser = userRepository.save(newUser);
-                    log.info("New user created: {} (ID: {})", email, savedUser.getId());
-                    return savedUser;
+                    User newUser = new User();
+                    newUser.setGoogleId(googleId);
+                    newUser.setEmail(email);
+                    newUser.setName(name);
+                    newUser.setAvatarUrl(avatarUrl);
+                    newUser.setIsAdmin(false);
+                    newUser.setLastLogin(LocalDateTime.now());
+                    return userRepository.save(newUser);
                 });
     }
 
-    public User findById(Long id) {
-        return userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
-    }
-
-    public User findByEmail(String email) {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
+    public UserDTO convertToDTO(User user) {
+        return new UserDTO(
+                user.getId(),
+                user.getEmail(),
+                user.getName(),
+                user.getAvatarUrl(),
+                user.getIsAdmin()
+        );
     }
 }

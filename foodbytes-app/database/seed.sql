@@ -1,386 +1,431 @@
--- FoodBytes Database Seed Data
--- Populates initial lookup tables and sample data
+-- FoodBytes Seed Data
+-- Version: 2.0.0 (Normalized)
 
-SET NAMES utf8mb4;
-SET CHARACTER SET utf8mb4;
+-- =============================================
+-- LOOKUP TABLES
+-- =============================================
 
--- ===========================
--- SEED AISLES (17 total)
--- ===========================
-INSERT INTO `aisles` (`key`, `name`, `display_order`) VALUES
-('MEAT', 'Meat', 1),
-('POULTRY', 'Poultry', 2),
-('VEG', 'Veg', 3),
-('FRUIT', 'Fruit', 4),
-('FISH', 'Fish', 5),
-('DAIRY', 'Dairy', 6),
-('FROZEN', 'Frozen', 7),
-('HERBS_SPICES', 'Herbs & Spices', 8),
-('OILS', 'Oils & Fats', 9),
-('TINS_JARS', 'Tins & Jars', 10),
-('GRAINS_PASTA', 'Grains & Pasta', 11),
-('CONDIMENTS', 'Condiments & Sauces', 12),
-('BAKERY', 'Bakery', 13),
-('NUTS', 'Nuts', 14),
-('SEEDS', 'Seeds', 15),
-('BEVERAGES', 'Beverages', 16),
-('MISC', 'Misc', 17);
+-- Aisles (for shopping list organization)
+INSERT INTO aisles (id, `key`, name, display_order) VALUES
+(1, 'produce', 'Produce', 1),
+(2, 'dairy', 'Dairy & Eggs', 2),
+(3, 'meat', 'Meat & Poultry', 3),
+(4, 'seafood', 'Seafood', 4),
+(5, 'bakery', 'Bakery', 5),
+(6, 'grains', 'Grains & Pasta', 6),
+(7, 'canned', 'Canned Goods', 7),
+(8, 'condiments', 'Condiments & Sauces', 8),
+(9, 'spices', 'Spices & Seasonings', 9),
+(10, 'oils', 'Oils & Vinegars', 10),
+(11, 'nuts', 'Nuts & Seeds', 11),
+(12, 'snacks', 'Snacks & Confectionery', 12),
+(13, 'breakfast', 'Breakfast & Cereals', 13),
+(14, 'health', 'Health Foods', 14),
+(15, 'deli', 'Deli', 15);
 
--- ===========================
--- SEED UNITS (23 total)
--- ===========================
-INSERT INTO `units` (`key`, `value`) VALUES
--- Weight
-('GRAM', 'g'),
-('KILOGRAM', 'kg'),
-('OUNCE', 'oz'),
-('POUND', 'lb'),
+-- Units
+INSERT INTO units (id, `key`, value) VALUES
+(1, 'g', 'g'),
+(2, 'ml', 'ml'),
+(3, 'tsp', 'tsp'),
+(4, 'tbsp', 'tbsp'),
+(5, 'piece', 'piece'),
+(6, 'small', 'small'),
+(7, 'medium', 'medium'),
+(8, 'large', 'large'),
+(9, 'handful', 'handful'),
+(10, 'clove', 'clove'),
+(11, 'head', 'head'),
+(12, 'stalk', 'stalk'),
+(13, 'slice', 'slice'),
+(14, 'leaf', 'leaf');
 
--- Volume (Metric)
-('MILLILITER', 'ml'),
-('LITER', 'l'),
+-- Meals
+INSERT INTO meals (id, `key`, name, display_order) VALUES
+(1, 'breakfast', 'Breakfast', 1),
+(2, 'lunch', 'Lunch', 2),
+(3, 'dinner', 'Dinner', 3),
+(4, 'snacks', 'Snacks', 4);
 
--- Volume (Imperial/US)
-('TEASPOON', 'tsp'),
-('TABLESPOON', 'tbsp'),
-('CUP', 'cup'),
+-- =============================================
+-- INGREDIENTS (with aisle references)
+-- =============================================
+INSERT INTO ingredients (id, `key`, name, aisle_id) VALUES
+-- Produce (aisle 1)
+(1, 'mixed_berries', 'Mixed berries', 1),
+(2, 'banana', 'Banana', 1),
+(3, 'spinach', 'Spinach', 1),
+(4, 'avocado', 'Avocado', 1),
+(5, 'cucumber', 'Cucumber', 1),
+(6, 'cherry_tomatoes', 'Cherry tomatoes', 1),
+(7, 'carrot', 'Carrot', 1),
+(8, 'lemon', 'Lemon', 1),
+(9, 'salad_leaves', 'Salad leaves', 1),
+(10, 'lettuce_leaves', 'Lettuce leaves', 1),
+(11, 'tomato', 'Tomato', 1),
+(12, 'red_onion', 'Red onion', 1),
+(13, 'fresh_parsley', 'Fresh parsley', 1),
+(14, 'broccoli', 'Broccoli', 1),
+(15, 'green_bell_pepper', 'Green bell pepper', 1),
+(16, 'red_bell_pepper', 'Red bell pepper', 1),
+(17, 'onion', 'Onion', 1),
+(18, 'garlic', 'Garlic', 1),
+(19, 'ginger', 'Ginger', 1),
+(20, 'celery', 'Celery', 1),
+(21, 'potatoes', 'Potatoes', 1),
+(22, 'lettuce', 'Lettuce', 1),
 
--- Count / Size
-('PIECES', 'piece'),
-('SLICES', 'slice'),
-('HANDFUL', 'handful'),
-('SMALL', 'small'),
-('MEDIUM', 'medium'),
-('LARGE', 'large'),
+-- Dairy & Eggs (aisle 2)
+(23, 'greek_yogurt', 'Greek yogurt', 2),
+(24, 'milk', 'Milk', 2),
+(25, 'eggs', 'Eggs', 2),
+(26, 'butter', 'Butter', 2),
+(27, 'feta_cheese', 'Feta cheese', 2),
+(28, 'cheese', 'Cheese', 2),
 
--- Containers
-('TIN', 'tin'),
-('CAN', 'can'),
-('PACK', 'pack'),
+-- Meat & Poultry (aisle 3)
+(29, 'chicken_breast', 'Chicken breast', 3),
+(30, 'turkey_breast', 'Turkey breast', 3),
+(31, 'beef_sirloin', 'Beef sirloin', 3),
+(32, 'beef_mince', 'Beef mince', 3),
 
--- Cooking Measures
-('PINCH', 'pinch'),
-('DASH', 'dash'),
-('SPRIG', 'sprig'),
-('CLOVE', 'clove'),
-('LEAF', 'leaf'),
+-- Seafood (aisle 4)
+(33, 'salmon_fillet', 'Salmon fillet', 4),
 
--- Special
-('HEAD', 'head'),
-('STALK', 'stalk'),
-('NONE', '');
+-- Bakery (aisle 5)
+(34, 'flour_tortillas', 'Flour tortillas', 5),
+(35, 'burger_bun', 'Burger bun', 5),
+(36, 'plain_flour', 'Plain flour', 5),
 
--- ===========================
--- SEED SAMPLE INGREDIENTS (50 common items)
--- ===========================
+-- Grains & Pasta (aisle 6)
+(37, 'rolled_oats', 'Rolled oats', 6),
+(38, 'quinoa', 'Quinoa', 6),
+(39, 'brown_rice', 'Brown rice', 6),
 
--- Get aisle IDs for reference
-SET @aisle_meat = (SELECT id FROM aisles WHERE `key` = 'MEAT');
-SET @aisle_poultry = (SELECT id FROM aisles WHERE `key` = 'POULTRY');
-SET @aisle_veg = (SELECT id FROM aisles WHERE `key` = 'VEG');
-SET @aisle_fruit = (SELECT id FROM aisles WHERE `key` = 'FRUIT');
-SET @aisle_fish = (SELECT id FROM aisles WHERE `key` = 'FISH');
-SET @aisle_dairy = (SELECT id FROM aisles WHERE `key` = 'DAIRY');
-SET @aisle_frozen = (SELECT id FROM aisles WHERE `key` = 'FROZEN');
-SET @aisle_herbs = (SELECT id FROM aisles WHERE `key` = 'HERBS_SPICES');
-SET @aisle_oils = (SELECT id FROM aisles WHERE `key` = 'OILS');
-SET @aisle_tins = (SELECT id FROM aisles WHERE `key` = 'TINS_JARS');
-SET @aisle_grains = (SELECT id FROM aisles WHERE `key` = 'GRAINS_PASTA');
-SET @aisle_condiments = (SELECT id FROM aisles WHERE `key` = 'CONDIMENTS');
-SET @aisle_bakery = (SELECT id FROM aisles WHERE `key` = 'BAKERY');
-SET @aisle_nuts = (SELECT id FROM aisles WHERE `key` = 'NUTS');
-SET @aisle_seeds = (SELECT id FROM aisles WHERE `key` = 'SEEDS');
-SET @aisle_beverages = (SELECT id FROM aisles WHERE `key` = 'BEVERAGES');
-SET @aisle_misc = (SELECT id FROM aisles WHERE `key` = 'MISC');
+-- Canned Goods (aisle 7)
+(40, 'chickpeas', 'Chickpeas', 7),
 
-INSERT INTO `ingredients` (`key`, `name`, `aisle_id`) VALUES
--- Grains & Bakery
-('ROLLED_OATS', 'Rolled oats', @aisle_grains),
-('PLAIN_FLOUR', 'Plain flour', @aisle_bakery),
-('ALMOND_FLOUR', 'Almond flour', @aisle_bakery),
-('PAELLA_RICE', 'Paella rice', @aisle_grains),
-('BREAD', 'Bread', @aisle_bakery),
-('WHOLEMEAL_BREAD', 'Wholemeal bread', @aisle_bakery),
-('FLOUR_TORTILLAS', 'Flour tortillas', @aisle_bakery),
-('PASTA', 'Pasta', @aisle_grains),
-('RICE', 'Rice', @aisle_grains),
+-- Condiments & Sauces (aisle 8)
+(41, 'honey', 'Honey', 8),
+(42, 'mayonnaise', 'Mayonnaise', 8),
+(43, 'soy_sauce', 'Soy sauce', 8),
+(44, 'maple_syrup', 'Maple syrup', 8),
 
--- Dairy & Eggs
-('GREEK_YOGURT', 'Greek yogurt', @aisle_dairy),
-('MILK', 'Milk', @aisle_dairy),
-('CREME_FRAICHE', 'Crème Fraîche', @aisle_dairy),
-('BUTTER', 'Butter', @aisle_dairy),
-('DOUBLE_CREAM', 'Double cream', @aisle_dairy),
-('CHEESE', 'Cheese', @aisle_dairy),
-('MOZZARELLA', 'Mozzarella', @aisle_dairy),
-('PARMESAN_CHEESE', 'Parmesan', @aisle_dairy),
-('FETA_CHEESE', 'Feta cheese', @aisle_dairy),
-('HALLOUMI', 'Halloumi', @aisle_dairy),
-('EGG', 'Egg', @aisle_dairy),
+-- Spices & Seasonings (aisle 9)
+(45, 'cinnamon', 'Cinnamon', 9),
+(46, 'salt', 'Salt', 9),
 
--- Meat & Poultry
-('BEEF_MINCE', 'Beef mince', @aisle_meat),
-('CHICKEN_BREAST', 'Chicken breast', @aisle_poultry),
-('BACON', 'Bacon', @aisle_meat),
-('SAUSAGE', 'Sausage', @aisle_meat),
+-- Oils & Vinegars (aisle 10)
+(47, 'olive_oil', 'Olive oil', 10),
+(48, 'lemon_juice', 'Lemon juice', 10),
 
--- Fish
-('SALMON', 'Salmon', @aisle_fish),
-('COD', 'Cod', @aisle_fish),
-('PRAWNS', 'Prawns', @aisle_fish),
+-- Nuts & Seeds (aisle 11)
+(49, 'chia_seeds', 'Chia seeds', 11),
+(50, 'almonds', 'Almonds', 11),
+(51, 'cashews', 'Cashews', 11),
+(52, 'walnuts', 'Walnuts', 11),
+(53, 'sesame_seeds', 'Sesame seeds', 11),
 
--- Vegetables
-('ONION', 'Onion', @aisle_veg),
-('GARLIC', 'Garlic', @aisle_veg),
-('TOMATO', 'Tomato', @aisle_veg),
-('CARROT', 'Carrot', @aisle_veg),
-('BROCCOLI', 'Broccoli', @aisle_veg),
-('SPINACH', 'Spinach', @aisle_veg),
-('BELL_PEPPER', 'Bell pepper', @aisle_veg),
-('MUSHROOM', 'Mushroom', @aisle_veg),
-('POTATO', 'Potato', @aisle_veg),
-('SWEET_POTATO', 'Sweet potato', @aisle_veg),
+-- Snacks & Confectionery (aisle 12)
+(54, 'dark_chocolate', 'Dark chocolate', 12),
+(55, 'dark_chocolate_chips', 'Dark chocolate chips', 12),
 
--- Fruits
-('BANANA', 'Banana', @aisle_fruit),
-('APPLE', 'Apple', @aisle_fruit),
-('LEMON', 'Lemon', @aisle_fruit),
-('BLUEBERRY', 'Blueberry', @aisle_fruit),
+-- Breakfast & Cereals (aisle 13)
+(56, 'granola', 'Granola', 13),
+(57, 'peanut_butter', 'Peanut butter', 13),
 
--- Herbs & Spices
-('SALT', 'Salt', @aisle_herbs),
-('BLACK_PEPPER', 'Black pepper', @aisle_herbs),
-('PAPRIKA', 'Paprika', @aisle_herbs),
-('CUMIN', 'Cumin', @aisle_herbs),
-('BASIL', 'Basil', @aisle_herbs),
-('OREGANO', 'Oregano', @aisle_herbs),
+-- Deli (aisle 15)
+(58, 'hummus', 'Hummus', 15);
 
--- Oils & Condiments
-('OLIVE_OIL', 'Olive oil', @aisle_oils),
-('VEGETABLE_OIL', 'Vegetable oil', @aisle_oils),
-('SOY_SAUCE', 'Soy sauce', @aisle_condiments),
-('HONEY', 'Honey', @aisle_condiments);
+-- =============================================
+-- RECIPES
+-- =============================================
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+(1, 'Overnight Oats', 2, 880, FALSE, TRUE),
+(2, 'Scrambled Eggs with Spinach & Avocado', 2, 734, FALSE, TRUE),
+(3, 'Greek Yogurt Parfait', 1, 350, FALSE, TRUE),
+(4, 'Grilled Chicken Salad', 2, 1210, FALSE, TRUE),
+(5, 'Turkey & Avocado Wrap', 2, 680, FALSE, TRUE),
+(6, 'Mediterranean Quinoa Bowl', 2, 720, FALSE, TRUE),
+(7, 'Baked Salmon with Vegetables', 2, 1200, FALSE, TRUE),
+(8, 'Stir-Fried Chicken & Peppers', 2, 1180, FALSE, TRUE),
+(9, 'Beef Stir Fry with Broccoli', 2, 980, FALSE, TRUE),
+(10, 'Mixed Nuts & Dark Chocolate', 1, 280, FALSE, TRUE),
+(11, 'Hummus with Veggie Sticks', 1, 220, FALSE, TRUE),
+(12, 'Protein Energy Balls', 2, 320, FALSE, TRUE),
+(13, 'Pancakes with Maple Syrup', 2, 650, TRUE, TRUE),
+(14, 'Burger with Fries', 1, 1100, TRUE, TRUE);
 
--- ===========================
--- SEED SAMPLE ADMIN USER
--- ===========================
-INSERT INTO `users` (`email`, `name`, `oauth_provider`, `oauth_id`, `is_admin`, `created_at`, `last_login`) VALUES
-('admin@foodbytes.app', 'Admin User', 'GOOGLE', 'admin-test-oauth-id-12345', TRUE, NOW(), NOW());
+-- =============================================
+-- RECIPE MEALS (using meal_id)
+-- =============================================
+INSERT INTO recipe_meals (recipe_id, meal_id) VALUES
+-- Breakfast (meal_id = 1)
+(1, 1), (2, 1), (3, 1), (13, 1),
+-- Lunch (meal_id = 2)
+(4, 2), (5, 2), (6, 2),
+-- Dinner (meal_id = 3)
+(7, 3), (8, 3), (9, 3), (14, 3),
+-- Snacks (meal_id = 4)
+(10, 4), (11, 4), (12, 4);
 
--- Get admin user ID for sample data
-SET @admin_user_id = LAST_INSERT_ID();
+-- =============================================
+-- RECIPE INGREDIENTS (using ingredient_id and unit_id)
+-- =============================================
 
--- ===========================
--- SEED SAMPLE RECIPES (3 simple examples)
--- ===========================
+-- Recipe 1: Overnight Oats
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit_id, sort_order) VALUES
+(1, 37, 40, 1, 1),    -- Rolled oats, 40g
+(1, 23, 100, 1, 2),   -- Greek yogurt, 100g
+(1, 24, 200, 2, 3),   -- Milk, 200ml
+(1, 1, 100, 1, 4),    -- Mixed berries, 100g
+(1, 49, 2, 3, 5),     -- Chia seeds, 2 tsp
+(1, 41, 0.5, 3, 6),   -- Honey, 0.5 tsp
+(1, 57, 1, 4, 7),     -- Peanut butter, 1 tbsp
+(1, 2, 1, 5, 8),      -- Banana, 1 piece
+(1, 45, 0.25, 3, 9);  -- Cinnamon, 0.25 tsp
 
--- Recipe 1: Greek Yogurt Bowl (Breakfast, Live)
-INSERT INTO `recipes` (
-  `name`,
-  `meal_types`,
-  `default_servings`,
-  `calories`,
-  `ingredients`,
-  `steps`,
-  `is_cheat`,
-  `is_live`,
-  `is_deleted`
-) VALUES (
-  'Greek Yogurt Bowl',
-  JSON_ARRAY('breakfast'),
-  2,
-  350,
-  JSON_ARRAY(
-    JSON_OBJECT('name', 'Greek yogurt', 'quantity', 300, 'unit', 'g'),
-    JSON_OBJECT('name', 'Rolled oats', 'quantity', 50, 'unit', 'g'),
-    JSON_OBJECT('name', 'Honey', 'quantity', 2, 'unit', 'tbsp'),
-    JSON_OBJECT('name', 'Blueberry', 'quantity', 100, 'unit', 'g'),
-    JSON_OBJECT('name', 'Banana', 'quantity', 1, 'unit', 'piece')
-  ),
-  JSON_ARRAY(
-    'Place Greek yogurt in bowls',
-    'Top with rolled oats',
-    'Drizzle with honey',
-    'Add fresh blueberries and sliced banana',
-    'Serve immediately'
-  ),
-  FALSE,
-  TRUE,
-  FALSE
-);
+-- Recipe 2: Scrambled Eggs with Spinach & Avocado
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit_id, sort_order) VALUES
+(2, 25, 8, 6, 1),     -- Eggs, 8 small
+(2, 26, 1, 3, 2),     -- Butter, 1 tsp
+(2, 3, 60, 1, 3),     -- Spinach, 60g
+(2, 4, 1, 7, 4);      -- Avocado, 1 medium
 
--- Recipe 2: Chicken and Vegetable Stir Fry (Lunch/Dinner, Live)
-INSERT INTO `recipes` (
-  `name`,
-  `meal_types`,
-  `default_servings`,
-  `calories`,
-  `ingredients`,
-  `steps`,
-  `is_cheat`,
-  `is_live`,
-  `is_deleted`
-) VALUES (
-  'Chicken and Vegetable Stir Fry',
-  JSON_ARRAY('lunch', 'dinner'),
-  2,
-  480,
-  JSON_ARRAY(
-    JSON_OBJECT('name', 'Chicken breast', 'quantity', 300, 'unit', 'g'),
-    JSON_OBJECT('name', 'Bell pepper', 'quantity', 1, 'unit', 'piece'),
-    JSON_OBJECT('name', 'Broccoli', 'quantity', 200, 'unit', 'g'),
-    JSON_OBJECT('name', 'Carrot', 'quantity', 1, 'unit', 'piece'),
-    JSON_OBJECT('name', 'Onion', 'quantity', 1, 'unit', 'piece'),
-    JSON_OBJECT('name', 'Garlic', 'quantity', 2, 'unit', 'clove'),
-    JSON_OBJECT('name', 'Soy sauce', 'quantity', 3, 'unit', 'tbsp'),
-    JSON_OBJECT('name', 'Vegetable oil', 'quantity', 2, 'unit', 'tbsp'),
-    JSON_OBJECT('name', 'Rice', 'quantity', 200, 'unit', 'g')
-  ),
-  JSON_ARRAY(
-    'Cook rice according to package instructions',
-    'Cut chicken breast into bite-sized pieces',
-    'Chop all vegetables into similar-sized pieces',
-    'Heat oil in a large pan or wok over high heat',
-    'Add chicken and cook until browned (5-6 minutes)',
-    'Add garlic and onion, stir fry for 2 minutes',
-    'Add remaining vegetables and stir fry for 4-5 minutes',
-    'Add soy sauce and toss to coat',
-    'Serve immediately over cooked rice'
-  ),
-  FALSE,
-  TRUE,
-  FALSE
-);
+-- Recipe 3: Greek Yogurt Parfait
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit_id, sort_order) VALUES
+(3, 23, 200, 1, 1),   -- Greek yogurt, 200g
+(3, 1, 80, 1, 2),     -- Mixed berries, 80g
+(3, 56, 30, 1, 3),    -- Granola, 30g
+(3, 41, 1, 4, 4);     -- Honey, 1 tbsp
 
--- Recipe 3: Cheese Pizza (Dinner, Cheat, Hidden - for testing admin visibility)
-INSERT INTO `recipes` (
-  `name`,
-  `meal_types`,
-  `default_servings`,
-  `calories`,
-  `ingredients`,
-  `steps`,
-  `is_cheat`,
-  `is_live`,
-  `is_deleted`
-) VALUES (
-  'Cheese Pizza',
-  JSON_ARRAY('dinner'),
-  2,
-  850,
-  JSON_ARRAY(
-    JSON_OBJECT('name', 'Plain flour', 'quantity', 300, 'unit', 'g'),
-    JSON_OBJECT('name', 'Mozzarella', 'quantity', 200, 'unit', 'g'),
-    JSON_OBJECT('name', 'Tomato', 'quantity', 400, 'unit', 'g'),
-    JSON_OBJECT('name', 'Olive oil', 'quantity', 2, 'unit', 'tbsp'),
-    JSON_OBJECT('name', 'Basil', 'quantity', 1, 'unit', 'handful'),
-    JSON_OBJECT('name', 'Salt', 'quantity', 1, 'unit', 'pinch')
-  ),
-  JSON_ARRAY(
-    'Prepare pizza dough with flour, water, salt, and olive oil',
-    'Let dough rest for 30 minutes',
-    'Roll out dough into pizza shape',
-    'Spread crushed tomatoes on dough',
-    'Add torn mozzarella on top',
-    'Bake in preheated oven at 220°C for 12-15 minutes',
-    'Top with fresh basil leaves before serving'
-  ),
-  TRUE,
-  FALSE,
-  FALSE
-);
+-- Recipe 4: Grilled Chicken Salad
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit_id, sort_order) VALUES
+(4, 29, 240, 1, 1),   -- Chicken breast, 240g
+(4, 9, 2, 9, 2),      -- Salad leaves, 2 handful
+(4, 5, 1, 5, 3),      -- Cucumber, 1 piece
+(4, 6, 10, 5, 4),     -- Cherry tomatoes, 10 piece
+(4, 7, 2, 5, 5),      -- Carrot, 2 piece
+(4, 8, 1, 5, 6),      -- Lemon, 1 piece
+(4, 47, 1, 4, 7),     -- Olive oil, 1 tbsp
+(4, 4, 0.5, 7, 8),    -- Avocado, 0.5 medium
+(4, 40, 150, 1, 9),   -- Chickpeas, 150g
+(4, 27, 40, 1, 10);   -- Feta cheese, 40g
 
--- ===========================
--- SEED SAMPLE MEAL PLAN ENTRIES (Admin user, next 7 days)
--- ===========================
+-- Recipe 5: Turkey & Avocado Wrap
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit_id, sort_order) VALUES
+(5, 34, 2, 5, 1),     -- Flour tortillas, 2 piece
+(5, 30, 150, 1, 2),   -- Turkey breast, 150g
+(5, 4, 1, 7, 3),      -- Avocado, 1 medium
+(5, 10, 4, 5, 4),     -- Lettuce leaves, 4 piece
+(5, 11, 1, 5, 5),     -- Tomato, 1 piece
+(5, 42, 1, 4, 6);     -- Mayonnaise, 1 tbsp
 
--- Get recipe IDs
-SET @recipe_yogurt_id = (SELECT id FROM recipes WHERE name = 'Greek Yogurt Bowl');
-SET @recipe_stirfry_id = (SELECT id FROM recipes WHERE name = 'Chicken and Vegetable Stir Fry');
+-- Recipe 6: Mediterranean Quinoa Bowl
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit_id, sort_order) VALUES
+(6, 38, 150, 1, 1),   -- Quinoa, 150g
+(6, 5, 1, 5, 2),      -- Cucumber, 1 piece
+(6, 6, 8, 5, 3),      -- Cherry tomatoes, 8 piece
+(6, 12, 0.5, 5, 4),   -- Red onion, 0.5 piece
+(6, 27, 50, 1, 5),    -- Feta cheese, 50g
+(6, 47, 2, 4, 6),     -- Olive oil, 2 tbsp
+(6, 48, 1, 4, 7),     -- Lemon juice, 1 tbsp
+(6, 13, 2, 4, 8);     -- Fresh parsley, 2 tbsp
 
--- Next 7 days of meal planning for admin user
-INSERT INTO `meal_plan_entries` (`user_id`, `plan_date`, `meal_type`, `recipe_id`, `servings`) VALUES
--- Day 1
-(@admin_user_id, CURDATE(), 'breakfast', @recipe_yogurt_id, 2),
-(@admin_user_id, CURDATE(), 'lunch', @recipe_stirfry_id, 2),
+-- Recipe 7: Baked Salmon with Vegetables
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit_id, sort_order) VALUES
+(7, 33, 2, 5, 1),     -- Salmon fillet, 2 piece
+(7, 14, 1, 11, 2),    -- Broccoli, 1 head
+(7, 7, 2, 5, 3),      -- Carrot, 2 piece
+(7, 9, 2, 9, 4),      -- Salad leaves, 2 handful
+(7, 8, 1, 5, 5),      -- Lemon, 1 piece
+(7, 47, 3, 4, 6),     -- Olive oil, 3 tbsp
+(7, 4, 1, 7, 7),      -- Avocado, 1 medium
+(7, 46, 0.5, 3, 8),   -- Salt, 0.5 tsp
+(7, 50, 20, 1, 9);    -- Almonds, 20g
 
--- Day 2
-(@admin_user_id, DATE_ADD(CURDATE(), INTERVAL 1 DAY), 'breakfast', @recipe_yogurt_id, 2),
-(@admin_user_id, DATE_ADD(CURDATE(), INTERVAL 1 DAY), 'dinner', @recipe_stirfry_id, 3),
+-- Recipe 8: Stir-Fried Chicken & Peppers
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit_id, sort_order) VALUES
+(8, 29, 240, 1, 1),   -- Chicken breast, 240g
+(8, 15, 1, 5, 2),     -- Green bell pepper, 1 piece
+(8, 16, 1, 5, 3),     -- Red bell pepper, 1 piece
+(8, 17, 1, 5, 4),     -- Onion, 1 piece
+(8, 43, 2, 4, 5),     -- Soy sauce, 2 tbsp
+(8, 18, 2, 10, 6),    -- Garlic, 2 clove
+(8, 19, 1, 3, 7),     -- Ginger, 1 tsp
+(8, 47, 2, 4, 8),     -- Olive oil, 2 tbsp
+(8, 53, 1, 3, 9);     -- Sesame seeds, 1 tsp
 
--- Day 3
-(@admin_user_id, DATE_ADD(CURDATE(), INTERVAL 2 DAY), 'breakfast', @recipe_yogurt_id, 1),
+-- Recipe 9: Beef Stir Fry with Broccoli
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit_id, sort_order) VALUES
+(9, 31, 250, 1, 1),   -- Beef sirloin, 250g
+(9, 14, 200, 1, 2),   -- Broccoli, 200g
+(9, 43, 3, 4, 3),     -- Soy sauce, 3 tbsp
+(9, 18, 3, 10, 4),    -- Garlic, 3 clove
+(9, 47, 2, 4, 5),     -- Olive oil, 2 tbsp
+(9, 39, 150, 1, 6);   -- Brown rice, 150g
 
--- Day 4
-(@admin_user_id, DATE_ADD(CURDATE(), INTERVAL 3 DAY), 'lunch', @recipe_stirfry_id, 2),
+-- Recipe 10: Mixed Nuts & Dark Chocolate
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit_id, sort_order) VALUES
+(10, 50, 20, 1, 1),   -- Almonds, 20g
+(10, 51, 15, 1, 2),   -- Cashews, 15g
+(10, 52, 15, 1, 3),   -- Walnuts, 15g
+(10, 54, 20, 1, 4);   -- Dark chocolate, 20g
 
--- Day 5
-(@admin_user_id, DATE_ADD(CURDATE(), INTERVAL 4 DAY), 'breakfast', @recipe_yogurt_id, 2),
-(@admin_user_id, DATE_ADD(CURDATE(), INTERVAL 4 DAY), 'dinner', @recipe_stirfry_id, 2);
+-- Recipe 11: Hummus with Veggie Sticks
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit_id, sort_order) VALUES
+(11, 58, 100, 1, 1),  -- Hummus, 100g
+(11, 7, 2, 5, 2),     -- Carrot, 2 piece
+(11, 5, 0.5, 5, 3),   -- Cucumber, 0.5 piece
+(11, 20, 2, 12, 4),   -- Celery, 2 stalk
+(11, 16, 0.5, 5, 5);  -- Red bell pepper, 0.5 piece
 
--- ===========================
--- SEED SAMPLE AUDIT LOG ENTRIES
--- ===========================
+-- Recipe 12: Protein Energy Balls
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit_id, sort_order) VALUES
+(12, 37, 100, 1, 1),  -- Rolled oats, 100g
+(12, 57, 80, 1, 2),   -- Peanut butter, 80g
+(12, 41, 3, 4, 3),    -- Honey, 3 tbsp
+(12, 55, 30, 1, 4),   -- Dark chocolate chips, 30g
+(12, 49, 1, 4, 5);    -- Chia seeds, 1 tbsp
 
--- CREATE action for Greek Yogurt Bowl
-INSERT INTO `recipe_audit_log` (`recipe_id`, `user_id`, `action`, `old_values`, `new_values`) VALUES
-(
-  @recipe_yogurt_id,
-  @admin_user_id,
-  'CREATE',
-  NULL,
-  JSON_OBJECT(
-    'name', 'Greek Yogurt Bowl',
-    'meal_types', JSON_ARRAY('breakfast'),
-    'default_servings', 2,
-    'calories', 350,
-    'is_cheat', FALSE,
-    'is_live', TRUE
-  )
-);
+-- Recipe 13: Pancakes with Maple Syrup
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit_id, sort_order) VALUES
+(13, 36, 200, 1, 1),  -- Plain flour, 200g
+(13, 25, 2, 8, 2),    -- Eggs, 2 large
+(13, 24, 300, 2, 3),  -- Milk, 300ml
+(13, 26, 30, 1, 4),   -- Butter, 30g
+(13, 44, 4, 4, 5),    -- Maple syrup, 4 tbsp
+(13, 1, 100, 1, 6);   -- Mixed berries, 100g
 
--- CREATE action for Chicken Stir Fry
-INSERT INTO `recipe_audit_log` (`recipe_id`, `user_id`, `action`, `old_values`, `new_values`) VALUES
-(
-  @recipe_stirfry_id,
-  @admin_user_id,
-  'CREATE',
-  NULL,
-  JSON_OBJECT(
-    'name', 'Chicken and Vegetable Stir Fry',
-    'meal_types', JSON_ARRAY('lunch', 'dinner'),
-    'default_servings', 2,
-    'calories', 480,
-    'is_cheat', FALSE,
-    'is_live', TRUE
-  )
-);
+-- Recipe 14: Burger with Fries
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit_id, sort_order) VALUES
+(14, 32, 200, 1, 1),  -- Beef mince, 200g
+(14, 35, 1, 5, 2),    -- Burger bun, 1 piece
+(14, 22, 2, 14, 3),   -- Lettuce, 2 leaf
+(14, 11, 2, 13, 4),   -- Tomato, 2 slice
+(14, 28, 1, 13, 5),   -- Cheese, 1 slice
+(14, 21, 200, 1, 6),  -- Potatoes, 200g
+(14, 47, 2, 4, 7),    -- Olive oil, 2 tbsp
+(14, 46, 0.5, 3, 8);  -- Salt, 0.5 tsp
 
--- Sample UPDATE action (admin changed yogurt bowl calories)
-INSERT INTO `recipe_audit_log` (`recipe_id`, `user_id`, `action`, `old_values`, `new_values`) VALUES
-(
-  @recipe_yogurt_id,
-  @admin_user_id,
-  'UPDATE',
-  JSON_OBJECT('calories', 320),
-  JSON_OBJECT('calories', 350)
-);
+-- =============================================
+-- RECIPE STEPS
+-- =============================================
 
--- ===========================
--- VERIFY DATA
--- ===========================
+-- Recipe 1: Overnight Oats
+INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
+(1, 1, 'Combine oats, yogurt, milk, chia seeds, and peanut butter.'),
+(1, 2, 'Mix well and refrigerate overnight.'),
+(1, 3, 'In the morning, stir and top with berries, banana slices, honey, and cinnamon.');
 
--- Show counts
-SELECT 'Aisles' AS table_name, COUNT(*) AS row_count FROM aisles
-UNION ALL
-SELECT 'Units', COUNT(*) FROM units
-UNION ALL
-SELECT 'Ingredients', COUNT(*) FROM ingredients
-UNION ALL
-SELECT 'Users', COUNT(*) FROM users
-UNION ALL
-SELECT 'Recipes', COUNT(*) FROM recipes
-UNION ALL
-SELECT 'Meal Plan Entries', COUNT(*) FROM meal_plan_entries
-UNION ALL
-SELECT 'Audit Log', COUNT(*) FROM recipe_audit_log;
+-- Recipe 2: Scrambled Eggs
+INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
+(2, 1, 'Slice or mash avocado and set aside.'),
+(2, 2, 'Sauté spinach in a non-stick pan until wilted. Remove and plate.'),
+(2, 3, 'Whisk eggs with salt to taste.'),
+(2, 4, 'Heat butter in a pan, add eggs, and stir continuously until softly scrambled.'),
+(2, 5, 'Serve eggs with spinach and avocado on the side.');
+
+-- Recipe 3: Greek Yogurt Parfait
+INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
+(3, 1, 'Layer half the yogurt in a glass or bowl.'),
+(3, 2, 'Add half the berries and granola.'),
+(3, 3, 'Repeat layers and drizzle with honey.');
+
+-- Recipe 4: Grilled Chicken Salad
+INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
+(4, 1, 'Cook and slice the chicken breast. Let rest if made in advance.'),
+(4, 2, 'Wash and prep the salad leaves, cucumber, tomatoes, and carrots.'),
+(4, 3, 'Slice avocado and drain chickpeas.'),
+(4, 4, 'Crumble feta over the vegetables.'),
+(4, 5, 'In a small bowl, mix lemon juice and 1 tbsp olive oil for dressing.'),
+(4, 6, 'Combine all ingredients in a large bowl and toss with dressing.'),
+(4, 7, 'Top with grilled chicken and serve.');
+
+-- Recipe 5: Turkey & Avocado Wrap
+INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
+(5, 1, 'Warm the tortillas slightly.'),
+(5, 2, 'Spread mayonnaise on each tortilla.'),
+(5, 3, 'Layer turkey, sliced avocado, lettuce, and tomato.'),
+(5, 4, 'Roll up tightly and slice in half to serve.');
+
+-- Recipe 6: Mediterranean Quinoa Bowl
+INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
+(6, 1, 'Cook quinoa according to package instructions and let cool.'),
+(6, 2, 'Dice cucumber, halve tomatoes, and thinly slice red onion.'),
+(6, 3, 'Combine cooled quinoa with vegetables.'),
+(6, 4, 'Crumble feta cheese over the bowl.'),
+(6, 5, 'Drizzle with olive oil and lemon juice, toss to combine.'),
+(6, 6, 'Garnish with fresh parsley.');
+
+-- Recipe 7: Baked Salmon
+INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
+(7, 1, 'Preheat oven to 180°C.'),
+(7, 2, 'Cut broccoli into florets and toss with 1 tbsp olive oil and salt.'),
+(7, 3, 'Spread broccoli on a baking tray and roast for 10 minutes.'),
+(7, 4, 'Add salmon fillets in the center, drizzle with olive oil and season.'),
+(7, 5, 'Bake for another 20 minutes until salmon is cooked and broccoli tender.'),
+(7, 6, 'Spiralize carrots and toss with salad leaves, avocado, and almonds.'),
+(7, 7, 'Make a dressing with lemon juice and 1 tbsp olive oil.'),
+(7, 8, 'Serve salmon with roasted broccoli and the avocado-nut salad.');
+
+-- Recipe 8: Stir-Fried Chicken
+INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
+(8, 1, 'Slice chicken and peppers into strips.'),
+(8, 2, 'Heat oil in a wok over high heat.'),
+(8, 3, 'Stir-fry chicken for 4-5 minutes until cooked.'),
+(8, 4, 'Add garlic and ginger, stir for 30 seconds.'),
+(8, 5, 'Add peppers and onion, cook for 3 minutes.'),
+(8, 6, 'Add soy sauce and toss to combine.'),
+(8, 7, 'Sprinkle with sesame seeds before serving.');
+
+-- Recipe 9: Beef Stir Fry
+INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
+(9, 1, 'Cook brown rice according to package instructions.'),
+(9, 2, 'Slice beef into thin strips.'),
+(9, 3, 'Cut broccoli into small florets.'),
+(9, 4, 'Heat oil in a wok and stir-fry beef for 2-3 minutes.'),
+(9, 5, 'Add garlic and broccoli, cook for 4 minutes.'),
+(9, 6, 'Add soy sauce and toss well.'),
+(9, 7, 'Serve over brown rice.');
+
+-- Recipe 10: Mixed Nuts & Dark Chocolate
+INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
+(10, 1, 'Combine all nuts in a small container.'),
+(10, 2, 'Break dark chocolate into small pieces and add.'),
+(10, 3, 'Mix and enjoy as a healthy snack.');
+
+-- Recipe 11: Hummus with Veggie Sticks
+INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
+(11, 1, 'Cut vegetables into sticks.'),
+(11, 2, 'Serve hummus in a bowl with veggie sticks around it.'),
+(11, 3, 'Dip and enjoy!');
+
+-- Recipe 12: Protein Energy Balls
+INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
+(12, 1, 'Mix all ingredients in a bowl until well combined.'),
+(12, 2, 'Refrigerate for 15 minutes to make rolling easier.'),
+(12, 3, 'Roll into small balls (about 12).'),
+(12, 4, 'Store in refrigerator for up to 1 week.');
+
+-- Recipe 13: Pancakes
+INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
+(13, 1, 'Whisk flour, eggs, and milk until smooth batter forms.'),
+(13, 2, 'Heat a non-stick pan with a little butter.'),
+(13, 3, 'Pour batter to make pancakes, flip when bubbles form.'),
+(13, 4, 'Stack pancakes and top with berries and maple syrup.');
+
+-- Recipe 14: Burger with Fries
+INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
+(14, 1, 'Cut potatoes into fries, toss with oil and salt, bake at 200°C for 25 min.'),
+(14, 2, 'Form beef mince into a patty, season with salt.'),
+(14, 3, 'Grill or pan-fry patty for 4 minutes each side.'),
+(14, 4, 'Toast the burger bun.'),
+(14, 5, 'Assemble: bun, lettuce, patty, cheese, tomato, bun.'),
+(14, 6, 'Serve with fries.');
+
+-- =============================================
+-- TEST USER (development only)
+-- =============================================
+INSERT INTO users (email, name, google_id, is_admin, created_at) VALUES
+('admin@foodbytes.test', 'Admin User', 'google_admin_test_id', TRUE, NOW());

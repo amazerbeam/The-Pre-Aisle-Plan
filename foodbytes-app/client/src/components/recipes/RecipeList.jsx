@@ -1,67 +1,72 @@
-import { useState } from 'react';
-import { useRecipes } from '../../hooks/useRecipes';
-import RecipeCard from './RecipeCard';
-import Loading from '../common/Loading';
-import './RecipeList.css';
+import { useState, useEffect } from 'react'
+import recipeService from '../../services/recipeService'
+import RecipeCard from './RecipeCard'
+import './RecipeList.css'
 
-const MEAL_TYPES = [
-  { value: 'all', label: 'All Recipes' },
-  { value: 'breakfast', label: 'Breakfast' },
-  { value: 'lunch', label: 'Lunch' },
-  { value: 'dinner', label: 'Dinner' },
-  { value: 'snack', label: 'Snacks' },
-];
+const MEAL_TYPES = ['breakfast', 'lunch', 'dinner', 'snacks']
 
-const RecipeList = () => {
-  const [selectedMealType, setSelectedMealType] = useState('all');
-  const { filteredRecipes, loading, error } = useRecipes(selectedMealType);
+function RecipeList() {
+  const [recipes, setRecipes] = useState([])
+  const [activeMeal, setActiveMeal] = useState('breakfast')
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
-  if (loading) {
-    return <Loading fullScreen text="Loading recipes..." />;
-  }
+  useEffect(() => {
+    loadRecipes(activeMeal)
+  }, [activeMeal])
 
-  if (error) {
-    return (
-      <div className="recipe-list__error">
-        <p>Failed to load recipes: {error}</p>
-      </div>
-    );
+  const loadRecipes = async (mealType) => {
+    setLoading(true)
+    setError(null)
+    try {
+      const data = await recipeService.getRecipesByMealType(mealType)
+      setRecipes(data)
+    } catch (err) {
+      setError('Failed to load recipes. Please try again.')
+      console.error('Error loading recipes:', err)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
-    <div className="recipe-list">
-      <div className="recipe-list__header">
-        <h1>Recipes</h1>
-        <div className="recipe-list__filters">
-          {MEAL_TYPES.map((type) => (
-            <button
-              key={type.value}
-              className={`recipe-list__filter ${
-                selectedMealType === type.value
-                  ? 'recipe-list__filter--active'
-                  : ''
-              }`}
-              onClick={() => setSelectedMealType(type.value)}
-            >
-              {type.label}
-            </button>
-          ))}
+    <div className="recipe-list-container">
+      <nav className="meal-tabs">
+        {MEAL_TYPES.map((meal) => (
+          <button
+            key={meal}
+            className={`meal-tab ${activeMeal === meal ? 'active' : ''}`}
+            onClick={() => setActiveMeal(meal)}
+          >
+            {meal.charAt(0).toUpperCase() + meal.slice(1)}
+          </button>
+        ))}
+      </nav>
+
+      {loading && (
+        <div className="loading">
+          <div className="spinner"></div>
         </div>
-      </div>
+      )}
 
-      <div className="recipe-list__grid">
-        {filteredRecipes.length === 0 ? (
-          <div className="recipe-list__empty">
-            <p>No recipes found for this category.</p>
-          </div>
-        ) : (
-          filteredRecipes.map((recipe) => (
+      {error && (
+        <div className="error-message">
+          {error}
+        </div>
+      )}
+
+      {!loading && !error && (
+        <div className="recipe-grid">
+          {recipes.map((recipe) => (
             <RecipeCard key={recipe.id} recipe={recipe} />
-          ))
-        )}
-      </div>
+          ))}
+          {recipes.length === 0 && (
+            <p className="no-recipes">No recipes found for {activeMeal}.</p>
+          )}
+        </div>
+      )}
     </div>
-  );
-};
+  )
+}
 
-export default RecipeList;
+export default RecipeList

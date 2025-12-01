@@ -1,52 +1,64 @@
-import { Link } from 'react-router-dom';
-import { useAuth } from '../../hooks/useAuth';
-import './Header.css';
+import { useState } from 'react'
+import { useAuth } from '../../contexts/AuthContext'
+import LoginModal from '../auth/LoginModal'
+import './Header.css'
 
-const Header = () => {
-  const { user, logout } = useAuth();
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-      window.location.href = '/login';
-    } catch (error) {
-      console.error('Logout failed:', error);
-    }
-  };
+function Header() {
+  const { user, isAuthenticated, logout } = useAuth()
+  const [showLoginModal, setShowLoginModal] = useState(false)
+  const [showUserMenu, setShowUserMenu] = useState(false)
 
   return (
     <header className="header">
-      <div className="header__container">
-        <Link to="/" className="header__logo">
-          <span className="header__logo-icon">🍽️</span>
-          <span className="header__logo-text">FoodBytes</span>
-        </Link>
+      <div className="header-content">
+        <div className="logo">
+          <h1>FoodBytes</h1>
+        </div>
 
-        {user && (
-          <div className="header__user">
-            {user.picture && (
-              <img
-                src={user.picture}
-                alt={user.name}
-                className="header__user-avatar"
-              />
-            )}
-            <div className="header__user-menu">
-              <button className="header__user-name">{user.name}</button>
-              <div className="header__dropdown">
-                <Link to="/profile" className="header__dropdown-item">
-                  Profile
-                </Link>
-                <button onClick={handleLogout} className="header__dropdown-item">
-                  Logout
-                </button>
-              </div>
+        <div className="header-right">
+          {isAuthenticated ? (
+            <div className="user-menu-container">
+              <button
+                className="user-button"
+                onClick={() => setShowUserMenu(!showUserMenu)}
+              >
+                {user.avatarUrl ? (
+                  <img src={user.avatarUrl} alt={user.name} className="avatar" />
+                ) : (
+                  <div className="avatar-placeholder">
+                    {user.name?.charAt(0).toUpperCase()}
+                  </div>
+                )}
+                <span className="user-name">{user.name}</span>
+              </button>
+
+              {showUserMenu && (
+                <div className="user-dropdown">
+                  <div className="user-info">
+                    <span className="user-email">{user.email}</span>
+                  </div>
+                  <button className="logout-btn" onClick={logout}>
+                    Sign Out
+                  </button>
+                </div>
+              )}
             </div>
-          </div>
-        )}
+          ) : (
+            <button
+              className="sign-in-btn"
+              onClick={() => setShowLoginModal(true)}
+            >
+              Sign In
+            </button>
+          )}
+        </div>
       </div>
-    </header>
-  );
-};
 
-export default Header;
+      {showLoginModal && (
+        <LoginModal onClose={() => setShowLoginModal(false)} />
+      )}
+    </header>
+  )
+}
+
+export default Header
