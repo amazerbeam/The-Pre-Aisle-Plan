@@ -272,31 +272,32 @@
 
 ## Global Date Range
 
-### FR-007: Shared Date Range Across All Views
+### FR-007: Shared Start Date with Fixed 7-Day Range
 **Priority:** High
 
-**Description:** A single "From" and "To" date range controls all three main views: Recipes, Shopping List, and Meal Plan
+**Description:** A single "From" date picker controls the start of a fixed 7-day planning window across all three main views: Recipes, Shopping List, and Meal Plan
 
-**User Story:** As a user, I want to set my date range once and have it apply everywhere so that my recipes, shopping list, and meal plan are always synchronized.
+**User Story:** As a user, I want to set my start date once and have a 7-day meal plan automatically generated so that my recipes, shopping list, and meal plan are always synchronized.
 
 **Acceptance Criteria:**
-- **"From" date picker** - start of the planning period
-- **"To" date picker** - end of the planning period
-- **Default range:** Current date (From) to current date + 6 days (To) = 7 days total
-- Date range is displayed prominently and accessible from all views
-- Changing the date range **immediately updates all three views:**
-  - **Recipes view:** Day buttons (Mon-Sun) reflect the selected week
-  - **Shopping List:** Only shows ingredients for recipes in the date range
-  - **Meal Plan:** Only shows days within the date range
-- End date must be on or after start date (validation)
-- Date range persists in user session
-- Authenticated users: date range preference saved to account
-- Guest users: date range stored in localStorage
+- **"From" date picker only** - start of the planning period
+- **"To" date is automatically calculated** as From date + 6 days (7 days total)
+- **NO separate "To" date picker** - end date is always fixed at 7 days
+- **Default:** Current date as "From" date (showing current day through 6 days ahead)
+- Date range is displayed prominently showing "From [date] - To [calculated date]"
+- Changing the "From" date **immediately updates all three views:**
+  - **Recipes view:** Day buttons (Mon-Sun) reflect the 7-day window starting from "From" date
+  - **Shopping List:** Only shows ingredients for recipes in the 7-day window
+  - **Meal Plan:** Only shows the 7 days starting from "From" date
+- Start date persists in user session
+- Authenticated users: start date preference saved to account
+- Guest users: start date stored in localStorage
 
 **Source Evidence:**
 - Global date range state
-- `dateFrom` and `dateTo` variables
-- Date picker components
+- `dateFrom` variable (primary)
+- `dateTo` calculated as `dateFrom + 6 days`
+- Single date picker component
 
 ---
 
@@ -449,13 +450,13 @@
 ### FR-014: Assign Recipes to Days of the Week
 **Priority:** High
 
-**Description:** Users can assign recipes to specific days within the selected date range using day-of-week buttons (Mon-Sun)
+**Description:** Users can assign recipes to specific days within the 7-day planning window using day-of-week buttons (Mon-Sun)
 
 **User Story:** As a user, I want to quickly assign recipes to days of the week so that I can easily plan my meals.
 
 **Acceptance Criteria:**
 - Each recipe card displays **7 day buttons: Mon, Tue, Wed, Thu, Fri, Sat, Sun**
-- Day buttons correspond to the days within the **current date range** (from "From" date to "To" date)
+- Day buttons correspond to the **7 days starting from the "From" date** (see FR-007)
 - Clicking a day button assigns the recipe to that specific date
 - **Clicking an already-assigned day removes the recipe** (toggle behavior)
 - Visual indicator shows which days the recipe is assigned to (highlighted/filled button)
@@ -497,27 +498,27 @@
 ### FR-016: View Meal Plan Calendar
 **Priority:** High
 
-**Description:** Users can view their meal plan for the selected date range showing all assigned recipes
+**Description:** Users can view their meal plan for the 7-day planning window showing all assigned recipes
 
 **User Story:** As a user, I want to view my meal plan so that I can see what I've planned for the week.
 
 **Acceptance Criteria:**
 - Meal Plan button in footer opens calendar view
-- **Uses the shared global date range** (same "From" and "To" as Recipes and Shopping List - see FR-007)
-- Displays all days within the date range
+- **Uses the shared 7-day window** starting from "From" date (see FR-007)
+- Displays all 7 days in the planning window
 - Current date is visually highlighted (if within range)
 - Each date shows assigned recipes organized by meal type (Breakfast, Lunch, Dinner, Snacks)
 - Each recipe entry shows: recipe name and serving size
 - Daily calorie total is displayed for each date
 - Can remove recipes directly from the meal plan view
 - Visual distinction between past, current, and future dates
-- Changing the global date range updates the meal plan view
+- Changing the "From" date updates the meal plan view to show new 7-day window
 - Wake lock activates when calendar is visible (if supported)
 
 **Source Evidence:**
 - `renderCalendar()`
 - `#calendar-view` element
-- Server API: GET meal plan with date range
+- Server API: GET meal plan with start date (returns 7-day window)
 
 ---
 
@@ -566,29 +567,28 @@
 ### FR-019: Generate Aggregated Shopping List
 **Priority:** High
 
-**Description:** System generates a unified shopping list from recipes in the meal plan using the shared global date range (see FR-007)
+**Description:** System generates a unified shopping list from recipes in the meal plan using the shared 7-day planning window (see FR-007)
 
 **User Story:** As a user, I want a consolidated shopping list for my planned meals so that I can shop efficiently.
 
 **Acceptance Criteria:**
 - Shopping List view accessible from bottom navigation
-- **Uses the shared global date range** (same "From" and "To" as Recipes and Meal Plan views - see FR-007)
+- **Uses the shared 7-day window** starting from "From" date (see FR-007)
 - **NO preset buttons** (no "3 days", "1 week", "2 weeks" buttons)
-- **NO separate date pickers** - uses the global date range
-- Only ingredients from recipes within the global date range (inclusive) are aggregated
+- **NO separate date pickers** - uses the global "From" date with auto-calculated 7-day window
+- Only ingredients from recipes within the 7-day window are aggregated
 - Same ingredients from multiple recipes are combined (quantities summed)
 - Quantities reflect recipe serving sizes from meal plan
 - List updates automatically when:
-  - Global date range changes
+  - "From" date changes (new 7-day window)
   - Recipes are added/removed from meal plan
   - Serving sizes are changed
 
 **Source Evidence:**
-- `renderShoppingList(dateFrom, dateTo)`
+- `renderShoppingList(dateFrom)` - calculates dateTo internally as dateFrom + 6 days
 - `ingredientTotals` Map with key = `name|unit`
 - Calculation: `quantity * servings / defaultServings`
-- Start date picker input
-- End date picker input
+- Single "From" date picker input
 
 ---
 
@@ -741,20 +741,20 @@
 ### FR-027: Generate Shareable Meal Plan URL
 **Priority:** Low
 
-**Description:** Users can generate a URL that encodes a date range of their meal plan for sharing
+**Description:** Users can generate a URL that encodes their 7-day meal plan for sharing
 
 **User Story:** As a user, I want to generate a shareable link so that I can share my meal plan with friends or family.
 
 **Acceptance Criteria:**
 - Share button visible in meal plan view
-- User can select date range to share (default: current week)
-- Clicking generates URL with base64-encoded planner data including dates
+- Shares the current 7-day window (from "From" date, see FR-007)
+- Clicking generates URL with base64-encoded planner data including the 7 days of dates
 - URL is automatically copied to clipboard
 - Success message confirms URL was copied
 - URL uses `?planner=` query parameter with date-indexed data
 
 **Source Evidence:**
-- `generateShareURL(dateFrom, dateTo)`
+- `generateShareURL(dateFrom)` - shares 7-day window starting from dateFrom
 - Encoding: `btoa(JSON.stringify(plannerWithDates))`
 - `navigator.clipboard.writeText()`
 
