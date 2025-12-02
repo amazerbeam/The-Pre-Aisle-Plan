@@ -36,7 +36,11 @@
 
 | Req # | Description |
 |-------|-------------|
-| NFR-016 | Simplified Day Button Styling (No Animations, No Loading Effects) |
+| FR-019 | Generate Aggregated Shopping List |
+| FR-020 | Group Ingredients by Grocery Aisle |
+| FR-021 | Check Off Purchased Items |
+| FR-022 | Uncheck All Shopping Items |
+| FR-024 | Sort Shopping List by Aisle, Ingredient Name, and Check Status |
 
 ## In Progress - Finish
 
@@ -62,6 +66,7 @@
 | FR-039 | Logo Click Navigates to Recipes |
 | FR-040 | Hide Empty Meal Types in Meal Plan |
 | FR-041 | Random Food Emojis Per Meal Type (Meal Plan View Only) |
+| NFR-016 | Simplified Day Button Styling (No Animations, No Loading Effects) |
 | Database: Users | Store user accounts from Google OAuth |
 | Database: Recipes | Store recipe data (migrated from recipes.js) |
 
@@ -1271,7 +1276,12 @@
 - Reference: `/Legacy/styles.css` lines 181-212
 - User clarification - "The issue with the buttons enlarging seems to be a loading state. when loading the buttons should simply be disabled. It's appending a 'loading' class to the files."
 
-**Status:** In Progress
+**Implementation:**
+- Modified `foodbytes-app/client/src/components/recipes/DayAssignmentButtons.jsx` (line 112): Removed 'loading' class from className
+- Modified `foodbytes-app/client/src/components/recipes/DayAssignmentButtons.css` (lines 65-73): Removed `.day-button.loading` rule, enhanced `:disabled` state with opacity: 0.6, cursor: not-allowed, pointer-events: none
+- Verified against Legacy reference: All styling matches `/Legacy/styles.css` lines 181-212
+
+**Status:** Completed
 
 ---
 

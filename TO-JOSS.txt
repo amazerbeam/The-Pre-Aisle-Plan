@@ -1,7 +1,8 @@
 # TODO 
 
-????
+BUG:
 The calories count shold not increase when servings are increase. If you think about it this does not make sence, each person will only eat 1 portion and they would not care about how many calories everyone at the table are eating. 
+
 
 
 Shared Meal Plans :
@@ -27,7 +28,7 @@ User Perfrences:
 	Inside the user profile, they user will have "perference" or something. First setting will be "Default Servings" this will set all recipes to this default number, so if the user wants to always see 2 servings then this is where the set that. It'll be above "Sign out" onlt logged in users can see this. 
 
 
-
+Recipes to move: 
 Recipes to seed with
 Overnight Oats
 Grilled Chicken Salad
