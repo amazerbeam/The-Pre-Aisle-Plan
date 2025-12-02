@@ -1,11 +1,13 @@
-/* DayAssignmentButtons - FR-014, FR-015: Day-of-week buttons for recipe assignment */
+/* DayAssignmentButtons - FR-014, FR-015, FR-037, NFR-016
+ * Legacy-style flat day buttons with three states
+ * No animations, no circles - simple flat design
+ */
 
-.day-assignment-buttons {
+.day-buttons {
   display: flex;
-  gap: 4px;
-  margin: 12px 0;
   flex-wrap: wrap;
-  justify-content: flex-start;
+  gap: 8px;
+  margin-top: 12px;
 }
 
 .day-button {
@@ -13,82 +15,80 @@
   flex-direction: column;
   align-items: center;
   gap: 2px;
-  padding: 6px 8px;
-  min-width: 42px;
-  border: 1px solid #ddd;
+  padding: 6px 10px;
+  min-width: 48px;
+  border: none;
   border-radius: 6px;
-  background-color: #fff;
   cursor: pointer;
-  transition: all 0.15s ease;
-  font-size: 12px;
-}
-
-.day-button:hover:not(:disabled) {
-  border-color: var(--primary-color, #4a3f80);
-  background-color: rgba(74, 63, 128, 0.05);
-}
-
-.day-button:disabled {
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
-.day-button.assigned {
-  background-color: var(--primary-color, #4a3f80);
-  border-color: var(--primary-color, #4a3f80);
-  color: #fff;
-}
-
-.day-button.assigned:hover:not(:disabled) {
-  background-color: #3d3469;
-}
-
-.day-button.today {
-  border-width: 2px;
-  border-color: var(--primary-color, #4a3f80);
-}
-
-.day-button.loading {
-  opacity: 0.7;
-  animation: pulse 0.8s infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 0.7; }
-  50% { opacity: 0.5; }
-}
-
-.day-name {
   font-weight: 500;
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  font-size: 12px;
+  /* No transitions/animations per NFR-016 */
 }
 
-.day-indicator {
-  font-size: 10px;
+/* FR-041: Day label and emoji styling */
+.day-label {
+  font-weight: 500;
+}
+
+.day-emoji {
+  font-size: 14px;
   line-height: 1;
 }
 
-.day-button.assigned .day-indicator {
-  color: #fff;
+/* NFR-016: Unselected state - slot is available */
+.day-button.unselected {
+  background-color: #eee;
+  color: #333;
+}
+
+.day-button.unselected:hover:not(:disabled) {
+  background-color: #e0e0e0;
+}
+
+/* NFR-016: Selected state - THIS recipe is assigned */
+.day-button.selected {
+  background-color: #4a3f80;
+  color: white;
+  font-weight: bold;
+}
+
+.day-button.selected:hover:not(:disabled) {
+  background-color: #3d336d;
+}
+
+/* NFR-016: Already-selected state - ANOTHER recipe is assigned (greyed out) */
+.day-button.already-selected {
+  background-color: #ccc;
+  color: #666;
+}
+
+.day-button.already-selected:hover:not(:disabled) {
+  background-color: #bbb;
+}
+
+/* Loading state - minimal pulse, no fancy animation */
+.day-button.loading {
+  opacity: 0.7;
+}
+
+/* Disabled state */
+.day-button:disabled {
+  cursor: not-allowed;
 }
 
 /* Mobile responsive */
 @media (max-width: 480px) {
-  .day-assignment-buttons {
+  .day-buttons {
     justify-content: space-between;
-    gap: 2px;
+    gap: 4px;
   }
 
   .day-button {
-    min-width: 38px;
-    padding: 5px 6px;
+    padding: 6px 10px;
+    font-size: 12px;
     flex: 1;
+    min-width: 40px;
     max-width: 50px;
-  }
-
-  .day-name {
-    font-size: 9px;
+    text-align: center;
   }
 }

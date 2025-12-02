@@ -1,15 +1,24 @@
 import { useState } from 'react'
 import { useMealPlan } from '../../contexts/MealPlanContext'
 import { useAuth } from '../../contexts/AuthContext'
+import { getEmojiForMeal } from '../../utils/emojiUtils'
 import './DayAssignmentButtons.css'
 
 /**
- * DayAssignmentButtons - FR-014, FR-015: Day-of-week buttons for recipe assignment
+ * DayAssignmentButtons - FR-014, FR-015, FR-037, NFR-016, FR-041
+ * Day-of-week buttons for recipe assignment with swap behavior
  * Hidden for guest users (as per user preference)
+ *
+ * Button States (NFR-016 - Legacy styling):
+ * - unselected: No recipe assigned to this slot
+ * - selected: THIS recipe is assigned to this slot
+ * - already-selected: ANOTHER recipe is assigned (greyed out, clickable for swap)
+ *
+ * FR-041: Buttons display food emojis themed by meal type
  */
 function DayAssignmentButtons({ recipe, servings, currentMealType }) {
   const { isAuthenticated } = useAuth()
-  const { weekDays, assignRecipe, isRecipeAssigned } = useMealPlan()
+  const { weekDays, weekPlan, assignRecipe, isRecipeAssigned } = useMealPlan()
   const [loading, setLoading] = useState(null) // Track which day is loading
 
   // Hidden for guest users
@@ -28,6 +37,40 @@ function DayAssignmentButtons({ recipe, servings, currentMealType }) {
     return mealIds[mealType?.toLowerCase()] || 1
   }
 
+  /**
+   * FR-037: Determine button class based on slot state
+   * - 'selected': This recipe is assigned to this day/meal
+   * - 'already-selected': Another recipe is assigned (greyed out)
+   * - 'unselected': Slot is available
+   */
+  const getButtonClass = (dateStr) => {
+    const mealType = currentMealType?.toLowerCase()
+
+    // Check if THIS recipe is assigned
+    if (isRecipeAssigned(recipe.id, dateStr, mealType)) {
+      return 'selected'
+    }
+
+    // Check if ANOTHER recipe is assigned to this slot
+    if (weekPlan && weekPlan.days) {
+      const day = weekPlan.days.find(d => d.date === dateStr)
+      if (day && day.mealsByType) {
+        const entries = day.mealsByType[mealType] || []
+        if (entries.length > 0) {
+          return 'already-selected'
+        }
+      }
+    }
+
+    return 'unselected'
+  }
+
+  /**
+   * FR-037: Handle day click with swap behavior
+   * - If unselected: Assign this recipe
+   * - If selected: Remove this recipe (toggle)
+   * - If already-selected: Replace with this recipe (swap - no confirmation)
+   */
   const handleDayClick = async (dateStr) => {
     if (loading) return // Prevent multiple clicks
 
@@ -42,23 +85,39 @@ function DayAssignmentButtons({ recipe, servings, currentMealType }) {
     }
   }
 
+  /**
+   * Get title/tooltip based on button state
+   */
+  const getButtonTitle = (dateStr, dayName, buttonClass) => {
+    switch (buttonClass) {
+      case 'selected':
+        return `Remove from ${dayName}`
+      case 'already-selected':
+        return `Replace meal on ${dayName}`
+      default:
+        return `Add to ${dayName}`
+    }
+  }
+
   return (
-    <div className="day-assignment-buttons">
+    <div className="day-buttons">
       {weekDays.map((day) => {
-        const isAssigned = isRecipeAssigned(recipe.id, day.date, currentMealType?.toLowerCase())
+        const buttonClass = getButtonClass(day.date)
         const isLoading = loading === day.date
+        // FR-041: Get themed emoji for this day/meal combination
+        const dayEmoji = getEmojiForMeal(day.date, currentMealType)
 
         return (
           <button
             key={day.date}
-            className={`day-button ${isAssigned ? 'assigned' : ''} ${day.isToday ? 'today' : ''} ${isLoading ? 'loading' : ''}`}
+            className={`day-button ${buttonClass} ${isLoading ? 'loading' : ''}`}
             onClick={() => handleDayClick(day.date)}
             disabled={isLoading}
-            title={`${isAssigned ? 'Remove from' : 'Add to'} ${day.dayName}`}
-            aria-label={`${isAssigned ? 'Remove from' : 'Add to'} ${day.dayName} ${day.date}`}
+            title={getButtonTitle(day.date, day.dayName, buttonClass)}
+            aria-label={getButtonTitle(day.date, day.dayName, buttonClass)}
           >
-            <span className="day-name">{day.dayName}</span>
-            <span className="day-indicator">{isAssigned ? '●' : '○'}</span>
+            <span className="day-label">{day.dayName}</span>
+            <span className="day-emoji">{dayEmoji}</span>
           </button>
         )
       })}

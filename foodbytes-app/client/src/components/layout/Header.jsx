@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import LoginModal from '../auth/LoginModal'
 import DateRangePicker from '../common/DateRangePicker'
@@ -8,11 +9,20 @@ function Header() {
   const { user, isAuthenticated, logout } = useAuth()
   const [showLoginModal, setShowLoginModal] = useState(false)
   const [showUserMenu, setShowUserMenu] = useState(false)
+  const navigate = useNavigate()
 
   return (
     <header className="header">
       <div className="header-content">
-        <div className="logo">
+        {/* FR-039: Clickable logo navigates to Recipes */}
+        <div
+          className="logo clickable"
+          onClick={() => navigate('/')}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => e.key === 'Enter' && navigate('/')}
+          title="Go to Recipes"
+        >
           <h1>FoodBytes</h1>
         </div>
 

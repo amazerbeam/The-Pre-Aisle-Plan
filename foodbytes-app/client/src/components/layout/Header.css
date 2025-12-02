@@ -22,6 +22,21 @@
   margin: 0;
 }
 
+/* FR-039: Clickable logo */
+.logo.clickable {
+  cursor: pointer;
+}
+
+.logo.clickable:hover {
+  opacity: 0.9;
+}
+
+.logo.clickable:focus-visible {
+  outline: 2px solid white;
+  outline-offset: 4px;
+  border-radius: var(--radius-sm);
+}
+
 .header-right {
   display: flex;
   align-items: center;

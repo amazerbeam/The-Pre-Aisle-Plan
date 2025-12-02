@@ -64,6 +64,17 @@ public interface MealPlanEntryRepository extends JpaRepository<MealPlanEntry, Lo
     Optional<MealPlanEntry> findByIdAndUserId(Long id, Long userId);
 
     /**
+     * FR-037: Find any recipe assigned to a specific date/meal slot for a user.
+     * Used to implement single-recipe-per-slot constraint and swap behavior.
+     *
+     * @param userId User ID
+     * @param planDate The date
+     * @param mealId Meal type ID (breakfast, lunch, etc.)
+     * @return Optional containing the entry if slot is occupied
+     */
+    Optional<MealPlanEntry> findByUserIdAndPlanDateAndMealId(Long userId, LocalDate planDate, Long mealId);
+
+    /**
      * Get all entries for a specific user and date.
      * Useful for checking daily assignments.
      *

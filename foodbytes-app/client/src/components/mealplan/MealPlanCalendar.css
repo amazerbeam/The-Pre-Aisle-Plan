@@ -16,9 +16,34 @@
   border-bottom: 2px solid var(--primary-color, #4a3f80);
 }
 
+/* FR-038: Header top row with title and Recipes button */
+.calendar-header-top {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+
 .calendar-header h2 {
   margin: 0;
   color: var(--primary-color, #4a3f80);
+}
+
+/* FR-038: Recipes navigation button */
+.recipes-nav-button {
+  margin-left: auto;
+  padding: 8px 16px;
+  background-color: #eee;
+  color: #333;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.recipes-nav-button:hover {
+  background-color: #ddd;
 }
 
 .date-range {

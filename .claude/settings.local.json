@@ -25,7 +25,9 @@
       "Bash(del \"C:\\Users\\jossd\\Documents\\MyWebSites\\FoodBytes\\foodbytes-app\\foodbytes-api\\src\\main\\java\\com\\foodbytes\\model\\MealType.java\")",
       "Bash(docker-compose:*)",
       "Bash(dir /b \"C:\\Users\\jossd\\Documents\\MyWebSites\\FoodBytes\")",
-      "Bash(dir /b \"C:\\Users\\jossd\\Documents\\MyWebSites\\FoodBytes\\foodbytes-app\\client\\src\\components\")"
+      "Bash(dir /b \"C:\\Users\\jossd\\Documents\\MyWebSites\\FoodBytes\\foodbytes-app\\client\\src\\components\")",
+      "Bash(cat:*)",
+      "Bash(xargs -I {} sh -c 'echo \"\"{}\"\"')"
     ],
     "deny": [],
     "ask": []

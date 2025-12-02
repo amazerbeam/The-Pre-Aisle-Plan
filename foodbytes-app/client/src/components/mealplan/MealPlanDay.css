@@ -99,6 +99,15 @@
   padding: 4px;
 }
 
+/* FR-040: Empty day placeholder when no meals are planned */
+.empty-day-message {
+  color: #999;
+  font-size: 12px;
+  text-align: center;
+  padding: 20px 8px;
+  font-style: italic;
+}
+
 .day-footer {
   padding: 8px 12px;
   background-color: #f8f9fa;

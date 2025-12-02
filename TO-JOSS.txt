@@ -1,24 +1,37 @@
 # TODO 
 
-
-#Bugs 
-Selecting days of the week: 
-	-A day can only have 1 "Meal Type"(Breakfast, Dinner, Lunch, Snacks) per day.Example A user can not assign 2 breakfasts to Monday.
-	-If mondays breakfasts is selected (Oats) then Monday is greyout (Not disabled) for the other recipes in that meal type. 
-	-If the users clicks on a greyeed out Recipe (Pancakes) for Monday it just changes Monday to pancakes, the other meals are greyout and so is Oats now.
-
-No way back to recipes: 
-	- When in meal plan currently there is no way back to "Recipes" 
-	- Add a recipes button
-	- Clicking on FoodBytes Logo should bring user back to "Recipes" too. 
-No snacks selected: 
-	- If no of "Meal Type" is selected dont' show it in the meal plan. 
-	- I selected no "Snacks", but it's showing for each day
-
-UX of day buttons
-	- I don't like the clicks animation or the circle in the Day buttons. 
-	- Simplifly the design of the buttons 
-	- I love the emoties, but could we add more and set random ones to each meal so they are different
-
-Next: 
+????
 The calories count shold not increase when servings are increase. If you think about it this does not make sence, each person will only eat 1 portion and they would not care about how many calories everyone at the table are eating. 
+
+
+Shared Meal Plans :
+	Be able to link with another user. So Karen and I can have the same "Meal plan" this way if she changes the plan mine will also update. She or I can set a meal plan and this will update for both of us. Basically we'll both share meal plan. 
+
+
+NF: Guest, Vs Paid VS logged in only. Also free Month trial of full access. 
+
+NF: Extras
+
+	An "extras" section (or a better named) This section will be things that go with meals. For example, the "Bean burretio" uses a "Flat Bread". The "Flat Bread" would be in the Extras section. Things in the exta section do not get added to the meal plan, but will be added to shopping list. 
+
+
+	If a user clicks on a meal that is "Linked" to 1 or More "Extras" they'll be promoted with "Home made " + ExtraName + " or Store bought" with a button to select both, and a check box to say "Don't ask me again" 
+	Inside the. 
+
+	Inside the "Meal" say "Burretio" beside "Flat Bread" there will be a check box "Home Made" this is where the user can change this "If they've selected Don't ask me again", but this checkbox will always be there. 
+
+User Perfrences: 
+	Inside the user profile, they user will have "perference" or something. First setting will be "Default Servings" this will set all recipes to this default number, so if the user wants to always see 2 servings then this is where the set that. It'll be above "Sign out" onlt logged in users can see this. 
+
+
+
+Recipes to seed with
+Overnight Oats
+Grilled Chicken Salad
+Stir-Fried Chicken & Peppers with Tofu & Nuts
+Spicy Tofu Stir-Fry with Mushrooms & Nuts
+Pancakes and Bacon
+Banana Chia Pudding with Peanut Butter & Berries
+Tuna & Egg Patties
+Crispy Chicken Wings with Fries
+Turkey Lettuce Cups with Feta & Nut Salad

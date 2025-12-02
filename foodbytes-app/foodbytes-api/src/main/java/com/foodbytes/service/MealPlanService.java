@@ -64,25 +64,40 @@ public class MealPlanService {
     }
 
     /**
-     * FR-014: Assign recipe to a date (toggle behavior).
-     * If the entry already exists, it removes it. If not, it creates it.
+     * FR-014, FR-037: Assign recipe to a date with swap behavior.
+     *
+     * FR-037 Behavior:
+     * - If THIS recipe is already assigned to the slot → toggle off (remove)
+     * - If ANOTHER recipe is assigned to the slot → replace it (swap)
+     * - If slot is empty → create new assignment
+     *
+     * Only ONE recipe per date/meal slot is allowed.
      *
      * @param userId User ID
      * @param request The assignment request
-     * @return MealPlanEntryDTO if created, null if removed (toggle off)
+     * @return MealPlanEntryDTO if created/swapped, null if removed (toggle off)
      */
     @Transactional
     public MealPlanEntryDTO assignRecipe(Long userId, MealPlanCreateRequest request) {
-        // Check if already exists (toggle off)
-        Optional<MealPlanEntry> existing = mealPlanEntryRepository
+        // FR-037: Check if THIS recipe is already assigned (toggle off case)
+        Optional<MealPlanEntry> sameRecipeEntry = mealPlanEntryRepository
             .findByUserIdAndPlanDateAndMealIdAndRecipeId(
                 userId, request.getPlanDate(), request.getMealId(), request.getRecipeId()
             );
 
-        if (existing.isPresent()) {
-            // Toggle off - remove and return null
-            mealPlanEntryRepository.delete(existing.get());
+        if (sameRecipeEntry.isPresent()) {
+            // Toggle off - clicking the same recipe again removes it
+            mealPlanEntryRepository.delete(sameRecipeEntry.get());
             return null;
+        }
+
+        // FR-037: Check if ANY other recipe is assigned to this slot (swap case)
+        Optional<MealPlanEntry> existingSlotEntry = mealPlanEntryRepository
+            .findByUserIdAndPlanDateAndMealId(userId, request.getPlanDate(), request.getMealId());
+
+        if (existingSlotEntry.isPresent()) {
+            // Swap - remove the existing recipe before adding the new one
+            mealPlanEntryRepository.delete(existingSlotEntry.get());
         }
 
         // Create new entry
