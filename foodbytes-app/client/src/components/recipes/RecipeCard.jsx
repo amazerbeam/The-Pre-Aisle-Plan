@@ -1,7 +1,8 @@
 import { useState } from 'react'
+import DayAssignmentButtons from './DayAssignmentButtons'
 import './RecipeCard.css'
 
-function RecipeCard({ recipe }) {
+function RecipeCard({ recipe, currentMealType }) {
   const [showDetails, setShowDetails] = useState(false)
   const [servings, setServings] = useState(recipe.defaultServings || 1)
 
@@ -36,6 +37,13 @@ function RecipeCard({ recipe }) {
           onChange={(e) => setServings(Math.max(1, parseInt(e.target.value) || 1))}
         />
       </div>
+
+      {/* FR-014, FR-015: Day assignment buttons (hidden for guests) */}
+      <DayAssignmentButtons
+        recipe={recipe}
+        servings={servings}
+        currentMealType={currentMealType}
+      />
 
       <button
         className="details-toggle"

@@ -1,107 +1,44 @@
 # TODO 
 
-User table doens't handle "logged in", no account or subscribed. 
+BUG:
+The calories count shold not increase when servings are increase. If you think about it this does not make sence, each person will only eat 1 portion and they would not care about how many calories everyone at the table are eating. 
 
-The recipe_ingredients table shold not have ingredients name in the table, we should have created an ingredients table with a name. What if we make a spelling mistake in a  
-  ingredient and need to update it for every recipe. update @Claude\agents\MySQL\agent-sql.md  
-  
-  
-  mysql> select * from recipe_ingredients
-    -> ;
-+----+-----------+----------------------+----------+---------+------------+
-| id | recipe_id | name                 | quantity | unit    | sort_order |
-+----+-----------+----------------------+----------+---------+------------+
-|  1 |         1 | Rolled oats          |    40.00 | g       |          1 |
-|  2 |         1 | Greek yogurt         |   100.00 | g       |          2 |
-|  3 |         1 | Milk                 |   200.00 | ml      |          3 |
-|  4 |         1 | Mixed berries        |   100.00 | g       |          4 |
-|  5 |         1 | Chia seeds           |     2.00 | tsp     |          5 |
-|  6 |         1 | Honey                |     0.50 | tsp     |          6 |
-|  7 |         1 | Peanut butter        |     1.00 | tbsp    |          7 |
-|  8 |         1 | Banana               |     1.00 | piece   |          8 |
-|  9 |         1 | Cinnamon             |     0.25 | tsp     |          9 |
-| 10 |         2 | Eggs                 |     8.00 | small   |          1 |
-| 11 |         2 | Butter               |     1.00 | tsp     |          2 |
-| 12 |         2 | Spinach              |    60.00 | g       |          3 |
-| 13 |         2 | Avocado              |     1.00 | medium  |          4 |
-| 14 |         3 | Greek yogurt         |   200.00 | g       |          1 |
-| 15 |         3 | Mixed berries        |    80.00 | g       |          2 |
-| 16 |         3 | Granola              |    30.00 | g       |          3 |
-| 17 |         3 | Honey                |     1.00 | tbsp    |          4 |
-| 18 |         4 | Chicken breast       |   240.00 | g       |          1 |
-| 19 |         4 | Salad leaves         |     2.00 | handful |          2 |
-| 20 |         4 | Cucumber             |     1.00 | piece   |          3 |
-| 21 |         4 | Cherry tomatoes      |    10.00 | piece   |          4 |
-| 22 |         4 | Carrot               |     2.00 | piece   |          5 |
-| 23 |         4 | Lemon                |     1.00 | piece   |          6 |
-| 24 |         4 | Olive oil            |     1.00 | tbsp    |          7 |
-| 25 |         4 | Avocado              |     0.50 | medium  |          8 |
-| 26 |         4 | Chickpeas            |   150.00 | g       |          9 |
-| 27 |         4 | Feta cheese          |    40.00 | g       |         10 |
-| 28 |         5 | Flour tortillas      |     2.00 | piece   |          1 |
-| 29 |         5 | Turkey breast        |   150.00 | g       |          2 |
-| 30 |         5 | Avocado              |     1.00 | medium  |          3 |
-| 31 |         5 | Lettuce leaves       |     4.00 | piece   |          4 |
-| 32 |         5 | Tomato               |     1.00 | piece   |          5 |
-| 33 |         5 | Mayonnaise           |     1.00 | tbsp    |          6 |
-| 34 |         6 | Quinoa               |   150.00 | g       |          1 |
-| 35 |         6 | Cucumber             |     1.00 | piece   |          2 |
-| 36 |         6 | Cherry tomatoes      |     8.00 | piece   |          3 |
-| 37 |         6 | Red onion            |     0.50 | piece   |          4 |
-| 38 |         6 | Feta cheese          |    50.00 | g       |          5 |
-| 39 |         6 | Olive oil            |     2.00 | tbsp    |          6 |
-| 40 |         6 | Lemon juice          |     1.00 | tbsp    |          7 |
-| 41 |         6 | Fresh parsley        |     2.00 | tbsp    |          8 |
-| 42 |         7 | Salmon fillet        |     2.00 | piece   |          1 |
-| 43 |         7 | Broccoli             |     1.00 | head    |          2 |
-| 44 |         7 | Carrot               |     2.00 | piece   |          3 |
-| 45 |         7 | Salad leaves         |     2.00 | handful |          4 |
-| 46 |         7 | Lemon                |     1.00 | piece   |          5 |
-| 47 |         7 | Olive oil            |     3.00 | tbsp    |          6 |
-| 48 |         7 | Avocado              |     1.00 | medium  |          7 |
-| 49 |         7 | Salt                 |     0.50 | tsp     |          8 |
-| 50 |         7 | Almonds              |    20.00 | g       |          9 |
-| 51 |         8 | Chicken breast       |   240.00 | g       |          1 |
-| 52 |         8 | Green bell pepper    |     1.00 | piece   |          2 |
-| 53 |         8 | Red bell pepper      |     1.00 | piece   |          3 |
-| 54 |         8 | Onion                |     1.00 | piece   |          4 |
-| 55 |         8 | Soy sauce            |     2.00 | tbsp    |          5 |
-| 56 |         8 | Garlic               |     2.00 | clove   |          6 |
-| 57 |         8 | Ginger               |     1.00 | tsp     |          7 |
-| 58 |         8 | Olive oil            |     2.00 | tbsp    |          8 |
-| 59 |         8 | Sesame seeds         |     1.00 | tsp     |          9 |
-| 60 |         9 | Beef sirloin         |   250.00 | g       |          1 |
-| 61 |         9 | Broccoli             |   200.00 | g       |          2 |
-| 62 |         9 | Soy sauce            |     3.00 | tbsp    |          3 |
-| 63 |         9 | Garlic               |     3.00 | clove   |          4 |
-| 64 |         9 | Olive oil            |     2.00 | tbsp    |          5 |
-| 65 |         9 | Brown rice           |   150.00 | g       |          6 |
-| 66 |        10 | Almonds              |    20.00 | g       |          1 |
-| 67 |        10 | Cashews              |    15.00 | g       |          2 |
-| 68 |        10 | Walnuts              |    15.00 | g       |          3 |
-| 69 |        10 | Dark chocolate       |    20.00 | g       |          4 |
-| 70 |        11 | Hummus               |   100.00 | g       |          1 |
-| 71 |        11 | Carrot               |     2.00 | piece   |          2 |
-| 72 |        11 | Cucumber             |     0.50 | piece   |          3 |
-| 73 |        11 | Celery               |     2.00 | stalk   |          4 |
-| 74 |        11 | Red bell pepper      |     0.50 | piece   |          5 |
-| 75 |        12 | Rolled oats          |   100.00 | g       |          1 |
-| 76 |        12 | Peanut butter        |    80.00 | g       |          2 |
-| 77 |        12 | Honey                |     3.00 | tbsp    |          3 |
-| 78 |        12 | Dark chocolate chips |    30.00 | g       |          4 |
-| 79 |        12 | Chia seeds           |     1.00 | tbsp    |          5 |
-| 80 |        13 | Plain flour          |   200.00 | g       |          1 |
-| 81 |        13 | Eggs                 |     2.00 | large   |          2 |
-| 82 |        13 | Milk                 |   300.00 | ml      |          3 |
-| 83 |        13 | Butter               |    30.00 | g       |          4 |
-| 84 |        13 | Maple syrup          |     4.00 | tbsp    |          5 |
-| 85 |        13 | Mixed berries        |   100.00 | g       |          6 |
-| 86 |        14 | Beef mince           |   200.00 | g       |          1 |
-| 87 |        14 | Burger bun           |     1.00 | piece   |          2 |
-| 88 |        14 | Lettuce              |     2.00 | leaf    |          3 |
-| 89 |        14 | Tomato               |     2.00 | slice   |          4 |
-| 90 |        14 | Cheese               |     1.00 | slice   |          5 |
-| 91 |        14 | Potatoes             |   200.00 | g       |          6 |
-| 92 |        14 | Olive oil            |     2.00 | tbsp    |          7 |
-| 93 |        14 | Salt                 |     0.50 | tsp     |          8 |
-+----+-----------+----------------------+----------+---------+------------+
+
+
+Shared Meal Plans :
+	Be able to link with another user. So Karen and I can have the same "Meal plan" this way if she changes the plan mine will also update. She or I can set a meal plan and this will update for both of us. Basically we'll both share meal plan. 
+
+
+NF: 
+Guest, Vs Paid VS logged in only.
+ Also free Month trial of full access, give free month trials to users that share the app the other users
+A  way to get users to spread the app around.   
+
+NF: Extras
+
+	An "extras" section (or a better named) This section will be things that go with meals. For example, the "Bean burretio" uses a "Flat Bread". The "Flat Bread" would be in the Extras section. Things in the exta section do not get added to the meal plan, but will be added to shopping list. 
+
+
+	If a user clicks on a meal that is "Linked" to 1 or More "Extras" they'll be promoted with "Home made " + ExtraName + " or Store bought" with a button to select both, and a check box to say "Don't ask me again" 
+	Inside the. 
+
+	Inside the "Meal" say "Burretio" beside "Flat Bread" there will be a check box "Home Made" this is where the user can change this "If they've selected Don't ask me again", but this checkbox will always be there. 
+
+User Perfrences: 
+	Inside the user profile, they user will have "perference" or something. First setting will be "Default Servings" this will set all recipes to this default number, so if the user wants to always see 2 servings then this is where the set that. It'll be above "Sign out" onlt logged in users can see this. 
+
+
+Recipes to move: 
+Recipes to seed with
+Overnight Oats
+Grilled Chicken Salad
+Stir-Fried Chicken & Peppers with Tofu & Nuts
+Spicy Tofu Stir-Fry with Mushrooms & Nuts
+Pancakes and Bacon
+Banana Chia Pudding with Peanut Butter & Berries
+Tuna & Egg Patties
+Crispy Chicken Wings with Fries
+Turkey Lettuce Cups with Feta & Nut Salad
+
+
+I want you to create a agent-failed-requirements. it will ask for the FR-XX number and a description of the issues. It'll ask the agent-cea why the requiremt failed, the agent-failed-requirements will then make a plan to rewrite the requirement so the issue doens't happen again, not to speak like it's bug fix, but if the system was to be rebuild from scrratch the mistake woulld not be made. Add  a DO an DO NOT section to the requirement if needed. Like what we just did. Also create an context--failed-requirements with teh context of what we just did

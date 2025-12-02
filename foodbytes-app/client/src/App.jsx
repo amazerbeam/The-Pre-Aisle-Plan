@@ -3,6 +3,7 @@ import Header from './components/layout/Header.jsx'
 import Footer from './components/layout/Footer.jsx'
 import RecipeList from './components/recipes/RecipeList.jsx'
 import SearchView from './components/recipes/SearchView.jsx'
+import MealPlanCalendar from './components/mealplan/MealPlanCalendar.jsx'
 import './styles/global.css'
 
 function App() {
@@ -13,6 +14,7 @@ function App() {
         <Routes>
           <Route path="/" element={<RecipeList />} />
           <Route path="/search" element={<SearchView />} />
+          <Route path="/mealplan" element={<MealPlanCalendar />} />
         </Routes>
       </main>
       <Footer />

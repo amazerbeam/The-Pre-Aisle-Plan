@@ -1,0 +1,151 @@
+/* MealPlanDay - Single day in the meal plan calendar */
+
+.meal-plan-day {
+  background-color: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.meal-plan-day.today {
+  border-color: var(--primary-color, #4a3f80);
+  border-width: 2px;
+  box-shadow: 0 2px 8px rgba(74, 63, 128, 0.15);
+}
+
+.day-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 12px;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.meal-plan-day.today .day-header {
+  background-color: rgba(74, 63, 128, 0.08);
+}
+
+.day-name {
+  font-weight: 600;
+  color: #333;
+  font-size: 14px;
+}
+
+.day-date {
+  color: #666;
+  font-size: 12px;
+}
+
+.today-badge {
+  margin-left: auto;
+  padding: 2px 8px;
+  background-color: var(--primary-color, #4a3f80);
+  color: white;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.day-meals {
+  flex: 1;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.meal-section {
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.meal-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  background-color: #f0f0f0;
+  font-size: 11px;
+  color: #555;
+}
+
+.meal-icon {
+  font-size: 12px;
+}
+
+.meal-label {
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.meal-entries {
+  padding: 4px 8px;
+  min-height: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.empty-meal {
+  color: #ccc;
+  font-size: 12px;
+  text-align: center;
+  padding: 4px;
+}
+
+/* FR-040: Empty day placeholder when no meals are planned */
+.empty-day-message {
+  color: #999;
+  font-size: 12px;
+  text-align: center;
+  padding: 20px 8px;
+  font-style: italic;
+}
+
+.day-footer {
+  padding: 8px 12px;
+  background-color: #f8f9fa;
+  border-top: 1px solid #e0e0e0;
+  text-align: right;
+}
+
+.day-calories {
+  font-weight: 600;
+  color: var(--primary-color, #4a3f80);
+  font-size: 13px;
+}
+
+/* Mobile: Expand days for better readability */
+@media (max-width: 600px) {
+  .day-header {
+    padding: 12px 16px;
+  }
+
+  .day-name {
+    font-size: 16px;
+  }
+
+  .day-date {
+    font-size: 14px;
+  }
+
+  .day-meals {
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .meal-header {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+
+  .meal-entries {
+    padding: 8px 12px;
+  }
+}

@@ -32,13 +32,57 @@
 
 ---
 
-# Complete
+## In Progress - Start
 
-> Requirements that have been fully implemented and tested.
+| Req # | Description |
+|-------|-------------|
+| FR-019 | Generate Aggregated Shopping List |
+| FR-020 | Group Ingredients by Grocery Aisle |
+| FR-021 | Check Off Purchased Items |
+| FR-022 | Uncheck All Shopping Items |
+| FR-024 | Sort Shopping List by Aisle, Ingredient Name, and Check Status |
+
+## In Progress - Finish
 
 ---
 
-## FR-001: Sign In / Guest Access
+## Completed - Start
+
+| Req # | Description |
+|-------|-------------|
+| FR-001 | Sign In / Guest Access |
+| FR-002 | Browse Recipes by Meal Category |
+| FR-003 | View Recipe Details |
+| FR-004 | Adjust Serving Sizes |
+| FR-005 | Search Recipes |
+| FR-006 | Footer Navigation |
+| FR-007 | Shared Start Date with Fixed 7-Day Range |
+| FR-014 | Assign Recipes to Days of the Week |
+| FR-015 | Remove Recipes from Calendar |
+| FR-016 | View Meal Plan Calendar |
+| FR-017 | Calculate Daily Calorie Totals |
+| FR-037 | Single Recipe Per Meal Slot with Swap Behavior |
+| FR-038 | Recipes Navigation Button in Footer |
+| FR-039 | Logo Click Navigates to Recipes |
+| FR-040 | Hide Empty Meal Types in Meal Plan |
+| FR-041 | Random Food Emojis Per Meal Type (Meal Plan View Only) |
+| NFR-016 | Simplified Day Button Styling (No Animations, No Loading Effects) |
+| Database: Users | Store user accounts from Google OAuth |
+| Database: Recipes | Store recipe data (migrated from recipes.js) |
+
+## Completed - Finish
+
+---
+
+## All Requirements - Start
+
+---
+
+# Functional Requirements
+
+## Recipe Management
+
+### FR-001: Sign In / Guest Access
 
 **Priority:** Critical
 
@@ -63,7 +107,7 @@
 
 ---
 
-## FR-002: Browse Recipes by Meal Category
+### FR-002: Browse Recipes by Meal Category
 
 **Priority:** Critical
 
@@ -88,7 +132,7 @@
 
 ---
 
-## FR-003: View Recipe Details
+### FR-003: View Recipe Details
 
 **Priority:** Critical
 
@@ -106,7 +150,7 @@
 
 ---
 
-## FR-004: Adjust Serving Sizes
+### FR-004: Adjust Serving Sizes
 
 **Priority:** High
 
@@ -118,11 +162,11 @@
 - Each recipe displays a servings input control
 - Default value is 1 serving (or recipe's default)
 - Changing servings recalculates all ingredient quantities
-- Calorie display updates based on serving adjustment
+- Calorie display remains fixed (per-serving, does not scale) - see FR-036
 
 ---
 
-## FR-005: Search Recipes
+### FR-005: Search Recipes
 
 **Priority:** Medium
 
@@ -139,7 +183,7 @@
 
 ---
 
-## FR-006: Footer Navigation
+### FR-006: Footer Navigation
 
 **Priority:** High
 
@@ -156,151 +200,6 @@
 - Uses brand color `#4a3f80` for active/highlighted elements
 
 ---
-
-## Database: Users Table
-
-**Priority:** Critical
-
-**Description:** Store user accounts from Google OAuth
-
-**Table: `users`**
-
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| id | INT | PK, AUTO_INCREMENT | Unique user ID |
-| email | VARCHAR(255) | UNIQUE, NOT NULL | Email from Google |
-| name | VARCHAR(255) | NOT NULL | Display name from Google |
-| google_id | VARCHAR(255) | UNIQUE, NOT NULL | Google OAuth ID |
-| avatar_url | VARCHAR(500) | NULLABLE | Profile picture URL |
-| is_admin | BOOLEAN | DEFAULT FALSE | Admin flag for future use |
-| created_at | DATETIME | NOT NULL | Account creation time |
-| last_login | DATETIME | NULLABLE | Most recent login |
-
----
-
-## Database: Recipes Table
-
-**Priority:** Critical
-
-**Description:** Store recipe data (migrated from recipes.js)
-
-**Table: `recipes`**
-
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| id | INT | PK, AUTO_INCREMENT | Unique recipe ID |
-| name | VARCHAR(255) | NOT NULL | Recipe name |
-| default_servings | INT | NOT NULL, DEFAULT 2 | Base serving count |
-| calories | INT | NOT NULL | Total calories for default servings |
-| is_cheat | BOOLEAN | DEFAULT FALSE | Cheat meal flag |
-| is_live | BOOLEAN | DEFAULT TRUE | Visibility flag |
-| created_at | DATETIME | NOT NULL | Creation time |
-| updated_at | DATETIME | NOT NULL | Last update time |
-
-**Table: `recipe_meals`** (junction table)
-
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| recipe_id | INT | FK → recipes.id | Recipe reference |
-| meal_type | ENUM | 'breakfast','lunch','dinner','snacks' | Meal category |
-
-**Table: `aisles`** (lookup table)
-
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| id | INT UNSIGNED | PK, AUTO_INCREMENT | Unique aisle ID |
-| key | VARCHAR(50) | UNIQUE, NOT NULL | Constant key (e.g., "DAIRY") |
-| name | VARCHAR(100) | NOT NULL | Display name (e.g., "Dairy") |
-| display_order | TINYINT UNSIGNED | NOT NULL | Sort order for shopping list (1-17) |
-
-**Table: `units`** (lookup table)
-
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| id | INT UNSIGNED | PK, AUTO_INCREMENT | Unique unit ID |
-| key | VARCHAR(50) | UNIQUE, NOT NULL | Constant key (e.g., "GRAM") |
-| value | VARCHAR(20) | NOT NULL | Display value (e.g., "g") |
-
-**Table: `ingredients`** (lookup table)
-
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| id | INT UNSIGNED | PK, AUTO_INCREMENT | Unique ingredient ID |
-| key | VARCHAR(100) | UNIQUE, NOT NULL | Constant key (e.g., "ROLLED_OATS") |
-| name | VARCHAR(255) | UNIQUE, NOT NULL | Display name (e.g., "Rolled oats") |
-| aisle_id | INT UNSIGNED | FK → aisles.id, NOT NULL | Grocery aisle reference |
-
-**Table: `recipe_ingredients`** (junction table)
-
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| id | INT UNSIGNED | PK, AUTO_INCREMENT | Unique ID |
-| recipe_id | INT UNSIGNED | FK → recipes.id | Recipe reference |
-| ingredient_id | INT UNSIGNED | FK → ingredients.id | Ingredient reference |
-| quantity | DECIMAL(10,2) | NOT NULL | Amount |
-| unit_id | INT UNSIGNED | FK → units.id | Unit reference |
-| sort_order | SMALLINT UNSIGNED | NOT NULL, DEFAULT 0 | Display order |
-
-**Table: `recipe_steps`**
-
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| id | INT | PK, AUTO_INCREMENT | Unique ID |
-| recipe_id | INT | FK → recipes.id | Recipe reference |
-| step_number | INT | NOT NULL | Step order |
-| instruction | TEXT | NOT NULL | Step text |
-
----
-
-# In Progress
-
-> Requirements currently being implemented.
-
----
-
-*No requirements in progress.*
-
----
-
-# Backlog
-
-> Future requirements to be implemented.
-
----
-
-# Functional Requirements
-
-## Global Date Range
-
-### FR-007: Shared Date Range Across All Views
-**Priority:** High
-
-**Description:** A single "From" and "To" date range controls all three main views: Recipes, Shopping List, and Meal Plan
-
-**User Story:** As a user, I want to set my date range once and have it apply everywhere so that my recipes, shopping list, and meal plan are always synchronized.
-
-**Acceptance Criteria:**
-- **"From" date picker** - start of the planning period
-- **"To" date picker** - end of the planning period
-- **Default range:** Current date (From) to current date + 6 days (To) = 7 days total
-- Date range is displayed prominently and accessible from all views
-- Changing the date range **immediately updates all three views:**
-  - **Recipes view:** Day buttons (Mon-Sun) reflect the selected week
-  - **Shopping List:** Only shows ingredients for recipes in the date range
-  - **Meal Plan:** Only shows days within the date range
-- End date must be on or after start date (validation)
-- Date range persists in user session
-- Authenticated users: date range preference saved to account
-- Guest users: date range stored in localStorage
-
-**Source Evidence:**
-- Global date range state
-- `dateFrom` and `dateTo` variables
-- Date picker components
-
----
-
-## Recipe Management
 
 ### FR-008: Browse Recipes by Meal Category
 **Priority:** High
@@ -392,13 +291,13 @@
 - Minimum serving size is 1
 - Maximum serving size is 10 (or reasonable max)
 - Scaled quantities show appropriate precision (whole numbers or 1 decimal)
-- Calorie display updates based on serving adjustment
+- Calorie display remains fixed (per-serving, does not scale) - see FR-036
 
 **Source Evidence:**
 - `createServingsInput(entry)`
 - `localServingsMap`
 - User's `default_servings` preference
-- Calculation: `quantity * (servings / defaultServings)`
+- Ingredient calculation: `quantity * (servings / defaultServings)`
 
 ---
 
@@ -431,7 +330,7 @@
 
 **Acceptance Criteria:**
 - Maximize button opens fullscreen recipe overlay
-- Fullscreen view displays recipe title, servings info, and calories
+- Fullscreen view displays recipe title, servings info, and per-serving calories (see FR-036)
 - Ingredients list shows scaled quantities
 - Cooking steps are numbered and clearly displayed
 - Close button (X) exits fullscreen mode
@@ -444,18 +343,49 @@
 
 ---
 
+## Global Date Range
+
+### FR-007: Shared Start Date with Fixed 7-Day Range
+**Priority:** High
+
+**Description:** A single "From" date picker controls the start of a fixed 7-day planning window across all three main views: Recipes, Shopping List, and Meal Plan
+
+**User Story:** As a user, I want to set my start date once and have a 7-day meal plan automatically generated so that my recipes, shopping list, and meal plan are always synchronized.
+
+**Acceptance Criteria:**
+- **"From" date picker only** - start of the planning period
+- **"To" date is automatically calculated** as From date + 6 days (7 days total)
+- **NO separate "To" date picker** - end date is always fixed at 7 days
+- **Default:** Current date as "From" date (showing current day through 6 days ahead)
+- Date range is displayed prominently showing "From [date] - To [calculated date]"
+- Changing the "From" date **immediately updates all three views:**
+  - **Recipes view:** Day buttons (Mon-Sun) reflect the 7-day window starting from "From" date
+  - **Shopping List:** Only shows ingredients for recipes in the 7-day window
+  - **Meal Plan:** Only shows the 7 days starting from "From" date
+- Start date persists in user session
+- Authenticated users: start date preference saved to account
+- Guest users: start date stored in localStorage
+
+**Source Evidence:**
+- Global date range state
+- `dateFrom` variable (primary)
+- `dateTo` calculated as `dateFrom + 6 days`
+- Single date picker component
+
+---
+
 ## Meal Planning
 
 ### FR-014: Assign Recipes to Days of the Week
 **Priority:** High
 
-**Description:** Users can assign recipes to specific days within the selected date range using day-of-week buttons (Mon-Sun)
+**Description:** Users can assign recipes to specific days within the 7-day planning window using day-of-week buttons (Mon-Sun)
 
 **User Story:** As a user, I want to quickly assign recipes to days of the week so that I can easily plan my meals.
 
 **Acceptance Criteria:**
 - Each recipe card displays **7 day buttons: Mon, Tue, Wed, Thu, Fri, Sat, Sun**
-- Day buttons correspond to the days within the **current date range** (from "From" date to "To" date)
+- Day buttons correspond to the **7 days starting from the "From" date** (see FR-007)
 - Clicking a day button assigns the recipe to that specific date
 - **Clicking an already-assigned day removes the recipe** (toggle behavior)
 - Visual indicator shows which days the recipe is assigned to (highlighted/filled button)
@@ -497,27 +427,27 @@
 ### FR-016: View Meal Plan Calendar
 **Priority:** High
 
-**Description:** Users can view their meal plan for the selected date range showing all assigned recipes
+**Description:** Users can view their meal plan for the 7-day planning window showing all assigned recipes
 
 **User Story:** As a user, I want to view my meal plan so that I can see what I've planned for the week.
 
 **Acceptance Criteria:**
 - Meal Plan button in footer opens calendar view
-- **Uses the shared global date range** (same "From" and "To" as Recipes and Shopping List - see FR-007)
-- Displays all days within the date range
+- **Uses the shared 7-day window** starting from "From" date (see FR-007)
+- Displays all 7 days in the planning window
 - Current date is visually highlighted (if within range)
 - Each date shows assigned recipes organized by meal type (Breakfast, Lunch, Dinner, Snacks)
 - Each recipe entry shows: recipe name and serving size
 - Daily calorie total is displayed for each date
 - Can remove recipes directly from the meal plan view
 - Visual distinction between past, current, and future dates
-- Changing the global date range updates the meal plan view
+- Changing the "From" date updates the meal plan view to show new 7-day window
 - Wake lock activates when calendar is visible (if supported)
 
 **Source Evidence:**
 - `renderCalendar()`
 - `#calendar-view` element
-- Server API: GET meal plan with date range
+- Server API: GET meal plan with start date (returns 7-day window)
 
 ---
 
@@ -529,13 +459,13 @@
 **User Story:** As a user, I want to see the total calories for each day so that I can track my nutritional intake.
 
 **Acceptance Criteria:**
-- Each day in meal plan shows sum of all recipe calories
-- Calories are calculated based on recipe's calories and serving size
+- Each day in meal plan shows sum of per-serving calories for all assigned recipes
+- Daily total assumes 1 serving per meal (does not multiply by servings) - see FR-036
 - Per-serving calorie info shows for individual recipes
 - Total updates automatically when recipes are added/removed
 
 **Source Evidence:**
-- Calculation: `entry.calories / entry.defaultServings * servings`
+- Calculation: `entry.calories / entry.defaultServings` (per-serving, not scaled)
 - Day-box calorie totals in `renderFullCalendar()`
 
 ---
@@ -561,34 +491,137 @@
 
 ---
 
+### FR-036: Fixed Per-Serving Calorie Display
+**Priority:** High
+
+**Description:** Calorie displays always show per-serving values and do not scale when users adjust serving sizes
+
+**User Story:** As a user, I want to see calories per serving (fixed) so that I know my personal calorie intake regardless of how many people I'm cooking for.
+
+**Acceptance Criteria:**
+- Recipe cards display calories per serving (not total)
+- Adjusting servings does NOT change the calorie number displayed
+- Calorie display format remains as "X cal" (no label change needed)
+- Daily calorie totals in Meal Plan assume 1 serving per meal
+- Fullscreen recipe view shows per-serving calories
+
+**Rationale:** Scaling calories with servings is confusing - if cooking for 4 people, each person still eats 1 portion and their individual calorie intake remains the same.
+
+**Source Evidence:**
+- Recipe card calorie display
+- Fullscreen recipe view
+- Meal plan daily totals calculation
+
+---
+
+### FR-037: Single Recipe Per Meal Slot with Swap Behavior
+**Priority:** High
+
+**Category:** Meal Planning
+
+**Description:** Each day can only have one recipe assigned per meal type (Breakfast, Lunch, Dinner, Snacks). If a slot is already occupied, the day button appears greyed out for other recipes but remains clickable - clicking it swaps/replaces the current recipe.
+
+**User Story:** As a user, I want to assign only one recipe per meal slot so that my meal plan is clear, and I want to easily swap recipes without having to remove the old one first.
+
+**Acceptance Criteria:**
+- [x] A day can only have ONE recipe per meal type (e.g., cannot have 2 breakfasts on Monday)
+- [x] When a meal slot is occupied, the day button for that slot appears **greyed out** (not disabled) for other recipes
+- [x] Clicking a greyed-out day button **replaces** the current recipe with the new one (swap behavior)
+- [x] After swapping, the previously assigned recipe's day button becomes greyed out, and the new recipe's button becomes selected
+- [x] No confirmation dialog required for swap - immediate replacement
+- [x] Visual states: **unselected** (available), **selected** (this recipe assigned), **greyed-out** (another recipe assigned)
+
+**Source Evidence:** User request; enhances FR-014
+
+**Status:** Completed
+
+---
+
+### FR-040: Hide Empty Meal Types in Meal Plan
+**Priority:** Medium
+
+**Category:** Meal Planning
+
+**Description:** Meal types with no assigned recipes should not display in the Meal Plan calendar view.
+
+**User Story:** As a user, I want to see only meal types that have recipes assigned so that my meal plan is uncluttered.
+
+**Acceptance Criteria:**
+- [x] If no recipes are assigned for Snacks (any day), Snacks row/section is hidden from meal plan
+- [x] Same applies to Breakfast, Lunch, Dinner - only show if at least one recipe assigned
+- [x] Each day only shows meal types that have recipes assigned for that day
+- [x] If all meal types are empty for a day, show minimal placeholder or hide day entirely
+- [x] When a recipe is assigned to a meal type, that section appears in the view
+
+**Source Evidence:** User request - "I selected no Snacks, but it's showing for each day"
+
+**Status:** Completed
+
+---
+
+### FR-041: Random Food Emojis Per Meal Type (Meal Plan View Only)
+**Priority:** Low
+
+**Category:** UX Enhancement
+
+**Description:** Display themed food emojis in the Meal Plan calendar view next to meal type headers, providing visual variety.
+
+**User Story:** As a user, I want to see fun food emojis in my Meal Plan calendar so that the interface feels more lively.
+
+**Acceptance Criteria:**
+- [x] Emojis appear in the Meal Plan calendar view next to each meal type header (Breakfast, Lunch, Dinner, Snacks)
+- [x] Each meal type has a themed emoji pool:
+  - Breakfast: 🍳🥞🧇🥣🥐🍩☕🥯 (8+ options)
+  - Lunch: 🥗🥪🍲🌯🥙🍱🥡 (7+ options)
+  - Dinner: 🍝🍕🍔🍖🥘🍛🍣🌮 (8+ options)
+  - Snacks: 🍎🍌🥜🍿🧁🍪🍫🥤 (8+ options)
+- [x] Emoji selection is consistent per date+meal combination (same date/meal always shows same emoji)
+- [x] Emojis are randomized across different dates for variety
+
+**DO:**
+- Add emojis to `MealPlanDay.jsx` component in the meal type header section
+- Create an emoji utility function that returns consistent emoji based on date + meal type hash
+- Use emojis only as visual decoration alongside meal type labels
+
+**DO NOT:**
+- Do NOT add emojis to day assignment buttons in the Recipes view (DayAssignmentButtons.jsx)
+- Do NOT add emojis to recipe cards
+- Do NOT add emojis to the footer navigation
+- Do NOT make emojis change on every re-render (must be consistent for same date/meal)
+
+**Source Evidence:** User clarification - "this should only be in 'Meal Plan'" (not on recipe day buttons)
+
+**Status:** Completed
+
+---
+
 ## Shopping List
 
 ### FR-019: Generate Aggregated Shopping List
 **Priority:** High
 
-**Description:** System generates a unified shopping list from recipes in the meal plan using the shared global date range (see FR-007)
+**Description:** System generates a unified shopping list from recipes in the meal plan using the shared 7-day planning window (see FR-007)
 
 **User Story:** As a user, I want a consolidated shopping list for my planned meals so that I can shop efficiently.
 
 **Acceptance Criteria:**
 - Shopping List view accessible from bottom navigation
-- **Uses the shared global date range** (same "From" and "To" as Recipes and Meal Plan views - see FR-007)
+- **Uses the shared 7-day window** starting from "From" date (see FR-007)
 - **NO preset buttons** (no "3 days", "1 week", "2 weeks" buttons)
-- **NO separate date pickers** - uses the global date range
-- Only ingredients from recipes within the global date range (inclusive) are aggregated
+- **NO separate date pickers** - uses the global "From" date with auto-calculated 7-day window
+- Only ingredients from recipes within the 7-day window are aggregated
 - Same ingredients from multiple recipes are combined (quantities summed)
 - Quantities reflect recipe serving sizes from meal plan
 - List updates automatically when:
-  - Global date range changes
+  - "From" date changes (new 7-day window)
   - Recipes are added/removed from meal plan
   - Serving sizes are changed
 
 **Source Evidence:**
-- `renderShoppingList(dateFrom, dateTo)`
+- `renderShoppingList(dateFrom)` - calculates dateTo internally as dateFrom + 6 days
 - `ingredientTotals` Map with key = `name|unit`
 - Calculation: `quantity * servings / defaultServings`
-- Start date picker input
-- End date picker input
+- Single "From" date picker input
 
 ---
 
@@ -741,20 +774,20 @@
 ### FR-027: Generate Shareable Meal Plan URL
 **Priority:** Low
 
-**Description:** Users can generate a URL that encodes a date range of their meal plan for sharing
+**Description:** Users can generate a URL that encodes their 7-day meal plan for sharing
 
 **User Story:** As a user, I want to generate a shareable link so that I can share my meal plan with friends or family.
 
 **Acceptance Criteria:**
 - Share button visible in meal plan view
-- User can select date range to share (default: current week)
-- Clicking generates URL with base64-encoded planner data including dates
+- Shares the current 7-day window (from "From" date, see FR-007)
+- Clicking generates URL with base64-encoded planner data including the 7 days of dates
 - URL is automatically copied to clipboard
 - Success message confirms URL was copied
 - URL uses `?planner=` query parameter with date-indexed data
 
 **Source Evidence:**
-- `generateShareURL(dateFrom, dateTo)`
+- `generateShareURL(dateFrom)` - shares 7-day window starting from dateFrom
 - Encoding: `btoa(JSON.stringify(plannerWithDates))`
 - `navigator.clipboard.writeText()`
 
@@ -805,6 +838,65 @@
 - `releaseWakeLock()`
 - `navigator.wakeLock.request('screen')`
 - Feature detection: `if ('wakeLock' in navigator)`
+
+---
+
+## Navigation
+
+### FR-038: Recipes Navigation Button in Footer
+**Priority:** High
+
+**Category:** Navigation
+
+**Description:** Add a "Recipes" button to the bottom footer navigation bar, positioned alongside the existing "Meal Plan", "Search", and "Shopping" buttons.
+
+**User Story:** As a user, I want a Recipes button in the footer navigation so that I can easily return to browse recipes from any screen.
+
+**Acceptance Criteria:**
+- [x] "Recipes" button appears in the footer navigation bar at the bottom of the screen
+- [x] Button is positioned as the first item (leftmost) in the footer, before "Meal Plan"
+- [x] Button uses identical styling as other footer buttons (`.footer-btn` CSS class)
+- [x] Button includes an SVG icon (utensils/fork-knife icon)
+- [x] Button includes "Recipes" text label below the icon
+- [x] Button has active/highlighted state when user is on Recipes view (home route `/`)
+- [x] Clicking navigates to Recipes view
+
+**DO:**
+- Place the button in `Footer.jsx` component
+- Use the existing `.footer-btn` CSS class for consistent styling
+- Follow the same icon + label pattern as Meal Plan, Search, Shopping buttons
+- Add `.active` class when on home route `/`
+
+**DO NOT:**
+- Do NOT place this button in a header or top bar
+- Do NOT place this button inside MealPlanCalendar or any other view-specific component
+- Do NOT create custom styling - must match existing footer buttons exactly
+- Do NOT add this button to multiple locations
+
+**Source Evidence:** User clarification - "it should be at the bottom footer beside 'Meal Plan' 'Search' & 'Shopping' and be the same style"
+
+**Status:** Completed
+
+---
+
+### FR-039: Logo Click Navigates to Recipes
+**Priority:** Medium
+
+**Category:** Navigation
+
+**Description:** Clicking the FoodBytes/Pre-Aisle Plan logo should navigate the user back to the Recipes view from any screen.
+
+**User Story:** As a user, I want to click the logo to return to Recipes so that I have a familiar navigation pattern.
+
+**Acceptance Criteria:**
+- [x] Logo in header is clickable
+- [x] Clicking logo from Meal Plan view closes it and returns to Recipes
+- [x] Clicking logo from Shopping List view closes it and returns to Recipes
+- [x] Returns to previously active meal tab (or Breakfast as default)
+
+**Source Evidence:** User request - "Clicking on FoodBytes Logo should bring user back to Recipes too"
+
+**Status:** Completed
 
 ---
 
@@ -961,6 +1053,103 @@
 
 ---
 
+# Database Schema
+
+## Database: Users Table
+
+**Priority:** Critical
+
+**Description:** Store user accounts from Google OAuth
+
+**Table: `users`**
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | INT | PK, AUTO_INCREMENT | Unique user ID |
+| email | VARCHAR(255) | UNIQUE, NOT NULL | Email from Google |
+| name | VARCHAR(255) | NOT NULL | Display name from Google |
+| google_id | VARCHAR(255) | UNIQUE, NOT NULL | Google OAuth ID |
+| avatar_url | VARCHAR(500) | NULLABLE | Profile picture URL |
+| is_admin | BOOLEAN | DEFAULT FALSE | Admin flag for future use |
+| created_at | DATETIME | NOT NULL | Account creation time |
+| last_login | DATETIME | NULLABLE | Most recent login |
+
+---
+
+## Database: Recipes Table
+
+**Priority:** Critical
+
+**Description:** Store recipe data (migrated from recipes.js)
+
+**Table: `recipes`**
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | INT | PK, AUTO_INCREMENT | Unique recipe ID |
+| name | VARCHAR(255) | NOT NULL | Recipe name |
+| default_servings | INT | NOT NULL, DEFAULT 2 | Base serving count |
+| calories | INT | NOT NULL | Total calories for default servings |
+| is_cheat | BOOLEAN | DEFAULT FALSE | Cheat meal flag |
+| is_live | BOOLEAN | DEFAULT TRUE | Visibility flag |
+| created_at | DATETIME | NOT NULL | Creation time |
+| updated_at | DATETIME | NOT NULL | Last update time |
+
+**Table: `recipe_meals`** (junction table)
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| recipe_id | INT | FK → recipes.id | Recipe reference |
+| meal_type | ENUM | 'breakfast','lunch','dinner','snacks' | Meal category |
+
+**Table: `aisles`** (lookup table)
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | INT UNSIGNED | PK, AUTO_INCREMENT | Unique aisle ID |
+| key | VARCHAR(50) | UNIQUE, NOT NULL | Constant key (e.g., "DAIRY") |
+| name | VARCHAR(100) | NOT NULL | Display name (e.g., "Dairy") |
+| display_order | TINYINT UNSIGNED | NOT NULL | Sort order for shopping list (1-17) |
+
+**Table: `units`** (lookup table)
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | INT UNSIGNED | PK, AUTO_INCREMENT | Unique unit ID |
+| key | VARCHAR(50) | UNIQUE, NOT NULL | Constant key (e.g., "GRAM") |
+| value | VARCHAR(20) | NOT NULL | Display value (e.g., "g") |
+
+**Table: `ingredients`** (lookup table)
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | INT UNSIGNED | PK, AUTO_INCREMENT | Unique ingredient ID |
+| key | VARCHAR(100) | UNIQUE, NOT NULL | Constant key (e.g., "ROLLED_OATS") |
+| name | VARCHAR(255) | UNIQUE, NOT NULL | Display name (e.g., "Rolled oats") |
+| aisle_id | INT UNSIGNED | FK → aisles.id, NOT NULL | Grocery aisle reference |
+
+**Table: `recipe_ingredients`** (junction table)
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | INT UNSIGNED | PK, AUTO_INCREMENT | Unique ID |
+| recipe_id | INT UNSIGNED | FK → recipes.id | Recipe reference |
+| ingredient_id | INT UNSIGNED | FK → ingredients.id | Ingredient reference |
+| quantity | DECIMAL(10,2) | NOT NULL | Amount |
+| unit_id | INT UNSIGNED | FK → units.id | Unit reference |
+| sort_order | SMALLINT UNSIGNED | NOT NULL, DEFAULT 0 | Display order |
+
+**Table: `recipe_steps`**
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | INT | PK, AUTO_INCREMENT | Unique ID |
+| recipe_id | INT | FK → recipes.id | Recipe reference |
+| step_number | INT | NOT NULL | Step order |
+| instruction | TEXT | NOT NULL | Step text |
+
+---
+
 # Non-Functional Requirements
 
 ## Architecture
@@ -984,8 +1173,6 @@
 ---
 
 ## Performance
-
----
 
 ### NFR-002: Instant Ingredient Scaling
 **Category:** Performance
@@ -1043,6 +1230,58 @@
 - Color applied as left border on list items
 
 **Source Evidence:** Border-left colors for each aisle class (Veg=#2ecc71, Meat=#e74c3c, Dairy=#8e44ad, etc.)
+
+---
+
+### NFR-016: Simplified Day Button Styling (No Animations, No Loading Effects)
+**Category:** Usability
+
+**Description:** Day selection buttons in the Recipes view should use simplified, flat design matching the Legacy implementation - no click animations, no ripple effects, no transitions, and no animated loading states.
+
+**Measurable Criteria:**
+- No click animation (no scale, no ripple, no circle effect)
+- No hover transitions or transform effects
+- No focus ring animation
+- **No loading animations or effects** (no spinners, no scaling, no "loading" class with visual effects)
+- **Loading states use simple `disabled` attribute only**
+- Flat button design with four clear visual states:
+  - **Unselected:** Light background (#eee), dark text (#333)
+  - **Selected:** Brand purple (#4a3f80), white text, bold
+  - **Already-selected (another recipe):** Gray background (#ccc), muted text (#666)
+  - **Disabled/Loading:** Simple opacity reduction (`opacity: 0.6`), `cursor: not-allowed`, no animations
+- Simple hover state: slight background color change only, no transition timing
+- Consistent padding and border-radius with Legacy (padding: 8px 14px, border-radius: 6px)
+
+**DO:**
+- Add explicit `transition: none` to day button CSS in `DayAssignmentButtons.css`
+- Use `!important` if needed to override global button styles from `global.css`
+- Keep button styling flat and simple
+- Match the Legacy `/Legacy/styles.css` button appearance
+- **When button is processing (loading), add `disabled` attribute**
+- **Use simple disabled styling:** `opacity: 0.6` and `cursor: not-allowed` only
+- **Use `pointer-events: none` during loading** to prevent multiple clicks
+
+**DO NOT:**
+- Do NOT rely on global button styles (they may include transitions that need overriding)
+- Do NOT add CSS transitions, transforms, or animations to day buttons
+- Do NOT add ripple effects or material design interactions
+- Do NOT add scale effects on click or hover
+- **Do NOT add a "loading" class with visual effects** (scale, transform, animations)
+- **Do NOT show spinners or loading indicators** on day buttons
+- **Do NOT animate the button during loading states**
+- **Do NOT enlarge, shrink, or transform buttons** when clicked or loading
+
+**Source Evidence:**
+- User request - "I don't like the clicks animation or the circle in the Day buttons. Check the behaviors in /Legacy/index.html"
+- Reference: `/Legacy/styles.css` lines 181-212
+- User clarification - "The issue with the buttons enlarging seems to be a loading state. when loading the buttons should simply be disabled. It's appending a 'loading' class to the files."
+
+**Implementation:**
+- Modified `foodbytes-app/client/src/components/recipes/DayAssignmentButtons.jsx` (line 112): Removed 'loading' class from className
+- Modified `foodbytes-app/client/src/components/recipes/DayAssignmentButtons.css` (lines 65-73): Removed `.day-button.loading` rule, enhanced `:disabled` state with opacity: 0.6, cursor: not-allowed, pointer-events: none
+- Verified against Legacy reference: All styling matches `/Legacy/styles.css` lines 181-212
+
+**Status:** Completed
 
 ---
 
@@ -1228,7 +1467,7 @@ A meal recipe with ingredients and cooking instructions
 | meal | string \| array\<string\> | required, values: breakfast/lunch/dinner/snacks | Meal category or categories |
 | recipe | string | required, non-empty | Display name of the recipe |
 | defaultServings | integer | required, positive (typically 2-6) | Base number of servings |
-| calories | integer | required, positive | Total calories for all defaultServings |
+| calories | integer | required, positive | Total calories for all defaultServings (displayed as per-serving to users - see FR-036) |
 | ingredients | array\<IngredientReference\> | required, non-empty | List of ingredients with quantities |
 | steps | array\<string\> | required, non-empty | Ordered cooking instructions |
 | isCheat | boolean | optional, default false | Flag for "cheat meal" recipes |
@@ -1407,3 +1646,5 @@ Immutable audit record of recipe modifications (full diff)
 - Append-only table (no UPDATE or DELETE operations permitted)
 - Retained indefinitely (exempt from data retention policy)
 - `old_values` and `new_values` contain full JSON snapshots of all recipe fields
+
+## All Requirements - Finish

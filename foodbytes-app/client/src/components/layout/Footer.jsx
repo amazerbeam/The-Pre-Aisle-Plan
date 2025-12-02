@@ -11,11 +11,10 @@ function Footer() {
 
   const handleMealPlanClick = () => {
     if (!isAuthenticated) {
-      setShowMessage('Coming soon - Sign in to unlock!')
+      setShowMessage('Sign in to access meal planning!')
       setTimeout(() => setShowMessage(null), 3000)
     } else {
-      setShowMessage('Feature coming soon!')
-      setTimeout(() => setShowMessage(null), 3000)
+      navigate('/mealplan')
     }
   }
 
@@ -35,8 +34,21 @@ function Footer() {
         <div className="footer-message">{showMessage}</div>
       )}
       <nav className="footer-nav">
+        {/* FR-038: Recipes button - first item in footer, uses same .footer-btn styling */}
         <button
-          className="footer-btn"
+          className={`footer-btn ${location.pathname === '/' ? 'active' : ''}`}
+          onClick={() => navigate('/')}
+        >
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+            <path d="M2 17l10 5 10-5"/>
+            <path d="M2 12l10 5 10-5"/>
+          </svg>
+          <span>Recipes</span>
+        </button>
+
+        <button
+          className={`footer-btn ${location.pathname === '/mealplan' ? 'active' : ''}`}
           onClick={handleMealPlanClick}
         >
           <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2">

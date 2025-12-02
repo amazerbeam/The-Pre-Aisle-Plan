@@ -1,0 +1,87 @@
+/* DayAssignmentButtons - FR-014, FR-015, FR-037, NFR-016
+ * Legacy-style flat day buttons with three states
+ * No animations, no circles - simple flat design
+ */
+
+.day-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.day-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 14px;
+  min-width: 48px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 12px;
+  /* NFR-016: Override global button transitions - must be flat with no animations */
+  transition: none !important;
+  transform: none !important;
+}
+
+/* Day label styling - no emojis per FR-041 (emojis only in Meal Plan view) */
+.day-label {
+  font-weight: 500;
+}
+
+/* NFR-016: Unselected state - slot is available */
+.day-button.unselected {
+  background-color: #eee;
+  color: #333;
+}
+
+.day-button.unselected:hover:not(:disabled) {
+  background-color: #e0e0e0;
+}
+
+/* NFR-016: Selected state - THIS recipe is assigned */
+.day-button.selected {
+  background-color: #4a3f80;
+  color: white;
+  font-weight: bold;
+}
+
+.day-button.selected:hover:not(:disabled) {
+  background-color: #3d336d;
+}
+
+/* NFR-016: Already-selected state - ANOTHER recipe is assigned (greyed out) */
+.day-button.already-selected {
+  background-color: #ccc;
+  color: #666;
+}
+
+.day-button.already-selected:hover:not(:disabled) {
+  background-color: #bbb;
+}
+
+/* NFR-016: Disabled state - simple opacity reduction, no animations */
+.day-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Mobile responsive */
+@media (max-width: 480px) {
+  .day-buttons {
+    justify-content: space-between;
+    gap: 4px;
+  }
+
+  .day-button {
+    padding: 6px 10px;
+    font-size: 12px;
+    flex: 1;
+    min-width: 40px;
+    max-width: 50px;
+    text-align: center;
+  }
+}

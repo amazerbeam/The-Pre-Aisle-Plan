@@ -58,7 +58,7 @@ function RecipeList() {
       {!loading && !error && (
         <div className="recipe-grid">
           {recipes.map((recipe) => (
-            <RecipeCard key={recipe.id} recipe={recipe} />
+            <RecipeCard key={recipe.id} recipe={recipe} currentMealType={activeMeal} />
           ))}
           {recipes.length === 0 && (
             <p className="no-recipes">No recipes found for {activeMeal}.</p>

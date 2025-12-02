@@ -1,0 +1,166 @@
+/* MealPlanCalendar - FR-016: 7-day calendar view */
+
+.meal-plan-calendar {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.calendar-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--primary-color, #4a3f80);
+}
+
+/* FR-038: Header top row with title and Recipes button */
+.calendar-header-top {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+
+.calendar-header h2 {
+  margin: 0;
+  color: var(--primary-color, #4a3f80);
+}
+
+/* FR-038: Recipes navigation button */
+.recipes-nav-button {
+  margin-left: auto;
+  padding: 8px 16px;
+  background-color: #eee;
+  color: #333;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.recipes-nav-button:hover {
+  background-color: #ddd;
+}
+
+.date-range {
+  color: #666;
+  font-size: 14px;
+}
+
+.week-calories {
+  margin-left: auto;
+  padding: 6px 12px;
+  background-color: var(--primary-color, #4a3f80);
+  color: white;
+  border-radius: 16px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Desktop: 7-column grid */
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+}
+
+.meal-plan-auth-required,
+.meal-plan-loading,
+.meal-plan-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  text-align: center;
+  padding: 20px;
+}
+
+.meal-plan-auth-required h2 {
+  color: var(--primary-color, #4a3f80);
+  margin-bottom: 12px;
+}
+
+.meal-plan-auth-required button,
+.meal-plan-error button {
+  margin-top: 16px;
+  padding: 10px 24px;
+  background-color: var(--primary-color, #4a3f80);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.meal-plan-auth-required button:hover,
+.meal-plan-error button:hover {
+  background-color: #3d3469;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid var(--primary-color, #4a3f80);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.empty-plan {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px 20px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  margin-top: 20px;
+}
+
+.empty-plan p {
+  margin: 8px 0;
+  color: #666;
+}
+
+.empty-plan a {
+  color: var(--primary-color, #4a3f80);
+  text-decoration: underline;
+}
+
+/* Tablet: 4 columns */
+@media (max-width: 1024px) {
+  .calendar-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Mobile: Stack vertically */
+@media (max-width: 600px) {
+  .meal-plan-calendar {
+    padding: 12px;
+  }
+
+  .calendar-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .week-calories {
+    margin-left: 0;
+  }
+
+  .calendar-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
