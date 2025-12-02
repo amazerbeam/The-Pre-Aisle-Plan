@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useMealPlan } from '../../contexts/MealPlanContext'
 import { useAuth } from '../../contexts/AuthContext'
-import { getEmojiForMeal } from '../../utils/emojiUtils'
+// FR-041: Emojis are only shown in Meal Plan view, NOT on day assignment buttons
 import './DayAssignmentButtons.css'
 
 /**
@@ -104,8 +104,7 @@ function DayAssignmentButtons({ recipe, servings, currentMealType }) {
       {weekDays.map((day) => {
         const buttonClass = getButtonClass(day.date)
         const isLoading = loading === day.date
-        // FR-041: Get themed emoji for this day/meal combination
-        const dayEmoji = getEmojiForMeal(day.date, currentMealType)
+        // FR-041: NO emojis on day buttons - emojis only appear in Meal Plan view
 
         return (
           <button
@@ -116,8 +115,7 @@ function DayAssignmentButtons({ recipe, servings, currentMealType }) {
             title={getButtonTitle(day.date, day.dayName, buttonClass)}
             aria-label={getButtonTitle(day.date, day.dayName, buttonClass)}
           >
-            <span className="day-label">{day.dayName}</span>
-            <span className="day-emoji">{dayEmoji}</span>
+            {day.dayName}
           </button>
         )
       })}

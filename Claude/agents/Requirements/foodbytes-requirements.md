@@ -37,11 +37,11 @@
 | Req # | Description |
 |-------|-------------|
 | FR-037 | Single Recipe Per Meal Slot with Swap Behavior |
-| FR-038 | Recipes Navigation Button in Meal Plan |
+| FR-038 | Recipes Navigation Button in Footer |
 | FR-039 | Logo Click Navigates to Recipes |
 | FR-040 | Hide Empty Meal Types in Meal Plan |
-| FR-041 | Random Food Emojis Per Meal Type |
-| NFR-016 | Simplified Day Button Styling |
+| FR-041 | Random Food Emojis Per Meal Type (Meal Plan View Only) |
+| NFR-016 | Simplified Day Button Styling (No Animations) |
 
 ## In Progress - Finish
 
@@ -554,27 +554,37 @@
 
 ---
 
-### FR-041: Random Food Emojis Per Meal Type
+### FR-041: Random Food Emojis Per Meal Type (Meal Plan View Only)
 **Priority:** Low
 
 **Category:** UX Enhancement
 
-**Description:** Display random food/happy emojis on day buttons and in meal plan view, with emoji pools themed by meal type for variety.
+**Description:** Display themed food emojis in the Meal Plan calendar view next to meal type headers, providing visual variety.
 
-**User Story:** As a user, I want to see fun, varied food emojis on my day buttons and meal plan so that the interface feels more lively and personalized.
+**User Story:** As a user, I want to see fun food emojis in my Meal Plan calendar so that the interface feels more lively.
 
 **Acceptance Criteria:**
-- [ ] Emojis appear on day buttons (e.g., "Mon 🍳", "Tue 🥗")
-- [ ] Emojis appear in meal plan calendar view next to each meal entry
+- [ ] Emojis appear in the Meal Plan calendar view next to each meal type header (Breakfast, Lunch, Dinner, Snacks)
 - [ ] Each meal type has a themed emoji pool:
   - Breakfast: 🍳🥞🧇🥣🥐🍩☕🥯 (8+ options)
   - Lunch: 🥗🥪🍲🌯🥙🍱🥡 (7+ options)
   - Dinner: 🍝🍕🍔🍖🥘🍛🍣🌮 (8+ options)
   - Snacks: 🍎🍌🥜🍿🧁🍪🍫🥤 (8+ options)
-- [ ] Emoji selection is randomized to provide variety
-- [ ] Same meal assignment shows consistent emoji (doesn't change on re-render)
+- [ ] Emoji selection is consistent per date+meal combination (same date/meal always shows same emoji)
+- [ ] Emojis are randomized across different dates for variety
 
-**Source Evidence:** User request - "love the emojis, but could we add more and set random ones to each meal so they are different"
+**DO:**
+- Add emojis to `MealPlanDay.jsx` component in the meal type header section
+- Create an emoji utility function that returns consistent emoji based on date + meal type hash
+- Use emojis only as visual decoration alongside meal type labels
+
+**DO NOT:**
+- Do NOT add emojis to day assignment buttons in the Recipes view (DayAssignmentButtons.jsx)
+- Do NOT add emojis to recipe cards
+- Do NOT add emojis to the footer navigation
+- Do NOT make emojis change on every re-render (must be consistent for same date/meal)
+
+**Source Evidence:** User clarification - "this should only be in 'Meal Plan'" (not on recipe day buttons)
 
 **Status:** Backlog
 
@@ -828,22 +838,37 @@
 
 ## Navigation
 
-### FR-038: Recipes Navigation Button in Meal Plan
+### FR-038: Recipes Navigation Button in Footer
 **Priority:** High
 
 **Category:** Navigation
 
-**Description:** Add a "Recipes" button to the Meal Plan view allowing users to navigate back to the recipe browser.
+**Description:** Add a "Recipes" button to the bottom footer navigation bar, positioned alongside the existing "Meal Plan", "Search", and "Shopping" buttons.
 
-**User Story:** As a user, I want a Recipes button in the Meal Plan view so that I can easily navigate back to browse and assign more recipes.
+**User Story:** As a user, I want a Recipes button in the footer navigation so that I can easily return to browse recipes from any screen.
 
 **Acceptance Criteria:**
-- [ ] "Recipes" button visible in Meal Plan view header/top bar
-- [ ] Clicking Recipes button closes Meal Plan and returns to Recipes view
-- [ ] Button styled consistently with other navigation elements
-- [ ] Returns to previously active meal tab (Breakfast, Lunch, Dinner, Snacks)
+- [ ] "Recipes" button appears in the footer navigation bar at the bottom of the screen
+- [ ] Button is positioned as the first item (leftmost) in the footer, before "Meal Plan"
+- [ ] Button uses identical styling as other footer buttons (`.footer-btn` CSS class)
+- [ ] Button includes an SVG icon (utensils/fork-knife icon)
+- [ ] Button includes "Recipes" text label below the icon
+- [ ] Button has active/highlighted state when user is on Recipes view (home route `/`)
+- [ ] Clicking navigates to Recipes view
 
-**Source Evidence:** User request - "When in meal plan currently there is no way back to Recipes"
+**DO:**
+- Place the button in `Footer.jsx` component
+- Use the existing `.footer-btn` CSS class for consistent styling
+- Follow the same icon + label pattern as Meal Plan, Search, Shopping buttons
+- Add `.active` class when on home route `/`
+
+**DO NOT:**
+- Do NOT place this button in a header or top bar
+- Do NOT place this button inside MealPlanCalendar or any other view-specific component
+- Do NOT create custom styling - must match existing footer buttons exactly
+- Do NOT add this button to multiple locations
+
+**Source Evidence:** User clarification - "it should be at the bottom footer beside 'Meal Plan' 'Search' & 'Shopping' and be the same style"
 
 **Status:** Backlog
 
@@ -1203,20 +1228,33 @@
 
 ---
 
-### NFR-016: Simplified Day Button Styling
+### NFR-016: Simplified Day Button Styling (No Animations)
 **Category:** Usability
 
-**Description:** Day selection buttons should use simplified, flat design without click animations or ripple effects, matching the Legacy implementation.
+**Description:** Day selection buttons in the Recipes view should use simplified, flat design matching the Legacy implementation - no click animations, no ripple effects, no transitions.
 
 **Measurable Criteria:**
 - No click animation (no scale, no ripple, no circle effect)
-- No focus ring or outline animation
+- No hover transitions or transform effects
+- No focus ring animation
 - Flat button design with three clear visual states:
   - **Unselected:** Light background (#eee), dark text (#333)
   - **Selected:** Brand purple (#4a3f80), white text, bold
-  - **Greyed-out:** Gray background (#ccc), muted text (#666)
-- Simple hover state (slight background color change only)
+  - **Already-selected (another recipe):** Gray background (#ccc), muted text (#666)
+- Simple hover state: slight background color change only, no transition timing
 - Consistent padding and border-radius with Legacy (padding: 8px 14px, border-radius: 6px)
+
+**DO:**
+- Add explicit `transition: none` to day button CSS in `DayAssignmentButtons.css`
+- Use `!important` if needed to override global button styles from `global.css`
+- Keep button styling flat and simple
+- Match the Legacy `/Legacy/styles.css` button appearance
+
+**DO NOT:**
+- Do NOT rely on global button styles (they may include transitions that need overriding)
+- Do NOT add CSS transitions, transforms, or animations to day buttons
+- Do NOT add ripple effects or material design interactions
+- Do NOT add scale effects on click or hover
 
 **Source Evidence:** User request - "I don't like the clicks animation or the circle in the Day buttons. Check the behaviors in /Legacy/index.html"; Reference: `/Legacy/styles.css` lines 181-212
 

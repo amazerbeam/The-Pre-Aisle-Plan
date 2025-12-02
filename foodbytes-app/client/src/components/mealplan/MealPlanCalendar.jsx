@@ -46,17 +46,8 @@ function MealPlanCalendar() {
   return (
     <div className="meal-plan-calendar">
       <header className="calendar-header">
-        <div className="calendar-header-top">
-          <h2>Meal Plan</h2>
-          {/* FR-038: Recipes navigation button */}
-          <button
-            className="recipes-nav-button"
-            onClick={() => navigate('/')}
-            title="Back to Recipes"
-          >
-            🍳 Recipes
-          </button>
-        </div>
+        {/* FR-038: Recipes button moved to Footer.jsx - DO NOT add navigation buttons here */}
+        <h2>Meal Plan</h2>
         <span className="date-range">{formatDateRange(startDate, endDate)}</span>
         {weekPlan && (
           <span className="week-calories">
