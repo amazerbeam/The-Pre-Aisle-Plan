@@ -1,0 +1,1 @@
+- Issues with google login maybe fixable wiht GOOGLE_CLIENT_SECRET refresh.

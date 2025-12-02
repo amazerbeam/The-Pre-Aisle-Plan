@@ -36,12 +36,7 @@
 
 | Req # | Description |
 |-------|-------------|
-| FR-037 | Single Recipe Per Meal Slot with Swap Behavior |
-| FR-038 | Recipes Navigation Button in Footer |
-| FR-039 | Logo Click Navigates to Recipes |
-| FR-040 | Hide Empty Meal Types in Meal Plan |
-| FR-041 | Random Food Emojis Per Meal Type (Meal Plan View Only) |
-| NFR-016 | Simplified Day Button Styling (No Animations) |
+| NFR-016 | Simplified Day Button Styling (No Animations, No Loading Effects) |
 
 ## In Progress - Finish
 
@@ -62,6 +57,11 @@
 | FR-015 | Remove Recipes from Calendar |
 | FR-016 | View Meal Plan Calendar |
 | FR-017 | Calculate Daily Calorie Totals |
+| FR-037 | Single Recipe Per Meal Slot with Swap Behavior |
+| FR-038 | Recipes Navigation Button in Footer |
+| FR-039 | Logo Click Navigates to Recipes |
+| FR-040 | Hide Empty Meal Types in Meal Plan |
+| FR-041 | Random Food Emojis Per Meal Type (Meal Plan View Only) |
 | Database: Users | Store user accounts from Google OAuth |
 | Database: Recipes | Store recipe data (migrated from recipes.js) |
 
@@ -519,16 +519,16 @@
 **User Story:** As a user, I want to assign only one recipe per meal slot so that my meal plan is clear, and I want to easily swap recipes without having to remove the old one first.
 
 **Acceptance Criteria:**
-- [ ] A day can only have ONE recipe per meal type (e.g., cannot have 2 breakfasts on Monday)
-- [ ] When a meal slot is occupied, the day button for that slot appears **greyed out** (not disabled) for other recipes
-- [ ] Clicking a greyed-out day button **replaces** the current recipe with the new one (swap behavior)
-- [ ] After swapping, the previously assigned recipe's day button becomes greyed out, and the new recipe's button becomes selected
-- [ ] No confirmation dialog required for swap - immediate replacement
-- [ ] Visual states: **unselected** (available), **selected** (this recipe assigned), **greyed-out** (another recipe assigned)
+- [x] A day can only have ONE recipe per meal type (e.g., cannot have 2 breakfasts on Monday)
+- [x] When a meal slot is occupied, the day button for that slot appears **greyed out** (not disabled) for other recipes
+- [x] Clicking a greyed-out day button **replaces** the current recipe with the new one (swap behavior)
+- [x] After swapping, the previously assigned recipe's day button becomes greyed out, and the new recipe's button becomes selected
+- [x] No confirmation dialog required for swap - immediate replacement
+- [x] Visual states: **unselected** (available), **selected** (this recipe assigned), **greyed-out** (another recipe assigned)
 
 **Source Evidence:** User request; enhances FR-014
 
-**Status:** Backlog
+**Status:** Completed
 
 ---
 
@@ -542,15 +542,15 @@
 **User Story:** As a user, I want to see only meal types that have recipes assigned so that my meal plan is uncluttered.
 
 **Acceptance Criteria:**
-- [ ] If no recipes are assigned for Snacks (any day), Snacks row/section is hidden from meal plan
-- [ ] Same applies to Breakfast, Lunch, Dinner - only show if at least one recipe assigned
-- [ ] Each day only shows meal types that have recipes assigned for that day
-- [ ] If all meal types are empty for a day, show minimal placeholder or hide day entirely
-- [ ] When a recipe is assigned to a meal type, that section appears in the view
+- [x] If no recipes are assigned for Snacks (any day), Snacks row/section is hidden from meal plan
+- [x] Same applies to Breakfast, Lunch, Dinner - only show if at least one recipe assigned
+- [x] Each day only shows meal types that have recipes assigned for that day
+- [x] If all meal types are empty for a day, show minimal placeholder or hide day entirely
+- [x] When a recipe is assigned to a meal type, that section appears in the view
 
 **Source Evidence:** User request - "I selected no Snacks, but it's showing for each day"
 
-**Status:** Backlog
+**Status:** Completed
 
 ---
 
@@ -564,14 +564,14 @@
 **User Story:** As a user, I want to see fun food emojis in my Meal Plan calendar so that the interface feels more lively.
 
 **Acceptance Criteria:**
-- [ ] Emojis appear in the Meal Plan calendar view next to each meal type header (Breakfast, Lunch, Dinner, Snacks)
-- [ ] Each meal type has a themed emoji pool:
+- [x] Emojis appear in the Meal Plan calendar view next to each meal type header (Breakfast, Lunch, Dinner, Snacks)
+- [x] Each meal type has a themed emoji pool:
   - Breakfast: 🍳🥞🧇🥣🥐🍩☕🥯 (8+ options)
   - Lunch: 🥗🥪🍲🌯🥙🍱🥡 (7+ options)
   - Dinner: 🍝🍕🍔🍖🥘🍛🍣🌮 (8+ options)
   - Snacks: 🍎🍌🥜🍿🧁🍪🍫🥤 (8+ options)
-- [ ] Emoji selection is consistent per date+meal combination (same date/meal always shows same emoji)
-- [ ] Emojis are randomized across different dates for variety
+- [x] Emoji selection is consistent per date+meal combination (same date/meal always shows same emoji)
+- [x] Emojis are randomized across different dates for variety
 
 **DO:**
 - Add emojis to `MealPlanDay.jsx` component in the meal type header section
@@ -586,7 +586,7 @@
 
 **Source Evidence:** User clarification - "this should only be in 'Meal Plan'" (not on recipe day buttons)
 
-**Status:** Backlog
+**Status:** Completed
 
 ---
 
@@ -848,13 +848,13 @@
 **User Story:** As a user, I want a Recipes button in the footer navigation so that I can easily return to browse recipes from any screen.
 
 **Acceptance Criteria:**
-- [ ] "Recipes" button appears in the footer navigation bar at the bottom of the screen
-- [ ] Button is positioned as the first item (leftmost) in the footer, before "Meal Plan"
-- [ ] Button uses identical styling as other footer buttons (`.footer-btn` CSS class)
-- [ ] Button includes an SVG icon (utensils/fork-knife icon)
-- [ ] Button includes "Recipes" text label below the icon
-- [ ] Button has active/highlighted state when user is on Recipes view (home route `/`)
-- [ ] Clicking navigates to Recipes view
+- [x] "Recipes" button appears in the footer navigation bar at the bottom of the screen
+- [x] Button is positioned as the first item (leftmost) in the footer, before "Meal Plan"
+- [x] Button uses identical styling as other footer buttons (`.footer-btn` CSS class)
+- [x] Button includes an SVG icon (utensils/fork-knife icon)
+- [x] Button includes "Recipes" text label below the icon
+- [x] Button has active/highlighted state when user is on Recipes view (home route `/`)
+- [x] Clicking navigates to Recipes view
 
 **DO:**
 - Place the button in `Footer.jsx` component
@@ -870,7 +870,7 @@
 
 **Source Evidence:** User clarification - "it should be at the bottom footer beside 'Meal Plan' 'Search' & 'Shopping' and be the same style"
 
-**Status:** Backlog
+**Status:** Completed
 
 ---
 
@@ -884,14 +884,14 @@
 **User Story:** As a user, I want to click the logo to return to Recipes so that I have a familiar navigation pattern.
 
 **Acceptance Criteria:**
-- [ ] Logo in header is clickable
-- [ ] Clicking logo from Meal Plan view closes it and returns to Recipes
-- [ ] Clicking logo from Shopping List view closes it and returns to Recipes
-- [ ] Returns to previously active meal tab (or Breakfast as default)
+- [x] Logo in header is clickable
+- [x] Clicking logo from Meal Plan view closes it and returns to Recipes
+- [x] Clicking logo from Shopping List view closes it and returns to Recipes
+- [x] Returns to previously active meal tab (or Breakfast as default)
 
 **Source Evidence:** User request - "Clicking on FoodBytes Logo should bring user back to Recipes too"
 
-**Status:** Backlog
+**Status:** Completed
 
 ---
 
@@ -1228,19 +1228,22 @@
 
 ---
 
-### NFR-016: Simplified Day Button Styling (No Animations)
+### NFR-016: Simplified Day Button Styling (No Animations, No Loading Effects)
 **Category:** Usability
 
-**Description:** Day selection buttons in the Recipes view should use simplified, flat design matching the Legacy implementation - no click animations, no ripple effects, no transitions.
+**Description:** Day selection buttons in the Recipes view should use simplified, flat design matching the Legacy implementation - no click animations, no ripple effects, no transitions, and no animated loading states.
 
 **Measurable Criteria:**
 - No click animation (no scale, no ripple, no circle effect)
 - No hover transitions or transform effects
 - No focus ring animation
-- Flat button design with three clear visual states:
+- **No loading animations or effects** (no spinners, no scaling, no "loading" class with visual effects)
+- **Loading states use simple `disabled` attribute only**
+- Flat button design with four clear visual states:
   - **Unselected:** Light background (#eee), dark text (#333)
   - **Selected:** Brand purple (#4a3f80), white text, bold
   - **Already-selected (another recipe):** Gray background (#ccc), muted text (#666)
+  - **Disabled/Loading:** Simple opacity reduction (`opacity: 0.6`), `cursor: not-allowed`, no animations
 - Simple hover state: slight background color change only, no transition timing
 - Consistent padding and border-radius with Legacy (padding: 8px 14px, border-radius: 6px)
 
@@ -1249,16 +1252,26 @@
 - Use `!important` if needed to override global button styles from `global.css`
 - Keep button styling flat and simple
 - Match the Legacy `/Legacy/styles.css` button appearance
+- **When button is processing (loading), add `disabled` attribute**
+- **Use simple disabled styling:** `opacity: 0.6` and `cursor: not-allowed` only
+- **Use `pointer-events: none` during loading** to prevent multiple clicks
 
 **DO NOT:**
 - Do NOT rely on global button styles (they may include transitions that need overriding)
 - Do NOT add CSS transitions, transforms, or animations to day buttons
 - Do NOT add ripple effects or material design interactions
 - Do NOT add scale effects on click or hover
+- **Do NOT add a "loading" class with visual effects** (scale, transform, animations)
+- **Do NOT show spinners or loading indicators** on day buttons
+- **Do NOT animate the button during loading states**
+- **Do NOT enlarge, shrink, or transform buttons** when clicked or loading
 
-**Source Evidence:** User request - "I don't like the clicks animation or the circle in the Day buttons. Check the behaviors in /Legacy/index.html"; Reference: `/Legacy/styles.css` lines 181-212
+**Source Evidence:**
+- User request - "I don't like the clicks animation or the circle in the Day buttons. Check the behaviors in /Legacy/index.html"
+- Reference: `/Legacy/styles.css` lines 181-212
+- User clarification - "The issue with the buttons enlarging seems to be a loading state. when loading the buttons should simply be disabled. It's appending a 'loading' class to the files."
 
-**Status:** Backlog
+**Status:** In Progress
 
 ---
 

@@ -1,5 +1,26 @@
 # Docker Rebuild Context
 
+## Google OAuth Troubleshooting
+
+**IF GOOGLE LOGIN FAILS, CHECK THIS FIRST:**
+
+1. **Verify `.env` credentials match Google Cloud Console**
+   - Go to: https://console.cloud.google.com/apis/credentials
+   - Click on your OAuth 2.0 Client ID
+   - Compare `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` in `.env` with Console values
+   - If secret was regenerated in Console, update `.env` and rebuild
+
+2. **Check API logs for the actual error:**
+   ```bash
+   docker-compose logs api --tail=50
+   ```
+   - `401 Unauthorized: [no body]` = Invalid client credentials (check secret!)
+   - `OAuth2AuthenticationException` = Could be credentials OR session issues
+
+3. **Common fixes:**
+   - Regenerate client secret in Google Console, update `.env`, rebuild
+   - Ensure OAuth consent screen is configured (not just credentials)
+
 ## Google OAuth Configuration
 
 These URIs must be configured in the Google Cloud Console for OAuth to work.
