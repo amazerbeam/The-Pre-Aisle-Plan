@@ -109,7 +109,7 @@ function DayAssignmentButtons({ recipe, servings, currentMealType }) {
         return (
           <button
             key={day.date}
-            className={`day-button ${buttonClass} ${isLoading ? 'loading' : ''}`}
+            className={`day-button ${buttonClass}`}
             onClick={() => handleDayClick(day.date)}
             disabled={isLoading}
             title={getButtonTitle(day.date, day.dayName, buttonClass)}
