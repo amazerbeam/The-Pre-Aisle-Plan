@@ -8,7 +8,10 @@ Shared Meal Plans :
 	Be able to link with another user. So Karen and I can have the same "Meal plan" this way if she changes the plan mine will also update. She or I can set a meal plan and this will update for both of us. Basically we'll both share meal plan. 
 
 
-NF: Guest, Vs Paid VS logged in only. Also free Month trial of full access. 
+NF: 
+Guest, Vs Paid VS logged in only.
+ Also free Month trial of full access, give free month trials to users that share the app the other users
+A  way to get users to spread the app around.   
 
 NF: Extras
 
@@ -35,3 +38,6 @@ Banana Chia Pudding with Peanut Butter & Berries
 Tuna & Egg Patties
 Crispy Chicken Wings with Fries
 Turkey Lettuce Cups with Feta & Nut Salad
+
+
+I want you to create a agent-failed-requirements. it will ask for the FR-XX number and a description of the issues. It'll ask the agent-cea why the requiremt failed, the agent-failed-requirements will then make a plan to rewrite the requirement so the issue doens't happen again, not to speak like it's bug fix, but if the system was to be rebuild from scrratch the mistake woulld not be made. Add  a DO an DO NOT section to the requirement if needed. Like what we just did. Also create an context--failed-requirements with teh context of what we just did
