@@ -503,6 +503,77 @@
 
 ---
 
+### FR-037: Single Recipe Per Meal Slot with Swap Behavior
+**Priority:** High
+
+**Category:** Meal Planning
+
+**Description:** Each day can only have one recipe assigned per meal type (Breakfast, Lunch, Dinner, Snacks). If a slot is already occupied, the day button appears greyed out for other recipes but remains clickable - clicking it swaps/replaces the current recipe.
+
+**User Story:** As a user, I want to assign only one recipe per meal slot so that my meal plan is clear, and I want to easily swap recipes without having to remove the old one first.
+
+**Acceptance Criteria:**
+- [ ] A day can only have ONE recipe per meal type (e.g., cannot have 2 breakfasts on Monday)
+- [ ] When a meal slot is occupied, the day button for that slot appears **greyed out** (not disabled) for other recipes
+- [ ] Clicking a greyed-out day button **replaces** the current recipe with the new one (swap behavior)
+- [ ] After swapping, the previously assigned recipe's day button becomes greyed out, and the new recipe's button becomes selected
+- [ ] No confirmation dialog required for swap - immediate replacement
+- [ ] Visual states: **unselected** (available), **selected** (this recipe assigned), **greyed-out** (another recipe assigned)
+
+**Source Evidence:** User request; enhances FR-014
+
+**Status:** Backlog
+
+---
+
+### FR-040: Hide Empty Meal Types in Meal Plan
+**Priority:** Medium
+
+**Category:** Meal Planning
+
+**Description:** Meal types with no assigned recipes should not display in the Meal Plan calendar view.
+
+**User Story:** As a user, I want to see only meal types that have recipes assigned so that my meal plan is uncluttered.
+
+**Acceptance Criteria:**
+- [ ] If no recipes are assigned for Snacks (any day), Snacks row/section is hidden from meal plan
+- [ ] Same applies to Breakfast, Lunch, Dinner - only show if at least one recipe assigned
+- [ ] Each day only shows meal types that have recipes assigned for that day
+- [ ] If all meal types are empty for a day, show minimal placeholder or hide day entirely
+- [ ] When a recipe is assigned to a meal type, that section appears in the view
+
+**Source Evidence:** User request - "I selected no Snacks, but it's showing for each day"
+
+**Status:** Backlog
+
+---
+
+### FR-041: Random Food Emojis Per Meal Type
+**Priority:** Low
+
+**Category:** UX Enhancement
+
+**Description:** Display random food/happy emojis on day buttons and in meal plan view, with emoji pools themed by meal type for variety.
+
+**User Story:** As a user, I want to see fun, varied food emojis on my day buttons and meal plan so that the interface feels more lively and personalized.
+
+**Acceptance Criteria:**
+- [ ] Emojis appear on day buttons (e.g., "Mon 🍳", "Tue 🥗")
+- [ ] Emojis appear in meal plan calendar view next to each meal entry
+- [ ] Each meal type has a themed emoji pool:
+  - Breakfast: 🍳🥞🧇🥣🥐🍩☕🥯 (8+ options)
+  - Lunch: 🥗🥪🍲🌯🥙🍱🥡 (7+ options)
+  - Dinner: 🍝🍕🍔🍖🥘🍛🍣🌮 (8+ options)
+  - Snacks: 🍎🍌🥜🍿🧁🍪🍫🥤 (8+ options)
+- [ ] Emoji selection is randomized to provide variety
+- [ ] Same meal assignment shows consistent emoji (doesn't change on re-render)
+
+**Source Evidence:** User request - "love the emojis, but could we add more and set random ones to each meal so they are different"
+
+**Status:** Backlog
+
+---
+
 ## Shopping List
 
 ### FR-019: Generate Aggregated Shopping List
@@ -746,6 +817,50 @@
 - `releaseWakeLock()`
 - `navigator.wakeLock.request('screen')`
 - Feature detection: `if ('wakeLock' in navigator)`
+
+---
+
+## Navigation
+
+### FR-038: Recipes Navigation Button in Meal Plan
+**Priority:** High
+
+**Category:** Navigation
+
+**Description:** Add a "Recipes" button to the Meal Plan view allowing users to navigate back to the recipe browser.
+
+**User Story:** As a user, I want a Recipes button in the Meal Plan view so that I can easily navigate back to browse and assign more recipes.
+
+**Acceptance Criteria:**
+- [ ] "Recipes" button visible in Meal Plan view header/top bar
+- [ ] Clicking Recipes button closes Meal Plan and returns to Recipes view
+- [ ] Button styled consistently with other navigation elements
+- [ ] Returns to previously active meal tab (Breakfast, Lunch, Dinner, Snacks)
+
+**Source Evidence:** User request - "When in meal plan currently there is no way back to Recipes"
+
+**Status:** Backlog
+
+---
+
+### FR-039: Logo Click Navigates to Recipes
+**Priority:** Medium
+
+**Category:** Navigation
+
+**Description:** Clicking the FoodBytes/Pre-Aisle Plan logo should navigate the user back to the Recipes view from any screen.
+
+**User Story:** As a user, I want to click the logo to return to Recipes so that I have a familiar navigation pattern.
+
+**Acceptance Criteria:**
+- [ ] Logo in header is clickable
+- [ ] Clicking logo from Meal Plan view closes it and returns to Recipes
+- [ ] Clicking logo from Shopping List view closes it and returns to Recipes
+- [ ] Returns to previously active meal tab (or Breakfast as default)
+
+**Source Evidence:** User request - "Clicking on FoodBytes Logo should bring user back to Recipes too"
+
+**Status:** Backlog
 
 ---
 
@@ -1079,6 +1194,27 @@
 - Color applied as left border on list items
 
 **Source Evidence:** Border-left colors for each aisle class (Veg=#2ecc71, Meat=#e74c3c, Dairy=#8e44ad, etc.)
+
+---
+
+### NFR-016: Simplified Day Button Styling
+**Category:** Usability
+
+**Description:** Day selection buttons should use simplified, flat design without click animations or ripple effects, matching the Legacy implementation.
+
+**Measurable Criteria:**
+- No click animation (no scale, no ripple, no circle effect)
+- No focus ring or outline animation
+- Flat button design with three clear visual states:
+  - **Unselected:** Light background (#eee), dark text (#333)
+  - **Selected:** Brand purple (#4a3f80), white text, bold
+  - **Greyed-out:** Gray background (#ccc), muted text (#666)
+- Simple hover state (slight background color change only)
+- Consistent padding and border-radius with Legacy (padding: 8px 14px, border-radius: 6px)
+
+**Source Evidence:** User request - "I don't like the clicks animation or the circle in the Day buttons. Check the behaviors in /Legacy/index.html"; Reference: `/Legacy/styles.css` lines 181-212
+
+**Status:** Backlog
 
 ---
 
