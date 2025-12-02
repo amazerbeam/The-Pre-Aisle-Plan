@@ -36,11 +36,12 @@
 
 | Req # | Description |
 |-------|-------------|
-| FR-007 | Shared Start Date with Fixed 7-Day Range |
-| FR-014 | Assign Recipes to Days of the Week |
-| FR-015 | Remove Recipes from Calendar |
-| FR-016 | View Meal Plan Calendar |
-| FR-017 | Calculate Daily Calorie Totals |
+| FR-037 | Single Recipe Per Meal Slot with Swap Behavior |
+| FR-038 | Recipes Navigation Button in Meal Plan |
+| FR-039 | Logo Click Navigates to Recipes |
+| FR-040 | Hide Empty Meal Types in Meal Plan |
+| FR-041 | Random Food Emojis Per Meal Type |
+| NFR-016 | Simplified Day Button Styling |
 
 ## In Progress - Finish
 
@@ -56,6 +57,11 @@
 | FR-004 | Adjust Serving Sizes |
 | FR-005 | Search Recipes |
 | FR-006 | Footer Navigation |
+| FR-007 | Shared Start Date with Fixed 7-Day Range |
+| FR-014 | Assign Recipes to Days of the Week |
+| FR-015 | Remove Recipes from Calendar |
+| FR-016 | View Meal Plan Calendar |
+| FR-017 | Calculate Daily Calorie Totals |
 | Database: Users | Store user accounts from Google OAuth |
 | Database: Recipes | Store recipe data (migrated from recipes.js) |
 
