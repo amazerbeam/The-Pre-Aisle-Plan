@@ -32,13 +32,46 @@
 
 ---
 
-# Complete
+## In Progress - Start
 
-> Requirements that have been fully implemented and tested.
+| Req # | Description |
+|-------|-------------|
+| FR-007 | Shared Start Date with Fixed 7-Day Range |
+| FR-014 | Assign Recipes to Days of the Week |
+| FR-015 | Remove Recipes from Calendar |
+| FR-016 | View Meal Plan Calendar |
+| FR-017 | Calculate Daily Calorie Totals |
+
+## In Progress - Finish
 
 ---
 
-## FR-001: Sign In / Guest Access
+## Completed - Start
+
+| Req # | Description |
+|-------|-------------|
+| FR-001 | Sign In / Guest Access |
+| FR-002 | Browse Recipes by Meal Category |
+| FR-003 | View Recipe Details |
+| FR-004 | Adjust Serving Sizes |
+| FR-005 | Search Recipes |
+| FR-006 | Footer Navigation |
+| Database: Users | Store user accounts from Google OAuth |
+| Database: Recipes | Store recipe data (migrated from recipes.js) |
+
+## Completed - Finish
+
+---
+
+## All Requirements - Start
+
+---
+
+# Functional Requirements
+
+## Recipe Management
+
+### FR-001: Sign In / Guest Access
 
 **Priority:** Critical
 
@@ -63,7 +96,7 @@
 
 ---
 
-## FR-002: Browse Recipes by Meal Category
+### FR-002: Browse Recipes by Meal Category
 
 **Priority:** Critical
 
@@ -88,7 +121,7 @@
 
 ---
 
-## FR-003: View Recipe Details
+### FR-003: View Recipe Details
 
 **Priority:** Critical
 
@@ -106,7 +139,7 @@
 
 ---
 
-## FR-004: Adjust Serving Sizes
+### FR-004: Adjust Serving Sizes
 
 **Priority:** High
 
@@ -122,7 +155,7 @@
 
 ---
 
-## FR-005: Search Recipes
+### FR-005: Search Recipes
 
 **Priority:** Medium
 
@@ -139,7 +172,7 @@
 
 ---
 
-## FR-006: Footer Navigation
+### FR-006: Footer Navigation
 
 **Priority:** High
 
@@ -156,244 +189,6 @@
 - Uses brand color `#4a3f80` for active/highlighted elements
 
 ---
-
-## Database: Users Table
-
-**Priority:** Critical
-
-**Description:** Store user accounts from Google OAuth
-
-**Table: `users`**
-
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| id | INT | PK, AUTO_INCREMENT | Unique user ID |
-| email | VARCHAR(255) | UNIQUE, NOT NULL | Email from Google |
-| name | VARCHAR(255) | NOT NULL | Display name from Google |
-| google_id | VARCHAR(255) | UNIQUE, NOT NULL | Google OAuth ID |
-| avatar_url | VARCHAR(500) | NULLABLE | Profile picture URL |
-| is_admin | BOOLEAN | DEFAULT FALSE | Admin flag for future use |
-| created_at | DATETIME | NOT NULL | Account creation time |
-| last_login | DATETIME | NULLABLE | Most recent login |
-
----
-
-## Database: Recipes Table
-
-**Priority:** Critical
-
-**Description:** Store recipe data (migrated from recipes.js)
-
-**Table: `recipes`**
-
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| id | INT | PK, AUTO_INCREMENT | Unique recipe ID |
-| name | VARCHAR(255) | NOT NULL | Recipe name |
-| default_servings | INT | NOT NULL, DEFAULT 2 | Base serving count |
-| calories | INT | NOT NULL | Total calories for default servings |
-| is_cheat | BOOLEAN | DEFAULT FALSE | Cheat meal flag |
-| is_live | BOOLEAN | DEFAULT TRUE | Visibility flag |
-| created_at | DATETIME | NOT NULL | Creation time |
-| updated_at | DATETIME | NOT NULL | Last update time |
-
-**Table: `recipe_meals`** (junction table)
-
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| recipe_id | INT | FK → recipes.id | Recipe reference |
-| meal_type | ENUM | 'breakfast','lunch','dinner','snacks' | Meal category |
-
-**Table: `aisles`** (lookup table)
-
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| id | INT UNSIGNED | PK, AUTO_INCREMENT | Unique aisle ID |
-| key | VARCHAR(50) | UNIQUE, NOT NULL | Constant key (e.g., "DAIRY") |
-| name | VARCHAR(100) | NOT NULL | Display name (e.g., "Dairy") |
-| display_order | TINYINT UNSIGNED | NOT NULL | Sort order for shopping list (1-17) |
-
-**Table: `units`** (lookup table)
-
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| id | INT UNSIGNED | PK, AUTO_INCREMENT | Unique unit ID |
-| key | VARCHAR(50) | UNIQUE, NOT NULL | Constant key (e.g., "GRAM") |
-| value | VARCHAR(20) | NOT NULL | Display value (e.g., "g") |
-
-**Table: `ingredients`** (lookup table)
-
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| id | INT UNSIGNED | PK, AUTO_INCREMENT | Unique ingredient ID |
-| key | VARCHAR(100) | UNIQUE, NOT NULL | Constant key (e.g., "ROLLED_OATS") |
-| name | VARCHAR(255) | UNIQUE, NOT NULL | Display name (e.g., "Rolled oats") |
-| aisle_id | INT UNSIGNED | FK → aisles.id, NOT NULL | Grocery aisle reference |
-
-**Table: `recipe_ingredients`** (junction table)
-
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| id | INT UNSIGNED | PK, AUTO_INCREMENT | Unique ID |
-| recipe_id | INT UNSIGNED | FK → recipes.id | Recipe reference |
-| ingredient_id | INT UNSIGNED | FK → ingredients.id | Ingredient reference |
-| quantity | DECIMAL(10,2) | NOT NULL | Amount |
-| unit_id | INT UNSIGNED | FK → units.id | Unit reference |
-| sort_order | SMALLINT UNSIGNED | NOT NULL, DEFAULT 0 | Display order |
-
-**Table: `recipe_steps`**
-
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| id | INT | PK, AUTO_INCREMENT | Unique ID |
-| recipe_id | INT | FK → recipes.id | Recipe reference |
-| step_number | INT | NOT NULL | Step order |
-| instruction | TEXT | NOT NULL | Step text |
-
----
-
-# In Progress
-
-> Requirements currently being implemented.
-
----
-
-## Global Date Range
-
-### FR-007: Shared Start Date with Fixed 7-Day Range
-**Priority:** High
-
-**Description:** A single "From" date picker controls the start of a fixed 7-day planning window across all three main views: Recipes, Shopping List, and Meal Plan
-
-**User Story:** As a user, I want to set my start date once and have a 7-day meal plan automatically generated so that my recipes, shopping list, and meal plan are always synchronized.
-
-**Acceptance Criteria:**
-- **"From" date picker only** - start of the planning period
-- **"To" date is automatically calculated** as From date + 6 days (7 days total)
-- **NO separate "To" date picker** - end date is always fixed at 7 days
-- **Default:** Current date as "From" date (showing current day through 6 days ahead)
-- Date range is displayed prominently showing "From [date] - To [calculated date]"
-- Changing the "From" date **immediately updates all three views:**
-  - **Recipes view:** Day buttons (Mon-Sun) reflect the 7-day window starting from "From" date
-  - **Shopping List:** Only shows ingredients for recipes in the 7-day window
-  - **Meal Plan:** Only shows the 7 days starting from "From" date
-- Start date persists in user session
-- Authenticated users: start date preference saved to account
-- Guest users: start date stored in localStorage
-
-**Source Evidence:**
-- Global date range state
-- `dateFrom` variable (primary)
-- `dateTo` calculated as `dateFrom + 6 days`
-- Single date picker component
-
----
-
-## Meal Planning
-
-### FR-014: Assign Recipes to Days of the Week
-**Priority:** High
-
-**Description:** Users can assign recipes to specific days within the 7-day planning window using day-of-week buttons (Mon-Sun)
-
-**User Story:** As a user, I want to quickly assign recipes to days of the week so that I can easily plan my meals.
-
-**Acceptance Criteria:**
-- Each recipe card displays **7 day buttons: Mon, Tue, Wed, Thu, Fri, Sat, Sun**
-- Day buttons correspond to the **7 days starting from the "From" date** (see FR-007)
-- Clicking a day button assigns the recipe to that specific date
-- **Clicking an already-assigned day removes the recipe** (toggle behavior)
-- Visual indicator shows which days the recipe is assigned to (highlighted/filled button)
-- Recipe's current serving size is saved with the assignment
-- Recipe is assigned to the meal type matching the current tab (e.g., if viewing Breakfast tab, assigns to Breakfast slot)
-- **Assigning a recipe automatically updates:**
-  - The Shopping List (ingredients added)
-  - The Meal Plan calendar view
-- Authenticated users' assignments sync to server database
-- Guest users can browse recipes but cannot save assignments
-
-**Source Evidence:**
-- `createDayButtons(entry, servings)`
-- `assignRecipeToDay()`
-- `planner[]` variable (date-indexed)
-- Server API: meal plan endpoints
-
----
-
-### FR-015: Remove Recipes from Calendar
-**Priority:** High
-
-**Description:** Users can remove previously assigned recipes from a date
-
-**User Story:** As a user, I want to remove a recipe from my meal plan so that I can change my planned meals.
-
-**Acceptance Criteria:**
-- Clicking an already-assigned date removes the recipe from that date
-- Visual indicator updates to show the recipe is no longer assigned
-- Date entry is cleaned up if no recipes remain for that date
-- Change syncs to server database for authenticated users
-
-**Source Evidence:**
-- `assignRecipeToDate()` toggle behavior
-- Server API: DELETE meal plan endpoint
-
----
-
-### FR-016: View Meal Plan Calendar
-**Priority:** High
-
-**Description:** Users can view their meal plan for the 7-day planning window showing all assigned recipes
-
-**User Story:** As a user, I want to view my meal plan so that I can see what I've planned for the week.
-
-**Acceptance Criteria:**
-- Meal Plan button in footer opens calendar view
-- **Uses the shared 7-day window** starting from "From" date (see FR-007)
-- Displays all 7 days in the planning window
-- Current date is visually highlighted (if within range)
-- Each date shows assigned recipes organized by meal type (Breakfast, Lunch, Dinner, Snacks)
-- Each recipe entry shows: recipe name and serving size
-- Daily calorie total is displayed for each date
-- Can remove recipes directly from the meal plan view
-- Visual distinction between past, current, and future dates
-- Changing the "From" date updates the meal plan view to show new 7-day window
-- Wake lock activates when calendar is visible (if supported)
-
-**Source Evidence:**
-- `renderCalendar()`
-- `#calendar-view` element
-- Server API: GET meal plan with start date (returns 7-day window)
-
----
-
-### FR-017: Calculate Daily Calorie Totals
-**Priority:** Medium
-
-**Description:** System calculates and displays total calories for each day based on assigned recipes
-
-**User Story:** As a user, I want to see the total calories for each day so that I can track my nutritional intake.
-
-**Acceptance Criteria:**
-- Each day in meal plan shows sum of per-serving calories for all assigned recipes
-- Daily total assumes 1 serving per meal (does not multiply by servings) - see FR-036
-- Per-serving calorie info shows for individual recipes
-- Total updates automatically when recipes are added/removed
-
-**Source Evidence:**
-- Calculation: `entry.calories / entry.defaultServings` (per-serving, not scaled)
-- Day-box calorie totals in `renderFullCalendar()`
-
----
-
-# Backlog
-
-> Future requirements to be implemented.
-
----
-
-# Functional Requirements
-
-## Recipe Management
 
 ### FR-008: Browse Recipes by Meal Category
 **Priority:** High
@@ -537,7 +332,132 @@
 
 ---
 
+## Global Date Range
+
+### FR-007: Shared Start Date with Fixed 7-Day Range
+**Priority:** High
+
+**Description:** A single "From" date picker controls the start of a fixed 7-day planning window across all three main views: Recipes, Shopping List, and Meal Plan
+
+**User Story:** As a user, I want to set my start date once and have a 7-day meal plan automatically generated so that my recipes, shopping list, and meal plan are always synchronized.
+
+**Acceptance Criteria:**
+- **"From" date picker only** - start of the planning period
+- **"To" date is automatically calculated** as From date + 6 days (7 days total)
+- **NO separate "To" date picker** - end date is always fixed at 7 days
+- **Default:** Current date as "From" date (showing current day through 6 days ahead)
+- Date range is displayed prominently showing "From [date] - To [calculated date]"
+- Changing the "From" date **immediately updates all three views:**
+  - **Recipes view:** Day buttons (Mon-Sun) reflect the 7-day window starting from "From" date
+  - **Shopping List:** Only shows ingredients for recipes in the 7-day window
+  - **Meal Plan:** Only shows the 7 days starting from "From" date
+- Start date persists in user session
+- Authenticated users: start date preference saved to account
+- Guest users: start date stored in localStorage
+
+**Source Evidence:**
+- Global date range state
+- `dateFrom` variable (primary)
+- `dateTo` calculated as `dateFrom + 6 days`
+- Single date picker component
+
+---
+
 ## Meal Planning
+
+### FR-014: Assign Recipes to Days of the Week
+**Priority:** High
+
+**Description:** Users can assign recipes to specific days within the 7-day planning window using day-of-week buttons (Mon-Sun)
+
+**User Story:** As a user, I want to quickly assign recipes to days of the week so that I can easily plan my meals.
+
+**Acceptance Criteria:**
+- Each recipe card displays **7 day buttons: Mon, Tue, Wed, Thu, Fri, Sat, Sun**
+- Day buttons correspond to the **7 days starting from the "From" date** (see FR-007)
+- Clicking a day button assigns the recipe to that specific date
+- **Clicking an already-assigned day removes the recipe** (toggle behavior)
+- Visual indicator shows which days the recipe is assigned to (highlighted/filled button)
+- Recipe's current serving size is saved with the assignment
+- Recipe is assigned to the meal type matching the current tab (e.g., if viewing Breakfast tab, assigns to Breakfast slot)
+- **Assigning a recipe automatically updates:**
+  - The Shopping List (ingredients added)
+  - The Meal Plan calendar view
+- Authenticated users' assignments sync to server database
+- Guest users can browse recipes but cannot save assignments
+
+**Source Evidence:**
+- `createDayButtons(entry, servings)`
+- `assignRecipeToDay()`
+- `planner[]` variable (date-indexed)
+- Server API: meal plan endpoints
+
+---
+
+### FR-015: Remove Recipes from Calendar
+**Priority:** High
+
+**Description:** Users can remove previously assigned recipes from a date
+
+**User Story:** As a user, I want to remove a recipe from my meal plan so that I can change my planned meals.
+
+**Acceptance Criteria:**
+- Clicking an already-assigned date removes the recipe from that date
+- Visual indicator updates to show the recipe is no longer assigned
+- Date entry is cleaned up if no recipes remain for that date
+- Change syncs to server database for authenticated users
+
+**Source Evidence:**
+- `assignRecipeToDate()` toggle behavior
+- Server API: DELETE meal plan endpoint
+
+---
+
+### FR-016: View Meal Plan Calendar
+**Priority:** High
+
+**Description:** Users can view their meal plan for the 7-day planning window showing all assigned recipes
+
+**User Story:** As a user, I want to view my meal plan so that I can see what I've planned for the week.
+
+**Acceptance Criteria:**
+- Meal Plan button in footer opens calendar view
+- **Uses the shared 7-day window** starting from "From" date (see FR-007)
+- Displays all 7 days in the planning window
+- Current date is visually highlighted (if within range)
+- Each date shows assigned recipes organized by meal type (Breakfast, Lunch, Dinner, Snacks)
+- Each recipe entry shows: recipe name and serving size
+- Daily calorie total is displayed for each date
+- Can remove recipes directly from the meal plan view
+- Visual distinction between past, current, and future dates
+- Changing the "From" date updates the meal plan view to show new 7-day window
+- Wake lock activates when calendar is visible (if supported)
+
+**Source Evidence:**
+- `renderCalendar()`
+- `#calendar-view` element
+- Server API: GET meal plan with start date (returns 7-day window)
+
+---
+
+### FR-017: Calculate Daily Calorie Totals
+**Priority:** Medium
+
+**Description:** System calculates and displays total calories for each day based on assigned recipes
+
+**User Story:** As a user, I want to see the total calories for each day so that I can track my nutritional intake.
+
+**Acceptance Criteria:**
+- Each day in meal plan shows sum of per-serving calories for all assigned recipes
+- Daily total assumes 1 serving per meal (does not multiply by servings) - see FR-036
+- Per-serving calorie info shows for individual recipes
+- Total updates automatically when recipes are added/removed
+
+**Source Evidence:**
+- Calculation: `entry.calories / entry.defaultServings` (per-serving, not scaled)
+- Day-box calorie totals in `renderFullCalendar()`
+
+---
 
 ### FR-018: Enforce Cheat Meal Limits
 **Priority:** Low
@@ -982,6 +902,103 @@
 
 ---
 
+# Database Schema
+
+## Database: Users Table
+
+**Priority:** Critical
+
+**Description:** Store user accounts from Google OAuth
+
+**Table: `users`**
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | INT | PK, AUTO_INCREMENT | Unique user ID |
+| email | VARCHAR(255) | UNIQUE, NOT NULL | Email from Google |
+| name | VARCHAR(255) | NOT NULL | Display name from Google |
+| google_id | VARCHAR(255) | UNIQUE, NOT NULL | Google OAuth ID |
+| avatar_url | VARCHAR(500) | NULLABLE | Profile picture URL |
+| is_admin | BOOLEAN | DEFAULT FALSE | Admin flag for future use |
+| created_at | DATETIME | NOT NULL | Account creation time |
+| last_login | DATETIME | NULLABLE | Most recent login |
+
+---
+
+## Database: Recipes Table
+
+**Priority:** Critical
+
+**Description:** Store recipe data (migrated from recipes.js)
+
+**Table: `recipes`**
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | INT | PK, AUTO_INCREMENT | Unique recipe ID |
+| name | VARCHAR(255) | NOT NULL | Recipe name |
+| default_servings | INT | NOT NULL, DEFAULT 2 | Base serving count |
+| calories | INT | NOT NULL | Total calories for default servings |
+| is_cheat | BOOLEAN | DEFAULT FALSE | Cheat meal flag |
+| is_live | BOOLEAN | DEFAULT TRUE | Visibility flag |
+| created_at | DATETIME | NOT NULL | Creation time |
+| updated_at | DATETIME | NOT NULL | Last update time |
+
+**Table: `recipe_meals`** (junction table)
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| recipe_id | INT | FK → recipes.id | Recipe reference |
+| meal_type | ENUM | 'breakfast','lunch','dinner','snacks' | Meal category |
+
+**Table: `aisles`** (lookup table)
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | INT UNSIGNED | PK, AUTO_INCREMENT | Unique aisle ID |
+| key | VARCHAR(50) | UNIQUE, NOT NULL | Constant key (e.g., "DAIRY") |
+| name | VARCHAR(100) | NOT NULL | Display name (e.g., "Dairy") |
+| display_order | TINYINT UNSIGNED | NOT NULL | Sort order for shopping list (1-17) |
+
+**Table: `units`** (lookup table)
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | INT UNSIGNED | PK, AUTO_INCREMENT | Unique unit ID |
+| key | VARCHAR(50) | UNIQUE, NOT NULL | Constant key (e.g., "GRAM") |
+| value | VARCHAR(20) | NOT NULL | Display value (e.g., "g") |
+
+**Table: `ingredients`** (lookup table)
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | INT UNSIGNED | PK, AUTO_INCREMENT | Unique ingredient ID |
+| key | VARCHAR(100) | UNIQUE, NOT NULL | Constant key (e.g., "ROLLED_OATS") |
+| name | VARCHAR(255) | UNIQUE, NOT NULL | Display name (e.g., "Rolled oats") |
+| aisle_id | INT UNSIGNED | FK → aisles.id, NOT NULL | Grocery aisle reference |
+
+**Table: `recipe_ingredients`** (junction table)
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | INT UNSIGNED | PK, AUTO_INCREMENT | Unique ID |
+| recipe_id | INT UNSIGNED | FK → recipes.id | Recipe reference |
+| ingredient_id | INT UNSIGNED | FK → ingredients.id | Ingredient reference |
+| quantity | DECIMAL(10,2) | NOT NULL | Amount |
+| unit_id | INT UNSIGNED | FK → units.id | Unit reference |
+| sort_order | SMALLINT UNSIGNED | NOT NULL, DEFAULT 0 | Display order |
+
+**Table: `recipe_steps`**
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | INT | PK, AUTO_INCREMENT | Unique ID |
+| recipe_id | INT | FK → recipes.id | Recipe reference |
+| step_number | INT | NOT NULL | Step order |
+| instruction | TEXT | NOT NULL | Step text |
+
+---
+
 # Non-Functional Requirements
 
 ## Architecture
@@ -1005,8 +1022,6 @@
 ---
 
 ## Performance
-
----
 
 ### NFR-002: Instant Ingredient Scaling
 **Category:** Performance
@@ -1428,3 +1443,5 @@ Immutable audit record of recipe modifications (full diff)
 - Append-only table (no UPDATE or DELETE operations permitted)
 - Retained indefinitely (exempt from data retention policy)
 - `old_values` and `new_values` contain full JSON snapshots of all recipe fields
+
+## All Requirements - Finish
