@@ -36,6 +36,8 @@
 
 | Req # | Description |
 |-------|-------------|
+| FR-036 | Fixed Per-Serving Calorie Display (No Scaling) |
+| FR-042 | Ingredient Breakdown Popup (Long Press) |
 
 ## In Progress - Finish
 
@@ -491,26 +493,54 @@
 
 ---
 
-### FR-036: Fixed Per-Serving Calorie Display
+### FR-036: Fixed Per-Serving Calorie Display (No Scaling)
 **Priority:** High
 
-**Description:** Calorie displays always show per-serving values and do not scale when users adjust serving sizes
+**Category:** Recipe Display
+
+**Description:** Calorie displays always show per-serving values and do NOT scale when users adjust serving sizes. The calorie number remains constant regardless of servings selected.
 
 **User Story:** As a user, I want to see calories per serving (fixed) so that I know my personal calorie intake regardless of how many people I'm cooking for.
 
 **Acceptance Criteria:**
 - Recipe cards display calories per serving (not total)
-- Adjusting servings does NOT change the calorie number displayed
+- **Adjusting servings does NOT change the calorie number displayed** (calorie value is constant)
 - Calorie display format remains as "X cal" (no label change needed)
 - Daily calorie totals in Meal Plan assume 1 serving per meal
-- Fullscreen recipe view shows per-serving calories
+- Fullscreen recipe view shows per-serving calories (fixed, not scaled)
+- Shopping list view shows per-serving calories (if displayed)
 
-**Rationale:** Scaling calories with servings is confusing - if cooking for 4 people, each person still eats 1 portion and their individual calorie intake remains the same.
+**Rationale:** Scaling calories with servings is confusing and incorrect. If cooking for 4 people, each person still eats 1 portion. The individual calorie intake per person remains the same regardless of total servings prepared. Users care about their own calorie intake, not the total calories consumed by everyone at the table.
+
+**DO:**
+- Display calories as `recipe.calories / recipe.defaultServings` (per-serving calculation)
+- Calculate per-serving calories ONCE when recipe loads
+- Store per-serving calorie value separately from servings state
+- Keep calorie display independent from servings input/slider
+- Show same calorie number whether servings = 1, 2, 4, or 10
+- Apply same logic to all views: Recipe cards, Fullscreen view, Meal Plan calendar
+
+**DO NOT:**
+- Do NOT multiply calories by current servings (e.g., `calories * (servings / defaultServings)`)
+- Do NOT update calorie display when servings input changes
+- Do NOT recalculate calories based on servings state
+- Do NOT show "total calories for all servings" anywhere
+- Do NOT add a toggle between "per serving" and "total" calories (always show per-serving)
+
+**Example:**
+- Recipe: "Pasta Carbonara" with `defaultServings: 2`, `calories: 800`
+- Per-serving calories: 800 / 2 = **400 cal**
+- **User selects 1 serving:** Display "400 cal" ✅
+- **User selects 2 servings:** Display "400 cal" ✅ (NOT "800 cal" ❌)
+- **User selects 4 servings:** Display "400 cal" ✅ (NOT "1600 cal" ❌)
 
 **Source Evidence:**
 - Recipe card calorie display
 - Fullscreen recipe view
 - Meal plan daily totals calculation
+- User feedback: "The calories count should not increase when servings are increased. If you think about it this does not make sense, each person will only eat 1 portion and they would not care about how many calories everyone at the table are eating."
+
+**Status:** In Progress
 
 ---
 
@@ -739,6 +769,62 @@
 
 **Source Evidence:**
 - Sort logic in `renderShoppingList()`
+
+---
+
+### FR-042: Ingredient Breakdown Popup (Long Press)
+**Priority:** Medium
+
+**Category:** Shopping List
+
+**Description:** Users can long press (press and hold for 3 seconds) on any ingredient in the shopping list to see a breakdown popup showing which meals use that ingredient and how much each meal requires.
+
+**User Story:** As a user, I want to long press an ingredient in my shopping list so that I can see which meals require that ingredient and how much each meal needs, helping me understand why I need that quantity.
+
+**Acceptance Criteria:**
+- Long press (3 seconds) on any shopping list ingredient triggers breakdown popup
+- Works on both desktop (mouse down) and mobile (touch/finger down)
+- Popup displays:
+  - Ingredient name and total aggregated quantity as header
+  - List of meals that use this ingredient
+  - Quantity required for each meal
+  - Meal name with quantity (e.g., "Pizza: 1 tbsp", "Stir Fry: 3 tbsp")
+- Popup closes when user clicks/taps anywhere (on popup or outside)
+- Popup positioned near the ingredient item (above or below, based on available space)
+- Visual feedback during long press (e.g., subtle highlight or progress indicator)
+- If user releases before 3 seconds, popup does not appear (normal click behavior for checkbox)
+
+**DO:**
+- Use `mousedown`/`touchstart` event with timer (3000ms timeout)
+- Cancel timer on `mouseup`/`touchend` if released before 3 seconds
+- Query meal plan entries that use this ingredient within the current shopping list date range
+- Calculate per-meal quantities (ingredient quantity × servings / defaultServings)
+- Format quantities with clean number display (apply FR-019 formatting rules: no trailing zeros)
+- Show meal type emoji or icon next to meal name for visual clarity
+- Close popup on any click/tap event (add overlay with click handler)
+- Position popup dynamically based on viewport space available
+- Add visual feedback during long press (e.g., opacity change or border highlight)
+
+**DO NOT:**
+- Do NOT trigger popup on normal click (< 3 seconds) - preserve checkbox toggle behavior
+- Do NOT show popup if ingredient is not used in any meals (shouldn't happen, but handle gracefully)
+- Do NOT allow multiple popups to be open simultaneously
+- Do NOT block scrolling when popup is open (popup should scroll with list)
+- Do NOT make popup modal (user should be able to dismiss by clicking anywhere)
+- Do NOT show popup for checked (purchased) items - only unchecked items need breakdown
+
+**Edge Cases:**
+- Ingredient used in multiple meals: Show all meals in list
+- Ingredient with different serving sizes across meals: Show each meal's calculated amount
+- Very long meal names: Truncate with ellipsis if needed
+- Small screen (mobile): Ensure popup fits within viewport, allow vertical scrolling if needed
+- User drags/scrolls during long press: Cancel timer, do not show popup
+
+**Source Evidence:**
+- User request: "If the user presses and holds an Ingredient for 3 seconds in the shopping list (Mouse down or finger down) all the meals and quantities will show in a pop up"
+- Example: "[] 8 Tbsp of Olive Oil → Pizza: 1 tbsp, Stir Fry: 3 tbsp"
+
+**Status:** In Progress
 
 ---
 
