@@ -612,16 +612,31 @@
 - Only ingredients from recipes within the 7-day window are aggregated
 - Same ingredients from multiple recipes are combined (quantities summed)
 - Quantities reflect recipe serving sizes from meal plan
+- **Quantities are formatted with clean number display** (see DO/DO NOT sections)
 - List updates automatically when:
   - "From" date changes (new 7-day window)
   - Recipes are added/removed from meal plan
   - Serving sizes are changed
+
+**DO:**
+- Format whole numbers without decimal points: `1` not `1.00`, `100` not `100.00`
+- Strip trailing zeros from decimals: `2.5` not `2.50`, `1.25` not `1.2500`
+- Round to 2 decimal places maximum for display: `1.33` not `1.333333`
+- Display format: `[quantity] [unit]` (e.g., "1 tbsp", "2.5 cups", "1200 ml")
+- Apply formatting in the shopping list rendering logic (display layer only)
+
+**DO NOT:**
+- Do NOT display `.00` for whole numbers (show `1 tbsp` not `1.00 tbsp`)
+- Do NOT show trailing zeros after decimal point (show `2.5` not `2.50`)
+- Do NOT show more than 2 decimal places (show `0.33` not `0.333333`)
+- Do NOT use scientific notation (show `1200 ml` not `1.2e3 ml`)
 
 **Source Evidence:**
 - `renderShoppingList(dateFrom)` - calculates dateTo internally as dateFrom + 6 days
 - `ingredientTotals` Map with key = `name|unit`
 - Calculation: `quantity * servings / defaultServings`
 - Single "From" date picker input
+- User feedback: "my shopping list item count is showing like 1.00 tbps. I want 1 tbps. 2.50 I want 2.5. 1200.00 ml"
 
 ---
 
