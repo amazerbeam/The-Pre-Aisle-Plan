@@ -38,6 +38,7 @@
 |-------|-------------|
 | FR-036 | Fixed Per-Serving Calorie Display (No Scaling) |
 | FR-042 | Ingredient Breakdown Popup (Long Press) |
+| FR-043 | Linked Recipe Variants (Recipe Families) |
 
 ## In Progress - Finish
 
@@ -342,6 +343,124 @@
 - `openFullscreen(entry)`
 - `closeFullscreen()`
 - `#fullscreen-recipe` element
+
+---
+
+### FR-043: Linked Recipe Variants (Recipe Families)
+**Priority:** Medium
+
+**Category:** Recipe Management
+
+**Description:** Recipes can be grouped into "recipe families" to represent different variants of the same base meal (e.g., vegetarian, vegan, low-carb versions). A dropdown selector next to the recipe name allows users to switch between linked variants.
+
+**User Story:** As a user, I want to create and link different versions of the same meal (e.g., curry with chicken, curry with tofu, curry low-carb) so that I can easily switch between dietary variants without searching for separate recipes.
+
+**Acceptance Criteria:**
+- Recipes can be linked together into a "recipe family" (group of related variants)
+- Each recipe family has ONE recipe marked as the "default" (base recipe)
+- Dropdown appears next to recipe name ONLY if the recipe has linked variants
+- Dropdown lists all linked recipes in the family
+- Default recipe appears first in dropdown with "(Default)" label
+- Selecting a variant from dropdown:
+  - Replaces current recipe card with selected variant
+  - Maintains current servings selection (carries over to variant)
+  - Preserves day assignments (if recipe was assigned to days, variant inherits those assignments with confirmation)
+- Admin can create/edit recipe families and set default recipe
+- Admin can add/remove recipes from a family
+- Variants show visual indicator (e.g., badge or icon) that they belong to a family
+
+**Example Use Case:**
+**Base Recipe:** "Curry Sauce with Rice and Chicken" (Default)
+- **Variant 1:** "Curry Sauce with Rice and Tofu" (Vegetarian)
+- **Variant 2:** "Curry Sauce with Rice, Tofu, and Cashews" (Vegan)
+- **Variant 3:** "Curry Sauce with Chicken and Vegetables (No Rice)" (Low-Carb)
+
+User sees "Curry Sauce with Rice and Chicken" with dropdown → selects "Vegan" variant → card updates to show tofu + cashews version
+
+**Database Schema:**
+
+**Table: `recipe_families`**
+```sql
+CREATE TABLE recipe_families (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    family_name VARCHAR(255) NOT NULL,  -- e.g., "Curry Sauce Variants"
+    description TEXT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+```
+
+**Table: `recipe_family_members`** (junction table)
+```sql
+CREATE TABLE recipe_family_members (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    family_id BIGINT NOT NULL,
+    recipe_id BIGINT NOT NULL,
+    is_default BOOLEAN DEFAULT FALSE,
+    variant_label VARCHAR(100) NULL,  -- e.g., "Vegetarian", "Vegan", "Low-Carb"
+    display_order INT DEFAULT 0,      -- Order in dropdown (default first)
+    CONSTRAINT fk_family FOREIGN KEY (family_id) REFERENCES recipe_families(id) ON DELETE CASCADE,
+    CONSTRAINT fk_recipe FOREIGN KEY (recipe_id) REFERENCES recipes(id) ON DELETE CASCADE,
+    UNIQUE KEY unique_recipe_in_family (family_id, recipe_id),
+    INDEX idx_family_id (family_id),
+    INDEX idx_recipe_id (recipe_id)
+);
+```
+
+**Constraint:** Each family must have exactly ONE default recipe (enforced in application logic)
+
+**DO:**
+- Show dropdown ONLY if recipe has linked variants (check `recipe_family_members` table)
+- Display default recipe first in dropdown with "(Default)" suffix
+- Use variant labels for dropdown options (e.g., "Vegetarian", "Vegan", "Low-Carb")
+- Allow admin to create families and link recipes via admin panel
+- Validate that each family has exactly one default recipe
+- When switching variants, carry over current servings value
+- Show family indicator badge (e.g., "3 variants" or link icon) on recipe cards
+- Log variant switches in analytics (optional - track popular variants)
+- Include all family variants in recipe search results (treat as separate recipes)
+
+**DO NOT:**
+- Do NOT show dropdown if recipe has no linked variants (dropdown appears conditionally)
+- Do NOT allow multiple default recipes in same family (validation error)
+- Do NOT allow a recipe to belong to multiple families (1 recipe = 1 family maximum)
+- Do NOT automatically switch variants when navigating between views (preserve user selection)
+- Do NOT hide non-default recipes from search/browse (all variants are discoverable)
+- Do NOT merge recipe IDs (each variant is a distinct recipe with its own ID, ingredients, steps)
+- Do NOT require users to set a variant when assigning to meal plan (default is fine)
+
+**UI Placement:**
+- **Recipe Card Header:** Recipe name followed by dropdown (if variants exist)
+  - Example: `[Curry Sauce with Rice and Chicken ▼]`
+- **Dropdown Options:**
+  ```
+  Curry with Chicken and Rice (Default)
+  Curry with Tofu and Rice (Vegetarian)
+  Curry with Tofu and Cashews (Vegan)
+  Curry with Chicken and Veg (Low-Carb)
+  ```
+
+**Admin Panel Features:**
+- Create new recipe family with name and description
+- Add existing recipes to family
+- Set default recipe for family
+- Assign variant labels (Vegetarian, Vegan, Low-Carb, etc.)
+- Reorder variants in dropdown (display_order)
+- Remove recipes from family
+- Delete entire family (unlinks all recipes, doesn't delete recipes)
+
+**Edge Cases:**
+- Recipe removed from family: Dropdown disappears from that recipe's card
+- Default recipe deleted: Prompt admin to set new default before allowing deletion
+- User has variant assigned to meal plan, then variant deleted: Keep assignment with recipe name (graceful degradation)
+- Family with only 1 recipe: No dropdown shown (need 2+ for dropdown)
+
+**Source Evidence:**
+- User request: "I want to be able to create different versions of the same meal. These recipes would be linked."
+- Example: Curry sauce with chicken (base), tofu (vegetarian), tofu + cashew (vegan), chicken + veg (low-carb)
+- Database design: "we need a link table to link all the recipes and we need to mark one as the default"
+
+**Status:** In Progress
 
 ---
 

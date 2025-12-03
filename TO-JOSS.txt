@@ -1,9 +1,17 @@
 # TODO 
 
-BUG:
-The calories count shold not increase when servings are increase. If you think about it this does not make sence, each person will only eat 1 portion and they would not care about how many calories everyone at the table are eating. 
-
-
+Linked meals: 
+	I want to be able to create different version of the same meal. Thses recipes would be linked. 
+	
+	For example : 
+		I could have a Curry sauce recie 
+		1 with Rice and chicken - Base Recipe 
+		1 with Rice and tofu and create - Vegatarian  
+		1 with Rice and tofu and cashew Create - Vegan
+		1 with chicken and veg (No Carbs) 
+	A dropdown across from the "Meal Name" will have all the different options if there are any. 
+	
+	we need a link table to link all the recipes and we need to mark one as the default. 
 
 Shared Meal Plans :
 	Be able to link with another user. So Karen and I can have the same "Meal plan" this way if she changes the plan mine will also update. She or I can set a meal plan and this will update for both of us. Basically we'll both share meal plan. 
@@ -29,16 +37,28 @@ User Perfrences:
 
 
 Recipes to move: 
-Recipes to seed with
-Overnight Oats
-Grilled Chicken Salad
-Stir-Fried Chicken & Peppers with Tofu & Nuts
-Spicy Tofu Stir-Fry with Mushrooms & Nuts
-Pancakes and Bacon
-Banana Chia Pudding with Peanut Butter & Berries
-Tuna & Egg Patties
-Crispy Chicken Wings with Fries
-Turkey Lettuce Cups with Feta & Nut Salad
-
+Breakfast
+	Almond Flour Pancakes
+	Monkey Moo
+	Warm Oat Porridge with Berries & Nuts
+	Pancakes and Bacon
+Lunch
+	Argentine Beef Empanada Bites
+	Chicken & Black Bean Burrito
+	Fish Cakes with Leafy Salad & Sweet Potato
+	Grilled Chicken Salad
+	Turkey Lettuce Cups with Feta & Nut Salad 
+	Argentine Beef Empanada Bites
+Dinner
+	Argentine Beef Empanada Bites
+	Breaded Chicken with Garlic Veggies & Avocado
+	Chinese Chickpea & Tofy Curry 
+	Mild Chicken & Chickpea Tikka Masala
+	Spicy Tofu Stir-Fry with Mushrooms & Nuts
+	Stir-Fried Chicken & Peppers with Tofu & Nuts
+	Tuscan Turkey Meatballs
+	Black Pepper Beef Stir Fry
+	Chicken & Pork Paella
+	Chorizo Pizza
 
 I want you to create a agent-failed-requirements. it will ask for the FR-XX number and a description of the issues. It'll ask the agent-cea why the requiremt failed, the agent-failed-requirements will then make a plan to rewrite the requirement so the issue doens't happen again, not to speak like it's bug fix, but if the system was to be rebuild from scrratch the mistake woulld not be made. Add  a DO an DO NOT section to the requirement if needed. Like what we just did. Also create an context--failed-requirements with teh context of what we just did
