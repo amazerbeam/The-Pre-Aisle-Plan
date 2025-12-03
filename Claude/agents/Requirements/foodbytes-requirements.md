@@ -36,11 +36,6 @@
 
 | Req # | Description |
 |-------|-------------|
-| FR-019 | Generate Aggregated Shopping List |
-| FR-020 | Group Ingredients by Grocery Aisle |
-| FR-021 | Check Off Purchased Items |
-| FR-022 | Uncheck All Shopping Items |
-| FR-024 | Sort Shopping List by Aisle, Ingredient Name, and Check Status |
 
 ## In Progress - Finish
 
@@ -61,6 +56,11 @@
 | FR-015 | Remove Recipes from Calendar |
 | FR-016 | View Meal Plan Calendar |
 | FR-017 | Calculate Daily Calorie Totals |
+| FR-019 | Generate Aggregated Shopping List |
+| FR-020 | Group Ingredients by Grocery Aisle |
+| FR-021 | Check Off Purchased Items |
+| FR-022 | Uncheck All Shopping Items |
+| FR-024 | Sort Shopping List by Aisle, Ingredient Name, and Check Status |
 | FR-037 | Single Recipe Per Meal Slot with Swap Behavior |
 | FR-038 | Recipes Navigation Button in Footer |
 | FR-039 | Logo Click Navigates to Recipes |

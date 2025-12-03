@@ -20,11 +20,10 @@ function Footer() {
 
   const handleShoppingClick = () => {
     if (!isAuthenticated) {
-      setShowMessage('Coming soon - Sign in to unlock!')
+      setShowMessage('Sign in to access shopping list!')
       setTimeout(() => setShowMessage(null), 3000)
     } else {
-      setShowMessage('Feature coming soon!')
-      setTimeout(() => setShowMessage(null), 3000)
+      navigate('/shopping')
     }
   }
 
@@ -72,7 +71,7 @@ function Footer() {
         </button>
 
         <button
-          className="footer-btn"
+          className={`footer-btn ${location.pathname === '/shopping' ? 'active' : ''}`}
           onClick={handleShoppingClick}
         >
           <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2">

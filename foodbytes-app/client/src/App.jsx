@@ -4,6 +4,7 @@ import Footer from './components/layout/Footer.jsx'
 import RecipeList from './components/recipes/RecipeList.jsx'
 import SearchView from './components/recipes/SearchView.jsx'
 import MealPlanCalendar from './components/mealplan/MealPlanCalendar.jsx'
+import ShoppingList from './components/shopping/ShoppingList.jsx'
 import './styles/global.css'
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
           <Route path="/" element={<RecipeList />} />
           <Route path="/search" element={<SearchView />} />
           <Route path="/mealplan" element={<MealPlanCalendar />} />
+          <Route path="/shopping" element={<ShoppingList />} />
         </Routes>
       </main>
       <Footer />
