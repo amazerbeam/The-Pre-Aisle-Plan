@@ -15,6 +15,20 @@ export const shoppingService = {
       params: { startDate }
     })
     return response.data
+  },
+
+  /**
+   * FR-042: Get breakdown of which meals use a specific ingredient
+   * @param {number} ingredientId - Ingredient ID
+   * @param {string} unit - Unit string (e.g., "tbsp", "g")
+   * @param {string} startDate - ISO format date string (YYYY-MM-DD)
+   * @returns {Promise<IngredientBreakdownDTO>}
+   */
+  getIngredientBreakdown: async (ingredientId, unit, startDate) => {
+    const response = await api.get('/meal-plan/shopping-list/ingredient-breakdown', {
+      params: { ingredientId, unit, startDate }
+    })
+    return response.data
   }
 }
 

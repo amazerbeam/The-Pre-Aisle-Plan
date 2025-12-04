@@ -36,9 +36,6 @@
 
 | Req # | Description |
 |-------|-------------|
-| FR-036 | Fixed Per-Serving Calorie Display (No Scaling) |
-| FR-042 | Ingredient Breakdown Popup (Long Press) |
-| FR-043 | Linked Recipe Variants (Recipe Families) |
 
 ## In Progress - Finish
 
@@ -69,6 +66,9 @@
 | FR-039 | Logo Click Navigates to Recipes |
 | FR-040 | Hide Empty Meal Types in Meal Plan |
 | FR-041 | Random Food Emojis Per Meal Type (Meal Plan View Only) |
+| FR-036 | Fixed Per-Serving Calorie Display (No Scaling) |
+| FR-042 | Ingredient Breakdown Popup (Long Press) |
+| FR-043 | Linked Recipe Variants (Recipe Families) |
 | NFR-016 | Simplified Day Button Styling (No Animations, No Loading Effects) |
 | Database: Users | Store user accounts from Google OAuth |
 | Database: Recipes | Store recipe data (migrated from recipes.js) |
@@ -460,7 +460,13 @@ CREATE TABLE recipe_family_members (
 - Example: Curry sauce with chicken (base), tofu (vegetarian), tofu + cashew (vegan), chicken + veg (low-carb)
 - Database design: "we need a link table to link all the recipes and we need to mark one as the default"
 
-**Status:** In Progress
+**Status:** Completed
+
+**Implementation:**
+- Database: Added `recipe_families` and `recipe_family_members` tables to `schema.sql`
+- Backend: Created `RecipeFamily.java`, `RecipeFamilyMember.java` entities; `RecipeVariantDTO.java`, `RecipeFamilyDTO.java`, `RecipeFamilyMemberDTO.java` DTOs; `RecipeFamilyRepository.java`, `RecipeFamilyMemberRepository.java`; `RecipeFamilyService.java` with CRUD and variant lookup; `RecipeFamilyController.java` with admin endpoints at `/api/admin/recipe-families`
+- Frontend: Updated `RecipeCard.jsx` to show variant dropdown when recipe has 2+ variants; added `RecipeDTO` fields for `variantLabel` and `variants`; added CSS for variant selector
+- API: `GET /api/admin/recipe-families`, `POST/PUT/DELETE` for family management, member operations
 
 ---
 
@@ -659,7 +665,9 @@ CREATE TABLE recipe_family_members (
 - Meal plan daily totals calculation
 - User feedback: "The calories count should not increase when servings are increased. If you think about it this does not make sense, each person will only eat 1 portion and they would not care about how many calories everyone at the table are eating."
 
-**Status:** In Progress
+**Status:** Completed
+
+**Implementation:** Fixed `RecipeCard.jsx` line 15-16 to calculate per-serving calories without scaling by servings. All other views (MealPlanEntry, MealPlanDay, MealPlanCalendar) were already correctly implemented.
 
 ---
 
@@ -943,7 +951,11 @@ CREATE TABLE recipe_family_members (
 - User request: "If the user presses and holds an Ingredient for 3 seconds in the shopping list (Mouse down or finger down) all the meals and quantities will show in a pop up"
 - Example: "[] 8 Tbsp of Olive Oil → Pizza: 1 tbsp, Stir Fry: 3 tbsp"
 
-**Status:** In Progress
+**Status:** Completed
+
+**Implementation:**
+- Backend: Created `IngredientBreakdownDTO.java`, `MealIngredientUsageDTO.java`, `ShoppingListService.getIngredientBreakdown()` method, and `GET /api/meal-plan/shopping-list/ingredient-breakdown` endpoint
+- Frontend: Created `IngredientBreakdownPopup.jsx` component with long-press detection in `ShoppingListItem.jsx` (3-second timer, visual feedback, mobile/desktop support)
 
 ---
 
