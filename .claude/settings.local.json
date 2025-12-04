@@ -32,7 +32,12 @@
       "Bash(docker builder prune:*)",
       "Bash(start chrome http://localhost:3000)",
       "Bash(start chrome \"http://localhost:8080/oauth2/authorization/google\")",
-      "Bash(./mvnw clean compile:*)"
+      "Bash(./mvnw clean compile:*)",
+      "Bash(mvn compile:*)",
+      "Bash(dir /b \"C:\\Users\\jossd\\Documents\\MyWebSites\\FoodBytes\\foodbytes-app\\foodbytes-api\\Dockerfile\")",
+      "Bash(dir /b \"C:\\Users\\jossd\\Documents\\MyWebSites\\FoodBytes\\foodbytes-app\\client\\Dockerfile\")",
+      "Bash(dir /b \"C:\\Users\\jossd\\Documents\\MyWebSites\\FoodBytes\\foodbytes-app\\database\\schema.sql\")",
+      "Bash(dir /b \"C:\\Users\\jossd\\Documents\\MyWebSites\\FoodBytes\\foodbytes-app\\database\\seed.sql\")"
     ],
     "deny": [],
     "ask": []

@@ -1575,49 +1575,66 @@ CREATE TABLE recipe_family_members (
 ### NFR-010: Centralized Ingredient Definitions
 **Category:** Maintainability
 
-**Description:** All ingredient data is centralized with consistent naming to prevent shopping list duplicates
+**Description:** All ingredient data is centralized in the database with validation to prevent duplicates
 
 **Measurable Criteria:**
-- Single source of truth for ingredient names via `INGREDIENTS` constant
-- **No duplicate ingredient names allowed** (e.g., cannot have both "Carrot" and "Carrots")
-- All ingredient names must be singular form (e.g., "Carrot" not "Carrots")
-- Recipes must reference ingredients by constant key, not free-text strings
-- Single source of truth for aisle assignments
-- Adding new ingredient requires database/constant update only
-- `N()` helper function enforces ingredient key validation at recipe creation
+- Single source of truth: `ingredients` table (id, key, name, aisle_id)
+- **No duplicate ingredient names allowed** - enforced by:
+  - Database UNIQUE constraint on `name` column (exact match)
+  - `IngredientService` fuzzy matching (catches "Carrots" vs "Carrot")
+- All ingredient names should be singular form (e.g., "Carrot" not "Carrots")
+- Recipes reference ingredients by `ingredient_id` FK, not free-text
+- Single source of truth for aisle assignments via `aisle_id` FK
+- Adding new ingredient requires:
+  1. POST `/api/admin/ingredients/validate?name=` (pre-validation)
+  2. POST `/api/admin/ingredients` (create with auto-generated key)
+- `IngredientService.validateAndGetByKey()` enforces key validation at recipe creation
 
-**Source Evidence:** `INGREDIENTS` object with 170+ items; `AISLE` object with 17 categories; `N()` function for ingredient creation with validation
+**Implementation:**
+- Database: `ingredients` table with 90 ingredients, 17 aisles
+- Backend: `IngredientService` with fuzzy matching (Levenshtein distance)
+- API: `/api/admin/ingredients/*` endpoints for CRUD + validation
+- Thresholds: 50% similarity to suggest, 70% to block as duplicate
+
+**Source Evidence:**
+- `seed.sql` - ingredients table with 90 items
+- `IngredientRepository.java` - search queries
+- `IngredientService.java` - validation logic
+- `IngredientController.java` - admin endpoints
 
 ---
 
 ### NFR-011: Data Validation Helpers
 **Category:** Maintainability
 
-**Description:** Helper functions validate and normalize ingredient data
+**Description:** Backend services validate and normalize ingredient data
 
 **Measurable Criteria:**
-- `N()` function validates ingredient key existence
-- `getAisleInfoByName()` provides safe aisle lookup
-- Invalid data logs errors for debugging
+- `IngredientService.validateAndGetByKey()` validates ingredient key exists
+- `IngredientService.validateNewIngredient()` checks for duplicates before creation
+- `IngredientService.normalizeName()` converts to singular form, title case
+- `IngredientService.findSimilar()` provides fuzzy matching for duplicate detection
+- Invalid data throws `IllegalArgumentException` with descriptive message
+- All validation errors logged for debugging
 
-**Source Evidence:** `N(key, quantity, unit)` with validation; `getAisleInfoByName(name)` with fallback; `console.error` for missing ingredients
+**Source Evidence:** `IngredientService.java` with validation methods; `IngredientController.java` exposes `/validate` endpoint
 
 ---
 
 ### NFR-015: Centralized Unit Definitions
 **Category:** Maintainability
 
-**Description:** All measurement units are defined in a central constant to prevent duplicates in shopping lists
+**Description:** All measurement units are defined in the database to prevent duplicates in shopping lists
 
 **Measurable Criteria:**
-- Single source of truth for units via `UNIT` constant
+- Single source of truth: `units` table (id, key, value)
 - **No duplicate unit representations allowed** (e.g., cannot have both "unit" and "units")
 - All units are singular/invariant form (e.g., "piece" not "pieces", "g" not "grams")
-- Recipes must reference units by constant key, not free-text strings
+- Recipes reference units by `unit_id` FK, not free-text strings
 - Shopping list aggregation uses exact unit matching (same ingredient + same unit = combine quantities)
 - Different units for same ingredient display as separate line items but grouped together
 
-**Source Evidence:** `UNIT` object with standardized values; Recipe ingredient validation
+**Source Evidence:** `seed.sql` - units table with 18 standardized values (g, ml, tsp, tbsp, piece, small, medium, large, handful, clove, head, stalk, slice, leaf, tin, cup, pinch, oz)
 
 ---
 
