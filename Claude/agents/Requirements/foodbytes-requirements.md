@@ -356,16 +356,17 @@
 
 **Category:** Recipe Management
 
-**Description:** Recipes can be grouped into "recipe families" to represent different variants of the same base meal (e.g., vegetarian, vegan, low-carb versions). A dropdown selector next to the recipe name allows users to switch between linked variants.
+**Description:** Recipes can be grouped into "recipe families" to represent different calorie-tier variants of the same base meal. A dropdown selector next to the recipe name allows users to switch between **Light**, **Standard**, and **Full** versions based on their daily calorie budget.
 
-**User Story:** As a user, I want to create and link different versions of the same meal (e.g., curry with chicken, curry with tofu, curry low-carb) so that I can easily switch between dietary variants without searching for separate recipes.
+**User Story:** As a user, I want to choose different calorie versions of the same meal (Light for calorie-saving days, Standard for normal days, Full for training days) so I can practice flexible dieting while enjoying the same dishes.
 
 **Acceptance Criteria:**
 - Recipes can be linked together into a "recipe family" (group of related variants)
-- Each recipe family has ONE recipe marked as the "default" (base recipe)
+- Each recipe family has ONE recipe marked as the "default" (Standard version)
+- **Cheat meals (is_cheat = TRUE) are excluded** — no variants for treats
 - Dropdown appears next to recipe name ONLY if the recipe has linked variants
-- Dropdown lists all linked recipes in the family
-- Default recipe appears first in dropdown with "(Default)" label
+- Dropdown lists variants using **standard labels: "Light", "Standard", "Full"**
+- Standard (default) recipe appears first in dropdown
 - Selecting a variant from dropdown:
   - Replaces current recipe card with selected variant
   - Maintains current servings selection (carries over to variant)
@@ -374,13 +375,20 @@
 - Admin can add/remove recipes from a family
 - Variants show visual indicator (e.g., badge or icon) that they belong to a family
 
-**Example Use Case:**
-**Base Recipe:** "Curry Sauce with Rice and Chicken" (Default)
-- **Variant 1:** "Curry Sauce with Rice and Tofu" (Vegetarian)
-- **Variant 2:** "Curry Sauce with Rice, Tofu, and Cashews" (Vegan)
-- **Variant 3:** "Curry Sauce with Chicken and Vegetables (No Rice)" (Low-Carb)
+**Calorie Tier Definitions:**
+| Tier | Target Calories | When To Choose |
+|------|-----------------|----------------|
+| **Light** | ~400-500 cal | Big breakfast/lunch, calorie-saving day |
+| **Standard** | ~550-700 cal | Normal day (default) |
+| **Full** | ~750-900 cal | Light earlier meals, training day |
 
-User sees "Curry Sauce with Rice and Chicken" with dropdown → selects "Vegan" variant → card updates to show tofu + cashews version
+**Example Use Case:**
+**Recipe Family:** "Chicken Curry"
+- **Light:** Chicken Curry (no rice) — 550 cal
+- **Standard:** Chicken Curry + Rice — 700 cal (Default)
+- **Full:** Chicken Curry + Rice + Naan — 850 cal
+
+User's day: Big breakfast (500 cal) → sees "Chicken Curry" with dropdown → selects "Light" → gets curry without rice (550 cal) → stays within daily budget
 
 **Database Schema:**
 
@@ -402,8 +410,8 @@ CREATE TABLE recipe_family_members (
     family_id BIGINT NOT NULL,
     recipe_id BIGINT NOT NULL,
     is_default BOOLEAN DEFAULT FALSE,
-    variant_label VARCHAR(100) NULL,  -- e.g., "Vegetarian", "Vegan", "Low-Carb"
-    display_order INT DEFAULT 0,      -- Order in dropdown (default first)
+    variant_label VARCHAR(100) NULL,  -- MUST be: "Light", "Standard", or "Full"
+    display_order INT DEFAULT 0,      -- Order: Standard (1), Light (2), Full (3)
     CONSTRAINT fk_family FOREIGN KEY (family_id) REFERENCES recipe_families(id) ON DELETE CASCADE,
     CONSTRAINT fk_recipe FOREIGN KEY (recipe_id) REFERENCES recipes(id) ON DELETE CASCADE,
     UNIQUE KEY unique_recipe_in_family (family_id, recipe_id),
@@ -416,10 +424,11 @@ CREATE TABLE recipe_family_members (
 
 **DO:**
 - Show dropdown ONLY if recipe has linked variants (check `recipe_family_members` table)
-- Display default recipe first in dropdown with "(Default)" suffix
-- Use variant labels for dropdown options (e.g., "Vegetarian", "Vegan", "Low-Carb")
+- Display Standard (default) recipe first in dropdown
+- Use ONLY these variant labels: **"Light", "Standard", "Full"**
+- **Exclude cheat meals** — recipes with `is_cheat = TRUE` cannot be added to families
 - Allow admin to create families and link recipes via admin panel
-- Validate that each family has exactly one default recipe
+- Validate that each family has exactly one default recipe (Standard)
 - When switching variants, carry over current servings value
 - Show family indicator badge (e.g., "3 variants" or link icon) on recipe cards
 - Log variant switches in analytics (optional - track popular variants)
@@ -429,6 +438,8 @@ CREATE TABLE recipe_family_members (
 - Do NOT show dropdown if recipe has no linked variants (dropdown appears conditionally)
 - Do NOT allow multiple default recipes in same family (validation error)
 - Do NOT allow a recipe to belong to multiple families (1 recipe = 1 family maximum)
+- Do NOT add cheat meals to recipe families (is_cheat = TRUE recipes are excluded)
+- Do NOT use variant labels other than "Light", "Standard", "Full"
 - Do NOT automatically switch variants when navigating between views (preserve user selection)
 - Do NOT hide non-default recipes from search/browse (all variants are discoverable)
 - Do NOT merge recipe IDs (each variant is a distinct recipe with its own ID, ingredients, steps)
@@ -436,23 +447,24 @@ CREATE TABLE recipe_family_members (
 
 **UI Placement:**
 - **Recipe Card Header:** Recipe name followed by dropdown (if variants exist)
-  - Example: `[Curry Sauce with Rice and Chicken ▼]`
+  - Example: `[Chicken Curry ▼]`
 - **Dropdown Options:**
   ```
-  Curry with Chicken and Rice (Default)
-  Curry with Tofu and Rice (Vegetarian)
-  Curry with Tofu and Cashews (Vegan)
-  Curry with Chicken and Veg (Low-Carb)
+  Standard — 700 cal
+  Light — 550 cal
+  Full — 850 cal
   ```
+- **Dropdown shows:** Label + calories for easy decision-making
 
 **Admin Panel Features:**
 - Create new recipe family with name and description
-- Add existing recipes to family
-- Set default recipe for family
-- Assign variant labels (Vegetarian, Vegan, Low-Carb, etc.)
+- Add existing non-cheat recipes to family
+- Set default recipe for family (Standard version)
+- Assign variant labels (Light, Standard, Full only)
 - Reorder variants in dropdown (display_order)
 - Remove recipes from family
 - Delete entire family (unlinks all recipes, doesn't delete recipes)
+- **Validation:** Prevent adding recipes where is_cheat = TRUE
 
 **Edge Cases:**
 - Recipe removed from family: Dropdown disappears from that recipe's card
@@ -462,7 +474,9 @@ CREATE TABLE recipe_family_members (
 
 **Source Evidence:**
 - User request: "I want to be able to create different versions of the same meal. These recipes would be linked."
-- Example: Curry sauce with chicken (base), tofu (vegetarian), tofu + cashew (vegan), chicken + veg (low-carb)
+- Calorie-tier system: "Light, Standard, and Full. That's what we needed. Perfect."
+- Use case: "if I wanted to eat a bigger breakfast or lunch but then wanted to eat the curry... I'd chose the vegetarian version, or if I had a lighter lunch I'd chose the chicken version with rice"
+- Cheat exclusion: "We don't want to do this for cheat meals, they are not for this."
 - Database design: "we need a link table to link all the recipes and we need to mark one as the default"
 
 **Status:** Completed

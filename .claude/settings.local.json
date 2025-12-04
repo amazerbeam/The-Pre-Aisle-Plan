@@ -40,7 +40,8 @@
       "Bash(dir /b \"C:\\Users\\jossd\\Documents\\MyWebSites\\FoodBytes\\foodbytes-app\\database\\seed.sql\")",
       "Bash(./mvnw.cmd compile:*)",
       "Bash(dir \"C:\\Users\\jossd\\Documents\\MyWebSites\\FoodBytes\\foodbytes-app\" /b)",
-      "Bash(docker logs:*)"
+      "Bash(docker logs:*)",
+      "Bash(docker ps:*)"
     ],
     "deny": [],
     "ask": []

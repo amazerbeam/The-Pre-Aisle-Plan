@@ -722,6 +722,68 @@ INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
 (18, 4, 'Roll, sauce, top with cheese & chorizo. Bake 12-15 min.');
 
 -- =============================================
+-- RECIPE 19: Spiced Banana Curry with Rice (Linked to Recipe 11)
+-- =============================================
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+(19, 'Spiced Banana Curry with Chickpeas & Tofu (With Rice)', 2, 2120, FALSE, TRUE);
+
+-- Recipe 19 meal assignment (Dinner)
+INSERT INTO recipe_meals (recipe_id, meal_id) VALUES
+(19, 3);
+
+-- Recipe 19 ingredients (same as recipe 11 + jasmine rice)
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit_id, sort_order) VALUES
+(19, 71, 180, 1, 1),   -- Jasmine rice, 180g (dry)
+(19, 64, 240, 1, 2),   -- Chickpeas, 240g
+(19, 6, 150, 1, 3),    -- Firm tofu, 150g
+(19, 17, 1, 8, 4),     -- Onion, 1 large
+(19, 13, 3, 10, 5),    -- Garlic, 3 cloves
+(19, 14, 5, 1, 6),     -- Ginger, 5g
+(19, 32, 1, 7, 7),     -- Banana, 1 medium
+(19, 72, 2, 3, 8),     -- Soy sauce, 2 tsp
+(19, 60, 1, 4, 9),     -- Tomato paste, 1 tbsp
+(19, 76, 1, 3, 10),    -- Honey, 1 tsp
+(19, 44, 1, 3, 11),    -- Salt, 1 tsp
+(19, 57, 0.5, 3, 12),  -- Turmeric, 0.5 tsp
+(19, 49, 0.5, 3, 13),  -- Cumin, 0.5 tsp
+(19, 50, 0.25, 3, 14), -- Cinnamon, 0.25 tsp
+(19, 52, 1, 5, 15),    -- Star anise, 1 piece
+(19, 53, 1, 17, 16),   -- MSG, 1 pinch
+(19, 90, 480, 2, 17),  -- Stock, 480ml
+(19, 59, 2, 4, 18),    -- Olive oil, 2 tbsp
+(19, 26, 400, 1, 19),  -- Sweet potato, 400g
+(19, 41, 1, 16, 20),   -- Petit pois, 1 cup
+(19, 45, 0.25, 3, 21); -- Black pepper, 0.25 tsp
+
+-- Recipe 19 steps (same as recipe 11 + rice cooking)
+INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
+(19, 1, 'Rinse the jasmine rice under cold water until water runs clear. Add to a pot with 360ml water, bring to boil, then reduce heat to low, cover and cook for 12-15 minutes. Let rest covered for 5 minutes.'),
+(19, 2, 'Preheat oven to 200C.'),
+(19, 3, 'Preheat 2 pans, one for tofu and one for curry sauce.'),
+(19, 4, 'Peel and cube the sweet potatoes. Toss with 1 tbsp olive oil and a pinch of salt.'),
+(19, 5, 'Fry the tofu cubes until golden on all sides.'),
+(19, 6, 'Put sweet potatoes in the oven for 30 minutes.'),
+(19, 7, 'In a saucepan, heat 1 tbsp olive oil over medium heat. Add sliced onion and a pinch of salt; fry 5 minutes until softened.'),
+(19, 8, 'Add minced garlic and grated ginger; cook 30 seconds.'),
+(19, 9, 'Add banana, soy sauce, tomato puree, sugar, salt, turmeric, cumin, cinnamon, MSG, and stock.'),
+(19, 10, 'Remove sauce and blend until smooth.'),
+(19, 11, 'Return to pan. Add Star Anise.'),
+(19, 12, 'Add chickpeas to the sauce and simmer for 20 minutes.'),
+(19, 13, 'Add the fried tofu and peas to the curry sauce. Cook for another 5 minutes.'),
+(19, 14, 'Fluff the rice with a fork. Serve curry hot over jasmine rice with roasted sweet potatoes on the side.');
+
+-- =============================================
+-- RECIPE FAMILIES (Linked Recipe Variants)
+-- =============================================
+INSERT INTO recipe_families (id, family_name, description) VALUES
+(1, 'Spiced Banana Curry', 'Aromatic banana curry with chickpeas and tofu - available with or without rice');
+
+-- Link recipes to family
+INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_label, display_order) VALUES
+(1, 19, TRUE, 'With Rice', 1),
+(1, 11, FALSE, 'Without Rice', 2);
+
+-- =============================================
 -- TEST USER (development only)
 -- =============================================
 INSERT INTO users (email, name, google_id, is_admin, created_at) VALUES
