@@ -3,6 +3,7 @@ package com.foodbytes.controller;
 import com.foodbytes.dto.*;
 import com.foodbytes.security.UserPrincipal;
 import com.foodbytes.service.MealPlanService;
+import com.foodbytes.service.ShoppingListService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -24,6 +25,7 @@ import java.util.Map;
 public class MealPlanController {
 
     private final MealPlanService mealPlanService;
+    private final ShoppingListService shoppingListService;
 
     /**
      * FR-007, FR-016: Get 7-day meal plan starting from a given date.
@@ -125,5 +127,25 @@ public class MealPlanController {
         List<MealPlanEntryDTO> assignments = mealPlanService.getRecipeAssignments(
             userPrincipal.getId(), recipeId, startDate);
         return ResponseEntity.ok(assignments);
+    }
+
+    /**
+     * FR-019, FR-020: Get aggregated shopping list for 7-day meal plan.
+     * GET /api/meal-plan/shopping-list?startDate=2025-12-01
+     *
+     * @param userPrincipal Authenticated user (required)
+     * @param startDate Start date of the 7-day period
+     * @return AggregatedShoppingListDTO with items grouped by aisle
+     */
+    @GetMapping("/shopping-list")
+    public ResponseEntity<AggregatedShoppingListDTO> getShoppingList(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate) {
+
+        AggregatedShoppingListDTO shoppingList = shoppingListService.getShoppingList(
+            userPrincipal.getId(),
+            startDate
+        );
+        return ResponseEntity.ok(shoppingList);
     }
 }

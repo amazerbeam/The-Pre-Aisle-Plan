@@ -36,6 +36,23 @@
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+
+  /* Aisle color coding for shopping list (15 aisles) */
+  --aisle-produce: #4caf50;
+  --aisle-dairy: #2196f3;
+  --aisle-meat: #f44336;
+  --aisle-seafood: #00bcd4;
+  --aisle-bakery: #ff9800;
+  --aisle-grains: #795548;
+  --aisle-canned: #9e9e9e;
+  --aisle-condiments: #ffc107;
+  --aisle-snacks: #e91e63;
+  --aisle-beverages: #3f51b5;
+  --aisle-frozen: #03a9f4;
+  --aisle-spices: #8bc34a;
+  --aisle-oils: #ffeb3b;
+  --aisle-baking: #9c27b0;
+  --aisle-misc: #607d8b;
 }
 
 * {

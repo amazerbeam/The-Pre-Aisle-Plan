@@ -36,11 +36,9 @@
 
 | Req # | Description |
 |-------|-------------|
-| FR-019 | Generate Aggregated Shopping List |
-| FR-020 | Group Ingredients by Grocery Aisle |
-| FR-021 | Check Off Purchased Items |
-| FR-022 | Uncheck All Shopping Items |
-| FR-024 | Sort Shopping List by Aisle, Ingredient Name, and Check Status |
+| FR-036 | Fixed Per-Serving Calorie Display (No Scaling) |
+| FR-042 | Ingredient Breakdown Popup (Long Press) |
+| FR-043 | Linked Recipe Variants (Recipe Families) |
 
 ## In Progress - Finish
 
@@ -61,6 +59,11 @@
 | FR-015 | Remove Recipes from Calendar |
 | FR-016 | View Meal Plan Calendar |
 | FR-017 | Calculate Daily Calorie Totals |
+| FR-019 | Generate Aggregated Shopping List |
+| FR-020 | Group Ingredients by Grocery Aisle |
+| FR-021 | Check Off Purchased Items |
+| FR-022 | Uncheck All Shopping Items |
+| FR-024 | Sort Shopping List by Aisle, Ingredient Name, and Check Status |
 | FR-037 | Single Recipe Per Meal Slot with Swap Behavior |
 | FR-038 | Recipes Navigation Button in Footer |
 | FR-039 | Logo Click Navigates to Recipes |
@@ -343,6 +346,124 @@
 
 ---
 
+### FR-043: Linked Recipe Variants (Recipe Families)
+**Priority:** Medium
+
+**Category:** Recipe Management
+
+**Description:** Recipes can be grouped into "recipe families" to represent different variants of the same base meal (e.g., vegetarian, vegan, low-carb versions). A dropdown selector next to the recipe name allows users to switch between linked variants.
+
+**User Story:** As a user, I want to create and link different versions of the same meal (e.g., curry with chicken, curry with tofu, curry low-carb) so that I can easily switch between dietary variants without searching for separate recipes.
+
+**Acceptance Criteria:**
+- Recipes can be linked together into a "recipe family" (group of related variants)
+- Each recipe family has ONE recipe marked as the "default" (base recipe)
+- Dropdown appears next to recipe name ONLY if the recipe has linked variants
+- Dropdown lists all linked recipes in the family
+- Default recipe appears first in dropdown with "(Default)" label
+- Selecting a variant from dropdown:
+  - Replaces current recipe card with selected variant
+  - Maintains current servings selection (carries over to variant)
+  - Preserves day assignments (if recipe was assigned to days, variant inherits those assignments with confirmation)
+- Admin can create/edit recipe families and set default recipe
+- Admin can add/remove recipes from a family
+- Variants show visual indicator (e.g., badge or icon) that they belong to a family
+
+**Example Use Case:**
+**Base Recipe:** "Curry Sauce with Rice and Chicken" (Default)
+- **Variant 1:** "Curry Sauce with Rice and Tofu" (Vegetarian)
+- **Variant 2:** "Curry Sauce with Rice, Tofu, and Cashews" (Vegan)
+- **Variant 3:** "Curry Sauce with Chicken and Vegetables (No Rice)" (Low-Carb)
+
+User sees "Curry Sauce with Rice and Chicken" with dropdown → selects "Vegan" variant → card updates to show tofu + cashews version
+
+**Database Schema:**
+
+**Table: `recipe_families`**
+```sql
+CREATE TABLE recipe_families (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    family_name VARCHAR(255) NOT NULL,  -- e.g., "Curry Sauce Variants"
+    description TEXT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+```
+
+**Table: `recipe_family_members`** (junction table)
+```sql
+CREATE TABLE recipe_family_members (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    family_id BIGINT NOT NULL,
+    recipe_id BIGINT NOT NULL,
+    is_default BOOLEAN DEFAULT FALSE,
+    variant_label VARCHAR(100) NULL,  -- e.g., "Vegetarian", "Vegan", "Low-Carb"
+    display_order INT DEFAULT 0,      -- Order in dropdown (default first)
+    CONSTRAINT fk_family FOREIGN KEY (family_id) REFERENCES recipe_families(id) ON DELETE CASCADE,
+    CONSTRAINT fk_recipe FOREIGN KEY (recipe_id) REFERENCES recipes(id) ON DELETE CASCADE,
+    UNIQUE KEY unique_recipe_in_family (family_id, recipe_id),
+    INDEX idx_family_id (family_id),
+    INDEX idx_recipe_id (recipe_id)
+);
+```
+
+**Constraint:** Each family must have exactly ONE default recipe (enforced in application logic)
+
+**DO:**
+- Show dropdown ONLY if recipe has linked variants (check `recipe_family_members` table)
+- Display default recipe first in dropdown with "(Default)" suffix
+- Use variant labels for dropdown options (e.g., "Vegetarian", "Vegan", "Low-Carb")
+- Allow admin to create families and link recipes via admin panel
+- Validate that each family has exactly one default recipe
+- When switching variants, carry over current servings value
+- Show family indicator badge (e.g., "3 variants" or link icon) on recipe cards
+- Log variant switches in analytics (optional - track popular variants)
+- Include all family variants in recipe search results (treat as separate recipes)
+
+**DO NOT:**
+- Do NOT show dropdown if recipe has no linked variants (dropdown appears conditionally)
+- Do NOT allow multiple default recipes in same family (validation error)
+- Do NOT allow a recipe to belong to multiple families (1 recipe = 1 family maximum)
+- Do NOT automatically switch variants when navigating between views (preserve user selection)
+- Do NOT hide non-default recipes from search/browse (all variants are discoverable)
+- Do NOT merge recipe IDs (each variant is a distinct recipe with its own ID, ingredients, steps)
+- Do NOT require users to set a variant when assigning to meal plan (default is fine)
+
+**UI Placement:**
+- **Recipe Card Header:** Recipe name followed by dropdown (if variants exist)
+  - Example: `[Curry Sauce with Rice and Chicken ▼]`
+- **Dropdown Options:**
+  ```
+  Curry with Chicken and Rice (Default)
+  Curry with Tofu and Rice (Vegetarian)
+  Curry with Tofu and Cashews (Vegan)
+  Curry with Chicken and Veg (Low-Carb)
+  ```
+
+**Admin Panel Features:**
+- Create new recipe family with name and description
+- Add existing recipes to family
+- Set default recipe for family
+- Assign variant labels (Vegetarian, Vegan, Low-Carb, etc.)
+- Reorder variants in dropdown (display_order)
+- Remove recipes from family
+- Delete entire family (unlinks all recipes, doesn't delete recipes)
+
+**Edge Cases:**
+- Recipe removed from family: Dropdown disappears from that recipe's card
+- Default recipe deleted: Prompt admin to set new default before allowing deletion
+- User has variant assigned to meal plan, then variant deleted: Keep assignment with recipe name (graceful degradation)
+- Family with only 1 recipe: No dropdown shown (need 2+ for dropdown)
+
+**Source Evidence:**
+- User request: "I want to be able to create different versions of the same meal. These recipes would be linked."
+- Example: Curry sauce with chicken (base), tofu (vegetarian), tofu + cashew (vegan), chicken + veg (low-carb)
+- Database design: "we need a link table to link all the recipes and we need to mark one as the default"
+
+**Status:** In Progress
+
+---
+
 ## Global Date Range
 
 ### FR-007: Shared Start Date with Fixed 7-Day Range
@@ -491,26 +612,54 @@
 
 ---
 
-### FR-036: Fixed Per-Serving Calorie Display
+### FR-036: Fixed Per-Serving Calorie Display (No Scaling)
 **Priority:** High
 
-**Description:** Calorie displays always show per-serving values and do not scale when users adjust serving sizes
+**Category:** Recipe Display
+
+**Description:** Calorie displays always show per-serving values and do NOT scale when users adjust serving sizes. The calorie number remains constant regardless of servings selected.
 
 **User Story:** As a user, I want to see calories per serving (fixed) so that I know my personal calorie intake regardless of how many people I'm cooking for.
 
 **Acceptance Criteria:**
 - Recipe cards display calories per serving (not total)
-- Adjusting servings does NOT change the calorie number displayed
+- **Adjusting servings does NOT change the calorie number displayed** (calorie value is constant)
 - Calorie display format remains as "X cal" (no label change needed)
 - Daily calorie totals in Meal Plan assume 1 serving per meal
-- Fullscreen recipe view shows per-serving calories
+- Fullscreen recipe view shows per-serving calories (fixed, not scaled)
+- Shopping list view shows per-serving calories (if displayed)
 
-**Rationale:** Scaling calories with servings is confusing - if cooking for 4 people, each person still eats 1 portion and their individual calorie intake remains the same.
+**Rationale:** Scaling calories with servings is confusing and incorrect. If cooking for 4 people, each person still eats 1 portion. The individual calorie intake per person remains the same regardless of total servings prepared. Users care about their own calorie intake, not the total calories consumed by everyone at the table.
+
+**DO:**
+- Display calories as `recipe.calories / recipe.defaultServings` (per-serving calculation)
+- Calculate per-serving calories ONCE when recipe loads
+- Store per-serving calorie value separately from servings state
+- Keep calorie display independent from servings input/slider
+- Show same calorie number whether servings = 1, 2, 4, or 10
+- Apply same logic to all views: Recipe cards, Fullscreen view, Meal Plan calendar
+
+**DO NOT:**
+- Do NOT multiply calories by current servings (e.g., `calories * (servings / defaultServings)`)
+- Do NOT update calorie display when servings input changes
+- Do NOT recalculate calories based on servings state
+- Do NOT show "total calories for all servings" anywhere
+- Do NOT add a toggle between "per serving" and "total" calories (always show per-serving)
+
+**Example:**
+- Recipe: "Pasta Carbonara" with `defaultServings: 2`, `calories: 800`
+- Per-serving calories: 800 / 2 = **400 cal**
+- **User selects 1 serving:** Display "400 cal" ✅
+- **User selects 2 servings:** Display "400 cal" ✅ (NOT "800 cal" ❌)
+- **User selects 4 servings:** Display "400 cal" ✅ (NOT "1600 cal" ❌)
 
 **Source Evidence:**
 - Recipe card calorie display
 - Fullscreen recipe view
 - Meal plan daily totals calculation
+- User feedback: "The calories count should not increase when servings are increased. If you think about it this does not make sense, each person will only eat 1 portion and they would not care about how many calories everyone at the table are eating."
+
+**Status:** In Progress
 
 ---
 
@@ -612,16 +761,31 @@
 - Only ingredients from recipes within the 7-day window are aggregated
 - Same ingredients from multiple recipes are combined (quantities summed)
 - Quantities reflect recipe serving sizes from meal plan
+- **Quantities are formatted with clean number display** (see DO/DO NOT sections)
 - List updates automatically when:
   - "From" date changes (new 7-day window)
   - Recipes are added/removed from meal plan
   - Serving sizes are changed
+
+**DO:**
+- Format whole numbers without decimal points: `1` not `1.00`, `100` not `100.00`
+- Strip trailing zeros from decimals: `2.5` not `2.50`, `1.25` not `1.2500`
+- Round to 2 decimal places maximum for display: `1.33` not `1.333333`
+- Display format: `[quantity] [unit]` (e.g., "1 tbsp", "2.5 cups", "1200 ml")
+- Apply formatting in the shopping list rendering logic (display layer only)
+
+**DO NOT:**
+- Do NOT display `.00` for whole numbers (show `1 tbsp` not `1.00 tbsp`)
+- Do NOT show trailing zeros after decimal point (show `2.5` not `2.50`)
+- Do NOT show more than 2 decimal places (show `0.33` not `0.333333`)
+- Do NOT use scientific notation (show `1200 ml` not `1.2e3 ml`)
 
 **Source Evidence:**
 - `renderShoppingList(dateFrom)` - calculates dateTo internally as dateFrom + 6 days
 - `ingredientTotals` Map with key = `name|unit`
 - Calculation: `quantity * servings / defaultServings`
 - Single "From" date picker input
+- User feedback: "my shopping list item count is showing like 1.00 tbps. I want 1 tbps. 2.50 I want 2.5. 1200.00 ml"
 
 ---
 
@@ -724,6 +888,62 @@
 
 **Source Evidence:**
 - Sort logic in `renderShoppingList()`
+
+---
+
+### FR-042: Ingredient Breakdown Popup (Long Press)
+**Priority:** Medium
+
+**Category:** Shopping List
+
+**Description:** Users can long press (press and hold for 3 seconds) on any ingredient in the shopping list to see a breakdown popup showing which meals use that ingredient and how much each meal requires.
+
+**User Story:** As a user, I want to long press an ingredient in my shopping list so that I can see which meals require that ingredient and how much each meal needs, helping me understand why I need that quantity.
+
+**Acceptance Criteria:**
+- Long press (3 seconds) on any shopping list ingredient triggers breakdown popup
+- Works on both desktop (mouse down) and mobile (touch/finger down)
+- Popup displays:
+  - Ingredient name and total aggregated quantity as header
+  - List of meals that use this ingredient
+  - Quantity required for each meal
+  - Meal name with quantity (e.g., "Pizza: 1 tbsp", "Stir Fry: 3 tbsp")
+- Popup closes when user clicks/taps anywhere (on popup or outside)
+- Popup positioned near the ingredient item (above or below, based on available space)
+- Visual feedback during long press (e.g., subtle highlight or progress indicator)
+- If user releases before 3 seconds, popup does not appear (normal click behavior for checkbox)
+
+**DO:**
+- Use `mousedown`/`touchstart` event with timer (3000ms timeout)
+- Cancel timer on `mouseup`/`touchend` if released before 3 seconds
+- Query meal plan entries that use this ingredient within the current shopping list date range
+- Calculate per-meal quantities (ingredient quantity × servings / defaultServings)
+- Format quantities with clean number display (apply FR-019 formatting rules: no trailing zeros)
+- Show meal type emoji or icon next to meal name for visual clarity
+- Close popup on any click/tap event (add overlay with click handler)
+- Position popup dynamically based on viewport space available
+- Add visual feedback during long press (e.g., opacity change or border highlight)
+
+**DO NOT:**
+- Do NOT trigger popup on normal click (< 3 seconds) - preserve checkbox toggle behavior
+- Do NOT show popup if ingredient is not used in any meals (shouldn't happen, but handle gracefully)
+- Do NOT allow multiple popups to be open simultaneously
+- Do NOT block scrolling when popup is open (popup should scroll with list)
+- Do NOT make popup modal (user should be able to dismiss by clicking anywhere)
+- Do NOT show popup for checked (purchased) items - only unchecked items need breakdown
+
+**Edge Cases:**
+- Ingredient used in multiple meals: Show all meals in list
+- Ingredient with different serving sizes across meals: Show each meal's calculated amount
+- Very long meal names: Truncate with ellipsis if needed
+- Small screen (mobile): Ensure popup fits within viewport, allow vertical scrolling if needed
+- User drags/scrolls during long press: Cancel timer, do not show popup
+
+**Source Evidence:**
+- User request: "If the user presses and holds an Ingredient for 3 seconds in the shopping list (Mouse down or finger down) all the meals and quantities will show in a pop up"
+- Example: "[] 8 Tbsp of Olive Oil → Pizza: 1 tbsp, Stir Fry: 3 tbsp"
+
+**Status:** In Progress
 
 ---
 

@@ -31,7 +31,8 @@
       "Bash(docker rmi:*)",
       "Bash(docker builder prune:*)",
       "Bash(start chrome http://localhost:3000)",
-      "Bash(start chrome \"http://localhost:8080/oauth2/authorization/google\")"
+      "Bash(start chrome \"http://localhost:8080/oauth2/authorization/google\")",
+      "Bash(./mvnw clean compile:*)"
     ],
     "deny": [],
     "ask": []
