@@ -186,26 +186,26 @@ INSERT INTO ingredients (id, `key`, name, aisle_id) VALUES
 -- =============================================
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
 -- Breakfast
-(1, 'Almond Flour Pancakes', 2, 880, FALSE, TRUE),
-(2, 'Monkey Moo', 2, 1200, FALSE, TRUE),
-(3, 'Warm Oat Porridge with Berries & Nuts', 2, 880, FALSE, TRUE),
-(4, 'Pancakes and Bacon', 2, 900, TRUE, TRUE),
+(1, 'Almond Flour Pancakes', 2, 745, FALSE, TRUE),
+(2, 'Frozen Banana Whip', 2, 930, FALSE, TRUE),
+(3, 'Morning Oats with Honey, Nuts & Berries', 2, 620, FALSE, TRUE),
+(4, 'Buttermilk Pancake Stack with Streaky Bacon', 2, 1680, TRUE, TRUE),
 -- Lunch
-(5, 'Argentine Beef Empanada Bites', 2, 900, TRUE, TRUE),
-(6, 'Chicken & Black Bean Burrito', 2, 440, FALSE, TRUE),
-(7, 'Fish Cakes with Leafy Salad & Sweet Potato', 2, 1220, FALSE, TRUE),
-(8, 'Grilled Chicken Salad', 2, 1210, FALSE, TRUE),
-(9, 'Turkey Lettuce Cups with Feta & Nut Salad', 2, 1280, FALSE, TRUE),
+(5, 'Argentine Beef Empanada Bites', 2, 2575, TRUE, TRUE),
+(6, 'Chicken & Black Bean Burrito', 2, 760, FALSE, TRUE),
+(7, 'Pan-Fried Fish Cakes with Lemon & Roasted Sweet Potato', 2, 920, FALSE, TRUE),
+(8, 'Lemon Chicken Salad with Feta & Chickpeas', 2, 1150, FALSE, TRUE),
+(9, 'Turkish-Style Lettuce Wraps', 2, 1195, FALSE, TRUE),
 -- Dinner
-(10, 'Breaded Chicken with Garlic Veggies & Avocado', 2, 1195, FALSE, TRUE),
-(11, 'Chinese Chickpea & Tofu Curry', 2, 1340, FALSE, TRUE),
-(12, 'Mild Chicken & Chickpea Tikka Masala', 2, 592, FALSE, TRUE),
-(13, 'Spicy Tofu Stir-Fry with Mushrooms & Nuts', 2, 1180, FALSE, TRUE),
-(14, 'Stir-Fried Chicken & Peppers with Tofu & Nuts', 2, 1180, FALSE, TRUE),
-(15, 'Tuscan Turkey Meatballs', 2, 1584, FALSE, TRUE),
-(16, 'Black Pepper Beef Stir Fry', 2, 1000, TRUE, TRUE),
-(17, 'Chicken & Pork Paella', 4, 1200, TRUE, TRUE),
-(18, 'Chorizo Pizza', 2, 1800, TRUE, TRUE);
+(10, 'Crispy Herb Chicken with Roasted Garlic Vegetables', 2, 1495, FALSE, TRUE),
+(11, 'Spiced Banana Curry with Chickpeas & Tofu', 2, 1470, FALSE, TRUE),
+(12, 'Creamy Tikka Masala with Chickpeas', 2, 1205, FALSE, TRUE),
+(13, 'Chili Crisp Tofu with Mushrooms', 2, 960, FALSE, TRUE),
+(14, 'Wok-Tossed Chicken with Cashews & Pak Choi', 2, 1200, FALSE, TRUE),
+(15, 'Tuscan Turkey Meatballs', 2, 1500, FALSE, TRUE),
+(16, 'Black Pepper Beef Stir Fry', 2, 1170, TRUE, TRUE),
+(17, 'Chicken & Pork Paella', 4, 4540, TRUE, TRUE),
+(18, 'Chorizo Pizza', 2, 3820, TRUE, TRUE);
 
 -- =============================================
 -- RECIPE MEALS (using meal_id)

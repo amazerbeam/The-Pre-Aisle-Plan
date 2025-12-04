@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback } from 'react'
 import { useShoppingList } from '../../contexts/ShoppingListContext'
+import { useMealPlan } from '../../contexts/MealPlanContext'
 import { shoppingService } from '../../services/shoppingService'
-import { useDateRange } from '../../contexts/DateRangeContext'
 import IngredientBreakdownPopup from './IngredientBreakdownPopup'
 
 /**
@@ -10,7 +10,7 @@ import IngredientBreakdownPopup from './IngredientBreakdownPopup'
  */
 const ShoppingListItem = ({ item }) => {
   const { toggleItem, isItemChecked } = useShoppingList()
-  const { startDate } = useDateRange()
+  const { startDate } = useMealPlan()
   const checked = isItemChecked(item.ingredientId, item.unit)
 
   // FR-042: Long press state

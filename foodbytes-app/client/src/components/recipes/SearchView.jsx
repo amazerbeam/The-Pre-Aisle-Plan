@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import recipeService from '../../services/recipeService'
 import RecipeCard from './RecipeCard'
+import RecipeEditModal from '../admin/RecipeEditModal'
 import './SearchView.css'
 
 function SearchView() {
@@ -9,6 +10,7 @@ function SearchView() {
   const [recipes, setRecipes] = useState([])
   const [loading, setLoading] = useState(false)
   const [searched, setSearched] = useState(false)
+  const [editingRecipeId, setEditingRecipeId] = useState(null)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -45,6 +47,17 @@ function SearchView() {
 
   const handleBack = () => {
     navigate('/')
+  }
+
+  // FR-033: Handle edit and refresh
+  const handleEdit = (recipeId) => {
+    setEditingRecipeId(recipeId)
+  }
+
+  const handleRecipeSave = () => {
+    if (query.trim().length >= 2) {
+      searchRecipes(query)
+    }
   }
 
   return (
@@ -93,7 +106,7 @@ function SearchView() {
         {!loading && recipes.length > 0 && (
           <div className="recipe-grid">
             {recipes.map((recipe) => (
-              <RecipeCard key={recipe.id} recipe={recipe} />
+              <RecipeCard key={recipe.id} recipe={recipe} onEdit={handleEdit} />
             ))}
           </div>
         )}
@@ -102,6 +115,16 @@ function SearchView() {
           <p className="search-hint">Type at least 2 characters to search...</p>
         )}
       </div>
+
+      {/* FR-033: Recipe Edit Modal */}
+      {editingRecipeId && (
+        <RecipeEditModal
+          recipeId={editingRecipeId}
+          isNew={false}
+          onClose={() => setEditingRecipeId(null)}
+          onSave={handleRecipeSave}
+        />
+      )}
     </div>
   )
 }

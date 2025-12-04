@@ -1,8 +1,10 @@
 import { useState } from 'react'
+import { useAuth } from '../../contexts/AuthContext'
 import DayAssignmentButtons from './DayAssignmentButtons'
 import './RecipeCard.css'
 
-function RecipeCard({ recipe, currentMealType, onSelectVariant }) {
+function RecipeCard({ recipe, currentMealType, onSelectVariant, onEdit }) {
+  const { isAdmin } = useAuth()
   const [showDetails, setShowDetails] = useState(false)
   const [servings, setServings] = useState(recipe.defaultServings || 1)
 
@@ -55,6 +57,16 @@ function RecipeCard({ recipe, currentMealType, onSelectVariant }) {
             <h3 className="recipe-name">{recipe.name}</h3>
           )}
           {recipe.isCheat && <span className="cheat-badge">Cheat</span>}
+          {/* FR-033: Edit button for admins */}
+          {isAdmin && onEdit && (
+            <button
+              className="edit-button"
+              onClick={() => onEdit(recipe.id)}
+              title="Edit recipe"
+            >
+              Edit
+            </button>
+          )}
         </div>
         <div className="recipe-meta">
           <span className="calories">{perServingCalories} cal</span>

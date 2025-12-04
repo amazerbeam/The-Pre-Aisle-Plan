@@ -37,7 +37,10 @@
       "Bash(dir /b \"C:\\Users\\jossd\\Documents\\MyWebSites\\FoodBytes\\foodbytes-app\\foodbytes-api\\Dockerfile\")",
       "Bash(dir /b \"C:\\Users\\jossd\\Documents\\MyWebSites\\FoodBytes\\foodbytes-app\\client\\Dockerfile\")",
       "Bash(dir /b \"C:\\Users\\jossd\\Documents\\MyWebSites\\FoodBytes\\foodbytes-app\\database\\schema.sql\")",
-      "Bash(dir /b \"C:\\Users\\jossd\\Documents\\MyWebSites\\FoodBytes\\foodbytes-app\\database\\seed.sql\")"
+      "Bash(dir /b \"C:\\Users\\jossd\\Documents\\MyWebSites\\FoodBytes\\foodbytes-app\\database\\seed.sql\")",
+      "Bash(./mvnw.cmd compile:*)",
+      "Bash(dir \"C:\\Users\\jossd\\Documents\\MyWebSites\\FoodBytes\\foodbytes-app\" /b)",
+      "Bash(docker logs:*)"
     ],
     "deny": [],
     "ask": []

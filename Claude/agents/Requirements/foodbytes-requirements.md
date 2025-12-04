@@ -36,6 +36,14 @@
 
 | Req # | Description |
 |-------|-------------|
+| FR-033 | Recipe Editing (Admin Only) - Detailed Edit Flow |
+| FR-036 | Fixed Per-Serving Calorie Display (No Scaling) |
+| FR-042 | Ingredient Breakdown Popup (Long Press) |
+| FR-043 | Linked Recipe Variants (Recipe Families) |
+| FR-044 | Ingredient Autocomplete (Admin Recipe Editing) |
+| FR-045 | Unit Autocomplete (Admin Recipe Editing) |
+| FR-046 | Recipe Step Editing (Admin Only) |
+| FR-047 | Create New Recipe (Admin Only) |
 
 ## In Progress - Finish
 
@@ -66,9 +74,6 @@
 | FR-039 | Logo Click Navigates to Recipes |
 | FR-040 | Hide Empty Meal Types in Meal Plan |
 | FR-041 | Random Food Emojis Per Meal Type (Meal Plan View Only) |
-| FR-036 | Fixed Per-Serving Calorie Display (No Scaling) |
-| FR-042 | Ingredient Breakdown Popup (Long Press) |
-| FR-043 | Linked Recipe Variants (Recipe Families) |
 | NFR-016 | Simplified Day Button Styling (No Animations, No Loading Effects) |
 | Database: Users | Store user accounts from Google OAuth |
 | Database: Recipes | Store recipe data (migrated from recipes.js) |
@@ -1200,9 +1205,9 @@ CREATE TABLE recipe_family_members (
 - Admin role stored in database (`is_admin` flag on user record)
 - Admin status assigned directly in database (not self-service)
 - Admin users see "Edit Recipe" button on recipe cards
+- Admin users see "Add Recipe" button in recipe tabs area
 - Admin users can access recipe management functions
 - Non-admin users see recipes as read-only
-- Admin actions are logged for accountability
 
 **Source Evidence:**
 - `is_admin` column in users table
@@ -1214,51 +1219,80 @@ CREATE TABLE recipe_family_members (
 ### FR-033: Recipe Editing (Admin Only)
 **Priority:** High
 
-**Description:** Admin users can create, update, and delete recipes
+**Category:** Admin Features
 
-**User Story:** As an admin, I want to edit recipe details so that I can correct errors, improve instructions, or add new recipes.
+**Description:** Admin users can edit existing recipes through a structured popup interface with separate forms for Steps, Ingredients, and Recipe Info.
+
+**User Story:** As an admin, I want to edit recipe details through an organized interface so that I can easily manage recipe content without confusion.
 
 **Acceptance Criteria:**
-- Edit form allows modifying recipe name
-- Edit form allows modifying default servings and calories
-- Can add, remove, or modify ingredients (name, quantity, unit)
-- Can add, remove, or reorder cooking steps
-- Can toggle cheat meal flag
-- Can toggle recipe visibility (Live/Hidden) - see FR-035
-- Can assign recipe to meal categories
-- Delete recipe performs soft delete (preserves for audit)
-- Changes immediately visible to all users after save (for Live recipes)
-- Only admin users can access edit functionality
+
+**Edit Flow:**
+- Admin clicks "Edit" button on recipe card
+- Popup opens showing 3 option buttons: **[Steps]** **[Ingredients]** **[Recipe Info]**
+- A **[Delete]** button appears separately, styled in **red** and positioned away from the other options
+- Selecting an option opens that specific edit form
+- Each form has a **"← Back"** button at top to return to the 3-option menu
+- **Unsaved changes warning**: If user has unsaved changes and tries to close/navigate away, show "You have unsaved changes. Discard changes?"
+- After saving: Show **success/error message**, success returns to 3-option menu
+
+**Recipe Info Form:**
+- Recipe name (text input, required)
+- Default servings (number input)
+- Calories (number input)
+- Meal types: Breakfast, Lunch, Dinner, Snacks (checkboxes, at least one required)
+- Cheat meal flag (checkbox)
+- Visibility: Live/Hidden toggle (see FR-035)
+- Save button commits all changes
+
+**Ingredients Form (see FR-044 for autocomplete details):**
+- **Sticky "Add Ingredient" button** at top of form (always visible when scrolling)
+- Add ingredient: Choose position (Bottom / Start / After Ingredient X)
+- Each ingredient row: `[↑↓ arrows] [Ingredient autocomplete] [Quantity input] [Unit autocomplete] [Delete X]`
+- Up/down arrows to reorder ingredients (auto-renumbers sort_order)
+- Delete button removes ingredient immediately (no confirmation)
+- **Before save**: If creating new ingredients or units, show confirmation:
+  > "You are creating the following new items:
+  > - **Ingredients:** [list]
+  > - **Units:** [list]
+  >
+  > Continue?"
+- Save button commits all changes
+
+**Steps Form (see FR-046 for details):**
+- **Sticky "Add Step" button** at top of form (always visible when scrolling)
+- Add step: Choose position (Bottom / Start / After Step X)
+- Each step row: `[↑↓ arrows] [Step #] [Editable text area]`
+- Up/down arrows to reorder steps (auto-renumbers)
+- Empty steps removed on save, server renumbers remaining steps
+- Save button commits all changes
+
+**Delete Recipe:**
+- **Hard delete** - recipe permanently removed from database
+- **Confirmation required**: "Are you sure you want to permanently delete [Recipe Name]?"
+- Deletes recipe and all associated data (ingredients, steps, meal assignments)
+
+**DO:**
+- Use popup/modal for all edit forms
+- Validate required fields before save (name, at least 1 meal type, at least 1 ingredient, at least 1 step)
+- Show loading state during save operations
+- Return to 3-option menu on successful save
+- Keep form state until explicitly saved or discarded
+
+**DO NOT:**
+- Do NOT allow saving with empty required fields
+- Do NOT close popup without warning if unsaved changes exist
+- Do NOT allow non-admin users to access any edit functionality
 
 **Source Evidence:**
 - Recipe edit form component
 - Server API: POST/PUT/DELETE recipe endpoints
 - Admin authorization middleware
 
----
-
-### FR-034: Recipe Edit Audit Trail
-**Priority:** High
-
-**Description:** All recipe modifications are logged to an audit table with full change history
-
-**User Story:** As an admin, I want a complete history of recipe changes so that I can track who changed what and when, and review or revert changes if needed.
-
-**Acceptance Criteria:**
-- Every recipe create, update, and delete action is logged
-- Audit record captures: admin user ID, recipe ID, action type, timestamp
-- **Full diff stored**: Complete `old_values` and `new_values` JSON for every field changed
-- Audit log viewable by admin users
-- Can filter audit log by recipe, user, or date range
-- Can view side-by-side comparison of changes
-- Audit records are immutable (append-only, no edits or deletes)
-
-**Source Evidence:**
-- `recipe_audit_log` table
-- Audit trigger on recipe modifications
-- Audit log viewer component
+**Status:** In Progress
 
 ---
+
 
 ### FR-035: Recipe Visibility Toggle (Admin Only)
 **Priority:** High
@@ -1274,7 +1308,6 @@ CREATE TABLE recipe_family_members (
 - Hidden recipes are NOT visible to regular users in any view (browse, search, meal plan assignment)
 - Hidden recipes ARE visible to admin users with a visual indicator (e.g., "Hidden" badge)
 - Admin users see a toggle/button to change visibility status on recipe cards and edit form
-- Visibility changes are logged in the audit trail (old_values/new_values includes is_live)
 - Admin recipe management view can filter by Live/Hidden status
 
 **Source Evidence:**
@@ -1282,6 +1315,226 @@ CREATE TABLE recipe_family_members (
 - Admin-only visibility toggle UI component
 - Recipe query filters by `is_live=1` for non-admin users
 - Admin sees all recipes regardless of `is_live` value
+
+---
+
+### FR-044: Ingredient Autocomplete (Admin Recipe Editing)
+**Priority:** High
+
+**Category:** Admin Features
+
+**Description:** When editing recipe ingredients, an autocomplete field suggests existing ingredients from the database. If the user types something not in the database, they are informed they're creating a new ingredient and must select an aisle.
+
+**User Story:** As an admin, I want ingredient suggestions while editing recipes so that I use consistent ingredient names and avoid creating duplicates.
+
+**Acceptance Criteria:**
+
+**Autocomplete Behavior:**
+- Autocomplete triggers after **2 characters** typed OR on **focus/click**
+- **Contains matching**: Typing "carr" matches "Carrot", "Baby Carrot", etc.
+- Suggestions displayed in dropdown below the input field
+- Maximum 10 suggestions shown at once
+- Selecting a suggestion auto-fills the ingredient name
+- Selecting a suggestion also **pre-selects the ingredient's default unit** (if defined)
+
+**Duplicate Detection:**
+- **70% similarity threshold** triggers a warning (using fuzzy matching / Levenshtein distance)
+- Warning message: "This is similar to existing ingredient '[name]'. Are you sure you want to create a new one?"
+- User can proceed despite warning (not blocked)
+
+**New Ingredient Flow:**
+- If typed text doesn't match any existing ingredient, show message: "Creating new ingredient: [name]"
+- User must select an **aisle** for the new ingredient (dropdown of 17 aisles)
+- **Default unit** is set automatically from the unit selected in the current recipe ingredient row (first usage sets the default)
+- New ingredient created on recipe save (not immediately)
+
+**DO:**
+- Search ingredient names case-insensitively
+- Highlight matching text in suggestions (e.g., bold the "carr" in "Carrot")
+- Show aisle name next to each suggestion for context (e.g., "Carrot (Veg)")
+- Debounce API calls (300ms delay after typing stops)
+- Cache ingredient list on page load for faster suggestions
+
+**DO NOT:**
+- Do NOT create ingredients immediately - wait until recipe save
+- Do NOT allow saving without an aisle for new ingredients
+- Do NOT block creation entirely on 70% match (warn only)
+- Do NOT show duplicate warning for exact matches (that's a different error)
+
+**API Endpoints:**
+- `GET /api/admin/ingredients/search?q=[query]` - Returns matching ingredients
+- `GET /api/admin/ingredients` - Returns all ingredients (for caching)
+- `POST /api/admin/ingredients` - Creates new ingredient (called during recipe save)
+
+**Source Evidence:**
+- User request for autocomplete when editing ingredients
+- NFR-010 centralized ingredient definitions
+- Fuzzy matching logic in `IngredientService`
+
+**Status:** In Progress
+
+---
+
+### FR-045: Unit Autocomplete (Admin Recipe Editing)
+**Priority:** High
+
+**Category:** Admin Features
+
+**Description:** When editing recipe ingredients, an autocomplete field suggests existing units from the database. Same behavior as ingredient autocomplete.
+
+**User Story:** As an admin, I want unit suggestions while editing recipes so that I use consistent unit abbreviations.
+
+**Acceptance Criteria:**
+
+**Autocomplete Behavior:**
+- Autocomplete triggers after **1 character** typed OR on **focus/click**
+- **Contains matching**: Typing "t" matches "tsp", "tbsp", etc.
+- Shows all units on focus (since there are only ~20 units)
+- Selecting a suggestion auto-fills the unit field
+
+**New Unit Flow:**
+- If typed text doesn't match any existing unit, show message: "Creating new unit: [value]"
+- New unit created on recipe save (not immediately)
+- Confirmation shown before save if creating new units
+
+**DO:**
+- Show unit display value in suggestions (e.g., "g", "ml", "tsp")
+- Allow both typing and dropdown selection
+- Pre-select ingredient's default unit when ingredient is selected (if available)
+
+**DO NOT:**
+- Do NOT require minimum characters on focus (show all options)
+- Do NOT create units immediately - wait until recipe save
+
+**API Endpoints:**
+- `GET /api/admin/units` - Returns all units
+- `POST /api/admin/units` - Creates new unit (called during recipe save)
+
+**Source Evidence:**
+- Same UX as ingredient autocomplete
+- NFR-015 centralized unit definitions
+
+**Status:** In Progress
+
+---
+
+### FR-046: Recipe Step Editing (Admin Only)
+**Priority:** High
+
+**Category:** Admin Features
+
+**Description:** Admin users can edit, reorder, add, and remove cooking steps through a dedicated popup form.
+
+**User Story:** As an admin, I want to manage recipe steps in an organized way so that I can easily update cooking instructions.
+
+**Acceptance Criteria:**
+
+**Step Editing Form:**
+- Opens as popup when admin selects "Steps" from edit menu
+- **Sticky "Add Step" button** at top (always visible when scrolling)
+- Each step displays as: `[↑ ↓] [Step #] [Editable text area]`
+- Text area allows multi-line step instructions
+
+**Reordering:**
+- Up/down arrow buttons move step position
+- Step numbers **auto-renumber** after reorder (1, 2, 3, ... always sequential)
+- Visual feedback when step moves (brief highlight)
+
+**Adding Steps:**
+- Click "Add Step" button → popup asks "Add to position?"
+- Options: **"Bottom"** | **"Start"** | **"After Step X"** (dropdown of existing steps)
+- New step appears at selected position with empty text area
+- Focus moves to new step's text area
+
+**Removing Steps:**
+- Clear step text to mark for removal (or explicit delete button)
+- **Immediate removal** from UI (no confirmation dialog)
+- Can undo by not saving (unsaved changes warning applies)
+- On save, server removes empty steps and renumbers remaining
+
+**Save Behavior:**
+- Single "Save" button commits all changes
+- Empty steps automatically removed
+- Server renumbers steps to ensure sequential (1, 2, 3...)
+- Success message shown, returns to edit menu
+
+**DO:**
+- Allow steps to have empty lines within text (multi-paragraph)
+- Preserve whitespace/formatting in step text
+- Show step count in form header (e.g., "Steps (5)")
+
+**DO NOT:**
+- Do NOT allow saving with zero steps (minimum 1 required)
+- Do NOT show confirmation for individual step deletions
+- Do NOT auto-save (only save on explicit Save button)
+
+**Source Evidence:**
+- User request for step editing with reorder capability
+- FR-033 recipe editing requirements
+
+**Status:** In Progress
+
+---
+
+### FR-047: Create New Recipe (Admin Only)
+**Priority:** High
+
+**Category:** Admin Features
+
+**Description:** Admin users can create new recipes through an "Add Recipe" button in the recipe tabs area.
+
+**User Story:** As an admin, I want to create new recipes so that I can expand the recipe library.
+
+**Acceptance Criteria:**
+
+**Add Recipe Button:**
+- "Add Recipe" button visible in **recipe tabs area** (near Breakfast/Lunch/Dinner/Snacks tabs)
+- Button only visible to admin users
+- Clicking opens the recipe edit popup with empty form
+
+**Minimum Requirements:**
+- **Recipe name** is required
+- At least **1 ingredient** required
+- At least **1 step** required
+- At least **1 meal type** must be selected (checkboxes)
+
+**Default Values:**
+- **isLive = false (Hidden)** - new recipes start hidden
+- **Cannot be saved as Live** - must be created as Hidden first
+- Default servings: 2
+- Calories: 0 (must be set by admin)
+- Cheat meal: unchecked
+
+**Create Flow:**
+1. Admin clicks "Add Recipe"
+2. Empty edit popup opens with 3 options: [Steps] [Ingredients] [Recipe Info]
+3. Admin fills in Recipe Info (name required)
+4. Admin adds at least 1 ingredient
+5. Admin adds at least 1 step
+6. Admin saves - recipe created as Hidden
+7. Admin can later edit and set to Live when ready
+
+**Validation:**
+- Show error if saving without required fields
+- Show which fields are missing (e.g., "Recipe name is required")
+- Prevent save until minimum requirements met
+
+**DO:**
+- Pre-fill default servings as 2
+- Show "New Recipe" or similar in popup header
+- Allow admin to cancel without saving (with unsaved changes warning)
+
+**DO NOT:**
+- Do NOT allow new recipes to be saved as Live
+- Do NOT allow saving without name, 1+ ingredient, 1+ step
+- Do NOT show Delete button for new recipes (not yet created)
+
+**Source Evidence:**
+- User request for Add Recipe functionality
+- FR-033 recipe editing requirements
+- FR-035 visibility requirements (new recipes default to Hidden)
+
+**Status:** In Progress
 
 ---
 
@@ -1359,6 +1612,7 @@ CREATE TABLE recipe_family_members (
 | key | VARCHAR(100) | UNIQUE, NOT NULL | Constant key (e.g., "ROLLED_OATS") |
 | name | VARCHAR(255) | UNIQUE, NOT NULL | Display name (e.g., "Rolled oats") |
 | aisle_id | INT UNSIGNED | FK → aisles.id, NOT NULL | Grocery aisle reference |
+| default_unit_id | INT UNSIGNED | FK → units.id, NULLABLE | Default unit for this ingredient (set from first usage) |
 
 **Table: `recipe_ingredients`** (junction table)
 
@@ -1394,7 +1648,7 @@ CREATE TABLE recipe_family_members (
 **Measurable Criteria:**
 - Frontend remains vanilla HTML/CSS/JS (no framework required)
 - Backend: Node.js + Express REST API
-- Database: MySQL for users, meal plans, recipes, and audit logs
+- Database: MySQL for users, meal plans, and recipes
 - Recipe data may remain in recipes.js initially (migration optional)
 - API endpoints secured with JWT authentication
 - Guest browsing requires no authentication
@@ -1559,7 +1813,6 @@ CREATE TABLE recipe_family_members (
 **Measurable Criteria:**
 - Meal plans stored in MySQL database (authenticated users)
 - Recipe data stored in MySQL database (admin-managed)
-- Audit logs stored in MySQL database
 - localStorage used only for: JWT tokens, shopping list checkbox state, UI preferences
 - Application degrades gracefully if localStorage unavailable
 - Server database is single source of truth for user data
@@ -1670,34 +1923,16 @@ CREATE TABLE recipe_family_members (
 
 ---
 
-### NFR-013: Audit Data Integrity
-**Category:** Security
-
-**Description:** Recipe audit logs maintain complete, tamper-proof history with full change diffs
-
-**Measurable Criteria:**
-- Audit table uses auto-increment ID for ordering
-- Timestamps stored in UTC timezone
-- Foreign keys ensure referential integrity to users and recipes
-- No DELETE or UPDATE operations permitted on audit table (append-only)
-- `old_values` and `new_values` columns store complete JSON snapshots
-- Audit records preserved even if related recipe is deleted (soft delete)
-- Regular backup strategy for audit data
-
-**Source Evidence:** `recipe_audit_log` table schema; Database constraints; Backup procedures
-
----
 
 ### NFR-014: Data Retention Policy
 **Category:** Reliability
 
-**Description:** Meal plan history is retained for rolling 6 months; audit logs retained indefinitely
+**Description:** Meal plan history is retained for rolling 6 months
 
 **Measurable Criteria:**
 - Scheduled job archives meal plan entries older than 6 months
 - Archived data moved to archive table or deleted (configurable)
 - Users can export their data before archival (optional)
-- Audit logs are exempt from retention policy (kept indefinitely)
 - Recipe data never auto-archived (admin-managed lifecycle)
 
 **Source Evidence:** Scheduled archival job; Archive table schema; Data retention configuration
@@ -1869,31 +2104,8 @@ A registered user account (created via OAuth)
 
 **Storage:** MySQL `users` table
 
-**Relationships:** Has many MealPlanEntry (via user_id), Has many RecipeAuditLog (via user_id)
+**Relationships:** Has many MealPlanEntry (via user_id)
 
 ---
-
-## Entity: RecipeAuditLog
-
-Immutable audit record of recipe modifications (full diff)
-
-| Attribute | Type | Constraints | Description |
-|-----------|------|-------------|-------------|
-| id | integer | PK, auto-increment | Unique audit record identifier |
-| recipe_id | integer | FK → Recipe, required | Recipe that was modified |
-| user_id | integer | FK → User, required | Admin user who made the change |
-| action | string | required, one of: CREATE/UPDATE/DELETE | Type of modification |
-| old_values | JSON | nullable | Complete snapshot of previous values (for UPDATE/DELETE) |
-| new_values | JSON | nullable | Complete snapshot of new values (for CREATE/UPDATE) |
-| timestamp | datetime | required, UTC | When the modification occurred |
-
-**Storage:** MySQL `recipe_audit_log` table
-
-**Relationships:** References Recipe (via recipe_id), References User (via user_id)
-
-**Constraints:**
-- Append-only table (no UPDATE or DELETE operations permitted)
-- Retained indefinitely (exempt from data retention policy)
-- `old_values` and `new_values` contain full JSON snapshots of all recipe fields
 
 ## All Requirements - Finish

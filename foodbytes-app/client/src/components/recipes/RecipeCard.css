@@ -34,6 +34,26 @@
   flex-shrink: 0;
 }
 
+/* FR-033: Admin Edit Button */
+.edit-button {
+  background: var(--bg-secondary);
+  color: var(--brand-primary);
+  border: 1px solid var(--border-color);
+  font-size: 0.75rem;
+  padding: 2px 10px;
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.edit-button:hover {
+  background: var(--brand-primary);
+  color: white;
+  border-color: var(--brand-primary);
+}
+
 .recipe-meta {
   color: var(--text-secondary);
   font-size: 0.875rem;
