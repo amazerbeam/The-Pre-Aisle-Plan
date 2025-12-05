@@ -58,13 +58,19 @@ function MealPlanEntry({ entry }) {
         </button>
       </div>
 
-      {/* FR-014: Recipe View Modal */}
+      {/* FR-013/FR-014: Recipe View Modal with variant support */}
       {showRecipeView && entry.recipe && (
         <RecipeViewModal
           recipe={entry.recipe}
           servings={entry.servings}
           caloriesPerServing={entry.caloriesPerServing}
           onClose={() => setShowRecipeView(false)}
+          variants={entry.recipe.variants}
+          onSelectVariant={(variantId, servings) => {
+            // FR-013: In meal plan view, variant selection updates display only
+            // (recipe swap would require updating the meal plan entry)
+            console.log('Variant selected in modal:', variantId, servings)
+          }}
         />
       )}
     </>

@@ -43,7 +43,17 @@
       "Bash(docker logs:*)",
       "Bash(docker ps:*)",
       "Bash(docker stop:*)",
-      "Bash(docker rm:*)"
+      "Bash(docker rm:*)",
+      "Bash(del \"C:\\Users\\jossd\\Documents\\MyWebSites\\FoodBytes\\.env\")",
+      "Bash(netstat:*)",
+      "Bash(npm run build:*)",
+      "Bash(npx vite build)",
+      "Bash(npm install)",
+      "Bash(taskkill /PID 24300 /F)",
+      "Bash(taskkill:*)",
+      "Bash(npm run dev:*)",
+      "Bash(dir:*)",
+      "Bash(ping:*)"
     ],
     "deny": [],
     "ask": []

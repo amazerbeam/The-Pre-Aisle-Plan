@@ -14,7 +14,14 @@ function RecipeCard({ recipe, currentMealType, onSelectVariant, onEdit }) {
   const [showCalorieDropdown, setShowCalorieDropdown] = useState(false)
   // Fullscreen recipe view state
   const [showFullscreen, setShowFullscreen] = useState(false)
+  // FR-013: Track the recipe to display in fullscreen modal (may change on variant selection)
+  const [modalRecipe, setModalRecipe] = useState(recipe)
   const dropdownRef = useRef(null)
+
+  // FR-013: Sync modal recipe when recipe prop changes
+  useEffect(() => {
+    setModalRecipe(recipe)
+  }, [recipe])
 
   // FR-043: Close dropdown when clicking outside
   useEffect(() => {
@@ -61,6 +68,19 @@ function RecipeCard({ recipe, currentMealType, onSelectVariant, onEdit }) {
     if (!hasVariants) return perServingCalories
     const currentVariant = sortedVariants.find(v => v.recipeId === selectedVariantId)
     return currentVariant ? currentVariant.caloriesPerServing : perServingCalories
+  }
+
+  // FR-013: Handle variant selection in fullscreen modal (update content in-place)
+  const handleModalVariantSelect = async (variantId, currentServings) => {
+    // For now, we update the calories display immediately via the variants array
+    // The full recipe data (ingredients, steps) would need to be fetched from API
+    // if the variant has different ingredients than the base recipe
+    setSelectedVariantId(variantId)
+
+    // If the parent has a variant selection handler, call it to potentially swap recipes
+    if (onSelectVariant && variantId !== recipe.id) {
+      onSelectVariant(variantId, currentServings)
+    }
   }
 
   return (
@@ -184,13 +204,15 @@ function RecipeCard({ recipe, currentMealType, onSelectVariant, onEdit }) {
         </div>
       )}
 
-      {/* Fullscreen Recipe View Modal */}
+      {/* FR-013: Fullscreen Recipe View Modal with variant support */}
       {showFullscreen && (
         <RecipeViewModal
-          recipe={recipe}
+          recipe={modalRecipe}
           servings={servings}
           caloriesPerServing={getCurrentVariantCalories()}
           onClose={() => setShowFullscreen(false)}
+          variants={recipe.variants}
+          onSelectVariant={handleModalVariantSelect}
         />
       )}
     </article>

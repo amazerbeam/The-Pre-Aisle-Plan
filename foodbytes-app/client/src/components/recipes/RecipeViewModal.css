@@ -1,4 +1,8 @@
-/* FR-014: RecipeViewModal - Fullscreen recipe view styles */
+/* FR-013: RecipeViewModal - Fullscreen recipe view styles
+ * - 99vh height with 0.5vh even margins top/bottom
+ * - White text (#fff) on dark background
+ * - Variant dropdown styled same as RecipeCard
+ */
 
 .recipe-view-overlay {
   position: fixed;
@@ -11,7 +15,8 @@
   justify-content: center;
   align-items: center;
   z-index: 1000;
-  padding: var(--spacing-md);
+  /* FR-013: 0.5vh margin evenly distributed top and bottom */
+  padding: 0.5vh 0;
   animation: fadeIn 0.2s ease;
 }
 
@@ -26,7 +31,8 @@
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   max-width: 600px;
   width: 100%;
-  max-height: 90vh;
+  /* FR-013: 99vh max height with even margins */
+  max-height: 99vh;
   display: flex;
   flex-direction: column;
   animation: slideUp 0.3s ease;
@@ -51,7 +57,8 @@
   align-items: flex-start;
   padding: var(--spacing-lg);
   background: var(--brand-primary);
-  color: white;
+  /* FR-013: Explicit white text color */
+  color: #ffffff;
   flex-shrink: 0;
 }
 
@@ -64,12 +71,15 @@
   font-size: 1.25rem;
   font-weight: 600;
   line-height: 1.3;
+  /* FR-013: Explicit white text */
+  color: #ffffff;
 }
 
 .recipe-meta {
   display: flex;
   flex-wrap: wrap;
   gap: var(--spacing-sm);
+  align-items: center;
 }
 
 .calories-badge,
@@ -80,6 +90,8 @@
   border-radius: 20px;
   font-size: 0.8rem;
   font-weight: 500;
+  /* FR-013: Explicit white text for all badges */
+  color: #ffffff;
 }
 
 .cheat-badge {
@@ -87,10 +99,97 @@
   color: #333;
 }
 
+/* FR-013: Variant Dropdown Styles (same as RecipeCard) */
+.calorie-dropdown-container {
+  position: relative;
+  display: inline-block;
+}
+
+.calorie-dropdown-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  padding: 4px 10px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 500;
+  /* FR-013: Explicit white text */
+  color: #ffffff;
+  transition: background 0.2s ease;
+}
+
+.calorie-dropdown-trigger:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.calories-text {
+  /* FR-013: Explicit white text for calories */
+  color: #ffffff;
+}
+
+.dropdown-chevron {
+  font-size: 0.65rem;
+  /* FR-013: Explicit white chevron */
+  color: #ffffff;
+  transition: transform 0.2s ease;
+}
+
+.calorie-dropdown-trigger[aria-expanded="true"] .dropdown-chevron {
+  transform: rotate(180deg);
+}
+
+.calorie-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  min-width: 160px;
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
+  list-style: none;
+  padding: 4px 0;
+  margin: 0;
+  z-index: 1001;
+}
+
+.calorie-dropdown-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  /* Dropdown items have dark text on white background */
+  color: var(--text-primary);
+}
+
+.calorie-dropdown-item:hover {
+  background-color: rgba(74, 63, 128, 0.08);
+}
+
+.calorie-dropdown-item.selected {
+  background-color: rgba(74, 63, 128, 0.15);
+}
+
+.variant-name {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.variant-calories {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
 .close-button {
   background: rgba(255, 255, 255, 0.2);
   border: none;
-  color: white;
+  /* FR-013: Explicit white text */
+  color: #ffffff;
   font-size: 1.5rem;
   width: 36px;
   height: 36px;
@@ -199,12 +298,14 @@
 /* Mobile responsive */
 @media (max-width: 480px) {
   .recipe-view-overlay {
-    padding: 0;
+    /* FR-013: Even margins on mobile too */
+    padding: 0.5vh 0;
     align-items: flex-end;
   }
 
   .recipe-view-modal {
-    max-height: 95vh;
+    /* FR-013: 99vh on mobile as well */
+    max-height: 99vh;
     border-radius: var(--radius-lg) var(--radius-lg) 0 0;
   }
 
@@ -218,5 +319,9 @@
 
   .recipe-view-content {
     padding: var(--spacing-md);
+  }
+
+  .calorie-dropdown-menu {
+    min-width: 140px;
   }
 }

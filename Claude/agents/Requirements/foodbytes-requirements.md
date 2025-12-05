@@ -36,6 +36,7 @@
 
 | Req # | Description |
 |-------|-------------|
+| FR-013 | Fullscreen Recipe View (Popup Modal with Variant Support) |
 | FR-033 | Recipe Editing (Admin Only) - Detailed Edit Flow |
 | FR-036 | Fixed Per-Serving Calorie Display (No Scaling) |
 | FR-042 | Ingredient Breakdown Popup (Long Press) |
@@ -76,6 +77,7 @@
 | FR-040 | Hide Empty Meal Types in Meal Plan |
 | FR-041 | Random Food Emojis Per Meal Type (Meal Plan View Only) |
 | NFR-016 | Simplified Day Button Styling (No Animations, No Loading Effects) |
+| FR-049 | Expand Recipe to Fullscreen (Recipe Cards) |
 | Database: Users | Store user accounts from Google OAuth |
 | Database: Recipes | Store recipe data (migrated from recipes.js) |
 
@@ -330,25 +332,68 @@
 
 ---
 
-### FR-013: Fullscreen Recipe View
+### FR-013: Fullscreen Recipe View (Popup Modal with Variant Support)
 **Priority:** Medium
 
-**Description:** Users can view a recipe in fullscreen mode for distraction-free cooking
+**Category:** Recipe Management
 
-**User Story:** As a user, I want to view a recipe in fullscreen mode so that I can focus on cooking without UI distractions.
+**Description:** Users can view a recipe in a fullscreen popup modal for distraction-free cooking. The popup displays recipe details with white text on a dark background, supports recipe family variant switching without closing, and uses 99% viewport height with even margins.
+
+**User Story:** As a user, I want to view a recipe in fullscreen mode so that I can focus on cooking without UI distractions, and switch between recipe variants without losing my place.
 
 **Acceptance Criteria:**
-- Maximize button opens fullscreen recipe overlay
-- Fullscreen view displays recipe title, servings info, and per-serving calories (see FR-036)
-- Ingredients list shows scaled quantities
-- Cooking steps are numbered and clearly displayed
+- Maximize/expand button opens fullscreen recipe popup modal
+- Popup uses dark/brand background with **white text (#ffffff)** for all content
+- Popup displays:
+  - Recipe name (with variant dropdown if recipe has variants - see FR-043)
+  - Calories per serving in white text (see FR-036)
+  - Servings info
+  - Ingredients list with scaled quantities
+  - Numbered cooking steps
+- **Variant dropdown** appears next to recipe name IF recipe belongs to a recipe family (has linked variants)
+- Variant dropdown styled **identically to RecipeCard.jsx dropdown**
+- Selecting a variant updates popup content **in-place without closing the popup**
 - Close button (X) exits fullscreen mode
+- Popup closes on: X button click, backdrop click, or ESC key press
 - Screen wake lock activates in fullscreen mode (if supported)
+- Popup height is **max-height: 99vh** with **0.5vh margin evenly distributed top and bottom**
+- Content scrolls within the fixed-height popup container
+
+**DO:**
+- Use white text color (#ffffff) for ALL text in the popup (recipe name, cal/serving, ingredients, steps)
+- If recipe has variants (belongs to recipe family per FR-043), display the variant dropdown in the popup header
+- Style the variant dropdown identically to the dropdown in `RecipeCard.jsx`
+- Keep popup open when user selects a different variant - only update the recipe content in-place
+- Set popup max-height: 99vh (99% of viewport height)
+- Apply 0.5vh margin evenly to top and bottom (tiny visible margins on both sides)
+- Center popup both horizontally and vertically on the viewport
+- Allow popup content to scroll if it exceeds the fixed height
+- Reuse `RecipeViewModal` component for consistency
+
+**DO NOT:**
+- Do NOT use dark/black text on the dark overlay background - text must be white
+- Do NOT omit the variant dropdown for recipes that belong to a recipe family
+- Do NOT close the popup when user changes variant - update content in-place only
+- Do NOT use height: 100vh or 100% - must be 99vh max with visible margins
+- Do NOT use uneven margins (e.g., more margin at bottom than top)
+- Do NOT extend popup beyond viewport edges
+- Do NOT style variant dropdown differently from RecipeCard dropdown
+
+**Cross-References:**
+- FR-043: Linked Recipe Variants (variant dropdown behavior and styling)
+- FR-036: Fixed Per-Serving Calorie Display (cal/serving calculation)
+- FR-049: Expand Recipe to Fullscreen (expand button on recipe cards)
 
 **Source Evidence:**
 - `openFullscreen(entry)`
 - `closeFullscreen()`
-- `#fullscreen-recipe` element
+- `RecipeViewModal.jsx` component
+- User feedback: "cal/serving text color should be white"
+- User feedback: "cal with family recipe should have the dropdown same as Recipe card view"
+- User feedback: "When variant recipe is changed keep popup open"
+- User feedback: "popup should be 99% of the screen height, need max height. Leave tiny margin evenly top and bottom"
+
+**Status:** In Progress
 
 ---
 
@@ -1287,6 +1332,50 @@ Each feature fades in, pauses 1.5 seconds, then fades out before the next:
 - User insight: "Diet is learned habits, if you don't know how to cook how are you suppose to figure this out. I have to build a website to get an understanding of this."
 
 **Status:** Backlog
+
+---
+
+### FR-049: Expand Recipe to Fullscreen (Recipe Cards)
+**Priority:** Medium
+
+**Category:** Recipe Management / UI
+
+**Description:** Each recipe card in the Recipes view displays an expand icon in the top-right corner. Clicking this icon opens the recipe in a fullscreen modal view, allowing users to see the full recipe details without scrolling within the card.
+
+**User Story:** As a user, I want to expand a recipe to fullscreen so that I can easily read all the details while cooking.
+
+**Acceptance Criteria:**
+- Every recipe card displays an expand icon (⤢) in the **top-right corner**
+- Icon uses a subtle style that doesn't distract from the recipe content
+- Icon has a hover effect (color change to brand primary)
+- Clicking the icon opens a **fullscreen modal** with:
+  - Recipe name
+  - Calories per serving
+  - Ingredients list (scaled to current serving selection)
+  - Cooking instructions/steps
+- Modal can be closed via:
+  - Close button (X) in top-right corner
+  - Clicking the backdrop overlay
+  - Pressing the Escape key
+- Modal reuses the same `RecipeViewModal` component used for meal plan entries (FR-014)
+
+**DO:**
+- Position the expand icon absolutely in the top-right corner of the card
+- Use an SVG icon for crisp rendering at any size
+- Pass the current serving count to the modal for proper ingredient scaling
+- Include proper ARIA labels for accessibility
+
+**DO NOT:**
+- Do NOT make the icon too large (should be subtle)
+- Do NOT block other card interactions (Edit button, calorie dropdown)
+- Do NOT create a separate modal component (reuse RecipeViewModal)
+
+**Source Evidence:**
+- User request: "the recipe cards on the Recipe viewer should on the top right corner of every recipe have a [ ] icon, that will expand the recipe into full screen"
+- RecipeCard.jsx: expand-button, showFullscreen state
+- RecipeViewModal.jsx: reused from FR-014 implementation
+
+**Status:** Complete
 
 ---
 
