@@ -5,7 +5,7 @@ import { useAuth } from '../../contexts/AuthContext'
 import './DayAssignmentButtons.css'
 
 /**
- * DayAssignmentButtons - FR-014, FR-015, FR-037, NFR-016, FR-041
+ * DayAssignmentButtons - FR-014, FR-015, FR-037, NFR-016, FR-041, FR-043
  * Day-of-week buttons for recipe assignment with swap behavior
  * Hidden for guest users (as per user preference)
  *
@@ -15,8 +15,11 @@ import './DayAssignmentButtons.css'
  * - already-selected: ANOTHER recipe is assigned (greyed out, clickable for swap)
  *
  * FR-041: Buttons display food emojis themed by meal type
+ * FR-043: selectedRecipeId prop allows assigning a variant instead of base recipe
  */
-function DayAssignmentButtons({ recipe, servings, currentMealType }) {
+function DayAssignmentButtons({ recipe, servings, currentMealType, selectedRecipeId }) {
+  // FR-043: Use selectedRecipeId if provided (for variants), otherwise use recipe.id
+  const recipeIdToAssign = selectedRecipeId || recipe.id
   const { isAuthenticated } = useAuth()
   const { weekDays, weekPlan, assignRecipe, isRecipeAssigned } = useMealPlan()
   const [loading, setLoading] = useState(null) // Track which day is loading
@@ -42,12 +45,13 @@ function DayAssignmentButtons({ recipe, servings, currentMealType }) {
    * - 'selected': This recipe is assigned to this day/meal
    * - 'already-selected': Another recipe is assigned (greyed out)
    * - 'unselected': Slot is available
+   * FR-043: Check both base recipe and selected variant
    */
   const getButtonClass = (dateStr) => {
     const mealType = currentMealType?.toLowerCase()
 
-    // Check if THIS recipe is assigned
-    if (isRecipeAssigned(recipe.id, dateStr, mealType)) {
+    // FR-043: Check if THIS recipe (or selected variant) is assigned
+    if (isRecipeAssigned(recipeIdToAssign, dateStr, mealType)) {
       return 'selected'
     }
 
@@ -70,6 +74,7 @@ function DayAssignmentButtons({ recipe, servings, currentMealType }) {
    * - If unselected: Assign this recipe
    * - If selected: Remove this recipe (toggle)
    * - If already-selected: Replace with this recipe (swap - no confirmation)
+   * FR-043: Uses recipeIdToAssign (selected variant or base recipe)
    */
   const handleDayClick = async (dateStr) => {
     if (loading) return // Prevent multiple clicks
@@ -77,7 +82,8 @@ function DayAssignmentButtons({ recipe, servings, currentMealType }) {
     setLoading(dateStr)
     try {
       const mealId = getMealId(currentMealType)
-      await assignRecipe(recipe.id, dateStr, mealId, servings)
+      // FR-043: Use recipeIdToAssign to assign selected variant
+      await assignRecipe(recipeIdToAssign, dateStr, mealId, servings)
     } catch (error) {
       console.error('Failed to assign recipe:', error)
     } finally {

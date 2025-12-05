@@ -14,7 +14,8 @@ import lombok.AllArgsConstructor;
 public class RecipeVariantDTO {
     private Long recipeId;
     private String recipeName;
-    private String variantLabel;    // e.g., "Vegetarian", "Vegan", "Low-Carb"
+    private String variantLabel;    // e.g., "Light", "Standard", "Full"
     private Boolean isDefault;
     private Integer displayOrder;
+    private Integer caloriesPerServing; // FR-043: Calories per serving for dropdown display
 }

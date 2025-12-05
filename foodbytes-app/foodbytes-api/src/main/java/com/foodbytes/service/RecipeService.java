@@ -42,21 +42,30 @@ public class RecipeService {
 
     @Transactional(readOnly = true)
     public List<RecipeDTO> getAllRecipes() {
+        // FR-043: Filter out non-default family members (only show defaults in list)
+        Set<Long> hiddenRecipeIds = new HashSet<>(recipeFamilyMemberRepository.findNonDefaultRecipeIds());
         return recipeRepository.findAllLiveRecipes().stream()
+                .filter(recipe -> !hiddenRecipeIds.contains(recipe.getId()))
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
     public List<RecipeDTO> getRecipesByMealType(String mealType) {
+        // FR-043: Filter out non-default family members (only show defaults in list)
+        Set<Long> hiddenRecipeIds = new HashSet<>(recipeFamilyMemberRepository.findNonDefaultRecipeIds());
         return recipeRepository.findByMealKey(mealType.toLowerCase()).stream()
+                .filter(recipe -> !hiddenRecipeIds.contains(recipe.getId()))
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
     public List<RecipeDTO> searchRecipes(String query) {
+        // FR-043: Filter out non-default family members (only show defaults in list)
+        Set<Long> hiddenRecipeIds = new HashSet<>(recipeFamilyMemberRepository.findNonDefaultRecipeIds());
         return recipeRepository.searchByName(query).stream()
+                .filter(recipe -> !hiddenRecipeIds.contains(recipe.getId()))
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
@@ -115,13 +124,21 @@ public class RecipeService {
             // Only include variants if 2+ members
             if (allMembers.size() >= 2) {
                 dto.setVariants(allMembers.stream()
-                    .map(m -> new RecipeVariantDTO(
-                        m.getRecipe().getId(),
-                        m.getRecipe().getName(),
-                        m.getVariantLabel(),
-                        m.getIsDefault(),
-                        m.getDisplayOrder()
-                    ))
+                    .map(m -> {
+                        Recipe variantRecipe = m.getRecipe();
+                        // FR-043: Calculate per-serving calories for dropdown display
+                        Integer caloriesPerServing = variantRecipe.getDefaultServings() > 0
+                            ? variantRecipe.getCalories() / variantRecipe.getDefaultServings()
+                            : variantRecipe.getCalories();
+                        return new RecipeVariantDTO(
+                            variantRecipe.getId(),
+                            variantRecipe.getName(),
+                            m.getVariantLabel(),
+                            m.getIsDefault(),
+                            m.getDisplayOrder(),
+                            caloriesPerServing
+                        );
+                    })
                     .collect(Collectors.toList()));
             } else {
                 dto.setVariants(new ArrayList<>());

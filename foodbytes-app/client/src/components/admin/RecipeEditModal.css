@@ -27,6 +27,13 @@
   animation: slideUp 0.3s ease;
 }
 
+/* FR-046 FIX: Wider modal on desktop for better step editing UX */
+@media (min-width: 800px) {
+  .recipe-edit-modal {
+    max-width: 750px;
+  }
+}
+
 /* Header */
 .modal-header {
   display: flex;

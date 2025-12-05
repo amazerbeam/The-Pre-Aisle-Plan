@@ -44,6 +44,7 @@
 | FR-045 | Unit Autocomplete (Admin Recipe Editing) |
 | FR-046 | Recipe Step Editing (Admin Only) |
 | FR-047 | Create New Recipe (Admin Only) |
+| FR-048 | Landing Page Animation (Guest Homepage) |
 
 ## In Progress - Finish
 
@@ -444,6 +445,10 @@ CREATE TABLE recipe_family_members (
 - Do NOT hide non-default recipes from search/browse (all variants are discoverable)
 - Do NOT merge recipe IDs (each variant is a distinct recipe with its own ID, ingredients, steps)
 - Do NOT require users to set a variant when assigning to meal plan (default is fine)
+- Do NOT display recipe names in dropdown - show only "variantLabel — XXX cal" format (e.g., "Light — 550 cal")
+- Do NOT pass base recipe ID to meal plan after variant selection - always use the SELECTED variant's recipe ID
+- Do NOT show base recipe's calories after variant selection - calories must update to show variant's per-serving calories
+- Do NOT open base recipe in Edit mode after variant selection - Edit button must pass the selected variant's ID
 
 **UI Placement:**
 - **Recipe Card Header:** Recipe name followed by dropdown (if variants exist)
@@ -589,11 +594,26 @@ CREATE TABLE recipe_family_members (
 - Visual distinction between past, current, and future dates
 - Changing the "From" date updates the meal plan view to show new 7-day window
 - Wake lock activates when calendar is visible (if supported)
+- **Clicking on a recipe entry opens a fullscreen modal showing full recipe details** (ingredients, steps, calories per serving)
+
+**DO:**
+- Show cursor: pointer on meal plan recipe entries to indicate they are clickable
+- Open fullscreen modal overlay when clicking on recipe entry (not the remove button)
+- Display recipe name, calories per serving, servings count in modal header
+- Show scaled ingredients based on entry's servings count
+- Show all recipe steps/instructions
+- Close modal on ESC key, backdrop click, or close button
+
+**DO NOT:**
+- Do NOT open modal when clicking the remove (×) button - that should only remove the entry
+- Do NOT require additional API call to view recipe - use data already in the meal plan entry
+- Do NOT show edit functionality in the view modal - this is read-only
 
 **Source Evidence:**
 - `renderCalendar()`
 - `#calendar-view` element
 - Server API: GET meal plan with start date (returns 7-day window)
+- RecipeViewModal component: fullscreen recipe view opened from MealPlanEntry
 
 ---
 
@@ -958,6 +978,13 @@ CREATE TABLE recipe_family_members (
 - Do NOT block scrolling when popup is open (popup should scroll with list)
 - Do NOT make popup modal (user should be able to dismiss by clicking anywhere)
 - Do NOT show popup for checked (purchased) items - only unchecked items need breakdown
+- Do NOT use conflicting positioning (e.g., inline absolute positioning WITH flex centering on overlay)
+- Do NOT make popup too small on desktop - use min-width: 320px, max-width: 500px
+
+**Desktop Layout:**
+- Center popup using overlay's `display: flex; align-items: center; justify-content: center;`
+- Do NOT add inline `style` positioning to popup element - let CSS handle centering
+- Use min-width: 320px, max-width: 500px, width: 90% for responsive sizing
 
 **Edge Cases:**
 - Ingredient used in multiple meals: Show all meals in list
@@ -1148,6 +1175,118 @@ CREATE TABLE recipe_family_members (
 **Source Evidence:** User request - "Clicking on FoodBytes Logo should bring user back to Recipes too"
 
 **Status:** Completed
+
+---
+
+### FR-048: Landing Page Animation (Guest Homepage)
+**Priority:** High
+
+**Category:** Navigation / Onboarding
+
+**Description:** An animated landing page sequence that introduces guests to FoodBytes, highlighting the problem with modern nutrition education and presenting FoodBytes as the solution. The animation plays automatically when a guest visits the homepage.
+
+**User Story:** As a new visitor, I want to understand why FoodBytes exists and what it can do for me so that I'm motivated to sign up or explore the app.
+
+**Acceptance Criteria:**
+
+**Animation Sequence:**
+
+**Phase 1: The Problem (Depressing Tone)**
+1. Fade in: **"Most people have no idea what they're eating."**
+2. Pause 2 seconds, then fade in below: **"And it's not their fault."**
+3. Pause 2 seconds, fade both out
+
+**Phase 2: The Problems List (Depressing Tone)**
+Each problem fades in, pauses 1.5 seconds, then fades out before the next:
+- "Schools never taught us nutrition"
+- "Portion sizes are wildly distorted"
+- "Food labels are designed to confuse"
+- "Cooking skills weren't passed down"
+- "Nutrition advice changes every year"
+- "Tracking calories feels like a full-time job"
+
+Final problem statement fades in:
+- **"You're not lazy. You're not stupid. The system is broken."**
+- Pause 2 seconds, fade out
+
+**Phase 3: The Solution (Uplifting/Happy Tone)**
+1. Fade in: **"The Solution"** (larger, brighter styling)
+2. Pause 1 second, fade in below: **"Join FoodBytes"** (brand styling)
+3. Pause 2 seconds, fade both out
+
+**Phase 4: Features (Uplifting Tone)**
+Each feature fades in, pauses 1.5 seconds, then fades out before the next:
+- "Curated recipes with real calorie and macro data"
+- "Meal planning that hits your targets automatically"
+- "Shopping lists organized by aisle"
+- "No calorie counting — just pick meals and eat"
+- "Learn to cook through simple, repeatable recipes"
+- "Build habits that actually stick"
+
+**Phase 5: Final Summary**
+1. All benefits appear as bullet point list (fade in together):
+   - ✓ Curated recipes with real nutrition data
+   - ✓ Automatic meal planning
+   - ✓ Smart shopping lists by aisle
+   - ✓ No calorie counting required
+   - ✓ Simple, repeatable recipes
+   - ✓ Build lasting habits
+2. Below the list, fade in tagline: **"Stop guessing. Start knowing."**
+3. Below tagline, fade in two buttons side by side:
+   - **[Log In]** (primary button, brand color)
+   - **[Continue as Guest]** (secondary button, outline style)
+
+**Visual Design:**
+- Dark/muted background for Phase 1-2 (depressing tone)
+- Transition to lighter/brighter background for Phase 3-5 (happy tone)
+- Text centered on screen
+- Large, readable typography (minimum 24px for body, 36px+ for headlines)
+- Smooth fade transitions (300-500ms duration)
+- Brand colors for "FoodBytes" and CTA buttons
+
+**User Controls:**
+- **Skip button** in corner: "Skip intro →" (takes user directly to Phase 5 summary)
+- Animation does NOT replay on subsequent visits (store flag in localStorage)
+- Returning guests see Phase 5 summary immediately (or go straight to recipes if logged in)
+
+**DO:**
+- Use CSS animations/transitions for smooth fades
+- Center content vertically and horizontally
+- Make text large and readable on mobile
+- Store `hasSeenIntro` flag in localStorage after first view
+- Allow skipping at any point
+- Ensure animation is accessible (respects `prefers-reduced-motion`)
+
+**DO NOT:**
+- Do NOT auto-play sound or music
+- Do NOT make animation unskippable
+- Do NOT replay animation on every visit
+- Do NOT make phases too fast (users need time to read)
+- Do NOT block the entire app during animation (skip should always work)
+- Do NOT use heavy JavaScript animation libraries (CSS is sufficient)
+
+**Timing Summary:**
+| Phase | Duration |
+|-------|----------|
+| Phase 1 (Hook) | ~6 seconds |
+| Phase 2 (Problems) | ~15 seconds (6 items × 2.5s each) |
+| Phase 3 (Solution intro) | ~5 seconds |
+| Phase 4 (Features) | ~15 seconds (6 items × 2.5s each) |
+| Phase 5 (Summary + CTA) | Stays on screen |
+| **Total** | ~41 seconds (skippable) |
+
+**Accessibility:**
+- If `prefers-reduced-motion` is enabled, skip directly to Phase 5
+- All text must have sufficient contrast ratio (4.5:1 minimum)
+- Skip button must be keyboard accessible
+- CTA buttons must be focusable and have clear focus states
+
+**Source Evidence:**
+- User request: "I'd like to see 'Most people have no idea what they're eating. And it's not their fault' then a list of the problems. Then join food bytes and the solutions"
+- Conversation about the difficulty of understanding nutrition without proper education
+- User insight: "Diet is learned habits, if you don't know how to cook how are you suppose to figure this out. I have to build a website to get an understanding of this."
+
+**Status:** Backlog
 
 ---
 
@@ -1476,11 +1615,20 @@ CREATE TABLE recipe_family_members (
 - Allow steps to have empty lines within text (multi-paragraph)
 - Preserve whitespace/formatting in step text
 - Show step count in form header (e.g., "Steps (5)")
+- **Place Save/Cancel buttons in a sticky footer** - always visible while scrolling
+- Use min-width: 700px on desktop for better step editing UX
 
 **DO NOT:**
 - Do NOT allow saving with zero steps (minimum 1 required)
 - Do NOT show confirmation for individual step deletions
 - Do NOT auto-save (only save on explicit Save button)
+- Do NOT place action buttons inside scrollable content area - buttons must be in sticky footer
+- Do NOT make modal too narrow on desktop - step editing needs room for textarea and controls
+
+**Desktop Layout:**
+- Modal max-width: 750px on screens >= 800px wide (wider than default 600px)
+- Save/Cancel buttons in sticky footer with `position: sticky; bottom: 0;`
+- Steps list should scroll independently, with header and footer fixed
 
 **Source Evidence:**
 - User request for step editing with reorder capability

@@ -43,4 +43,11 @@ public interface RecipeFamilyMemberRepository extends JpaRepository<RecipeFamily
      * Count members in a family (for validation).
      */
     long countByFamilyId(Long familyId);
+
+    /**
+     * FR-043: Get all recipe IDs that are non-default family members.
+     * These should be hidden from main recipe lists (only shown via dropdown).
+     */
+    @Query("SELECT m.recipe.id FROM RecipeFamilyMember m WHERE m.isDefault = false")
+    List<Long> findNonDefaultRecipeIds();
 }

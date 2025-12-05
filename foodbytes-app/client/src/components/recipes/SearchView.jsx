@@ -60,6 +60,25 @@ function SearchView() {
     }
   }
 
+  // FR-043: Handle variant selection - fetch full recipe and replace in list
+  const handleSelectVariant = async (variantRecipeId, currentServings) => {
+    try {
+      const variantRecipe = await recipeService.getRecipeById(variantRecipeId)
+      if (variantRecipe) {
+        // Replace the recipe in the list with the selected variant
+        setRecipes(prevRecipes =>
+          prevRecipes.map(recipe =>
+            recipe.variants?.some(v => v.recipeId === variantRecipeId)
+              ? variantRecipe
+              : recipe
+          )
+        )
+      }
+    } catch (error) {
+      console.error('Failed to load variant recipe:', error)
+    }
+  }
+
   return (
     <div className="search-view">
       <div className="search-header">
@@ -106,7 +125,12 @@ function SearchView() {
         {!loading && recipes.length > 0 && (
           <div className="recipe-grid">
             {recipes.map((recipe) => (
-              <RecipeCard key={recipe.id} recipe={recipe} onEdit={handleEdit} />
+              <RecipeCard
+                key={recipe.id}
+                recipe={recipe}
+                onEdit={handleEdit}
+                onSelectVariant={handleSelectVariant}
+              />
             ))}
           </div>
         )}

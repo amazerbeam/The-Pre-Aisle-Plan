@@ -293,12 +293,18 @@ public class RecipeFamilyService {
     }
 
     private RecipeVariantDTO toVariantDTO(RecipeFamilyMember member) {
+        Recipe recipe = member.getRecipe();
+        // FR-043: Calculate per-serving calories for dropdown display
+        Integer caloriesPerServing = recipe.getDefaultServings() > 0
+            ? recipe.getCalories() / recipe.getDefaultServings()
+            : recipe.getCalories();
         return new RecipeVariantDTO(
-            member.getRecipe().getId(),
-            member.getRecipe().getName(),
+            recipe.getId(),
+            recipe.getName(),
             member.getVariantLabel(),
             member.getIsDefault(),
-            member.getDisplayOrder()
+            member.getDisplayOrder(),
+            caloriesPerServing
         );
     }
 

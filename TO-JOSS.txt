@@ -16,11 +16,11 @@ Click on the reciope in the meal planner should bring up the recipe full screen
 
 
 ### FR-046: Recipe Step Editing (Admin Only)
-The ux is all over the place on desk top. squashed, needs to work on browser and mobile
+	-The ux is all over the place on desk top. squashed, needs to work on browser and mobile
+	- save and cancel should alway be at the footer of the pop up
 
 ### FR-042: Ingredient Breakdown Popup (Long Press)
-	-The pop up is not centered and is a little small on desktop
-	- save and cancel should alway be at the footer of the pop up
+	- The pop up is not centered and is a little small on desktop
 
 
 Linked meals: 

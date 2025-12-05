@@ -50,14 +50,10 @@ function IngredientBreakdownPopup({ breakdown, position, onClose }) {
 
   return (
     <div className="breakdown-popup-overlay">
+      {/* FR-042 FIX: Removed inline positioning - let overlay flex centering handle it */}
       <div
         ref={popupRef}
         className="breakdown-popup"
-        style={{
-          top: position?.top || '50%',
-          left: position?.left || '50%',
-          transform: position ? 'none' : 'translate(-50%, -50%)'
-        }}
       >
         <header className="breakdown-header">
           <h4>{breakdown.ingredientName}</h4>

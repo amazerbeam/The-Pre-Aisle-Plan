@@ -52,6 +52,25 @@ function RecipeList() {
     loadRecipes(activeMeal)
   }
 
+  // FR-043: Handle variant selection - fetch full recipe and replace in list
+  const handleSelectVariant = async (variantRecipeId, currentServings) => {
+    try {
+      const variantRecipe = await recipeService.getRecipeById(variantRecipeId)
+      if (variantRecipe) {
+        // Replace the recipe in the list with the selected variant
+        setRecipes(prevRecipes =>
+          prevRecipes.map(recipe =>
+            recipe.variants?.some(v => v.recipeId === variantRecipeId)
+              ? variantRecipe
+              : recipe
+          )
+        )
+      }
+    } catch (error) {
+      console.error('Failed to load variant recipe:', error)
+    }
+  }
+
   return (
     <div className="recipe-list-container">
       <nav className="meal-tabs">
@@ -95,6 +114,7 @@ function RecipeList() {
               recipe={recipe}
               currentMealType={activeMeal}
               onEdit={handleEdit}
+              onSelectVariant={handleSelectVariant}
             />
           ))}
           {recipes.length === 0 && (
