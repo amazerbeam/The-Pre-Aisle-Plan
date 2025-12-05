@@ -1,5 +1,28 @@
 # TODO 
 
+
+
+##Issues##
+ ### FR-043: Linked Recipe Variants (Recipe Families)
+	- The dropdown for the linked recipes needs to be normlised to show "Light", "Standard (default) & "Full"
+	- Changing the varation recipe did not update the "Recipe" I selected "Wihtout Rice" and the recie in the meal plan was the same
+	- The varation recie did not add to the Meal Plan, the orignal version added. 
+	- Cal did not update when selecteing varation recipes. 
+	- The edit function is not opening the varation recipe. always shows base I believe
+	
+
+### FR-014: Assign Recipes to Days of the Week
+Click on the reciope in the meal planner should bring up the recipe full screen 
+
+
+### FR-046: Recipe Step Editing (Admin Only)
+	-The ux is all over the place on desk top. squashed, needs to work on browser and mobile
+	- save and cancel should alway be at the footer of the pop up
+
+### FR-042: Ingredient Breakdown Popup (Long Press)
+	- The pop up is not centered and is a little small on desktop
+
+
 Linked meals: 
 	I want to be able to create different version of the same meal. Thses recipes would be linked. 
 	
@@ -35,30 +58,6 @@ NF: Extras
 User Perfrences: 
 	Inside the user profile, they user will have "perference" or something. First setting will be "Default Servings" this will set all recipes to this default number, so if the user wants to always see 2 servings then this is where the set that. It'll be above "Sign out" onlt logged in users can see this. 
 
-
-Recipes to move: 
-Breakfast
-	Almond Flour Pancakes
-	Monkey Moo
-	Warm Oat Porridge with Berries & Nuts
-	Pancakes and Bacon
-Lunch
-	Argentine Beef Empanada Bites
-	Chicken & Black Bean Burrito
-	Fish Cakes with Leafy Salad & Sweet Potato
-	Grilled Chicken Salad
-	Turkey Lettuce Cups with Feta & Nut Salad 
-	Argentine Beef Empanada Bites
-Dinner
-	Argentine Beef Empanada Bites
-	Breaded Chicken with Garlic Veggies & Avocado
-	Chinese Chickpea & Tofy Curry 
-	Mild Chicken & Chickpea Tikka Masala
-	Spicy Tofu Stir-Fry with Mushrooms & Nuts
-	Stir-Fried Chicken & Peppers with Tofu & Nuts
-	Tuscan Turkey Meatballs
-	Black Pepper Beef Stir Fry
-	Chicken & Pork Paella
-	Chorizo Pizza
-
-I want you to create a agent-failed-requirements. it will ask for the FR-XX number and a description of the issues. It'll ask the agent-cea why the requiremt failed, the agent-failed-requirements will then make a plan to rewrite the requirement so the issue doens't happen again, not to speak like it's bug fix, but if the system was to be rebuild from scrratch the mistake woulld not be made. Add  a DO an DO NOT section to the requirement if needed. Like what we just did. Also create an context--failed-requirements with teh context of what we just did
+Remove Snacks: 
+	Remove the snacks section
+	

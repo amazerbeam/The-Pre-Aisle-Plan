@@ -1,0 +1,267 @@
+/* RecipeStepsForm.css - Steps editing form (FR-046) */
+
+.recipe-steps-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  min-height: 300px;
+}
+
+/* Sticky Header with Add Button */
+.recipe-steps-form .sticky-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  background: var(--bg-primary);
+  padding: var(--spacing-sm) 0;
+  z-index: 10;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: var(--spacing-sm);
+}
+
+.recipe-steps-form .form-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.recipe-steps-form .add-button {
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: 0.875rem;
+}
+
+/* Steps List */
+.steps-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  flex: 1;
+  overflow-y: auto;
+  padding-right: var(--spacing-xs);
+}
+
+.recipe-steps-form .empty-message {
+  text-align: center;
+  color: var(--text-secondary);
+  padding: var(--spacing-xl);
+  font-style: italic;
+}
+
+/* Step Row */
+.step-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+  background: var(--bg-secondary);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+}
+
+/* Move Arrows */
+.recipe-steps-form .row-arrows {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.recipe-steps-form .arrow-button {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.recipe-steps-form .arrow-button:hover:not(:disabled) {
+  background: var(--border-color);
+}
+
+.recipe-steps-form .arrow-button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* Step Number */
+.step-number {
+  width: 32px;
+  height: 32px;
+  background: var(--brand-primary);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.875rem;
+  flex-shrink: 0;
+}
+
+/* Step Textarea */
+.step-textarea {
+  flex: 1;
+  padding: var(--spacing-sm);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 60px;
+  transition: border-color 0.2s ease;
+}
+
+.step-textarea:focus {
+  outline: none;
+  border-color: var(--brand-primary);
+}
+
+.step-textarea::placeholder {
+  color: var(--text-secondary);
+}
+
+/* Delete Button */
+.step-row > .delete-button {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: #fff5f5;
+  border: 1px solid #f5c6cb;
+  border-radius: var(--radius-sm);
+  color: var(--error);
+  font-size: 1.25rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.step-row > .delete-button:hover {
+  background: #f8d7da;
+  border-color: var(--error);
+}
+
+/* Form Actions - FR-046 FIX: Sticky footer for Save/Cancel buttons */
+.recipe-steps-form .form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md) 0;
+  border-top: 1px solid var(--border-color);
+  position: sticky;
+  bottom: 0;
+  background: var(--bg-primary);
+  z-index: 10;
+  margin-top: auto;
+}
+
+/* Dialog Overlay */
+.recipe-steps-form .dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1100;
+}
+
+/* Dialog */
+.recipe-steps-form .dialog {
+  background: var(--bg-primary);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: var(--spacing-lg);
+  max-width: 400px;
+  width: 90%;
+}
+
+.recipe-steps-form .dialog h4 {
+  margin: 0 0 var(--spacing-md) 0;
+  font-size: 1.125rem;
+  color: var(--text-primary);
+}
+
+.recipe-steps-form .dialog-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-lg);
+}
+
+.recipe-steps-form .radio-label {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  cursor: pointer;
+}
+
+.recipe-steps-form .radio-label input[type="radio"] {
+  accent-color: var(--brand-primary);
+}
+
+.recipe-steps-form .after-select {
+  margin-left: var(--spacing-lg);
+  padding: var(--spacing-sm);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  width: calc(100% - var(--spacing-lg));
+}
+
+.recipe-steps-form .dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-md);
+}
+
+/* Mobile responsive */
+@media (max-width: 480px) {
+  .step-row {
+    flex-wrap: wrap;
+  }
+
+  .recipe-steps-form .row-arrows {
+    flex-direction: row;
+    order: 0;
+  }
+
+  .step-number {
+    order: 1;
+  }
+
+  .step-textarea {
+    flex: 1 1 100%;
+    order: 3;
+    margin-top: var(--spacing-sm);
+  }
+
+  .step-row > .delete-button {
+    order: 2;
+    margin-left: auto;
+  }
+
+  .recipe-steps-form .sticky-header {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    align-items: stretch;
+  }
+
+  .recipe-steps-form .add-button {
+    width: 100%;
+  }
+}

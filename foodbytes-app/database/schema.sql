@@ -2,6 +2,8 @@
 -- Version: 2.0.0 (Normalized)
 
 -- Drop existing tables if they exist (for clean re-creation)
+DROP TABLE IF EXISTS recipe_family_members;
+DROP TABLE IF EXISTS recipe_families;
 DROP TABLE IF EXISTS meal_plan_entries;
 DROP TABLE IF EXISTS recipe_steps;
 DROP TABLE IF EXISTS recipe_ingredients;
@@ -150,4 +152,36 @@ CREATE TABLE meal_plan_entries (
 
     -- Index for efficient date range queries (7-day window lookup)
     INDEX idx_user_date_range (user_id, plan_date)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- FR-043: Recipe Families table (groups recipe variants together)
+CREATE TABLE recipe_families (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    family_name VARCHAR(255) NOT NULL,
+    description TEXT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- FR-043: Recipe Family Members junction table
+-- Links recipes to families with variant labels and ordering
+CREATE TABLE recipe_family_members (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    family_id BIGINT NOT NULL,
+    recipe_id BIGINT NOT NULL,
+    is_default BOOLEAN DEFAULT FALSE,
+    variant_label VARCHAR(100) NULL,  -- e.g., "Vegetarian", "Vegan", "Low-Carb"
+    display_order INT DEFAULT 0,       -- Order in dropdown (default first)
+
+    UNIQUE KEY unique_recipe_in_family (family_id, recipe_id),
+    -- Ensure a recipe can only belong to ONE family
+    UNIQUE KEY unique_recipe_to_one_family (recipe_id),
+
+    CONSTRAINT fk_family_members_family FOREIGN KEY (family_id)
+        REFERENCES recipe_families(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_family_members_recipe FOREIGN KEY (recipe_id)
+        REFERENCES recipes(id) ON DELETE CASCADE ON UPDATE CASCADE,
+
+    INDEX idx_family_id (family_id),
+    INDEX idx_recipe_id (recipe_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

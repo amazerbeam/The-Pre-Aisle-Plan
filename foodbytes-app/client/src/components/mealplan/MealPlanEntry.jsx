@@ -1,16 +1,21 @@
 import { useState } from 'react'
 import { useMealPlan } from '../../contexts/MealPlanContext'
+import RecipeViewModal from '../recipes/RecipeViewModal'
 import './MealPlanEntry.css'
 
 /**
  * MealPlanEntry - Single recipe entry in the meal plan calendar
  * Shows recipe name, calories, and remove button
+ * FR-014: Click on entry to view recipe fullscreen
  */
 function MealPlanEntry({ entry }) {
   const { removeEntry } = useMealPlan()
   const [removing, setRemoving] = useState(false)
+  // FR-014: State for recipe view modal
+  const [showRecipeView, setShowRecipeView] = useState(false)
 
-  const handleRemove = async () => {
+  const handleRemove = async (e) => {
+    e.stopPropagation() // Prevent opening modal when removing
     if (removing) return
 
     setRemoving(true)
@@ -22,22 +27,53 @@ function MealPlanEntry({ entry }) {
     }
   }
 
+  // FR-014: Handle click on entry to open recipe view
+  const handleEntryClick = () => {
+    if (!removing && entry.recipe) {
+      setShowRecipeView(true)
+    }
+  }
+
   return (
-    <div className={`meal-plan-entry ${removing ? 'removing' : ''}`}>
-      <div className="entry-info">
-        <span className="recipe-name">{entry.recipe?.name}</span>
-        <span className="recipe-calories">{entry.caloriesPerServing} cal</span>
-      </div>
-      <button
-        className="remove-btn"
-        onClick={handleRemove}
-        disabled={removing}
-        title="Remove from meal plan"
-        aria-label={`Remove ${entry.recipe?.name} from meal plan`}
+    <>
+      <div
+        className={`meal-plan-entry ${removing ? 'removing' : ''}`}
+        onClick={handleEntryClick}
+        role="button"
+        tabIndex={0}
+        onKeyPress={(e) => e.key === 'Enter' && handleEntryClick()}
       >
-        ×
-      </button>
-    </div>
+        <div className="entry-info">
+          <span className="recipe-name">{entry.recipe?.name}</span>
+          <span className="recipe-calories">{entry.caloriesPerServing} cal</span>
+        </div>
+        <button
+          className="remove-btn"
+          onClick={handleRemove}
+          disabled={removing}
+          title="Remove from meal plan"
+          aria-label={`Remove ${entry.recipe?.name} from meal plan`}
+        >
+          ×
+        </button>
+      </div>
+
+      {/* FR-013/FR-014: Recipe View Modal with variant support */}
+      {showRecipeView && entry.recipe && (
+        <RecipeViewModal
+          recipe={entry.recipe}
+          servings={entry.servings}
+          caloriesPerServing={entry.caloriesPerServing}
+          onClose={() => setShowRecipeView(false)}
+          variants={entry.recipe.variants}
+          onSelectVariant={(variantId, servings) => {
+            // FR-013: In meal plan view, variant selection updates display only
+            // (recipe swap would require updating the meal plan entry)
+            console.log('Variant selected in modal:', variantId, servings)
+          }}
+        />
+      )}
+    </>
   )
 }
 

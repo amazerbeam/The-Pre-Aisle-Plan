@@ -1,1 +1,20 @@
 Using > @Claude\agents\CEO\agent-ceo.md plan to execute the requirements currently in # In Progress. 
+
+plan using @Claude\agents\Requirements\agent-failed-requirements.md to look at
+
+
+FR-007 Now that i've tried it the user should only be able to select "From Date" in "Recipes" and "Meal Plan" however, in the Shopping list the user should be able to select a "from data" and a "to date". 
+
+The users "From Date" and "To Date" selection should save to the database. If they user plans their meal from Sunday to Satuday and is viewing the say the 30/11/2025 as the first date, then presses refreh the first date is today 
+If the saved date is used, "Recipes" and "Meal Plan" still onyl use the save "From date" and force the next 7 days. 
+
+If the user preses and holds an Ingreigent for 3 seconds in the shopping list (Mouse down or finger down) all the meals and quantities will show in a pop up, this pop up will close once the user clicks on it again anywhere. 
+Example. 
+[] 8 Tbls of Olive Oil
+
+Pizza: 1 tbls spoon
+Stiry Fry: 3 tbls spoons 
+..... and so on 
+
+Move FR-019 to inprogress with a note "Look at the new requirements on "formatting specifications"
+Move FR-007 to in progress and check the new requirements on "date ranges"

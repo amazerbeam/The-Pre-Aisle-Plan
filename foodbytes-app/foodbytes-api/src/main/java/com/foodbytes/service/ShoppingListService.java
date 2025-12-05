@@ -2,6 +2,8 @@ package com.foodbytes.service;
 
 import com.foodbytes.dto.AggregatedShoppingListDTO;
 import com.foodbytes.dto.AisleDTO;
+import com.foodbytes.dto.IngredientBreakdownDTO;
+import com.foodbytes.dto.MealIngredientUsageDTO;
 import com.foodbytes.dto.ShoppingItemDTO;
 import com.foodbytes.dto.ShoppingListByAisleDTO;
 import com.foodbytes.model.*;
@@ -165,6 +167,83 @@ public class ShoppingListService {
             .aisles(aisles)
             .totalItems(totalItems)
             .build();
+    }
+
+    /**
+     * FR-042: Get breakdown of which meals use a specific ingredient.
+     * Shows each meal that uses the ingredient and how much it requires.
+     *
+     * @param userId User ID
+     * @param ingredientId Ingredient ID
+     * @param unit Unit string (e.g., "tbsp", "g")
+     * @param startDate Start date of the 7-day period
+     * @return IngredientBreakdownDTO with meal breakdown list
+     */
+    @Transactional(readOnly = true)
+    public IngredientBreakdownDTO getIngredientBreakdown(Long userId, Long ingredientId,
+                                                          String unit, LocalDate startDate) {
+        LocalDate endDate = startDate.plusDays(7);
+
+        // Fetch meal plan entries for user in date range
+        List<MealPlanEntry> entries = mealPlanEntryRepository
+            .findByUserIdAndDateRange(userId, startDate, endDate);
+
+        List<MealIngredientUsageDTO> mealBreakdown = new ArrayList<>();
+        BigDecimal totalQuantity = BigDecimal.ZERO;
+        String ingredientName = null;
+
+        // Process each meal plan entry
+        for (MealPlanEntry entry : entries) {
+            Recipe recipe = entry.getRecipe();
+            Integer entryServings = entry.getServings();
+            Integer recipeDefaultServings = recipe.getDefaultServings();
+
+            // Find the specific ingredient in this recipe
+            for (RecipeIngredient recipeIngredient : recipe.getIngredients()) {
+                Ingredient ingredient = recipeIngredient.getIngredient();
+
+                // Check if this is the ingredient we're looking for
+                if (ingredient.getId().equals(ingredientId) &&
+                    recipeIngredient.getUnit().getValue().equalsIgnoreCase(unit)) {
+
+                    // Capture ingredient name
+                    if (ingredientName == null) {
+                        ingredientName = ingredient.getName();
+                    }
+
+                    // Scale quantity: scaledQty = ingredient.quantity * entry.servings / recipe.defaultServings
+                    BigDecimal originalQuantity = recipeIngredient.getQuantity();
+                    BigDecimal scaledQuantity = originalQuantity
+                        .multiply(BigDecimal.valueOf(entryServings))
+                        .divide(BigDecimal.valueOf(recipeDefaultServings), 2, RoundingMode.HALF_UP);
+
+                    // Add to total
+                    totalQuantity = totalQuantity.add(scaledQuantity);
+
+                    // Add meal breakdown entry
+                    mealBreakdown.add(new MealIngredientUsageDTO(
+                        recipe.getName(),
+                        entry.getMeal().getKey(),
+                        entry.getPlanDate(),
+                        scaledQuantity,
+                        entryServings
+                    ));
+                }
+            }
+        }
+
+        // Sort by date, then meal type
+        mealBreakdown.sort(Comparator
+            .comparing(MealIngredientUsageDTO::getPlanDate)
+            .thenComparing(MealIngredientUsageDTO::getMealType));
+
+        return new IngredientBreakdownDTO(
+            ingredientId,
+            ingredientName != null ? ingredientName : "Unknown Ingredient",
+            unit,
+            totalQuantity.setScale(2, RoundingMode.HALF_UP),
+            mealBreakdown
+        );
     }
 
     /**

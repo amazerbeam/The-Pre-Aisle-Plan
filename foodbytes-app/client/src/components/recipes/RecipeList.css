@@ -32,6 +32,25 @@
   color: white;
 }
 
+/* FR-047: Add Recipe Button for Admins */
+.add-recipe-button {
+  flex-shrink: 0;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  background: var(--success);
+  border: 1px solid var(--success);
+  border-radius: var(--radius-md);
+  color: white;
+  font-weight: 500;
+  white-space: nowrap;
+  margin-left: auto;
+  transition: all 0.2s ease;
+}
+
+.add-recipe-button:hover {
+  background: #1a7f37;
+  border-color: #1a7f37;
+}
+
 .recipe-grid {
   display: grid;
   gap: var(--spacing-md);

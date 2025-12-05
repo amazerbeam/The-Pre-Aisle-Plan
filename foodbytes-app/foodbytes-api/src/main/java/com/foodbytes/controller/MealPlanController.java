@@ -148,4 +148,30 @@ public class MealPlanController {
         );
         return ResponseEntity.ok(shoppingList);
     }
+
+    /**
+     * FR-042: Get breakdown of which meals use a specific ingredient.
+     * GET /api/meal-plan/shopping-list/ingredient-breakdown?ingredientId=123&unit=tbsp&startDate=2025-12-01
+     *
+     * @param userPrincipal Authenticated user (required)
+     * @param ingredientId The ingredient ID to look up
+     * @param unit The unit string (e.g., "tbsp", "g")
+     * @param startDate Start date of the 7-day period
+     * @return IngredientBreakdownDTO with meal breakdown list
+     */
+    @GetMapping("/shopping-list/ingredient-breakdown")
+    public ResponseEntity<IngredientBreakdownDTO> getIngredientBreakdown(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @RequestParam Long ingredientId,
+            @RequestParam String unit,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate) {
+
+        IngredientBreakdownDTO breakdown = shoppingListService.getIngredientBreakdown(
+            userPrincipal.getId(),
+            ingredientId,
+            unit,
+            startDate
+        );
+        return ResponseEntity.ok(breakdown);
+    }
 }

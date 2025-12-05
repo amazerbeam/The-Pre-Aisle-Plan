@@ -17,4 +17,8 @@ public class RecipeDTO {
     private List<String> mealTypes;
     private List<IngredientDTO> ingredients;
     private List<String> steps;
+
+    // FR-043: Recipe variant info (null if recipe is not part of a family)
+    private String variantLabel;           // e.g., "Vegetarian" (null for non-family or default)
+    private List<RecipeVariantDTO> variants;  // All variants in the family (empty if not in family)
 }
