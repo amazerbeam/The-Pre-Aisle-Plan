@@ -99,13 +99,13 @@
   color: #333;
 }
 
-/* FR-013: Variant Dropdown Styles (same as RecipeCard) */
-.calorie-dropdown-container {
+/* FR-013: Variant Dropdown Styles - SCOPED to modal only to avoid conflict with RecipeCard */
+.recipe-view-modal .calorie-dropdown-container {
   position: relative;
   display: inline-block;
 }
 
-.calorie-dropdown-trigger {
+.recipe-view-modal .calorie-dropdown-trigger {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -116,32 +116,32 @@
   cursor: pointer;
   font-size: 0.8rem;
   font-weight: 500;
-  /* FR-013: Explicit white text */
+  /* FR-013: Explicit white text for modal (dark header background) */
   color: #ffffff;
   transition: background 0.2s ease;
 }
 
-.calorie-dropdown-trigger:hover {
+.recipe-view-modal .calorie-dropdown-trigger:hover {
   background: rgba(255, 255, 255, 0.3);
 }
 
-.calories-text {
+.recipe-view-modal .calories-text {
   /* FR-013: Explicit white text for calories */
   color: #ffffff;
 }
 
-.dropdown-chevron {
+.recipe-view-modal .dropdown-chevron {
   font-size: 0.65rem;
   /* FR-013: Explicit white chevron */
   color: #ffffff;
   transition: transform 0.2s ease;
 }
 
-.calorie-dropdown-trigger[aria-expanded="true"] .dropdown-chevron {
+.recipe-view-modal .calorie-dropdown-trigger[aria-expanded="true"] .dropdown-chevron {
   transform: rotate(180deg);
 }
 
-.calorie-dropdown-menu {
+.recipe-view-modal .calorie-dropdown-menu {
   position: absolute;
   top: calc(100% + 4px);
   left: 0;
@@ -156,7 +156,7 @@
   z-index: 1001;
 }
 
-.calorie-dropdown-item {
+.recipe-view-modal .calorie-dropdown-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -167,20 +167,20 @@
   color: var(--text-primary);
 }
 
-.calorie-dropdown-item:hover {
+.recipe-view-modal .calorie-dropdown-item:hover {
   background-color: rgba(74, 63, 128, 0.08);
 }
 
-.calorie-dropdown-item.selected {
+.recipe-view-modal .calorie-dropdown-item.selected {
   background-color: rgba(74, 63, 128, 0.15);
 }
 
-.variant-name {
+.recipe-view-modal .variant-name {
   font-weight: 500;
   color: var(--text-primary);
 }
 
-.variant-calories {
+.recipe-view-modal .variant-calories {
   font-size: 0.85rem;
   color: var(--text-secondary);
 }

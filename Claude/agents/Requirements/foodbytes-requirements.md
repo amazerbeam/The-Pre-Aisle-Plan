@@ -369,6 +369,10 @@
 - Center popup both horizontally and vertically on the viewport
 - Allow popup content to scroll if it exceeds the fixed height
 - Reuse `RecipeViewModal` component for consistency
+- **Use exact same calorie text format as RecipeCard: `{calories} cal` (e.g., "650 cal")**
+- **When variant is selected in modal, fetch the new variant's full recipe data (ingredients, steps) and update the modal content WITHOUT closing the modal**
+- **Handle variant switching entirely within RecipeCard/RecipeViewModal - do NOT rely on parent component to swap recipes**
+- **The modal must remain open even when the underlying recipe ID changes due to variant selection**
 
 **DO NOT:**
 - Do NOT use dark/black text on the dark overlay background - text must be white
@@ -378,6 +382,9 @@
 - Do NOT use uneven margins (e.g., more margin at bottom than top)
 - Do NOT extend popup beyond viewport edges
 - Do NOT style variant dropdown differently from RecipeCard dropdown
+- **Do NOT use "cal/serving" format in the modal - use "cal" only to match RecipeCard**
+- **Do NOT let the parent component unmount/remount RecipeCard when variant is selected in fullscreen modal**
+- **Do NOT call parent's onSelectVariant when changing variants in fullscreen - handle it internally by fetching recipe data directly**
 
 **Cross-References:**
 - FR-043: Linked Recipe Variants (variant dropdown behavior and styling)
@@ -392,6 +399,8 @@
 - User feedback: "cal with family recipe should have the dropdown same as Recipe card view"
 - User feedback: "When variant recipe is changed keep popup open"
 - User feedback: "popup should be 99% of the screen height, need max height. Leave tiny margin evenly top and bottom"
+- User feedback (2025-12-05): "When the full screen is open and the user changes the Cal, the full screen should stay open, just reload the new recipe in place of the old one"
+- User feedback (2025-12-05): "The dropdown to get the variant meal should simply read 'x cal' same as the card"
 
 **Status:** In Progress
 

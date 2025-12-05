@@ -194,19 +194,19 @@ INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VA
 -- Breakfast
 (1, 'Almond Flour Pancakes', 2, 745, FALSE, TRUE),
 (2, 'Frozen Banana Whip', 2, 930, FALSE, TRUE),
-(3, 'Morning Oats with Honey, Nuts & Berries', 2, 620, FALSE, TRUE),
-(4, 'Buttermilk Pancake Stack with Streaky Bacon', 2, 1680, FALSE, TRUE),
+(3, 'Protein Oats with Eggs & Greek Yogurt', 2, 1180, FALSE, TRUE),
+(4, 'Buttermilk Pancake Stack with Streaky Bacon', 2, 1280, FALSE, TRUE),
 -- Lunch
-(5, 'Argentine Beef Empanada Bites', 2, 2575, TRUE, TRUE),
-(6, 'Chicken & Black Bean Burrito', 2, 760, FALSE, TRUE),
-(7, 'Pan-Fried Fish Cakes with Lemon & Roasted Sweet Potato', 2, 920, FALSE, TRUE),
+(5, 'Argentine Beef Empanada Bites', 2, 1275, FALSE, TRUE),
+(6, 'Chicken & Black Bean Burrito', 2, 1070, FALSE, TRUE),
+(7, 'Pan-Fried Fish Cakes with Lemon & Roasted Sweet Potato', 2, 1040, FALSE, TRUE),
 (8, 'Lemon Chicken Salad with Feta & Chickpeas', 2, 1150, FALSE, TRUE),
 (9, 'Turkish-Style Lettuce Wraps', 2, 1195, FALSE, TRUE),
 -- Dinner
 (10, 'Crispy Herb Chicken with Roasted Garlic Vegetables', 2, 1495, FALSE, TRUE),
-(11, 'Spiced Banana Curry with Chickpeas & Tofu', 2, 1470, FALSE, TRUE),
+(11, 'Spiced Chicken & Banana Curry', 2, 1400, FALSE, TRUE),
 (12, 'Creamy Tikka Masala with Chickpeas', 2, 1205, FALSE, TRUE),
-(13, 'Chili Crisp Tofu with Mushrooms', 2, 960, FALSE, TRUE),
+(13, 'Chili Crisp Chicken with Mushrooms & Cashews', 2, 1270, FALSE, TRUE),
 (14, 'Wok-Tossed Chicken with Cashews & Pak Choi', 2, 1200, FALSE, TRUE),
 (15, 'Tuscan Turkey Meatballs', 2, 1500, FALSE, TRUE),
 (16, 'Black Pepper Beef Stir Fry', 2, 1170, TRUE, TRUE),
@@ -247,17 +247,16 @@ INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit_id, sor
 (2, 37, 520, 2, 2),    -- Milk, 520ml
 (2, 87, 60, 1, 3);     -- Peanut butter, 60g
 
--- Recipe 3: Warm Oat Porridge with Berries & Nuts
+-- Recipe 3: Protein Oats with Eggs & Greek Yogurt
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit_id, sort_order) VALUES
-(3, 69, 60, 1, 1),     -- Rolled oats, 60g
+(3, 69, 80, 1, 1),     -- Rolled oats, 80g
 (3, 37, 250, 2, 2),    -- Milk, 250ml
-(3, 89, 150, 2, 3),    -- Water, 150ml
-(3, 34, 80, 1, 4),     -- Mixed berries, 80g
-(3, 76, 1, 3, 5),      -- Honey, 1 tsp
-(3, 44, 0.5, 3, 6),    -- Salt, 0.5 tsp
-(3, 87, 1, 4, 7),      -- Peanut butter, 1 tbsp
-(3, 84, 10, 1, 8),     -- Almonds, 10g
-(3, 86, 10, 1, 9);     -- Walnuts, 10g
+(3, 36, 200, 1, 3),    -- Greek yogurt, 200g
+(3, 38, 6, 5, 4),      -- Eggs, 6 (scrambled on side)
+(3, 34, 60, 1, 5),     -- Mixed berries, 60g
+(3, 76, 1, 3, 6),      -- Honey, 1 tsp
+(3, 44, 0.5, 3, 7),    -- Salt, 0.5 tsp
+(3, 84, 15, 1, 8);     -- Almonds, 15g
 
 -- Recipe 4: Pancakes and Bacon
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit_id, sort_order) VALUES
@@ -289,7 +288,7 @@ INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit_id, sor
 
 -- Recipe 6: Chicken & Black Bean Burrito
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit_id, sort_order) VALUES
-(6, 7, 150, 1, 1),     -- Chicken breast, 150g
+(6, 7, 350, 1, 1),     -- Chicken breast, 350g
 (6, 62, 120, 1, 2),    -- Black beans, 120g
 (6, 18, 0.5, 6, 3),    -- Red onion, 0.5 small
 (6, 17, 0.5, 6, 4),    -- Onion, 0.5 small
@@ -309,7 +308,7 @@ INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit_id, sor
 
 -- Recipe 7: Fish Cakes with Leafy Salad & Sweet Potato
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit_id, sort_order) VALUES
-(7, 35, 250, 1, 1),    -- White fish, 250g
+(7, 35, 400, 1, 1),    -- White fish, 400g
 (7, 38, 2, 6, 2),      -- Eggs, 2 small
 (7, 13, 1, 10, 3),     -- Garlic, 1 clove
 (7, 19, 1, 6, 4),      -- Spring onion, 1 small
@@ -370,28 +369,25 @@ INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit_id, sor
 (10, 88, 1, 3, 13),    -- Sesame seeds, 1 tsp
 (10, 84, 15, 1, 14);   -- Almonds, 15g
 
--- Recipe 11: Chinese Chickpea & Tofu Curry
+-- Recipe 11: Spiced Chicken & Banana Curry
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit_id, sort_order) VALUES
-(11, 64, 240, 1, 1),   -- Chickpeas, 240g
-(11, 6, 150, 1, 2),    -- Firm tofu, 150g
-(11, 17, 1, 8, 3),     -- Onion, 1 large
-(11, 13, 3, 10, 4),    -- Garlic, 3 cloves
-(11, 14, 5, 1, 5),     -- Ginger, 5g
-(11, 32, 1, 7, 6),     -- Banana, 1 medium
-(11, 72, 2, 3, 7),     -- Soy sauce, 2 tsp
-(11, 60, 1, 4, 8),     -- Tomato paste, 1 tbsp
-(11, 76, 1, 3, 9),     -- Honey, 1 tsp
-(11, 44, 1, 3, 10),    -- Salt, 1 tsp
-(11, 57, 0.5, 3, 11),  -- Turmeric, 0.5 tsp
-(11, 49, 0.5, 3, 12),  -- Cumin, 0.5 tsp
-(11, 50, 0.25, 3, 13), -- Cinnamon, 0.25 tsp
-(11, 52, 1, 5, 14),    -- Star anise, 1 piece
-(11, 53, 1, 17, 15),   -- MSG, 1 pinch
-(11, 90, 480, 2, 16),  -- Stock, 480ml
-(11, 59, 2, 4, 17),    -- Olive oil, 2 tbsp
-(11, 26, 400, 1, 18),  -- Sweet potato, 400g
-(11, 41, 1, 16, 19),   -- Petit pois, 1 cup
-(11, 45, 0.25, 3, 20); -- Black pepper, 0.25 tsp
+(11, 7, 450, 1, 1),    -- Chicken breast, 450g
+(11, 17, 1, 8, 2),     -- Onion, 1 large
+(11, 13, 3, 10, 3),    -- Garlic, 3 cloves
+(11, 14, 5, 1, 4),     -- Ginger, 5g
+(11, 32, 1, 7, 5),     -- Banana, 1 medium
+(11, 72, 2, 3, 6),     -- Soy sauce, 2 tsp
+(11, 60, 1, 4, 7),     -- Tomato paste, 1 tbsp
+(11, 76, 1, 3, 8),     -- Honey, 1 tsp
+(11, 44, 1, 3, 9),     -- Salt, 1 tsp
+(11, 57, 0.5, 3, 10),  -- Turmeric, 0.5 tsp
+(11, 49, 0.5, 3, 11),  -- Cumin, 0.5 tsp
+(11, 50, 0.25, 3, 12), -- Cinnamon, 0.25 tsp
+(11, 52, 1, 5, 13),    -- Star anise, 1 piece
+(11, 90, 400, 2, 14),  -- Stock, 400ml
+(11, 59, 1.5, 4, 15),  -- Olive oil, 1.5 tbsp
+(11, 26, 250, 1, 16),  -- Sweet potato, 250g (reduced)
+(11, 45, 0.25, 3, 17); -- Black pepper, 0.25 tsp
 
 -- Recipe 12: Mild Chicken & Chickpea Tikka Masala
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit_id, sort_order) VALUES
@@ -414,18 +410,20 @@ INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit_id, sor
 (12, 76, 0.5, 3, 17),  -- Honey, 0.5 tsp
 (12, 54, 1, 3, 18);    -- Garam masala, 1 tsp
 
--- Recipe 13: Spicy Tofu Stir-Fry with Mushrooms & Nuts
+-- Recipe 13: Chili Crisp Chicken with Mushrooms & Cashews
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit_id, sort_order) VALUES
-(13, 6, 400, 1, 1),    -- Firm tofu, 400g
-(13, 59, 3, 4, 2),     -- Olive oil, 3 tbsp
-(13, 13, 1, 10, 3),    -- Garlic, 1 clove
+(13, 7, 450, 1, 1),    -- Chicken breast, 450g
+(13, 59, 2, 4, 2),     -- Olive oil, 2 tbsp
+(13, 13, 2, 10, 3),    -- Garlic, 2 cloves
 (13, 16, 1, 5, 4),     -- Red bell pepper, 1 piece
 (13, 17, 1, 5, 5),     -- Onion, 1 piece
-(13, 27, 150, 1, 6),   -- Mushrooms, 150g
+(13, 27, 200, 1, 6),   -- Mushrooms, 200g
 (13, 72, 2, 4, 7),     -- Soy sauce, 2 tbsp
 (13, 46, 0.5, 3, 8),   -- Smoked paprika, 0.5 tsp
-(13, 47, 0.5, 3, 9),   -- Chili flakes, 0.5 tsp
-(13, 85, 30, 1, 10);   -- Cashews, 30g
+(13, 47, 1, 3, 9),     -- Chili flakes, 1 tsp
+(13, 85, 30, 1, 10),   -- Cashews, 30g
+(13, 44, 0.5, 3, 11),  -- Salt, 0.5 tsp
+(13, 45, 0.25, 3, 12); -- Black pepper, 0.25 tsp
 
 -- Recipe 14: Stir-Fried Chicken & Peppers with Tofu & Nuts
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit_id, sort_order) VALUES
@@ -532,11 +530,12 @@ INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
 (2, 2, 'Blend everything until smooth.'),
 (2, 3, 'Pinch of salt to enhance flavor.');
 
--- Recipe 3: Warm Oat Porridge with Berries & Nuts
+-- Recipe 3: Protein Oats with Eggs & Greek Yogurt
 INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
-(3, 1, 'Set heat to 7/9. Bring milk, water, salt to boil.'),
-(3, 2, 'Chop and salt the nuts.'),
-(3, 3, 'Transfer oats to bowl. Add honey, peanut butter, nuts, and berries in that order.');
+(3, 1, 'Bring milk and salt to a simmer. Add oats and cook 4-5 minutes, stirring.'),
+(3, 2, 'While oats cook, scramble 6 eggs in a separate pan with a little butter.'),
+(3, 3, 'Transfer oats to bowls. Top with Greek yogurt, berries, almonds, and honey.'),
+(3, 4, 'Serve scrambled eggs on the side. Each person gets 3 eggs.');
 
 -- Recipe 4: Pancakes and Bacon
 INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
@@ -566,7 +565,7 @@ INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
 (5, 14, 'Place a spoonful of filling in the center of each dough circle. Fold over and seal the edges.'),
 (5, 15, 'Place on a baking tray, brush with beaten egg.'),
 (5, 16, 'Bake at 200C for 20-22 minutes until golden.'),
-(5, 17, 'Serve warm.');
+(5, 17, 'Serve 5 empanadas per person warm. Each empanada should contain approximately 30g of filling. Freeze remaining empanadas for later.');
 
 -- Recipe 6: Chicken & Black Bean Burrito
 INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
@@ -628,21 +627,18 @@ INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
 (10, 10, 'Top roasted vegetables with chopped nuts and sesame seeds.'),
 (10, 11, 'Serve chicken with garlic veggies and avocado slices on the side.');
 
--- Recipe 11: Chinese Chickpea & Tofu Curry
+-- Recipe 11: Spiced Chicken & Banana Curry
 INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
-(11, 1, 'Preheat oven to 200C.'),
-(11, 2, 'Preheat 2 pans, one for tofu and one for curry sauce.'),
-(11, 3, 'Peel and cube the sweet potatoes. Toss with 1 tbsp olive oil and a pinch of salt.'),
-(11, 4, 'Fry the tofu cubes until golden on all sides.'),
-(11, 5, 'Put sweet potatoes in the oven for 30 minutes.'),
-(11, 6, 'In a saucepan, heat 1 tbsp olive oil over medium heat. Add sliced onion and a pinch of salt; fry 5 minutes until softened.'),
-(11, 7, 'Add minced garlic and grated ginger; cook 30 seconds.'),
-(11, 8, 'Add banana, soy sauce, tomato puree, sugar, salt, turmeric, cumin, cinnamon, MSG, and stock.'),
-(11, 9, 'Remove sauce and blend until smooth.'),
-(11, 10, 'Return to pan. Add Anise Star.'),
-(11, 11, 'Add chickpeas to the sauce and simmer for 20 minutes.'),
-(11, 12, 'Add the fried tofu and peas to the curry sauce. Cook for another 5 minutes.'),
-(11, 13, 'Serve hot with the roasted sweet potatoes.');
+(11, 1, 'Preheat oven to 200C. Cube sweet potatoes, toss with a little oil and salt.'),
+(11, 2, 'Roast sweet potatoes for 25-30 minutes until tender.'),
+(11, 3, 'Cut chicken into bite-sized pieces. Season with salt and pepper.'),
+(11, 4, 'Heat oil in a pan. Brown chicken pieces 5-6 minutes. Set aside.'),
+(11, 5, 'In same pan, fry sliced onion 5 minutes until softened.'),
+(11, 6, 'Add garlic and ginger; cook 30 seconds until fragrant.'),
+(11, 7, 'Add banana, soy sauce, tomato paste, honey, turmeric, cumin, cinnamon, and stock.'),
+(11, 8, 'Blend sauce until smooth. Return to pan with star anise.'),
+(11, 9, 'Add chicken back to sauce. Simmer 15 minutes until chicken is cooked through.'),
+(11, 10, 'Serve curry over roasted sweet potatoes.');
 
 -- Recipe 12: Mild Chicken & Chickpea Tikka Masala
 INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
@@ -658,14 +654,15 @@ INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
 (12, 10, 'Turn off the heat and add garam masala and honey (optional). Taste and adjust salt, pepper, or sweetness.'),
 (12, 11, 'Serve with roasted vegetables, cauliflower rice, or a small portion of basmati rice if desired.');
 
--- Recipe 13: Spicy Tofu Stir-Fry with Mushrooms & Nuts
+-- Recipe 13: Chili Crisp Chicken with Mushrooms & Cashews
 INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
-(13, 1, 'Heat 1 tbsp olive oil or ghee in a pan and fry tofu until golden, about 20 minutes. Set aside.'),
-(13, 2, 'Add 1 tbsp more oil to the pan, saute garlic for 30 seconds.'),
-(13, 3, 'Add red pepper, onion, and mushrooms. Stir-fry for 4-5 minutes.'),
-(13, 4, 'Return tofu to the pan. Add soy sauce, smoked paprika, and chili flakes.'),
-(13, 5, 'Add final 1 tbsp of oil and the nuts. Stir well and cook for 1-2 more minutes.'),
-(13, 6, 'Serve hot.');
+(13, 1, 'Slice chicken breast into strips. Season with salt, pepper, and smoked paprika.'),
+(13, 2, 'Heat 1 tbsp oil in a wok or large pan over high heat. Stir-fry chicken 5-6 minutes until cooked. Set aside.'),
+(13, 3, 'Add remaining oil. Sauté garlic 30 seconds until fragrant.'),
+(13, 4, 'Add onion, red pepper, and mushrooms. Stir-fry 4-5 minutes until tender.'),
+(13, 5, 'Return chicken to pan. Add soy sauce and chili flakes. Toss to combine.'),
+(13, 6, 'Add cashews, stir through for 1 minute.'),
+(13, 7, 'Serve immediately.');
 
 -- Recipe 14: Stir-Fried Chicken & Peppers with Tofu & Nuts
 INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
@@ -844,34 +841,33 @@ INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
 -- RECIPE 22: Creamy Tikka Masala - Light (No Rice)
 -- =============================================
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
-(22, 'Creamy Tikka Masala (Light)', 2, 1205, FALSE, TRUE);
+(22, 'Creamy Tikka Masala (Light - No Chickpeas)', 2, 1095, FALSE, TRUE);
 
 -- Recipe 22 meal assignment (Dinner)
 INSERT INTO recipe_meals (recipe_id, meal_id) VALUES
 (22, 3);
 
--- Recipe 22 ingredients (same as 12, it's already without rice - this IS the light version)
+-- Recipe 22 ingredients (Light version - NO chickpeas, extra chicken for protein)
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit_id, sort_order) VALUES
-(22, 7, 250, 1, 1),    -- Chicken breast, 250g
-(22, 64, 150, 1, 2),   -- Chickpeas, 150g
-(22, 41, 1, 16, 3),    -- Petit pois, 1 cup
-(22, 17, 1, 7, 4),     -- Onion, 1 medium
-(22, 13, 3, 10, 5),    -- Garlic, 3 cloves
-(22, 14, 10, 1, 6),    -- Ginger, 10g
-(22, 60, 2, 4, 7),     -- Tomato paste, 2 tbsp
-(22, 61, 1, 15, 8),    -- Tinned tomatoes, 1 tin
-(22, 36, 75, 1, 9),    -- Greek yogurt, 75g
-(22, 59, 1.5, 4, 10),  -- Olive oil, 1.5 tbsp
-(22, 49, 1, 3, 11),    -- Cumin, 1 tsp
-(22, 57, 0.5, 3, 12),  -- Turmeric, 0.5 tsp
-(22, 46, 0.5, 3, 13),  -- Smoked paprika, 0.5 tsp
-(22, 50, 0.25, 3, 14), -- Cinnamon, 0.25 tsp
-(22, 44, 1, 3, 15),    -- Salt, 1 tsp
-(22, 45, 0.25, 3, 16), -- Black pepper, 0.25 tsp
-(22, 76, 0.5, 3, 17),  -- Honey, 0.5 tsp
-(22, 54, 1, 3, 18);    -- Garam masala, 1 tsp
+(22, 7, 350, 1, 1),    -- Chicken breast, 350g (extra to maintain protein)
+(22, 41, 1, 16, 2),    -- Petit pois, 1 cup
+(22, 17, 1, 7, 3),     -- Onion, 1 medium
+(22, 13, 3, 10, 4),    -- Garlic, 3 cloves
+(22, 14, 10, 1, 5),    -- Ginger, 10g
+(22, 60, 2, 4, 6),     -- Tomato paste, 2 tbsp
+(22, 61, 1, 15, 7),    -- Tinned tomatoes, 1 tin
+(22, 36, 75, 1, 8),    -- Greek yogurt, 75g
+(22, 59, 1.5, 4, 9),   -- Olive oil, 1.5 tbsp
+(22, 49, 1, 3, 10),    -- Cumin, 1 tsp
+(22, 57, 0.5, 3, 11),  -- Turmeric, 0.5 tsp
+(22, 46, 0.5, 3, 12),  -- Smoked paprika, 0.5 tsp
+(22, 50, 0.25, 3, 13), -- Cinnamon, 0.25 tsp
+(22, 44, 1, 3, 14),    -- Salt, 1 tsp
+(22, 45, 0.25, 3, 15), -- Black pepper, 0.25 tsp
+(22, 76, 0.5, 3, 16),  -- Honey, 0.5 tsp
+(22, 54, 1, 3, 17);    -- Garam masala, 1 tsp
 
--- Recipe 22 steps (same as 12)
+-- Recipe 22 steps (Light version - no chickpeas)
 INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
 (22, 1, 'Dice the onion, mince the garlic, and grate the ginger.'),
 (22, 2, 'Cut chicken into bite-sized pieces and season lightly with salt and pepper.'),
@@ -880,9 +876,9 @@ INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
 (22, 5, 'Sprinkle in cumin, turmeric, smoked paprika, and cinnamon. Stir and toast for 30 seconds.'),
 (22, 6, 'Add tomato paste and cook for 1 minute.'),
 (22, 7, 'Pour in the tinned tomatoes. Simmer for 8-10 minutes until thickened.'),
-(22, 8, 'Add chickpeas and frozen peas. Simmer for another 3 minutes.'),
+(22, 8, 'Add frozen peas. Simmer for another 3 minutes.'),
 (22, 9, 'Reduce heat to low. Stir in Greek yogurt slowly.'),
-(22, 10, 'Add garam masala and honey. Serve with roasted vegetables or cauliflower rice.');
+(22, 10, 'Add garam masala and honey. Serve with roasted vegetables (Light version - no rice).');
 
 -- =============================================
 -- RECIPE 23: Creamy Tikka Masala - Full (With Rice & Naan)
@@ -931,18 +927,18 @@ INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
 (23, 10, 'Serve curry over fluffy basmati rice with warm naan on the side.');
 
 -- =============================================
--- RECIPE 24: Wok-Tossed Chicken - Light (Tofu, No Rice)
+-- RECIPE 24: Wok-Tossed Chicken - Light (No Rice)
 -- =============================================
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
-(24, 'Wok-Tossed Tofu with Pak Choi (Light)', 2, 960, FALSE, TRUE);
+(24, 'Wok-Tossed Chicken with Pak Choi (Light)', 2, 980, FALSE, TRUE);
 
 -- Recipe 24 meal assignment (Dinner)
 INSERT INTO recipe_meals (recipe_id, meal_id) VALUES
 (24, 3);
 
--- Recipe 24 ingredients (tofu version, no rice)
+-- Recipe 24 ingredients (chicken, no rice - Light version)
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit_id, sort_order) VALUES
-(24, 6, 300, 1, 1),    -- Firm tofu, 300g (instead of chicken)
+(24, 7, 240, 1, 1),    -- Chicken breast, 240g (same protein as Standard)
 (24, 15, 1, 5, 2),     -- Green bell pepper, 1 piece
 (24, 16, 1, 5, 3),     -- Red bell pepper, 1 piece
 (24, 17, 1, 5, 4),     -- Onion, 1 piece
@@ -961,14 +957,14 @@ INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit_id, sor
 
 -- Recipe 24 steps
 INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
-(24, 1, 'Press tofu for 15 minutes, then cube. Pan-fry until golden on all sides. Set aside.'),
+(24, 1, 'Slice chicken breast into thin strips. Season with salt and pepper.'),
 (24, 2, 'Slice peppers, onion, celery, pak choi, and mushrooms.'),
-(24, 3, 'Heat oil in a wok over high heat. Stir-fry vegetables 3-4 minutes.'),
-(24, 4, 'Add garlic and ginger, cook 30 seconds.'),
+(24, 3, 'Heat oil in a wok over high heat. Stir-fry chicken 4-5 minutes until cooked through. Set aside.'),
+(24, 4, 'Stir-fry vegetables 3-4 minutes. Add garlic and ginger, cook 30 seconds.'),
 (24, 5, 'Add soy sauce and Worcestershire sauce.'),
 (24, 6, 'Mix corn flour with 1 tbsp water, add to wok to thicken.'),
-(24, 7, 'Add tofu and cashews. Toss to combine.'),
-(24, 8, 'Sprinkle with sesame seeds and serve immediately.');
+(24, 7, 'Return chicken to wok, add cashews. Toss to combine.'),
+(24, 8, 'Sprinkle with sesame seeds and serve immediately (no rice for Light version).');
 
 -- =============================================
 -- RECIPE 25: Wok-Tossed Chicken with Rice (Full)
@@ -1064,7 +1060,8 @@ INSERT INTO recipe_families (id, family_name, description) VALUES
 (2, 'Buttermilk Pancakes', 'Classic American pancakes - Light with almond flour, Standard with honey & berries, Full with streaky bacon'),
 (3, 'Creamy Tikka Masala', 'Rich and creamy chicken tikka - Light without carbs, Standard with chickpeas, Full with rice & naan'),
 (4, 'Wok-Tossed Stir Fry', 'Asian stir fry with cashews - Light tofu version, Standard chicken, Full with rice'),
-(5, 'Tuscan Turkey Meatballs', 'Italian-style meatballs in tomato sauce - Light without potato, Full with sweet potato');
+(5, 'Tuscan Turkey Meatballs', 'Italian-style meatballs in tomato sauce - Light without potato, Full with sweet potato'),
+(6, 'Empanadas', 'Hand-held pastry parcels - Beef Standard, Mushroom & Chicken with cashew cream');
 
 -- Link recipes to families using Light/Standard/Full labels
 INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_label, display_order) VALUES
@@ -1085,7 +1082,412 @@ INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_lab
 (4, 25, FALSE, 'Full', 3),
 -- Turkey Meatballs Family
 (5, 26, FALSE, 'Light', 2),
-(5, 15, TRUE, 'Standard', 1);
+(5, 15, TRUE, 'Standard', 1),
+-- Empanadas Family (recipe 36 added after it's created below)
+(6, 5, TRUE, 'Beef', 1);
+
+-- =============================================
+-- NEW INGREDIENTS FOR LUNCH RECIPES
+-- =============================================
+INSERT INTO ingredients (id, `key`, name, aisle_id) VALUES
+-- Grains (aisle 11)
+(95, 'quinoa', 'Quinoa', 11),
+-- Veg (aisle 3)
+(96, 'red_cabbage', 'Red cabbage', 3),
+(97, 'white_cabbage', 'White cabbage', 3),
+(98, 'rocket', 'Rocket (arugula)', 3),
+(99, 'baby_potatoes', 'Baby potatoes', 3),
+(100, 'green_beans_fresh', 'Green beans (fresh)', 3),
+-- Fish (aisle 5)
+(101, 'salmon', 'Salmon fillet', 5),
+(102, 'tinned_tuna', 'Tinned tuna (in olive oil)', 5),
+-- Dairy (aisle 6)
+(103, 'parmesan', 'Parmesan cheese', 6),
+-- Herbs & Spices (aisle 8)
+(104, 'fresh_parsley', 'Fresh parsley', 8),
+(105, 'dried_oregano', 'Dried oregano', 8),
+(106, 'fresh_coriander', 'Fresh coriander', 8),
+(107, 'bay_leaf', 'Bay leaf', 8),
+(108, 'dried_thyme', 'Dried thyme', 8),
+-- Oils (aisle 9)
+(109, 'sesame_oil', 'Sesame oil (toasted)', 9),
+-- Tins & Jars (aisle 10)
+(110, 'kalamata_olives', 'Kalamata olives', 10),
+(111, 'black_olives', 'Black olives', 10),
+-- Condiments (aisle 12)
+(112, 'rice_vinegar', 'Rice vinegar', 12),
+(113, 'balsamic_vinegar', 'Balsamic vinegar', 12),
+(114, 'dijon_mustard', 'Dijon mustard', 12),
+(115, 'red_wine_vinegar', 'Red wine vinegar', 12);
+
+-- =============================================
+-- RECIPE 27: Greek Chicken Power Bowl (Standard)
+-- Office lunch - travels cold
+-- =============================================
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+(27, 'Greek Chicken Power Bowl', 2, 1178, FALSE, FALSE);
+
+INSERT INTO recipe_meals (recipe_id, meal_id) VALUES
+(27, 2); -- Lunch
+
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit_id, sort_order) VALUES
+(27, 7, 400, 1, 1),    -- Chicken breast, 400g
+(27, 95, 150, 1, 2),   -- Quinoa (dry), 150g
+(27, 23, 150, 1, 3),   -- Cucumber, 150g
+(27, 24, 200, 1, 4),   -- Cherry tomatoes, 200g
+(27, 39, 60, 1, 5),    -- Feta cheese, 60g
+(27, 110, 40, 1, 6),   -- Kalamata olives, 40g
+(27, 18, 50, 1, 7),    -- Red onion, 50g
+(27, 104, 20, 1, 8),   -- Fresh parsley, 20g
+(27, 59, 2, 4, 9),     -- Olive oil, 2 tbsp
+(27, 30, 2, 4, 10),    -- Lemon juice, 2 tbsp
+(27, 13, 1, 10, 11),   -- Garlic, 1 clove
+(27, 105, 1, 3, 12),   -- Dried oregano, 1 tsp
+(27, 44, 1, 3, 13),    -- Salt, 1 tsp
+(27, 45, 0.5, 3, 14);  -- Black pepper, 0.5 tsp
+
+INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
+(27, 1, 'Rinse quinoa and cook with 300ml water: bring to boil, reduce heat, cover 15 minutes. Fluff and cool.'),
+(27, 2, 'Season chicken with salt, pepper, oregano. Grill or pan-fry in 1 tsp olive oil until cooked through (165°F internal). Rest 5 minutes, slice.'),
+(27, 3, 'Make dressing: Whisk remaining olive oil, lemon juice, minced garlic, oregano, salt, pepper.'),
+(27, 4, 'Dice cucumber, halve cherry tomatoes, thinly slice red onion, crumble feta.'),
+(27, 5, 'Divide cooled quinoa between 2 containers.'),
+(27, 6, 'Top with sliced chicken, cucumber, tomatoes, feta, olives, red onion.'),
+(27, 7, 'Pack dressing separately in small container.'),
+(27, 8, 'Add fresh parsley just before eating. Travels well cold for 3-4 days.');
+
+-- =============================================
+-- RECIPE 28: Greek Chicken Power Bowl (Light - No Quinoa)
+-- =============================================
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+(28, 'Greek Chicken Power Bowl (Light)', 2, 818, FALSE, FALSE);
+
+INSERT INTO recipe_meals (recipe_id, meal_id) VALUES
+(28, 2); -- Lunch
+
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit_id, sort_order) VALUES
+(28, 7, 400, 1, 1),    -- Chicken breast, 400g
+(28, 23, 200, 1, 2),   -- Cucumber, 200g (extra)
+(28, 24, 250, 1, 3),   -- Cherry tomatoes, 250g (extra)
+(28, 39, 60, 1, 4),    -- Feta cheese, 60g
+(28, 110, 40, 1, 5),   -- Kalamata olives, 40g
+(28, 18, 50, 1, 6),    -- Red onion, 50g
+(28, 11, 100, 1, 7),   -- Salad leaves, 100g (added for volume)
+(28, 104, 20, 1, 8),   -- Fresh parsley, 20g
+(28, 59, 2, 4, 9),     -- Olive oil, 2 tbsp
+(28, 30, 2, 4, 10),    -- Lemon juice, 2 tbsp
+(28, 13, 1, 10, 11),   -- Garlic, 1 clove
+(28, 105, 1, 3, 12),   -- Dried oregano, 1 tsp
+(28, 44, 1, 3, 13),    -- Salt, 1 tsp
+(28, 45, 0.5, 3, 14);  -- Black pepper, 0.5 tsp
+
+INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
+(28, 1, 'Season chicken with salt, pepper, oregano. Grill or pan-fry in 1 tsp olive oil until cooked through. Rest 5 minutes, slice.'),
+(28, 2, 'Make dressing: Whisk remaining olive oil, lemon juice, minced garlic, oregano, salt, pepper.'),
+(28, 3, 'Dice cucumber, halve cherry tomatoes, thinly slice red onion, crumble feta.'),
+(28, 4, 'Divide salad leaves between 2 containers.'),
+(28, 5, 'Top with sliced chicken, cucumber, tomatoes, feta, olives, red onion.'),
+(28, 6, 'Pack dressing separately. Add parsley before eating.');
+
+-- =============================================
+-- RECIPE 29: Asian Sesame Chicken Salad (Standard)
+-- Office lunch - travels cold, cabbage stays crunchy
+-- =============================================
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+(29, 'Asian Sesame Chicken Salad', 2, 960, FALSE, FALSE);
+
+INSERT INTO recipe_meals (recipe_id, meal_id) VALUES
+(29, 2); -- Lunch
+
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit_id, sort_order) VALUES
+(29, 7, 400, 1, 1),    -- Chicken breast, 400g
+(29, 96, 200, 1, 2),   -- Red cabbage, 200g
+(29, 97, 200, 1, 3),   -- White cabbage, 200g
+(29, 22, 120, 1, 4),   -- Carrots, 120g (2 medium)
+(29, 19, 40, 1, 5),    -- Spring onions, 40g
+(29, 16, 100, 1, 6),   -- Red bell pepper, 100g
+(29, 106, 30, 1, 7),   -- Fresh coriander, 30g
+(29, 88, 2, 4, 8),     -- Sesame seeds, 2 tbsp
+(29, 109, 1.5, 4, 9),  -- Sesame oil (toasted), 1.5 tbsp
+(29, 72, 1, 4, 10),    -- Soy sauce (Kikkoman), 1 tbsp
+(29, 112, 1, 4, 11),   -- Rice vinegar, 1 tbsp
+(29, 76, 1, 3, 12),    -- Honey, 1 tsp
+(29, 13, 1, 10, 13),   -- Garlic, 1 clove
+(29, 14, 10, 1, 14),   -- Ginger, 10g
+(29, 59, 1, 3, 15),    -- Olive oil (for cooking), 1 tsp
+(29, 44, 0.5, 3, 16);  -- Salt, 0.5 tsp
+
+INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
+(29, 1, 'Season chicken with salt. Grill or pan-fry in olive oil until cooked through. Rest, then slice or shred.'),
+(29, 2, 'Finely shred both cabbages. Julienne the carrots. Slice spring onions and red pepper thinly.'),
+(29, 3, 'Make dressing: Whisk sesame oil, soy sauce, rice vinegar, honey, minced garlic, grated ginger.'),
+(29, 4, 'Toast sesame seeds in a dry pan until golden (2 minutes). Set aside.'),
+(29, 5, 'Combine all vegetables in a large bowl or divide between containers.'),
+(29, 6, 'Top with sliced chicken and toasted sesame seeds.'),
+(29, 7, 'Pack dressing separately. Keeps 4-5 days - cabbage stays crunchy unlike lettuce.'),
+(29, 8, 'Add fresh coriander just before eating.');
+
+-- =============================================
+-- RECIPE 30: Honey Garlic Salmon & Greens (Standard)
+-- Office lunch - reheats well, or eat at home fresh
+-- =============================================
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+(30, 'Honey Garlic Salmon & Greens', 2, 1080, FALSE, FALSE);
+
+INSERT INTO recipe_meals (recipe_id, meal_id) VALUES
+(30, 2); -- Lunch
+
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit_id, sort_order) VALUES
+(30, 101, 400, 1, 1),  -- Salmon fillets, 400g (200g each)
+(30, 76, 1, 4, 2),     -- Honey, 1 tbsp
+(30, 13, 2, 10, 3),    -- Garlic, 2 cloves
+(30, 72, 1, 4, 4),     -- Soy sauce (Kikkoman), 1 tbsp
+(30, 109, 1, 3, 5),    -- Sesame oil, 1 tsp
+(30, 31, 1, 4, 6),     -- Lime juice, 1 tbsp
+(30, 9, 200, 1, 7),    -- Broccoli (tenderstem), 200g
+(30, 20, 200, 1, 8),   -- Pak choi, 200g
+(30, 59, 1, 3, 9),     -- Olive oil, 1 tsp
+(30, 44, 0.5, 3, 10),  -- Salt, 0.5 tsp
+(30, 45, 0.25, 3, 11); -- Black pepper, 0.25 tsp
+
+INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
+(30, 1, 'Mix honey, minced garlic, soy sauce, sesame oil, and lime juice in a bowl.'),
+(30, 2, 'Place salmon in a baking dish, pour marinade over. Let sit 10 minutes (or marinate overnight in fridge).'),
+(30, 3, 'Preheat oven to 200°C (400°F).'),
+(30, 4, 'Bake salmon for 12-15 minutes until it flakes easily with a fork.'),
+(30, 5, 'Meanwhile, steam or stir-fry broccoli and pak choi with olive oil and a pinch of salt until tender-crisp (3-4 minutes).'),
+(30, 6, 'Serve salmon over greens, spoon remaining glaze from the dish on top.'),
+(30, 7, 'For office: Pack salmon and greens separately. Reheat salmon loosely covered for 2 minutes in microwave.');
+
+-- =============================================
+-- RECIPE 31: Chicken & Vegetable Soup (Standard)
+-- Office lunch - reheats perfectly, freezer-friendly
+-- Dutch oven recipe
+-- =============================================
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+(31, 'Chicken & Vegetable Soup', 4, 900, FALSE, FALSE);
+
+INSERT INTO recipe_meals (recipe_id, meal_id) VALUES
+(31, 2); -- Lunch
+
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit_id, sort_order) VALUES
+(31, 7, 400, 1, 1),    -- Chicken breast, 400g
+(31, 59, 1, 4, 2),     -- Olive oil, 1 tbsp
+(31, 17, 150, 1, 3),   -- Onion, 150g (1 large)
+(31, 21, 150, 1, 4),   -- Celery, 150g (3 stalks)
+(31, 22, 150, 1, 5),   -- Carrots, 150g (2 medium)
+(31, 13, 3, 10, 6),    -- Garlic, 3 cloves
+(31, 90, 1000, 2, 7),  -- Stock (homemade), 1000ml
+(31, 100, 200, 1, 8),  -- Green beans (fresh), 200g
+(31, 12, 100, 1, 9),   -- Spinach, 100g
+(31, 107, 1, 5, 10),   -- Bay leaf, 1 piece
+(31, 108, 1, 3, 11),   -- Dried thyme, 1 tsp
+(31, 30, 1, 4, 12),    -- Lemon juice, 1 tbsp
+(31, 44, 1, 3, 13),    -- Salt, 1 tsp
+(31, 45, 0.5, 3, 14);  -- Black pepper, 0.5 tsp
+
+INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
+(31, 1, 'Heat olive oil in dutch oven over medium heat.'),
+(31, 2, 'Dice onion, celery, and carrots. Add to pot, sauté 5 minutes until softened.'),
+(31, 3, 'Add minced garlic, cook 30 seconds until fragrant.'),
+(31, 4, 'Add whole chicken breasts, stock, bay leaf, thyme, salt, and pepper.'),
+(31, 5, 'Bring to boil, reduce heat, cover. Simmer 20 minutes until chicken is cooked through.'),
+(31, 6, 'Remove chicken to a board. Shred with two forks.'),
+(31, 7, 'Cut green beans into 2-inch pieces. Add to pot, cook 5 minutes.'),
+(31, 8, 'Return shredded chicken to pot. Add spinach, stir until wilted.'),
+(31, 9, 'Remove bay leaf. Stir in lemon juice. Taste and adjust seasoning.'),
+(31, 10, 'For 50g protein per serving, eat 2 portions (450 cal each). Freezes well for 3 months.');
+
+-- =============================================
+-- RECIPE 32: Steak & Rocket Salad (Light)
+-- Home lunch - best fresh off the pan
+-- =============================================
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+(32, 'Steak & Rocket Salad', 2, 940, FALSE, FALSE);
+
+INSERT INTO recipe_meals (recipe_id, meal_id) VALUES
+(32, 2); -- Lunch
+
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit_id, sort_order) VALUES
+(32, 3, 350, 1, 1),    -- Sirloin steak, 350g
+(32, 98, 150, 1, 2),   -- Rocket, 150g
+(32, 24, 100, 1, 3),   -- Cherry tomatoes, 100g
+(32, 103, 40, 1, 4),   -- Parmesan, 40g (shaved)
+(32, 59, 1, 4, 5),     -- Olive oil, 1 tbsp
+(32, 113, 1, 4, 6),    -- Balsamic vinegar, 1 tbsp
+(32, 44, 1, 3, 7),     -- Salt, 1 tsp
+(32, 45, 0.5, 3, 8);   -- Black pepper, 0.5 tsp
+
+INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
+(32, 1, 'Remove steak from fridge 30 minutes before cooking.'),
+(32, 2, 'Season both sides generously with salt and pepper.'),
+(32, 3, 'Heat a pan to very hot. Add 1 tsp olive oil.'),
+(32, 4, 'Cook steak 2-3 minutes per side for medium-rare (adjust for preferred doneness). Rest 5 minutes.'),
+(32, 5, 'Toss rocket with remaining olive oil, balsamic vinegar, and a pinch of salt.'),
+(32, 6, 'Slice steak against the grain into strips.'),
+(32, 7, 'Divide rocket between plates. Top with sliced steak, halved cherry tomatoes, and parmesan shavings.'),
+(32, 8, 'Best eaten fresh - steak loses quality when reheated.');
+
+-- =============================================
+-- RECIPE 33: Steak & Rocket Salad (Standard - with potatoes)
+-- =============================================
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+(33, 'Steak & Rocket Salad with Roast Potatoes', 2, 1240, FALSE, FALSE);
+
+INSERT INTO recipe_meals (recipe_id, meal_id) VALUES
+(33, 2); -- Lunch
+
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit_id, sort_order) VALUES
+(33, 3, 350, 1, 1),    -- Sirloin steak, 350g
+(33, 98, 150, 1, 2),   -- Rocket, 150g
+(33, 24, 100, 1, 3),   -- Cherry tomatoes, 100g
+(33, 103, 40, 1, 4),   -- Parmesan, 40g
+(33, 99, 300, 1, 5),   -- Baby potatoes, 300g
+(33, 59, 2, 4, 6),     -- Olive oil, 2 tbsp (1 for potatoes)
+(33, 113, 1, 4, 7),    -- Balsamic vinegar, 1 tbsp
+(33, 44, 1.5, 3, 8),   -- Salt, 1.5 tsp
+(33, 45, 0.5, 3, 9);   -- Black pepper, 0.5 tsp
+
+INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
+(33, 1, 'Preheat oven to 200°C. Halve baby potatoes, toss with 1 tbsp olive oil and salt.'),
+(33, 2, 'Roast potatoes for 25-30 minutes until golden and crispy.'),
+(33, 3, 'Remove steak from fridge 30 minutes before cooking. Season well.'),
+(33, 4, 'Cook steak in hot pan 2-3 minutes per side. Rest 5 minutes, then slice.'),
+(33, 5, 'Toss rocket with remaining olive oil, balsamic, and salt.'),
+(33, 6, 'Plate rocket, top with steak, tomatoes, parmesan, and roast potatoes on the side.');
+
+-- =============================================
+-- RECIPE 34: Tuna Niçoise (Light - no potatoes)
+-- Office lunch - travels cold
+-- =============================================
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+(34, 'Tuna Niçoise (Light)', 2, 958, FALSE, FALSE);
+
+INSERT INTO recipe_meals (recipe_id, meal_id) VALUES
+(34, 2); -- Lunch
+
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit_id, sort_order) VALUES
+(34, 102, 320, 1, 1),  -- Tinned tuna (drained), 320g (2 tins)
+(34, 38, 4, 5, 2),     -- Eggs, 4 pieces
+(34, 100, 150, 1, 3),  -- Green beans (fresh), 150g
+(34, 24, 100, 1, 4),   -- Cherry tomatoes, 100g
+(34, 111, 40, 1, 5),   -- Black olives, 40g
+(34, 11, 100, 1, 6),   -- Salad leaves, 100g
+(34, 59, 1, 4, 7),     -- Olive oil, 1 tbsp
+(34, 115, 1, 4, 8),    -- Red wine vinegar, 1 tbsp
+(34, 114, 1, 3, 9),    -- Dijon mustard, 1 tsp
+(34, 44, 0.5, 3, 10),  -- Salt, 0.5 tsp
+(34, 45, 0.25, 3, 11); -- Black pepper, 0.25 tsp
+
+INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
+(34, 1, 'Boil eggs for 7-8 minutes for jammy yolks. Cool in ice water, peel, halve.'),
+(34, 2, 'Blanch green beans in boiling water for 3 minutes. Refresh in cold water, drain.'),
+(34, 3, 'Make dressing: Whisk olive oil, red wine vinegar, Dijon mustard, salt, pepper.'),
+(34, 4, 'Drain tuna and flake into chunks.'),
+(34, 5, 'Arrange salad leaves in containers or on plates.'),
+(34, 6, 'Top with green beans, tuna, halved eggs, cherry tomatoes, and olives.'),
+(34, 7, 'Pack dressing separately. Travels well cold for 2-3 days.');
+
+-- =============================================
+-- RECIPE 35: Tuna Niçoise (Standard - with potatoes)
+-- =============================================
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+(35, 'Tuna Niçoise', 2, 1112, FALSE, FALSE);
+
+INSERT INTO recipe_meals (recipe_id, meal_id) VALUES
+(35, 2); -- Lunch
+
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit_id, sort_order) VALUES
+(35, 102, 320, 1, 1),  -- Tinned tuna (drained), 320g
+(35, 38, 4, 5, 2),     -- Eggs, 4 pieces
+(35, 99, 200, 1, 3),   -- Baby potatoes, 200g
+(35, 100, 150, 1, 4),  -- Green beans (fresh), 150g
+(35, 24, 100, 1, 5),   -- Cherry tomatoes, 100g
+(35, 111, 40, 1, 6),   -- Black olives, 40g
+(35, 11, 100, 1, 7),   -- Salad leaves, 100g
+(35, 59, 1, 4, 8),     -- Olive oil, 1 tbsp
+(35, 115, 1, 4, 9),    -- Red wine vinegar, 1 tbsp
+(35, 114, 1, 3, 10),   -- Dijon mustard, 1 tsp
+(35, 44, 0.5, 3, 11),  -- Salt, 0.5 tsp
+(35, 45, 0.25, 3, 12); -- Black pepper, 0.25 tsp
+
+INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
+(35, 1, 'Boil baby potatoes until tender (15 minutes). Cool, halve.'),
+(35, 2, 'Boil eggs 7-8 minutes for jammy yolks. Cool in ice water, peel, halve.'),
+(35, 3, 'Blanch green beans 3 minutes. Refresh in cold water.'),
+(35, 4, 'Make dressing: Whisk olive oil, red wine vinegar, Dijon mustard, salt, pepper.'),
+(35, 5, 'Drain tuna and flake into chunks.'),
+(35, 6, 'Arrange salad leaves, top with potatoes, green beans, tuna, eggs, tomatoes, olives.'),
+(35, 7, 'Drizzle dressing or pack separately. Classic French composed salad.');
+
+-- =============================================
+-- RECIPE 36: Mushroom & Chicken Empanada with Cashew Cream
+-- Variant of Beef Empanadas - same dough, different filling
+-- =============================================
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+(36, 'Mushroom & Chicken Empanada with Cashew Cream', 2, 1140, FALSE, FALSE);
+
+INSERT INTO recipe_meals (recipe_id, meal_id) VALUES
+(36, 2), -- Lunch
+(36, 3); -- Dinner
+
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit_id, sort_order) VALUES
+-- Dough (same as beef empanadas)
+(36, 77, 300, 1, 1),   -- Plain flour, 300g
+(36, 44, 1, 3, 2),     -- Salt, 1 tsp
+(36, 36, 75, 1, 3),    -- Greek yogurt, 75g
+(36, 89, 120, 2, 4),   -- Water, 120ml
+-- Filling
+(36, 7, 350, 1, 5),    -- Chicken breast, 350g
+(36, 27, 250, 1, 6),   -- Mushrooms, 250g
+(36, 17, 100, 1, 7),   -- Onion, 100g
+(36, 13, 2, 10, 8),    -- Garlic, 2 cloves
+(36, 59, 1, 4, 9),     -- Olive oil, 1 tbsp
+(36, 108, 1, 3, 10),   -- Dried thyme, 1 tsp
+(36, 44, 0.5, 3, 11),  -- Salt, 0.5 tsp
+(36, 45, 0.25, 3, 12), -- Black pepper, 0.25 tsp
+-- Cashew Cream Sauce
+(36, 85, 40, 1, 13),   -- Cashews, 40g
+(36, 37, 100, 2, 14),  -- Milk, 100ml
+(36, 13, 1, 10, 15),   -- Garlic, 1 clove (for sauce)
+(36, 44, 0.25, 3, 16), -- Salt, 0.25 tsp (for sauce)
+-- Egg wash
+(36, 38, 1, 5, 17);    -- Egg, 1 piece
+
+INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
+(36, 1, 'DOUGH: Mix flour and salt. Rub in cold butter until breadcrumbs texture. Add yogurt and water, mix to form dough. Knead 5 minutes, cover, rest 30 minutes.'),
+(36, 2, 'CASHEW CREAM: Soak cashews in boiling water for 15 minutes. Drain. Blend cashews, milk, garlic, and salt until completely smooth. Set aside.'),
+(36, 3, 'FILLING: Dice chicken into small cubes. Finely chop mushrooms and onion.'),
+(36, 4, 'Heat olive oil in a pan. Cook chicken until browned (5 minutes). Remove and set aside.'),
+(36, 5, 'In same pan, cook onions until softened (3 minutes). Add mushrooms and thyme, cook until mushrooms release liquid and it evaporates (5-7 minutes).'),
+(36, 6, 'Return chicken to pan. Pour in half the cashew cream. Stir well, season with salt and pepper. Let cool slightly.'),
+(36, 7, 'Roll dough to 2-3mm thick. Cut 12cm circles. Place spoonful of filling in center.'),
+(36, 8, 'Fold dough over, seal edges with fork. Place on baking tray, brush with beaten egg.'),
+(36, 9, 'Bake at 200°C for 20-22 minutes until golden brown.'),
+(36, 10, 'Serve with remaining cashew cream as dipping sauce. Makes approximately 8-10 empanadas, serve 4-5 per person.');
+
+-- Add recipe 36 to Empanadas family (family 6 already exists)
+INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_label, display_order) VALUES
+(6, 36, FALSE, 'Mushroom & Chicken', 2);
+
+-- =============================================
+-- RECIPE FAMILIES FOR NEW LUNCHES
+-- =============================================
+INSERT INTO recipe_families (id, family_name, description) VALUES
+(7, 'Greek Chicken Power Bowl', 'Mediterranean bowl - Light no quinoa, Standard with quinoa'),
+(8, 'Steak & Rocket Salad', 'Bistro salad - Light no potatoes, Standard with roast potatoes'),
+(9, 'Tuna Niçoise', 'French composed salad - Light no potatoes, Standard with potatoes');
+
+INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_label, display_order) VALUES
+-- Greek Chicken Bowl Family
+(7, 27, TRUE, 'Standard', 1),
+(7, 28, FALSE, 'Light', 2),
+-- Steak Salad Family
+(8, 33, TRUE, 'Standard', 1),
+(8, 32, FALSE, 'Light', 2),
+-- Tuna Niçoise Family
+(9, 35, TRUE, 'Standard', 1),
+(9, 34, FALSE, 'Light', 2);
 
 -- =============================================
 -- TEST USER (development only)

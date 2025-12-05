@@ -211,6 +211,8 @@
   padding: 0;
   cursor: pointer;
   font-family: inherit;
+  /* Explicit color to prevent inheritance issues */
+  color: var(--text-secondary);
 }
 
 .calorie-dropdown-trigger:hover .calories {
@@ -219,6 +221,8 @@
 
 .calorie-dropdown-trigger .calories {
   font-weight: 500;
+  /* Explicit color for visibility on white card background */
+  color: var(--text-secondary);
   transition: color 0.15s ease;
 }
 

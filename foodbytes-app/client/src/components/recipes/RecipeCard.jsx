@@ -71,16 +71,11 @@ function RecipeCard({ recipe, currentMealType, onSelectVariant, onEdit }) {
   }
 
   // FR-013: Handle variant selection in fullscreen modal (update content in-place)
-  const handleModalVariantSelect = async (variantId, currentServings) => {
-    // For now, we update the calories display immediately via the variants array
-    // The full recipe data (ingredients, steps) would need to be fetched from API
-    // if the variant has different ingredients than the base recipe
+  // RecipeViewModal now handles variant switching internally - just sync local state
+  const handleModalVariantSelect = async (variantId) => {
+    // Sync local selectedVariantId state for consistency
+    // Modal fetches recipe data internally to stay open
     setSelectedVariantId(variantId)
-
-    // If the parent has a variant selection handler, call it to potentially swap recipes
-    if (onSelectVariant && variantId !== recipe.id) {
-      onSelectVariant(variantId, currentServings)
-    }
   }
 
   return (

@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef, useMemo } from 'react'
+import { recipeService } from '../../services/recipeService'
 import './RecipeViewModal.css'
 
 /**
@@ -87,6 +88,7 @@ function RecipeViewModal({
   }
 
   // Handle variant selection - update in-place without closing popup
+  // FR-013: Fetch variant recipe data internally to keep modal open
   const handleVariantSelect = async (variantId) => {
     setSelectedVariantId(variantId)
     setShowCalorieDropdown(false)
@@ -97,9 +99,15 @@ function RecipeViewModal({
       setCurrentCalories(selectedVariant.caloriesPerServing)
     }
 
-    // Call parent callback to fetch full recipe data for the variant
-    if (onSelectVariant && variantId !== currentRecipe?.id) {
-      onSelectVariant(variantId, servings)
+    // Fetch full recipe data for the variant (ingredients, steps) internally
+    // Do NOT call parent's onSelectVariant - that would cause unmount/remount
+    if (variantId !== currentRecipe?.id) {
+      try {
+        const variantRecipe = await recipeService.getRecipeById(variantId)
+        setCurrentRecipe(variantRecipe)
+      } catch (err) {
+        console.error('Failed to fetch variant recipe:', err)
+      }
     }
   }
 
@@ -131,7 +139,7 @@ function RecipeViewModal({
                     aria-expanded={showCalorieDropdown}
                     aria-haspopup="listbox"
                   >
-                    <span className="calories-text">{getCurrentVariantCalories()} cal/serving</span>
+                    <span className="calories-text">{getCurrentVariantCalories()} cal</span>
                     <span className="dropdown-chevron">▼</span>
                   </button>
                   {showCalorieDropdown && (
