@@ -36,7 +36,7 @@
 
 | Req # | Description |
 |-------|-------------|
-| (none) | All requirements completed |
+| FR-048 | Landing Page Animation (Guest Homepage) |
 
 ## In Progress - Finish
 
@@ -1340,7 +1340,7 @@ Each feature fades in, pauses 1.5 seconds, then fades out before the next:
 - Conversation about the difficulty of understanding nutrition without proper education
 - User insight: "Diet is learned habits, if you don't know how to cook how are you suppose to figure this out. I have to build a website to get an understanding of this."
 
-**Status:** Backlog
+**Status:** In Progress
 
 ---
 
