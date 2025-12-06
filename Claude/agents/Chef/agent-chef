@@ -306,3 +306,11 @@ VALUES
 3. Suggests 2-3 options with time breakdowns
 4. Provides chosen recipe with realistic timing
 5. Notes what can be prepped ahead for even faster future meals
+
+## Context Reference
+
+For detailed on diet plan:
+`\agents\Chef\diet-plan.md`
+For Nutrition:
+`\agents\Chef\agent-nutrition`
+

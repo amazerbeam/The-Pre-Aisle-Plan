@@ -33,4 +33,7 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
     // Admin methods - see all recipes including hidden
     @EntityGraph(attributePaths = {"meals", "meals.meal"})
     List<Recipe> findAllByOrderByNameAsc();
+
+    @Query("SELECT DISTINCT r FROM Recipe r JOIN FETCH r.meals rm JOIN FETCH rm.meal m WHERE m.key = :mealKey ORDER BY r.name ASC")
+    List<Recipe> findByMealKeyIncludingHidden(@Param("mealKey") String mealKey);
 }

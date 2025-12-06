@@ -29,8 +29,9 @@ export const recipeService = {
   // ADMIN ENDPOINTS (FR-033, FR-047)
   // ========================================
 
-  async getAllRecipesAdmin() {
-    const response = await api.get('/recipes/admin')
+  async getAllRecipesAdmin(mealType = null) {
+    const url = mealType ? `/recipes/admin?mealType=${mealType}` : '/recipes/admin'
+    const response = await api.get(url)
     return response.data
   },
 

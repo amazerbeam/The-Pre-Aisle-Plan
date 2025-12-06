@@ -496,7 +496,7 @@ CREATE TABLE recipe_family_members (
 - Do NOT add cheat meals to recipe families (is_cheat = TRUE recipes are excluded)
 - Do NOT use variant labels other than "Light", "Standard", "Full"
 - Do NOT automatically switch variants when navigating between views (preserve user selection)
-- Do NOT hide non-default recipes from search/browse (all variants are discoverable)
+- Do NOT show non-default variant recipes as separate cards in browse/list views (only default variant shows as card, others appear only in dropdown)
 - Do NOT merge recipe IDs (each variant is a distinct recipe with its own ID, ingredients, steps)
 - Do NOT require users to set a variant when assigning to meal plan (default is fine)
 - Do NOT display recipe names in dropdown - show only "variantLabel — XXX cal" format (e.g., "Light — 550 cal")

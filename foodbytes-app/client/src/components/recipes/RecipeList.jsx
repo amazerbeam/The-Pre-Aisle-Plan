@@ -19,13 +19,16 @@ function RecipeList() {
 
   useEffect(() => {
     loadRecipes(activeMeal)
-  }, [activeMeal])
+  }, [activeMeal, isAdmin])
 
   const loadRecipes = async (mealType) => {
     setLoading(true)
     setError(null)
     try {
-      const data = await recipeService.getRecipesByMealType(mealType)
+      // Admin users see all recipes (including hidden), regular users see only live recipes
+      const data = isAdmin
+        ? await recipeService.getAllRecipesAdmin(mealType)
+        : await recipeService.getRecipesByMealType(mealType)
       setRecipes(data)
     } catch (err) {
       setError('Failed to load recipes. Please try again.')

@@ -22,6 +22,27 @@ public class RecipeController {
     private final RecipeService recipeService;
 
     // ========================================
+    // ADMIN ENDPOINTS (FR-033, FR-047)
+    // Must be defined before /{id} to avoid route conflicts
+    // ========================================
+
+    @GetMapping("/admin")
+    @Operation(summary = "Get all recipes (admin)", description = "Returns all recipes including hidden ones, optionally filtered by meal type")
+    public ResponseEntity<List<RecipeDTO>> getAllRecipesAdmin(
+            @RequestParam(required = false) String mealType) {
+        if (mealType != null && !mealType.isEmpty()) {
+            return ResponseEntity.ok(recipeService.getRecipesByMealTypeAdmin(mealType));
+        }
+        return ResponseEntity.ok(recipeService.getAllRecipesAdmin());
+    }
+
+    @GetMapping("/admin/{id}")
+    @Operation(summary = "Get recipe by ID (admin)", description = "Returns recipe details for editing")
+    public ResponseEntity<RecipeAdminDTO> getRecipeByIdAdmin(@PathVariable Long id) {
+        return ResponseEntity.ok(recipeService.getRecipeByIdAdmin(id));
+    }
+
+    // ========================================
     // PUBLIC READ ENDPOINTS (for all users)
     // ========================================
 
@@ -45,22 +66,6 @@ public class RecipeController {
     @Operation(summary = "Search recipes by name")
     public ResponseEntity<List<RecipeDTO>> searchRecipes(@RequestParam String query) {
         return ResponseEntity.ok(recipeService.searchRecipes(query));
-    }
-
-    // ========================================
-    // ADMIN ENDPOINTS (FR-033, FR-047)
-    // ========================================
-
-    @GetMapping("/admin")
-    @Operation(summary = "Get all recipes (admin)", description = "Returns all recipes including hidden ones")
-    public ResponseEntity<List<RecipeDTO>> getAllRecipesAdmin() {
-        return ResponseEntity.ok(recipeService.getAllRecipesAdmin());
-    }
-
-    @GetMapping("/admin/{id}")
-    @Operation(summary = "Get recipe by ID (admin)", description = "Returns recipe details for editing")
-    public ResponseEntity<RecipeAdminDTO> getRecipeByIdAdmin(@PathVariable Long id) {
-        return ResponseEntity.ok(recipeService.getRecipeByIdAdmin(id));
     }
 
     @PostMapping("/admin")

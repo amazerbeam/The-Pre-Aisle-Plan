@@ -154,11 +154,27 @@ public class RecipeService {
     // ========================================
 
     /**
-     * Get all recipes for admin (including hidden).
+     * Get all recipes for admin (including hidden but excluding non-default variants).
+     * FR-043: Only default variant shows as card, others appear only in dropdown.
      */
     @Transactional(readOnly = true)
     public List<RecipeDTO> getAllRecipesAdmin() {
+        Set<Long> hiddenRecipeIds = new HashSet<>(recipeFamilyMemberRepository.findNonDefaultRecipeIds());
         return recipeRepository.findAllByOrderByNameAsc().stream()
+                .filter(recipe -> !hiddenRecipeIds.contains(recipe.getId()))
+                .map(this::convertToAdminDTO)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Get recipes by meal type for admin (including hidden but excluding non-default variants).
+     * FR-043: Only default variant shows as card, others appear only in dropdown.
+     */
+    @Transactional(readOnly = true)
+    public List<RecipeDTO> getRecipesByMealTypeAdmin(String mealType) {
+        Set<Long> hiddenRecipeIds = new HashSet<>(recipeFamilyMemberRepository.findNonDefaultRecipeIds());
+        return recipeRepository.findByMealKeyIncludingHidden(mealType.toLowerCase()).stream()
+                .filter(recipe -> !hiddenRecipeIds.contains(recipe.getId()))
                 .map(this::convertToAdminDTO)
                 .collect(Collectors.toList());
     }

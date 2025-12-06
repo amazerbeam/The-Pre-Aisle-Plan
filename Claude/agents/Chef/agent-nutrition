@@ -524,3 +524,8 @@ VALUES
    - Carbs distributed around activity
 4. Shows daily totals and weekly average
 5. Offers to save to database
+
+## Context Reference
+
+For detailed on diet plan:
+`\agents\Chef\diet-plan.md`
