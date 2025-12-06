@@ -33,7 +33,6 @@ INSERT INTO ingredients (id, `key`, name, aisle_id) VALUES
 -- Fish (aisle 5)
 (131, 'smoked_salmon', 'Smoked salmon', 5),
 (132, 'prawns', 'Prawns (shrimp)', 5),
-(169, 'tinned_tuna', 'Tinned tuna (in water)', 5),
 -- Dairy (aisle 6)
 (133, 'cream_cheese', 'Cream cheese', 6),
 (134, 'mozzarella', 'Fresh mozzarella', 6),
@@ -542,7 +541,7 @@ INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VA
 (74, 'High-Protein Tuna Nicoise', 2, 1300, FALSE, FALSE);
 INSERT INTO recipe_meals (recipe_id, meal_id) VALUES (74, 2);
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit_id, sort_order) VALUES
-(74, 169, 320, 1, 1), (74, 38, 4, 5, 2), (74, 100, 150, 1, 3), (74, 24, 100, 1, 4),
+(74, 102, 320, 1, 1), (74, 38, 4, 5, 2), (74, 100, 150, 1, 3), (74, 24, 100, 1, 4),
 (74, 111, 40, 1, 5), (74, 11, 80, 1, 6), (74, 59, 2, 4, 7), (74, 115, 1, 4, 8),
 (74, 114, 1, 3, 9), (74, 44, 0.5, 3, 10);
 INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
@@ -962,3 +961,70 @@ INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_lab
 -- Lemon Herb Chicken Family
 (24, 59, TRUE, 'Standard', 1),
 (24, 83, FALSE, 'Light', 2);
+
+-- =============================================
+-- NEW DINNER RECIPES (December 2024)
+-- Recipe IDs: 86-87
+-- =============================================
+
+-- New Ingredients
+INSERT INTO ingredients (id, `key`, name, aisle_id) VALUES
+(172, 'franks_hot_sauce', 'Franks Hot Sauce', 12),
+(173, 'white_potato', 'White potatoes (Maris Piper)', 3),
+(174, 'chicken_thigh_boneless_skinless', 'Chicken thigh (boneless, skinless)', 2),
+(175, 'garlic_granules', 'Garlic granules', 8),
+(176, 'fresh_parsley', 'Fresh parsley', 8)
+ON DUPLICATE KEY UPDATE name = VALUES(name);
+
+-- Recipe 86: Buffalo Chicken Thighs with Side Salad
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+(86, 'Buffalo Chicken Thighs with Side Salad', 2, 675, FALSE, FALSE);
+INSERT INTO recipe_meals (recipe_id, meal_id) VALUES (86, 3);
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit_id, sort_order) VALUES
+(86, 174, 4, 5, 1),    -- 4 chicken thighs (boneless, skinless)
+(86, 92, 30, 1, 2),    -- 30g butter
+(86, 172, 60, 2, 3),   -- 60ml Franks Hot Sauce
+(86, 59, 2, 4, 4),     -- 2 tbsp olive oil (1 for chicken, 1 for dressing)
+(86, 13, 2, 10, 5),    -- 2 cloves garlic
+(86, 44, 0.5, 3, 6),   -- 0.5 tsp salt
+(86, 45, 0.5, 3, 7),   -- 0.5 tsp black pepper
+(86, 11, 60, 1, 8),    -- 60g salad leaves
+(86, 23, 100, 1, 9),   -- 100g cucumber
+(86, 24, 80, 1, 10),   -- 80g cherry tomatoes
+(86, 30, 1, 4, 11);    -- 1 tbsp lemon juice
+INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
+(86, 1, 'Pat chicken thighs completely dry. Season with salt and pepper.'),
+(86, 2, 'Heat 1 tbsp olive oil in a skillet over medium-high heat.'),
+(86, 3, 'Cook chicken 5-6 minutes per side until golden and cooked through (74C internal).'),
+(86, 4, 'Meanwhile, melt butter in a small pan. Whisk in Franks Hot Sauce and minced garlic.'),
+(86, 5, 'SALAD: Slice cucumber. Halve cherry tomatoes. Arrange on plates with salad leaves.'),
+(86, 6, 'Whisk remaining 1 tbsp olive oil with lemon juice, pinch of salt. Drizzle over salad.'),
+(86, 7, 'Slice chicken thighs. Arrange on salad and drizzle generously with Buffalo sauce.'),
+(86, 8, 'Serve immediately with extra Buffalo sauce on the side.');
+
+-- Recipe 87: Sirloin Steak with Smoked Paprika Air Fryer Chips
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+(87, 'Sirloin Steak with Smoked Paprika Air Fryer Chips', 2, 780, FALSE, FALSE);
+INSERT INTO recipe_meals (recipe_id, meal_id) VALUES (87, 3);
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit_id, sort_order) VALUES
+(87, 173, 500, 1, 1),  -- 500g white potatoes
+(87, 59, 2, 4, 2),     -- 2 tbsp olive oil
+(87, 46, 1, 3, 3),     -- 1 tsp smoked paprika
+(87, 175, 1, 3, 4),    -- 1 tsp garlic granules
+(87, 44, 1, 3, 5),     -- 1 tsp salt
+(87, 3, 500, 1, 6),    -- 500g sirloin steak (2 x 250g)
+(87, 45, 1, 3, 7),     -- 1 tsp black pepper
+(87, 92, 15, 1, 8),    -- 15g butter
+(87, 13, 2, 10, 9),    -- 2 cloves garlic
+(87, 28, 1, 5, 10);    -- 1 rosemary sprig
+INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
+(87, 1, 'Remove steaks from fridge 30 minutes before cooking.'),
+(87, 2, 'CHIPS: Peel potatoes and cut into thick chips (1.5cm). Rinse and pat completely dry.'),
+(87, 3, 'Parboil chips in salted water for 5 minutes. Drain and let steam dry 2 minutes.'),
+(87, 4, 'Toss chips with 1.5 tbsp olive oil, smoked paprika, garlic granules, and half the salt.'),
+(87, 5, 'Air fry at 200C for 20-25 minutes, shaking halfway, until golden and crispy.'),
+(87, 6, 'STEAK: Pat steaks dry. Season generously with remaining salt and black pepper.'),
+(87, 7, 'Heat 0.5 tbsp olive oil in a heavy pan over high heat until smoking.'),
+(87, 8, 'Sear steaks 3-4 minutes per side for medium-rare. Adjust for preference.'),
+(87, 9, 'Add butter, smashed garlic, and rosemary. Tilt pan and baste steaks 1 minute.'),
+(87, 10, 'Rest steaks 5 minutes. Slice against the grain and serve with chips.');

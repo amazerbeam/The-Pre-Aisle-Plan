@@ -45,7 +45,6 @@
 | FR-045 | Unit Autocomplete (Admin Recipe Editing) |
 | FR-046 | Recipe Step Editing (Admin Only) |
 | FR-047 | Create New Recipe (Admin Only) |
-| FR-048 | Landing Page Animation (Guest Homepage) |
 
 ## In Progress - Finish
 
