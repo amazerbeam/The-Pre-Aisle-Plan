@@ -36,26 +36,27 @@
 
 ---
 
-## PHASE 1: Domain Name
+## PHASE 1: Domain Name - COMPLETE
 
-### Purchase Domain (Pick One)
-| Registrar | Price/Year | Notes |
-|-----------|-----------|-------|
-| Porkbun | ~$9 | Cheapest, includes privacy |
-| Namecheap | ~$10 | Good UI, includes privacy |
-| Cloudflare | ~$10 | At-cost pricing |
+- [x] Purchased mypantryplan.com on Porkbun ($11.08/year)
 
 ---
 
-## PHASE 2: Prepare Code
+## PHASE 2: Prepare Code - CURRENT
 
 ### Push to GitHub
 ```bash
-cd foodbytes-app
+cd C:\Users\jossd\Documents\MyWebSites\FoodBytes
 git add .
 git commit -m "Prepare for deployment"
 git push origin main
 ```
+
+### Uncommitted Changes (need to push):
+- client/src/App.jsx
+- client/src/styles/global.css
+- client/src/components/onboarding/ (new)
+- context-go-live.md (new)
 
 ---
 
@@ -217,7 +218,8 @@ Start with free tier. Upgrade if you exceed limits.
 |---------|-----|
 | Railway Dashboard | https://railway.app/dashboard |
 | Google Cloud Console | https://console.cloud.google.com |
-| Domain DNS (update this) | <your-registrar-url> |
+| Porkbun DNS Management | https://porkbun.com/account/domains |
+| GitHub Repo | https://github.com/amazerbeam/The-Pre-Aisle-Plan |
 
 ---
 
