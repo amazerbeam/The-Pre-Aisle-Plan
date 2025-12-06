@@ -53,7 +53,9 @@
       "Bash(taskkill:*)",
       "Bash(npm run dev:*)",
       "Bash(dir:*)",
-      "Bash(ping:*)"
+      "Bash(ping:*)",
+      "WebFetch(domain:foodbytes.com)",
+      "WebSearch"
     ],
     "deny": [],
     "ask": []

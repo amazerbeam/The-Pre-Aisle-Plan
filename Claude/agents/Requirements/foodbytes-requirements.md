@@ -36,7 +36,7 @@
 
 | Req # | Description |
 |-------|-------------|
-| FR-048 | Landing Page Animation (Guest Homepage) |
+| (none) | All requirements completed |
 
 ## In Progress - Finish
 
@@ -78,6 +78,7 @@
 | FR-045 | Unit Autocomplete (Admin Recipe Editing) |
 | FR-046 | Recipe Step Editing (Admin Only) |
 | FR-047 | Create New Recipe (Admin Only) |
+| FR-048 | Landing Page Animation (Guest Homepage) |
 | Database: Users | Store user accounts from Google OAuth |
 | Database: Recipes | Store recipe data (migrated from recipes.js) |
 
@@ -1340,7 +1341,13 @@ Each feature fades in, pauses 1.5 seconds, then fades out before the next:
 - Conversation about the difficulty of understanding nutrition without proper education
 - User insight: "Diet is learned habits, if you don't know how to cook how are you suppose to figure this out. I have to build a website to get an understanding of this."
 
-**Status:** In Progress
+**Status:** Completed
+
+**Implementation:**
+- Component: `client/src/components/onboarding/LandingPageAnimation.jsx`
+- Stylesheet: `client/src/components/onboarding/LandingPageAnimation.css`
+- App.jsx updated to conditionally render landing page for first-time guests
+- 5-phase animation with skip functionality, localStorage persistence, and reduced motion support
 
 ---
 
