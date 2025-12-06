@@ -3,24 +3,7 @@
 
 
 ##Issues##
- ### FR-043: Linked Recipe Variants (Recipe Families)
-	- The dropdown for the linked recipes needs to be normlised to show "Light", "Standard (default) & "Full"
-	- Changing the varation recipe did not update the "Recipe" I selected "Wihtout Rice" and the recie in the meal plan was the same
-	- The varation recie did not add to the Meal Plan, the orignal version added. 
-	- Cal did not update when selecteing varation recipes. 
-	- The edit function is not opening the varation recipe. always shows base I believe
-	
 
-### FR-014: Assign Recipes to Days of the Week
-Click on the reciope in the meal planner should bring up the recipe full screen 
-
-
-### FR-046: Recipe Step Editing (Admin Only)
-	-The ux is all over the place on desk top. squashed, needs to work on browser and mobile
-	- save and cancel should alway be at the footer of the pop up
-
-### FR-042: Ingredient Breakdown Popup (Long Press)
-	- The pop up is not centered and is a little small on desktop
 
 
 Linked meals: 
