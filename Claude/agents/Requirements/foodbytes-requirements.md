@@ -36,15 +36,7 @@
 
 | Req # | Description |
 |-------|-------------|
-| FR-013 | Fullscreen Recipe View (Popup Modal with Variant Support) |
-| FR-033 | Recipe Editing (Admin Only) - Detailed Edit Flow |
-| FR-036 | Fixed Per-Serving Calorie Display (No Scaling) |
-| FR-042 | Ingredient Breakdown Popup (Long Press) |
-| FR-043 | Linked Recipe Variants (Recipe Families) |
-| FR-044 | Ingredient Autocomplete (Admin Recipe Editing) |
-| FR-045 | Unit Autocomplete (Admin Recipe Editing) |
-| FR-046 | Recipe Step Editing (Admin Only) |
-| FR-047 | Create New Recipe (Admin Only) |
+| (none) | All requirements completed |
 
 ## In Progress - Finish
 
@@ -77,6 +69,15 @@
 | FR-041 | Random Food Emojis Per Meal Type (Meal Plan View Only) |
 | NFR-016 | Simplified Day Button Styling (No Animations, No Loading Effects) |
 | FR-049 | Expand Recipe to Fullscreen (Recipe Cards) |
+| FR-013 | Fullscreen Recipe View (Popup Modal with Variant Support) |
+| FR-033 | Recipe Editing (Admin Only) - Detailed Edit Flow |
+| FR-036 | Fixed Per-Serving Calorie Display (No Scaling) |
+| FR-042 | Ingredient Breakdown Popup (Long Press) |
+| FR-043 | Linked Recipe Variants (Recipe Families) |
+| FR-044 | Ingredient Autocomplete (Admin Recipe Editing) |
+| FR-045 | Unit Autocomplete (Admin Recipe Editing) |
+| FR-046 | Recipe Step Editing (Admin Only) |
+| FR-047 | Create New Recipe (Admin Only) |
 | Database: Users | Store user accounts from Google OAuth |
 | Database: Recipes | Store recipe data (migrated from recipes.js) |
 
@@ -401,7 +402,7 @@
 - User feedback (2025-12-05): "When the full screen is open and the user changes the Cal, the full screen should stay open, just reload the new recipe in place of the old one"
 - User feedback (2025-12-05): "The dropdown to get the variant meal should simply read 'x cal' same as the card"
 
-**Status:** In Progress
+**Status:** Completed
 
 ---
 
@@ -1539,7 +1540,7 @@ Each feature fades in, pauses 1.5 seconds, then fades out before the next:
 - Server API: POST/PUT/DELETE recipe endpoints
 - Admin authorization middleware
 
-**Status:** In Progress
+**Status:** Completed
 
 ---
 
@@ -1621,7 +1622,7 @@ Each feature fades in, pauses 1.5 seconds, then fades out before the next:
 - NFR-010 centralized ingredient definitions
 - Fuzzy matching logic in `IngredientService`
 
-**Status:** In Progress
+**Status:** Completed
 
 ---
 
@@ -1664,7 +1665,7 @@ Each feature fades in, pauses 1.5 seconds, then fades out before the next:
 - Same UX as ingredient autocomplete
 - NFR-015 centralized unit definitions
 
-**Status:** In Progress
+**Status:** Completed
 
 ---
 
@@ -1731,7 +1732,7 @@ Each feature fades in, pauses 1.5 seconds, then fades out before the next:
 - User request for step editing with reorder capability
 - FR-033 recipe editing requirements
 
-**Status:** In Progress
+**Status:** Completed
 
 ---
 
@@ -1793,7 +1794,7 @@ Each feature fades in, pauses 1.5 seconds, then fades out before the next:
 - FR-033 recipe editing requirements
 - FR-035 visibility requirements (new recipes default to Hidden)
 
-**Status:** In Progress
+**Status:** Completed
 
 ---
 
