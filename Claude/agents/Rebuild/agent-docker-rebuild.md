@@ -46,6 +46,18 @@ Use AskUserQuestion to ask:
   - Yes, delete everything (fresh start)
   - No, keep the database
 
+### Step 1b: Ask About Seed File (only if deleting database)
+If user chose to delete the database, use AskUserQuestion to ask:
+- "Which seed file do you want to use?"
+  1. **seed.sql** - Base recipes only
+  2. **seed-restructure.sql** - Oats, Banana Curry & Tikka Masala restructure
+  3. **seed-merged-recipes.sql** - 12 new international recipes (Japanese, Mexican, Thai, French, Italian, Chinese)
+
+Based on selection, update the seed file path in `docker-compose.yml`:
+- Option 1: `./foodbytes-app/database/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql`
+- Option 2: `./foodbytes-app/database/seed-restructure.sql:/docker-entrypoint-initdb.d/02-seed.sql`
+- Option 3: `./foodbytes-app/database/seed-merged-recipes.sql:/docker-entrypoint-initdb.d/02-seed.sql`
+
 ### Step 2: Validate Configuration
 Run these checks and FIX any issues before rebuilding:
 
