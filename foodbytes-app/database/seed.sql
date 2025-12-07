@@ -197,7 +197,7 @@ INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VA
 (3, 'Protein Oats with Eggs & Greek Yogurt', 2, 1180, FALSE, TRUE),
 (4, 'Buttermilk Pancake Stack with Streaky Bacon', 2, 1280, FALSE, TRUE),
 -- Lunch
-(5, 'Argentine Beef Empanada Bites', 2, 1275, FALSE, TRUE),
+(5, 'Argentine Beef Empanada Bites', 2, 3086, FALSE, TRUE),
 (6, 'Chicken & Black Bean Burrito', 2, 1070, FALSE, TRUE),
 (7, 'Pan-Fried Fish Cakes with Lemon & Roasted Sweet Potato', 2, 1040, FALSE, TRUE),
 (8, 'Lemon Chicken Salad with Feta & Chickpeas', 2, 1150, FALSE, TRUE),
@@ -271,7 +271,7 @@ INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit_id, sor
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit_id, sort_order) VALUES
 (5, 77, 300, 1, 1),    -- Plain flour, 300g
 (5, 44, 1, 3, 2),      -- Salt, 1 tsp
-(5, 36, 75, 1, 3),     -- Greek yogurt, 75g
+(5, 92, 75, 1, 3),     -- Butter, 75g
 (5, 89, 120, 2, 4),    -- Water, 120ml
 (5, 59, 1, 4, 5),      -- Olive oil, 1 tbsp
 (5, 17, 1, 5, 6),      -- Onion, 1 piece
@@ -1425,7 +1425,7 @@ INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
 -- Variant of Beef Empanadas - same dough, different filling
 -- =============================================
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
-(36, 'Mushroom & Chicken Empanada with Cashew Cream', 2, 1140, FALSE, FALSE);
+(36, 'Mushroom & Chicken Empanada with Cashew Cream', 2, 2780, FALSE, FALSE);
 
 INSERT INTO recipe_meals (recipe_id, meal_id) VALUES
 (36, 2), -- Lunch
@@ -1435,7 +1435,7 @@ INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit_id, sor
 -- Dough (same as beef empanadas)
 (36, 77, 300, 1, 1),   -- Plain flour, 300g
 (36, 44, 1, 3, 2),     -- Salt, 1 tsp
-(36, 36, 75, 1, 3),    -- Greek yogurt, 75g
+(36, 92, 75, 1, 3),    -- Butter, 75g
 (36, 89, 120, 2, 4),   -- Water, 120ml
 -- Filling
 (36, 7, 350, 1, 5),    -- Chicken breast, 350g

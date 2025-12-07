@@ -79,6 +79,7 @@
 | FR-046 | Recipe Step Editing (Admin Only) |
 | FR-047 | Create New Recipe (Admin Only) |
 | FR-048 | Landing Page Animation (Guest Homepage) |
+| FR-050 | Day Calorie Preview in Recipes View (above day buttons) |
 | Database: Users | Store user accounts from Google OAuth |
 | Database: Recipes | Store recipe data (migrated from recipes.js) |
 
@@ -843,6 +844,69 @@ CREATE TABLE recipe_family_members (
 **Source Evidence:** User clarification - "this should only be in 'Meal Plan'" (not on recipe day buttons)
 
 **Status:** Completed
+
+---
+
+### FR-050: Day Calorie Preview in Recipes View
+**Priority:** Medium
+
+**Category:** Meal Planning / UX Enhancement
+
+**Description:** Display a small calorie total above each day button (Mon-Sun) in the Recipes view, showing the cumulative calories already assigned to that day. This allows users to track their daily calorie intake while selecting meals without needing to navigate to the Meal Plan view.
+
+**User Story:** As a user, I want to see the current calorie total for each day while browsing recipes so that I can make informed meal selections without switching between views.
+
+**Acceptance Criteria:**
+- [x] Small text displaying calories appears **above** each day button (Mon-Sun)
+- [x] Format: `X cal` (e.g., "450 cal", "0 cal" if no meals assigned)
+- [x] Calorie total is the **sum of all meals assigned to that day** (Breakfast + Lunch + Dinner + Snacks)
+- [x] Calorie display updates immediately when a recipe is assigned or removed from that day
+- [x] When switching meal tabs (Breakfast → Lunch → Dinner → Snacks), the day calorie totals remain visible and reflect all meal types, not just the current tab
+- [x] Text is subtle/muted styling (smaller font, lighter color) so it doesn't distract from the day buttons
+- [x] Only visible to authenticated users (day buttons hidden for guests per existing behavior)
+- [x] "0 cal" shown for days with no meals assigned (always visible)
+
+**Example Flow:**
+1. User is on Breakfast tab, assigns "Oats" (350 cal) to Monday → Monday shows "350 cal"
+2. User switches to Lunch tab → Monday still shows "350 cal" (from Breakfast)
+3. User assigns "Salad" (450 cal) to Monday for Lunch → Monday now shows "800 cal"
+4. User can now see they have 800 cal planned for Monday while choosing Dinner
+
+**DO:**
+- Position calorie text directly above the day button, centered
+- Use the existing `getDailyCalories(planDate)` from MealPlanContext
+- Keep styling consistent with day button design (flat, no animations)
+- Update totals in real-time after assignment (use weekPlan state)
+- Use small font size (11-12px) and muted color (e.g., #666 or lighter)
+
+**DO NOT:**
+- Do NOT show calories for guest users (they can't assign meals anyway)
+- Do NOT add click behavior to the calorie text
+- Do NOT show calorie text in a popup/tooltip (must be always visible)
+- Do NOT use animations or transitions on calorie updates
+- Do NOT show "cal/serving" - show total calories assigned for the day
+- Do NOT filter by meal type - always show cumulative total for ALL meals on that day
+
+**Technical Context:**
+- `DayAssignmentButtons.jsx` is the target component
+- `MealPlanContext.jsx` already has `getDailyCalories(planDate)` method
+- `weekPlan.days[].totalCalories` contains server-calculated daily totals
+- weekDays array contains date strings and day names
+
+**Cross-References:**
+- FR-014: Assign Recipes to Days of the Week (day button functionality)
+- FR-017: Calculate Daily Calorie Totals (calorie calculation logic)
+- FR-036: Fixed Per-Serving Calorie Display (calorie display format)
+- NFR-016: Simplified Day Button Styling (no animations)
+
+**Source Evidence:** User request - "when I am creating a meal plan I will have an idea of how many calories I need to add/reduce based on what is selected, without having to go to the 'meal plan' tab"
+
+**Status:** Completed
+
+**Implementation:**
+- Modified `DayAssignmentButtons.jsx`: Added `getDailyCalories` from MealPlanContext, wrapped each button in `.day-container` div with `.day-calories` span showing cumulative daily calories
+- Modified `DayAssignmentButtons.css`: Added `.day-container` (flex column layout) and `.day-calories` (11px, #666 muted color) styling with mobile responsive adjustments (10px on mobile)
+- No backend changes required - uses existing `getDailyCalories(planDate)` which reads server-calculated totals from `weekPlan.days[].totalCalories`
 
 ---
 

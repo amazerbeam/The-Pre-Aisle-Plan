@@ -5,9 +5,10 @@ import { useAuth } from '../../contexts/AuthContext'
 import './DayAssignmentButtons.css'
 
 /**
- * DayAssignmentButtons - FR-014, FR-015, FR-037, NFR-016, FR-041, FR-043
+ * DayAssignmentButtons - FR-014, FR-015, FR-037, NFR-016, FR-041, FR-043, FR-050
  * Day-of-week buttons for recipe assignment with swap behavior
  * Hidden for guest users (as per user preference)
+ * FR-050: Shows cumulative daily calories above each day button
  *
  * Button States (NFR-016 - Legacy styling):
  * - unselected: No recipe assigned to this slot
@@ -21,7 +22,7 @@ function DayAssignmentButtons({ recipe, servings, currentMealType, selectedRecip
   // FR-043: Use selectedRecipeId if provided (for variants), otherwise use recipe.id
   const recipeIdToAssign = selectedRecipeId || recipe.id
   const { isAuthenticated } = useAuth()
-  const { weekDays, weekPlan, assignRecipe, isRecipeAssigned } = useMealPlan()
+  const { weekDays, weekPlan, assignRecipe, isRecipeAssigned, getDailyCalories } = useMealPlan()
   const [loading, setLoading] = useState(null) // Track which day is loading
 
   // Hidden for guest users
@@ -111,18 +112,23 @@ function DayAssignmentButtons({ recipe, servings, currentMealType, selectedRecip
         const buttonClass = getButtonClass(day.date)
         const isLoading = loading === day.date
         // FR-041: NO emojis on day buttons - emojis only appear in Meal Plan view
+        // FR-050: Get daily calories for calorie preview
+        const dailyCalories = getDailyCalories(day.date)
 
         return (
-          <button
-            key={day.date}
-            className={`day-button ${buttonClass}`}
-            onClick={() => handleDayClick(day.date)}
-            disabled={isLoading}
-            title={getButtonTitle(day.date, day.dayName, buttonClass)}
-            aria-label={getButtonTitle(day.date, day.dayName, buttonClass)}
-          >
-            {day.dayName}
-          </button>
+          <div key={day.date} className="day-container">
+            {/* FR-050: Calorie preview above day button */}
+            <span className="day-calories">{dailyCalories} cal</span>
+            <button
+              className={`day-button ${buttonClass}`}
+              onClick={() => handleDayClick(day.date)}
+              disabled={isLoading}
+              title={getButtonTitle(day.date, day.dayName, buttonClass)}
+              aria-label={getButtonTitle(day.date, day.dayName, buttonClass)}
+            >
+              {day.dayName}
+            </button>
+          </div>
         )
       })}
     </div>

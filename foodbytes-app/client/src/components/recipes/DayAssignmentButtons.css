@@ -1,7 +1,24 @@
-/* DayAssignmentButtons - FR-014, FR-015, FR-037, NFR-016
+/* DayAssignmentButtons - FR-014, FR-015, FR-037, NFR-016, FR-050
  * Legacy-style flat day buttons with three states
  * No animations, no circles - simple flat design
+ * FR-050: Includes calorie preview above each day button
  */
+
+/* FR-050: Day container - wraps calorie text and button */
+.day-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+/* FR-050: Calorie preview text above day button */
+.day-calories {
+  font-size: 11px;
+  color: #666;
+  font-weight: 400;
+  white-space: nowrap;
+}
 
 .day-buttons {
   display: flex;
@@ -83,5 +100,10 @@
     min-width: 40px;
     max-width: 50px;
     text-align: center;
+  }
+
+  /* FR-050: Smaller calorie text on mobile */
+  .day-calories {
+    font-size: 10px;
   }
 }
