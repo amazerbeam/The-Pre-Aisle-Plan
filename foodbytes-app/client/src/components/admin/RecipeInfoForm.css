@@ -128,13 +128,17 @@
   font-size: 0.875rem;
 }
 
-/* Form Actions */
-.form-actions {
+/* Form Actions - Sticky footer for Save/Cancel buttons */
+.recipe-info-form .form-actions {
   display: flex;
   justify-content: flex-end;
   gap: var(--spacing-md);
-  padding-top: var(--spacing-md);
+  padding: var(--spacing-md) 0;
   border-top: 1px solid var(--border-color);
+  position: sticky;
+  bottom: 0;
+  background: var(--bg-primary);
+  z-index: 10;
 }
 
 /* Mobile responsive */

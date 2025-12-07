@@ -23,7 +23,7 @@ function Header() {
           onKeyDown={(e) => e.key === 'Enter' && navigate('/')}
           title="Go to Recipes"
         >
-          <h1>FoodBytes</h1>
+          <h1>MyPantryPlan</h1>
         </div>
 
         {/* FR-007: Date Range Picker - only shown to authenticated users */}
