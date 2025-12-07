@@ -46,17 +46,37 @@ Use AskUserQuestion to ask:
   - Yes, delete everything (fresh start)
   - No, keep the database
 
-### Step 1b: Ask About Seed File (only if deleting database)
-If user chose to delete the database, use AskUserQuestion to ask:
-- "Which seed file do you want to use?"
+### Step 1b: Ask About Seed Files (only if deleting database)
+If user chose to delete the database, use AskUserQuestion with **multiSelect: true** to ask:
+- "Which seed file(s) do you want to use? (Select one or more)"
   1. **seed.sql** - Base recipes only
   2. **seed-restructure.sql** - Oats, Banana Curry & Tikka Masala restructure
   3. **seed-merged-recipes.sql** - 12 new international recipes (Japanese, Mexican, Thai, French, Italian, Chinese)
 
-Based on selection, update the seed file path in `docker-compose.yml`:
-- Option 1: `./foodbytes-app/database/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql`
-- Option 2: `./foodbytes-app/database/seed-restructure.sql:/docker-entrypoint-initdb.d/02-seed.sql`
-- Option 3: `./foodbytes-app/database/seed-merged-recipes.sql:/docker-entrypoint-initdb.d/02-seed.sql`
+**Multi-select examples:**
+- Select "1" → Base recipes only
+- Select "1,2" → Base recipes + restructure changes
+- Select "1,3" → Base recipes + international recipes
+- Select "1,2,3" → All seed files combined
+
+Based on selection, update the `db.volumes` section in `docker-compose.yml` to include ONLY the selected seed files. Files execute in alphabetical order, so use sequential numbering:
+
+**Volume mapping rules:**
+- Schema is always: `./foodbytes-app/database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql`
+- seed.sql (if selected): `./foodbytes-app/database/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql`
+- seed-restructure.sql (if selected): `./foodbytes-app/database/seed-restructure.sql:/docker-entrypoint-initdb.d/03-seed-restructure.sql`
+- seed-merged-recipes.sql (if selected): `./foodbytes-app/database/seed-merged-recipes.sql:/docker-entrypoint-initdb.d/04-seed-merged-recipes.sql`
+
+**Example docker-compose.yml volumes for selection "1,3":**
+```yaml
+volumes:
+  - mysql_data:/var/lib/mysql
+  - ./foodbytes-app/database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+  - ./foodbytes-app/database/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql
+  - ./foodbytes-app/database/seed-merged-recipes.sql:/docker-entrypoint-initdb.d/04-seed-merged-recipes.sql
+```
+
+**IMPORTANT:** Remove any seed file volume mappings that were NOT selected before rebuilding.
 
 ### Step 2: Validate Configuration
 Run these checks and FIX any issues before rebuilding:

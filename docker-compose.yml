@@ -17,7 +17,8 @@ services:
       - mysql_data:/var/lib/mysql
       - ./foodbytes-app/database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
       - ./foodbytes-app/database/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql
-      - ./foodbytes-app/database/seed-merged-recipes.sql:/docker-entrypoint-initdb.d/03-seed-merged-recipes.sql
+      - ./foodbytes-app/database/seed-restructure.sql:/docker-entrypoint-initdb.d/03-seed-restructure.sql
+      - ./foodbytes-app/database/seed-merged-recipes.sql:/docker-entrypoint-initdb.d/04-seed-merged-recipes.sql
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
