@@ -36,7 +36,7 @@
 
 | Req # | Description |
 |-------|-------------|
-| (none) | All requirements completed |
+| FR-029 | Screen Wake Lock with Lock Emoji Animation |
 
 ## In Progress - Finish
 
@@ -1216,12 +1216,12 @@ CREATE TABLE recipe_family_members (
 
 ## Mobile Features
 
-### FR-029: Screen Wake Lock During Cooking
+### FR-029: Screen Wake Lock During Cooking with Lock Emoji Animation
 **Priority:** Low
 
-**Description:** System keeps screen awake when viewing meal plan or fullscreen recipe
+**Description:** System keeps screen awake when viewing meal plan or fullscreen recipe. When the user opens the menu, a lock emoji animation plays to indicate the wake lock status.
 
-**User Story:** As a user, I want my screen to stay on while viewing recipes so that I don't have to keep unlocking my phone while cooking.
+**User Story:** As a user, I want my screen to stay on while viewing recipes so that I don't have to keep unlocking my phone while cooking, and I want to see a visual indicator (animated lock emoji) when the wake lock is active.
 
 **Acceptance Criteria:**
 - Wake lock requests when fullscreen recipe opens
@@ -1229,12 +1229,23 @@ CREATE TABLE recipe_family_members (
 - Wake lock releases when views close
 - Feature detection handles unsupported browsers gracefully
 - Errors are logged but don't interrupt user experience
+- [ ] When user opens the menu, display a lock emoji animation:
+  - [ ] Start with unlocked emoji (🔓) at 1x scale
+  - [ ] Scale up to 1.1x
+  - [ ] Scale down to 0.9x
+  - [ ] Flash white
+  - [ ] Transform to locked emoji (🔒)
+  - [ ] Return to 1x scale
+  - [ ] Total animation duration: 1 second
 
 **Source Evidence:**
 - `requestWakeLock()`
 - `releaseWakeLock()`
 - `navigator.wakeLock.request('screen')`
 - Feature detection: `if ('wakeLock' in navigator)`
+- CSS keyframe animation for lock emoji transition
+
+**Status:** In Progress
 
 ---
 
