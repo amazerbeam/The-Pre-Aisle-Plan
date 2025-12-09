@@ -2391,4 +2391,968 @@ A registered user account (created via OAuth)
 
 ---
 
+## Branding
+
+### FR-051: Update Site Favicon
+
+**Priority:** Low
+
+**Category:** Branding / UI
+
+**Description:** Update the website favicon to reflect the My Pantry Plan branding.
+
+**User Story:** As a user, I want to see a recognizable favicon in my browser tab so that I can easily identify the My Pantry Plan site.
+
+**Acceptance Criteria:**
+- [ ] Favicon displays in browser tab
+- [ ] Favicon displays in bookmarks
+- [ ] Multiple sizes provided for different devices (16x16, 32x32, 180x180 for Apple touch)
+- [ ] Favicon matches brand colors and identity
+- [ ] SVG version provided for modern browsers
+
+**Source Evidence:** Brand guidelines, UX context
+
+**Status:** Backlog
+
+---
+
+## Subscription System
+
+### FR-052: Free vs Paid Tier Access Control
+
+**Priority:** Critical
+
+**Category:** Subscription
+
+**Description:** The application enforces different access levels based on user subscription status. Free-tier users have limited functionality; paid users have full access.
+
+**User Story:** As a product owner, I want to restrict features based on subscription tier so that users are incentivized to subscribe.
+
+**Acceptance Criteria:**
+
+**Free Tier Restrictions:**
+- [ ] Only recipes marked `is_free = TRUE` are fully accessible
+- [ ] Premium recipes (`is_free = FALSE`) display as blurred cards with "🔒 Upgrade to unlock"
+- [ ] Clicking a locked recipe shows upgrade prompt modal
+- [ ] Calorie and macro information is hidden on all recipe cards
+- [ ] Meal planning limited to 2 days maximum
+- [ ] Shopping list feature completely disabled (shows upgrade prompt)
+- [ ] "Upgrade" button visible in header/profile area
+
+**Paid Tier Access:**
+- [ ] Full access to all recipes (current and future)
+- [ ] Full nutrition information displayed
+- [ ] Multi-week meal planning enabled
+- [ ] Meal plan history accessible
+- [ ] Full shopping list functionality
+- [ ] No upgrade prompts or locked content
+
+**Tier Determination Logic:**
+- IF user.subscription_status = 'active' OR user.subscription_status = 'trialing' → Paid tier access
+- ELSE → Free tier access
+
+**Source Evidence:** Subscription requirements addendum
+
+**Status:** Backlog
+
+---
+
+### FR-053: Premium Recipe Blurred Display
+
+**Priority:** High
+
+**Category:** Subscription / UI
+
+**Description:** Premium recipes are displayed to free-tier users as blurred cards showing only the recipe name, with a lock icon and upgrade prompt.
+
+**User Story:** As a free user, I want to see what premium recipes exist so that I understand the value of subscribing.
+
+**Acceptance Criteria:**
+- [ ] Premium recipe cards show recipe name (readable, not blurred)
+- [ ] Recipe card content (image area, details) is visually blurred (CSS `filter: blur(8px)`)
+- [ ] 🔒 lock icon overlays the blurred area (~48px size, centered)
+- [ ] "Premium Recipe" badge displayed on card (top-left corner, brand color)
+- [ ] Clicking anywhere on card opens upgrade modal
+- [ ] Calorie/macro info not shown (even blurred) for free users
+- [ ] Premium recipes appear in correct category tabs alongside free recipes
+- [ ] Premium recipes sorted after free recipes within each category
+
+**Source Evidence:** Subscription requirements addendum
+
+**Status:** Backlog
+
+---
+
+### FR-054: Two-Day Meal Planning Limit (Free Tier)
+
+**Priority:** High
+
+**Category:** Subscription / Meal Planning
+
+**Description:** Free-tier users can only plan meals for a maximum of 2 days. Additional days show upgrade prompts.
+
+**User Story:** As a free user, I can plan 2 days of meals to try the feature, and see that more days require a subscription.
+
+**Acceptance Criteria:**
+- [ ] Free users see all 7 day buttons but only 2 are interactive
+- [ ] First 2 days (from "From" date) are enabled
+- [ ] Days 3-7 display as disabled with lock icon
+- [ ] Clicking disabled day shows upgrade modal
+- [ ] Existing assignments on days 3-7 (from trial period) are hidden
+- [ ] Day calorie preview only shows for enabled days
+- [ ] Meal Plan calendar view only shows 2 days for free users
+- [ ] Preserve trial data (hidden, not deleted) in case user upgrades
+
+**Source Evidence:** Subscription requirements addendum
+
+**Status:** Backlog
+
+---
+
+### FR-055: Shopping List Paywall (Free Tier)
+
+**Priority:** High
+
+**Category:** Subscription / Shopping List
+
+**Description:** Free-tier users cannot access the shopping list feature. Clicking the Shopping button shows an upgrade prompt.
+
+**User Story:** As a free user, I understand that the shopping list is a premium feature worth subscribing for.
+
+**Acceptance Criteria:**
+- [ ] Shopping button in footer remains visible (not hidden)
+- [ ] Clicking Shopping button shows upgrade modal (not empty list)
+- [ ] Modal explains the feature benefits (aisle-organized, aggregated ingredients)
+- [ ] Modal includes "Start Free Trial" and "Subscribe" buttons
+- [ ] Shopping list API returns 403 for free-tier users
+
+**Source Evidence:** Subscription requirements addendum
+
+**Status:** Backlog
+
+---
+
+### FR-056: Hidden Nutrition Information (Free Tier)
+
+**Priority:** High
+
+**Category:** Subscription / Recipe Display
+
+**Description:** Free-tier users do not see calorie or macro information on any recipes, including free recipes.
+
+**User Story:** As a free user, I can browse and use free recipes but need to subscribe to see nutritional information.
+
+**Acceptance Criteria:**
+- [ ] Calorie display hidden on recipe cards for free users
+- [ ] "cal" text replaced with "🔒" or "Upgrade for nutrition info"
+- [ ] Fullscreen recipe view hides calorie information
+- [ ] Meal plan day totals hidden for free users
+- [ ] Day calorie preview (above day buttons) hidden for free users
+- [ ] Recipe variant dropdown hides calorie info (shows variant names only)
+- [ ] API responses exclude calorie data for free users (security)
+
+**Source Evidence:** Subscription requirements addendum
+
+**Status:** Backlog
+
+---
+
+## Trial System
+
+### FR-057: 7-Day Free Trial with Card Upfront
+
+**Priority:** Critical
+
+**Category:** Trial / Payments
+
+**Description:** New users receive a 7-day free trial with full paid-tier access. A valid payment method (credit card, Google Pay, Apple Pay) is required to start the trial. The subscription auto-converts to €4.99/month after trial ends unless cancelled.
+
+**User Story:** As a new user, I want to try all features free for 7 days so I can decide if the subscription is worth it.
+
+**Acceptance Criteria:**
+- [ ] New users see "Start 7-Day Free Trial" as primary CTA
+- [ ] Clicking opens Stripe Checkout with trial configuration
+- [ ] User must add valid payment method to start trial
+- [ ] Google Pay, Apple Pay, and card entry all supported
+- [ ] Trial starts immediately upon successful payment method validation
+- [ ] No charge during trial period
+- [ ] After 7 days: auto-charge €4.99 (monthly) unless cancelled
+- [ ] User can choose monthly (€4.99) or annual (€39.99) at checkout
+- [ ] Trial period clearly communicated: "Free until [date], then €X/month"
+- [ ] User receives welcome email with trial end date
+
+**Trial Status Values:**
+- `trialing` — Currently in trial period
+- `active` — Paying subscriber
+- `canceled` — Cancelled (access until period end)
+- `past_due` — Payment failed
+- `free` — Free tier (never subscribed or trial ended)
+
+**Source Evidence:** Subscription requirements addendum, Stripe integration
+
+**Status:** Backlog
+
+---
+
+### FR-058: Trial Extension via Referrals
+
+**Priority:** High
+
+**Category:** Trial / Referrals
+
+**Description:** Users can extend their trial period by referring friends. Each successful referral adds 5 days to the referrer's trial, up to a maximum of 28 total days (7 base + 21 bonus).
+
+**User Story:** As a trial user, I want to earn extra free days by sharing with friends so I have more time to evaluate the product.
+
+**Acceptance Criteria:**
+- [ ] Each successful referral adds +5 days to trial
+- [ ] Maximum total trial: 28 days (cap)
+- [ ] Referral bonus applied immediately when friend signs up for trial
+- [ ] User notified of bonus via in-app message and email
+- [ ] Bonus days stack (1 referral = 12 days, 2 = 17, 3 = 22, 4 = 27, 5+ = 28 cap)
+- [ ] Subscription charge date extends with bonus days
+- [ ] Referral stats visible in profile ("3 friends joined, +15 days earned")
+
+**Bonus Calculation:** `total_trial_days = min(7 + (referral_count × 5), 28)`
+
+**Source Evidence:** Subscription requirements addendum
+
+**Status:** Backlog
+
+---
+
+### FR-059: Trial Expiry Soft Lock Modal
+
+**Priority:** High
+
+**Category:** Trial / UX
+
+**Description:** When a user's trial expires and they haven't subscribed, a modal appears requiring them to choose: Subscribe or Continue with Free tier.
+
+**User Story:** As a user whose trial ended, I'm prompted to make a decision about subscribing rather than silently losing access.
+
+**Acceptance Criteria:**
+- [ ] Modal appears on first app interaction after trial expires
+- [ ] Modal is non-dismissable (must choose an option)
+- [ ] Modal shows what user is losing (premium features summary)
+- [ ] Two clear buttons: "Subscribe Now" and "Continue with Free"
+- [ ] "Subscribe Now" → Stripe checkout
+- [ ] "Continue with Free" → Downgrade to free tier, dismiss modal
+- [ ] Modal only appears once (choice is remembered)
+- [ ] If user had payment method, show "Your card was not charged"
+
+**Source Evidence:** Subscription requirements addendum
+
+**Status:** Backlog
+
+---
+
+### FR-060: Second Trial After 6 Months
+
+**Priority:** Medium
+
+**Category:** Trial
+
+**Description:** Users who declined to subscribe and have been on the free tier for 6+ months become eligible for a second trial.
+
+**User Story:** As a lapsed user who's been on free tier for 6 months, I want another chance to try premium features.
+
+**Acceptance Criteria:**
+- [ ] Track `last_trial_ended_at` timestamp in user record
+- [ ] If 6+ months since last trial ended, user eligible for new trial
+- [ ] Eligible users see "Try Premium Again — 7 Days Free" prompt
+- [ ] New trial follows same rules (7 days, card required, referral bonuses)
+- [ ] Maximum 2 trials per user lifetime (prevent infinite cycling)
+- [ ] `trial_count` tracked in user record
+
+**Eligibility Check:** `eligible = (trial_count < 2) AND (subscription_status = 'free') AND (last_trial_ended_at < now - 6 months)`
+
+**Source Evidence:** Subscription requirements addendum
+
+**Status:** Backlog
+
+---
+
+## Referral System
+
+### FR-061: Unique Referral Code Generation
+
+**Priority:** High
+
+**Category:** Referrals
+
+**Description:** Each user receives a unique, auto-generated referral code that creates their shareable referral link.
+
+**User Story:** As a user, I have a unique link I can share with friends to earn bonus trial days.
+
+**Acceptance Criteria:**
+- [ ] Referral code auto-generated on account creation
+- [ ] Format: 6 alphanumeric characters, uppercase (e.g., `ABC123`, `XK7M2P`)
+- [ ] Code is unique across all users
+- [ ] Referral link format: `mypantryplan.com/r/ABC123`
+- [ ] Code never changes (permanent for user)
+- [ ] Code visible in Profile → Referrals page
+- [ ] Link is easily copyable with one click
+
+**Source Evidence:** Subscription requirements addendum
+
+**Status:** Backlog
+
+---
+
+### FR-062: Referral Link Landing Page
+
+**Priority:** High
+
+**Category:** Referrals
+
+**Description:** When someone visits a referral link (`mypantryplan.com/r/ABC123`), they see a landing page explaining the offer and are tracked as referred by that user.
+
+**User Story:** As someone who clicked a friend's referral link, I see a welcome message and the referral is tracked when I sign up.
+
+**Acceptance Criteria:**
+- [ ] Referral code stored in localStorage on page visit
+- [ ] Landing page shows: "You've been invited to My Pantry Plan!"
+- [ ] Shows referrer's first name if available ("John invited you")
+- [ ] Explains trial offer: "Start your 7-day free trial"
+- [ ] Clear CTA: "Get Started" → Sign up flow
+- [ ] Referral code persists through signup flow (including OAuth redirect)
+- [ ] Referral code attached to new user record on signup
+- [ ] Invalid codes show standard homepage (no error)
+- [ ] Code expires after 30 days if not used
+
+**Source Evidence:** Subscription requirements addendum
+
+**Status:** Backlog
+
+---
+
+### FR-063: Referral Tracking and Credit
+
+**Priority:** High
+
+**Category:** Referrals
+
+**Description:** When a referred user signs up and starts a trial, the referrer receives their bonus days credit immediately.
+
+**User Story:** As a referrer, I receive +5 bonus days as soon as my friend signs up for their trial.
+
+**Acceptance Criteria:**
+- [ ] On referred user trial start: create referral record
+- [ ] Referral record links referrer_id → referred_id
+- [ ] Referrer's trial extended by 5 days (Stripe API call)
+- [ ] Referrer receives in-app notification: "🎉 [Name] joined! You earned +5 days"
+- [ ] Referrer receives email notification
+- [ ] Referral stats updated in referrer's profile
+- [ ] Referred user's record shows `referred_by` user ID
+- [ ] Bonus only awarded if referrer is still in trial period
+- [ ] No bonus if referrer is already paying subscriber or has hit 28-day cap
+
+**Source Evidence:** Subscription requirements addendum
+
+**Status:** Backlog
+
+---
+
+### FR-064: Referral Sharing UI
+
+**Priority:** High
+
+**Category:** Referrals / UI
+
+**Description:** Users can share their referral link via copy button, social media buttons, and native device share sheet.
+
+**User Story:** As a user, I want easy ways to share my referral link with friends across different platforms.
+
+**Acceptance Criteria:**
+- [ ] **Copy Link** — Copies `mypantryplan.com/r/CODE` to clipboard, shows "Copied!" confirmation
+- [ ] **WhatsApp** — Opens WhatsApp with pre-filled message
+- [ ] **Facebook** — Opens Facebook share dialog
+- [ ] **Twitter/X** — Opens Twitter with pre-filled tweet
+- [ ] **Native Share** — Uses `navigator.share()` API on supported devices
+- [ ] Use native share sheet on mobile (better UX)
+- [ ] Show social buttons on desktop (no native share)
+- [ ] Track which share method is used (analytics)
+
+**Share UI Location:**
+- Trial banner (prominent during trial)
+- Profile → Referrals page (permanent)
+
+**Source Evidence:** Subscription requirements addendum
+
+**Status:** Backlog
+
+---
+
+### FR-065: Referral Stats Dashboard
+
+**Priority:** Medium
+
+**Category:** Referrals / UI
+
+**Description:** Users can view their referral statistics in a dedicated page within their profile.
+
+**User Story:** As a user, I want to see how many friends I've referred and how many bonus days I've earned.
+
+**Acceptance Criteria:**
+- [ ] Total friends referred (count)
+- [ ] Bonus days earned (sum)
+- [ ] Days remaining in trial (if applicable)
+- [ ] Referral link (copyable)
+- [ ] Share buttons
+- [ ] Progress bar to cap (e.g., "3/5 referrals to max bonus")
+
+**Location:** Profile → "Invite Friends" or "Referrals" page
+
+**Source Evidence:** Subscription requirements addendum
+
+**Status:** Backlog
+
+---
+
+### FR-066: Trial Referral Banner
+
+**Priority:** High
+
+**Category:** Referrals / UI
+
+**Description:** During the trial period, a prominent banner encourages users to share their referral link to extend their trial.
+
+**User Story:** As a trial user, I see a clear prompt reminding me I can earn extra free days by sharing.
+
+**Acceptance Criteria:**
+- [ ] Banner visible at top of main views during trial
+- [ ] Banner text: "Get 5 more free days — invite a friend!"
+- [ ] Banner includes "Share" button (opens share modal/options)
+- [ ] Banner shows days remaining: "Trial ends in 5 days"
+- [ ] Banner dismissible (hide for session, reappears next day)
+- [ ] Banner NOT shown to paid subscribers
+- [ ] Banner NOT shown if user has hit 28-day cap
+
+**Source Evidence:** Subscription requirements addendum
+
+**Status:** Backlog
+
+---
+
+### FR-067: Paying Subscriber Referral (Goodwill)
+
+**Priority:** Low
+
+**Category:** Referrals
+
+**Description:** Paying subscribers can still share their referral link. Referred users get the standard trial offer, but the subscriber receives no reward.
+
+**User Story:** As a paying subscriber, I can share My Pantry Plan with friends even though I don't get a reward.
+
+**Acceptance Criteria:**
+- [ ] Subscribers have a referral code (same as everyone)
+- [ ] Share options available in profile
+- [ ] No banner prompts (only in profile)
+- [ ] Referred users get standard 7-day trial
+- [ ] No bonus awarded to subscriber (no trial to extend)
+- [ ] Referral still tracked (for analytics)
+
+**Source Evidence:** Subscription requirements addendum
+
+**Status:** Backlog
+
+---
+
+## Payment Integration
+
+### FR-068: Stripe Checkout Integration
+
+**Priority:** Critical
+
+**Category:** Payments
+
+**Description:** Subscription purchases are processed through Stripe Checkout, a hosted payment page that handles card entry, Google Pay, Apple Pay, and SCA compliance.
+
+**User Story:** As a user, I can securely subscribe using my preferred payment method through a trusted checkout experience.
+
+**Acceptance Criteria:**
+- [ ] "Subscribe" button redirects to Stripe Checkout
+- [ ] Checkout shows My Pantry Plan branding (logo, colors)
+- [ ] Price options: Monthly (€4.99) and Annual (€39.99)
+- [ ] Payment methods: Card, Google Pay, Apple Pay
+- [ ] Trial configuration: 7-day trial with card upfront
+- [ ] VAT calculated automatically via Stripe Tax
+- [ ] Success redirect: Return to app with success message
+- [ ] Cancel redirect: Return to app (no action taken)
+- [ ] Webhook receives `checkout.session.completed` event
+
+**Source Evidence:** Subscription requirements addendum, Stripe API
+
+**Status:** Backlog
+
+---
+
+### FR-069: Stripe Customer Portal (Manage Subscription)
+
+**Priority:** High
+
+**Category:** Payments
+
+**Description:** Users can manage their subscription (update payment method, cancel, view invoices) through Stripe's hosted Customer Portal.
+
+**User Story:** As a subscriber, I can manage my billing and cancel my subscription without contacting support.
+
+**Acceptance Criteria:**
+- [ ] "Manage Subscription" button in Profile/Settings
+- [ ] Button opens Stripe Customer Portal in new tab/redirect
+- [ ] Portal allows: Update payment method, Cancel subscription, View invoice history
+- [ ] Cancellation takes effect at end of billing period
+- [ ] Return URL brings user back to app
+- [ ] Portal styled with My Pantry Plan branding (configured in Stripe Dashboard)
+
+**Source Evidence:** Subscription requirements addendum, Stripe Customer Portal
+
+**Status:** Backlog
+
+---
+
+### FR-070: Stripe Webhook Handling
+
+**Priority:** Critical
+
+**Category:** Payments
+
+**Description:** The backend processes Stripe webhook events to keep subscription status synchronized.
+
+**User Story:** As the system, I need to update user subscription status when Stripe events occur (payment, cancellation, etc.).
+
+**Acceptance Criteria:**
+
+**Events to Handle:**
+- [ ] `checkout.session.completed` — New subscription created, update user status
+- [ ] `customer.subscription.created` — Subscription record created
+- [ ] `customer.subscription.updated` — Status change (trialing → active, etc.)
+- [ ] `customer.subscription.deleted` — Subscription cancelled
+- [ ] `invoice.payment_succeeded` — Record successful payment
+- [ ] `invoice.payment_failed` — Payment failed, send notification email
+
+**Webhook Processing:**
+- [ ] Verify webhook signature (prevent spoofing)
+- [ ] Idempotent handling (same event processed twice = same result)
+- [ ] Update `users.subscription_status` based on event
+- [ ] Update `users.subscription_ends_at` for period end
+- [ ] Log all webhook events for debugging
+
+**Source Evidence:** Subscription requirements addendum, Stripe Webhooks
+
+**Status:** Backlog
+
+---
+
+### FR-071: VAT Handling with Stripe Tax
+
+**Priority:** High
+
+**Category:** Payments / Legal
+
+**Description:** VAT is automatically calculated and applied to all EU customers using Stripe Tax.
+
+**User Story:** As a customer, I see the correct VAT for my country included in my subscription price.
+
+**Acceptance Criteria:**
+- [ ] Stripe Tax enabled on Checkout sessions
+- [ ] VAT calculated based on customer's location
+- [ ] VAT shown clearly in checkout (e.g., "€4.99 + €1.00 VAT")
+- [ ] Invoice includes VAT breakdown and registration number
+- [ ] Stripe Tax reporting available for accounting
+
+**Source Evidence:** Subscription requirements addendum, Stripe Tax
+
+**Status:** Backlog
+
+---
+
+### FR-072: Subscription Status Display
+
+**Priority:** High
+
+**Category:** Payments / UI
+
+**Description:** Users can see their current subscription status, renewal date, and manage their subscription from their profile.
+
+**User Story:** As a user, I want to see my subscription status and when my next payment is due.
+
+**Acceptance Criteria:**
+- [ ] Current plan: "Free", "Trial", "Monthly", or "Annual"
+- [ ] If trial: Days remaining, trial end date
+- [ ] If paid: Next billing date, amount
+- [ ] If cancelled: Access until date
+- [ ] "Manage Subscription" button → Stripe Portal
+- [ ] "Resubscribe" option for cancelled users
+
+**Source Evidence:** Subscription requirements addendum
+
+**Status:** Backlog
+
+---
+
+## Email System
+
+### FR-073: Welcome Email (Trial Start)
+
+**Priority:** High
+
+**Category:** Email
+
+**Description:** New users receive a welcome email when they sign up and start their free trial.
+
+**User Story:** As a new user, I receive a welcome email confirming my trial and explaining what to do next.
+
+**Acceptance Criteria:**
+- [ ] Email sent on `checkout.session.completed` with trial
+- [ ] Personalized with user's name
+- [ ] Clear trial end date
+- [ ] Lists trial features (recipes, nutrition, meal planning, shopping)
+- [ ] Includes referral CTA with share link
+
+**Source Evidence:** Subscription requirements addendum, Resend integration
+
+**Status:** Backlog
+
+---
+
+### FR-074: Trial Ending Soon Email
+
+**Priority:** High
+
+**Category:** Email
+
+**Description:** Users receive a reminder email 2 days before their trial expires.
+
+**User Story:** As a trial user, I'm reminded before my trial ends so I can decide whether to subscribe.
+
+**Acceptance Criteria:**
+- [ ] Email sent 2 days before `subscription.trial_end`
+- [ ] Clear date and pricing
+- [ ] Easy cancel link (EU requirement)
+- [ ] Referral option for extension
+- [ ] "No action needed to continue" message
+
+**Source Evidence:** Subscription requirements addendum
+
+**Status:** Backlog
+
+---
+
+### FR-075: Trial Ended Email
+
+**Priority:** High
+
+**Category:** Email
+
+**Description:** Users who don't subscribe receive an email when their trial ends explaining their options.
+
+**User Story:** As a user whose trial ended, I receive an email explaining what happens next.
+
+**Acceptance Criteria:**
+- [ ] Email sent when trial period ends
+- [ ] Explains subscription status (active if charged, free if not)
+- [ ] Lists free tier features
+- [ ] "Upgrade anytime" CTA
+
+**Source Evidence:** Subscription requirements addendum
+
+**Status:** Backlog
+
+---
+
+### FR-076: Referral Success Email
+
+**Priority:** Medium
+
+**Category:** Email
+
+**Description:** Users receive an email when their referral signs up, confirming bonus days earned.
+
+**User Story:** As a referrer, I receive confirmation that my friend joined and I earned bonus days.
+
+**Acceptance Criteria:**
+- [ ] Email sent when referred user starts trial
+- [ ] Shows friend's first name
+- [ ] Shows bonus days earned (+5)
+- [ ] Shows new trial end date
+- [ ] Shows referral stats (friends joined, total bonus)
+- [ ] Share link for more referrals
+
+**Source Evidence:** Subscription requirements addendum
+
+**Status:** Backlog
+
+---
+
+### FR-077: Payment Failed Email
+
+**Priority:** High
+
+**Category:** Email
+
+**Description:** Users receive an email if their subscription payment fails.
+
+**User Story:** As a subscriber, I'm notified if my payment fails so I can update my card.
+
+**Acceptance Criteria:**
+- [ ] Email sent on `invoice.payment_failed` webhook
+- [ ] Clear call to action (Update Payment button)
+- [ ] Deadline for resolution
+- [ ] Link to Stripe Portal for card update
+
+**Source Evidence:** Subscription requirements addendum
+
+**Status:** Backlog
+
+---
+
+### FR-078: Subscription Cancelled Email
+
+**Priority:** Medium
+
+**Category:** Email
+
+**Description:** Users receive confirmation when they cancel their subscription.
+
+**User Story:** As a user who cancelled, I receive confirmation and know when my access ends.
+
+**Acceptance Criteria:**
+- [ ] Email sent on `customer.subscription.deleted` webhook
+- [ ] Shows access end date
+- [ ] Lists free tier features
+- [ ] Resubscribe CTA
+- [ ] Feedback request
+
+**Source Evidence:** Subscription requirements addendum
+
+**Status:** Backlog
+
+---
+
+## Legal Requirements
+
+### FR-079: Legal Pages (Terms, Privacy, Cookies)
+
+**Priority:** High
+
+**Category:** Legal
+
+**Description:** The application includes required legal pages for subscription services operating in the EU.
+
+**User Story:** As a user, I can review the terms and privacy policy before subscribing.
+
+**Required Pages:**
+- [ ] **Terms of Service** (`/terms`) — Subscription terms, billing, cancellation, 14-day EU cooling-off period
+- [ ] **Privacy Policy** (`/privacy`) — Data collected, GDPR rights, third parties (Stripe, Google, Resend)
+- [ ] **Cookie Policy** (`/cookies`) — Cookies used, how to disable
+
+**Acceptance Criteria:**
+- [ ] Link to Terms and Privacy in signup flow
+- [ ] Checkbox: "I agree to Terms of Service and Privacy Policy"
+- [ ] Link to Terms in Stripe Checkout
+- [ ] Easy access to legal pages from footer
+- [ ] Right to cancel within 14 days (EU) — waived if user consents to immediate access
+- [ ] Clear pricing displayed before payment
+
+**Source Evidence:** EU legal requirements, GDPR
+
+**Status:** Backlog
+
+---
+
+## Non-Functional Requirements (Subscription)
+
+### NFR-017: Stripe Test Mode for Development
+
+**Category:** Development
+
+**Description:** Development and staging environments use Stripe test mode for safe payment testing without real charges.
+
+**Measurable Criteria:**
+- [ ] Separate API keys for test vs live mode
+- [ ] Test keys used in development/staging environments
+- [ ] Live keys used only in production
+- [ ] Test card numbers work in test mode (`4242424242424242` = success)
+- [ ] No real charges possible in test mode
+- [ ] Webhook endpoints configured for both modes
+
+**Source Evidence:** Stripe test mode documentation
+
+**Status:** Backlog
+
+---
+
+### NFR-018: Subscription Status Caching
+
+**Category:** Performance
+
+**Description:** User subscription status is cached to minimize API calls and improve response time.
+
+**Measurable Criteria:**
+- [ ] Subscription status cached in session/JWT on login
+- [ ] Cache invalidated on webhook events
+- [ ] Frontend caches status in state/context
+- [ ] Status check does not block page render
+- [ ] Cache TTL: 5 minutes (refresh on actions)
+
+**Source Evidence:** Performance optimization
+
+**Status:** Backlog
+
+---
+
+### NFR-019: Email Delivery Reliability
+
+**Category:** Reliability
+
+**Description:** Transactional emails are delivered reliably via Resend with retry logic.
+
+**Measurable Criteria:**
+- [ ] Resend API integration with retry on failure
+- [ ] Failed emails logged for monitoring
+- [ ] Email events tracked (sent, delivered, bounced)
+- [ ] Bounce handling (mark invalid emails)
+- [ ] Under 3,000 emails/month (free tier)
+
+**Source Evidence:** Resend integration
+
+**Status:** Backlog
+
+---
+
+### NFR-020: GDPR Compliance
+
+**Category:** Legal / Security
+
+**Description:** Application complies with EU General Data Protection Regulation.
+
+**Measurable Criteria:**
+- [ ] Privacy Policy accessible and up-to-date
+- [ ] Consent obtained before data collection
+- [ ] User can request data export
+- [ ] User can request account deletion
+- [ ] Data deletion completes within 30 days
+- [ ] Minimal data collection (only what's needed)
+- [ ] Third-party processors documented (Stripe, Google, Resend)
+
+**Source Evidence:** GDPR requirements
+
+**Status:** Backlog
+
+---
+
+### NFR-021: PCI Compliance via Stripe
+
+**Category:** Security
+
+**Description:** Payment card data is handled securely via Stripe, inheriting their PCI DSS compliance.
+
+**Measurable Criteria:**
+- [ ] No card numbers stored in application database
+- [ ] No card numbers logged or transmitted through app servers
+- [ ] All payment forms hosted by Stripe (Checkout/Elements)
+- [ ] Stripe handles SCA (Strong Customer Authentication)
+- [ ] Webhook signatures verified on all events
+
+**Source Evidence:** PCI DSS, Stripe compliance
+
+**Status:** Backlog
+
+---
+
+## Database Schema Changes (Subscription)
+
+### Entity: Users Table (Updated for Subscription)
+
+**Additional Fields:**
+
+| Field | Type | Constraints | Description |
+|-------|------|-------------|-------------|
+| subscription_status | ENUM | default 'free' | Values: free, trialing, active, cancelled, past_due |
+| stripe_customer_id | VARCHAR(255) | nullable, indexed | Stripe customer ID |
+| stripe_subscription_id | VARCHAR(255) | nullable | Stripe subscription ID |
+| trial_ends_at | DATETIME | nullable | Trial expiration timestamp |
+| subscription_ends_at | DATETIME | nullable | Subscription period end |
+| referral_code | VARCHAR(10) | unique, not null | User's referral code |
+| referred_by_user_id | BIGINT | nullable, FK | Who referred this user |
+| referral_bonus_days | INT | default 0 | Total bonus days earned |
+| trial_count | INT | default 0 | Number of trials used |
+| last_trial_ended_at | DATETIME | nullable | When last trial ended |
+
+---
+
+### Entity: Recipes Table (Updated)
+
+**Additional Field:**
+
+| Field | Type | Constraints | Description |
+|-------|------|-------------|-------------|
+| is_free | BOOLEAN | default FALSE | Whether recipe is free tier |
+
+---
+
+### Entity: Referrals Table (New)
+
+**Purpose:** Track referral relationships and rewards
+
+| Field | Type | Constraints | Description |
+|-------|------|-------------|-------------|
+| id | BIGINT | PK, auto-increment | Primary key |
+| referrer_id | BIGINT | FK → users.id | User who shared |
+| referred_id | BIGINT | FK → users.id | User who signed up |
+| bonus_days_awarded | INT | default 5 | Days awarded |
+| status | ENUM | default 'pending' | Values: pending, credited, expired |
+| created_at | TIMESTAMP | default now | Record creation |
+| credited_at | TIMESTAMP | nullable | When bonus credited |
+
+**Constraints:** UNIQUE (referrer_id, referred_id)
+
+---
+
+### Entity: Subscription Events Table (New)
+
+**Purpose:** Log subscription lifecycle events
+
+| Field | Type | Constraints | Description |
+|-------|------|-------------|-------------|
+| id | BIGINT | PK, auto-increment | Primary key |
+| user_id | BIGINT | FK → users.id | User record |
+| event_type | VARCHAR(100) | required | Event type |
+| stripe_event_id | VARCHAR(255) | nullable, indexed | Stripe event ID |
+| event_data | JSON | nullable | Full event payload |
+| created_at | TIMESTAMP | default now | Record creation |
+
+---
+
+## API Endpoints (Subscription)
+
+### Subscription Endpoints
+
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| POST | `/api/subscription/checkout` | Create Stripe Checkout session | User |
+| POST | `/api/subscription/portal` | Create Stripe Customer Portal session | User |
+| GET | `/api/subscription/status` | Get current subscription status | User |
+| POST | `/api/webhooks/stripe` | Handle Stripe webhook events | Stripe signature |
+
+### Referral Endpoints
+
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| GET | `/api/referral/code` | Get user's referral code and link | User |
+| GET | `/api/referral/stats` | Get referral statistics | User |
+| GET | `/api/referral/validate/:code` | Validate referral code | Public |
+| POST | `/api/referral/track` | Track referral code on signup | Public |
+
+### Recipe Endpoints (Updated)
+
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| GET | `/api/recipes` | Get recipes (filtered by subscription tier) | Public/User |
+| GET | `/api/recipes/free` | Get free recipes only | Public |
+
+---
+
 ## All Requirements - Finish
