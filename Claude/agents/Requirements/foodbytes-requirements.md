@@ -36,7 +36,9 @@
 
 | Req # | Description |
 |-------|-------------|
-| FR-029 | Screen Wake Lock with Lock Emoji Animation |
+| FR-080 | Ingredient Macro Data |
+| FR-081 | Daily Macro Popup (Meal Plan View) |
+| FR-082 | Weekly Macro Summary (Meal Plan View) |
 
 ## In Progress - Finish
 
@@ -3352,6 +3354,148 @@ A registered user account (created via OAuth)
 |--------|----------|-------------|------|
 | GET | `/api/recipes` | Get recipes (filtered by subscription tier) | Public/User |
 | GET | `/api/recipes/free` | Get free recipes only | Public |
+
+---
+
+## Nutrition Tracking
+
+### FR-080: Ingredient Macro Data
+
+**Priority:** High
+
+**Category:** Nutrition / Data Model
+
+**Description:** Each ingredient in the database includes macronutrient data (protein, carbohydrates, fat) per 100g. This enables automatic macro calculation for recipes based on their ingredients.
+
+**User Story:** As a user, I want the app to calculate macros automatically so that I don't have to look up nutrition information manually.
+
+**Acceptance Criteria:**
+- [ ] `ingredients` table includes new columns: `protein_per_100g`, `carbs_per_100g`, `fat_per_100g`
+- [ ] All values stored as DECIMAL(5,2) to allow precision (e.g., 31.50g protein)
+- [ ] Macro data populated for all existing ingredients
+- [ ] Admin ingredient editing form includes macro input fields
+- [ ] Recipe macro totals calculated automatically: `SUM(ingredient.macro * quantity / 100)`
+- [ ] Per-serving macros calculated: `recipe_total_macro / default_servings`
+
+**Database Schema Update:**
+
+```sql
+ALTER TABLE ingredients ADD COLUMN protein_per_100g DECIMAL(5,2) DEFAULT 0;
+ALTER TABLE ingredients ADD COLUMN carbs_per_100g DECIMAL(5,2) DEFAULT 0;
+ALTER TABLE ingredients ADD COLUMN fat_per_100g DECIMAL(5,2) DEFAULT 0;
+```
+
+**Example Data:**
+
+| Ingredient | Protein/100g | Carbs/100g | Fat/100g |
+|------------|--------------|------------|----------|
+| Chicken Breast | 31 | 0 | 3.6 |
+| White Rice (cooked) | 2.7 | 28 | 0.3 |
+| Olive Oil | 0 | 0 | 100 |
+| Egg | 13 | 1.1 | 11 |
+| Butter | 0.9 | 0.1 | 81 |
+
+**Source Evidence:** User conversation - "ingredient-level macros is the way to go"
+
+**Status:** Backlog
+
+---
+
+### FR-081: Daily Macro Popup (Meal Plan View)
+
+**Priority:** Medium
+
+**Category:** Nutrition / UI
+
+**Description:** In the Meal Plan view, the daily calorie display is clickable. Clicking it opens a popup showing the full macro breakdown (protein, carbs, fat) for that day.
+
+**User Story:** As a user, I want to click on a day's calorie total to see the detailed macro breakdown so that I can ensure I'm hitting my nutrition targets.
+
+**Acceptance Criteria:**
+- [ ] Daily calorie text in Meal Plan is clickable (cursor: pointer)
+- [ ] Clicking opens a popup/modal with macro breakdown
+- [ ] Popup displays:
+  - Day name and date
+  - Total calories
+  - Protein (grams and percentage of calories)
+  - Carbohydrates (grams and percentage of calories)
+  - Fat (grams and percentage of calories)
+- [ ] Macros calculated from ingredient data (see FR-080)
+- [ ] Popup closes on: backdrop click, X button, ESC key
+- [ ] Styling consistent with existing popups (brand colors)
+
+**Popup Content Example:**
+
+```
+Monday - 1,850 cal
+─────────────────────
+Protein:  130g  (28%)
+Carbs:    185g  (40%)
+Fat:       72g  (32%)
+```
+
+**DO:**
+- Reuse existing popup/modal component styling
+- Calculate percentages: protein/carbs = 4 cal/g, fat = 9 cal/g
+- Show all values rounded to whole numbers
+
+**DO NOT:**
+- Do NOT replace the calorie display — enhance it with click behavior
+- Do NOT require scrolling for the popup content
+- Do NOT show meal-by-meal breakdown (just daily total)
+
+**Source Evidence:** User conversation - "For days, we could have where we display the cal for the day, make that a button and once clicked we pop up with the info"
+
+**Status:** Backlog
+
+---
+
+### FR-082: Weekly Macro Summary (Meal Plan View)
+
+**Priority:** Medium
+
+**Category:** Nutrition / UI
+
+**Description:** In the Meal Plan view, the weekly "Total" calorie display is clickable. Clicking it opens a popup showing the weekly macro summary and daily averages.
+
+**User Story:** As a user, I want to click on the weekly total to see my overall macro intake so that I can track my nutrition across the entire week.
+
+**Acceptance Criteria:**
+- [ ] Weekly "Total" text in Meal Plan is clickable (cursor: pointer)
+- [ ] Clicking opens a popup/modal with weekly macro summary
+- [ ] Popup displays:
+  - Week date range (e.g., "Dec 9 - Dec 15")
+  - Total weekly calories
+  - Total weekly protein, carbs, fat
+  - Daily averages for all macros
+- [ ] Macros calculated from ingredient data (see FR-080)
+- [ ] Popup closes on: backdrop click, X button, ESC key
+
+**Popup Content Example:**
+
+```
+Week: Dec 9 - Dec 15
+────────────────────────────
+Total:     12,950 cal
+           910g protein | 1,295g carbs | 504g fat
+
+Daily Average:
+           1,850 cal
+           130g protein (28%) | 185g carbs (40%) | 72g fat (32%)
+```
+
+**DO:**
+- Reuse existing popup/modal component styling
+- Calculate daily averages based on days with meals assigned (not always 7)
+- Show clear visual separation between weekly totals and daily averages
+
+**DO NOT:**
+- Do NOT replace the total display — enhance it with click behavior
+- Do NOT show day-by-day breakdown in this popup (use FR-081 for that)
+
+**Source Evidence:** User conversation - "for the week, same thing repurpose the 'Total' at the top"
+
+**Status:** Backlog
 
 ---
 
