@@ -80,6 +80,13 @@
 | FR-047 | Create New Recipe (Admin Only) |
 | FR-048 | Landing Page Animation (Guest Homepage) |
 | FR-050 | Day Calorie Preview in Recipes View (above day buttons) |
+| FR-025 | Persist Meal Plan to Server Database |
+| FR-030 | User Registration and Login (Google OAuth Only) |
+| FR-032 | GOD Mode Admin Access |
+| FR-035 | Recipe Visibility Toggle (Admin Only) |
+| NFR-008 | Server-Side Data Storage |
+| NFR-010 | Centralized Ingredient Definitions |
+| NFR-015 | Centralized Unit Definitions |
 | Database: Users | Store user accounts from Google OAuth |
 | Database: Recipes | Store recipe data (migrated from recipes.js) |
 
@@ -214,103 +221,23 @@
 
 ---
 
-### FR-008: Browse Recipes by Meal Category
-**Priority:** High
-
-**Description:** Users can browse recipes filtered by meal type using tab navigation
-
-**User Story:** As a user, I want to browse recipes by meal category (Breakfast, Lunch, Dinner, Snacks) so that I can quickly find appropriate recipes for each meal.
-
-**Acceptance Criteria:**
-- **ONLY four tab buttons:** Breakfast, Lunch, Dinner, Snacks
-- **NO "All Recipes" tab** - users must select a specific meal category
-- Default tab on load is Breakfast
-- Clicking a tab filters and displays only recipes belonging to that meal type
-- **Each recipe MUST be assigned to at least one meal category** - recipes without a meal assignment will not display
-- Active tab is visually distinguished from inactive tabs
-- Recipes are sorted alphabetically within each category
-- Cheat meal recipes appear after regular recipes
-- Each recipe card displays:
-  - Recipe name
-  - Calories
-  - Servings control
-  - "View Details" button
-  - **Day-of-week assignment buttons** (see FR-014)
-
-**Source Evidence:**
-- `renderTabs()`
-- `selectMeal(meal)`
-- `renderRecipes(meal)`
-- `recipe_meals` junction table (links recipes to meal types)
+### FR-008: DUPLICATE
+**Status:** Removed - Duplicate of FR-002
 
 ---
 
-### FR-009: Search Recipes by Name
-**Priority:** Medium
-
-**Description:** Users can search for recipes using a text search input
-
-**User Story:** As a user, I want to search recipes by name so that I can quickly find a specific recipe without browsing categories.
-
-**Acceptance Criteria:**
-- Search bar is accessible from bottom navigation
-- Search filters recipes case-insensitively by recipe name
-- Results update as user types (real-time filtering)
-- "No recipes found" message displays when search yields no results
-- Clearing search returns user to previous meal category view
-
-**Source Evidence:**
-- `#recipe-search` element
-- Input event handler (lines 139-157)
-- `#search-bar` element
+### FR-009: DUPLICATE
+**Status:** Removed - Duplicate of FR-005
 
 ---
 
-### FR-010: View Recipe Details
-**Priority:** High
-
-**Description:** Users can expand recipe cards to view full ingredients list and cooking steps
-
-**User Story:** As a user, I want to view complete recipe details including ingredients and cooking instructions so that I can prepare the meal.
-
-**Acceptance Criteria:**
-- Each recipe card has a collapsible details section
-- Details section shows complete ingredients list with quantities and units
-- Details section shows numbered cooking steps
-- Toggle button switches between "Show Details" and "Hide Details"
-- Ingredient quantities are scaled based on current serving size
-
-**Source Evidence:**
-- `createCollapsibleContent(entry, servings)`
-- `createToggleButton()`
-- `recipeData[].ingredients`
-- `recipeData[].steps`
+### FR-010: DUPLICATE
+**Status:** Removed - Duplicate of FR-003
 
 ---
 
-### FR-011: Adjust Serving Sizes with Ingredient Scaling
-**Priority:** High
-
-**Description:** Users can adjust the number of servings and see ingredient quantities automatically recalculated
-
-**User Story:** As a user, I want to adjust the serving size of a recipe so that ingredient quantities automatically scale for my needs.
-
-**Acceptance Criteria:**
-- Each recipe displays a servings input control
-- **Default value is the user's Default Servings preference** (from profile, see FR-031)
-- If user has no preference set, default to 1 serving
-- Guest users default to 1 serving
-- Changing servings recalculates all ingredient quantities proportionally
-- Minimum serving size is 1
-- Maximum serving size is 10 (or reasonable max)
-- Scaled quantities show appropriate precision (whole numbers or 1 decimal)
-- Calorie display remains fixed (per-serving, does not scale) - see FR-036
-
-**Source Evidence:**
-- `createServingsInput(entry)`
-- `localServingsMap`
-- User's `default_servings` preference
-- Ingredient calculation: `quantity * (servings / defaultServings)`
+### FR-011: DUPLICATE
+**Status:** Removed - Duplicate of FR-004
 
 ---
 
@@ -1134,18 +1061,20 @@ CREATE TABLE recipe_family_members (
 **User Story:** As a user, I want my meal plan saved to my account so that I can access it from any device.
 
 **Acceptance Criteria:**
-- Authenticated users' meal plans sync to MySQL database via REST API
-- Plan loads from server on login
-- Guest users can browse recipes but cannot save meal plans
-- Changes sync to server after each modification
-- Corrupted data is handled gracefully with fallback to empty plan
-- localStorage used only for session tokens and temporary guest data
-- Meal plan data retained for rolling 6 months (older data auto-archived)
+- [x] Authenticated users' meal plans sync to MySQL database via REST API
+- [x] Plan loads from server on login
+- [x] Guest users can browse recipes but cannot save meal plans
+- [x] Changes sync to server after each modification
+- [x] Corrupted data is handled gracefully with fallback to empty plan
+- [x] localStorage used only for session tokens and temporary guest data
+- [x] Meal plan data retained for rolling 6 months (older data auto-archived)
 
 **Source Evidence:**
 - Server API: meal plan endpoints
 - JWT authentication for API calls
 - MySQL `meal_plan_entries` table
+
+**Status:** Completed
 
 ---
 
@@ -1480,22 +1409,24 @@ Each feature fades in, pauses 1.5 seconds, then fades out before the next:
 **User Story:** As a user, I want to log in with my Google account so that I can save my meal plans and access them from any device.
 
 **Acceptance Criteria:**
-- **Google Sign-In button only** - no GitHub or other providers
-- **Use official Google branding** - official Google "G" logo and styling
-- Button text must be "Sign in with Google" (not "Login with Google")
-- Follow Google's Brand Guidelines for the sign-in button
-- New users automatically registered on first Google OAuth login
-- JWT tokens stored in httpOnly cookies for session management
-- User profile displays name and email from Google
-- Logout button clears session and returns user to guest mode
-- Guest users can browse recipes but cannot save meal plans
-- Session persists across browser sessions until explicit logout
+- [x] **Google Sign-In button only** - no GitHub or other providers
+- [x] **Use official Google branding** - official Google "G" logo and styling
+- [x] Button text must be "Sign in with Google" (not "Login with Google")
+- [x] Follow Google's Brand Guidelines for the sign-in button
+- [x] New users automatically registered on first Google OAuth login
+- [x] JWT tokens stored in httpOnly cookies for session management
+- [x] User profile displays name and email from Google
+- [x] Logout button clears session and returns user to guest mode
+- [x] Guest users can browse recipes but cannot save meal plans
+- [x] Session persists across browser sessions until explicit logout
 
 **Source Evidence:**
 - Google OAuth callback handlers
 - JWT token storage in httpOnly cookies
 - User session state management
 - Google Sign-In button component
+
+**Status:** Completed
 
 ---
 
@@ -1535,17 +1466,19 @@ Each feature fades in, pauses 1.5 seconds, then fades out before the next:
 **User Story:** As an admin, I want special access so that I can manage and improve recipes for all users.
 
 **Acceptance Criteria:**
-- Admin role stored in database (`is_admin` flag on user record)
-- Admin status assigned directly in database (not self-service)
-- Admin users see "Edit Recipe" button on recipe cards
-- Admin users see "Add Recipe" button in recipe tabs area
-- Admin users can access recipe management functions
-- Non-admin users see recipes as read-only
+- [x] Admin role stored in database (`is_admin` flag on user record)
+- [x] Admin status assigned directly in database (not self-service)
+- [x] Admin users see "Edit Recipe" button on recipe cards
+- [x] Admin users see "Add Recipe" button in recipe tabs area
+- [x] Admin users can access recipe management functions
+- [x] Non-admin users see recipes as read-only
 
 **Source Evidence:**
 - `is_admin` column in users table
 - Admin role check middleware
 - Conditional UI rendering based on admin status
+
+**Status:** Completed
 
 ---
 
@@ -1635,19 +1568,21 @@ Each feature fades in, pauses 1.5 seconds, then fades out before the next:
 **User Story:** As an admin, I want to hide recipes from regular users so that I can prepare and review recipes before making them publicly available.
 
 **Acceptance Criteria:**
-- Each recipe has a visibility status: Live (1) or Hidden (0)
-- All new recipes default to Hidden (0)
-- Only admin (GOD mode) users can toggle visibility status
-- Hidden recipes are NOT visible to regular users in any view (browse, search, meal plan assignment)
-- Hidden recipes ARE visible to admin users with a visual indicator (e.g., "Hidden" badge)
-- Admin users see a toggle/button to change visibility status on recipe cards and edit form
-- Admin recipe management view can filter by Live/Hidden status
+- [x] Each recipe has a visibility status: Live (1) or Hidden (0)
+- [x] All new recipes default to Hidden (0)
+- [x] Only admin (GOD mode) users can toggle visibility status
+- [x] Hidden recipes are NOT visible to regular users in any view (browse, search, meal plan assignment)
+- [x] Hidden recipes ARE visible to admin users with a visual indicator (e.g., "Hidden" badge)
+- [x] Admin users see a toggle/button to change visibility status on recipe cards and edit form
+- [x] Admin recipe management view can filter by Live/Hidden status
 
 **Source Evidence:**
 - `is_live` column in recipes table
 - Admin-only visibility toggle UI component
 - Recipe query filters by `is_live=1` for non-admin users
 - Admin sees all recipes regardless of `is_live` value
+
+**Status:** Completed
 
 ---
 
@@ -2153,13 +2088,15 @@ Each feature fades in, pauses 1.5 seconds, then fades out before the next:
 **Description:** Primary data storage is server-side MySQL database; localStorage used only for local preferences
 
 **Measurable Criteria:**
-- Meal plans stored in MySQL database (authenticated users)
-- Recipe data stored in MySQL database (admin-managed)
-- localStorage used only for: JWT tokens, shopping list checkbox state, UI preferences
-- Application degrades gracefully if localStorage unavailable
-- Server database is single source of truth for user data
+- [x] Meal plans stored in MySQL database (authenticated users)
+- [x] Recipe data stored in MySQL database (admin-managed)
+- [x] localStorage used only for: JWT tokens, shopping list checkbox state, UI preferences
+- [x] Application degrades gracefully if localStorage unavailable
+- [x] Server database is single source of truth for user data
 
 **Source Evidence:** MySQL database schema; Server API for CRUD operations; localStorage for session tokens only
+
+**Status:** Completed
 
 ---
 
@@ -2185,17 +2122,17 @@ Each feature fades in, pauses 1.5 seconds, then fades out before the next:
 **Description:** All ingredient data is centralized in the database with validation to prevent duplicates
 
 **Measurable Criteria:**
-- Single source of truth: `ingredients` table (id, key, name, aisle_id)
-- **No duplicate ingredient names allowed** - enforced by:
+- [x] Single source of truth: `ingredients` table (id, key, name, aisle_id)
+- [x] **No duplicate ingredient names allowed** - enforced by:
   - Database UNIQUE constraint on `name` column (exact match)
   - `IngredientService` fuzzy matching (catches "Carrots" vs "Carrot")
-- All ingredient names should be singular form (e.g., "Carrot" not "Carrots")
-- Recipes reference ingredients by `ingredient_id` FK, not free-text
-- Single source of truth for aisle assignments via `aisle_id` FK
-- Adding new ingredient requires:
+- [x] All ingredient names should be singular form (e.g., "Carrot" not "Carrots")
+- [x] Recipes reference ingredients by `ingredient_id` FK, not free-text
+- [x] Single source of truth for aisle assignments via `aisle_id` FK
+- [x] Adding new ingredient requires:
   1. POST `/api/admin/ingredients/validate?name=` (pre-validation)
   2. POST `/api/admin/ingredients` (create with auto-generated key)
-- `IngredientService.validateAndGetByKey()` enforces key validation at recipe creation
+- [x] `IngredientService.validateAndGetByKey()` enforces key validation at recipe creation
 
 **Implementation:**
 - Database: `ingredients` table with 90 ingredients, 17 aisles
@@ -2208,6 +2145,8 @@ Each feature fades in, pauses 1.5 seconds, then fades out before the next:
 - `IngredientRepository.java` - search queries
 - `IngredientService.java` - validation logic
 - `IngredientController.java` - admin endpoints
+
+**Status:** Completed
 
 ---
 
@@ -2234,14 +2173,16 @@ Each feature fades in, pauses 1.5 seconds, then fades out before the next:
 **Description:** All measurement units are defined in the database to prevent duplicates in shopping lists
 
 **Measurable Criteria:**
-- Single source of truth: `units` table (id, key, value)
-- **No duplicate unit representations allowed** (e.g., cannot have both "unit" and "units")
-- All units are singular/invariant form (e.g., "piece" not "pieces", "g" not "grams")
-- Recipes reference units by `unit_id` FK, not free-text strings
-- Shopping list aggregation uses exact unit matching (same ingredient + same unit = combine quantities)
-- Different units for same ingredient display as separate line items but grouped together
+- [x] Single source of truth: `units` table (id, key, value)
+- [x] **No duplicate unit representations allowed** (e.g., cannot have both "unit" and "units")
+- [x] All units are singular/invariant form (e.g., "piece" not "pieces", "g" not "grams")
+- [x] Recipes reference units by `unit_id` FK, not free-text strings
+- [x] Shopping list aggregation uses exact unit matching (same ingredient + same unit = combine quantities)
+- [x] Different units for same ingredient display as separate line items but grouped together
 
 **Source Evidence:** `seed.sql` - units table with 18 standardized values (g, ml, tsp, tbsp, piece, small, medium, large, handful, clove, head, stalk, slice, leaf, tin, cup, pinch, oz)
+
+**Status:** Completed
 
 ---
 
