@@ -78,7 +78,43 @@ INSERT INTO ingredients (id, `key`, name, aisle_id, protein_per_100g, carbs_per_
 (8, 'walnuts', 'Walnuts', 14, 15.00, 14.00, 65.00, TRUE),
 
 -- Beverages (aisle 16)
-(9, 'water', 'Water', 16, 0.00, 0.00, 0.00, TRUE);
+(9, 'water', 'Water', 16, 0.00, 0.00, 0.00, TRUE),
+
+-- Fruit (aisle 4)
+(10, 'banana', 'Banana', 4, 1.10, 22.70, 0.30, TRUE),
+
+-- Poultry (aisle 2)
+(11, 'chicken_breast', 'Chicken breast', 2, 31.00, 0.00, 3.60, TRUE),
+
+-- Vegetables (aisle 3)
+(12, 'onion', 'Onion', 3, 1.10, 9.30, 0.10, TRUE),
+(13, 'garlic', 'Garlic', 3, 6.40, 33.00, 0.50, TRUE),
+(14, 'ginger', 'Ginger', 3, 1.80, 18.00, 0.80, TRUE),
+(15, 'sweet_potato', 'Sweet potato', 3, 1.60, 20.00, 0.10, TRUE),
+
+-- Frozen (aisle 7)
+(16, 'frozen_peas', 'Frozen peas', 7, 5.40, 14.00, 0.40, TRUE),
+
+-- Herbs & Spices (aisle 8)
+(17, 'turmeric', 'Turmeric', 8, 8.00, 65.00, 10.00, TRUE),
+(18, 'cumin', 'Cumin', 8, 18.00, 44.00, 22.00, TRUE),
+(19, 'cinnamon', 'Cinnamon', 8, 4.00, 81.00, 1.20, TRUE),
+(20, 'star_anise', 'Star anise', 8, 18.00, 50.00, 16.00, TRUE),
+(21, 'msg', 'MSG', 8, 0.00, 0.00, 0.00, TRUE),
+
+-- Oils (aisle 9)
+(22, 'olive_oil', 'Olive oil', 9, 0.00, 0.00, 100.00, TRUE),
+
+-- Tins & Jars (aisle 10)
+(23, 'tomato_paste', 'Tomato paste', 10, 4.30, 19.00, 0.50, TRUE),
+(24, 'chicken_stock', 'Chicken stock', 10, 0.50, 0.50, 0.10, TRUE),
+
+-- Condiments (aisle 12)
+(25, 'soy_sauce', 'Soy sauce', 12, 5.00, 5.00, 0.00, TRUE),
+
+-- Grains (aisle 11)
+(26, 'rice', 'Rice (cooked)', 11, 2.70, 28.00, 0.30, TRUE),
+(27, 'cornflour', 'Cornflour', 11, 0.30, 91.00, 0.10, TRUE);
 
 -- =============================================
 -- RECIPES
@@ -87,7 +123,17 @@ INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VA
 -- Porridge with Berries & Nuts Family
 (1, 'Porridge with Berries & Nuts (Light)', 2, 1010, FALSE, TRUE),
 (2, 'Porridge with Berries & Nuts', 2, 1190, FALSE, TRUE),
-(3, 'Porridge with Berries & Nuts (Full)', 2, 1430, FALSE, TRUE);
+(3, 'Porridge with Berries & Nuts (Full)', 2, 1430, FALSE, TRUE),
+
+-- Peanut Butter Banana Smoothie Family
+(4, 'Peanut Butter Banana Smoothie (Light)', 2, 860, FALSE, TRUE),
+(5, 'Peanut Butter Banana Smoothie', 2, 1080, FALSE, TRUE),
+(6, 'Peanut Butter Banana Smoothie (Full)', 2, 1360, FALSE, TRUE),
+
+-- Irish Chicken Curry Family
+(7, 'Irish Chicken Curry (Light)', 2, 960, FALSE, TRUE),
+(8, 'Irish Chicken Curry', 2, 1240, FALSE, TRUE),
+(9, 'Irish Chicken Curry (Full)', 2, 1560, FALSE, TRUE);
 
 -- =============================================
 -- RECIPE MEALS
@@ -95,7 +141,20 @@ INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VA
 INSERT INTO recipe_meals (recipe_id, meal_id) VALUES
 (1, 1),  -- Light: Breakfast
 (2, 1),  -- Standard: Breakfast
-(3, 1);  -- Full: Breakfast
+(3, 1),  -- Full: Breakfast
+
+-- Peanut Butter Banana Smoothie: Breakfast & Snacks
+(4, 1),  -- Light: Breakfast
+(4, 4),  -- Light: Snacks
+(5, 1),  -- Standard: Breakfast
+(5, 4),  -- Standard: Snacks
+(6, 1),  -- Full: Breakfast
+(6, 4),  -- Full: Snacks
+
+-- Irish Chicken Curry: Dinner
+(7, 3),  -- Light: Dinner
+(8, 3),  -- Standard: Dinner
+(9, 3);  -- Full: Dinner
 
 -- =============================================
 -- RECIPE INGREDIENTS
@@ -137,6 +196,96 @@ INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit_id, qua
 (3, 7, 24, 1, 24.00, 8),      -- Almonds, 24g
 (3, 8, 24, 1, 24.00, 9);      -- Walnuts, 24g
 
+-- Recipe 4: Peanut Butter Banana Smoothie (Light) - ~860 cal total, ~430 cal/serving
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit_id, quantity_grams, sort_order) VALUES
+(4, 10, 300, 1, 300.00, 1),   -- Banana (frozen), 300g
+(4, 2, 400, 2, 412.00, 2),    -- Milk, 400ml
+(4, 6, 45, 1, 45.00, 3),      -- Peanut butter, 45g
+(4, 5, 1, 17, 0.50, 4);       -- Salt, 1 pinch
+
+-- Recipe 5: Peanut Butter Banana Smoothie (Standard) - ~1080 cal total, ~540 cal/serving
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit_id, quantity_grams, sort_order) VALUES
+(5, 10, 400, 1, 400.00, 1),   -- Banana (frozen), 400g
+(5, 2, 520, 2, 536.00, 2),    -- Milk, 520ml
+(5, 6, 60, 1, 60.00, 3),      -- Peanut butter, 60g
+(5, 5, 1, 17, 0.50, 4);       -- Salt, 1 pinch
+
+-- Recipe 6: Peanut Butter Banana Smoothie (Full) - ~1360 cal total, ~680 cal/serving
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit_id, quantity_grams, sort_order) VALUES
+(6, 10, 500, 1, 500.00, 1),   -- Banana (frozen), 500g
+(6, 2, 650, 2, 670.00, 2),    -- Milk, 650ml
+(6, 6, 75, 1, 75.00, 3),      -- Peanut butter, 75g
+(6, 5, 1, 17, 0.50, 4);       -- Salt, 1 pinch
+
+-- Recipe 7: Irish Chicken Curry (Light) - ~960 cal total, ~480 cal/serving
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit_id, quantity_grams, sort_order) VALUES
+(7, 11, 240, 1, 240.00, 1),     -- Chicken breast, 240g (120g x 2)
+(7, 22, 1, 4, 14.00, 2),        -- Olive oil, 1 tbsp
+(7, 12, 1, 8, 150.00, 3),       -- Onion, 1 large
+(7, 13, 3, 10, 9.00, 4),        -- Garlic, 3 cloves
+(7, 14, 5, 1, 5.00, 5),         -- Ginger, 5g
+(7, 10, 1, 7, 120.00, 6),       -- Banana, 1 medium
+(7, 23, 1, 4, 16.00, 7),        -- Tomato paste, 1 tbsp
+(7, 25, 2, 3, 10.00, 8),        -- Soy sauce, 2 tsp
+(7, 4, 1, 3, 7.00, 9),          -- Honey, 1 tsp
+(7, 24, 480, 2, 480.00, 10),    -- Chicken stock, 480ml
+(7, 17, 0.5, 3, 1.00, 11),      -- Turmeric, 0.5 tsp
+(7, 18, 0.5, 3, 1.50, 12),      -- Cumin, 0.5 tsp
+(7, 19, 0.33, 3, 0.50, 13),     -- Cinnamon, 0.33 tsp
+(7, 20, 1, 5, 2.00, 14),        -- Star anise, 1 piece
+(7, 21, 1, 17, 0.50, 15),       -- MSG, 1 pinch (optional)
+(7, 5, 1, 3, 6.00, 16),         -- Salt, 1 tsp
+(7, 27, 1, 4, 8.00, 17),        -- Cornflour, 1 tbsp
+(7, 15, 150, 1, 150.00, 18),    -- Sweet potato, 150g (75g x 2)
+(7, 16, 0.5, 16, 72.00, 19),    -- Frozen peas, 0.5 cup
+(7, 26, 278, 1, 278.00, 20);    -- Rice (cooked), 278g (3/4 cup x 2)
+
+-- Recipe 8: Irish Chicken Curry (Standard) - ~1240 cal total, ~620 cal/serving
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit_id, quantity_grams, sort_order) VALUES
+(8, 11, 300, 1, 300.00, 1),     -- Chicken breast, 300g (150g x 2)
+(8, 22, 1, 4, 14.00, 2),        -- Olive oil, 1 tbsp
+(8, 12, 1, 8, 150.00, 3),       -- Onion, 1 large
+(8, 13, 3, 10, 9.00, 4),        -- Garlic, 3 cloves
+(8, 14, 5, 1, 5.00, 5),         -- Ginger, 5g
+(8, 10, 1, 7, 120.00, 6),       -- Banana, 1 medium
+(8, 23, 1, 4, 16.00, 7),        -- Tomato paste, 1 tbsp
+(8, 25, 2, 3, 10.00, 8),        -- Soy sauce, 2 tsp
+(8, 4, 1, 3, 7.00, 9),          -- Honey, 1 tsp
+(8, 24, 480, 2, 480.00, 10),    -- Chicken stock, 480ml
+(8, 17, 0.5, 3, 1.00, 11),      -- Turmeric, 0.5 tsp
+(8, 18, 0.5, 3, 1.50, 12),      -- Cumin, 0.5 tsp
+(8, 19, 0.33, 3, 0.50, 13),     -- Cinnamon, 0.33 tsp
+(8, 20, 1, 5, 2.00, 14),        -- Star anise, 1 piece
+(8, 21, 1, 17, 0.50, 15),       -- MSG, 1 pinch (optional)
+(8, 5, 1, 3, 6.00, 16),         -- Salt, 1 tsp
+(8, 27, 1, 4, 8.00, 17),        -- Cornflour, 1 tbsp
+(8, 15, 200, 1, 200.00, 18),    -- Sweet potato, 200g (100g x 2)
+(8, 16, 0.5, 16, 72.00, 19),    -- Frozen peas, 0.5 cup
+(8, 26, 370, 1, 370.00, 20);    -- Rice (cooked), 370g (1 cup x 2)
+
+-- Recipe 9: Irish Chicken Curry (Full) - ~1560 cal total, ~780 cal/serving
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit_id, quantity_grams, sort_order) VALUES
+(9, 11, 400, 1, 400.00, 1),     -- Chicken breast, 400g (200g x 2)
+(9, 22, 1, 4, 14.00, 2),        -- Olive oil, 1 tbsp
+(9, 12, 1, 8, 150.00, 3),       -- Onion, 1 large
+(9, 13, 3, 10, 9.00, 4),        -- Garlic, 3 cloves
+(9, 14, 5, 1, 5.00, 5),         -- Ginger, 5g
+(9, 10, 1, 7, 120.00, 6),       -- Banana, 1 medium
+(9, 23, 1, 4, 16.00, 7),        -- Tomato paste, 1 tbsp
+(9, 25, 2, 3, 10.00, 8),        -- Soy sauce, 2 tsp
+(9, 4, 1, 3, 7.00, 9),          -- Honey, 1 tsp
+(9, 24, 480, 2, 480.00, 10),    -- Chicken stock, 480ml
+(9, 17, 0.5, 3, 1.00, 11),      -- Turmeric, 0.5 tsp
+(9, 18, 0.5, 3, 1.50, 12),      -- Cumin, 0.5 tsp
+(9, 19, 0.33, 3, 0.50, 13),     -- Cinnamon, 0.33 tsp
+(9, 20, 1, 5, 2.00, 14),        -- Star anise, 1 piece
+(9, 21, 1, 17, 0.50, 15),       -- MSG, 1 pinch (optional)
+(9, 5, 1, 3, 6.00, 16),         -- Salt, 1 tsp
+(9, 27, 1, 4, 8.00, 17),        -- Cornflour, 1 tbsp
+(9, 15, 300, 1, 300.00, 18),    -- Sweet potato, 300g (150g x 2)
+(9, 16, 0.5, 16, 72.00, 19),    -- Frozen peas, 0.5 cup
+(9, 26, 462, 1, 462.00, 20);    -- Rice (cooked), 462g (1.25 cups x 2)
+
 -- =============================================
 -- RECIPE STEPS
 -- =============================================
@@ -162,14 +311,44 @@ INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
 (3, 3, 'While oats cook, roughly chop almonds and walnuts. Give them a light pinch of salt.'),
 (3, 4, 'Transfer porridge to bowls. Drizzle honey over hot oats, add peanut butter, then top with chopped nuts and berries.');
 
+-- Recipe 4: Peanut Butter Banana Smoothie (Light)
+INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
+(4, 1, 'Peel bananas, break into chunks, and freeze for at least 2 hours (or overnight) until solid.'),
+(4, 2, 'Add frozen banana chunks, milk, and peanut butter to a blender.'),
+(4, 3, 'Blend on high until completely smooth and creamy, about 60-90 seconds. Scrape sides if needed.'),
+(4, 4, 'Add a pinch of salt to enhance sweetness. Pulse briefly to combine.'),
+(4, 5, 'Pour into glasses and serve immediately while thick and cold.');
+
+-- Recipe 5: Peanut Butter Banana Smoothie (Standard)
+INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
+(5, 1, 'Peel bananas, break into chunks, and freeze for at least 2 hours (or overnight) until solid.'),
+(5, 2, 'Add frozen banana chunks, milk, and peanut butter to a blender.'),
+(5, 3, 'Blend on high until completely smooth and creamy, about 60-90 seconds. Scrape sides if needed.'),
+(5, 4, 'Add a pinch of salt to enhance sweetness. Pulse briefly to combine.'),
+(5, 5, 'Pour into glasses and serve immediately while thick and cold.');
+
+-- Recipe 6: Peanut Butter Banana Smoothie (Full)
+INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
+(6, 1, 'Peel bananas, break into chunks, and freeze for at least 2 hours (or overnight) until solid.'),
+(6, 2, 'Add frozen banana chunks, milk, and peanut butter to a blender.'),
+(6, 3, 'Blend on high until completely smooth and creamy, about 60-90 seconds. Scrape sides if needed.'),
+(6, 4, 'Add a pinch of salt to enhance sweetness. Pulse briefly to combine.'),
+(6, 5, 'Pour into glasses and serve immediately while thick and cold.');
+
 -- =============================================
 -- RECIPE FAMILIES
 -- =============================================
 INSERT INTO recipe_families (id, family_name, description) VALUES
-(1, 'Porridge with Berries & Nuts', 'Creamy oat porridge topped with honey, peanut butter, mixed berries, and chopped nuts');
+(1, 'Porridge with Berries & Nuts', 'Creamy oat porridge topped with honey, peanut butter, mixed berries, and chopped nuts'),
+(2, 'Peanut Butter Banana Smoothie', 'Thick and creamy frozen banana smoothie with peanut butter and milk');
 
 -- Link recipes to family
 INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_label, display_order) VALUES
 (1, 2, TRUE, 'Standard', 1),   -- Standard is default
 (1, 1, FALSE, 'Light', 2),
-(1, 3, FALSE, 'Full', 3);
+(1, 3, FALSE, 'Full', 3),
+
+-- Peanut Butter Banana Smoothie Family
+(2, 5, TRUE, 'Standard', 1),   -- Standard is default
+(2, 4, FALSE, 'Light', 2),
+(2, 6, FALSE, 'Full', 3);

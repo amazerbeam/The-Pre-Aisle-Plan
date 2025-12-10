@@ -213,6 +213,28 @@
   border-color: var(--brand-primary);
 }
 
+/* FR-084: Grams Input for macro calculation */
+.grams-input {
+  width: 65px;
+  padding: var(--spacing-sm);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  text-align: center;
+  background: #f8f9fa;
+}
+
+.grams-input:focus {
+  outline: none;
+  border-color: var(--brand-primary);
+  background: var(--bg-primary);
+}
+
+.grams-input::placeholder {
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+}
+
 /* Delete Button */
 .ingredient-row > .delete-button {
   width: 32px;
@@ -363,12 +385,17 @@
   }
 
   .autocomplete-container.unit-container {
-    flex: 1 1 calc(100% - 70px - 40px);
+    flex: 1 1 calc(50% - 40px);
     order: 3;
   }
 
-  .ingredient-row > .delete-button {
+  .grams-input {
+    flex: 0 0 55px;
     order: 4;
+  }
+
+  .ingredient-row > .delete-button {
+    order: 5;
   }
 
   .sticky-header {

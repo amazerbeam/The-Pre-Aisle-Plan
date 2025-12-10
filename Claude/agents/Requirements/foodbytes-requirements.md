@@ -40,7 +40,7 @@
 | FR-081 | Daily Macro Popup (Meal Plan View) |
 | FR-082 | Weekly Macro Summary (Meal Plan View) |
 | FR-083 | Ingredient Macro Verification Flag |
-| FR-084 | Recipe Ingredient Gram Equivalent |
+| FR-084 | Recipe Ingredient Gram Equivalent (Frontend + Backend) |
 
 ## In Progress - Finish
 
@@ -3548,23 +3548,27 @@ ALTER TABLE ingredients ADD COLUMN macros_verified BOOLEAN DEFAULT FALSE;
 
 ---
 
-### FR-084: Recipe Ingredient Gram Equivalent
+### FR-084: Recipe Ingredient Gram Equivalent (Frontend + Backend)
 
 **Priority:** High
 
-**Category:** Nutrition / Data Model
+**Category:** Nutrition / Data Model / Admin UI
 
-**Description:** Each recipe ingredient stores the gram equivalent alongside the display quantity and unit. This enables accurate macro calculation regardless of the display unit used (cups, tbsp, pieces, etc.).
+**Description:** Each recipe ingredient stores the gram equivalent alongside the display quantity and unit. This enables accurate macro calculation regardless of the display unit used (cups, tbsp, pieces, etc.). The admin recipe editor MUST include a visible input field for entering gram weights.
 
 **User Story:** As a user, I want accurate macro calculations even when recipes use volume measurements so that my nutrition tracking is reliable.
 
 **Acceptance Criteria:**
 - [ ] `recipe_ingredients` table includes `quantity_grams DECIMAL(10,2) NOT NULL`
 - [ ] Admin enters display quantity + unit (e.g., `1 cup`) AND weighed grams (e.g., `185`)
-- [ ] If `unit_id` = grams, `quantity_grams` auto-fills to match `quantity`
+- [ ] If `unit_id` = grams (unit key = 'g'), `quantity_grams` auto-fills to match `quantity`
 - [ ] `quantity_grams` is required for all recipe ingredients
 - [ ] Macro calculation uses: `quantity_grams × (macro_per_100g / 100)`
-- [ ] Admin recipe ingredient form includes `quantity_grams` field
+- [ ] **Frontend: `RecipeEditModal.jsx` includes `quantityGrams` input field for each ingredient row**
+- [ ] **Frontend: Field labeled "Weight (g)" positioned AFTER unit field, BEFORE delete button**
+- [ ] **Frontend: Auto-fill triggers when unit dropdown value has key = 'g'**
+- [ ] **Frontend: Field is always editable (admin can override auto-fill)**
+- [ ] **Frontend: Field included for BOTH existing ingredients AND new ingredients**
 - [ ] Chef Agent provides both display format and gram equivalent for new recipes
 
 **Example Data:**
@@ -3594,21 +3598,58 @@ ALTER TABLE recipe_ingredients ADD COLUMN quantity_grams DECIMAL(10,2) NOT NULL;
 
 1. Admin creates/edits recipe ingredient
 2. Admin enters display quantity (e.g., `1`) and unit (e.g., `cup`)
-3. If unit = grams: `quantity_grams` auto-fills with same value
-4. If unit ≠ grams: Admin weighs ingredient on scale and enters gram equivalent
+3. If unit = grams (key = 'g'): `quantity_grams` auto-fills with same value as quantity
+4. If unit ≠ grams: Admin weighs ingredient on scale and enters gram equivalent in "Weight (g)" field
 5. System calculates macros using `quantity_grams`
 
+**Frontend Implementation Details:**
+
+Each ingredient row in `RecipeEditModal.jsx` must have this field layout:
+```
+[Ingredient Name] [Quantity] [Unit Dropdown] [Weight (g)] [Delete Button]
+```
+
+The "Weight (g)" field:
+- Input type: number
+- Field name: `quantityGrams`
+- Minimum value: 0
+- Step: 0.01 (allows decimal grams)
+- Required: true (form cannot submit without value)
+- Placeholder: "g"
+
+Auto-fill logic (in unit onChange handler):
+```javascript
+if (selectedUnit.key === 'g') {
+  setQuantityGrams(quantity); // Copy quantity value to grams
+}
+```
+
 **DO:**
-- Auto-fill `quantity_grams` when unit is grams (reduce manual entry)
+- Add `quantityGrams` input field to EVERY ingredient row in `RecipeEditModal.jsx`
+- Position the field AFTER the unit dropdown, BEFORE any action buttons
+- Auto-fill `quantity_grams` when unit key = 'g' (check unit.key, not unit.value)
+- Keep field editable even after auto-fill (admin may need to adjust)
+- Include the field for new ingredients being added (not just existing ones)
 - Require `quantity_grams` for all ingredients (no null values)
 - Use `quantity_grams` for all macro calculations
+- Send `quantityGrams` in the API request payload for each ingredient
 
 **DO NOT:**
-- Do NOT allow saving recipe ingredient without `quantity_grams`
+- Do NOT implement backend validation without corresponding frontend input field
+- Do NOT allow saving recipe ingredient without `quantity_grams` value
 - Do NOT attempt automatic unit-to-gram conversion (density varies by ingredient)
-- Do NOT display `quantity_grams` to end users (internal calculation field)
+- Do NOT display `quantity_grams` to end users in recipe view (admin-only field)
+- Do NOT hide or conditionally show the grams field - it must ALWAYS be visible in admin edit mode
+- Do NOT make the field readonly when auto-filled (admin must be able to override)
 
-**Source Evidence:** User conversation - "if I am adding an ingredient I'll be in the kitchen and have a scale at hand so I can do it"
+**Files to Modify:**
+- `client/src/components/admin/RecipeEditModal.jsx` - Add quantityGrams input field
+- `client/src/components/admin/RecipeEditModal.css` - Style the new field (if needed)
+- Backend DTO already has field: `foodbytes-api/src/main/java/com/foodbytes/dto/RecipeIngredientAdminDTO.java`
+
+**Source Evidence:**
+- User conversation - "if I am adding an ingredient I'll be in the kitchen and have a scale at hand so I can do it"
+- Implementation failure 2025-12-10: Backend had @NotNull validation on quantityGrams but frontend had no input field, causing 400 Bad Request on recipe save
 
 **Status:** In Progress
 

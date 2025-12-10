@@ -97,7 +97,9 @@ function RecipeIngredientsForm({ ingredients: initialIngredients, onSave, onCanc
       ingredientName: '',
       quantity: 1,
       unitId: null,
+      unitKey: null,
       unitValue: '',
+      quantityGrams: null,  // FR-084: Gram equivalent for macro calculation
       sortOrder: 0,
       aisleId: null,
       isNewIngredient: false,
@@ -142,12 +144,17 @@ function RecipeIngredientsForm({ ingredients: initialIngredients, onSave, onCanc
   }
 
   // Handle unit selection from autocomplete
-  const handleUnitSelect = (index, selectedUnit) => {
+  const handleUnitSelect = (index, selectedUnit, currentQuantity) => {
     if (selectedUnit) {
       updateIngredient(index, 'unitId', selectedUnit.id)
       updateIngredient(index, 'unitKey', selectedUnit.key)
       updateIngredient(index, 'unitValue', selectedUnit.value)
       updateIngredient(index, 'isNewUnit', false)
+
+      // FR-084: Auto-fill quantityGrams when unit is grams
+      if (selectedUnit.key === 'g' && currentQuantity) {
+        updateIngredient(index, 'quantityGrams', currentQuantity)
+      }
     }
   }
 
@@ -242,7 +249,7 @@ function RecipeIngredientsForm({ ingredients: initialIngredients, onSave, onCanc
               onUpdate={(field, value) => updateIngredient(index, field, value)}
               onIngredientSelect={(ing) => handleIngredientSelect(index, ing)}
               onNewIngredient={(name) => handleNewIngredient(index, name)}
-              onUnitSelect={(unit) => handleUnitSelect(index, unit)}
+              onUnitSelect={(unit) => handleUnitSelect(index, unit, ingredients[index]?.quantity)}
               onNewUnit={(value) => handleNewUnit(index, value)}
             />
           ))
@@ -562,6 +569,18 @@ function IngredientRow({
           </ul>
         )}
       </div>
+
+      {/* FR-084: Weight in grams for macro calculation */}
+      <input
+        type="number"
+        value={ingredient.quantityGrams || ''}
+        onChange={(e) => onUpdate('quantityGrams', parseFloat(e.target.value) || null)}
+        placeholder="g"
+        className="grams-input"
+        min="0"
+        step="0.01"
+        title="Weight in grams (for macro calculation)"
+      />
 
       {/* Delete button */}
       <button
