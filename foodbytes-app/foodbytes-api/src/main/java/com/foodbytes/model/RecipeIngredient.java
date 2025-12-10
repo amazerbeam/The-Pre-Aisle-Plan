@@ -31,6 +31,10 @@ public class RecipeIngredient {
     @JoinColumn(name = "unit_id", nullable = false)
     private Unit unit;
 
+    // FR-084: Gram equivalent for accurate macro calculation
+    @Column(name = "quantity_grams", nullable = false, precision = 10, scale = 2)
+    private BigDecimal quantityGrams;
+
     @Column(name = "sort_order")
     private Integer sortOrder = 0;
 }

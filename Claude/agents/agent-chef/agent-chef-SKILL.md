@@ -42,8 +42,11 @@ Read `../agent-nutrition/agent-nutrition-SKILL.md` for the full nutrition philos
 - Clarify cuisine, constraints, dietary needs
 - Use `AskUserQuestion` if critical info missing
 
-### 2. Check Existing Recipes
-Read `foodbytes-app/database/seed.sql` to understand user's taste profile and existing recipes.
+### 2. Check seed.sql Before Adding Data
+Read `foodbytes-app/database/seed.sql` to:
+- **Avoid ID conflicts** — Find highest recipe ID, ingredient ID, and recipe_family ID before adding new ones
+- **Reuse existing ingredients** — Check if ingredient already exists before creating new one
+- **Use existing lookup tables** — Never recreate aisles, units, or meals; reference by ID
 
 ### 3. Search When Needed
 Use `WebSearch` for authentic techniques:
@@ -55,6 +58,8 @@ Follow the output format below. For ingredient accessibility rules, see `referen
 
 ### 5. Calculate Macros
 Calculate macros for EVERY recipe. See `references/diet-guardrails.md` for guidance (not limits).
+
+**Important:** Provide gram equivalents for all ingredients (see Macro Data System section below).
 
 ### 6. Create Variant Family
 Create Light/Standard/Full variants by scaling portions. See `references/variant-system.md`.
@@ -108,6 +113,60 @@ For complete examples, see `references/examples/recipe-example.md`.
 - Create variants by removing ingredients (scale portions instead)
 - Skip macro calculation
 - Use specialty ingredients without accessible alternatives
+
+## Macro Data System
+
+### Gram Equivalents Required
+
+FoodBytes calculates macros from gram weights. When creating recipes, provide **both** the display unit AND the gram equivalent for non-gram measurements:
+
+**Output format for ingredients:**
+
+```markdown
+### Ingredients (Standard)
+- [ ] Chicken breast — 150g
+- [ ] Rice (cooked) — 1 cup (185g)
+- [ ] Olive oil — 1 tbsp (14g)
+- [ ] Garlic — 2 cloves (6g)
+- [ ] Broccoli — 1 cup (91g)
+```
+
+**Key principle:** Always weigh ingredients. The gram value is used for macro calculation.
+
+### Common Gram Equivalents
+
+| Ingredient | Unit | Grams |
+|------------|------|-------|
+| Rice (cooked) | 1 cup | 185g |
+| Pasta (cooked) | 1 cup | 140g |
+| Olive oil | 1 tbsp | 14g |
+| Butter | 1 tbsp | 14g |
+| Garlic | 1 clove | 3g |
+| Onion | 1 medium | 110g |
+| Egg | 1 medium | 50g |
+| Chicken breast | 1 palm | 100g |
+| Broccoli | 1 cup | 91g |
+| Honey | 1 tbsp | 21g |
+| Soy sauce | 1 tbsp | 18g |
+
+**Note:** These are approximations. When in doubt, weigh it.
+
+### Macro Calculation
+
+System calculates macros using:
+
+```
+ingredient_macros = quantity_grams × (macro_per_100g / 100)
+recipe_macros = SUM(all ingredient_macros)
+per_serving_macros = recipe_macros / default_servings
+```
+
+### Verification
+
+- Recipes can only go live if all ingredients have verified macro data
+- Nutrition Agent verifies math is correct and recipe hits calorie targets
+
+---
 
 ## References
 

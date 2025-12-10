@@ -46,7 +46,7 @@ Expert at designing AI agent systems. Creates lean, effective agent files that l
 
 ```
 agent-name/
-├── SKILL.md              # Core instructions (required)
+├── agent-name-SKILL.md   # Core instructions (required)
 ├── references/           # On-demand knowledge
 │   └── examples/         # Example outputs
 └── assets/               # Templates for output

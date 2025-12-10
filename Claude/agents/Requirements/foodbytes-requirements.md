@@ -39,6 +39,8 @@
 | FR-080 | Ingredient Macro Data |
 | FR-081 | Daily Macro Popup (Meal Plan View) |
 | FR-082 | Weekly Macro Summary (Meal Plan View) |
+| FR-083 | Ingredient Macro Verification Flag |
+| FR-084 | Recipe Ingredient Gram Equivalent |
 
 ## In Progress - Finish
 
@@ -3496,6 +3498,119 @@ Daily Average:
 **Source Evidence:** User conversation - "for the week, same thing repurpose the 'Total' at the top"
 
 **Status:** Backlog
+
+---
+
+### FR-083: Ingredient Macro Verification Flag
+
+**Priority:** High
+
+**Category:** Nutrition / Admin
+
+**Description:** Each ingredient has a `macros_verified` flag indicating whether its macro data has been verified. Recipes containing unverified ingredients cannot be published as live.
+
+**User Story:** As an admin, I want to track which ingredients have verified macro data so that only recipes with accurate nutrition information can be published.
+
+**Acceptance Criteria:**
+- [ ] `ingredients` table includes `macros_verified BOOLEAN DEFAULT FALSE`
+- [ ] New ingredients default to `macros_verified = FALSE`
+- [ ] Recipe cannot be set to `is_live = TRUE` if any ingredient has `macros_verified = FALSE`
+- [ ] Live recipe cannot be saved if it would contain unverified ingredients
+- [ ] Admin must enter `protein_per_100g`, `carbs_per_100g`, `fat_per_100g` to mark as verified
+- [ ] Admin ingredient form includes macro fields and verified checkbox
+- [ ] Admin UI shows warning when recipe has unverified ingredients
+- [ ] Admin can filter ingredients by verified/unverified status
+
+**Business Rules:**
+
+| Rule | Description |
+|------|-------------|
+| R1 | New ingredients default to `macros_verified = FALSE` |
+| R2 | Recipe cannot be `is_live = TRUE` if any ingredient has `macros_verified = FALSE` |
+| R3 | Live recipe cannot be saved if it would contain unverified ingredients |
+
+**Database Schema:**
+
+```sql
+ALTER TABLE ingredients ADD COLUMN macros_verified BOOLEAN DEFAULT FALSE;
+```
+
+**API Validation:**
+
+| Endpoint | Validation |
+|----------|------------|
+| `PUT /recipes/{id}` (set is_live=true) | Check all `recipe_ingredients` → `ingredients.macros_verified = TRUE` |
+| `PUT /ingredients/{id}` | If setting `macros_verified = TRUE`, require all 3 macro fields to be set |
+
+**Source Evidence:** User conversation - "Unverified recipes can't be made live, live recipes can't be saved as unverified"
+
+**Status:** In Progress
+
+---
+
+### FR-084: Recipe Ingredient Gram Equivalent
+
+**Priority:** High
+
+**Category:** Nutrition / Data Model
+
+**Description:** Each recipe ingredient stores the gram equivalent alongside the display quantity and unit. This enables accurate macro calculation regardless of the display unit used (cups, tbsp, pieces, etc.).
+
+**User Story:** As a user, I want accurate macro calculations even when recipes use volume measurements so that my nutrition tracking is reliable.
+
+**Acceptance Criteria:**
+- [ ] `recipe_ingredients` table includes `quantity_grams DECIMAL(10,2) NOT NULL`
+- [ ] Admin enters display quantity + unit (e.g., `1 cup`) AND weighed grams (e.g., `185`)
+- [ ] If `unit_id` = grams, `quantity_grams` auto-fills to match `quantity`
+- [ ] `quantity_grams` is required for all recipe ingredients
+- [ ] Macro calculation uses: `quantity_grams × (macro_per_100g / 100)`
+- [ ] Admin recipe ingredient form includes `quantity_grams` field
+- [ ] Chef Agent provides both display format and gram equivalent for new recipes
+
+**Example Data:**
+
+| Display Quantity | Unit | quantity_grams | Notes |
+|------------------|------|----------------|-------|
+| 1 | cup (rice) | 185 | Admin weighs 1 cup rice = 185g |
+| 200 | g (chicken) | 200 | Auto-filled (unit is grams) |
+| 1 | tbsp (oil) | 14 | Admin weighs 1 tbsp oil = 14g |
+| 2 | cloves (garlic) | 6 | Admin weighs 2 cloves = 6g |
+
+**Macro Calculation Formula:**
+
+```
+ingredient_macros = quantity_grams × (macro_per_100g / 100)
+recipe_macros = SUM(all ingredient_macros)
+per_serving_macros = recipe_macros / default_servings
+```
+
+**Database Schema:**
+
+```sql
+ALTER TABLE recipe_ingredients ADD COLUMN quantity_grams DECIMAL(10,2) NOT NULL;
+```
+
+**Workflow:**
+
+1. Admin creates/edits recipe ingredient
+2. Admin enters display quantity (e.g., `1`) and unit (e.g., `cup`)
+3. If unit = grams: `quantity_grams` auto-fills with same value
+4. If unit ≠ grams: Admin weighs ingredient on scale and enters gram equivalent
+5. System calculates macros using `quantity_grams`
+
+**DO:**
+- Auto-fill `quantity_grams` when unit is grams (reduce manual entry)
+- Require `quantity_grams` for all ingredients (no null values)
+- Use `quantity_grams` for all macro calculations
+
+**DO NOT:**
+- Do NOT allow saving recipe ingredient without `quantity_grams`
+- Do NOT attempt automatic unit-to-gram conversion (density varies by ingredient)
+- Do NOT display `quantity_grams` to end users (internal calculation field)
+
+**Source Evidence:** User conversation - "if I am adding an ingredient I'll be in the kitchen and have a scale at hand so I can do it"
+
+**Status:** In Progress
 
 ---
 

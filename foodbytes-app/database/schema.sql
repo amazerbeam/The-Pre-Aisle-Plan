@@ -57,11 +57,19 @@ CREATE TABLE meals (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Ingredients table (master list of all ingredients)
+-- FR-080: Added macro columns for nutrition tracking
+-- FR-083: Added macros_verified flag for verification workflow
 CREATE TABLE ingredients (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     `key` VARCHAR(100) NOT NULL,
     name VARCHAR(255) NOT NULL,
     aisle_id BIGINT NOT NULL,
+    -- FR-080: Macronutrient data per 100g
+    protein_per_100g DECIMAL(5,2) NOT NULL DEFAULT 0.00 COMMENT 'Protein in grams per 100g of ingredient',
+    carbs_per_100g DECIMAL(5,2) NOT NULL DEFAULT 0.00 COMMENT 'Carbohydrates in grams per 100g of ingredient',
+    fat_per_100g DECIMAL(5,2) NOT NULL DEFAULT 0.00 COMMENT 'Fat in grams per 100g of ingredient',
+    -- FR-083: Verification flag - must be TRUE for recipe to go live
+    macros_verified BOOLEAN NOT NULL DEFAULT FALSE COMMENT 'TRUE when macro data has been verified by admin',
     UNIQUE KEY unique_ingredient_key (`key`),
     UNIQUE KEY unique_ingredient_name (name),
     CONSTRAINT fk_ingredients_aisle FOREIGN KEY (aisle_id)
@@ -94,12 +102,15 @@ CREATE TABLE recipe_meals (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Recipe ingredients table
+-- FR-084: Added quantity_grams for accurate macro calculation
 CREATE TABLE recipe_ingredients (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     recipe_id BIGINT NOT NULL,
     ingredient_id BIGINT NOT NULL,
     quantity DECIMAL(10, 2) NOT NULL,
     unit_id BIGINT NOT NULL,
+    -- FR-084: Gram equivalent for macro calculations (admin weighs ingredient)
+    quantity_grams DECIMAL(10, 2) NOT NULL COMMENT 'Weight in grams for macro calculation',
     sort_order INT NOT NULL DEFAULT 0,
     CONSTRAINT fk_recipe_ingredients_recipe FOREIGN KEY (recipe_id)
         REFERENCES recipes(id) ON DELETE CASCADE ON UPDATE CASCADE,

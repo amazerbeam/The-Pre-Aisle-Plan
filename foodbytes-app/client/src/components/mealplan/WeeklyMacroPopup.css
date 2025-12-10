@@ -1,0 +1,86 @@
+/* FR-082: Weekly Macro Popup Styles */
+/* Shares base styles with DailyMacroPopup.css */
+
+.macro-section {
+  margin-bottom: 24px;
+}
+
+.macro-section:last-child {
+  margin-bottom: 0;
+}
+
+.macro-section-title {
+  margin: 0 0 12px 0;
+  font-size: 0.9rem;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 6px;
+}
+
+.macro-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.macro-summary-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  gap: 6px;
+}
+
+.macro-summary-label {
+  font-size: 0.75rem;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.macro-summary-value {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #333;
+}
+
+.macro-summary-calories {
+  font-size: 0.75rem;
+  color: #999;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 480px) {
+  .macro-summary-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .macro-summary-item {
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 10px 14px;
+  }
+
+  .macro-summary-label {
+    order: 1;
+    flex: 1;
+    text-align: left;
+  }
+
+  .macro-summary-value {
+    order: 2;
+  }
+
+  .macro-summary-calories {
+    order: 3;
+    margin-left: 6px;
+  }
+}

@@ -61,6 +61,28 @@
   font-weight: 500;
 }
 
+/* FR-082: Make week total clickable */
+.week-calories-clickable {
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.week-calories-clickable:hover {
+  background-color: #3d3469;
+  transform: scale(1.02);
+}
+
+.week-calories-clickable:active {
+  transform: scale(0.98);
+}
+
+/* Keyboard focus style */
+.week-calories-clickable:focus {
+  outline: 2px solid white;
+  outline-offset: 2px;
+}
+
 /* Desktop: 7-column grid */
 .calendar-grid {
   display: grid;

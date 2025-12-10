@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 /**
  * DTO for recipe ingredient data in admin operations (FR-044).
  * Uses ingredient key (existing) or name (new ingredient).
+ * FR-084: Includes quantityGrams for accurate macro calculation.
  */
 @Data
 @Builder
@@ -35,6 +36,12 @@ public class RecipeIngredientAdminDTO {
     private Long unitId;              // ID of existing unit
     private String unitKey;           // Key of existing unit (alternative to ID)
     private String unitValue;         // Display value for unit
+
+    // FR-084: Gram equivalent for macro calculations
+    // Required for all recipe ingredients - admin weighs ingredient on scale
+    @NotNull(message = "Quantity in grams is required for macro calculation")
+    @Min(value = 0, message = "Quantity in grams cannot be negative")
+    private BigDecimal quantityGrams;
 
     private Integer sortOrder;        // Display order in recipe
 

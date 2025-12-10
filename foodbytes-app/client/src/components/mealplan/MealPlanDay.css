@@ -121,6 +121,30 @@
   font-size: 13px;
 }
 
+/* FR-081: Make calorie text clickable */
+.day-calories-clickable {
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s ease;
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.day-calories-clickable:hover {
+  background-color: rgba(74, 63, 128, 0.1);
+}
+
+.day-calories-clickable:active {
+  background-color: rgba(74, 63, 128, 0.2);
+}
+
+/* Keyboard focus style */
+.day-calories-clickable:focus {
+  outline: 2px solid var(--primary-color, #4a3f80);
+  outline-offset: 2px;
+}
+
 /* Mobile: Expand days for better readability */
 @media (max-width: 600px) {
   .day-header {

@@ -13,7 +13,6 @@ services:
       - mysql_data:/var/lib/mysql
       - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
       - ./database/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql
-      - ./database/seed-merged-recipes.sql:/docker-entrypoint-initdb.d/03-seed-merged.sql
     ports:
       - "3306:3306"
     healthcheck:

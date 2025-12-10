@@ -229,6 +229,7 @@ public class RecipeService {
 
     /**
      * Update an existing recipe (FR-033).
+     * FR-083: Validates that recipe cannot go live with unverified ingredients.
      */
     @Transactional
     public RecipeAdminDTO updateRecipe(Long id, RecipeAdminDTO dto) {
@@ -240,6 +241,12 @@ public class RecipeService {
 
         // Create new units first if any
         Map<String, Unit> newUnitMap = createNewUnits(dto.getNewUnits());
+
+        // FR-083: Check if trying to set isLive = true with unverified ingredients
+        boolean wantsToGoLive = dto.getIsLive() != null && dto.getIsLive();
+        if (wantsToGoLive) {
+            validateIngredientsVerified(dto.getIngredients(), newIngredientMap);
+        }
 
         // Update basic fields
         recipe.setName(dto.getName());
@@ -284,11 +291,29 @@ public class RecipeService {
 
     /**
      * Update recipe visibility only (toggle Live/Hidden).
+     * FR-083: Validates that recipe cannot go live with unverified ingredients.
      */
     @Transactional
     public RecipeAdminDTO updateRecipeVisibility(Long id, boolean isLive) {
         Recipe recipe = recipeRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Recipe not found with id: " + id));
+
+        // FR-083: Check if trying to set isLive = true with unverified ingredients
+        if (isLive) {
+            List<String> unverifiedIngredients = recipe.getIngredients().stream()
+                    .filter(ri -> ri.getIngredient() != null &&
+                                  (ri.getIngredient().getMacrosVerified() == null ||
+                                   !ri.getIngredient().getMacrosVerified()))
+                    .map(ri -> ri.getIngredient().getName())
+                    .toList();
+
+            if (!unverifiedIngredients.isEmpty()) {
+                throw new IllegalStateException(
+                        "Cannot set recipe to live: the following ingredients have unverified macros: " +
+                        String.join(", ", unverifiedIngredients) +
+                        ". Please verify macro data for all ingredients before publishing.");
+            }
+        }
 
         recipe.setIsLive(isLive);
         recipe = recipeRepository.save(recipe);
@@ -299,6 +324,45 @@ public class RecipeService {
     // ========================================
     // HELPER METHODS FOR ADMIN OPERATIONS
     // ========================================
+
+    /**
+     * FR-083: Validates that all ingredients in a recipe have verified macros.
+     * Called when attempting to set a recipe to live.
+     *
+     * @param ingredientDTOs List of recipe ingredients
+     * @param newIngredientMap Map of newly created ingredients (by temp ID)
+     * @throws IllegalStateException if any ingredient has unverified macros
+     */
+    private void validateIngredientsVerified(List<RecipeIngredientAdminDTO> ingredientDTOs,
+                                             Map<String, Ingredient> newIngredientMap) {
+        List<String> unverifiedIngredients = new ArrayList<>();
+
+        for (RecipeIngredientAdminDTO dto : ingredientDTOs) {
+            Ingredient ingredient = null;
+
+            if (dto.getIsNewIngredient() != null && dto.getIsNewIngredient()) {
+                ingredient = newIngredientMap.get(dto.getIngredientName());
+            } else if (dto.getIngredientId() != null) {
+                ingredient = ingredientRepository.findById(dto.getIngredientId()).orElse(null);
+            } else if (dto.getIngredientKey() != null) {
+                ingredient = ingredientRepository.findByKeyIgnoreCase(dto.getIngredientKey()).orElse(null);
+            } else if (dto.getIngredientName() != null) {
+                ingredient = ingredientRepository.findByNameIgnoreCase(dto.getIngredientName()).orElse(null);
+            }
+
+            if (ingredient != null &&
+                (ingredient.getMacrosVerified() == null || !ingredient.getMacrosVerified())) {
+                unverifiedIngredients.add(ingredient.getName());
+            }
+        }
+
+        if (!unverifiedIngredients.isEmpty()) {
+            throw new IllegalStateException(
+                    "Cannot set recipe to live: the following ingredients have unverified macros: " +
+                    String.join(", ", unverifiedIngredients) +
+                    ". Please verify macro data for all ingredients before publishing.");
+        }
+    }
 
     private Map<String, Ingredient> createNewIngredients(List<NewIngredientDTO> newIngredients) {
         Map<String, Ingredient> map = new HashMap<>();
@@ -408,6 +472,8 @@ public class RecipeService {
             recipeIngredient.setIngredient(ingredient);
             recipeIngredient.setQuantity(dto.getQuantity());
             recipeIngredient.setUnit(unit);
+            // FR-084: Set quantity_grams for macro calculation
+            recipeIngredient.setQuantityGrams(dto.getQuantityGrams());
             recipeIngredient.setSortOrder(dto.getSortOrder() != null ? dto.getSortOrder() : sortOrder++);
 
             recipe.getIngredients().add(recipeIngredient);
@@ -468,6 +534,8 @@ public class RecipeService {
                 .unitId(ri.getUnit().getId())
                 .unitKey(ri.getUnit().getKey())
                 .unitValue(ri.getUnit().getValue())
+                // FR-084: Include quantityGrams for macro calculation
+                .quantityGrams(ri.getQuantityGrams())
                 .sortOrder(ri.getSortOrder())
                 .aisleId(ri.getIngredient().getAisle().getId())
                 .aisleName(ri.getIngredient().getAisle().getName())
