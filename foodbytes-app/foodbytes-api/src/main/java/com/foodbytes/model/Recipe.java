@@ -52,6 +52,11 @@ public class Recipe {
     @BatchSize(size = 20)
     private List<RecipeStep> steps = new ArrayList<>();
 
+    // FR-086: Recipes that are "extras" (sub-recipes) for this recipe
+    @OneToMany(mappedBy = "parentRecipe", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OrderBy("displayOrder ASC")
+    private List<RecipeExtra> extras = new ArrayList<>();
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();

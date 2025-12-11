@@ -2,6 +2,7 @@
 -- Version: 2.0.0 (Normalized)
 
 -- Drop existing tables if they exist (for clean re-creation)
+DROP TABLE IF EXISTS recipe_extras;
 DROP TABLE IF EXISTS recipe_family_members;
 DROP TABLE IF EXISTS recipe_families;
 DROP TABLE IF EXISTS meal_plan_entries;
@@ -122,15 +123,22 @@ CREATE TABLE recipe_ingredients (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Recipe steps table
+-- FR-091: Added linked_recipe_id and alt_instruction for linked recipe navigation
 CREATE TABLE recipe_steps (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     recipe_id BIGINT NOT NULL,
     step_number INT NOT NULL,
     instruction TEXT NOT NULL,
     tip TEXT NULL,
+    -- FR-091: Links step to an extras recipe (e.g., "Prepare the dough" links to Pizza Dough recipe)
+    linked_recipe_id BIGINT NULL COMMENT 'Optional link to extras recipe for this step',
+    -- FR-091: Alternative instruction when linked recipe is store-bought
+    alt_instruction TEXT NULL COMMENT 'Instruction to show if user selects store-bought for linked recipe',
     UNIQUE KEY unique_recipe_step (recipe_id, step_number),
     CONSTRAINT fk_recipe_steps_recipe FOREIGN KEY (recipe_id)
         REFERENCES recipes(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_recipe_steps_linked_recipe FOREIGN KEY (linked_recipe_id)
+        REFERENCES recipes(id) ON DELETE SET NULL ON UPDATE CASCADE,
     INDEX idx_recipe_id (recipe_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -195,4 +203,24 @@ CREATE TABLE recipe_family_members (
 
     INDEX idx_family_id (family_id),
     INDEX idx_recipe_id (recipe_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- FR-086: Recipe Extras table (links parent recipes to sub-recipes/extras)
+-- Creates hierarchical relationships: Pizza -> Pizza Dough, Pizza Sauce -> Pesto
+CREATE TABLE recipe_extras (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    parent_recipe_id BIGINT NOT NULL COMMENT 'The recipe that uses the extra (e.g., Pizza)',
+    child_recipe_id BIGINT NOT NULL COMMENT 'The extra recipe being linked (e.g., Pizza Sauce)',
+    display_order INT DEFAULT 0 COMMENT 'Order in the homemade selection popup',
+
+    -- Each parent-child pair must be unique
+    UNIQUE KEY unique_parent_child (parent_recipe_id, child_recipe_id),
+
+    CONSTRAINT fk_recipe_extras_parent FOREIGN KEY (parent_recipe_id)
+        REFERENCES recipes(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_recipe_extras_child FOREIGN KEY (child_recipe_id)
+        REFERENCES recipes(id) ON DELETE CASCADE ON UPDATE CASCADE,
+
+    INDEX idx_parent_recipe_id (parent_recipe_id),
+    INDEX idx_child_recipe_id (child_recipe_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

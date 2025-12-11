@@ -47,11 +47,13 @@ INSERT INTO units (id, `key`, value) VALUES
 (18, 'oz', 'oz');
 
 -- Meals
+-- FR-085: Added 'extras' meal type for sub-recipes (Pizza Dough, Pizza Sauce, Pesto, etc.)
 INSERT INTO meals (id, `key`, name, display_order) VALUES
 (1, 'breakfast', 'Breakfast', 1),
 (2, 'lunch', 'Lunch', 2),
 (3, 'dinner', 'Dinner', 3),
-(4, 'snacks', 'Snacks', 4);
+(4, 'snacks', 'Snacks', 4),
+(5, 'extras', 'Extras', 5);
 
 -- =============================================
 -- INGREDIENTS (with aisle references and macros)

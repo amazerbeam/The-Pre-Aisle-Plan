@@ -25,6 +25,15 @@ export const recipeService = {
     return response.data
   },
 
+  /**
+   * FR-086: Get extras hierarchy for a recipe
+   * Returns tree structure of linked sub-recipes
+   */
+  async getRecipeExtras(id) {
+    const response = await api.get(`/recipes/${id}/extras`)
+    return response.data
+  },
+
   // ========================================
   // ADMIN ENDPOINTS (FR-033, FR-047)
   // ========================================

@@ -2,6 +2,14 @@ Using > @Claude\agents\CEO\agent-ceo.md plan to execute the requirements current
 
 plan using @Claude\agents\Requirements\agent-failed-requirements.md to look at
 FR-050
+
+
+update context with anything that is broadly applicable
+
+  mysql -u root -prootpassword
+
+
+
 The If we select Monday the text should be #4a3f80, the other days should be grey, like the recipe cal count. 
 
 So for example. i've selected oats on monday for breakfast. Oats on monday would then show as #4a3f80 text on Monday and the rest of the days have grey text. 
@@ -25,3 +33,4 @@ Stiry Fry: 3 tbls spoons
 
 Move FR-019 to inprogress with a note "Look at the new requirements on "formatting specifications"
 Move FR-007 to in progress and check the new requirements on "date ranges"
+

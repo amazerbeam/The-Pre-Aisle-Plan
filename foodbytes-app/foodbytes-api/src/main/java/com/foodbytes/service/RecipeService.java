@@ -34,6 +34,7 @@ public class RecipeService {
     private final RecipeRepository recipeRepository;
     private final IngredientService ingredientService;
     private final RecipeFamilyMemberRepository recipeFamilyMemberRepository;
+    private final RecipeExtrasService recipeExtrasService;
     private final IngredientRepository ingredientRepository;
     private final UnitRepository unitRepository;
     private final MealRepository mealRepository;
@@ -96,14 +97,32 @@ public class RecipeService {
                     i.getUnit().getValue()))
                 .collect(Collectors.toList()));
 
+        // FR-091: Convert steps with linked recipe info
         dto.setSteps(recipe.getSteps().stream()
-                .map(s -> s.getInstruction())
+                .map(this::convertToStepViewDTO)
                 .collect(Collectors.toList()));
 
         // FR-043: Add variant information
         addVariantInfo(dto, recipe.getId());
 
+        // FR-086: Add extras information
+        addExtrasInfo(dto, recipe.getId());
+
         return dto;
+    }
+
+    /**
+     * FR-086: Add extras (sub-recipes) information to recipe DTO.
+     */
+    private void addExtrasInfo(RecipeDTO dto, Long recipeId) {
+        boolean hasExtras = recipeExtrasService.hasExtras(recipeId);
+        dto.setHasExtras(hasExtras);
+
+        if (hasExtras) {
+            dto.setExtras(recipeExtrasService.buildExtrasTree(recipeId, new HashSet<>()));
+        } else {
+            dto.setExtras(new ArrayList<>());
+        }
     }
 
     /**
@@ -494,6 +513,14 @@ public class RecipeService {
             step.setInstruction(dto.getInstruction().trim());
             step.setTip(dto.getTip());
 
+            // FR-091: Handle linked recipe
+            if (dto.getLinkedRecipeId() != null) {
+                Recipe linkedRecipe = recipeRepository.findById(dto.getLinkedRecipeId())
+                        .orElse(null);
+                step.setLinkedRecipe(linkedRecipe);
+                step.setAltInstruction(dto.getAltInstruction());
+            }
+
             recipe.getSteps().add(step);
         }
     }
@@ -545,11 +572,38 @@ public class RecipeService {
     }
 
     private RecipeStepAdminDTO convertToStepAdminDTO(RecipeStep step) {
-        return RecipeStepAdminDTO.builder()
+        RecipeStepAdminDTO.RecipeStepAdminDTOBuilder builder = RecipeStepAdminDTO.builder()
                 .id(step.getId())
                 .stepNumber(step.getStepNumber())
                 .instruction(step.getInstruction())
-                .tip(step.getTip())
-                .build();
+                .tip(step.getTip());
+
+        // FR-091: Include linked recipe info
+        if (step.getLinkedRecipe() != null) {
+            builder.linkedRecipeId(step.getLinkedRecipe().getId())
+                   .linkedRecipeName(step.getLinkedRecipe().getName())
+                   .altInstruction(step.getAltInstruction());
+        }
+
+        return builder.build();
+    }
+
+    /**
+     * FR-091: Convert step to view DTO with linked recipe info.
+     */
+    private RecipeStepViewDTO convertToStepViewDTO(RecipeStep step) {
+        RecipeStepViewDTO.RecipeStepViewDTOBuilder builder = RecipeStepViewDTO.builder()
+                .stepNumber(step.getStepNumber())
+                .instruction(step.getInstruction())
+                .tip(step.getTip());
+
+        // Include linked recipe info if present
+        if (step.getLinkedRecipe() != null) {
+            builder.linkedRecipeId(step.getLinkedRecipe().getId())
+                   .linkedRecipeName(step.getLinkedRecipe().getName())
+                   .altInstruction(step.getAltInstruction());
+        }
+
+        return builder.build();
     }
 }

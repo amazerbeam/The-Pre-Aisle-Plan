@@ -144,7 +144,34 @@ public class MealPlanController {
 
         AggregatedShoppingListDTO shoppingList = shoppingListService.getShoppingList(
             userPrincipal.getId(),
-            startDate
+            startDate,
+            null  // No homemade selections
+        );
+        return ResponseEntity.ok(shoppingList);
+    }
+
+    /**
+     * FR-089: Get aggregated shopping list with homemade/store-bought selections.
+     * POST /api/meal-plan/shopping-list?startDate=2025-12-01
+     *
+     * Store-bought extras are shown as single "Store Bought [Recipe Name]" items.
+     * Homemade extras have their ingredients added to the list.
+     *
+     * @param userPrincipal Authenticated user (required)
+     * @param startDate Start date of the 7-day period
+     * @param selections Homemade selections from localStorage
+     * @return AggregatedShoppingListDTO with items grouped by aisle
+     */
+    @PostMapping("/shopping-list")
+    public ResponseEntity<AggregatedShoppingListDTO> getShoppingListWithSelections(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestBody(required = false) HomemadeSelectionsDTO selections) {
+
+        AggregatedShoppingListDTO shoppingList = shoppingListService.getShoppingList(
+            userPrincipal.getId(),
+            startDate,
+            selections
         );
         return ResponseEntity.ok(shoppingList);
     }

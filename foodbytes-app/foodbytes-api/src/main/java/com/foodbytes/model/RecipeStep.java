@@ -27,4 +27,13 @@ public class RecipeStep {
 
     @Column(columnDefinition = "TEXT")
     private String tip;
+
+    // FR-091: Links step to an extras recipe (e.g., "Prepare the dough" links to Pizza Dough recipe)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "linked_recipe_id")
+    private Recipe linkedRecipe;
+
+    // FR-091: Alternative instruction when linked recipe is store-bought
+    @Column(name = "alt_instruction", columnDefinition = "TEXT")
+    private String altInstruction;
 }

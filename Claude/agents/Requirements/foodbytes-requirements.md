@@ -36,11 +36,14 @@
 
 | Req # | Description |
 |-------|-------------|
-| FR-080 | Ingredient Macro Data |
-| FR-081 | Daily Macro Popup (Meal Plan View) |
-| FR-082 | Weekly Macro Summary (Meal Plan View) |
-| FR-083 | Ingredient Macro Verification Flag |
-| FR-084 | Recipe Ingredient Gram Equivalent (Frontend + Backend) |
+| FR-085 | Extras Meal Type |
+| FR-086 | Recipe Extras Linking |
+| FR-087 | Homemade Selection Popup |
+| FR-088 | Smart Checkbox Cascade |
+| FR-089 | Shopping List Extras Integration |
+| FR-090 | Homemade Choices Persistence |
+| FR-091 | Recipe Step Linking |
+| FR-092 | Linked Recipe Navigation |
 
 ## In Progress - Finish
 
@@ -93,6 +96,11 @@
 | NFR-015 | Centralized Unit Definitions |
 | Database: Users | Store user accounts from Google OAuth |
 | Database: Recipes | Store recipe data (migrated from recipes.js) |
+| FR-080 | Ingredient Macro Data |
+| FR-081 | Daily Macro Popup (Meal Plan View) |
+| FR-082 | Weekly Macro Summary (Meal Plan View) |
+| FR-083 | Ingredient Macro Verification Flag |
+| FR-084 | Recipe Ingredient Gram Equivalent (Frontend + Backend) |
 
 ## Completed - Finish
 
@@ -3399,7 +3407,7 @@ ALTER TABLE ingredients ADD COLUMN fat_per_100g DECIMAL(5,2) DEFAULT 0;
 
 **Source Evidence:** User conversation - "ingredient-level macros is the way to go"
 
-**Status:** Backlog
+**Status:** Completed
 
 ---
 
@@ -3448,7 +3456,7 @@ Fat:       72g  (32%)
 
 **Source Evidence:** User conversation - "For days, we could have where we display the cal for the day, make that a button and once clicked we pop up with the info"
 
-**Status:** Backlog
+**Status:** Completed
 
 ---
 
@@ -3497,7 +3505,7 @@ Daily Average:
 
 **Source Evidence:** User conversation - "for the week, same thing repurpose the 'Total' at the top"
 
-**Status:** Backlog
+**Status:** Completed
 
 ---
 
@@ -3544,7 +3552,7 @@ ALTER TABLE ingredients ADD COLUMN macros_verified BOOLEAN DEFAULT FALSE;
 
 **Source Evidence:** User conversation - "Unverified recipes can't be made live, live recipes can't be saved as unverified"
 
-**Status:** In Progress
+**Status:** Completed
 
 ---
 
@@ -3650,6 +3658,274 @@ if (selectedUnit.key === 'g') {
 **Source Evidence:**
 - User conversation - "if I am adding an ingredient I'll be in the kitchen and have a scale at hand so I can do it"
 - Implementation failure 2025-12-10: Backend had @NotNull validation on quantityGrams but frontend had no input field, causing 400 Bad Request on recipe save
+
+**Status:** Completed
+
+---
+
+### FR-085: Extras Meal Type
+
+**Category:** Recipe Management
+
+**Priority:** High
+
+**Description:** Add a new "Extras" meal type to the application. Extras are recipes that serve as components for other recipes (e.g., Pizza Dough, Pizza Sauce, Pesto). They appear in their own tab and can be browsed independently.
+
+**User Story:** As a user, I want to browse "Extras" recipes separately so that I can find component recipes that are used in other dishes.
+
+**Acceptance Criteria:**
+- [ ] New "Extras" tab appears in navigation: [Breakfast] [Lunch] [Dinner] [Snacks] [Extras]
+- [ ] Database `meals` table has new entry: `(5, 'extras', 'Extras', 5)`
+- [ ] Recipes can be assigned to the "extras" meal type
+- [ ] Extras recipes appear when Extras tab is selected
+- [ ] Extras recipes can be assigned to meal plan days (for standalone use)
+
+**Database Schema:**
+```sql
+INSERT INTO meals (id, `key`, name, display_order) VALUES (5, 'extras', 'Extras', 5);
+```
+
+**Source Evidence:** User conversation - linked recipes/extras feature request
+
+**Status:** In Progress
+
+---
+
+### FR-086: Recipe Extras Linking
+
+**Category:** Recipe Management
+
+**Priority:** High
+
+**Description:** Recipes can be linked to other recipes as "extras" (sub-recipes). This creates a parent-child relationship where the parent recipe (e.g., Pizza) links to child recipes (e.g., Pizza Dough, Pizza Sauce). Child recipes can themselves have children (Pizza Sauce → Pesto), creating a hierarchy.
+
+**User Story:** As an admin, I want to link recipes together so that when a user selects a parent recipe, they can see and manage its component sub-recipes.
+
+**Acceptance Criteria:**
+- [ ] New `recipe_extras` junction table created
+- [ ] Parent recipe can link to multiple child recipes
+- [ ] Child recipes can have their own children (nested hierarchy)
+- [ ] Display order controls the sequence in the popup
+- [ ] Circular references are prevented (Pizza cannot link to itself or to a recipe that links back to Pizza)
+- [ ] Deleting a recipe cascades to remove its extras links
+- [ ] Backend service builds hierarchical tree structure for API response
+- [ ] RecipeDTO includes `extras` array and `hasExtras` boolean flag
+
+**Database Schema:**
+```sql
+CREATE TABLE recipe_extras (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    parent_recipe_id BIGINT NOT NULL,
+    child_recipe_id BIGINT NOT NULL,
+    display_order INT DEFAULT 0,
+    UNIQUE KEY unique_parent_child (parent_recipe_id, child_recipe_id),
+    CONSTRAINT fk_re_parent FOREIGN KEY (parent_recipe_id) REFERENCES recipes(id) ON DELETE CASCADE,
+    CONSTRAINT fk_re_child FOREIGN KEY (child_recipe_id) REFERENCES recipes(id) ON DELETE CASCADE
+);
+```
+
+**API Endpoint:**
+- `GET /api/recipes/{id}/extras` - Returns hierarchical extras tree
+
+**Source Evidence:** User conversation - linked recipes/extras feature request
+
+**Status:** In Progress
+
+---
+
+### FR-087: Homemade Selection Popup
+
+**Category:** Meal Planning
+
+**Priority:** High
+
+**Description:** When a user assigns a recipe that has extras to their meal plan, a popup appears showing all linked extras as checkboxes. Each checkbox represents a "Home Made" choice - checked means the user will make it from scratch, unchecked means they'll buy it store-bought.
+
+**User Story:** As a user, I want to choose which recipe components I'll make homemade vs buy store-bought, so that my shopping list only includes ingredients I actually need.
+
+**Acceptance Criteria:**
+- [ ] Popup appears when clicking a day button for a recipe with `hasExtras = true`
+- [ ] Popup displays recipe name at top (e.g., "Choose Homemade or Store-Bought for: Pizza")
+- [ ] Hierarchical checkbox list shows all extras with proper indentation:
+  ```
+  [x] Pizza Dough
+  [x] Pizza Sauce
+     [x] Pesto
+  ```
+- [ ] All checkboxes default to checked (Home Made)
+- [ ] "Home Made" label appears next to each checkbox
+- [ ] Instruction text: "Uncheck if you wish to store buy and ingredients will be omitted from your shopping list"
+- [ ] "Confirm" button assigns recipe with selections
+- [ ] "Cancel" button closes popup without assigning
+- [ ] If no extras, recipe assigns directly (no popup)
+
+**UI Placement:** Modal overlay, centered, similar to existing recipe modals
+
+**Source Evidence:** User conversation - linked recipes/extras feature request
+
+**Status:** In Progress
+
+---
+
+### FR-088: Smart Checkbox Cascade
+
+**Category:** Meal Planning
+
+**Priority:** Medium
+
+**Description:** When a parent extra is unchecked (store-bought), all its children are automatically unchecked. This reflects reality - if you're buying store-bought Pizza Sauce, you don't need to make the Pesto that goes in it.
+
+**User Story:** As a user, I want child ingredients to automatically uncheck when I uncheck a parent, so I don't have to manually manage nested dependencies.
+
+**Acceptance Criteria:**
+- [ ] Unchecking Pizza Sauce automatically unchecks Pesto (its child)
+- [ ] Unchecking a parent with multiple children unchecks all descendants
+- [ ] Re-checking a parent does NOT automatically re-check children (user must manually re-check)
+- [ ] Visual feedback shows the cascade happening (children grey out or visually update)
+- [ ] Child checkboxes become disabled when parent is unchecked (optional - discuss)
+
+**Source Evidence:** User conversation - linked recipes/extras feature request
+
+**Status:** In Progress
+
+---
+
+### FR-089: Shopping List Extras Integration
+
+**Category:** Shopping List
+
+**Priority:** High
+
+**Description:** The shopping list aggregation considers homemade selections for extras. Homemade extras add their ingredients to the list. Store-bought extras add a single "Store Bought [Recipe Name]" item instead.
+
+**User Story:** As a user, I want my shopping list to reflect my homemade/store-bought choices, so I know exactly what to buy at the store.
+
+**Acceptance Criteria:**
+- [ ] Homemade extra (checked): All ingredients from that recipe added to shopping list
+- [ ] Store-bought extra (unchecked): Single item "Store Bought [Recipe Name]" added (e.g., "Store Bought Pesto")
+- [ ] Store-bought items go to appropriate aisle (same as where homemade version's main ingredient would go)
+- [ ] Nested extras follow the same logic recursively
+- [ ] If parent is store-bought, children are not processed (already covered by parent)
+- [ ] Ingredient quantities scale with servings as normal
+- [ ] If same extra is used in multiple recipes in same week, ingredients aggregate (no deduplication)
+- [ ] Calorie note appears in meal plan view if any extra is store-bought: "Calories and macro info will be based on everything being homemade"
+
+**Source Evidence:** User conversation - linked recipes/extras feature request
+
+**Status:** In Progress
+
+---
+
+### FR-090: Homemade Choices Persistence
+
+**Category:** Meal Planning
+
+**Priority:** Medium
+
+**Description:** Homemade/store-bought choices are saved to localStorage so they persist across sessions. When the popup opens, previous choices are pre-selected, but the user is still prompted to confirm or change.
+
+**User Story:** As a user, I want my homemade preferences remembered so I don't have to re-select them every time I add the same recipe.
+
+**Acceptance Criteria:**
+- [ ] Choices saved to localStorage with key `homemadeSelections_{userId}`
+- [ ] Structure: `{ recipeId: { extraRecipeId: boolean, ... }, ... }`
+- [ ] When popup opens, load saved choices for that recipe
+- [ ] Pre-populate checkboxes with saved values (or default to checked if no saved value)
+- [ ] User is always prompted (popup always shows) - choices are suggestions, not automatic
+- [ ] Choices update in localStorage when user confirms popup
+- [ ] Clearing browser data resets to defaults (all homemade)
+
+**localStorage Structure:**
+```json
+{
+  "100": {
+    "101": true,
+    "102": false,
+    "103": false
+  }
+}
+```
+
+**Source Evidence:** User conversation - linked recipes/extras feature request
+
+**Status:** In Progress
+
+---
+
+### FR-091: Recipe Step Linking
+
+**Category:** Recipe Management
+
+**Priority:** High
+
+**Description:** Individual recipe steps can link to an extras recipe. This allows a step like "Prepare the dough" to link to the Pizza Dough recipe. Steps also have an alternative instruction for when the linked extra is store-bought.
+
+**User Story:** As a user viewing a recipe, I want steps that use sub-recipes to link to those recipes so I can navigate to the detailed instructions.
+
+**Acceptance Criteria:**
+- [ ] `recipe_steps` table has new columns: `linked_recipe_id` (FK, nullable), `alt_instruction` (TEXT, nullable)
+- [ ] Admin can select a linked recipe when editing a step
+- [ ] Admin can provide alternative instruction text (e.g., "Prepare your store-bought dough")
+- [ ] If `linked_recipe_id` is set and extra is homemade: display `instruction` as clickable link
+- [ ] If `linked_recipe_id` is set and extra is store-bought: display `alt_instruction` as plain text
+- [ ] If `linked_recipe_id` is NULL: display `instruction` as normal text
+- [ ] Link text styling: underlined, brand color, cursor pointer
+
+**Database Schema:**
+```sql
+ALTER TABLE recipe_steps
+  ADD COLUMN linked_recipe_id BIGINT NULL,
+  ADD COLUMN alt_instruction TEXT NULL,
+  ADD CONSTRAINT fk_step_linked_recipe FOREIGN KEY (linked_recipe_id) REFERENCES recipes(id) ON DELETE SET NULL;
+```
+
+**Source Evidence:** User conversation - linked recipes/extras feature request
+
+**Status:** In Progress
+
+---
+
+### FR-092: Linked Recipe Navigation
+
+**Category:** Recipe Management
+
+**Priority:** High
+
+**Description:** Clicking a linked step opens the sub-recipe in the modal. A back button allows returning to the parent recipe. Navigation supports multiple levels (Pizza → Pizza Sauce → Pesto) with a full navigation stack.
+
+**User Story:** As a user, I want to navigate between linked recipes while cooking so I can follow sub-recipe instructions and return to the main recipe.
+
+**Acceptance Criteria:**
+- [ ] Clicking a linked step opens that recipe's details in the modal
+- [ ] Back button appears at top: "< [Previous Recipe Name]" (e.g., "< Pizza")
+- [ ] Clicking back returns to the previous recipe in the stack
+- [ ] Navigation stack supports unlimited depth: Pizza → Pizza Sauce → Pesto → back → back
+- [ ] Current recipe name displayed in modal header
+- [ ] Breadcrumb trail (optional): "Pizza > Pizza Sauce > Pesto"
+- [ ] Closing modal clears the navigation stack
+- [ ] Re-opening modal starts fresh at the originally selected recipe
+
+**UI Behavior:**
+```
+[Initial State]
+Modal shows: "Pizza"
+Steps include: "Prepare the sauce" (linked to Pizza Sauce)
+
+[After clicking "Prepare the sauce"]
+Modal shows: "< Pizza" (back button) + "Pizza Sauce"
+Steps include: "Make the pesto base" (linked to Pesto)
+
+[After clicking "Make the pesto base"]
+Modal shows: "< Pizza Sauce" (back button) + "Pesto"
+
+[After clicking back]
+Modal shows: "< Pizza" (back button) + "Pizza Sauce"
+
+[After clicking back again]
+Modal shows: "Pizza" (no back button)
+```
+
+**Source Evidence:** User conversation - linked recipes/extras feature request
 
 **Status:** In Progress
 
