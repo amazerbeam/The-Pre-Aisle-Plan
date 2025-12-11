@@ -64,7 +64,15 @@ Calculate macros for EVERY recipe. See `references/diet-guardrails.md` for guida
 ### 6. Create Variant Family
 Create Light/Standard/Full variants by scaling portions. See `references/variant-system.md`.
 
-### 7. Offer Database Save
+### 7. Identify & Create Extras (FR-085 to FR-092)
+If recipe uses sub-components that can be homemade (dough, sauce, pesto, etc.):
+- Create each extra as a separate recipe with meal type `extras`
+- Link parent recipe to extras via `recipe_extras` table
+- Link steps to extras with alternative store-bought instructions
+
+See **Extras System** section below for details.
+
+### 8. Offer Database Save
 Ask if user wants recipe saved. Generate SQL following schema in `seed.sql`.
 
 ## Output Format
@@ -168,6 +176,153 @@ per_serving_macros = recipe_macros / default_servings
 
 ---
 
+## Extras System (FR-085 to FR-092)
+
+### What Are Extras?
+
+Extras are sub-recipes that can be made homemade or bought store-bought. When users assign a parent recipe, they choose which extras to make from scratch.
+
+**Examples:**
+- Pizza → Pizza Dough, Pizza Sauce
+- Pizza Sauce → Pesto (nested extra)
+- Burger → Burger Buns, Burger Sauce
+- Pasta Carbonara → Fresh Pasta
+
+### When to Create Extras
+
+Create an extra recipe when a component:
+1. Can reasonably be made from scratch OR bought store-bought
+2. Has enough complexity to warrant its own recipe
+3. Might be reused across multiple parent recipes
+
+**DO create extras for:** Doughs, sauces, pestos, fresh pasta, marinades, spice blends, condiments
+**DON'T create extras for:** Basic ingredients (garlic butter), single-step items (toast), things rarely bought pre-made
+
+### Extras Recipe Structure
+
+Extras are normal recipes with meal type `extras`:
+
+```sql
+-- Create the extra recipe
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+(201, 'Pizza Dough', 4, 800, FALSE, TRUE);
+
+-- Assign to 'extras' meal type (meal_id = 5)
+INSERT INTO recipe_meals (recipe_id, meal_id) VALUES (201, 5);
+
+-- Add ingredients and steps as normal...
+```
+
+### Linking Extras to Parent Recipe
+
+Use `recipe_extras` table to create parent-child relationships:
+
+```sql
+-- Link Pizza (id=200) to its extras
+INSERT INTO recipe_extras (parent_recipe_id, child_recipe_id, display_order) VALUES
+(200, 201, 0),  -- Pizza Dough
+(200, 202, 1);  -- Pizza Sauce
+
+-- Pizza Sauce (id=202) has nested extra: Pesto
+INSERT INTO recipe_extras (parent_recipe_id, child_recipe_id, display_order) VALUES
+(202, 203, 0);  -- Pesto
+```
+
+**Hierarchy Example:**
+```
+Pizza (200)
+├── Pizza Dough (201)
+└── Pizza Sauce (202)
+    └── Pesto (203)
+```
+
+### Linking Steps to Extras
+
+Steps can link to extras with alternative store-bought instructions:
+
+```sql
+INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
+-- Step links to Pizza Dough recipe, with store-bought alternative
+(200, 1, 'Prepare the pizza dough according to the linked recipe.', 201, 'Roll out your store-bought pizza dough on a floured surface.'),
+-- Step links to Pizza Sauce recipe
+(200, 2, 'Make the pizza sauce using the linked recipe.', 202, 'Spread store-bought pizza sauce evenly over the dough.'),
+-- Normal step with no link
+(200, 3, 'Add toppings and bake at 250°C for 12-15 minutes until crust is golden.', NULL, NULL);
+```
+
+**How it works for users:**
+- If user selects "Homemade" for Pizza Dough → They see step: "Prepare the pizza dough according to the linked recipe" (clickable link)
+- If user selects "Store Bought" for Pizza Dough → They see step: "Roll out your store-bought pizza dough on a floured surface"
+
+### Output Format for Recipes with Extras
+
+When creating a recipe with extras, include an Extras section:
+
+```markdown
+## Pizza Margherita
+**Cuisine:** Italian | **Time:** 30 min + dough | **Servings:** 4
+
+### Extras (make homemade or buy store-bought)
+- **Pizza Dough** — See linked recipe
+- **Pizza Sauce** — See linked recipe (contains Pesto)
+
+### Ingredients (Standard)
+- [ ] Pizza dough — 1 batch (from extras)
+- [ ] Pizza sauce — 1 cup (from extras)
+- [ ] Fresh mozzarella — 200g
+- [ ] Fresh basil — handful (10g)
+- [ ] Olive oil — 1 tbsp (14g)
+
+### Instructions
+1. **Prepare the dough** [LINKED: Pizza Dough] | *Store-bought: Roll out your store-bought pizza dough*
+2. **Make the sauce** [LINKED: Pizza Sauce] | *Store-bought: Use store-bought pizza sauce*
+3. Preheat oven to 250°C with pizza stone if available.
+4. Stretch dough to 12-inch round on floured surface.
+5. Spread sauce, leaving 1-inch border.
+6. Tear mozzarella and distribute evenly.
+7. Bake 12-15 minutes until crust is golden and cheese bubbles.
+8. Finish with fresh basil and olive oil drizzle.
+```
+
+### SQL Template for Extras
+
+```sql
+-- =============================================
+-- EXTRAS: [Parent Recipe Name]
+-- =============================================
+
+-- 1. Create extra recipes first
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+([EXTRA_ID], '[Extra Name]', [servings], [calories], FALSE, TRUE);
+
+INSERT INTO recipe_meals (recipe_id, meal_id) VALUES ([EXTRA_ID], 5);  -- 5 = extras
+
+-- Add extra's ingredients...
+-- Add extra's steps...
+
+-- 2. Create parent recipe
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+([PARENT_ID], '[Parent Name]', [servings], [calories], FALSE, TRUE);
+
+-- 3. Link extras to parent
+INSERT INTO recipe_extras (parent_recipe_id, child_recipe_id, display_order) VALUES
+([PARENT_ID], [EXTRA_ID], 0);
+
+-- 4. Add parent steps with linked recipes
+INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
+([PARENT_ID], 1, 'Prepare [extra] according to linked recipe.', [EXTRA_ID], 'Use store-bought [extra].');
+```
+
+### Important Rules
+
+1. **Extras must be created BEFORE parent** — Foreign keys require extras to exist first
+2. **No circular references** — Pizza cannot link to Pizza Sauce which links back to Pizza
+3. **Extras can have extras** — Pizza Sauce can link to Pesto (nested hierarchy)
+4. **Each extra is a complete recipe** — With its own ingredients, steps, and macros
+5. **Reuse extras across recipes** — Pizza Dough can be linked from multiple pizza recipes
+
+---
+
 ## References
 
 | File | When to Use |
@@ -178,3 +333,13 @@ per_serving_macros = recipe_macros / default_servings
 | `references/database-schema.md` | Before generating SQL inserts |
 | `references/examples/recipe-example.md` | When unsure of output format |
 | `../agent-nutrition/agent-nutrition-SKILL.md` | For nutrition questions |
+| `foodbytes-app/database/schema.sql` | For `recipe_extras` and `recipe_steps` linked fields |
+
+## Key Tables for Extras
+
+| Table | Purpose |
+|-------|---------|
+| `recipes` | All recipes including extras (extras have meal_type = 'extras') |
+| `recipe_extras` | Links parent recipes to child extras |
+| `recipe_steps` | Steps with `linked_recipe_id` and `alt_instruction` |
+| `meals` | Meal types including `extras` (id=5) |
