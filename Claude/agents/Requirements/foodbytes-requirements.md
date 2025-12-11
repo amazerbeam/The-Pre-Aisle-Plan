@@ -44,6 +44,9 @@
 | FR-090 | Homemade Choices Persistence |
 | FR-091 | Recipe Step Linking |
 | FR-092 | Linked Recipe Navigation |
+| FR-093 | Linked Recipe Ingredients |
+| FR-094 | Linked Recipe Macro Calculation |
+| FR-095 | Extras Recipe Servings Independence |
 
 ## In Progress - Finish
 
@@ -3564,6 +3567,8 @@ ALTER TABLE ingredients ADD COLUMN macros_verified BOOLEAN DEFAULT FALSE;
 
 **Description:** Each recipe ingredient stores the gram equivalent alongside the display quantity and unit. This enables accurate macro calculation regardless of the display unit used (cups, tbsp, pieces, etc.). The admin recipe editor MUST include a visible input field for entering gram weights.
 
+**Note:** `quantity_grams` applies to both raw ingredients AND linked recipes (see FR-093). For linked recipes, `quantity_grams` represents the portion of the linked recipe's total yield to use (e.g., 280g of a 761g Pizza Dough batch).
+
 **User Story:** As a user, I want accurate macro calculations even when recipes use volume measurements so that my nutrition tracking is reliable.
 
 **Acceptance Criteria:**
@@ -3809,6 +3814,9 @@ CREATE TABLE recipe_extras (
 - [ ] Ingredient quantities scale with servings as normal
 - [ ] If same extra is used in multiple recipes in same week, ingredients aggregate (no deduplication)
 - [ ] Calorie note appears in meal plan view if any extra is store-bought: "Calories and macro info will be based on everything being homemade"
+- [ ] **Linked Recipe Scaling (FR-093):** When extra is a linked ingredient (via `linked_recipe_id`), scale its raw ingredients by portion ratio
+- [ ] **Portion Ratio Calculation:** `parent_quantity_grams / extra_total_yield` where `extra_total_yield = SUM(quantity_grams)` from extra's ingredients
+- [ ] **Example:** Pizza Light uses 280g of 761g dough → flour added to shopping list as 280/761 = 36.8% of dough recipe amounts
 
 **Source Evidence:** User conversation - linked recipes/extras feature request
 
@@ -3926,6 +3934,180 @@ Modal shows: "Pizza" (no back button)
 ```
 
 **Source Evidence:** User conversation - linked recipes/extras feature request
+
+**Status:** In Progress
+
+---
+
+### FR-093: Linked Recipe Ingredients
+
+**Category:** Recipe Management
+
+**Priority:** High
+
+**Description:** Recipe ingredients can reference another recipe (an "extra") instead of a raw ingredient. This allows specifying the exact quantity of an extra used in a parent recipe (e.g., Pizza Light uses 280g of Pizza Dough). The linked recipe's macros are calculated proportionally based on the quantity used. This enables variant scaling where Light/Standard/Full portions use different amounts of the same extra.
+
+**User Story:** As a user, I want ingredient quantities for sub-recipes to scale with variants, so that macro calculations are accurate for Light/Standard/Full portions.
+
+**Acceptance Criteria:**
+- [ ] `recipe_ingredients` table has new column: `linked_recipe_id` (FK, nullable)
+- [ ] Constraint: Either `ingredient_id` OR `linked_recipe_id` must be set, not both (one must be NULL)
+- [ ] `ingredient_id` can be NULL when `linked_recipe_id` is set
+- [ ] `quantity_grams` specifies how much of the linked recipe is used (e.g., 280g of Pizza Dough)
+- [ ] Admin UI allows selecting a recipe instead of an ingredient
+- [ ] Display shows linked recipe name (e.g., "Pizza Dough — 280g")
+- [ ] Foreign key constraint: ON DELETE SET NULL (if linked recipe deleted, row becomes orphaned but not deleted)
+- [ ] Linked recipes must have meal_type = 'extras' (enforced in admin UI, not DB constraint)
+- [ ] RecipeIngredientDTO includes `linkedRecipeId` and `linkedRecipeName` fields
+
+**Database Schema:**
+```sql
+ALTER TABLE recipe_ingredients
+  MODIFY COLUMN ingredient_id BIGINT NULL,
+  ADD COLUMN linked_recipe_id BIGINT NULL,
+  ADD CONSTRAINT fk_ri_linked_recipe FOREIGN KEY (linked_recipe_id)
+    REFERENCES recipes(id) ON DELETE SET NULL,
+  ADD CONSTRAINT chk_ingredient_or_recipe
+    CHECK (
+      (ingredient_id IS NOT NULL AND linked_recipe_id IS NULL) OR
+      (ingredient_id IS NULL AND linked_recipe_id IS NOT NULL)
+    );
+```
+
+**Example Data:**
+
+| recipe_id | ingredient_id | linked_recipe_id | quantity_grams | Notes |
+|-----------|---------------|------------------|----------------|-------|
+| 13 (Pizza Light) | NULL | 11 (Pizza Dough) | 280 | Uses 280g of dough recipe |
+| 13 (Pizza Light) | NULL | 12 (Pizza Sauce) | 90 | Uses 90g of sauce recipe |
+| 13 (Pizza Light) | 37 (Mozzarella) | NULL | 120 | Regular ingredient |
+
+**Source Evidence:** User conversation - Pizza variants need different dough quantities with accurate macro calculation
+
+**Status:** In Progress
+
+---
+
+### FR-094: Linked Recipe Macro Calculation
+
+**Category:** Recipe Management / Nutrition
+
+**Priority:** High
+
+**Description:** When a recipe ingredient references a linked recipe (via `linked_recipe_id`), macros are calculated by determining the portion ratio and applying it to the linked recipe's total macros. The linked recipe's total yield is the sum of all its ingredient `quantity_grams`. This calculation is recursive — if a linked recipe has its own linked ingredients, those are calculated first.
+
+**User Story:** As a user, I want accurate calorie and macro information for recipes with sub-recipes, so I can trust the nutrition data regardless of which variant I choose.
+
+**Acceptance Criteria:**
+- [ ] Calculate linked recipe's total yield: `SUM(quantity_grams)` from all its `recipe_ingredients`
+- [ ] Calculate linked recipe's total macros: Sum of `(quantity_grams × macro_per_100g / 100)` for each raw ingredient
+- [ ] Calculate portion ratio: `this_row.quantity_grams / linked_recipe_total_yield`
+- [ ] Apply ratio to macros: `linked_recipe_macros × portion_ratio`
+- [ ] Recursive calculation: If linked recipe has its own linked ingredients, calculate those first (depth-first)
+- [ ] Display calculated macros in recipe detail view
+- [ ] Backend service provides macro breakdown in API response
+- [ ] Recipe total macros = SUM(all ingredient macros) + SUM(all linked recipe macros × their ratios)
+- [ ] Handle edge case: If linked recipe has 0 yield (no ingredients), treat as 0 macros with warning
+
+**Calculation Example:**
+```
+STEP 1: Calculate Pizza Dough macros
+  - Bread flour: 450g × (12/100) = 54g protein, (70/100) = 315g carbs, (1.5/100) = 6.75g fat
+  - Olive oil: 56g × (0/100) = 0g protein, (0/100) = 0g carbs, (100/100) = 56g fat
+  - Yeast: 3g × (40/100) = 1.2g protein, (41/100) = 1.23g carbs, (7/100) = 0.21g fat
+  - Salt: 12g × (0/100) = 0g protein, 0g carbs, 0g fat
+  - Water: 240g × (0/100) = 0g protein, 0g carbs, 0g fat
+  - TOTAL DOUGH: 55.2g protein, 316.2g carbs, 63g fat
+  - TOTAL YIELD: 450 + 56 + 3 + 12 + 240 = 761g
+
+STEP 2: Calculate Pizza Light dough portion
+  - Uses: 280g
+  - Ratio: 280 / 761 = 0.368
+  - Protein: 55.2 × 0.368 = 20.3g
+  - Carbs: 316.2 × 0.368 = 116.4g
+  - Fat: 63 × 0.368 = 23.2g
+  - Calories: (20.3×4) + (116.4×4) + (23.2×9) = 756 cal
+
+STEP 3: Add Pizza Light's other ingredients (sauce, cheese)
+  - (Similar calculation for sauce)
+  - Mozzarella: 120g × (22/100) = 26.4g protein, etc.
+
+STEP 4: Sum all = Pizza Light total macros
+```
+
+**API Response Structure:**
+```json
+{
+  "id": 13,
+  "name": "Pizza (Light)",
+  "ingredients": [
+    {
+      "linkedRecipeId": 11,
+      "linkedRecipeName": "Pizza Dough",
+      "quantityGrams": 280,
+      "calculatedMacros": {
+        "protein": 20.3,
+        "carbs": 116.4,
+        "fat": 23.2,
+        "calories": 756
+      }
+    },
+    {
+      "ingredientId": 37,
+      "ingredientName": "Mozzarella",
+      "quantityGrams": 120,
+      "calculatedMacros": {
+        "protein": 26.4,
+        "carbs": 2.4,
+        "fat": 25.2,
+        "calories": 336
+      }
+    }
+  ],
+  "totalMacros": {
+    "protein": 46.7,
+    "carbs": 118.8,
+    "fat": 48.4,
+    "calories": 1092
+  }
+}
+```
+
+**Source Evidence:** User conversation - macro calculation for variant portions of linked recipes
+
+**Status:** In Progress
+
+---
+
+### FR-095: Extras Recipe Servings Independence
+
+**Category:** Recipe Management
+
+**Priority:** High
+
+**Description:** When viewing a linked "extras" recipe (e.g., Pizza Dough, Pesto, Pizza Sauce) via the recipe navigation stack, the servings should reset to that recipe's own `defaultServings` rather than inheriting the parent recipe's servings. The servings badge should become a clickable dropdown (similar to the calorie/variant dropdown) allowing users to adjust servings for the current recipe independently. This ensures extras recipes display their full batch quantities correctly.
+
+**User Story:** As a user viewing a linked extras recipe, I want to see the full batch quantities (at default servings) so that I can prepare the complete sub-recipe correctly, and optionally adjust servings if I want to make a double batch.
+
+**Acceptance Criteria:**
+- [ ] When navigating to a linked recipe (via step link click), servings reset to that recipe's `defaultServings`
+- [ ] The servings badge ("X servings") becomes a clickable dropdown in RecipeViewModal
+- [ ] Dropdown displays serving options: 1, 2, 3, 4 (matching calorie dropdown styling)
+- [ ] Selecting a serving option updates ingredient quantities for the current recipe only
+- [ ] Each recipe in the navigation stack maintains its own independent servings state
+- [ ] Going back to the parent recipe restores the parent's original servings selection
+- [ ] Dropdown styling matches the existing calorie/variant dropdown pattern (purple theme)
+- [ ] Extras recipes always show at their own default servings when first navigated to
+
+**Technical Implementation:**
+- Add `currentServings` state to `RecipeViewModal.jsx` that tracks servings per recipe
+- Reset `currentServings` to `currentRecipe.defaultServings` when `stackRecipe` changes (navigation)
+- Convert servings badge to dropdown component (reuse calorie dropdown pattern)
+- Update `scaleQuantity` function to use `currentServings` instead of `servings` prop
+
+**Source Evidence:** User feedback - extras recipes (Pizza Dough, Pizza Sauce) showing incorrect scaled quantities (4x) when viewed from parent recipe (Pizza at 4 servings)
+
+**Related Requirements:** FR-091, FR-092, FR-093
 
 **Status:** In Progress
 

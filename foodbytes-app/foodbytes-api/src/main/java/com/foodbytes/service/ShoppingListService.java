@@ -205,10 +205,15 @@ public class ShoppingListService {
 
             // Find the specific ingredient in this recipe
             for (RecipeIngredient recipeIngredient : recipe.getIngredients()) {
+                // FR-093: Skip linked recipe ingredients (they don't have an ingredient)
+                if (recipeIngredient.isLinkedRecipe()) {
+                    continue;
+                }
+
                 Ingredient ingredient = recipeIngredient.getIngredient();
 
                 // Check if this is the ingredient we're looking for
-                if (ingredient.getId().equals(ingredientId) &&
+                if (ingredient != null && ingredient.getId().equals(ingredientId) &&
                     recipeIngredient.getUnit().getValue().equalsIgnoreCase(unit)) {
 
                     // Capture ingredient name
@@ -334,10 +339,16 @@ public class ShoppingListService {
 
     /**
      * FR-089: Process ingredients for a single recipe, adding to aggregated map.
+     * FR-093: Skip linked recipe ingredients (handled by extras system).
      */
     private void processRecipeIngredients(Recipe recipe, Integer entryServings, Integer defaultServings,
                                           Map<IngredientUnitKey, IngredientAggregate> aggregatedIngredients) {
         for (RecipeIngredient recipeIngredient : recipe.getIngredients()) {
+            // FR-093: Skip linked recipe ingredients - they are handled by extras system
+            if (recipeIngredient.isLinkedRecipe()) {
+                continue;
+            }
+
             // Scale quantity: scaledQty = ingredient.quantity * entry.servings / recipe.defaultServings
             BigDecimal originalQuantity = recipeIngredient.getQuantity();
             BigDecimal scaledQuantity = originalQuantity

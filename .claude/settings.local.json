@@ -62,7 +62,8 @@
       "WebFetch(domain:the-pre-aisle-plan-production.up.railway.app)",
       "WebFetch(domain:resourceful-healing-production-d127.up.railway.app)",
       "Bash(mkdir:*)",
-      "Bash(sort:*)"
+      "Bash(sort:*)",
+      "Bash(python -c:*)"
     ],
     "deny": [],
     "ask": []

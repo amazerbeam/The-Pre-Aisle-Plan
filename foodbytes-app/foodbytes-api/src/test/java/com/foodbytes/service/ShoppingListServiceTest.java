@@ -72,7 +72,7 @@ class ShoppingListServiceTest {
             .thenReturn(new ArrayList<>());
 
         // Act
-        AggregatedShoppingListDTO result = shoppingListService.getShoppingList(userId, startDate);
+        AggregatedShoppingListDTO result = shoppingListService.getShoppingList(userId, startDate, null);
 
         // Assert
         assertThat(result).isNotNull();
@@ -96,7 +96,7 @@ class ShoppingListServiceTest {
             .thenReturn(List.of(entry));
 
         // Act
-        AggregatedShoppingListDTO result = shoppingListService.getShoppingList(userId, startDate);
+        AggregatedShoppingListDTO result = shoppingListService.getShoppingList(userId, startDate, null);
 
         // Assert
         assertThat(result).isNotNull();
@@ -134,7 +134,7 @@ class ShoppingListServiceTest {
             .thenReturn(List.of(entry1, entry2));
 
         // Act
-        AggregatedShoppingListDTO result = shoppingListService.getShoppingList(userId, startDate);
+        AggregatedShoppingListDTO result = shoppingListService.getShoppingList(userId, startDate, null);
 
         // Assert
         assertThat(result.getTotalItems()).isEqualTo(1);
@@ -160,7 +160,7 @@ class ShoppingListServiceTest {
             .thenReturn(List.of(entry));
 
         // Act
-        AggregatedShoppingListDTO result = shoppingListService.getShoppingList(userId, startDate);
+        AggregatedShoppingListDTO result = shoppingListService.getShoppingList(userId, startDate, null);
 
         // Assert
         ShoppingItemDTO item = result.getAisles().get(0).getItems().get(0);
@@ -185,7 +185,7 @@ class ShoppingListServiceTest {
             .thenReturn(List.of(entry));
 
         // Act
-        AggregatedShoppingListDTO result = shoppingListService.getShoppingList(userId, startDate);
+        AggregatedShoppingListDTO result = shoppingListService.getShoppingList(userId, startDate, null);
 
         // Assert
         assertThat(result.getTotalItems()).isEqualTo(2); // Two separate items
@@ -218,7 +218,7 @@ class ShoppingListServiceTest {
             .thenReturn(List.of(entry));
 
         // Act
-        AggregatedShoppingListDTO result = shoppingListService.getShoppingList(userId, startDate);
+        AggregatedShoppingListDTO result = shoppingListService.getShoppingList(userId, startDate, null);
 
         // Assert
         assertThat(result.getAisles()).hasSize(2);
@@ -248,7 +248,7 @@ class ShoppingListServiceTest {
             .thenReturn(List.of(entry));
 
         // Act
-        AggregatedShoppingListDTO result = shoppingListService.getShoppingList(userId, startDate);
+        AggregatedShoppingListDTO result = shoppingListService.getShoppingList(userId, startDate, null);
 
         // Assert
         List<ShoppingItemDTO> items = result.getAisles().get(0).getItems();

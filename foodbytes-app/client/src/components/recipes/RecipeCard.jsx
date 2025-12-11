@@ -166,6 +166,7 @@ function RecipeCard({ recipe, currentMealType, onSelectVariant, onEdit }) {
         selectedRecipeId={selectedVariantId}
       />
 
+      {/* Show Details button hidden - users can use fullscreen modal instead
       <button
         className="details-toggle"
         onClick={() => setShowDetails(!showDetails)}
@@ -198,6 +199,7 @@ function RecipeCard({ recipe, currentMealType, onSelectVariant, onEdit }) {
           </div>
         </div>
       )}
+      */}
 
       {/* FR-013: Fullscreen Recipe View Modal with variant support */}
       {showFullscreen && (

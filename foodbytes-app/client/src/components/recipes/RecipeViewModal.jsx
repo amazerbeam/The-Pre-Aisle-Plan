@@ -6,13 +6,14 @@ import LinkedRecipeNavigation from './LinkedRecipeNavigation'
 import './RecipeViewModal.css'
 
 /**
- * FR-013, FR-091, FR-092: RecipeViewModal - Fullscreen recipe view popup
+ * FR-013, FR-091, FR-092, FR-095: RecipeViewModal - Fullscreen recipe view popup
  * - White text on dark background
  * - Variant dropdown for recipe families (same as RecipeCard)
  * - Keeps popup open when variant changes (updates content in-place)
  * - 99vh height with 0.5vh even margins
  * - FR-091: Linked steps display as clickable links
  * - FR-092: Navigation stack for browsing linked recipes
+ * - FR-095: Independent servings per recipe (extras show at their default servings)
  */
 function RecipeViewModal({
   recipe,
@@ -45,6 +46,9 @@ function RecipeViewModal({
   const [currentCalories, setCurrentCalories] = useState(caloriesPerServing)
   const dropdownRef = useRef(null)
 
+  // FR-095: Independent servings state per recipe in navigation stack
+  const [currentServings, setCurrentServings] = useState(servings)
+
   // Update current recipe when prop changes
   useEffect(() => {
     setCurrentRecipe(recipe)
@@ -52,12 +56,18 @@ function RecipeViewModal({
     resetStack(recipe)
   }, [recipe, resetStack])
 
-  // FR-092: Sync current recipe with stack when navigating
+  // FR-092, FR-095: Sync current recipe with stack when navigating
+  // Reset servings to the linked recipe's defaultServings when navigating
+  // Only trigger when stackRecipe changes (not when currentRecipe changes from variant selection)
+  const prevStackRecipeId = useRef(stackRecipe?.id)
   useEffect(() => {
-    if (stackRecipe && stackRecipe.id !== currentRecipe?.id) {
+    if (stackRecipe && stackRecipe.id !== prevStackRecipeId.current) {
       setCurrentRecipe(stackRecipe)
+      // FR-095: Reset servings to linked recipe's default (not parent's servings)
+      setCurrentServings(stackRecipe.defaultServings || 1)
+      prevStackRecipeId.current = stackRecipe.id
     }
-  }, [stackRecipe, currentRecipe?.id])
+  }, [stackRecipe])
 
   /**
    * FR-092: Handle clicking a linked step to navigate to that recipe
@@ -84,7 +94,7 @@ function RecipeViewModal({
     setCurrentCalories(caloriesPerServing)
   }, [caloriesPerServing])
 
-  // Close dropdown on click outside
+  // Close calorie dropdown on click outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -162,10 +172,16 @@ function RecipeViewModal({
 
   if (!currentRecipe) return null
 
-  // Scale quantity based on servings vs default servings
+  // FR-095: Scale quantity based on currentServings (independent per recipe)
   const scaleQuantity = (originalQty) => {
-    const scaled = (originalQty / currentRecipe.defaultServings) * servings
+    const scaled = (originalQty / currentRecipe.defaultServings) * currentServings
     return Number.isInteger(scaled) ? scaled : scaled.toFixed(2)
+  }
+
+  // FR-095: Handle servings input change
+  const handleServingsChange = (e) => {
+    const value = Math.max(1, parseInt(e.target.value) || 1)
+    setCurrentServings(value)
   }
 
   return (
@@ -222,7 +238,20 @@ function RecipeViewModal({
               ) : (
                 <span className="calories-badge">{currentCalories} cal/serving</span>
               )}
-              <span className="servings-badge">{servings} serving{servings !== 1 ? 's' : ''}</span>
+              {/* FR-095: Servings input (independent per recipe) */}
+              <div className="servings-input-container">
+                <input
+                  type="number"
+                  min="1"
+                  max="20"
+                  value={currentServings}
+                  onChange={handleServingsChange}
+                  onClick={(e) => e.stopPropagation()}
+                  className="servings-input"
+                  aria-label="Number of servings"
+                />
+                <span className="servings-label">serving{currentServings !== 1 ? 's' : ''}</span>
+              </div>
               {currentRecipe.isCheat && <span className="cheat-badge">Cheat</span>}
             </div>
           </div>

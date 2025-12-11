@@ -14,6 +14,9 @@ import java.math.BigDecimal;
  * DTO for recipe ingredient data in admin operations (FR-044).
  * Uses ingredient key (existing) or name (new ingredient).
  * FR-084: Includes quantityGrams for accurate macro calculation.
+ * FR-093: Supports linkedRecipeId for sub-recipe references.
+ *
+ * CONSTRAINT: Either ingredient fields OR linkedRecipeId must be provided, not both.
  */
 @Data
 @Builder
@@ -24,9 +27,15 @@ public class RecipeIngredientAdminDTO {
     private Long id;  // null for new ingredients in recipe
 
     // Either ingredientId (existing) or ingredientName (new) must be provided
+    // FR-093: These are NULL when linkedRecipeId is set
     private Long ingredientId;        // ID of existing ingredient
     private String ingredientKey;     // Key of existing ingredient (alternative to ID)
     private String ingredientName;    // Name for display or new ingredient creation
+
+    // FR-093: Reference to another recipe used as ingredient (e.g., Pizza Dough)
+    // When set, ingredient fields must be NULL. Macros calculated from linked recipe.
+    private Long linkedRecipeId;      // ID of linked recipe (if this is a sub-recipe reference)
+    private String linkedRecipeName;  // Name of linked recipe for display
 
     @NotNull(message = "Quantity is required")
     @Min(value = 0, message = "Quantity cannot be negative")
@@ -37,8 +46,9 @@ public class RecipeIngredientAdminDTO {
     private String unitKey;           // Key of existing unit (alternative to ID)
     private String unitValue;         // Display value for unit
 
-    // FR-084: Gram equivalent for macro calculations
-    // Required for all recipe ingredients - admin weighs ingredient on scale
+    // FR-084, FR-093: Gram equivalent for macro calculations
+    // For raw ingredients: admin weighs ingredient on scale
+    // For linked recipes: portion of linked recipe's total yield (e.g., 280g of 761g dough)
     @NotNull(message = "Quantity in grams is required for macro calculation")
     @Min(value = 0, message = "Quantity in grams cannot be negative")
     private BigDecimal quantityGrams;
@@ -54,4 +64,18 @@ public class RecipeIngredientAdminDTO {
 
     // Flag to indicate if this is a new unit (not in database)
     private Boolean isNewUnit = false;
+
+    /**
+     * FR-093: Check if this DTO represents a linked recipe reference.
+     */
+    public boolean isLinkedRecipe() {
+        return linkedRecipeId != null;
+    }
+
+    /**
+     * FR-093: Check if this DTO represents a raw ingredient reference.
+     */
+    public boolean isRawIngredient() {
+        return !isLinkedRecipe();
+    }
 }

@@ -66,6 +66,7 @@ function MealPlanEntry({ entry }) {
           caloriesPerServing={entry.caloriesPerServing}
           onClose={() => setShowRecipeView(false)}
           variants={entry.recipe.variants}
+          parentRecipeId={entry.recipe.id}
           onSelectVariant={(variantId, servings) => {
             // FR-013: In meal plan view, variant selection updates display only
             // (recipe swap would require updating the meal plan entry)

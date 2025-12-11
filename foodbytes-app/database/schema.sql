@@ -104,22 +104,33 @@ CREATE TABLE recipe_meals (
 
 -- Recipe ingredients table
 -- FR-084: Added quantity_grams for accurate macro calculation
+-- FR-093: Added linked_recipe_id to reference recipes as ingredients (for extras like Pizza Dough)
 CREATE TABLE recipe_ingredients (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     recipe_id BIGINT NOT NULL,
-    ingredient_id BIGINT NOT NULL,
+    -- FR-093: Either ingredient_id OR linked_recipe_id must be set, not both
+    ingredient_id BIGINT NULL COMMENT 'Reference to raw ingredient (NULL if linked_recipe_id is set)',
+    linked_recipe_id BIGINT NULL COMMENT 'Reference to another recipe used as ingredient (e.g., Pizza Dough)',
     quantity DECIMAL(10, 2) NOT NULL,
     unit_id BIGINT NOT NULL,
     -- FR-084: Gram equivalent for macro calculations (admin weighs ingredient)
+    -- FR-093: For linked recipes, this is the portion of the linked recipe to use
     quantity_grams DECIMAL(10, 2) NOT NULL COMMENT 'Weight in grams for macro calculation',
     sort_order INT NOT NULL DEFAULT 0,
     CONSTRAINT fk_recipe_ingredients_recipe FOREIGN KEY (recipe_id)
         REFERENCES recipes(id) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT fk_recipe_ingredients_ingredient FOREIGN KEY (ingredient_id)
         REFERENCES ingredients(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+    -- FR-093: FK for linked recipe ingredients
+    CONSTRAINT fk_recipe_ingredients_linked_recipe FOREIGN KEY (linked_recipe_id)
+        REFERENCES recipes(id) ON DELETE SET NULL ON UPDATE CASCADE,
     CONSTRAINT fk_recipe_ingredients_unit FOREIGN KEY (unit_id)
         REFERENCES units(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-    INDEX idx_recipe_id (recipe_id)
+    -- FR-093: Note - CHECK constraint removed due to MySQL 8.0 limitation
+    -- (Cannot use column in CHECK constraint when it has FK with ON DELETE SET NULL/RESTRICT)
+    -- The constraint (ingredient_id XOR linked_recipe_id) is enforced at application level
+    INDEX idx_recipe_id (recipe_id),
+    INDEX idx_linked_recipe_id (linked_recipe_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Recipe steps table
