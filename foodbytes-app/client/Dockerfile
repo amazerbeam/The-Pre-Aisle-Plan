@@ -16,15 +16,16 @@ ARG NGINX_ENV=prod
 
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# Copy the appropriate nginx config based on environment
-COPY nginx.conf /etc/nginx/conf.d/nginx.prod.conf
-COPY nginx.dev.conf /etc/nginx/conf.d/nginx.dev.conf
+# Remove default nginx config and copy only the appropriate one
+RUN rm -f /etc/nginx/conf.d/default.conf
+COPY nginx.conf /tmp/nginx.prod.conf
+COPY nginx.dev.conf /tmp/nginx.dev.conf
 RUN if [ "$NGINX_ENV" = "dev" ]; then \
-      cp /etc/nginx/conf.d/nginx.dev.conf /etc/nginx/conf.d/default.conf; \
+      mv /tmp/nginx.dev.conf /etc/nginx/conf.d/default.conf; \
     else \
-      cp /etc/nginx/conf.d/nginx.prod.conf /etc/nginx/conf.d/default.conf; \
+      mv /tmp/nginx.prod.conf /etc/nginx/conf.d/default.conf; \
     fi && \
-    rm /etc/nginx/conf.d/nginx.dev.conf /etc/nginx/conf.d/nginx.prod.conf
+    rm -f /tmp/nginx.*.conf
 
 EXPOSE 80
 
