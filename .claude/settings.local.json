@@ -63,7 +63,9 @@
       "WebFetch(domain:resourceful-healing-production-d127.up.railway.app)",
       "Bash(mkdir:*)",
       "Bash(sort:*)",
-      "Bash(python -c:*)"
+      "Bash(python -c:*)",
+      "Bash(docker cp:*)",
+      "Bash(del \"C:\\Users\\jossd\\Documents\\MyWebSites\\FoodBytes\\temp_soup.sql\" \"C:\\Users\\jossd\\Documents\\MyWebSites\\FoodBytes\\temp_soup2.sql\")"
     ],
     "deny": [],
     "ask": []

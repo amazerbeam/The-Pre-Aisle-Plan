@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UX Preview - The Pre-Aisle Plan</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f5f5f5;
+      color: #2c3e50;
+      line-height: 1.6;
+    }
+
+    .preview-container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #4a3f80;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #5a6c7d;
+      margin-bottom: 40px;
+    }
+
+    /* Section Styles */
+    .section {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 30px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .section-title {
+      font-size: 1.25rem;
+      color: #4a3f80;
+    }
+
+    /* Changes Button */
+    .changes-btn {
+      background: transparent;
+      border: 2px solid #4a3f80;
+      color: #4a3f80;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 0.875rem;
+    }
+
+    .changes-btn:hover {
+      background: #4a3f80;
+      color: white;
+    }
+
+    /* Modal Popup */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      max-width: 500px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      position: relative;
+      animation: modalIn 0.2s ease;
+    }
+
+    @keyframes modalIn {
+      from {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #5a6c7d;
+    }
+
+    .modal-title {
+      color: #4a3f80;
+      margin-bottom: 16px;
+      padding-right: 30px;
+    }
+
+    .modal-content ul {
+      padding-left: 20px;
+    }
+
+    .modal-content li {
+      margin-bottom: 8px;
+    }
+
+    .modal-content .change-item {
+      background: #f8f9fa;
+      padding: 12px;
+      border-radius: 6px;
+      margin-bottom: 10px;
+      border-left: 3px solid #4a3f80;
+    }
+
+    .change-item strong {
+      color: #4a3f80;
+    }
+
+    /* Preview Components */
+
+    /* 1. Header */
+    .preview-header {
+      background: #4a3f80;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .header-logo {
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+
+    .header-icons {
+      display: flex;
+      gap: 12px;
+    }
+
+    .header-icon {
+      width: 32px;
+      height: 32px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .nav-tabs {
+      background: #f8f9fa;
+      padding: 8px;
+      border-radius: 8px;
+      display: flex;
+      gap: 8px;
+    }
+
+    .nav-tab {
+      background: transparent;
+      border: 2px solid transparent;
+      color: #5a6c7d;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .nav-tab:hover {
+      border-color: #4a3f80;
+      color: #4a3f80;
+    }
+
+    .nav-tab.active {
+      background: #4a3f80;
+      color: white;
+      border-color: #4a3f80;
+    }
+
+    /* 2. Outline Buttons */
+    .button-demo {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn-outline-primary {
+      background: transparent;
+      border: 2px solid #4a3f80;
+      color: #4a3f80;
+      padding: 10px 24px;
+      border-radius: 6px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-outline-primary:hover {
+      background: #4a3f80;
+      color: white;
+    }
+
+    .btn-outline-secondary {
+      background: transparent;
+      border: 2px solid #5a6c7d;
+      color: #5a6c7d;
+      padding: 10px 24px;
+      border-radius: 6px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-outline-secondary:hover {
+      background: #5a6c7d;
+      color: white;
+    }
+
+    .btn-outline-success {
+      background: transparent;
+      border: 2px solid #27ae60;
+      color: #27ae60;
+      padding: 10px 24px;
+      border-radius: 6px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-outline-success:hover {
+      background: #27ae60;
+      color: white;
+    }
+
+    /* 3. Recipe Cards */
+    .recipe-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+    }
+
+    .recipe-card {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+      overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s;
+      border: 1px solid #eee;
+    }
+
+    .recipe-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    }
+
+    .recipe-accent {
+      height: 4px;
+    }
+
+    .accent-coral { background: #FF6B6B; }
+    .accent-mint { background: #4ECDC4; }
+    .accent-amber { background: #FFE66D; }
+    .accent-lavender { background: #A8A4CE; }
+    .accent-peach { background: #FFB085; }
+    .accent-sky { background: #87CEEB; }
+
+    .recipe-content {
+      padding: 16px;
+    }
+
+    .recipe-name {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .recipe-meta {
+      color: #5a6c7d;
+      font-size: 0.875rem;
+      margin-bottom: 12px;
+    }
+
+    .recipe-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .recipe-actions button {
+      flex: 1;
+      padding: 8px 12px;
+      font-size: 0.875rem;
+    }
+
+    /* 4. Bottom Navigation */
+    .bottom-nav-demo {
+      background: #2c3e50;
+      border-radius: 8px;
+      padding: 8px;
+      display: flex;
+      justify-content: space-around;
+    }
+
+    .bottom-nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #8e9eab;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+      background: transparent;
+      min-width: 64px;
+    }
+
+    .bottom-nav-item:hover {
+      color: white;
+      background: rgba(255,255,255,0.1);
+    }
+
+    .bottom-nav-item.active {
+      color: white;
+      background: #4a3f80;
+    }
+
+    .bottom-nav-icon {
+      font-size: 1.25rem;
+      margin-bottom: 4px;
+    }
+
+    .bottom-nav-label {
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    /* 5. Meal Plan Day Cards */
+    .day-cards-container {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      padding: 8px 0;
+    }
+
+    .day-card {
+      background: white;
+      border-radius: 12px;
+      padding: 16px;
+      min-width: 140px;
+      border: 2px solid #eee;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .day-card:hover {
+      border-color: #4a3f80;
+    }
+
+    .day-card.today {
+      border-color: #4a3f80;
+      background: linear-gradient(135deg, #f8f7fc 0%, #ffffff 100%);
+    }
+
+    .day-card.today .day-name {
+      color: #4a3f80;
+    }
+
+    .day-name {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .day-date {
+      color: #5a6c7d;
+      font-size: 0.875rem;
+      margin-bottom: 12px;
+    }
+
+    .day-meals {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .day-meal {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.75rem;
+    }
+
+    .meal-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .meal-dot.filled { background: #27ae60; }
+    .meal-dot.empty { background: #ddd; }
+
+    .day-calories {
+      margin-top: 12px;
+      padding-top: 8px;
+      border-top: 1px solid #eee;
+      font-size: 0.875rem;
+      color: #5a6c7d;
+    }
+
+    /* 6. Color Palette Display */
+    .color-palette {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .color-swatch {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .swatch {
+      width: 50px;
+      height: 50px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .swatch-label {
+      font-size: 0.75rem;
+      color: #5a6c7d;
+    }
+
+    /* 7. Mobile Preview */
+    .mobile-frame {
+      background: #1a1a1a;
+      border-radius: 30px;
+      padding: 10px;
+      max-width: 320px;
+      margin: 0 auto;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+
+    .mobile-screen {
+      background: #f5f5f5;
+      border-radius: 22px;
+      overflow: hidden;
+      height: 580px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .mobile-header {
+      background: #4a3f80;
+      color: white;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .mobile-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px;
+    }
+
+    .mobile-bottom-nav {
+      background: #2c3e50;
+      padding: 8px 4px;
+      display: flex;
+      justify-content: space-around;
+    }
+
+    .mobile-nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #8e9eab;
+      font-size: 0.65rem;
+      padding: 4px 8px;
+      border-radius: 6px;
+    }
+
+    .mobile-nav-item.active {
+      color: white;
+      background: #4a3f80;
+    }
+
+    .mobile-nav-item span:first-child {
+      font-size: 1rem;
+      margin-bottom: 2px;
+    }
+
+    .mobile-recipe-card {
+      background: white;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .mobile-recipe-accent {
+      height: 3px;
+    }
+
+    .mobile-recipe-content {
+      padding: 12px;
+    }
+
+    .mobile-recipe-name {
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 4px;
+    }
+
+    .mobile-recipe-meta {
+      color: #5a6c7d;
+      font-size: 0.75rem;
+      margin-bottom: 10px;
+    }
+
+    .mobile-recipe-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .mobile-recipe-actions button {
+      flex: 1;
+      padding: 6px 10px;
+      font-size: 0.75rem;
+      background: transparent;
+      border: 1.5px solid #4a3f80;
+      color: #4a3f80;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="preview-container">
+    <h1>UX Preview Updates</h1>
+    <p class="subtitle">The Pre-Aisle Plan - Design Refresh</p>
+
+    <!-- 1. Header -->
+    <div class="section">
+      <div class="section-header">
+        <h2 class="section-title">1. Header</h2>
+        <button class="changes-btn" onclick="showChanges('header')">Changes</button>
+      </div>
+      <div class="preview-header">
+        <span class="header-logo">The Pre-Aisle Plan</span>
+        <div class="header-icons">
+          <div class="header-icon">U</div>
+          <div class="header-icon">M</div>
+        </div>
+      </div>
+      <div class="nav-tabs">
+        <button class="nav-tab active">Breakfast</button>
+        <button class="nav-tab">Lunch</button>
+        <button class="nav-tab">Dinner</button>
+        <button class="nav-tab">Snacks</button>
+      </div>
+    </div>
+
+    <!-- 2. Outline Buttons -->
+    <div class="section">
+      <div class="section-header">
+        <h2 class="section-title">2. Outline Buttons</h2>
+        <button class="changes-btn" onclick="showChanges('buttons')">Changes</button>
+      </div>
+      <div class="button-demo">
+        <button class="btn-outline-primary">Details</button>
+        <button class="btn-outline-primary">Add to Plan</button>
+        <button class="btn-outline-secondary">Cancel</button>
+        <button class="btn-outline-success">Save</button>
+      </div>
+    </div>
+
+    <!-- 3. Recipe Cards with Color Accents -->
+    <div class="section">
+      <div class="section-header">
+        <h2 class="section-title">3. Recipe Cards</h2>
+        <button class="changes-btn" onclick="showChanges('cards')">Changes</button>
+      </div>
+      <div class="recipe-grid">
+        <div class="recipe-card">
+          <div class="recipe-accent accent-coral"></div>
+          <div class="recipe-content">
+            <div class="recipe-name">Morning Porridge</div>
+            <div class="recipe-meta">880 cal  |  2 servings</div>
+            <div class="recipe-actions">
+              <button class="btn-outline-secondary">Details</button>
+              <button class="btn-outline-primary">Add</button>
+            </div>
+          </div>
+        </div>
+        <div class="recipe-card">
+          <div class="recipe-accent accent-mint"></div>
+          <div class="recipe-content">
+            <div class="recipe-name">Garden Salad</div>
+            <div class="recipe-meta">320 cal  |  2 servings</div>
+            <div class="recipe-actions">
+              <button class="btn-outline-secondary">Details</button>
+              <button class="btn-outline-primary">Add</button>
+            </div>
+          </div>
+        </div>
+        <div class="recipe-card">
+          <div class="recipe-accent accent-amber"></div>
+          <div class="recipe-content">
+            <div class="recipe-name">Spaghetti</div>
+            <div class="recipe-meta">650 cal  |  2 servings</div>
+            <div class="recipe-actions">
+              <button class="btn-outline-secondary">Details</button>
+              <button class="btn-outline-primary">Add</button>
+            </div>
+          </div>
+        </div>
+        <div class="recipe-card">
+          <div class="recipe-accent accent-lavender"></div>
+          <div class="recipe-content">
+            <div class="recipe-name">Smoothie Bowl</div>
+            <div class="recipe-meta">280 cal  |  1 serving</div>
+            <div class="recipe-actions">
+              <button class="btn-outline-secondary">Details</button>
+              <button class="btn-outline-primary">Add</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. Bottom Navigation -->
+    <div class="section">
+      <div class="section-header">
+        <h2 class="section-title">4. Bottom Navigation</h2>
+        <button class="changes-btn" onclick="showChanges('bottomnav')">Changes</button>
+      </div>
+      <div class="bottom-nav-demo">
+        <button class="bottom-nav-item active">
+          <span class="bottom-nav-icon">R</span>
+          <span class="bottom-nav-label">Recipes</span>
+        </button>
+        <button class="bottom-nav-item">
+          <span class="bottom-nav-icon">P</span>
+          <span class="bottom-nav-label">Plan</span>
+        </button>
+        <button class="bottom-nav-item">
+          <span class="bottom-nav-icon">S</span>
+          <span class="bottom-nav-label">Shop</span>
+        </button>
+        <button class="bottom-nav-item">
+          <span class="bottom-nav-icon">U</span>
+          <span class="bottom-nav-label">Profile</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 5. Meal Plan Day Cards -->
+    <div class="section">
+      <div class="section-header">
+        <h2 class="section-title">5. Meal Plan Day Cards</h2>
+        <button class="changes-btn" onclick="showChanges('daycards')">Changes</button>
+      </div>
+      <div class="day-cards-container">
+        <div class="day-card">
+          <div class="day-name">Mon</div>
+          <div class="day-date">Dec 16</div>
+          <div class="day-meals">
+            <div class="day-meal"><span class="meal-dot filled"></span> Breakfast</div>
+            <div class="day-meal"><span class="meal-dot filled"></span> Lunch</div>
+            <div class="day-meal"><span class="meal-dot empty"></span> Dinner</div>
+          </div>
+          <div class="day-calories">1,200 cal</div>
+        </div>
+        <div class="day-card today">
+          <div class="day-name">Tue</div>
+          <div class="day-date">Dec 17</div>
+          <div class="day-meals">
+            <div class="day-meal"><span class="meal-dot filled"></span> Breakfast</div>
+            <div class="day-meal"><span class="meal-dot empty"></span> Lunch</div>
+            <div class="day-meal"><span class="meal-dot filled"></span> Dinner</div>
+          </div>
+          <div class="day-calories">1,530 cal</div>
+        </div>
+        <div class="day-card">
+          <div class="day-name">Wed</div>
+          <div class="day-date">Dec 18</div>
+          <div class="day-meals">
+            <div class="day-meal"><span class="meal-dot empty"></span> Breakfast</div>
+            <div class="day-meal"><span class="meal-dot empty"></span> Lunch</div>
+            <div class="day-meal"><span class="meal-dot empty"></span> Dinner</div>
+          </div>
+          <div class="day-calories">0 cal</div>
+        </div>
+        <div class="day-card">
+          <div class="day-name">Thu</div>
+          <div class="day-date">Dec 19</div>
+          <div class="day-meals">
+            <div class="day-meal"><span class="meal-dot filled"></span> Breakfast</div>
+            <div class="day-meal"><span class="meal-dot filled"></span> Lunch</div>
+            <div class="day-meal"><span class="meal-dot filled"></span> Dinner</div>
+          </div>
+          <div class="day-calories">1,850 cal</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. Color Accent Palette -->
+    <div class="section">
+      <div class="section-header">
+        <h2 class="section-title">6. Color Accent Palette</h2>
+        <button class="changes-btn" onclick="showChanges('colors')">Changes</button>
+      </div>
+      <div class="color-palette">
+        <div class="color-swatch">
+          <div class="swatch" style="background: #FF6B6B;"></div>
+          <span class="swatch-label">Coral</span>
+        </div>
+        <div class="color-swatch">
+          <div class="swatch" style="background: #4ECDC4;"></div>
+          <span class="swatch-label">Mint</span>
+        </div>
+        <div class="color-swatch">
+          <div class="swatch" style="background: #FFE66D;"></div>
+          <span class="swatch-label">Amber</span>
+        </div>
+        <div class="color-swatch">
+          <div class="swatch" style="background: #A8A4CE;"></div>
+          <span class="swatch-label">Lavender</span>
+        </div>
+        <div class="color-swatch">
+          <div class="swatch" style="background: #FFB085;"></div>
+          <span class="swatch-label">Peach</span>
+        </div>
+        <div class="color-swatch">
+          <div class="swatch" style="background: #87CEEB;"></div>
+          <span class="swatch-label">Sky</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. Mobile Preview -->
+    <div class="section">
+      <div class="section-header">
+        <h2 class="section-title">7. Mobile Preview</h2>
+        <button class="changes-btn" onclick="showChanges('mobile')">Changes</button>
+      </div>
+      <div class="mobile-frame">
+        <div class="mobile-screen">
+          <div class="mobile-header">
+            <span style="font-weight: 600;">Pre-Aisle Plan</span>
+            <span>U</span>
+          </div>
+          <div class="mobile-content">
+            <div class="nav-tabs" style="margin-bottom: 12px; padding: 6px;">
+              <button class="nav-tab active" style="padding: 6px 12px; font-size: 0.8rem;">Breakfast</button>
+              <button class="nav-tab" style="padding: 6px 12px; font-size: 0.8rem;">Lunch</button>
+              <button class="nav-tab" style="padding: 6px 12px; font-size: 0.8rem;">Dinner</button>
+            </div>
+            <div class="mobile-recipe-card">
+              <div class="mobile-recipe-accent accent-coral"></div>
+              <div class="mobile-recipe-content">
+                <div class="mobile-recipe-name">Morning Porridge</div>
+                <div class="mobile-recipe-meta">880 cal  |  2 servings</div>
+                <div class="mobile-recipe-actions">
+                  <button>Details</button>
+                  <button>Add</button>
+                </div>
+              </div>
+            </div>
+            <div class="mobile-recipe-card">
+              <div class="mobile-recipe-accent accent-mint"></div>
+              <div class="mobile-recipe-content">
+                <div class="mobile-recipe-name">Veggie Omelette</div>
+                <div class="mobile-recipe-meta">420 cal  |  2 servings</div>
+                <div class="mobile-recipe-actions">
+                  <button>Details</button>
+                  <button>Add</button>
+                </div>
+              </div>
+            </div>
+            <div class="mobile-recipe-card">
+              <div class="mobile-recipe-accent accent-amber"></div>
+              <div class="mobile-recipe-content">
+                <div class="mobile-recipe-name">Pancake Stack</div>
+                <div class="mobile-recipe-meta">550 cal  |  2 servings</div>
+                <div class="mobile-recipe-actions">
+                  <button>Details</button>
+                  <button>Add</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="mobile-bottom-nav">
+            <div class="mobile-nav-item active">
+              <span>R</span>
+              <span>Recipes</span>
+            </div>
+            <div class="mobile-nav-item">
+              <span>P</span>
+              <span>Plan</span>
+            </div>
+            <div class="mobile-nav-item">
+              <span>S</span>
+              <span>Shop</span>
+            </div>
+            <div class="mobile-nav-item">
+              <span>U</span>
+              <span>Profile</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Modal Overlay -->
+  <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+    <div class="modal" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+      <h3 class="modal-title" id="modalTitle"></h3>
+      <div class="modal-content" id="modalContent"></div>
+    </div>
+  </div>
+
+  <script>
+    const changesData = {
+      header: {
+        title: "Header Changes",
+        content: `
+          <div class="change-item">
+            <strong>Cleaner Layout:</strong> Separated the main header bar from the navigation tabs into two distinct rows for better visual hierarchy.
+          </div>
+          <div class="change-item">
+            <strong>Condensed User Area:</strong> User menu and settings collapsed into icon buttons on the right, reducing clutter.
+          </div>
+          <div class="change-item">
+            <strong>Tab Navigation:</strong> Meal type tabs moved to a secondary row with a light background, making them easier to scan.
+          </div>
+          <div class="change-item">
+            <strong>Brand Consistency:</strong> Deep purple (#4a3f80) header maintains brand identity while white text ensures readability.
+          </div>
+        `
+      },
+      buttons: {
+        title: "Button Style Changes",
+        content: `
+          <div class="change-item">
+            <strong>Outline Style:</strong> Buttons now use transparent backgrounds with colored borders instead of solid fills.
+          </div>
+          <div class="change-item">
+            <strong>Hover Interaction:</strong> On hover, buttons fill with their border color and text becomes white - providing clear visual feedback.
+          </div>
+          <div class="change-item">
+            <strong>Lighter Feel:</strong> The outline approach creates a more modern, airy interface that feels less heavy.
+          </div>
+          <div class="change-item">
+            <strong>Visual Hierarchy:</strong> Primary actions use brand purple, secondary use gray, success actions use green - all as outlines.
+          </div>
+        `
+      },
+      cards: {
+        title: "Recipe Card Changes",
+        content: `
+          <div class="change-item">
+            <strong>Color Accent Bar:</strong> Each card now has a 4px colored bar at the top, adding visual interest and variety.
+          </div>
+          <div class="change-item">
+            <strong>Replaced Cheat Badge:</strong> Instead of the orange "Cheat" badge, cards use soft accent colors (coral, mint, amber, lavender) for visual variety.
+          </div>
+          <div class="change-item">
+            <strong>Outline Buttons:</strong> Card action buttons now use the new outline style, consistent with the overall design refresh.
+          </div>
+          <div class="change-item">
+            <strong>Subtle Shadow:</strong> Cards have a refined shadow that lifts slightly on hover, creating depth without heaviness.
+          </div>
+        `
+      },
+      bottomnav: {
+        title: "Bottom Navigation Changes",
+        content: `
+          <div class="change-item">
+            <strong>Dark Background:</strong> Navigation uses a dark charcoal (#2c3e50) background for contrast with the main content area.
+          </div>
+          <div class="change-item">
+            <strong>Active State:</strong> Selected tab highlighted with brand purple background, making current location obvious.
+          </div>
+          <div class="change-item">
+            <strong>Muted Inactive:</strong> Unselected tabs use a muted gray that's visible but doesn't compete with the active state.
+          </div>
+          <div class="change-item">
+            <strong>Icon + Label:</strong> Each nav item combines an icon with a label for clarity, especially helpful for new users.
+          </div>
+          <div class="change-item">
+            <strong>Touch-Friendly:</strong> Nav items are sized for comfortable thumb tapping with adequate spacing.
+          </div>
+        `
+      },
+      daycards: {
+        title: "Meal Plan Day Cards Changes",
+        content: `
+          <div class="change-item">
+            <strong>Horizontal Scroll:</strong> Days displayed as horizontally scrollable cards, allowing quick navigation through the week.
+          </div>
+          <div class="change-item">
+            <strong>Today Highlight:</strong> Current day has a purple border and subtle gradient background to stand out.
+          </div>
+          <div class="change-item">
+            <strong>Meal Status Dots:</strong> Visual indicators show which meals are planned (green) vs empty (gray) at a glance.
+          </div>
+          <div class="change-item">
+            <strong>Daily Calories:</strong> Total planned calories shown at the bottom of each day card for quick reference.
+          </div>
+          <div class="change-item">
+            <strong>Compact Design:</strong> Cards are compact but information-rich, showing day, date, meal status, and calories.
+          </div>
+        `
+      },
+      colors: {
+        title: "Color Palette Changes",
+        content: `
+          <div class="change-item">
+            <strong>Soft Accent Colors:</strong> Introduced a palette of 6 soft, modern accent colors for recipe card variety.
+          </div>
+          <div class="change-item">
+            <strong>Coral (#FF6B6B):</strong> Warm, energetic - great for breakfast items.
+          </div>
+          <div class="change-item">
+            <strong>Mint (#4ECDC4):</strong> Fresh, healthy - perfect for salads and light meals.
+          </div>
+          <div class="change-item">
+            <strong>Amber (#FFE66D):</strong> Golden, comforting - suits hearty dinner dishes.
+          </div>
+          <div class="change-item">
+            <strong>Lavender (#A8A4CE):</strong> Soft, calming - works well for snacks and desserts.
+          </div>
+          <div class="change-item">
+            <strong>Peach & Sky:</strong> Additional accent options for more variety if needed.
+          </div>
+        `
+      },
+      mobile: {
+        title: "Mobile Preview Changes",
+        content: `
+          <div class="change-item">
+            <strong>All Updates Combined:</strong> This preview shows how all the design changes work together on a mobile device.
+          </div>
+          <div class="change-item">
+            <strong>Compact Header:</strong> Simplified header with just the app name and user icon to maximize content space.
+          </div>
+          <div class="change-item">
+            <strong>Full-Width Cards:</strong> Recipe cards span the full width with color accent bars and outline buttons.
+          </div>
+          <div class="change-item">
+            <strong>Tab Navigation:</strong> Meal type tabs fit comfortably in the mobile viewport with the active state clearly visible.
+          </div>
+          <div class="change-item">
+            <strong>Bottom Nav:</strong> Fixed bottom navigation with the new dark styling, always accessible.
+          </div>
+        `
+      }
+    };
+
+    function showChanges(section) {
+      const data = changesData[section];
+      document.getElementById('modalTitle').textContent = data.title;
+      document.getElementById('modalContent').innerHTML = data.content;
+      document.getElementById('modalOverlay').classList.add('active');
+    }
+
+    function closeModal(event) {
+      if (!event || event.target === document.getElementById('modalOverlay')) {
+        document.getElementById('modalOverlay').classList.remove('active');
+      }
+    }
+
+    // Close modal on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeModal();
+    });
+  </script>
+</body>
+</html>

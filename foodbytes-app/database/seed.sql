@@ -115,7 +115,7 @@ INSERT INTO ingredients (id, `key`, name, aisle_id, protein_per_100g, carbs_per_
 (25, 'soy_sauce', 'Soy sauce', 12, 5.00, 5.00, 0.00, TRUE),
 
 -- Grains (aisle 11)
-(26, 'rice', 'Rice (cooked)', 11, 2.70, 28.00, 0.30, TRUE),
+(26, 'jasmine_rice', 'Jasmine rice', 11, 7.00, 79.00, 0.60, TRUE),
 (27, 'cornflour', 'Cornflour', 11, 0.30, 91.00, 0.10, TRUE);
 
 -- =============================================
@@ -123,19 +123,19 @@ INSERT INTO ingredients (id, `key`, name, aisle_id, protein_per_100g, carbs_per_
 -- =============================================
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
 -- Porridge with Berries & Nuts Family
-(1, 'Porridge with Berries & Nuts (Light)', 2, 1010, FALSE, TRUE),
-(2, 'Porridge with Berries & Nuts', 2, 1190, FALSE, TRUE),
-(3, 'Porridge with Berries & Nuts (Full)', 2, 1430, FALSE, TRUE),
+(1, 'Porridge with Berries & Nuts (Light)', 2, 716, FALSE, TRUE),
+(2, 'Porridge with Berries & Nuts', 2, 972, FALSE, TRUE),
+(3, 'Porridge with Berries & Nuts (Full)', 2, 1236, FALSE, TRUE),
 
 -- Peanut Butter Banana Smoothie Family
-(4, 'Peanut Butter Banana Smoothie (Light)', 2, 860, FALSE, TRUE),
-(5, 'Peanut Butter Banana Smoothie', 2, 1080, FALSE, TRUE),
-(6, 'Peanut Butter Banana Smoothie (Full)', 2, 1360, FALSE, TRUE),
+(4, 'Peanut Butter Banana Smoothie (Light)', 2, 849, FALSE, TRUE),
+(5, 'Peanut Butter Banana Smoothie', 2, 1123, FALSE, TRUE),
+(6, 'Peanut Butter Banana Smoothie (Full)', 2, 1404, FALSE, TRUE),
 
 -- Irish Chicken Curry Family
-(7, 'Irish Chicken Curry (Light)', 2, 960, FALSE, TRUE),
-(8, 'Irish Chicken Curry', 2, 1240, FALSE, TRUE),
-(9, 'Irish Chicken Curry (Full)', 2, 1560, FALSE, TRUE);
+(7, 'Irish Chicken Curry (Light)', 2, 1395, FALSE, TRUE),
+(8, 'Irish Chicken Curry', 2, 1662, FALSE, TRUE),
+(9, 'Irish Chicken Curry (Full)', 2, 2035, FALSE, TRUE);
 
 -- =============================================
 -- RECIPE MEALS
@@ -162,42 +162,42 @@ INSERT INTO recipe_meals (recipe_id, meal_id) VALUES
 -- RECIPE INGREDIENTS
 -- =============================================
 
--- Recipe 1: Porridge with Berries & Nuts (Light) - ~1010 cal total, ~505 cal/serving
+-- Recipe 1: Porridge with Berries & Nuts (Light) - ~716 cal total, ~358 cal/serving
 -- FR-093: Added linked_recipe_id column (NULL for regular ingredients)
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
-(1, 1, NULL, 100, 1, 100.00, 1),    -- Rolled oats, 100g
-(1, 2, NULL, 425, 2, 438.00, 2),    -- Milk, 425ml
-(1, 9, NULL, 255, 2, 255.00, 3),    -- Water, 255ml
-(1, 3, NULL, 135, 1, 135.00, 4),    -- Mixed berries, 135g
-(1, 4, NULL, 1.5, 3, 12.00, 5),     -- Honey, 1.5 tsp
-(1, 5, NULL, 1, 3, 5.00, 6),        -- Salt, 1 tsp
-(1, 6, NULL, 1.5, 4, 27.00, 7),     -- Peanut butter, 1.5 tbsp
-(1, 7, NULL, 17, 1, 17.00, 8),      -- Almonds, 17g
-(1, 8, NULL, 17, 1, 17.00, 9);      -- Walnuts, 17g
+(1, 1, NULL, 60, 1, 60.00, 1),      -- Rolled oats, 60g
+(1, 2, NULL, 250, 2, 258.00, 2),    -- Milk, 250ml
+(1, 9, NULL, 150, 2, 150.00, 3),    -- Water, 150ml
+(1, 3, NULL, 80, 1, 80.00, 4),      -- Mixed berries, 80g
+(1, 4, NULL, 1, 3, 8.00, 5),        -- Honey, 1 tsp
+(1, 5, NULL, 0.5, 3, 3.00, 6),      -- Salt, 0.5 tsp
+(1, 6, NULL, 1, 4, 18.00, 7),       -- Peanut butter, 1 tbsp
+(1, 7, NULL, 10, 1, 10.00, 8),      -- Almonds, 10g
+(1, 8, NULL, 10, 1, 10.00, 9);      -- Walnuts, 10g
 
--- Recipe 2: Porridge with Berries & Nuts (Standard) - ~1190 cal total, ~595 cal/serving
+-- Recipe 2: Porridge with Berries & Nuts (Standard) - ~972 cal total, ~486 cal/serving
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
-(2, 1, NULL, 120, 1, 120.00, 1),    -- Rolled oats, 120g
-(2, 2, NULL, 500, 2, 515.00, 2),    -- Milk, 500ml
-(2, 9, NULL, 300, 2, 300.00, 3),    -- Water, 300ml
-(2, 3, NULL, 160, 1, 160.00, 4),    -- Mixed berries, 160g
-(2, 4, NULL, 2, 3, 14.00, 5),       -- Honey, 2 tsp
-(2, 5, NULL, 1, 3, 6.00, 6),        -- Salt, 1 tsp
-(2, 6, NULL, 2, 4, 32.00, 7),       -- Peanut butter, 2 tbsp
-(2, 7, NULL, 20, 1, 20.00, 8),      -- Almonds, 20g
-(2, 8, NULL, 20, 1, 20.00, 9);      -- Walnuts, 20g
+(2, 1, NULL, 80, 1, 80.00, 1),      -- Rolled oats, 80g
+(2, 2, NULL, 330, 2, 340.00, 2),    -- Milk, 330ml
+(2, 9, NULL, 200, 2, 200.00, 3),    -- Water, 200ml
+(2, 3, NULL, 105, 1, 105.00, 4),    -- Mixed berries, 105g
+(2, 4, NULL, 1.5, 3, 12.00, 5),     -- Honey, 1.5 tsp
+(2, 5, NULL, 0.5, 3, 3.00, 6),      -- Salt, 0.5 tsp
+(2, 6, NULL, 1.5, 4, 27.00, 7),     -- Peanut butter, 1.5 tbsp
+(2, 7, NULL, 13, 1, 13.00, 8),      -- Almonds, 13g
+(2, 8, NULL, 13, 1, 13.00, 9);      -- Walnuts, 13g
 
--- Recipe 3: Porridge with Berries & Nuts (Full) - ~1430 cal total, ~715 cal/serving
+-- Recipe 3: Porridge with Berries & Nuts (Full) - ~1236 cal total, ~618 cal/serving
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
-(3, 1, NULL, 145, 1, 145.00, 1),    -- Rolled oats, 145g
-(3, 2, NULL, 600, 2, 618.00, 2),    -- Milk, 600ml
-(3, 9, NULL, 360, 2, 360.00, 3),    -- Water, 360ml
-(3, 3, NULL, 190, 1, 190.00, 4),    -- Mixed berries, 190g
-(3, 4, NULL, 2.5, 3, 17.00, 5),     -- Honey, 2.5 tsp
-(3, 5, NULL, 1, 3, 7.00, 6),        -- Salt, 1 tsp
-(3, 6, NULL, 2.5, 4, 40.00, 7),     -- Peanut butter, 2.5 tbsp
-(3, 7, NULL, 24, 1, 24.00, 8),      -- Almonds, 24g
-(3, 8, NULL, 24, 1, 24.00, 9);      -- Walnuts, 24g
+(3, 1, NULL, 100, 1, 100.00, 1),    -- Rolled oats, 100g
+(3, 2, NULL, 415, 2, 427.00, 2),    -- Milk, 415ml
+(3, 9, NULL, 250, 2, 250.00, 3),    -- Water, 250ml
+(3, 3, NULL, 135, 1, 135.00, 4),    -- Mixed berries, 135g
+(3, 4, NULL, 2, 3, 14.00, 5),       -- Honey, 2 tsp
+(3, 5, NULL, 0.75, 3, 4.50, 6),     -- Salt, 0.75 tsp
+(3, 6, NULL, 2, 4, 36.00, 7),       -- Peanut butter, 2 tbsp
+(3, 7, NULL, 17, 1, 17.00, 8),      -- Almonds, 17g
+(3, 8, NULL, 17, 1, 17.00, 9);      -- Walnuts, 17g
 
 -- Recipe 4: Peanut Butter Banana Smoothie (Light) - ~860 cal total, ~430 cal/serving
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
@@ -241,7 +241,7 @@ INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quan
 (7, 27, NULL, 1, 4, 8.00, 17),        -- Cornflour, 1 tbsp
 (7, 15, NULL, 150, 1, 150.00, 18),    -- Sweet potato, 150g (75g x 2)
 (7, 16, NULL, 0.5, 16, 72.00, 19),    -- Frozen peas, 0.5 cup
-(7, 26, NULL, 278, 1, 278.00, 20);    -- Rice (cooked), 278g (3/4 cup x 2)
+(7, 26, NULL, 111, 1, 111.00, 20);    -- Jasmine rice (uncooked), 111g
 
 -- Recipe 8: Irish Chicken Curry (Standard) - ~1240 cal total, ~620 cal/serving
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
@@ -264,7 +264,7 @@ INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quan
 (8, 27, NULL, 1, 4, 8.00, 17),        -- Cornflour, 1 tbsp
 (8, 15, NULL, 200, 1, 200.00, 18),    -- Sweet potato, 200g (100g x 2)
 (8, 16, NULL, 0.5, 16, 72.00, 19),    -- Frozen peas, 0.5 cup
-(8, 26, NULL, 370, 1, 370.00, 20);    -- Rice (cooked), 370g (1 cup x 2)
+(8, 26, NULL, 148, 1, 148.00, 20);    -- Jasmine rice (uncooked), 148g
 
 -- Recipe 9: Irish Chicken Curry (Full) - ~1560 cal total, ~780 cal/serving
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
@@ -287,7 +287,7 @@ INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quan
 (9, 27, NULL, 1, 4, 8.00, 17),        -- Cornflour, 1 tbsp
 (9, 15, NULL, 300, 1, 300.00, 18),    -- Sweet potato, 300g (150g x 2)
 (9, 16, NULL, 0.5, 16, 72.00, 19),    -- Frozen peas, 0.5 cup
-(9, 26, NULL, 462, 1, 462.00, 20);    -- Rice (cooked), 462g (1.25 cups x 2)
+(9, 26, NULL, 185, 1, 185.00, 20);    -- Jasmine rice (uncooked), 185g
 
 -- =============================================
 -- RECIPE STEPS
@@ -430,15 +430,29 @@ INSERT INTO ingredients (id, `key`, name, aisle_id, protein_per_100g, carbs_per_
 (33, 'tinned_tomatoes', 'Tinned tomatoes', 10, 1.00, 4.00, 0.10, TRUE),
 
 -- Condiments (aisle 12)
-(36, 'sugar', 'Sugar', 12, 0.00, 100.00, 0.00, TRUE);
+(36, 'sugar', 'Sugar', 12, 0.00, 100.00, 0.00, TRUE),
+
+-- =============================================
+-- CHICKEN SATAY INGREDIENTS (IDs 38-42)
+-- =============================================
+-- Tins & Jars (aisle 10)
+(38, 'coconut_milk', 'Coconut milk', 10, 2.00, 3.00, 21.00, TRUE),
+-- Condiments (aisle 12)
+(39, 'worcestershire_sauce', 'Worcestershire sauce', 12, 1.00, 23.00, 0.00, TRUE),
+-- Fruit (aisle 4)
+(40, 'lime_juice', 'Lime juice', 4, 0.40, 8.40, 0.10, TRUE),
+-- Poultry (aisle 2)
+(41, 'chicken_thigh', 'Chicken thigh (boneless)', 2, 26.00, 0.00, 10.00, TRUE),
+-- Vegetables (aisle 3)
+(42, 'red_bell_pepper', 'Red bell pepper', 3, 1.00, 6.00, 0.30, TRUE);
 
 -- =============================================
 -- EXTRAS RECIPES (must be created BEFORE parent)
 -- =============================================
 
--- Recipe 10: Pesto (Extras) - ~879 cal total, makes ~165g
+-- Recipe 10: Pesto (Extras) - ~895 cal total, makes ~165g
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
-(10, 'Pesto', 11, 879, FALSE, TRUE);
+(10, 'Pesto', 11, 895, FALSE, TRUE);
 
 INSERT INTO recipe_meals (recipe_id, meal_id) VALUES (10, 5);  -- 5 = extras
 
@@ -459,9 +473,9 @@ INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id,
 (10, 6, 'Slowly drizzle in olive oil while stirring with the pestle. Continue until you reach a loose, spoonable consistency.', NULL, NULL),
 (10, 7, 'Taste and adjust salt. Transfer to a jar, top with a thin layer of olive oil to preserve. Refrigerate up to 1 week.', NULL, NULL);
 
--- Recipe 11: Pizza Dough (Extras) - ~2033 cal total, makes ~760g (4 portions)
+-- Recipe 11: Pizza Dough (Extras) - ~2052 cal total, makes ~760g (4 portions)
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
-(11, 'Pizza Dough', 4, 2033, FALSE, TRUE);
+(11, 'Pizza Dough', 4, 2052, FALSE, TRUE);
 
 INSERT INTO recipe_meals (recipe_id, meal_id) VALUES (11, 5);  -- 5 = extras
 
@@ -482,9 +496,9 @@ INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id,
 (11, 7, 'Punch down the dough to release air. Divide into 4 equal portions (~190g each).', NULL, NULL),
 (11, 8, 'Use immediately, or wrap individual portions tightly in cling film and freeze for up to 3 months. Thaw overnight in fridge before use.', NULL, NULL);
 
--- Recipe 12: Pizza Sauce (Extras) - ~313 cal total, makes ~440g
+-- Recipe 12: Pizza Sauce (Extras) - ~246 cal total, makes ~440g
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
-(12, 'Pizza Sauce', 7, 313, FALSE, TRUE);
+(12, 'Pizza Sauce', 7, 246, FALSE, TRUE);
 
 INSERT INTO recipe_meals (recipe_id, meal_id) VALUES (12, 5);  -- 5 = extras
 
@@ -516,9 +530,9 @@ INSERT INTO recipe_extras (parent_recipe_id, child_recipe_id, display_order) VAL
 -- PIZZA RECIPES (Dinner - 3 Variants)
 -- =============================================
 
--- Recipe 13: Pizza (Light) - ~1220 cal total (2 servings, 610 cal each)
+-- Recipe 13: Pizza (Light) - ~1148 cal total (2 servings, 574 cal each)
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
-(13, 'Pizza (Light)', 2, 1220, FALSE, TRUE);
+(13, 'Pizza (Light)', 2, 1148, FALSE, TRUE);
 
 INSERT INTO recipe_meals (recipe_id, meal_id) VALUES (13, 3);  -- 3 = dinner
 
@@ -540,9 +554,9 @@ INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id,
 (13, 9, 'Bake for 10-12 minutes until crust is golden and puffed, cheese is bubbling with golden spots.', NULL, NULL),
 (13, 10, 'Remove from oven. Let rest 2 minutes before slicing.', NULL, NULL);
 
--- Recipe 14: Pizza (Standard) - ~1680 cal total (2 servings, 840 cal each)
+-- Recipe 14: Pizza (Standard) - ~1636 cal total (2 servings, 818 cal each)
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
-(14, 'Pizza', 2, 1680, FALSE, TRUE);
+(14, 'Pizza', 2, 1636, FALSE, TRUE);
 
 INSERT INTO recipe_meals (recipe_id, meal_id) VALUES (14, 3);  -- 3 = dinner
 
@@ -564,9 +578,9 @@ INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id,
 (14, 9, 'Bake for 12-14 minutes until crust is golden and puffed, cheese is bubbling with golden spots.', NULL, NULL),
 (14, 10, 'Remove from oven. Let rest 2 minutes before slicing.', NULL, NULL);
 
--- Recipe 15: Pizza (Full) - ~2140 cal total (2 servings, 1070 cal each)
+-- Recipe 15: Pizza (Full) - ~2124 cal total (2 servings, 1062 cal each)
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
-(15, 'Pizza (Full)', 2, 2140, FALSE, TRUE);
+(15, 'Pizza (Full)', 2, 2124, FALSE, TRUE);
 
 INSERT INTO recipe_meals (recipe_id, meal_id) VALUES (15, 3);  -- 3 = dinner
 
@@ -610,3 +624,1071 @@ INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_lab
 (4, 14, TRUE, 'Standard', 1),   -- Standard is default
 (4, 13, FALSE, 'Light', 2),
 (4, 15, FALSE, 'Full', 3);
+
+-- =============================================
+-- CHICKEN SATAY FAMILY
+-- =============================================
+
+-- Recipe 16: Chicken Satay (Light) - ~1100 cal total, ~550 cal/serving
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+(16, 'Chicken Satay (Light)', 2, 1100, FALSE, TRUE);
+
+-- Recipe 17: Chicken Satay (Standard) - ~1460 cal total, ~730 cal/serving
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+(17, 'Chicken Satay', 2, 1460, FALSE, TRUE);
+
+-- Recipe 18: Chicken Satay (Full) - ~1900 cal total, ~950 cal/serving
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+(18, 'Chicken Satay (Full)', 2, 1900, FALSE, TRUE);
+
+-- =============================================
+-- CHICKEN SATAY RECIPE MEALS (Dinner)
+-- =============================================
+INSERT INTO recipe_meals (recipe_id, meal_id) VALUES
+(16, 3),  -- Light: Dinner
+(17, 3),  -- Standard: Dinner
+(18, 3);  -- Full: Dinner
+
+-- =============================================
+-- CHICKEN SATAY RECIPE INGREDIENTS
+-- =============================================
+
+-- Recipe 16: Chicken Satay (Light) - ~1100 cal total
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
+-- Chicken & Marinade
+(16, 41, NULL, 220, 1, 220.00, 1),      -- Chicken thigh, 220g
+(16, 13, NULL, 2, 10, 6.00, 2),         -- Garlic, 2 cloves (6g)
+(16, 14, NULL, 5, 1, 5.00, 3),          -- Ginger, 5g
+(16, 25, NULL, 1, 4, 15.00, 4),         -- Soy sauce (marinade), 1 tbsp
+(16, 4, NULL, 1, 3, 7.00, 5),           -- Honey (marinade), 1 tsp
+(16, 22, NULL, 0.5, 4, 7.00, 6),        -- Olive oil, 0.5 tbsp
+-- Vegetables (for skewers)
+(16, 12, NULL, 80, 1, 80.00, 7),        -- Onion, 80g
+(16, 42, NULL, 80, 1, 80.00, 8),        -- Red bell pepper, 80g
+-- Peanut Sauce
+(16, 6, NULL, 2, 4, 32.00, 9),          -- Peanut butter, 2 tbsp
+(16, 38, NULL, 100, 2, 100.00, 10),     -- Coconut milk, 100ml
+(16, 25, NULL, 1, 4, 15.00, 11),        -- Soy sauce (sauce), 1 tbsp
+(16, 39, NULL, 0.5, 4, 9.00, 12),       -- Worcestershire, 0.5 tbsp
+(16, 4, NULL, 1, 3, 7.00, 13),          -- Honey (sauce), 1 tsp
+(16, 18, NULL, 0.25, 3, 0.75, 14),      -- Cumin, 0.25 tsp
+(16, 40, NULL, 15, 2, 15.00, 15),       -- Lime juice, 15ml (0.5 lime)
+(16, 27, NULL, 0.5, 3, 1.50, 16),       -- Cornflour, 0.5 tsp
+-- Side
+(16, 26, NULL, 56, 1, 56.00, 17),       -- Jasmine rice (uncooked), 56g
+(16, 5, NULL, 0.5, 3, 3.00, 18);        -- Salt, 0.5 tsp
+
+-- Recipe 17: Chicken Satay (Standard) - ~1460 cal total
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
+-- Chicken & Marinade
+(17, 41, NULL, 280, 1, 280.00, 1),      -- Chicken thigh, 280g
+(17, 13, NULL, 2, 10, 6.00, 2),         -- Garlic, 2 cloves (6g)
+(17, 14, NULL, 5, 1, 5.00, 3),          -- Ginger, 5g
+(17, 25, NULL, 1, 4, 15.00, 4),         -- Soy sauce (marinade), 1 tbsp
+(17, 4, NULL, 1, 3, 7.00, 5),           -- Honey (marinade), 1 tsp
+(17, 22, NULL, 1, 4, 14.00, 6),         -- Olive oil, 1 tbsp
+-- Vegetables (for skewers)
+(17, 12, NULL, 100, 1, 100.00, 7),      -- Onion, 100g
+(17, 42, NULL, 100, 1, 100.00, 8),      -- Red bell pepper, 100g
+-- Peanut Sauce
+(17, 6, NULL, 2, 4, 32.00, 9),          -- Peanut butter, 2 tbsp
+(17, 38, NULL, 100, 2, 100.00, 10),     -- Coconut milk, 100ml
+(17, 25, NULL, 1, 4, 15.00, 11),        -- Soy sauce (sauce), 1 tbsp
+(17, 39, NULL, 0.5, 4, 9.00, 12),       -- Worcestershire, 0.5 tbsp
+(17, 4, NULL, 1, 3, 7.00, 13),          -- Honey (sauce), 1 tsp
+(17, 18, NULL, 0.25, 3, 0.75, 14),      -- Cumin, 0.25 tsp
+(17, 40, NULL, 15, 2, 15.00, 15),       -- Lime juice, 15ml (0.5 lime)
+(17, 27, NULL, 0.5, 3, 1.50, 16),       -- Cornflour, 0.5 tsp
+-- Side
+(17, 26, NULL, 74, 1, 74.00, 17),       -- Jasmine rice (uncooked), 74g
+(17, 5, NULL, 0.5, 3, 3.00, 18);        -- Salt, 0.5 tsp
+
+-- Recipe 18: Chicken Satay (Full) - ~1900 cal total
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
+-- Chicken & Marinade
+(18, 41, NULL, 360, 1, 360.00, 1),      -- Chicken thigh, 360g
+(18, 13, NULL, 3, 10, 9.00, 2),         -- Garlic, 3 cloves (9g)
+(18, 14, NULL, 8, 1, 8.00, 3),          -- Ginger, 8g
+(18, 25, NULL, 1.5, 4, 22.00, 4),       -- Soy sauce (marinade), 1.5 tbsp
+(18, 4, NULL, 1.5, 3, 10.00, 5),        -- Honey (marinade), 1.5 tsp
+(18, 22, NULL, 1.5, 4, 21.00, 6),       -- Olive oil, 1.5 tbsp
+-- Vegetables (for skewers)
+(18, 12, NULL, 120, 1, 120.00, 7),      -- Onion, 120g
+(18, 42, NULL, 120, 1, 120.00, 8),      -- Red bell pepper, 120g
+-- Peanut Sauce
+(18, 6, NULL, 2.5, 4, 40.00, 9),        -- Peanut butter, 2.5 tbsp
+(18, 38, NULL, 130, 2, 130.00, 10),     -- Coconut milk, 130ml
+(18, 25, NULL, 1.5, 4, 22.00, 11),      -- Soy sauce (sauce), 1.5 tbsp
+(18, 39, NULL, 0.75, 4, 14.00, 12),     -- Worcestershire, 0.75 tbsp
+(18, 4, NULL, 1.5, 3, 10.00, 13),       -- Honey (sauce), 1.5 tsp
+(18, 18, NULL, 0.33, 3, 1.00, 14),      -- Cumin, 0.33 tsp
+(18, 40, NULL, 22, 2, 22.00, 15),       -- Lime juice, 22ml (0.75 lime)
+(18, 27, NULL, 0.75, 3, 2.25, 16),      -- Cornflour, 0.75 tsp
+-- Side
+(18, 26, NULL, 92, 1, 92.00, 17),       -- Jasmine rice (uncooked), 92g
+(18, 5, NULL, 0.75, 3, 4.50, 18);       -- Salt, 0.75 tsp
+
+-- =============================================
+-- CHICKEN SATAY RECIPE STEPS
+-- =============================================
+
+-- Recipe 16: Chicken Satay (Light)
+INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
+(16, 1, 'Brine the chicken: Cut chicken thigh into 1-inch cubes. Dissolve 1 tbsp salt in 500ml cold water. Submerge chicken, refrigerate 15-20 minutes. Rinse and pat dry.'),
+(16, 2, 'Make the marinade: In a bowl, combine minced garlic, grated ginger, soy sauce, honey, and olive oil. Whisk until honey dissolves. Toss brined chicken in marinade. Set aside while you prep other ingredients.'),
+(16, 3, 'Start the rice: Rinse jasmine rice under cold water until water runs clear. Cook according to package directions with a pinch of salt. Keep warm.'),
+(16, 4, 'Prep vegetables: Cut onion and red bell pepper into 1-inch chunks.'),
+(16, 5, 'Make the peanut sauce: In a small saucepan over medium-low heat, combine coconut milk, peanut butter, soy sauce, Worcestershire, honey, and cumin. Whisk until smooth and peanut butter melts. Simmer 3-4 minutes.'),
+(16, 6, 'Thicken the sauce: Mix cornflour with 1 tbsp cold water to make a slurry. Stir into the simmering sauce. Cook 1-2 minutes until glossy. Remove from heat, stir in lime juice. Taste and adjust.'),
+(16, 7, 'Cook the vegetables: Heat a large pan or wok over medium-high heat with a drizzle of oil. Sauté onion and red pepper for 3-4 minutes until slightly charred but still crisp. Remove and set aside.'),
+(16, 8, 'Cook the chicken: In the same pan over medium-high heat, cook marinated chicken pieces in a single layer. Don''t crowd the pan. Cook 3-4 minutes per side until golden and cooked through (74°C internal).'),
+(16, 9, 'Combine: Return vegetables to the pan with the chicken. Toss briefly to combine.'),
+(16, 10, 'Serve: Spoon chicken and vegetables over jasmine rice. Drizzle generously with peanut sauce.');
+
+-- Recipe 17: Chicken Satay (Standard)
+INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
+(17, 1, 'Brine the chicken: Cut chicken thigh into 1-inch cubes. Dissolve 1 tbsp salt in 500ml cold water. Submerge chicken, refrigerate 15-20 minutes. Rinse and pat dry.'),
+(17, 2, 'Make the marinade: In a bowl, combine minced garlic, grated ginger, soy sauce, honey, and olive oil. Whisk until honey dissolves. Toss brined chicken in marinade. Set aside while you prep other ingredients.'),
+(17, 3, 'Start the rice: Rinse jasmine rice under cold water until water runs clear. Cook according to package directions with a pinch of salt. Keep warm.'),
+(17, 4, 'Prep vegetables: Cut onion and red bell pepper into 1-inch chunks.'),
+(17, 5, 'Make the peanut sauce: In a small saucepan over medium-low heat, combine coconut milk, peanut butter, soy sauce, Worcestershire, honey, and cumin. Whisk until smooth and peanut butter melts. Simmer 3-4 minutes.'),
+(17, 6, 'Thicken the sauce: Mix cornflour with 1 tbsp cold water to make a slurry. Stir into the simmering sauce. Cook 1-2 minutes until glossy. Remove from heat, stir in lime juice. Taste and adjust.'),
+(17, 7, 'Cook the vegetables: Heat a large pan or wok over medium-high heat with a drizzle of oil. Sauté onion and red pepper for 3-4 minutes until slightly charred but still crisp. Remove and set aside.'),
+(17, 8, 'Cook the chicken: In the same pan over medium-high heat, cook marinated chicken pieces in a single layer. Don''t crowd the pan. Cook 3-4 minutes per side until golden and cooked through (74°C internal).'),
+(17, 9, 'Combine: Return vegetables to the pan with the chicken. Toss briefly to combine.'),
+(17, 10, 'Serve: Spoon chicken and vegetables over jasmine rice. Drizzle generously with peanut sauce.');
+
+-- Recipe 18: Chicken Satay (Full)
+INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
+(18, 1, 'Brine the chicken: Cut chicken thigh into 1-inch cubes. Dissolve 1 tbsp salt in 500ml cold water. Submerge chicken, refrigerate 15-20 minutes. Rinse and pat dry.'),
+(18, 2, 'Make the marinade: In a bowl, combine minced garlic, grated ginger, soy sauce, honey, and olive oil. Whisk until honey dissolves. Toss brined chicken in marinade. Set aside while you prep other ingredients.'),
+(18, 3, 'Start the rice: Rinse jasmine rice under cold water until water runs clear. Cook according to package directions with a pinch of salt. Keep warm.'),
+(18, 4, 'Prep vegetables: Cut onion and red bell pepper into 1-inch chunks.'),
+(18, 5, 'Make the peanut sauce: In a small saucepan over medium-low heat, combine coconut milk, peanut butter, soy sauce, Worcestershire, honey, and cumin. Whisk until smooth and peanut butter melts. Simmer 3-4 minutes.'),
+(18, 6, 'Thicken the sauce: Mix cornflour with 1 tbsp cold water to make a slurry. Stir into the simmering sauce. Cook 1-2 minutes until glossy. Remove from heat, stir in lime juice. Taste and adjust.'),
+(18, 7, 'Cook the vegetables: Heat a large pan or wok over medium-high heat with a drizzle of oil. Sauté onion and red pepper for 3-4 minutes until slightly charred but still crisp. Remove and set aside.'),
+(18, 8, 'Cook the chicken: In the same pan over medium-high heat, cook marinated chicken pieces in a single layer. Don''t crowd the pan. Cook 3-4 minutes per side until golden and cooked through (74°C internal).'),
+(18, 9, 'Combine: Return vegetables to the pan with the chicken. Toss briefly to combine.'),
+(18, 10, 'Serve: Spoon chicken and vegetables over jasmine rice. Drizzle generously with peanut sauce.');
+
+-- =============================================
+-- CHICKEN SATAY RECIPE FAMILY
+-- =============================================
+INSERT INTO recipe_families (id, family_name, description) VALUES
+(5, 'Chicken Satay', 'Thai-style grilled chicken skewers with onion and red pepper, served with a creamy peanut dipping sauce over jasmine rice.');
+
+INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_label, display_order) VALUES
+(5, 17, TRUE, 'Standard', 1),   -- Standard is default
+(5, 16, FALSE, 'Light', 2),
+(5, 18, FALSE, 'Full', 3);
+
+-- =============================================
+-- BLACK BEAN CHICKEN WRAP INGREDIENTS (IDs 43-50)
+-- =============================================
+INSERT INTO ingredients (id, `key`, name, aisle_id, protein_per_100g, carbs_per_100g, fat_per_100g, macros_verified) VALUES
+-- Grains (aisle 11)
+(43, 'plain_flour', 'Plain flour', 11, 10.00, 76.00, 1.00, TRUE),
+-- Dairy (aisle 6)
+(44, 'unsalted_butter', 'Unsalted butter', 6, 0.90, 0.10, 81.00, TRUE),
+(49, 'greek_yogurt', 'Greek yogurt', 6, 10.00, 3.60, 0.70, TRUE),
+-- Tins & Jars (aisle 10)
+(45, 'black_beans', 'Black beans (tinned)', 10, 8.90, 23.70, 0.50, TRUE),
+-- Herbs & Spices (aisle 8)
+(46, 'smoked_paprika', 'Smoked paprika', 8, 14.00, 54.00, 13.00, TRUE),
+(50, 'black_pepper', 'Black pepper', 8, 10.00, 64.00, 3.30, TRUE),
+-- Vegetables (aisle 3)
+(47, 'lettuce', 'Lettuce', 3, 1.40, 2.90, 0.20, TRUE),
+(48, 'tomato', 'Tomato', 3, 0.90, 3.90, 0.20, TRUE);
+
+-- =============================================
+-- FLATBREAD (Extra Recipe)
+-- =============================================
+
+-- Recipe 19: Flatbread - ~1368 cal total, makes ~486g (5-6 wraps)
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+(19, 'Flatbread', 5, 1368, FALSE, TRUE);
+
+INSERT INTO recipe_meals (recipe_id, meal_id) VALUES (19, 5);  -- 5 = extras
+
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
+(19, 43, NULL, 250, 1, 250.00, 1),    -- Plain flour, 250g (2 cups)
+(19, 5, NULL, 1, 3, 6.00, 2),         -- Salt, 1 tsp
+(19, 44, NULL, 50, 1, 50.00, 3),      -- Unsalted butter, 50g
+(19, 2, NULL, 180, 2, 180.00, 4);     -- Milk, 180ml (3/4 cup)
+
+INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
+(19, 1, 'Combine flour and salt in a large bowl. Make a well in the center.', NULL, NULL),
+(19, 2, 'Melt butter and add to milk. Pour into the flour well.', NULL, NULL),
+(19, 3, 'Mix with a fork until a shaggy dough forms, then knead by hand for 3-4 minutes until smooth and elastic.', NULL, NULL),
+(19, 4, 'Cover dough with a damp tea towel and rest for 15-20 minutes.', NULL, NULL),
+(19, 5, 'Divide dough into 5-6 portions (~80-90g each). Roll each into a thin circle, about 8 inches diameter.', NULL, NULL),
+(19, 6, 'Heat a dry pan or griddle over medium-high heat. Cook each flatbread for 1-2 minutes per side until golden spots appear and bread puffs slightly.', NULL, NULL),
+(19, 7, 'Stack cooked flatbreads under a clean tea towel to keep warm and soft.', NULL, NULL);
+
+-- =============================================
+-- BLACK BEAN CHICKEN WRAP FAMILY
+-- =============================================
+
+-- Recipe 20: Black Bean Chicken Wrap (Light) - ~1313 cal total, ~656 cal/serving
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+(20, 'Black Bean Chicken Wrap (Light)', 2, 1313, FALSE, TRUE);
+
+-- Recipe 21: Black Bean Chicken Wrap (Standard) - ~1699 cal total, ~849 cal/serving
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+(21, 'Black Bean Chicken Wrap', 2, 1699, FALSE, TRUE);
+
+-- Recipe 22: Black Bean Chicken Wrap (Full) - ~2136 cal total, ~1068 cal/serving
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+(22, 'Black Bean Chicken Wrap (Full)', 2, 2136, FALSE, TRUE);
+
+-- =============================================
+-- BLACK BEAN WRAP RECIPE MEALS (Lunch)
+-- =============================================
+INSERT INTO recipe_meals (recipe_id, meal_id) VALUES
+(20, 2),  -- Light: Lunch
+(21, 2),  -- Standard: Lunch
+(22, 2);  -- Full: Lunch
+
+-- =============================================
+-- BLACK BEAN WRAP RECIPE EXTRAS (link to Flatbread)
+-- =============================================
+INSERT INTO recipe_extras (parent_recipe_id, child_recipe_id, display_order) VALUES
+(20, 19, 0),  -- Light → Flatbread
+(21, 19, 0),  -- Standard → Flatbread
+(22, 19, 0);  -- Full → Flatbread
+
+-- =============================================
+-- BLACK BEAN WRAP RECIPE INGREDIENTS
+-- =============================================
+
+-- Recipe 20: Black Bean Chicken Wrap (Light) - ~1100 cal total
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
+-- Flatbread (linked recipe)
+(20, NULL, 19, 140, 1, 140.00, 1),     -- Flatbread, 140g (70g x 2)
+-- Chicken & seasoning
+(20, 11, NULL, 200, 1, 200.00, 2),     -- Chicken breast, 200g
+(20, 22, NULL, 1, 4, 14.00, 3),        -- Olive oil, 1 tbsp
+(20, 46, NULL, 0.5, 3, 1.50, 4),       -- Smoked paprika, 0.5 tsp
+(20, 18, NULL, 0.5, 3, 1.50, 5),       -- Cumin, 0.5 tsp
+(20, 5, NULL, 0.5, 3, 3.00, 6),        -- Salt, 0.5 tsp
+(20, 50, NULL, 0.25, 3, 0.75, 7),      -- Black pepper, 0.25 tsp
+-- Black bean dip
+(20, 45, NULL, 200, 1, 200.00, 8),     -- Black beans, 200g
+(20, 40, NULL, 2, 4, 30.00, 9),        -- Lime juice, 2 tbsp
+(20, 46, NULL, 0.5, 3, 1.50, 10),      -- Smoked paprika (dip), 0.5 tsp
+(20, 18, NULL, 0.5, 3, 1.50, 11),      -- Cumin (dip), 0.5 tsp
+-- Greek yogurt sauce
+(20, 49, NULL, 60, 1, 60.00, 12),      -- Greek yogurt, 60g
+(20, 13, NULL, 1, 10, 3.00, 13),       -- Garlic, 1 clove
+(20, 40, NULL, 1, 4, 15.00, 14),       -- Lime juice (sauce), 1 tbsp
+-- Rice & veg
+(20, 26, NULL, 25, 1, 25.00, 15),      -- Jasmine rice (uncooked), 25g
+(20, 47, NULL, 40, 1, 40.00, 16),      -- Lettuce, 40g
+(20, 48, NULL, 60, 1, 60.00, 17),      -- Tomato, 60g
+(20, 12, NULL, 40, 1, 40.00, 18);      -- Onion, 40g
+
+-- Recipe 21: Black Bean Chicken Wrap (Standard) - ~1400 cal total
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
+-- Flatbread (linked recipe)
+(21, NULL, 19, 180, 1, 180.00, 1),     -- Flatbread, 180g (90g x 2)
+-- Chicken & seasoning
+(21, 11, NULL, 260, 1, 260.00, 2),     -- Chicken breast, 260g
+(21, 22, NULL, 1.5, 4, 21.00, 3),      -- Olive oil, 1.5 tbsp
+(21, 46, NULL, 0.75, 3, 2.25, 4),      -- Smoked paprika, 0.75 tsp
+(21, 18, NULL, 0.75, 3, 2.25, 5),      -- Cumin, 0.75 tsp
+(21, 5, NULL, 0.5, 3, 3.00, 6),        -- Salt, 0.5 tsp
+(21, 50, NULL, 0.25, 3, 0.75, 7),      -- Black pepper, 0.25 tsp
+-- Black bean dip
+(21, 45, NULL, 240, 1, 240.00, 8),     -- Black beans, 240g
+(21, 40, NULL, 2, 4, 30.00, 9),        -- Lime juice, 2 tbsp
+(21, 46, NULL, 0.5, 3, 1.50, 10),      -- Smoked paprika (dip), 0.5 tsp
+(21, 18, NULL, 0.5, 3, 1.50, 11),      -- Cumin (dip), 0.5 tsp
+-- Greek yogurt sauce
+(21, 49, NULL, 80, 1, 80.00, 12),      -- Greek yogurt, 80g
+(21, 13, NULL, 1, 10, 3.00, 13),       -- Garlic, 1 clove
+(21, 40, NULL, 1, 4, 15.00, 14),       -- Lime juice (sauce), 1 tbsp
+-- Rice & veg
+(21, 26, NULL, 35, 1, 35.00, 15),      -- Jasmine rice (uncooked), 35g
+(21, 47, NULL, 50, 1, 50.00, 16),      -- Lettuce, 50g
+(21, 48, NULL, 80, 1, 80.00, 17),      -- Tomato, 80g
+(21, 12, NULL, 50, 1, 50.00, 18);      -- Onion, 50g
+
+-- Recipe 22: Black Bean Chicken Wrap (Full) - ~1700 cal total
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
+-- Flatbread (linked recipe)
+(22, NULL, 19, 220, 1, 220.00, 1),     -- Flatbread, 220g (110g x 2)
+-- Chicken & seasoning
+(22, 11, NULL, 340, 1, 340.00, 2),     -- Chicken breast, 340g
+(22, 22, NULL, 2, 4, 28.00, 3),        -- Olive oil, 2 tbsp
+(22, 46, NULL, 1, 3, 3.00, 4),         -- Smoked paprika, 1 tsp
+(22, 18, NULL, 1, 3, 3.00, 5),         -- Cumin, 1 tsp
+(22, 5, NULL, 0.75, 3, 4.50, 6),       -- Salt, 0.75 tsp
+(22, 50, NULL, 0.5, 3, 1.50, 7),       -- Black pepper, 0.5 tsp
+-- Black bean dip
+(22, 45, NULL, 280, 1, 280.00, 8),     -- Black beans, 280g
+(22, 40, NULL, 2.5, 4, 37.00, 9),      -- Lime juice, 2.5 tbsp
+(22, 46, NULL, 0.75, 3, 2.25, 10),     -- Smoked paprika (dip), 0.75 tsp
+(22, 18, NULL, 0.75, 3, 2.25, 11),     -- Cumin (dip), 0.75 tsp
+-- Greek yogurt sauce
+(22, 49, NULL, 100, 1, 100.00, 12),    -- Greek yogurt, 100g
+(22, 13, NULL, 2, 10, 6.00, 13),       -- Garlic, 2 cloves
+(22, 40, NULL, 1.5, 4, 22.00, 14),     -- Lime juice (sauce), 1.5 tbsp
+-- Rice & veg
+(22, 26, NULL, 45, 1, 45.00, 15),      -- Jasmine rice (uncooked), 45g
+(22, 47, NULL, 60, 1, 60.00, 16),      -- Lettuce, 60g
+(22, 48, NULL, 100, 1, 100.00, 17),    -- Tomato, 100g
+(22, 12, NULL, 60, 1, 60.00, 18);      -- Onion, 60g
+
+-- =============================================
+-- BLACK BEAN WRAP RECIPE STEPS
+-- =============================================
+
+-- Recipe 20: Black Bean Chicken Wrap (Light)
+INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
+(20, 1, 'Prepare the flatbread according to the linked recipe. Use 70g dough per wrap.', 19, 'Use 2 store-bought tortillas or wraps (about 70g each).'),
+(20, 2, 'Cook the rice: Rinse jasmine rice until water runs clear. Cook according to package directions with a pinch of salt. Keep warm.', NULL, NULL),
+(20, 3, 'Season the chicken: Slice chicken breast into strips. Toss with olive oil, smoked paprika, cumin, salt, and black pepper until evenly coated.', NULL, NULL),
+(20, 4, 'Grill the chicken: Heat a grill pan or skillet over medium-high heat. Cook chicken strips 3-4 minutes per side until charred and cooked through (74°C internal). Set aside to rest.', NULL, NULL),
+(20, 5, 'Make the black bean dip: Drain and rinse black beans. Mash roughly with a fork, leaving some texture. Stir in lime juice, smoked paprika, and cumin. Season to taste.', NULL, NULL),
+(20, 6, 'Make the yogurt sauce: Mince garlic finely. Mix Greek yogurt with garlic and lime juice. Season with a pinch of salt.', NULL, NULL),
+(20, 7, 'Prep the veg: Shred lettuce, dice tomato, and thinly slice onion.', NULL, NULL),
+(20, 8, 'Assemble wraps: Warm flatbreads briefly. Spread black bean dip down the center, add rice, sliced chicken, lettuce, tomato, and onion. Drizzle with yogurt sauce.', NULL, NULL),
+(20, 9, 'Roll burrito-style: Fold bottom edge up over filling, fold sides in, then roll tightly from bottom to top. Cut in half diagonally to serve.', NULL, NULL);
+
+-- Recipe 21: Black Bean Chicken Wrap (Standard)
+INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
+(21, 1, 'Prepare the flatbread according to the linked recipe. Use 90g dough per wrap.', 19, 'Use 2 store-bought tortillas or wraps (about 90g each).'),
+(21, 2, 'Cook the rice: Rinse jasmine rice until water runs clear. Cook according to package directions with a pinch of salt. Keep warm.', NULL, NULL),
+(21, 3, 'Season the chicken: Slice chicken breast into strips. Toss with olive oil, smoked paprika, cumin, salt, and black pepper until evenly coated.', NULL, NULL),
+(21, 4, 'Grill the chicken: Heat a grill pan or skillet over medium-high heat. Cook chicken strips 3-4 minutes per side until charred and cooked through (74°C internal). Set aside to rest.', NULL, NULL),
+(21, 5, 'Make the black bean dip: Drain and rinse black beans. Mash roughly with a fork, leaving some texture. Stir in lime juice, smoked paprika, and cumin. Season to taste.', NULL, NULL),
+(21, 6, 'Make the yogurt sauce: Mince garlic finely. Mix Greek yogurt with garlic and lime juice. Season with a pinch of salt.', NULL, NULL),
+(21, 7, 'Prep the veg: Shred lettuce, dice tomato, and thinly slice onion.', NULL, NULL),
+(21, 8, 'Assemble wraps: Warm flatbreads briefly. Spread black bean dip down the center, add rice, sliced chicken, lettuce, tomato, and onion. Drizzle with yogurt sauce.', NULL, NULL),
+(21, 9, 'Roll burrito-style: Fold bottom edge up over filling, fold sides in, then roll tightly from bottom to top. Cut in half diagonally to serve.', NULL, NULL);
+
+-- Recipe 22: Black Bean Chicken Wrap (Full)
+INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
+(22, 1, 'Prepare the flatbread according to the linked recipe. Use 110g dough per wrap.', 19, 'Use 2 large store-bought tortillas or wraps (about 110g each).'),
+(22, 2, 'Cook the rice: Rinse jasmine rice until water runs clear. Cook according to package directions with a pinch of salt. Keep warm.', NULL, NULL),
+(22, 3, 'Season the chicken: Slice chicken breast into strips. Toss with olive oil, smoked paprika, cumin, salt, and black pepper until evenly coated.', NULL, NULL),
+(22, 4, 'Grill the chicken: Heat a grill pan or skillet over medium-high heat. Cook chicken strips 3-4 minutes per side until charred and cooked through (74°C internal). Set aside to rest.', NULL, NULL),
+(22, 5, 'Make the black bean dip: Drain and rinse black beans. Mash roughly with a fork, leaving some texture. Stir in lime juice, smoked paprika, and cumin. Season to taste.', NULL, NULL),
+(22, 6, 'Make the yogurt sauce: Mince garlic finely. Mix Greek yogurt with garlic and lime juice. Season with a pinch of salt.', NULL, NULL),
+(22, 7, 'Prep the veg: Shred lettuce, dice tomato, and thinly slice onion.', NULL, NULL),
+(22, 8, 'Assemble wraps: Warm flatbreads briefly. Spread black bean dip down the center, add rice, sliced chicken, lettuce, tomato, and onion. Drizzle with yogurt sauce.', NULL, NULL),
+(22, 9, 'Roll burrito-style: Fold bottom edge up over filling, fold sides in, then roll tightly from bottom to top. Cut in half diagonally to serve.', NULL, NULL);
+
+-- =============================================
+-- BLACK BEAN WRAP RECIPE FAMILY
+-- =============================================
+INSERT INTO recipe_families (id, family_name, description) VALUES
+(6, 'Black Bean Chicken Wrap', 'Grilled spiced chicken with smoky black bean dip, Greek yogurt sauce, fresh veg, and rice wrapped in homemade flatbread.');
+
+INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_label, display_order) VALUES
+(6, 21, TRUE, 'Standard', 1),   -- Standard is default
+(6, 20, FALSE, 'Light', 2),
+(6, 22, FALSE, 'Full', 3);
+
+-- =============================================
+-- CHICKEN & VEGETABLE SOUP INGREDIENTS (IDs 51-52)
+-- =============================================
+INSERT INTO ingredients (id, `key`, name, aisle_id, protein_per_100g, carbs_per_100g, fat_per_100g, macros_verified) VALUES
+(51, 'broccoli', 'Broccoli', 3, 2.80, 7.00, 0.40, TRUE),
+(52, 'baby_potatoes', 'Baby potatoes', 3, 2.00, 17.00, 0.10, TRUE);
+
+-- =============================================
+-- CHICKEN & VEGETABLE SOUP FAMILY
+-- =============================================
+
+-- Recipe 23: Chicken & Vegetable Soup (Light) - ~868 cal total, ~434 cal/serving
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+(23, 'Chicken & Vegetable Soup (Light)', 2, 868, FALSE, TRUE);
+
+-- Recipe 24: Chicken & Vegetable Soup (Standard) - ~1135 cal total, ~567 cal/serving
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+(24, 'Chicken & Vegetable Soup', 2, 1135, FALSE, TRUE);
+
+-- Recipe 25: Chicken & Vegetable Soup (Full) - ~1398 cal total, ~699 cal/serving
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+(25, 'Chicken & Vegetable Soup (Full)', 2, 1398, FALSE, TRUE);
+
+-- =============================================
+-- CHICKEN & VEGETABLE SOUP RECIPE MEALS (Lunch)
+-- =============================================
+INSERT INTO recipe_meals (recipe_id, meal_id) VALUES
+(23, 2),  -- Light: Lunch
+(24, 2),  -- Standard: Lunch
+(25, 2);  -- Full: Lunch
+
+-- =============================================
+-- CHICKEN & VEGETABLE SOUP RECIPE INGREDIENTS
+-- =============================================
+
+-- Recipe 23: Chicken & Vegetable Soup (Light) - ~900 cal total
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
+-- Soup base (fried, then blended)
+(23, 12, NULL, 1, 7, 110.00, 1),       -- Onion, 1 medium (110g)
+(23, 13, NULL, 2, 10, 6.00, 2),        -- Garlic, 2 cloves (6g)
+(23, 42, NULL, 100, 1, 100.00, 3),     -- Red bell pepper, 100g
+(23, 51, NULL, 120, 1, 120.00, 4),     -- Broccoli, 120g
+(23, 44, NULL, 20, 1, 20.00, 5),       -- Unsalted butter, 20g
+(23, 5, NULL, 0.5, 3, 3.00, 6),        -- Salt, 0.5 tsp
+(23, 50, NULL, 0.25, 3, 0.75, 7),      -- Black pepper, 0.25 tsp
+-- Stock and chicken (added after frying)
+(23, 24, NULL, 500, 2, 500.00, 8),     -- Chicken stock, 500ml
+(23, 11, NULL, 200, 1, 200.00, 9),     -- Chicken breast, 200g
+-- Peas (added at end)
+(23, 16, NULL, 80, 1, 80.00, 10),      -- Frozen peas, 80g
+-- Roasted potato topping
+(23, 52, NULL, 150, 1, 150.00, 11),    -- Baby potatoes, 150g
+(23, 22, NULL, 0.5, 4, 7.00, 12);      -- Olive oil (for potatoes), 0.5 tbsp
+
+-- Recipe 24: Chicken & Vegetable Soup (Standard) - ~1100 cal total
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
+-- Soup base (fried, then blended)
+(24, 12, NULL, 1, 7, 110.00, 1),       -- Onion, 1 medium (110g)
+(24, 13, NULL, 2, 10, 6.00, 2),        -- Garlic, 2 cloves (6g)
+(24, 42, NULL, 120, 1, 120.00, 3),     -- Red bell pepper, 120g
+(24, 51, NULL, 150, 1, 150.00, 4),     -- Broccoli, 150g
+(24, 44, NULL, 25, 1, 25.00, 5),       -- Unsalted butter, 25g
+(24, 5, NULL, 0.5, 3, 3.00, 6),        -- Salt, 0.5 tsp
+(24, 50, NULL, 0.25, 3, 0.75, 7),      -- Black pepper, 0.25 tsp
+-- Stock and chicken (added after frying)
+(24, 24, NULL, 500, 2, 500.00, 8),     -- Chicken stock, 500ml
+(24, 11, NULL, 260, 1, 260.00, 9),     -- Chicken breast, 260g
+-- Peas (added at end)
+(24, 16, NULL, 100, 1, 100.00, 10),    -- Frozen peas, 100g
+-- Roasted potato topping
+(24, 52, NULL, 200, 1, 200.00, 11),    -- Baby potatoes, 200g
+(24, 22, NULL, 1, 4, 14.00, 12);       -- Olive oil (for potatoes), 1 tbsp
+
+-- Recipe 25: Chicken & Vegetable Soup (Full) - ~1400 cal total
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
+-- Soup base (fried, then blended)
+(25, 12, NULL, 1, 8, 150.00, 1),       -- Onion, 1 large (150g)
+(25, 13, NULL, 3, 10, 9.00, 2),        -- Garlic, 3 cloves (9g)
+(25, 42, NULL, 150, 1, 150.00, 3),     -- Red bell pepper, 150g
+(25, 51, NULL, 180, 1, 180.00, 4),     -- Broccoli, 180g
+(25, 44, NULL, 30, 1, 30.00, 5),       -- Unsalted butter, 30g
+(25, 5, NULL, 0.75, 3, 4.50, 6),       -- Salt, 0.75 tsp
+(25, 50, NULL, 0.5, 3, 1.50, 7),       -- Black pepper, 0.5 tsp
+-- Stock and chicken (added after frying)
+(25, 24, NULL, 500, 2, 500.00, 8),     -- Chicken stock, 500ml
+(25, 11, NULL, 340, 1, 340.00, 9),     -- Chicken breast, 340g
+-- Peas (added at end)
+(25, 16, NULL, 120, 1, 120.00, 10),    -- Frozen peas, 120g
+-- Roasted potato topping
+(25, 52, NULL, 250, 1, 250.00, 11),    -- Baby potatoes, 250g
+(25, 22, NULL, 1, 4, 14.00, 12);       -- Olive oil (for potatoes), 1 tbsp
+
+-- =============================================
+-- CHICKEN & VEGETABLE SOUP RECIPE STEPS
+-- =============================================
+
+-- Recipe 23: Chicken & Vegetable Soup (Light)
+INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
+(23, 1, 'Start the potatoes: Preheat oven to 200°C. Halve the baby potatoes, toss with olive oil and a pinch of salt. Spread on a baking tray and roast for 25-30 minutes until golden and crispy.'),
+(23, 2, 'While potatoes roast, prep the soup base: Dice onion, mince garlic, roughly chop red bell pepper and broccoli.'),
+(23, 3, 'Fry the vegetables: Melt butter in a large pot over medium heat. Add onion and garlic, cook 3-4 minutes until softened. Add red pepper and broccoli, season with salt and pepper. Cook 5-6 minutes, stirring occasionally.'),
+(23, 4, 'Add stock: Pour in the chicken stock and bring to a simmer.'),
+(23, 5, 'Poach the chicken: Add whole chicken breast to the pot. Simmer gently for 12-15 minutes until chicken is cooked through (74°C internal). Remove chicken and set aside.'),
+(23, 6, 'Blend the soup: Use an immersion blender to blend the soup until smooth. Alternatively, transfer to a blender in batches.'),
+(23, 7, 'Slice or shred the chicken. Return to the pot.'),
+(23, 8, 'Add peas: Stir in frozen peas. Simmer for 3 minutes until peas are cooked but still bright green. Taste and adjust seasoning.'),
+(23, 9, 'Serve: Ladle soup into bowls. Top with crispy roasted potatoes.');
+
+-- Recipe 24: Chicken & Vegetable Soup (Standard)
+INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
+(24, 1, 'Start the potatoes: Preheat oven to 200°C. Halve the baby potatoes, toss with olive oil and a pinch of salt. Spread on a baking tray and roast for 25-30 minutes until golden and crispy.'),
+(24, 2, 'While potatoes roast, prep the soup base: Dice onion, mince garlic, roughly chop red bell pepper and broccoli.'),
+(24, 3, 'Fry the vegetables: Melt butter in a large pot over medium heat. Add onion and garlic, cook 3-4 minutes until softened. Add red pepper and broccoli, season with salt and pepper. Cook 5-6 minutes, stirring occasionally.'),
+(24, 4, 'Add stock: Pour in the chicken stock and bring to a simmer.'),
+(24, 5, 'Poach the chicken: Add whole chicken breast to the pot. Simmer gently for 12-15 minutes until chicken is cooked through (74°C internal). Remove chicken and set aside.'),
+(24, 6, 'Blend the soup: Use an immersion blender to blend the soup until smooth. Alternatively, transfer to a blender in batches.'),
+(24, 7, 'Slice or shred the chicken. Return to the pot.'),
+(24, 8, 'Add peas: Stir in frozen peas. Simmer for 3 minutes until peas are cooked but still bright green. Taste and adjust seasoning.'),
+(24, 9, 'Serve: Ladle soup into bowls. Top with crispy roasted potatoes.');
+
+-- Recipe 25: Chicken & Vegetable Soup (Full)
+INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
+(25, 1, 'Start the potatoes: Preheat oven to 200°C. Halve the baby potatoes, toss with olive oil and a pinch of salt. Spread on a baking tray and roast for 25-30 minutes until golden and crispy.'),
+(25, 2, 'While potatoes roast, prep the soup base: Dice onion, mince garlic, roughly chop red bell pepper and broccoli.'),
+(25, 3, 'Fry the vegetables: Melt butter in a large pot over medium heat. Add onion and garlic, cook 3-4 minutes until softened. Add red pepper and broccoli, season with salt and pepper. Cook 5-6 minutes, stirring occasionally.'),
+(25, 4, 'Add stock: Pour in the chicken stock and bring to a simmer.'),
+(25, 5, 'Poach the chicken: Add whole chicken breast to the pot. Simmer gently for 12-15 minutes until chicken is cooked through (74°C internal). Remove chicken and set aside.'),
+(25, 6, 'Blend the soup: Use an immersion blender to blend the soup until smooth. Alternatively, transfer to a blender in batches.'),
+(25, 7, 'Slice or shred the chicken. Return to the pot.'),
+(25, 8, 'Add peas: Stir in frozen peas. Simmer for 3 minutes until peas are cooked but still bright green. Taste and adjust seasoning.'),
+(25, 9, 'Serve: Ladle soup into bowls. Top with crispy roasted potatoes.');
+
+-- =============================================
+-- CHICKEN & VEGETABLE SOUP RECIPE FAMILY
+-- =============================================
+INSERT INTO recipe_families (id, family_name, description) VALUES
+(7, 'Chicken & Vegetable Soup', 'Hearty blended soup with chunky chicken and peas, topped with crispy roasted baby potatoes.');
+
+INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_label, display_order) VALUES
+(7, 24, TRUE, 'Standard', 1),   -- Standard is default
+(7, 23, FALSE, 'Light', 2),
+(7, 25, FALSE, 'Full', 3);
+
+-- =============================================
+-- MILK BREAD & SALMON SANDWICH INGREDIENTS (IDs 53-54)
+-- =============================================
+INSERT INTO ingredients (id, `key`, name, aisle_id, protein_per_100g, carbs_per_100g, fat_per_100g, macros_verified) VALUES
+(53, 'salted_butter', 'Salted butter', 6, 0.90, 0.10, 81.00, TRUE),
+(54, 'tinned_salmon', 'Tinned salmon', 10, 20.50, 0.00, 8.00, TRUE);
+
+-- =============================================
+-- MILK BREAD (Extra Recipe)
+-- =============================================
+
+-- Recipe 26: Milk Bread - ~1770 cal total, makes ~743g (6-8 slices)
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+(26, 'Milk Bread', 6, 1770, FALSE, TRUE);
+
+INSERT INTO recipe_meals (recipe_id, meal_id) VALUES (26, 5);  -- 5 = extras
+
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
+(26, 32, NULL, 400, 1, 400.00, 1),     -- Bread flour, 400g
+(26, 53, NULL, 20, 1, 20.00, 2),       -- Salted butter, 20g
+(26, 36, NULL, 1, 4, 12.00, 3),        -- Sugar, 1 tbsp
+(26, 5, NULL, 1.5, 3, 9.00, 4),        -- Salt, 1.5 tsp
+(26, 2, NULL, 290, 2, 299.00, 5),      -- Milk, 290ml
+(26, 31, NULL, 1, 3, 3.00, 6);         -- Dry yeast, 1 tsp
+
+INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
+(26, 1, 'Warm the milk to lukewarm (about 37C). Sprinkle yeast over the surface and let bloom for 5 minutes until foamy.', NULL, NULL),
+(26, 2, 'In a large bowl, combine bread flour, sugar, and salt. Make a well in the center.', NULL, NULL),
+(26, 3, 'Melt the butter and add to the yeast mixture. Pour into the flour well.', NULL, NULL),
+(26, 4, 'Mix with a wooden spoon until a shaggy dough forms. Turn out onto a floured surface.', NULL, NULL),
+(26, 5, 'Knead for 10-12 minutes until smooth, elastic, and slightly tacky. The dough should spring back when poked.', NULL, NULL),
+(26, 6, 'Form into a ball. Place in a lightly oiled bowl, cover with a damp tea towel or cling film.', NULL, NULL),
+(26, 7, 'Let rise in a warm spot for 1-1.5 hours until doubled in size.', NULL, NULL),
+(26, 8, 'Punch down the dough. Shape into a loaf and place in a greased 9x5 inch loaf tin.', NULL, NULL),
+(26, 9, 'Cover and let rise again for 30-45 minutes until dough rises above the tin edge.', NULL, NULL),
+(26, 10, 'Preheat oven to 180C. Bake for 30-35 minutes until golden brown and sounds hollow when tapped.', NULL, NULL),
+(26, 11, 'Remove from tin and cool on a wire rack before slicing.', NULL, NULL);
+
+-- =============================================
+-- SALMON SANDWICH FAMILY
+-- =============================================
+
+-- Recipe 27: Salmon Sandwich (Light) - ~650 cal total, ~325 cal/serving
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+(27, 'Salmon Sandwich (Light)', 2, 650, FALSE, TRUE);
+
+-- Recipe 28: Salmon Sandwich (Standard) - ~839 cal total, ~419 cal/serving
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+(28, 'Salmon Sandwich', 2, 839, FALSE, TRUE);
+
+-- Recipe 29: Salmon Sandwich (Full) - ~1020 cal total, ~510 cal/serving
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+(29, 'Salmon Sandwich (Full)', 2, 1020, FALSE, TRUE);
+
+-- =============================================
+-- SALMON SANDWICH RECIPE MEALS (Lunch)
+-- =============================================
+INSERT INTO recipe_meals (recipe_id, meal_id) VALUES
+(27, 2),  -- Light: Lunch
+(28, 2),  -- Standard: Lunch
+(29, 2);  -- Full: Lunch
+
+-- =============================================
+-- SALMON SANDWICH RECIPE EXTRAS (link to Milk Bread)
+-- =============================================
+INSERT INTO recipe_extras (parent_recipe_id, child_recipe_id, display_order) VALUES
+(27, 26, 0),  -- Light -> Milk Bread
+(28, 26, 0),  -- Standard -> Milk Bread
+(29, 26, 0);  -- Full -> Milk Bread
+
+-- =============================================
+-- SALMON SANDWICH RECIPE INGREDIENTS
+-- =============================================
+
+-- Recipe 27: Salmon Sandwich (Light) - ~620 cal total
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
+(27, NULL, 26, 120, 1, 120.00, 1),     -- Milk Bread (linked), 120g (4 slices)
+(27, 54, NULL, 160, 1, 160.00, 2),     -- Tinned salmon, 160g
+(27, 53, NULL, 15, 1, 15.00, 3),       -- Salted butter, 15g
+(27, 47, NULL, 40, 1, 40.00, 4);       -- Lettuce, 40g
+
+-- Recipe 28: Salmon Sandwich (Standard) - ~780 cal total
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
+(28, NULL, 26, 150, 1, 150.00, 1),     -- Milk Bread (linked), 150g (4 slices)
+(28, 54, NULL, 213, 1, 213.00, 2),     -- Tinned salmon, 213g (1 large tin)
+(28, 53, NULL, 20, 1, 20.00, 3),       -- Salted butter, 20g
+(28, 47, NULL, 40, 1, 40.00, 4);       -- Lettuce, 40g
+
+-- Recipe 29: Salmon Sandwich (Full) - ~940 cal total
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
+(29, NULL, 26, 180, 1, 180.00, 1),     -- Milk Bread (linked), 180g (4 slices)
+(29, 54, NULL, 260, 1, 260.00, 2),     -- Tinned salmon, 260g
+(29, 53, NULL, 25, 1, 25.00, 3),       -- Salted butter, 25g
+(29, 47, NULL, 40, 1, 40.00, 4);       -- Lettuce, 40g
+
+-- =============================================
+-- SALMON SANDWICH RECIPE STEPS
+-- =============================================
+
+-- Recipe 27: Salmon Sandwich (Light)
+INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
+(27, 1, 'Prepare the milk bread according to the linked recipe. Slice into pieces (~30g each).', 26, 'Use 4 slices of store-bought bread (~30g each).'),
+(27, 2, 'Drain the tinned salmon. Tip into a bowl and mash with a fork. Check carefully for any bones and remove.', NULL, NULL),
+(27, 3, 'Butter each slice of bread.', NULL, NULL),
+(27, 4, 'Wash and dry the lettuce leaves.', NULL, NULL),
+(27, 5, 'Assemble: Place lettuce on 2 slices of buttered bread. Divide the mashed salmon between them. Top with remaining bread slices.', NULL, NULL),
+(27, 6, 'Cut in half and serve.', NULL, NULL);
+
+-- Recipe 28: Salmon Sandwich (Standard)
+INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
+(28, 1, 'Prepare the milk bread according to the linked recipe. Slice into pieces (~37g each).', 26, 'Use 4 slices of store-bought bread (~37g each).'),
+(28, 2, 'Drain the tinned salmon. Tip into a bowl and mash with a fork. Check carefully for any bones and remove.', NULL, NULL),
+(28, 3, 'Butter each slice of bread.', NULL, NULL),
+(28, 4, 'Wash and dry the lettuce leaves.', NULL, NULL),
+(28, 5, 'Assemble: Place lettuce on 2 slices of buttered bread. Divide the mashed salmon between them. Top with remaining bread slices.', NULL, NULL),
+(28, 6, 'Cut in half and serve.', NULL, NULL);
+
+-- Recipe 29: Salmon Sandwich (Full)
+INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
+(29, 1, 'Prepare the milk bread according to the linked recipe. Slice into pieces (~45g each).', 26, 'Use 4 slices of store-bought bread (~45g each).'),
+(29, 2, 'Drain the tinned salmon. Tip into a bowl and mash with a fork. Check carefully for any bones and remove.', NULL, NULL),
+(29, 3, 'Butter each slice of bread.', NULL, NULL),
+(29, 4, 'Wash and dry the lettuce leaves.', NULL, NULL),
+(29, 5, 'Assemble: Place lettuce on 2 slices of buttered bread. Divide the mashed salmon between them. Top with remaining bread slices.', NULL, NULL),
+(29, 6, 'Cut in half and serve.', NULL, NULL);
+
+-- =============================================
+-- SALMON SANDWICH RECIPE FAMILY
+-- =============================================
+INSERT INTO recipe_families (id, family_name, description) VALUES
+(8, 'Salmon Sandwich', 'Simple salmon sandwich with homemade milk bread, salted butter, and fresh lettuce.');
+
+INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_label, display_order) VALUES
+(8, 28, TRUE, 'Standard', 1),   -- Standard is default
+(8, 27, FALSE, 'Light', 2),
+(8, 29, FALSE, 'Full', 3);
+
+-- =============================================
+-- LENTIL STEW INGREDIENTS (IDs 55-58)
+-- =============================================
+INSERT INTO ingredients (id, `key`, name, aisle_id, protein_per_100g, carbs_per_100g, fat_per_100g, macros_verified) VALUES
+(55, 'brown_lentils_tinned', 'Brown lentils (tinned)', 10, 9.00, 20.00, 0.40, TRUE),
+(56, 'carrot', 'Carrot', 3, 0.90, 10.00, 0.20, TRUE),
+(57, 'pak_choi', 'Pak choi', 3, 1.50, 2.20, 0.20, TRUE),
+(58, 'vegetable_stock', 'Vegetable stock', 10, 0.30, 0.40, 0.00, TRUE);
+
+-- =============================================
+-- LENTIL STEW FAMILY
+-- =============================================
+
+-- Recipe 30: Lentil Stew (Light) - ~708 cal total, ~354 cal/serving
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+(30, 'Lentil Stew (Light)', 2, 708, FALSE, TRUE);
+
+-- Recipe 31: Lentil Stew (Standard) - ~852 cal total, ~426 cal/serving
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+(31, 'Lentil Stew', 2, 852, FALSE, TRUE);
+
+-- Recipe 32: Lentil Stew (Full) - ~963 cal total, ~481 cal/serving
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+(32, 'Lentil Stew (Full)', 2, 963, FALSE, TRUE);
+
+-- =============================================
+-- LENTIL STEW RECIPE MEALS (Lunch)
+-- =============================================
+INSERT INTO recipe_meals (recipe_id, meal_id) VALUES
+(30, 2),  -- Light: Lunch
+(31, 2),  -- Standard: Lunch
+(32, 2);  -- Full: Lunch
+
+-- =============================================
+-- LENTIL STEW RECIPE INGREDIENTS
+-- =============================================
+
+-- Recipe 30: Lentil Stew (Light) - ~900 cal total
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
+(30, 55, NULL, 300, 1, 300.00, 1),     -- Brown lentils (tinned), 300g
+(30, 12, NULL, 1, 7, 110.00, 2),       -- Onion, 1 medium (110g)
+(30, 13, NULL, 2, 10, 6.00, 3),        -- Garlic, 2 cloves (6g)
+(30, 56, NULL, 80, 1, 80.00, 4),       -- Carrot, 80g
+(30, 33, NULL, 1, 15, 400.00, 5),      -- Tinned tomatoes, 1 tin (400g)
+(30, 46, NULL, 1, 3, 3.00, 6),         -- Smoked paprika, 1 tsp
+(30, 18, NULL, 1, 3, 3.00, 7),         -- Cumin, 1 tsp
+(30, 58, NULL, 200, 2, 200.00, 8),     -- Vegetable stock, 200ml
+(30, 57, NULL, 100, 1, 100.00, 9),     -- Pak choi, 100g
+(30, 5, NULL, 0.5, 3, 3.00, 10),       -- Salt, 0.5 tsp
+(30, 22, NULL, 1, 4, 14.00, 11);       -- Olive oil, 1 tbsp
+
+-- Recipe 31: Lentil Stew (Standard) - ~1100 cal total
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
+(31, 55, NULL, 400, 1, 400.00, 1),     -- Brown lentils (tinned), 400g (1 tin)
+(31, 12, NULL, 1, 7, 110.00, 2),       -- Onion, 1 medium (110g)
+(31, 13, NULL, 3, 10, 9.00, 3),        -- Garlic, 3 cloves (9g)
+(31, 56, NULL, 100, 1, 100.00, 4),     -- Carrot, 100g
+(31, 33, NULL, 1, 15, 400.00, 5),      -- Tinned tomatoes, 1 tin (400g)
+(31, 46, NULL, 1, 3, 3.00, 6),         -- Smoked paprika, 1 tsp
+(31, 18, NULL, 1, 3, 3.00, 7),         -- Cumin, 1 tsp
+(31, 58, NULL, 250, 2, 250.00, 8),     -- Vegetable stock, 250ml
+(31, 57, NULL, 150, 1, 150.00, 9),     -- Pak choi, 150g
+(31, 5, NULL, 0.5, 3, 3.00, 10),       -- Salt, 0.5 tsp
+(31, 22, NULL, 1, 4, 14.00, 11);       -- Olive oil, 1 tbsp
+
+-- Recipe 32: Lentil Stew (Full) - ~1300 cal total
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
+(32, 55, NULL, 400, 1, 400.00, 1),     -- Brown lentils (tinned), 400g (1 tin)
+(32, 12, NULL, 1, 8, 150.00, 2),       -- Onion, 1 large (150g)
+(32, 13, NULL, 3, 10, 9.00, 3),        -- Garlic, 3 cloves (9g)
+(32, 56, NULL, 120, 1, 120.00, 4),     -- Carrot, 120g
+(32, 33, NULL, 1, 15, 400.00, 5),      -- Tinned tomatoes, 1 tin (400g)
+(32, 46, NULL, 1.5, 3, 4.50, 6),       -- Smoked paprika, 1.5 tsp
+(32, 18, NULL, 1.5, 3, 4.50, 7),       -- Cumin, 1.5 tsp
+(32, 58, NULL, 300, 2, 300.00, 8),     -- Vegetable stock, 300ml
+(32, 57, NULL, 200, 1, 200.00, 9),     -- Pak choi, 200g
+(32, 5, NULL, 0.75, 3, 4.50, 10),      -- Salt, 0.75 tsp
+(32, 22, NULL, 1.5, 4, 21.00, 11);     -- Olive oil, 1.5 tbsp
+
+-- =============================================
+-- LENTIL STEW RECIPE STEPS
+-- =============================================
+
+-- Recipe 30: Lentil Stew (Light)
+INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
+(30, 1, 'Prep the vegetables: Dice the onion, mince the garlic, and dice the carrot into small cubes. Roughly chop the pak choi, keeping stems and leaves separate.'),
+(30, 2, 'Heat olive oil in a large pot over medium heat. Add onion and cook 4-5 minutes until softened.'),
+(30, 3, 'Add garlic, smoked paprika, and cumin. Stir for 30 seconds until fragrant.'),
+(30, 4, 'Add the diced carrot. Cook 2-3 minutes, stirring occasionally.'),
+(30, 5, 'Pour in the tinned tomatoes and vegetable stock. Stir to combine, scraping any bits from the bottom.'),
+(30, 6, 'Drain and rinse the tinned lentils. Add to the pot.'),
+(30, 7, 'Bring to a simmer. Cook uncovered for 15-20 minutes until the stew thickens and carrots are tender.'),
+(30, 8, 'Add the pak choi stems first, cook 2 minutes. Then add the leaves and cook another 2 minutes until wilted.'),
+(30, 9, 'Season with salt to taste. Serve in bowls.');
+
+-- Recipe 31: Lentil Stew (Standard)
+INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
+(31, 1, 'Prep the vegetables: Dice the onion, mince the garlic, and dice the carrot into small cubes. Roughly chop the pak choi, keeping stems and leaves separate.'),
+(31, 2, 'Heat olive oil in a large pot over medium heat. Add onion and cook 4-5 minutes until softened.'),
+(31, 3, 'Add garlic, smoked paprika, and cumin. Stir for 30 seconds until fragrant.'),
+(31, 4, 'Add the diced carrot. Cook 2-3 minutes, stirring occasionally.'),
+(31, 5, 'Pour in the tinned tomatoes and vegetable stock. Stir to combine, scraping any bits from the bottom.'),
+(31, 6, 'Drain and rinse the tinned lentils. Add to the pot.'),
+(31, 7, 'Bring to a simmer. Cook uncovered for 15-20 minutes until the stew thickens and carrots are tender.'),
+(31, 8, 'Add the pak choi stems first, cook 2 minutes. Then add the leaves and cook another 2 minutes until wilted.'),
+(31, 9, 'Season with salt to taste. Serve in bowls.');
+
+-- Recipe 32: Lentil Stew (Full)
+INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
+(32, 1, 'Prep the vegetables: Dice the onion, mince the garlic, and dice the carrot into small cubes. Roughly chop the pak choi, keeping stems and leaves separate.'),
+(32, 2, 'Heat olive oil in a large pot over medium heat. Add onion and cook 4-5 minutes until softened.'),
+(32, 3, 'Add garlic, smoked paprika, and cumin. Stir for 30 seconds until fragrant.'),
+(32, 4, 'Add the diced carrot. Cook 2-3 minutes, stirring occasionally.'),
+(32, 5, 'Pour in the tinned tomatoes and vegetable stock. Stir to combine, scraping any bits from the bottom.'),
+(32, 6, 'Drain and rinse the tinned lentils. Add to the pot.'),
+(32, 7, 'Bring to a simmer. Cook uncovered for 15-20 minutes until the stew thickens and carrots are tender.'),
+(32, 8, 'Add the pak choi stems first, cook 2 minutes. Then add the leaves and cook another 2 minutes until wilted.'),
+(32, 9, 'Season with salt to taste. Serve in bowls.');
+
+-- =============================================
+-- LENTIL STEW RECIPE FAMILY
+-- =============================================
+INSERT INTO recipe_families (id, family_name, description) VALUES
+(9, 'Lentil Stew', 'Hearty vegetarian stew with brown lentils, tomatoes, carrots, and pak choi, spiced with smoked paprika and cumin.');
+
+INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_label, display_order) VALUES
+(9, 31, TRUE, 'Standard', 1),   -- Standard is default
+(9, 30, FALSE, 'Light', 2),
+(9, 32, FALSE, 'Full', 3);
+
+-- =============================================
+-- LENTIL STUFFED PEPPERS FAMILY
+-- =============================================
+
+-- Recipe 33: Lentil Stuffed Peppers (Light) - ~782 cal total, ~391 cal/serving
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+(33, 'Lentil Stuffed Peppers (Light)', 2, 782, FALSE, TRUE);
+
+-- Recipe 34: Lentil Stuffed Peppers (Standard) - ~969 cal total, ~484 cal/serving
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+(34, 'Lentil Stuffed Peppers', 2, 969, FALSE, TRUE);
+
+-- Recipe 35: Lentil Stuffed Peppers (Full) - ~1217 cal total, ~608 cal/serving
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+(35, 'Lentil Stuffed Peppers (Full)', 2, 1217, FALSE, TRUE);
+
+-- =============================================
+-- LENTIL STUFFED PEPPERS RECIPE MEALS (Lunch)
+-- =============================================
+INSERT INTO recipe_meals (recipe_id, meal_id) VALUES
+(33, 2),  -- Light: Lunch
+(34, 2),  -- Standard: Lunch
+(35, 2);  -- Full: Lunch
+
+-- =============================================
+-- LENTIL STUFFED PEPPERS RECIPE INGREDIENTS
+-- =============================================
+
+-- Recipe 33: Lentil Stuffed Peppers (Light) - ~700 cal total
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
+(33, 42, NULL, 3, 7, 450.00, 1),       -- Red bell peppers, 3 medium (450g)
+(33, 55, NULL, 300, 1, 300.00, 2),     -- Brown lentils (tinned), 300g
+(33, 33, NULL, 300, 1, 300.00, 3),     -- Tinned tomatoes, 300g
+(33, 23, NULL, 1, 4, 15.00, 4),        -- Tomato paste, 1 tbsp
+(33, 12, NULL, 1, 7, 110.00, 5),       -- Onion, 1 medium (110g)
+(33, 13, NULL, 2, 10, 6.00, 6),        -- Garlic, 2 cloves (6g)
+(33, 22, NULL, 1, 4, 14.00, 7),        -- Olive oil, 1 tbsp
+(33, 36, NULL, 1, 3, 4.00, 8),         -- Sugar, 1 tsp
+(33, 35, NULL, 1, 3, 2.00, 9),         -- Oregano, 1 tsp
+(33, 5, NULL, 0.5, 3, 3.00, 10),       -- Salt, 0.5 tsp
+(33, 50, NULL, 0.25, 3, 0.75, 11);     -- Black pepper, 0.25 tsp
+
+-- Recipe 34: Lentil Stuffed Peppers (Standard) - ~800 cal total
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
+(34, 42, NULL, 4, 7, 600.00, 1),       -- Red bell peppers, 4 medium (600g)
+(34, 55, NULL, 400, 1, 400.00, 2),     -- Brown lentils (tinned), 400g (1 tin)
+(34, 33, NULL, 1, 15, 400.00, 3),      -- Tinned tomatoes, 1 tin (400g)
+(34, 23, NULL, 1, 4, 15.00, 4),        -- Tomato paste, 1 tbsp
+(34, 12, NULL, 1, 7, 110.00, 5),       -- Onion, 1 medium (110g)
+(34, 13, NULL, 2, 10, 6.00, 6),        -- Garlic, 2 cloves (6g)
+(34, 22, NULL, 1, 4, 14.00, 7),        -- Olive oil, 1 tbsp
+(34, 36, NULL, 1, 3, 4.00, 8),         -- Sugar, 1 tsp
+(34, 35, NULL, 1, 3, 2.00, 9),         -- Oregano, 1 tsp
+(34, 5, NULL, 0.5, 3, 3.00, 10),       -- Salt, 0.5 tsp
+(34, 50, NULL, 0.25, 3, 0.75, 11);     -- Black pepper, 0.25 tsp
+
+-- Recipe 35: Lentil Stuffed Peppers (Full) - ~1040 cal total
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
+(35, 42, NULL, 4, 8, 700.00, 1),       -- Red bell peppers, 4 large (700g)
+(35, 55, NULL, 500, 1, 500.00, 2),     -- Brown lentils (tinned), 500g
+(35, 33, NULL, 1, 15, 400.00, 3),      -- Tinned tomatoes, 1 tin (400g)
+(35, 23, NULL, 1.5, 4, 22.00, 4),      -- Tomato paste, 1.5 tbsp
+(35, 12, NULL, 1, 8, 150.00, 5),       -- Onion, 1 large (150g)
+(35, 13, NULL, 3, 10, 9.00, 6),        -- Garlic, 3 cloves (9g)
+(35, 22, NULL, 1.5, 4, 21.00, 7),      -- Olive oil, 1.5 tbsp
+(35, 36, NULL, 1, 3, 4.00, 8),         -- Sugar, 1 tsp
+(35, 35, NULL, 1.5, 3, 3.00, 9),       -- Oregano, 1.5 tsp
+(35, 5, NULL, 0.75, 3, 4.50, 10),      -- Salt, 0.75 tsp
+(35, 50, NULL, 0.5, 3, 1.50, 11);      -- Black pepper, 0.5 tsp
+
+-- =============================================
+-- LENTIL STUFFED PEPPERS RECIPE STEPS
+-- =============================================
+
+-- Recipe 33: Lentil Stuffed Peppers (Light)
+INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
+(33, 1, 'Preheat oven to 190C.'),
+(33, 2, 'Halve the peppers lengthways, remove seeds and white membrane. Place cut-side up on a baking tray.'),
+(33, 3, 'Heat olive oil in a pan over medium heat. Add diced onion and cook 4-5 minutes until softened.'),
+(33, 4, 'Add minced garlic, cook 30 seconds until fragrant.'),
+(33, 5, 'Add tinned tomatoes, tomato paste, sugar, and oregano. Stir to combine.'),
+(33, 6, 'Drain and rinse the tinned lentils. Add to the pan.'),
+(33, 7, 'Simmer for 10-15 minutes until the sauce thickens. Season with salt and pepper.'),
+(33, 8, 'Spoon the lentil bolognese filling into the pepper halves, packing it in generously.'),
+(33, 9, 'Bake for 25-30 minutes until peppers are soft and slightly charred at the edges.'),
+(33, 10, 'Serve hot.');
+
+-- Recipe 34: Lentil Stuffed Peppers (Standard)
+INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
+(34, 1, 'Preheat oven to 190C.'),
+(34, 2, 'Halve the peppers lengthways, remove seeds and white membrane. Place cut-side up on a baking tray.'),
+(34, 3, 'Heat olive oil in a pan over medium heat. Add diced onion and cook 4-5 minutes until softened.'),
+(34, 4, 'Add minced garlic, cook 30 seconds until fragrant.'),
+(34, 5, 'Add tinned tomatoes, tomato paste, sugar, and oregano. Stir to combine.'),
+(34, 6, 'Drain and rinse the tinned lentils. Add to the pan.'),
+(34, 7, 'Simmer for 10-15 minutes until the sauce thickens. Season with salt and pepper.'),
+(34, 8, 'Spoon the lentil bolognese filling into the pepper halves, packing it in generously.'),
+(34, 9, 'Bake for 25-30 minutes until peppers are soft and slightly charred at the edges.'),
+(34, 10, 'Serve hot.');
+
+-- Recipe 35: Lentil Stuffed Peppers (Full)
+INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
+(35, 1, 'Preheat oven to 190C.'),
+(35, 2, 'Halve the peppers lengthways, remove seeds and white membrane. Place cut-side up on a baking tray.'),
+(35, 3, 'Heat olive oil in a pan over medium heat. Add diced onion and cook 4-5 minutes until softened.'),
+(35, 4, 'Add minced garlic, cook 30 seconds until fragrant.'),
+(35, 5, 'Add tinned tomatoes, tomato paste, sugar, and oregano. Stir to combine.'),
+(35, 6, 'Drain and rinse the tinned lentils. Add to the pan.'),
+(35, 7, 'Simmer for 10-15 minutes until the sauce thickens. Season with salt and pepper.'),
+(35, 8, 'Spoon the lentil bolognese filling into the pepper halves, packing it in generously.'),
+(35, 9, 'Bake for 25-30 minutes until peppers are soft and slightly charred at the edges.'),
+(35, 10, 'Serve hot.');
+
+-- =============================================
+-- LENTIL STUFFED PEPPERS RECIPE FAMILY
+-- =============================================
+INSERT INTO recipe_families (id, family_name, description) VALUES
+(10, 'Lentil Stuffed Peppers', 'Roasted red peppers stuffed with lentil bolognese - a hearty vegetarian take on the Italian classic.');
+
+INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_label, display_order) VALUES
+(10, 34, TRUE, 'Standard', 1),   -- Standard is default
+(10, 33, FALSE, 'Light', 2),
+(10, 35, FALSE, 'Full', 3);
+
+-- =============================================
+-- FRESH PASTA INGREDIENT (ID 59)
+-- =============================================
+INSERT INTO ingredients (id, `key`, name, aisle_id, protein_per_100g, carbs_per_100g, fat_per_100g, macros_verified) VALUES
+(59, 'egg', 'Egg', 6, 13.00, 1.10, 11.00, TRUE);
+
+-- =============================================
+-- FRESH PASTA (Extra Recipe)
+-- =============================================
+
+-- Recipe 36: Fresh Pasta - ~793 cal total, makes ~280g (2 servings)
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+(36, 'Fresh Pasta', 2, 793, FALSE, TRUE);
+
+INSERT INTO recipe_meals (recipe_id, meal_id) VALUES (36, 5);  -- 5 = extras
+
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
+(36, 43, NULL, 180, 1, 180.00, 1),    -- Plain flour, 180g
+(36, 59, NULL, 2, 7, 100.00, 2),      -- Eggs, 2 medium (100g)
+(36, 5, NULL, 1, 17, 2.00, 3);        -- Salt, 1 pinch (2g)
+
+INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
+(36, 1, 'Mound flour on a clean work surface. Make a deep well in the center.', NULL, NULL),
+(36, 2, 'Crack eggs into the well. Add salt. Beat eggs with a fork, gradually incorporating flour from the inner walls.', NULL, NULL),
+(36, 3, 'Once a shaggy dough forms, knead by hand for 8-10 minutes until smooth and elastic. The dough should spring back when poked.', NULL, NULL),
+(36, 4, 'Wrap tightly in cling film. Rest at room temperature for 30 minutes minimum (up to 2 hours).', NULL, NULL),
+(36, 5, 'Divide dough in half. Keep unused portion wrapped. Roll each piece thin — setting 5-6 on a pasta machine, or about 2mm thick by hand.', NULL, NULL),
+(36, 6, 'Cut to desired shape: tagliatelle (8mm wide), fettuccine (6mm), or pappardelle (25mm). Dust with flour to prevent sticking.', NULL, NULL),
+(36, 7, 'To cook: Boil well-salted water. Cook fresh pasta 2-3 minutes until al dente. Reserve pasta water before draining.', NULL, NULL),
+(36, 8, 'Use immediately, or dry on a rack for 30 minutes then store in an airtight container for up to 2 days. Can also freeze.', NULL, NULL);
+
+-- =============================================
+-- PINK SAUCE PASTA INGREDIENT (ID 60)
+-- =============================================
+INSERT INTO ingredients (id, `key`, name, aisle_id, protein_per_100g, carbs_per_100g, fat_per_100g, macros_verified) VALUES
+(60, 'cashews', 'Cashews', 14, 18.00, 27.00, 44.00, TRUE);
+
+-- =============================================
+-- PINK SAUCE PASTA FAMILY (Dinner)
+-- =============================================
+
+-- Recipe 37: Pink Sauce Pasta (Light) - ~1150 cal total, ~575 cal/serving
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+(37, 'Pink Sauce Pasta (Light)', 2, 1150, FALSE, TRUE);
+
+-- Recipe 38: Pink Sauce Pasta (Standard) - ~1404 cal total, ~702 cal/serving
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+(38, 'Pink Sauce Pasta', 2, 1404, FALSE, TRUE);
+
+-- Recipe 39: Pink Sauce Pasta (Full) - ~1773 cal total, ~886 cal/serving
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+(39, 'Pink Sauce Pasta (Full)', 2, 1773, FALSE, TRUE);
+
+-- =============================================
+-- PINK SAUCE PASTA RECIPE MEALS (Dinner)
+-- =============================================
+INSERT INTO recipe_meals (recipe_id, meal_id) VALUES
+(37, 3),  -- Light: Dinner
+(38, 3),  -- Standard: Dinner
+(39, 3);  -- Full: Dinner
+
+-- =============================================
+-- PINK SAUCE PASTA RECIPE EXTRAS (link to Fresh Pasta)
+-- =============================================
+INSERT INTO recipe_extras (parent_recipe_id, child_recipe_id, display_order) VALUES
+(37, 36, 0),  -- Light -> Fresh Pasta
+(38, 36, 0),  -- Standard -> Fresh Pasta
+(39, 36, 0);  -- Full -> Fresh Pasta
+
+-- =============================================
+-- PINK SAUCE PASTA RECIPE INGREDIENTS
+-- =============================================
+
+-- Recipe 37: Pink Sauce Pasta (Light) - ~1150 cal total
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
+-- Fresh Pasta (linked recipe)
+(37, NULL, 36, 120, 1, 120.00, 1),        -- Fresh Pasta, 120g
+-- Chicken
+(37, 11, NULL, 160, 1, 160.00, 2),        -- Chicken breast, 160g
+(37, 22, NULL, 0.75, 4, 10.00, 3),        -- Olive oil, 0.75 tbsp (10g)
+(37, 5, NULL, 0.5, 3, 3.00, 4),           -- Salt, 0.5 tsp
+(37, 50, NULL, 0.25, 3, 0.75, 5),         -- Black pepper, 0.25 tsp
+-- Cashew cream sauce
+(37, 60, NULL, 50, 1, 50.00, 6),          -- Cashews, 50g
+(37, 2, NULL, 130, 2, 134.00, 7),         -- Milk, 130ml
+(37, 13, NULL, 1, 10, 3.00, 8),           -- Garlic, 1 clove (3g)
+(37, 46, NULL, 0.5, 3, 1.50, 9),          -- Smoked paprika, 0.5 tsp
+(37, 30, NULL, 20, 1, 20.00, 10);         -- Parmesan, 20g
+
+-- Recipe 38: Pink Sauce Pasta (Standard) - ~1404 cal total
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
+-- Fresh Pasta (linked recipe)
+(38, NULL, 36, 140, 1, 140.00, 1),        -- Fresh Pasta, 140g
+-- Chicken
+(38, 11, NULL, 200, 1, 200.00, 2),        -- Chicken breast, 200g
+(38, 22, NULL, 1, 4, 14.00, 3),           -- Olive oil, 1 tbsp (14g)
+(38, 5, NULL, 0.5, 3, 3.00, 4),           -- Salt, 0.5 tsp
+(38, 50, NULL, 0.25, 3, 0.75, 5),         -- Black pepper, 0.25 tsp
+-- Cashew cream sauce
+(38, 60, NULL, 60, 1, 60.00, 6),          -- Cashews, 60g
+(38, 2, NULL, 150, 2, 155.00, 7),         -- Milk, 150ml
+(38, 13, NULL, 2, 10, 6.00, 8),           -- Garlic, 2 cloves (6g)
+(38, 46, NULL, 1, 3, 3.00, 9),            -- Smoked paprika, 1 tsp
+(38, 30, NULL, 25, 1, 25.00, 10);         -- Parmesan, 25g
+
+-- Recipe 39: Pink Sauce Pasta (Full) - ~1773 cal total
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
+-- Fresh Pasta (linked recipe)
+(39, NULL, 36, 160, 1, 160.00, 1),        -- Fresh Pasta, 160g
+-- Chicken
+(39, 11, NULL, 260, 1, 260.00, 2),        -- Chicken breast, 260g
+(39, 22, NULL, 1.25, 4, 18.00, 3),        -- Olive oil, 1.25 tbsp (18g)
+(39, 5, NULL, 0.75, 3, 4.50, 4),          -- Salt, 0.75 tsp
+(39, 50, NULL, 0.5, 3, 1.50, 5),          -- Black pepper, 0.5 tsp
+-- Cashew cream sauce
+(39, 60, NULL, 80, 1, 80.00, 6),          -- Cashews, 80g
+(39, 2, NULL, 180, 2, 186.00, 7),         -- Milk, 180ml
+(39, 13, NULL, 2, 10, 6.00, 8),           -- Garlic, 2 cloves (6g)
+(39, 46, NULL, 1.5, 3, 4.50, 9),          -- Smoked paprika, 1.5 tsp
+(39, 30, NULL, 35, 1, 35.00, 10);         -- Parmesan, 35g
+
+-- =============================================
+-- PINK SAUCE PASTA RECIPE STEPS
+-- =============================================
+
+-- Recipe 37: Pink Sauce Pasta (Light)
+INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
+(37, 1, 'Prepare the fresh pasta according to the linked recipe. Use 60g dough per person.', 36, 'Cook 120g dried pasta (fettuccine or tagliatelle) according to package directions.'),
+(37, 2, 'Soak cashews in boiling water for 15 minutes to soften. Drain.', NULL, NULL),
+(37, 3, 'Blend soaked cashews with milk until completely smooth and creamy (2-3 minutes in a high-powered blender).', NULL, NULL),
+(37, 4, 'Season chicken breast with salt and pepper. Heat olive oil in a pan over medium-high heat. Cook chicken 5-6 minutes per side until golden and cooked through (74C internal). Rest, then slice.', NULL, NULL),
+(37, 5, 'In the same pan, add minced garlic and cook 30 seconds until fragrant.', NULL, NULL),
+(37, 6, 'Pour in the cashew cream. Add smoked paprika. Simmer gently for 3-4 minutes, stirring occasionally.', NULL, NULL),
+(37, 7, 'Stir in grated parmesan until melted. Add a splash of pasta water to loosen if needed.', NULL, NULL),
+(37, 8, 'Toss cooked pasta in the sauce. Top with sliced chicken. Serve immediately.', NULL, NULL);
+
+-- Recipe 38: Pink Sauce Pasta (Standard)
+INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
+(38, 1, 'Prepare the fresh pasta according to the linked recipe. Use 70g dough per person.', 36, 'Cook 140g dried pasta (fettuccine or tagliatelle) according to package directions.'),
+(38, 2, 'Soak cashews in boiling water for 15 minutes to soften. Drain.', NULL, NULL),
+(38, 3, 'Blend soaked cashews with milk until completely smooth and creamy (2-3 minutes in a high-powered blender).', NULL, NULL),
+(38, 4, 'Season chicken breast with salt and pepper. Heat olive oil in a pan over medium-high heat. Cook chicken 5-6 minutes per side until golden and cooked through (74C internal). Rest, then slice.', NULL, NULL),
+(38, 5, 'In the same pan, add minced garlic and cook 30 seconds until fragrant.', NULL, NULL),
+(38, 6, 'Pour in the cashew cream. Add smoked paprika. Simmer gently for 3-4 minutes, stirring occasionally.', NULL, NULL),
+(38, 7, 'Stir in grated parmesan until melted. Add a splash of pasta water to loosen if needed.', NULL, NULL),
+(38, 8, 'Toss cooked pasta in the sauce. Top with sliced chicken. Serve immediately.', NULL, NULL);
+
+-- Recipe 39: Pink Sauce Pasta (Full)
+INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
+(39, 1, 'Prepare the fresh pasta according to the linked recipe. Use 80g dough per person.', 36, 'Cook 160g dried pasta (fettuccine or tagliatelle) according to package directions.'),
+(39, 2, 'Soak cashews in boiling water for 15 minutes to soften. Drain.', NULL, NULL),
+(39, 3, 'Blend soaked cashews with milk until completely smooth and creamy (2-3 minutes in a high-powered blender).', NULL, NULL),
+(39, 4, 'Season chicken breast with salt and pepper. Heat olive oil in a pan over medium-high heat. Cook chicken 5-6 minutes per side until golden and cooked through (74C internal). Rest, then slice.', NULL, NULL),
+(39, 5, 'In the same pan, add minced garlic and cook 30 seconds until fragrant.', NULL, NULL),
+(39, 6, 'Pour in the cashew cream. Add smoked paprika. Simmer gently for 3-4 minutes, stirring occasionally.', NULL, NULL),
+(39, 7, 'Stir in grated parmesan until melted. Add a splash of pasta water to loosen if needed.', NULL, NULL),
+(39, 8, 'Toss cooked pasta in the sauce. Top with sliced chicken. Serve immediately.', NULL, NULL);
+
+-- =============================================
+-- PINK SAUCE PASTA RECIPE FAMILY
+-- =============================================
+INSERT INTO recipe_families (id, family_name, description) VALUES
+(11, 'Pink Sauce Pasta', 'Creamy cashew-based pink sauce with smoked paprika, parmesan, and sliced chicken over fresh pasta.');
+
+INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_label, display_order) VALUES
+(11, 38, TRUE, 'Standard', 1),   -- Standard is default
+(11, 37, FALSE, 'Light', 2),
+(11, 39, FALSE, 'Full', 3);
