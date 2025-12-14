@@ -1692,3 +1692,145 @@ INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_lab
 (11, 38, TRUE, 'Standard', 1),   -- Standard is default
 (11, 37, FALSE, 'Light', 2),
 (11, 39, FALSE, 'Full', 3);
+
+-- =============================================
+-- CHICKEN TIKKA MASALA FAMILY
+-- =============================================
+
+-- New Ingredient: Garam Masala (ID 61)
+INSERT INTO ingredients (id, `key`, name, aisle_id, protein_per_100g, carbs_per_100g, fat_per_100g, macros_verified) VALUES
+(61, 'garam_masala', 'Garam masala', 8, 12.00, 60.00, 15.00, TRUE);
+
+-- =============================================
+-- CHICKEN TIKKA MASALA RECIPES
+-- =============================================
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+(40, 'Chicken Tikka Masala (Light)', 2, 1258, FALSE, TRUE),
+(41, 'Chicken Tikka Masala', 2, 1493, FALSE, TRUE),
+(42, 'Chicken Tikka Masala (Full)', 2, 1792, FALSE, TRUE);
+
+-- =============================================
+-- CHICKEN TIKKA MASALA RECIPE MEALS (Dinner)
+-- =============================================
+INSERT INTO recipe_meals (recipe_id, meal_id) VALUES
+(40, 3),  -- Light: Dinner
+(41, 3),  -- Standard: Dinner
+(42, 3);  -- Full: Dinner
+
+-- =============================================
+-- CHICKEN TIKKA MASALA RECIPE INGREDIENTS
+-- =============================================
+
+-- Recipe 40: Chicken Tikka Masala (Light) - ~1258 cal total, ~629 cal/serving
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
+(40, 11, NULL, 240, 1, 240.00, 1),       -- Chicken breast, 240g
+(40, 22, NULL, 1.5, 4, 21.00, 2),        -- Olive oil, 1.5 tbsp
+(40, 12, NULL, 1, 7, 110.00, 3),         -- Onion, 1 medium
+(40, 13, NULL, 3, 10, 9.00, 4),          -- Garlic, 3 cloves
+(40, 14, NULL, 10, 1, 10.00, 5),         -- Ginger, 10g
+(40, 23, NULL, 2, 4, 32.00, 6),          -- Tomato paste, 2 tbsp
+(40, 33, NULL, 1, 15, 400.00, 7),        -- Tinned tomatoes, 1 tin
+(40, 49, NULL, 75, 1, 75.00, 8),         -- Greek yogurt, 75g
+(40, 18, NULL, 1, 3, 3.00, 9),           -- Cumin, 1 tsp
+(40, 17, NULL, 0.5, 3, 1.00, 10),        -- Turmeric, 0.5 tsp
+(40, 46, NULL, 0.5, 3, 1.50, 11),        -- Smoked paprika, 0.5 tsp
+(40, 19, NULL, 0.33, 3, 0.50, 12),       -- Cinnamon, 0.33 tsp
+(40, 5, NULL, 1, 3, 6.00, 13),           -- Salt, 1 tsp
+(40, 50, NULL, 0.33, 3, 1.00, 14),       -- Black pepper, 0.33 tsp
+(40, 4, NULL, 0.5, 3, 3.50, 15),         -- Honey, 0.5 tsp
+(40, 61, NULL, 1, 3, 3.00, 16),          -- Garam masala, 1 tsp
+(40, 26, NULL, 120, 1, 120.00, 17);      -- Jasmine rice (uncooked), 120g
+
+-- Recipe 41: Chicken Tikka Masala (Standard) - ~1493 cal total, ~747 cal/serving
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
+(41, 11, NULL, 300, 1, 300.00, 1),       -- Chicken breast, 300g
+(41, 22, NULL, 1.5, 4, 21.00, 2),        -- Olive oil, 1.5 tbsp
+(41, 12, NULL, 1, 7, 110.00, 3),         -- Onion, 1 medium
+(41, 13, NULL, 3, 10, 9.00, 4),          -- Garlic, 3 cloves
+(41, 14, NULL, 10, 1, 10.00, 5),         -- Ginger, 10g
+(41, 23, NULL, 2, 4, 32.00, 6),          -- Tomato paste, 2 tbsp
+(41, 33, NULL, 1, 15, 400.00, 7),        -- Tinned tomatoes, 1 tin
+(41, 49, NULL, 75, 1, 75.00, 8),         -- Greek yogurt, 75g
+(41, 18, NULL, 1, 3, 3.00, 9),           -- Cumin, 1 tsp
+(41, 17, NULL, 0.5, 3, 1.00, 10),        -- Turmeric, 0.5 tsp
+(41, 46, NULL, 0.5, 3, 1.50, 11),        -- Smoked paprika, 0.5 tsp
+(41, 19, NULL, 0.33, 3, 0.50, 12),       -- Cinnamon, 0.33 tsp
+(41, 5, NULL, 1, 3, 6.00, 13),           -- Salt, 1 tsp
+(41, 50, NULL, 0.33, 3, 1.00, 14),       -- Black pepper, 0.33 tsp
+(41, 4, NULL, 0.5, 3, 3.50, 15),         -- Honey, 0.5 tsp
+(41, 61, NULL, 1, 3, 3.00, 16),          -- Garam masala, 1 tsp
+(41, 26, NULL, 160, 1, 160.00, 17);      -- Jasmine rice (uncooked), 160g
+
+-- Recipe 42: Chicken Tikka Masala (Full) - ~1792 cal total, ~896 cal/serving
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
+(42, 11, NULL, 400, 1, 400.00, 1),       -- Chicken breast, 400g
+(42, 22, NULL, 1.5, 4, 21.00, 2),        -- Olive oil, 1.5 tbsp
+(42, 12, NULL, 1, 7, 110.00, 3),         -- Onion, 1 medium
+(42, 13, NULL, 3, 10, 9.00, 4),          -- Garlic, 3 cloves
+(42, 14, NULL, 10, 1, 10.00, 5),         -- Ginger, 10g
+(42, 23, NULL, 2, 4, 32.00, 6),          -- Tomato paste, 2 tbsp
+(42, 33, NULL, 1, 15, 400.00, 7),        -- Tinned tomatoes, 1 tin
+(42, 49, NULL, 75, 1, 75.00, 8),         -- Greek yogurt, 75g
+(42, 18, NULL, 1, 3, 3.00, 9),           -- Cumin, 1 tsp
+(42, 17, NULL, 0.5, 3, 1.00, 10),        -- Turmeric, 0.5 tsp
+(42, 46, NULL, 0.5, 3, 1.50, 11),        -- Smoked paprika, 0.5 tsp
+(42, 19, NULL, 0.33, 3, 0.50, 12),       -- Cinnamon, 0.33 tsp
+(42, 5, NULL, 1, 3, 6.00, 13),           -- Salt, 1 tsp
+(42, 50, NULL, 0.33, 3, 1.00, 14),       -- Black pepper, 0.33 tsp
+(42, 4, NULL, 0.5, 3, 3.50, 15),         -- Honey, 0.5 tsp
+(42, 61, NULL, 1, 3, 3.00, 16),          -- Garam masala, 1 tsp
+(42, 26, NULL, 200, 1, 200.00, 17);      -- Jasmine rice (uncooked), 200g
+
+-- =============================================
+-- CHICKEN TIKKA MASALA RECIPE STEPS
+-- =============================================
+
+-- Recipe 40: Chicken Tikka Masala (Light)
+INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
+(40, 1, 'Cut chicken into bite-sized pieces. Season with salt, pepper, and half the garam masala.'),
+(40, 2, 'Heat 1 tbsp olive oil in a large pan over medium-high heat. Cook chicken until golden on all sides, about 5 minutes. Remove and set aside.'),
+(40, 3, 'Add remaining oil to pan. Sauté diced onion until softened and lightly golden, about 5 minutes.'),
+(40, 4, 'Add minced garlic and grated ginger. Cook 1 minute until fragrant.'),
+(40, 5, 'Add cumin, turmeric, smoked paprika, and cinnamon. Stir for 30 seconds until fragrant.'),
+(40, 6, 'Stir in tomato paste and cook for 1 minute.'),
+(40, 7, 'Pour in tinned tomatoes. Use a wooden spoon to break them up. Simmer for 10 minutes, stirring occasionally.'),
+(40, 8, 'Reduce heat to low. Stir in Greek yogurt, honey, and remaining garam masala. Season with salt and pepper to taste.'),
+(40, 9, 'Return chicken to the sauce. Simmer gently for 5-10 minutes until chicken is cooked through (74°C internal).'),
+(40, 10, 'Meanwhile, cook rice according to package directions. Serve curry over rice.');
+
+-- Recipe 41: Chicken Tikka Masala (Standard)
+INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
+(41, 1, 'Cut chicken into bite-sized pieces. Season with salt, pepper, and half the garam masala.'),
+(41, 2, 'Heat 1 tbsp olive oil in a large pan over medium-high heat. Cook chicken until golden on all sides, about 5 minutes. Remove and set aside.'),
+(41, 3, 'Add remaining oil to pan. Sauté diced onion until softened and lightly golden, about 5 minutes.'),
+(41, 4, 'Add minced garlic and grated ginger. Cook 1 minute until fragrant.'),
+(41, 5, 'Add cumin, turmeric, smoked paprika, and cinnamon. Stir for 30 seconds until fragrant.'),
+(41, 6, 'Stir in tomato paste and cook for 1 minute.'),
+(41, 7, 'Pour in tinned tomatoes. Use a wooden spoon to break them up. Simmer for 10 minutes, stirring occasionally.'),
+(41, 8, 'Reduce heat to low. Stir in Greek yogurt, honey, and remaining garam masala. Season with salt and pepper to taste.'),
+(41, 9, 'Return chicken to the sauce. Simmer gently for 5-10 minutes until chicken is cooked through (74°C internal).'),
+(41, 10, 'Meanwhile, cook rice according to package directions. Serve curry over rice.');
+
+-- Recipe 42: Chicken Tikka Masala (Full)
+INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
+(42, 1, 'Cut chicken into bite-sized pieces. Season with salt, pepper, and half the garam masala.'),
+(42, 2, 'Heat 1 tbsp olive oil in a large pan over medium-high heat. Cook chicken until golden on all sides, about 5 minutes. Remove and set aside.'),
+(42, 3, 'Add remaining oil to pan. Sauté diced onion until softened and lightly golden, about 5 minutes.'),
+(42, 4, 'Add minced garlic and grated ginger. Cook 1 minute until fragrant.'),
+(42, 5, 'Add cumin, turmeric, smoked paprika, and cinnamon. Stir for 30 seconds until fragrant.'),
+(42, 6, 'Stir in tomato paste and cook for 1 minute.'),
+(42, 7, 'Pour in tinned tomatoes. Use a wooden spoon to break them up. Simmer for 10 minutes, stirring occasionally.'),
+(42, 8, 'Reduce heat to low. Stir in Greek yogurt, honey, and remaining garam masala. Season with salt and pepper to taste.'),
+(42, 9, 'Return chicken to the sauce. Simmer gently for 5-10 minutes until chicken is cooked through (74°C internal).'),
+(42, 10, 'Meanwhile, cook rice according to package directions. Serve curry over rice.');
+
+-- =============================================
+-- CHICKEN TIKKA MASALA RECIPE FAMILY
+-- =============================================
+INSERT INTO recipe_families (id, family_name, description) VALUES
+(12, 'Chicken Tikka Masala', 'Creamy tomato-based curry with tender chicken, Greek yogurt, and aromatic spices. Served over jasmine rice.');
+
+INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_label, display_order) VALUES
+(12, 41, TRUE, 'Standard', 1),   -- Standard is default
+(12, 40, FALSE, 'Light', 2),
+(12, 42, FALSE, 'Full', 3);
