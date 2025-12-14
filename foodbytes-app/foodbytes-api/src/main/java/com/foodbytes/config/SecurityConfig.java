@@ -5,6 +5,7 @@ import com.foodbytes.security.CustomOAuth2UserService;
 import com.foodbytes.security.JwtAuthenticationFilter;
 import com.foodbytes.security.JwtTokenProvider;
 import com.foodbytes.security.OAuth2AuthenticationSuccessHandler;
+import com.foodbytes.security.OAuth2AuthenticationFailureHandler;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -32,6 +33,7 @@ public class SecurityConfig {
     private final UserRepository userRepository;
     private final CustomOAuth2UserService oAuth2UserService;
     private final OAuth2AuthenticationSuccessHandler oAuth2SuccessHandler;
+    private final OAuth2AuthenticationFailureHandler oAuth2FailureHandler;
 
     @Bean
     @Order(1)
@@ -80,6 +82,7 @@ public class SecurityConfig {
                         .userInfoEndpoint(userInfo ->
                                 userInfo.userService(oAuth2UserService))
                         .successHandler(oAuth2SuccessHandler)
+                        .failureHandler(oAuth2FailureHandler)
                 );
 
         return http.build();
