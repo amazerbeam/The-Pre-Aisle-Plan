@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef } from 'react'
 import { adminService } from '../../services/adminService'
+import { recipeService } from '../../services/recipeService'
 import './RecipeIngredientsForm.css'
 
 /**
- * Form for editing recipe ingredients with autocomplete (FR-044, FR-045).
+ * Form for editing recipe ingredients with autocomplete (FR-044, FR-045, FR-093).
  * Features: autocomplete, reorder arrows, add position selector, new item detection.
+ * FR-093: Supports linked recipe ingredients (sub-recipes like Pizza Dough).
  */
 function RecipeIngredientsForm({ ingredients: initialIngredients, onSave, onCancel, setHasUnsavedChanges }) {
   const [ingredients, setIngredients] = useState([])
@@ -13,9 +15,11 @@ function RecipeIngredientsForm({ ingredients: initialIngredients, onSave, onCanc
   const [allIngredients, setAllIngredients] = useState([])
   const [allUnits, setAllUnits] = useState([])
   const [allAisles, setAllAisles] = useState([])
+  const [allExtrasRecipes, setAllExtrasRecipes] = useState([])  // FR-093: Recipes available for linking
   const [showAddDialog, setShowAddDialog] = useState(false)
   const [addPosition, setAddPosition] = useState('bottom')
   const [addAfterIndex, setAddAfterIndex] = useState(0)
+  const [addAsLinkedRecipe, setAddAsLinkedRecipe] = useState(false)  // FR-093: Toggle for adding linked recipe
   const [showNewItemsConfirm, setShowNewItemsConfirm] = useState(false)
   const [saving, setSaving] = useState(false)
   const formRef = useRef(null)
@@ -31,7 +35,9 @@ function RecipeIngredientsForm({ ingredients: initialIngredients, onSave, onCanc
       setIngredients(initialIngredients.map((ing, idx) => ({
         ...ing,
         tempId: `existing-${idx}`,
-        sortOrder: idx
+        sortOrder: idx,
+        // FR-093: Detect if this is a linked recipe ingredient
+        isLinkedRecipe: ing.linkedRecipeId != null
       })))
     }
   }, [initialIngredients])
@@ -41,21 +47,25 @@ function RecipeIngredientsForm({ ingredients: initialIngredients, onSave, onCanc
     const hasChanges = JSON.stringify(ingredients) !== JSON.stringify(initialIngredients?.map((ing, idx) => ({
       ...ing,
       tempId: `existing-${idx}`,
-      sortOrder: idx
+      sortOrder: idx,
+      isLinkedRecipe: ing.linkedRecipeId != null
     })) || [])
     setHasUnsavedChanges(hasChanges)
   }, [ingredients, initialIngredients, setHasUnsavedChanges])
 
   const loadReferenceData = async () => {
     try {
-      const [ingredientsData, unitsData, aislesData] = await Promise.all([
+      const [ingredientsData, unitsData, aislesData, extrasRecipes] = await Promise.all([
         adminService.getAllIngredients(),
         adminService.getAllUnits(),
-        adminService.getAllAisles()
+        adminService.getAllAisles(),
+        // FR-093: Load extras recipes for linked recipe selection
+        recipeService.getAllRecipesAdmin('extras').catch(() => [])
       ])
       setAllIngredients(ingredientsData)
       setAllUnits(unitsData)
       setAllAisles(aislesData)
+      setAllExtrasRecipes(extrasRecipes)
     } catch (err) {
       console.error('Error loading reference data:', err)
     }
@@ -89,7 +99,7 @@ function RecipeIngredientsForm({ ingredients: initialIngredients, onSave, onCanc
     ))
   }
 
-  // Add new ingredient
+  // Add new ingredient (FR-093: supports both raw ingredients and linked recipes)
   const handleAddIngredient = () => {
     const newIng = {
       tempId: `new-${Date.now()}`,
@@ -97,11 +107,17 @@ function RecipeIngredientsForm({ ingredients: initialIngredients, onSave, onCanc
       ingredientName: '',
       quantity: 1,
       unitId: null,
+      unitKey: null,
       unitValue: '',
+      quantityGrams: null,  // FR-084: Gram equivalent for macro calculation
       sortOrder: 0,
       aisleId: null,
       isNewIngredient: false,
-      isNewUnit: false
+      isNewUnit: false,
+      // FR-093: Linked recipe fields
+      linkedRecipeId: null,
+      linkedRecipeName: '',
+      isLinkedRecipe: addAsLinkedRecipe
     }
 
     let newList
@@ -119,6 +135,20 @@ function RecipeIngredientsForm({ ingredients: initialIngredients, onSave, onCanc
 
     setIngredients(newList.map((ing, idx) => ({ ...ing, sortOrder: idx })))
     setShowAddDialog(false)
+    setAddAsLinkedRecipe(false)  // Reset for next add
+  }
+
+  // FR-093: Handle linked recipe selection
+  const handleLinkedRecipeSelect = (index, selectedRecipe) => {
+    if (selectedRecipe) {
+      updateIngredient(index, 'linkedRecipeId', selectedRecipe.id)
+      updateIngredient(index, 'linkedRecipeName', selectedRecipe.name)
+      // Clear raw ingredient fields
+      updateIngredient(index, 'ingredientId', null)
+      updateIngredient(index, 'ingredientName', null)
+      updateIngredient(index, 'ingredientKey', null)
+      updateIngredient(index, 'isNewIngredient', false)
+    }
   }
 
   // Handle ingredient selection from autocomplete
@@ -142,12 +172,17 @@ function RecipeIngredientsForm({ ingredients: initialIngredients, onSave, onCanc
   }
 
   // Handle unit selection from autocomplete
-  const handleUnitSelect = (index, selectedUnit) => {
+  const handleUnitSelect = (index, selectedUnit, currentQuantity) => {
     if (selectedUnit) {
       updateIngredient(index, 'unitId', selectedUnit.id)
       updateIngredient(index, 'unitKey', selectedUnit.key)
       updateIngredient(index, 'unitValue', selectedUnit.value)
       updateIngredient(index, 'isNewUnit', false)
+
+      // FR-084: Auto-fill quantityGrams when unit is grams
+      if (selectedUnit.key === 'g' && currentQuantity) {
+        updateIngredient(index, 'quantityGrams', currentQuantity)
+      }
     }
   }
 
@@ -236,14 +271,16 @@ function RecipeIngredientsForm({ ingredients: initialIngredients, onSave, onCanc
               allIngredients={allIngredients}
               allUnits={allUnits}
               allAisles={allAisles}
+              allExtrasRecipes={allExtrasRecipes}  // FR-093: For linked recipe selection
               onMoveUp={() => moveUp(index)}
               onMoveDown={() => moveDown(index)}
               onDelete={() => deleteIngredient(index)}
               onUpdate={(field, value) => updateIngredient(index, field, value)}
               onIngredientSelect={(ing) => handleIngredientSelect(index, ing)}
               onNewIngredient={(name) => handleNewIngredient(index, name)}
-              onUnitSelect={(unit) => handleUnitSelect(index, unit)}
+              onUnitSelect={(unit) => handleUnitSelect(index, unit, ingredients[index]?.quantity)}
               onNewUnit={(value) => handleNewUnit(index, value)}
+              onLinkedRecipeSelect={(recipe) => handleLinkedRecipeSelect(index, recipe)}  // FR-093
             />
           ))
         )}
@@ -263,54 +300,91 @@ function RecipeIngredientsForm({ ingredients: initialIngredients, onSave, onCanc
       {showAddDialog && (
         <div className="dialog-overlay" onClick={() => setShowAddDialog(false)}>
           <div className="dialog" onClick={e => e.stopPropagation()}>
-            <h4>Add Ingredient Position</h4>
-            <div className="dialog-options">
-              <label className="radio-label">
-                <input
-                  type="radio"
-                  name="position"
-                  value="bottom"
-                  checked={addPosition === 'bottom'}
-                  onChange={() => setAddPosition('bottom')}
-                />
-                <span>Bottom</span>
-              </label>
-              <label className="radio-label">
-                <input
-                  type="radio"
-                  name="position"
-                  value="start"
-                  checked={addPosition === 'start'}
-                  onChange={() => setAddPosition('start')}
-                />
-                <span>Start</span>
-              </label>
-              <label className="radio-label">
-                <input
-                  type="radio"
-                  name="position"
-                  value="after"
-                  checked={addPosition === 'after'}
-                  onChange={() => setAddPosition('after')}
-                />
-                <span>After ingredient:</span>
-              </label>
-              {addPosition === 'after' && (
-                <select
-                  value={addAfterIndex}
-                  onChange={(e) => setAddAfterIndex(parseInt(e.target.value))}
-                  className="after-select"
-                >
-                  {ingredients.map((ing, idx) => (
-                    <option key={idx} value={idx}>
-                      {idx + 1}. {ing.ingredientName || '(unnamed)'}
-                    </option>
-                  ))}
-                </select>
+            <h4>Add Ingredient</h4>
+
+            {/* FR-093: Type selector - Raw Ingredient or Linked Recipe */}
+            <div className="dialog-section">
+              <label className="section-label">Type:</label>
+              <div className="dialog-options type-options">
+                <label className="radio-label">
+                  <input
+                    type="radio"
+                    name="ingredientType"
+                    checked={!addAsLinkedRecipe}
+                    onChange={() => setAddAsLinkedRecipe(false)}
+                  />
+                  <span>Raw Ingredient</span>
+                </label>
+                <label className="radio-label">
+                  <input
+                    type="radio"
+                    name="ingredientType"
+                    checked={addAsLinkedRecipe}
+                    onChange={() => setAddAsLinkedRecipe(true)}
+                  />
+                  <span>Linked Recipe (Sub-recipe)</span>
+                </label>
+              </div>
+              {addAsLinkedRecipe && (
+                <div className="linked-recipe-hint">
+                  Link to an extras recipe (e.g., Pizza Dough, Pizza Sauce).
+                  Macros will be calculated from the linked recipe.
+                </div>
               )}
             </div>
+
+            {/* Position selector */}
+            <div className="dialog-section">
+              <label className="section-label">Position:</label>
+              <div className="dialog-options">
+                <label className="radio-label">
+                  <input
+                    type="radio"
+                    name="position"
+                    value="bottom"
+                    checked={addPosition === 'bottom'}
+                    onChange={() => setAddPosition('bottom')}
+                  />
+                  <span>Bottom</span>
+                </label>
+                <label className="radio-label">
+                  <input
+                    type="radio"
+                    name="position"
+                    value="start"
+                    checked={addPosition === 'start'}
+                    onChange={() => setAddPosition('start')}
+                  />
+                  <span>Start</span>
+                </label>
+                <label className="radio-label">
+                  <input
+                    type="radio"
+                    name="position"
+                    value="after"
+                    checked={addPosition === 'after'}
+                    onChange={() => setAddPosition('after')}
+                  />
+                  <span>After ingredient:</span>
+                </label>
+                {addPosition === 'after' && (
+                  <select
+                    value={addAfterIndex}
+                    onChange={(e) => setAddAfterIndex(parseInt(e.target.value))}
+                    className="after-select"
+                  >
+                    {ingredients.map((ing, idx) => (
+                      <option key={idx} value={idx}>
+                        {idx + 1}. {ing.isLinkedRecipe ? ing.linkedRecipeName : ing.ingredientName || '(unnamed)'}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
+            </div>
+
             <div className="dialog-actions">
-              <button className="btn-secondary" onClick={() => setShowAddDialog(false)}>Cancel</button>
+              <button className="btn-secondary" onClick={() => { setShowAddDialog(false); setAddAsLinkedRecipe(false) }}>Cancel</button>
               <button className="btn-primary" onClick={handleAddIngredient}>Add</button>
             </div>
           </div>
@@ -357,7 +431,7 @@ function RecipeIngredientsForm({ ingredients: initialIngredients, onSave, onCanc
 }
 
 /**
- * Single ingredient row component
+ * Single ingredient row component (FR-093: supports both raw ingredients and linked recipes)
  */
 function IngredientRow({
   ingredient,
@@ -367,6 +441,7 @@ function IngredientRow({
   allIngredients,
   allUnits,
   allAisles,
+  allExtrasRecipes,  // FR-093: Available extras recipes for linking
   onMoveUp,
   onMoveDown,
   onDelete,
@@ -374,15 +449,20 @@ function IngredientRow({
   onIngredientSelect,
   onNewIngredient,
   onUnitSelect,
-  onNewUnit
+  onNewUnit,
+  onLinkedRecipeSelect  // FR-093: Handler for linked recipe selection
 }) {
   const [ingredientSearch, setIngredientSearch] = useState(ingredient.ingredientName || '')
+  const [linkedRecipeSearch, setLinkedRecipeSearch] = useState(ingredient.linkedRecipeName || '')  // FR-093
   const [unitSearch, setUnitSearch] = useState(ingredient.unitValue || '')
   const [showIngredientDropdown, setShowIngredientDropdown] = useState(false)
+  const [showLinkedRecipeDropdown, setShowLinkedRecipeDropdown] = useState(false)  // FR-093
   const [showUnitDropdown, setShowUnitDropdown] = useState(false)
   const [filteredIngredients, setFilteredIngredients] = useState([])
+  const [filteredLinkedRecipes, setFilteredLinkedRecipes] = useState([])  // FR-093
   const [filteredUnits, setFilteredUnits] = useState([])
   const ingredientRef = useRef(null)
+  const linkedRecipeRef = useRef(null)  // FR-093
   const unitRef = useRef(null)
 
   // Filter ingredients on search
@@ -396,6 +476,18 @@ function IngredientRow({
       setFilteredIngredients(allIngredients.slice(0, 10))
     }
   }, [ingredientSearch, allIngredients, showIngredientDropdown])
+
+  // FR-093: Filter linked recipes on search
+  useEffect(() => {
+    if (linkedRecipeSearch.length >= 1) {
+      const filtered = (allExtrasRecipes || []).filter(recipe =>
+        recipe.name.toLowerCase().includes(linkedRecipeSearch.toLowerCase())
+      ).slice(0, 10)
+      setFilteredLinkedRecipes(filtered)
+    } else if (showLinkedRecipeDropdown) {
+      setFilteredLinkedRecipes((allExtrasRecipes || []).slice(0, 10))
+    }
+  }, [linkedRecipeSearch, allExtrasRecipes, showLinkedRecipeDropdown])
 
   // Filter units on search
   useEffect(() => {
@@ -443,6 +535,10 @@ function IngredientRow({
       if (ingredientRef.current && !ingredientRef.current.contains(e.target)) {
         setShowIngredientDropdown(false)
       }
+      // FR-093: Handle linked recipe dropdown
+      if (linkedRecipeRef.current && !linkedRecipeRef.current.contains(e.target)) {
+        setShowLinkedRecipeDropdown(false)
+      }
       if (unitRef.current && !unitRef.current.contains(e.target)) {
         setShowUnitDropdown(false)
       }
@@ -452,7 +548,7 @@ function IngredientRow({
   }, [])
 
   return (
-    <div className={`ingredient-row ${ingredient.isNewIngredient ? 'new-ingredient' : ''}`}>
+    <div className={`ingredient-row ${ingredient.isNewIngredient ? 'new-ingredient' : ''} ${ingredient.isLinkedRecipe ? 'linked-recipe' : ''}`}>
       {/* Move arrows */}
       <div className="row-arrows">
         <button
@@ -475,51 +571,92 @@ function IngredientRow({
         </button>
       </div>
 
-      {/* Ingredient autocomplete */}
-      <div className="autocomplete-container" ref={ingredientRef}>
-        <input
-          type="text"
-          value={ingredientSearch}
-          onChange={(e) => handleIngredientChange(e.target.value)}
-          onFocus={() => setShowIngredientDropdown(true)}
-          placeholder="Ingredient name"
-          className="ingredient-input"
-        />
-        {ingredient.isNewIngredient && (
-          <span className="new-badge">NEW</span>
-        )}
-        {showIngredientDropdown && filteredIngredients.length > 0 && (
-          <ul className="autocomplete-dropdown">
-            {filteredIngredients.map(ing => (
-              <li
-                key={ing.id}
-                onClick={() => {
-                  setIngredientSearch(ing.name)
-                  onIngredientSelect(ing)
-                  setShowIngredientDropdown(false)
-                }}
-              >
-                <span className="ing-name">{ing.name}</span>
-                <span className="ing-aisle">({ing.aisleName})</span>
-              </li>
-            ))}
-          </ul>
-        )}
-        {/* Aisle selector for new ingredients */}
-        {ingredient.isNewIngredient && (
-          <select
-            value={ingredient.aisleId || ''}
-            onChange={(e) => onUpdate('aisleId', parseInt(e.target.value))}
-            className="aisle-select"
-            required
-          >
-            <option value="">Select aisle...</option>
-            {allAisles.map(aisle => (
-              <option key={aisle.id} value={aisle.id}>{aisle.name}</option>
-            ))}
-          </select>
-        )}
-      </div>
+      {/* FR-093: Conditional render - Linked Recipe or Raw Ingredient */}
+      {ingredient.isLinkedRecipe ? (
+        /* Linked Recipe autocomplete */
+        <div className="autocomplete-container linked-recipe-container" ref={linkedRecipeRef}>
+          <span className="linked-badge" title="Linked Recipe (sub-recipe)">🔗</span>
+          <input
+            type="text"
+            value={linkedRecipeSearch}
+            onChange={(e) => {
+              setLinkedRecipeSearch(e.target.value)
+              onUpdate('linkedRecipeName', e.target.value)
+            }}
+            onFocus={() => setShowLinkedRecipeDropdown(true)}
+            placeholder="Search extras recipe..."
+            className="ingredient-input linked-recipe-input"
+          />
+          {showLinkedRecipeDropdown && filteredLinkedRecipes.length > 0 && (
+            <ul className="autocomplete-dropdown">
+              {filteredLinkedRecipes.map(recipe => (
+                <li
+                  key={recipe.id}
+                  onClick={() => {
+                    setLinkedRecipeSearch(recipe.name)
+                    onLinkedRecipeSelect(recipe)
+                    setShowLinkedRecipeDropdown(false)
+                  }}
+                >
+                  <span className="ing-name">{recipe.name}</span>
+                  <span className="ing-aisle">(extras)</span>
+                </li>
+              ))}
+            </ul>
+          )}
+          {showLinkedRecipeDropdown && filteredLinkedRecipes.length === 0 && linkedRecipeSearch.length >= 1 && (
+            <div className="no-results-hint">
+              No extras recipes found. Create an extras recipe first.
+            </div>
+          )}
+        </div>
+      ) : (
+        /* Standard Ingredient autocomplete */
+        <div className="autocomplete-container" ref={ingredientRef}>
+          <input
+            type="text"
+            value={ingredientSearch}
+            onChange={(e) => handleIngredientChange(e.target.value)}
+            onFocus={() => setShowIngredientDropdown(true)}
+            placeholder="Ingredient name"
+            className="ingredient-input"
+          />
+          {ingredient.isNewIngredient && (
+            <span className="new-badge">NEW</span>
+          )}
+          {showIngredientDropdown && filteredIngredients.length > 0 && (
+            <ul className="autocomplete-dropdown">
+              {filteredIngredients.map(ing => (
+                <li
+                  key={ing.id}
+                  onClick={() => {
+                    setIngredientSearch(ing.name)
+                    onIngredientSelect(ing)
+                    setShowIngredientDropdown(false)
+                  }}
+                >
+                  <span className="ing-name">{ing.name}</span>
+                  <span className="ing-aisle">({ing.aisleName})</span>
+                </li>
+              ))}
+            </ul>
+          )}
+          {/* Aisle selector for new ingredients */}
+          {ingredient.isNewIngredient && (
+            <select
+              value={ingredient.aisleId || ''}
+              onChange={(e) => onUpdate('aisleId', parseInt(e.target.value))}
+              className="aisle-select"
+              required
+            >
+              <option value="">Select aisle...</option>
+              {allAisles.map(aisle => (
+                <option key={aisle.id} value={aisle.id}>{aisle.name}</option>
+              ))}
+            </select>
+          )}
+        </div>
+      )}
 
       {/* Quantity */}
       <input
@@ -562,6 +699,18 @@ function IngredientRow({
           </ul>
         )}
       </div>
+
+      {/* FR-084: Weight in grams for macro calculation */}
+      <input
+        type="number"
+        value={ingredient.quantityGrams || ''}
+        onChange={(e) => onUpdate('quantityGrams', parseFloat(e.target.value) || null)}
+        placeholder="g"
+        className="grams-input"
+        min="0"
+        step="0.01"
+        title="Weight in grams (for macro calculation)"
+      />
 
       {/* Delete button */}
       <button

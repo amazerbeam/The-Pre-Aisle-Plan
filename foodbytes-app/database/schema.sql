@@ -2,6 +2,7 @@
 -- Version: 2.0.0 (Normalized)
 
 -- Drop existing tables if they exist (for clean re-creation)
+DROP TABLE IF EXISTS recipe_extras;
 DROP TABLE IF EXISTS recipe_family_members;
 DROP TABLE IF EXISTS recipe_families;
 DROP TABLE IF EXISTS meal_plan_entries;
@@ -57,11 +58,19 @@ CREATE TABLE meals (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Ingredients table (master list of all ingredients)
+-- FR-080: Added macro columns for nutrition tracking
+-- FR-083: Added macros_verified flag for verification workflow
 CREATE TABLE ingredients (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     `key` VARCHAR(100) NOT NULL,
     name VARCHAR(255) NOT NULL,
     aisle_id BIGINT NOT NULL,
+    -- FR-080: Macronutrient data per 100g
+    protein_per_100g DECIMAL(5,2) NOT NULL DEFAULT 0.00 COMMENT 'Protein in grams per 100g of ingredient',
+    carbs_per_100g DECIMAL(5,2) NOT NULL DEFAULT 0.00 COMMENT 'Carbohydrates in grams per 100g of ingredient',
+    fat_per_100g DECIMAL(5,2) NOT NULL DEFAULT 0.00 COMMENT 'Fat in grams per 100g of ingredient',
+    -- FR-083: Verification flag - must be TRUE for recipe to go live
+    macros_verified BOOLEAN NOT NULL DEFAULT FALSE COMMENT 'TRUE when macro data has been verified by admin',
     UNIQUE KEY unique_ingredient_key (`key`),
     UNIQUE KEY unique_ingredient_name (name),
     CONSTRAINT fk_ingredients_aisle FOREIGN KEY (aisle_id)
@@ -94,32 +103,53 @@ CREATE TABLE recipe_meals (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Recipe ingredients table
+-- FR-084: Added quantity_grams for accurate macro calculation
+-- FR-093: Added linked_recipe_id to reference recipes as ingredients (for extras like Pizza Dough)
 CREATE TABLE recipe_ingredients (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     recipe_id BIGINT NOT NULL,
-    ingredient_id BIGINT NOT NULL,
+    -- FR-093: Either ingredient_id OR linked_recipe_id must be set, not both
+    ingredient_id BIGINT NULL COMMENT 'Reference to raw ingredient (NULL if linked_recipe_id is set)',
+    linked_recipe_id BIGINT NULL COMMENT 'Reference to another recipe used as ingredient (e.g., Pizza Dough)',
     quantity DECIMAL(10, 2) NOT NULL,
     unit_id BIGINT NOT NULL,
+    -- FR-084: Gram equivalent for macro calculations (admin weighs ingredient)
+    -- FR-093: For linked recipes, this is the portion of the linked recipe to use
+    quantity_grams DECIMAL(10, 2) NOT NULL COMMENT 'Weight in grams for macro calculation',
     sort_order INT NOT NULL DEFAULT 0,
     CONSTRAINT fk_recipe_ingredients_recipe FOREIGN KEY (recipe_id)
         REFERENCES recipes(id) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT fk_recipe_ingredients_ingredient FOREIGN KEY (ingredient_id)
         REFERENCES ingredients(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+    -- FR-093: FK for linked recipe ingredients
+    CONSTRAINT fk_recipe_ingredients_linked_recipe FOREIGN KEY (linked_recipe_id)
+        REFERENCES recipes(id) ON DELETE SET NULL ON UPDATE CASCADE,
     CONSTRAINT fk_recipe_ingredients_unit FOREIGN KEY (unit_id)
         REFERENCES units(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-    INDEX idx_recipe_id (recipe_id)
+    -- FR-093: Note - CHECK constraint removed due to MySQL 8.0 limitation
+    -- (Cannot use column in CHECK constraint when it has FK with ON DELETE SET NULL/RESTRICT)
+    -- The constraint (ingredient_id XOR linked_recipe_id) is enforced at application level
+    INDEX idx_recipe_id (recipe_id),
+    INDEX idx_linked_recipe_id (linked_recipe_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Recipe steps table
+-- FR-091: Added linked_recipe_id and alt_instruction for linked recipe navigation
 CREATE TABLE recipe_steps (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     recipe_id BIGINT NOT NULL,
     step_number INT NOT NULL,
     instruction TEXT NOT NULL,
     tip TEXT NULL,
+    -- FR-091: Links step to an extras recipe (e.g., "Prepare the dough" links to Pizza Dough recipe)
+    linked_recipe_id BIGINT NULL COMMENT 'Optional link to extras recipe for this step',
+    -- FR-091: Alternative instruction when linked recipe is store-bought
+    alt_instruction TEXT NULL COMMENT 'Instruction to show if user selects store-bought for linked recipe',
     UNIQUE KEY unique_recipe_step (recipe_id, step_number),
     CONSTRAINT fk_recipe_steps_recipe FOREIGN KEY (recipe_id)
         REFERENCES recipes(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_recipe_steps_linked_recipe FOREIGN KEY (linked_recipe_id)
+        REFERENCES recipes(id) ON DELETE SET NULL ON UPDATE CASCADE,
     INDEX idx_recipe_id (recipe_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -184,4 +214,24 @@ CREATE TABLE recipe_family_members (
 
     INDEX idx_family_id (family_id),
     INDEX idx_recipe_id (recipe_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- FR-086: Recipe Extras table (links parent recipes to sub-recipes/extras)
+-- Creates hierarchical relationships: Pizza -> Pizza Dough, Pizza Sauce -> Pesto
+CREATE TABLE recipe_extras (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    parent_recipe_id BIGINT NOT NULL COMMENT 'The recipe that uses the extra (e.g., Pizza)',
+    child_recipe_id BIGINT NOT NULL COMMENT 'The extra recipe being linked (e.g., Pizza Sauce)',
+    display_order INT DEFAULT 0 COMMENT 'Order in the homemade selection popup',
+
+    -- Each parent-child pair must be unique
+    UNIQUE KEY unique_parent_child (parent_recipe_id, child_recipe_id),
+
+    CONSTRAINT fk_recipe_extras_parent FOREIGN KEY (parent_recipe_id)
+        REFERENCES recipes(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_recipe_extras_child FOREIGN KEY (child_recipe_id)
+        REFERENCES recipes(id) ON DELETE CASCADE ON UPDATE CASCADE,
+
+    INDEX idx_parent_recipe_id (parent_recipe_id),
+    INDEX idx_child_recipe_id (child_recipe_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

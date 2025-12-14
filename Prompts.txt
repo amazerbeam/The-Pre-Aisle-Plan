@@ -1,7 +1,22 @@
 Using > @Claude\agents\CEO\agent-ceo.md plan to execute the requirements currently in # In Progress. 
 
 plan using @Claude\agents\Requirements\agent-failed-requirements.md to look at
+FR-050
 
+
+update context with anything that is broadly applicable
+
+  mysql -u root -prootpassword
+
+
+
+The If we select Monday the text should be #4a3f80, the other days should be grey, like the recipe cal count. 
+
+So for example. i've selected oats on monday for breakfast. Oats on monday would then show as #4a3f80 text on Monday and the rest of the days have grey text. 
+
+I then go to lunch Monday is grey with 0 cal, then I select 'Asian Sesame Chicken Salad' for lunch on mon, the cal count update and the text for Modany turns #Asian Sesame Chicken Salad
+
+So basically the test will only tbe highliuted on the day that is selected. 
 
 FR-007 Now that i've tried it the user should only be able to select "From Date" in "Recipes" and "Meal Plan" however, in the Shopping list the user should be able to select a "from data" and a "to date". 
 
@@ -18,3 +33,4 @@ Stiry Fry: 3 tbls spoons
 
 Move FR-019 to inprogress with a note "Look at the new requirements on "formatting specifications"
 Move FR-007 to in progress and check the new requirements on "date ranges"
+

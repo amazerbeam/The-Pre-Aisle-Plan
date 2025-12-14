@@ -13,7 +13,8 @@ import java.util.stream.Collectors;
 
 /**
  * Service for meal plan operations.
- * Implements FR-007 (date range), FR-014 (assign), FR-015 (remove), FR-016 (calendar), FR-017 (calories).
+ * Implements FR-007 (date range), FR-014 (assign), FR-015 (remove), FR-016 (calendar), FR-017 (calories),
+ * FR-081 (daily macros), FR-082 (weekly macros).
  */
 @Service
 @RequiredArgsConstructor
@@ -24,14 +25,16 @@ public class MealPlanService {
     private final RecipeRepository recipeRepository;
     private final UserRepository userRepository;
     private final RecipeService recipeService;
+    private final MacroCalculationService macroCalculationService;
 
     /**
-     * FR-007, FR-016: Get 7-day meal plan starting from a given date.
+     * FR-007, FR-016, FR-081, FR-082: Get 7-day meal plan starting from a given date.
      * Always returns exactly 7 days, even if some are empty.
+     * Includes daily and weekly macro totals.
      *
      * @param userId User ID
      * @param startDate The "From" date
-     * @return MealPlanWeekDTO with 7 days
+     * @return MealPlanWeekDTO with 7 days and macro data
      */
     @Transactional(readOnly = true)
     public MealPlanWeekDTO getWeekPlan(Long userId, LocalDate startDate) {
@@ -45,20 +48,62 @@ public class MealPlanService {
         Map<LocalDate, List<MealPlanEntry>> byDate = entries.stream()
             .collect(Collectors.groupingBy(MealPlanEntry::getPlanDate));
 
-        // Build 7 days (even if empty)
+        // Build 7 days with macro data
         List<MealPlanDayDTO> days = new ArrayList<>();
+        List<int[]> dailyMacrosForWeek = new ArrayList<>();
+        int daysWithMeals = 0;
+
         for (int i = 0; i < 7; i++) {
             LocalDate date = startDate.plusDays(i);
-            MealPlanDayDTO dayDTO = buildDayDTO(date, byDate.getOrDefault(date, List.of()), today);
+            List<MealPlanEntry> dayEntries = byDate.getOrDefault(date, List.of());
+            MealPlanDayDTO dayDTO = buildDayDTO(date, dayEntries, today);
+
+            // FR-081: Calculate daily macros
+            if (!dayEntries.isEmpty()) {
+                List<Recipe> dayRecipes = dayEntries.stream()
+                    .map(MealPlanEntry::getRecipe)
+                    .collect(Collectors.toList());
+
+                int[] dailyMacros = macroCalculationService.calculateTotalMacros(dayRecipes);
+                dayDTO.setTotalProtein(dailyMacros[0]);
+                dayDTO.setTotalCarbs(dailyMacros[1]);
+                dayDTO.setTotalFat(dailyMacros[2]);
+
+                dailyMacrosForWeek.add(dailyMacros);
+                daysWithMeals++;
+            } else {
+                // Empty day - set macros to 0
+                dayDTO.setTotalProtein(0);
+                dayDTO.setTotalCarbs(0);
+                dayDTO.setTotalFat(0);
+            }
+
             days.add(dayDTO);
         }
+
+        // FR-082: Calculate weekly totals and averages
+        int[] weeklyTotals = macroCalculationService.calculateWeeklyTotals(dailyMacrosForWeek);
+        int[] dailyAverages = macroCalculationService.calculateDailyAverages(weeklyTotals, daysWithMeals);
+
+        // Calculate weekly calorie data
+        int weekTotalCalories = days.stream().mapToInt(MealPlanDayDTO::getTotalCalories).sum();
+        int avgDailyCalories = daysWithMeals > 0 ? Math.round((float) weekTotalCalories / daysWithMeals) : 0;
 
         MealPlanWeekDTO weekDTO = new MealPlanWeekDTO();
         weekDTO.setStartDate(startDate);
         weekDTO.setEndDate(startDate.plusDays(6)); // Inclusive end for display
         weekDTO.setDays(days);
-        weekDTO.setWeekTotalCalories(days.stream()
-            .mapToInt(MealPlanDayDTO::getTotalCalories).sum());
+        weekDTO.setWeekTotalCalories(weekTotalCalories);
+
+        // FR-082: Set weekly macro data
+        weekDTO.setWeekTotalProtein(weeklyTotals[0]);
+        weekDTO.setWeekTotalCarbs(weeklyTotals[1]);
+        weekDTO.setWeekTotalFat(weeklyTotals[2]);
+        weekDTO.setAvgDailyCalories(avgDailyCalories);
+        weekDTO.setAvgDailyProtein(dailyAverages[0]);
+        weekDTO.setAvgDailyCarbs(dailyAverages[1]);
+        weekDTO.setAvgDailyFat(dailyAverages[2]);
+        weekDTO.setDaysWithMeals(daysWithMeals);
 
         return weekDTO;
     }

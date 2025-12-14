@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "ingredients")
@@ -24,4 +25,18 @@ public class Ingredient {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "aisle_id", nullable = false)
     private Aisle aisle;
+
+    // FR-080: Macronutrient data per 100g
+    @Column(name = "protein_per_100g", precision = 5, scale = 2, nullable = false)
+    private BigDecimal proteinPer100g = BigDecimal.ZERO;
+
+    @Column(name = "carbs_per_100g", precision = 5, scale = 2, nullable = false)
+    private BigDecimal carbsPer100g = BigDecimal.ZERO;
+
+    @Column(name = "fat_per_100g", precision = 5, scale = 2, nullable = false)
+    private BigDecimal fatPer100g = BigDecimal.ZERO;
+
+    // FR-083: Verification flag - recipes cannot go live with unverified ingredients
+    @Column(name = "macros_verified", nullable = false)
+    private Boolean macrosVerified = false;
 }

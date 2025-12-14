@@ -34,6 +34,7 @@ public class RecipeService {
     private final RecipeRepository recipeRepository;
     private final IngredientService ingredientService;
     private final RecipeFamilyMemberRepository recipeFamilyMemberRepository;
+    private final RecipeExtrasService recipeExtrasService;
     private final IngredientRepository ingredientRepository;
     private final UnitRepository unitRepository;
     private final MealRepository mealRepository;
@@ -91,19 +92,39 @@ public class RecipeService {
 
         dto.setIngredients(recipe.getIngredients().stream()
                 .map(i -> new IngredientDTO(
-                    i.getIngredient().getName(),
+                    i.isLinkedRecipe()
+                        ? i.getLinkedRecipe().getName()  // FR-093: Use linked recipe name
+                        : i.getIngredient().getName(),
                     i.getQuantity(),
                     i.getUnit().getValue()))
                 .collect(Collectors.toList()));
 
+        // FR-091: Convert steps with linked recipe info
         dto.setSteps(recipe.getSteps().stream()
-                .map(s -> s.getInstruction())
+                .map(this::convertToStepViewDTO)
                 .collect(Collectors.toList()));
 
         // FR-043: Add variant information
         addVariantInfo(dto, recipe.getId());
 
+        // FR-086: Add extras information
+        addExtrasInfo(dto, recipe.getId());
+
         return dto;
+    }
+
+    /**
+     * FR-086: Add extras (sub-recipes) information to recipe DTO.
+     */
+    private void addExtrasInfo(RecipeDTO dto, Long recipeId) {
+        boolean hasExtras = recipeExtrasService.hasExtras(recipeId);
+        dto.setHasExtras(hasExtras);
+
+        if (hasExtras) {
+            dto.setExtras(recipeExtrasService.buildExtrasTree(recipeId, new HashSet<>()));
+        } else {
+            dto.setExtras(new ArrayList<>());
+        }
     }
 
     /**
@@ -229,6 +250,7 @@ public class RecipeService {
 
     /**
      * Update an existing recipe (FR-033).
+     * FR-083: Validates that recipe cannot go live with unverified ingredients.
      */
     @Transactional
     public RecipeAdminDTO updateRecipe(Long id, RecipeAdminDTO dto) {
@@ -240,6 +262,12 @@ public class RecipeService {
 
         // Create new units first if any
         Map<String, Unit> newUnitMap = createNewUnits(dto.getNewUnits());
+
+        // FR-083: Check if trying to set isLive = true with unverified ingredients
+        boolean wantsToGoLive = dto.getIsLive() != null && dto.getIsLive();
+        if (wantsToGoLive) {
+            validateIngredientsVerified(dto.getIngredients(), newIngredientMap);
+        }
 
         // Update basic fields
         recipe.setName(dto.getName());
@@ -284,11 +312,29 @@ public class RecipeService {
 
     /**
      * Update recipe visibility only (toggle Live/Hidden).
+     * FR-083: Validates that recipe cannot go live with unverified ingredients.
      */
     @Transactional
     public RecipeAdminDTO updateRecipeVisibility(Long id, boolean isLive) {
         Recipe recipe = recipeRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Recipe not found with id: " + id));
+
+        // FR-083: Check if trying to set isLive = true with unverified ingredients
+        if (isLive) {
+            List<String> unverifiedIngredients = recipe.getIngredients().stream()
+                    .filter(ri -> ri.getIngredient() != null &&
+                                  (ri.getIngredient().getMacrosVerified() == null ||
+                                   !ri.getIngredient().getMacrosVerified()))
+                    .map(ri -> ri.getIngredient().getName())
+                    .toList();
+
+            if (!unverifiedIngredients.isEmpty()) {
+                throw new IllegalStateException(
+                        "Cannot set recipe to live: the following ingredients have unverified macros: " +
+                        String.join(", ", unverifiedIngredients) +
+                        ". Please verify macro data for all ingredients before publishing.");
+            }
+        }
 
         recipe.setIsLive(isLive);
         recipe = recipeRepository.save(recipe);
@@ -299,6 +345,45 @@ public class RecipeService {
     // ========================================
     // HELPER METHODS FOR ADMIN OPERATIONS
     // ========================================
+
+    /**
+     * FR-083: Validates that all ingredients in a recipe have verified macros.
+     * Called when attempting to set a recipe to live.
+     *
+     * @param ingredientDTOs List of recipe ingredients
+     * @param newIngredientMap Map of newly created ingredients (by temp ID)
+     * @throws IllegalStateException if any ingredient has unverified macros
+     */
+    private void validateIngredientsVerified(List<RecipeIngredientAdminDTO> ingredientDTOs,
+                                             Map<String, Ingredient> newIngredientMap) {
+        List<String> unverifiedIngredients = new ArrayList<>();
+
+        for (RecipeIngredientAdminDTO dto : ingredientDTOs) {
+            Ingredient ingredient = null;
+
+            if (dto.getIsNewIngredient() != null && dto.getIsNewIngredient()) {
+                ingredient = newIngredientMap.get(dto.getIngredientName());
+            } else if (dto.getIngredientId() != null) {
+                ingredient = ingredientRepository.findById(dto.getIngredientId()).orElse(null);
+            } else if (dto.getIngredientKey() != null) {
+                ingredient = ingredientRepository.findByKeyIgnoreCase(dto.getIngredientKey()).orElse(null);
+            } else if (dto.getIngredientName() != null) {
+                ingredient = ingredientRepository.findByNameIgnoreCase(dto.getIngredientName()).orElse(null);
+            }
+
+            if (ingredient != null &&
+                (ingredient.getMacrosVerified() == null || !ingredient.getMacrosVerified())) {
+                unverifiedIngredients.add(ingredient.getName());
+            }
+        }
+
+        if (!unverifiedIngredients.isEmpty()) {
+            throw new IllegalStateException(
+                    "Cannot set recipe to live: the following ingredients have unverified macros: " +
+                    String.join(", ", unverifiedIngredients) +
+                    ". Please verify macro data for all ingredients before publishing.");
+        }
+    }
 
     private Map<String, Ingredient> createNewIngredients(List<NewIngredientDTO> newIngredients) {
         Map<String, Ingredient> map = new HashMap<>();
@@ -361,31 +446,63 @@ public class RecipeService {
         }
     }
 
+    /**
+     * FR-093: Handle adding ingredients to a recipe.
+     * Supports both raw ingredients and linked recipe references.
+     *
+     * CONSTRAINT: Either ingredient fields OR linkedRecipeId must be provided, not both.
+     */
     private void addIngredients(Recipe recipe, List<RecipeIngredientAdminDTO> ingredientDTOs,
                                 Map<String, Ingredient> newIngredientMap, Map<String, Unit> newUnitMap) {
         int sortOrder = 0;
         for (RecipeIngredientAdminDTO dto : ingredientDTOs) {
-            // Get or create ingredient
-            Ingredient ingredient;
-            if (dto.getIsNewIngredient() != null && dto.getIsNewIngredient()) {
-                // Use temp ID to find newly created ingredient
-                ingredient = newIngredientMap.get(dto.getIngredientName());
-                if (ingredient == null) {
-                    throw new RuntimeException("New ingredient not found in map: " + dto.getIngredientName());
+            RecipeIngredient recipeIngredient = new RecipeIngredient();
+            recipeIngredient.setRecipe(recipe);
+
+            // FR-093: Check if this is a linked recipe reference
+            if (dto.isLinkedRecipe()) {
+                // Linked recipe ingredient - no raw ingredient, just recipe reference
+                Recipe linkedRecipe = recipeRepository.findById(dto.getLinkedRecipeId())
+                        .orElseThrow(() -> new RuntimeException("Linked recipe not found: " + dto.getLinkedRecipeId()));
+
+                // FR-093: Linked recipes must have meal_type = 'extras' (enforced in admin UI)
+                // We don't enforce at DB level, but log a warning if not 'extras'
+                boolean isExtras = linkedRecipe.getMeals().stream()
+                        .anyMatch(m -> "extras".equalsIgnoreCase(m.getMeal().getKey()));
+                if (!isExtras) {
+                    // Just a warning, not blocking - admin may have valid reason
+                    System.err.println("Warning: Linked recipe " + linkedRecipe.getId() +
+                            " (" + linkedRecipe.getName() + ") is not an 'extras' recipe.");
                 }
-            } else if (dto.getIngredientId() != null) {
-                ingredient = ingredientRepository.findById(dto.getIngredientId())
-                        .orElseThrow(() -> new RuntimeException("Ingredient not found: " + dto.getIngredientId()));
-            } else if (dto.getIngredientKey() != null) {
-                ingredient = ingredientRepository.findByKeyIgnoreCase(dto.getIngredientKey())
-                        .orElseThrow(() -> new RuntimeException("Ingredient not found with key: " + dto.getIngredientKey()));
+
+                recipeIngredient.setLinkedRecipe(linkedRecipe);
+                recipeIngredient.setIngredient(null);  // FR-093: Must be NULL when linkedRecipe is set
             } else {
-                // Try to find by name
-                ingredient = ingredientRepository.findByNameIgnoreCase(dto.getIngredientName())
-                        .orElseThrow(() -> new RuntimeException("Ingredient not found: " + dto.getIngredientName()));
+                // Raw ingredient - standard flow
+                Ingredient ingredient;
+                if (dto.getIsNewIngredient() != null && dto.getIsNewIngredient()) {
+                    // Use temp ID to find newly created ingredient
+                    ingredient = newIngredientMap.get(dto.getIngredientName());
+                    if (ingredient == null) {
+                        throw new RuntimeException("New ingredient not found in map: " + dto.getIngredientName());
+                    }
+                } else if (dto.getIngredientId() != null) {
+                    ingredient = ingredientRepository.findById(dto.getIngredientId())
+                            .orElseThrow(() -> new RuntimeException("Ingredient not found: " + dto.getIngredientId()));
+                } else if (dto.getIngredientKey() != null) {
+                    ingredient = ingredientRepository.findByKeyIgnoreCase(dto.getIngredientKey())
+                            .orElseThrow(() -> new RuntimeException("Ingredient not found with key: " + dto.getIngredientKey()));
+                } else {
+                    // Try to find by name
+                    ingredient = ingredientRepository.findByNameIgnoreCase(dto.getIngredientName())
+                            .orElseThrow(() -> new RuntimeException("Ingredient not found: " + dto.getIngredientName()));
+                }
+
+                recipeIngredient.setIngredient(ingredient);
+                recipeIngredient.setLinkedRecipe(null);  // FR-093: Must be NULL when ingredient is set
             }
 
-            // Get or create unit
+            // Get or create unit (required for both raw ingredients and linked recipes)
             Unit unit;
             if (dto.getIsNewUnit() != null && dto.getIsNewUnit()) {
                 unit = newUnitMap.get(dto.getUnitValue());
@@ -403,11 +520,12 @@ public class RecipeService {
                         .orElseThrow(() -> new RuntimeException("Unit not found: " + dto.getUnitValue()));
             }
 
-            RecipeIngredient recipeIngredient = new RecipeIngredient();
-            recipeIngredient.setRecipe(recipe);
-            recipeIngredient.setIngredient(ingredient);
             recipeIngredient.setQuantity(dto.getQuantity());
             recipeIngredient.setUnit(unit);
+            // FR-084, FR-093: Set quantity_grams for macro calculation
+            // For raw ingredients: actual weight in grams
+            // For linked recipes: portion of linked recipe's total yield
+            recipeIngredient.setQuantityGrams(dto.getQuantityGrams());
             recipeIngredient.setSortOrder(dto.getSortOrder() != null ? dto.getSortOrder() : sortOrder++);
 
             recipe.getIngredients().add(recipeIngredient);
@@ -427,6 +545,14 @@ public class RecipeService {
             step.setStepNumber(stepNumber++);
             step.setInstruction(dto.getInstruction().trim());
             step.setTip(dto.getTip());
+
+            // FR-091: Handle linked recipe
+            if (dto.getLinkedRecipeId() != null) {
+                Recipe linkedRecipe = recipeRepository.findById(dto.getLinkedRecipeId())
+                        .orElse(null);
+                step.setLinkedRecipe(linkedRecipe);
+                step.setAltInstruction(dto.getAltInstruction());
+            }
 
             recipe.getSteps().add(step);
         }
@@ -458,30 +584,82 @@ public class RecipeService {
                 .build();
     }
 
+    /**
+     * FR-093: Convert RecipeIngredient entity to admin DTO.
+     * Handles both raw ingredients and linked recipe references.
+     */
     private RecipeIngredientAdminDTO convertToIngredientAdminDTO(RecipeIngredient ri) {
-        return RecipeIngredientAdminDTO.builder()
+        RecipeIngredientAdminDTO.RecipeIngredientAdminDTOBuilder builder = RecipeIngredientAdminDTO.builder()
                 .id(ri.getId())
-                .ingredientId(ri.getIngredient().getId())
-                .ingredientKey(ri.getIngredient().getKey())
-                .ingredientName(ri.getIngredient().getName())
                 .quantity(ri.getQuantity())
                 .unitId(ri.getUnit().getId())
                 .unitKey(ri.getUnit().getKey())
                 .unitValue(ri.getUnit().getValue())
+                // FR-084: Include quantityGrams for macro calculation
+                .quantityGrams(ri.getQuantityGrams())
                 .sortOrder(ri.getSortOrder())
-                .aisleId(ri.getIngredient().getAisle().getId())
-                .aisleName(ri.getIngredient().getAisle().getName())
                 .isNewIngredient(false)
-                .isNewUnit(false)
-                .build();
+                .isNewUnit(false);
+
+        // FR-093: Check if this is a linked recipe or raw ingredient
+        if (ri.isLinkedRecipe()) {
+            // Linked recipe ingredient
+            builder.linkedRecipeId(ri.getLinkedRecipe().getId())
+                   .linkedRecipeName(ri.getLinkedRecipe().getName())
+                   // Set ingredient fields to null for linked recipes
+                   .ingredientId(null)
+                   .ingredientKey(null)
+                   .ingredientName(null)
+                   .aisleId(null)
+                   .aisleName(null);
+        } else if (ri.isRawIngredient()) {
+            // Raw ingredient
+            builder.ingredientId(ri.getIngredient().getId())
+                   .ingredientKey(ri.getIngredient().getKey())
+                   .ingredientName(ri.getIngredient().getName())
+                   .aisleId(ri.getIngredient().getAisle().getId())
+                   .aisleName(ri.getIngredient().getAisle().getName())
+                   // Set linked recipe fields to null for raw ingredients
+                   .linkedRecipeId(null)
+                   .linkedRecipeName(null);
+        }
+
+        return builder.build();
     }
 
     private RecipeStepAdminDTO convertToStepAdminDTO(RecipeStep step) {
-        return RecipeStepAdminDTO.builder()
+        RecipeStepAdminDTO.RecipeStepAdminDTOBuilder builder = RecipeStepAdminDTO.builder()
                 .id(step.getId())
                 .stepNumber(step.getStepNumber())
                 .instruction(step.getInstruction())
-                .tip(step.getTip())
-                .build();
+                .tip(step.getTip());
+
+        // FR-091: Include linked recipe info
+        if (step.getLinkedRecipe() != null) {
+            builder.linkedRecipeId(step.getLinkedRecipe().getId())
+                   .linkedRecipeName(step.getLinkedRecipe().getName())
+                   .altInstruction(step.getAltInstruction());
+        }
+
+        return builder.build();
+    }
+
+    /**
+     * FR-091: Convert step to view DTO with linked recipe info.
+     */
+    private RecipeStepViewDTO convertToStepViewDTO(RecipeStep step) {
+        RecipeStepViewDTO.RecipeStepViewDTOBuilder builder = RecipeStepViewDTO.builder()
+                .stepNumber(step.getStepNumber())
+                .instruction(step.getInstruction())
+                .tip(step.getTip());
+
+        // Include linked recipe info if present
+        if (step.getLinkedRecipe() != null) {
+            builder.linkedRecipeId(step.getLinkedRecipe().getId())
+                   .linkedRecipeName(step.getLinkedRecipe().getName())
+                   .altInstruction(step.getAltInstruction());
+        }
+
+        return builder.build();
     }
 }

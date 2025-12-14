@@ -2,7 +2,9 @@ package com.foodbytes.controller;
 
 import com.foodbytes.dto.RecipeAdminDTO;
 import com.foodbytes.dto.RecipeDTO;
+import com.foodbytes.dto.RecipeExtrasHierarchyDTO;
 import com.foodbytes.service.RecipeService;
+import com.foodbytes.service.RecipeExtrasService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -20,6 +22,7 @@ import java.util.List;
 public class RecipeController {
 
     private final RecipeService recipeService;
+    private final RecipeExtrasService recipeExtrasService;
 
     // ========================================
     // ADMIN ENDPOINTS (FR-033, FR-047)
@@ -97,5 +100,32 @@ public class RecipeController {
             @PathVariable Long id,
             @RequestParam boolean isLive) {
         return ResponseEntity.ok(recipeService.updateRecipeVisibility(id, isLive));
+    }
+
+    // ========================================
+    // FR-086: RECIPE EXTRAS ENDPOINTS
+    // ========================================
+
+    @GetMapping("/{id}/extras")
+    @Operation(summary = "Get recipe extras hierarchy",
+            description = "Returns hierarchical tree of linked extras for homemade selection popup")
+    public ResponseEntity<RecipeExtrasHierarchyDTO> getRecipeExtras(@PathVariable Long id) {
+        return ResponseEntity.ok(recipeExtrasService.getExtrasHierarchy(id));
+    }
+
+    @GetMapping("/admin/{id}/available-extras")
+    @Operation(summary = "Get available extras (admin)",
+            description = "Returns recipes that can be linked as extras (excludes self and circular refs)")
+    public ResponseEntity<List<RecipeDTO>> getAvailableExtras(@PathVariable Long id) {
+        return ResponseEntity.ok(
+            recipeExtrasService.getAvailableExtrasForRecipe(id).stream()
+                .map(recipe -> {
+                    RecipeDTO dto = new RecipeDTO();
+                    dto.setId(recipe.getId());
+                    dto.setName(recipe.getName());
+                    return dto;
+                })
+                .toList()
+        );
     }
 }

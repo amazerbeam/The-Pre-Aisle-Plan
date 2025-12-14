@@ -1,4 +1,6 @@
+import { useState } from 'react'
 import MealPlanEntry from './MealPlanEntry'
+import DailyMacroPopup from './DailyMacroPopup'
 import { formatDateShort } from '../../utils/dateUtils'
 import { getEmojiForMeal } from '../../utils/emojiUtils'
 import './MealPlanDay.css'
@@ -8,8 +10,11 @@ import './MealPlanDay.css'
  * Shows entries grouped by meal type (breakfast, lunch, dinner, snacks)
  * FR-040: Only shows meal types that have assigned recipes
  * FR-041: Uses dynamic food emojis per meal type
+ * FR-081: Clickable calories showing macro breakdown popup
  */
 function MealPlanDay({ day }) {
+  const [showMacroPopup, setShowMacroPopup] = useState(false)
+
   const mealTypes = [
     { key: 'breakfast', label: 'Breakfast' },
     { key: 'lunch', label: 'Lunch' },
@@ -59,8 +64,31 @@ function MealPlanDay({ day }) {
       </div>
 
       <footer className="day-footer">
-        <span className="day-calories">{day.totalCalories} cal</span>
+        {/* FR-081: Make calorie text clickable */}
+        <span
+          className="day-calories day-calories-clickable"
+          onClick={() => setShowMacroPopup(true)}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault()
+              setShowMacroPopup(true)
+            }
+          }}
+          aria-label={`View macro breakdown for ${day.dayOfWeek}`}
+        >
+          {day.totalCalories} cal
+        </span>
       </footer>
+
+      {/* FR-081: Daily Macro Popup */}
+      {showMacroPopup && (
+        <DailyMacroPopup
+          day={day}
+          onClose={() => setShowMacroPopup(false)}
+        />
+      )}
     </div>
   )
 }

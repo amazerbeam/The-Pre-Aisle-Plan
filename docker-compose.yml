@@ -17,8 +17,6 @@ services:
       - mysql_data:/var/lib/mysql
       - ./foodbytes-app/database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
       - ./foodbytes-app/database/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql
-      - ./foodbytes-app/database/seed-restructure.sql:/docker-entrypoint-initdb.d/03-seed-restructure.sql
-      - ./foodbytes-app/database/seed-merged-recipes.sql:/docker-entrypoint-initdb.d/04-seed-merged-recipes.sql
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
@@ -45,6 +43,7 @@ services:
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
       JWT_SECRET: ${JWT_SECRET:-change-this-to-a-secure-secret-key-in-production}
       FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
+      OAUTH_REDIRECT_URI: http://localhost:8080/login/oauth2/code/google
     ports:
       - "8080:8080"
     depends_on:
@@ -59,6 +58,7 @@ services:
       context: ./foodbytes-app/client
       dockerfile: Dockerfile
       args:
+        NGINX_ENV: dev
         VITE_API_URL: ${VITE_API_URL:-http://localhost:8080}
     container_name: foodbytes-client
     restart: unless-stopped

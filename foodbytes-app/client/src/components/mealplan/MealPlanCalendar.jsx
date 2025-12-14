@@ -1,18 +1,22 @@
+import { useState } from 'react'
 import { useMealPlan } from '../../contexts/MealPlanContext'
 import { useAuth } from '../../contexts/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import MealPlanDay from './MealPlanDay'
+import WeeklyMacroPopup from './WeeklyMacroPopup'
 import { formatDateRange } from '../../utils/dateUtils'
 import './MealPlanCalendar.css'
 
 /**
  * MealPlanCalendar - FR-016: 7-day calendar view of meal plan
+ * FR-082: Clickable week total showing macro summary popup
  * Shows recipes organized by date and meal type
  */
 function MealPlanCalendar() {
   const { isAuthenticated } = useAuth()
   const { weekPlan, startDate, endDate, loading, error } = useMealPlan()
   const navigate = useNavigate()
+  const [showWeeklyPopup, setShowWeeklyPopup] = useState(false)
 
   // Redirect to home if not authenticated
   if (!isAuthenticated) {
@@ -49,8 +53,21 @@ function MealPlanCalendar() {
         {/* FR-038: Recipes button moved to Footer.jsx - DO NOT add navigation buttons here */}
         <h2>Meal Plan</h2>
         <span className="date-range">{formatDateRange(startDate, endDate)}</span>
+        {/* FR-082: Make week total clickable */}
         {weekPlan && (
-          <span className="week-calories">
+          <span
+            className="week-calories week-calories-clickable"
+            onClick={() => setShowWeeklyPopup(true)}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                setShowWeeklyPopup(true)
+              }
+            }}
+            aria-label="View weekly macro summary"
+          >
             Week Total: {weekPlan.weekTotalCalories} cal
           </span>
         )}
@@ -69,6 +86,14 @@ function MealPlanCalendar() {
           <p>Your meal plan is empty for this week.</p>
           <p>Go to <a href="/">Recipes</a> and click the day buttons to add meals!</p>
         </div>
+      )}
+
+      {/* FR-082: Weekly Macro Popup */}
+      {showWeeklyPopup && weekPlan && (
+        <WeeklyMacroPopup
+          weekData={weekPlan}
+          onClose={() => setShowWeeklyPopup(false)}
+        />
       )}
     </div>
   )

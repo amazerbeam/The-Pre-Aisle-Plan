@@ -5,7 +5,7 @@ import RecipeCard from './RecipeCard'
 import RecipeEditModal from '../admin/RecipeEditModal'
 import './RecipeList.css'
 
-const MEAL_TYPES = ['breakfast', 'lunch', 'dinner', 'snacks']
+const MEAL_TYPES = ['breakfast', 'lunch', 'dinner', 'snacks', 'extras']
 
 function RecipeList() {
   const { isAdmin } = useAuth()

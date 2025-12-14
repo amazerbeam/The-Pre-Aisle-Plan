@@ -36,7 +36,17 @@
 
 | Req # | Description |
 |-------|-------------|
-| (none) | All requirements completed |
+| FR-085 | Extras Meal Type |
+| FR-086 | Recipe Extras Linking |
+| FR-087 | Homemade Selection Popup |
+| FR-088 | Smart Checkbox Cascade |
+| FR-089 | Shopping List Extras Integration |
+| FR-090 | Homemade Choices Persistence |
+| FR-091 | Recipe Step Linking |
+| FR-092 | Linked Recipe Navigation |
+| FR-093 | Linked Recipe Ingredients |
+| FR-094 | Linked Recipe Macro Calculation |
+| FR-095 | Extras Recipe Servings Independence |
 
 ## In Progress - Finish
 
@@ -80,8 +90,20 @@
 | FR-047 | Create New Recipe (Admin Only) |
 | FR-048 | Landing Page Animation (Guest Homepage) |
 | FR-050 | Day Calorie Preview in Recipes View (above day buttons) |
+| FR-025 | Persist Meal Plan to Server Database |
+| FR-030 | User Registration and Login (Google OAuth Only) |
+| FR-032 | GOD Mode Admin Access |
+| FR-035 | Recipe Visibility Toggle (Admin Only) |
+| NFR-008 | Server-Side Data Storage |
+| NFR-010 | Centralized Ingredient Definitions |
+| NFR-015 | Centralized Unit Definitions |
 | Database: Users | Store user accounts from Google OAuth |
 | Database: Recipes | Store recipe data (migrated from recipes.js) |
+| FR-080 | Ingredient Macro Data |
+| FR-081 | Daily Macro Popup (Meal Plan View) |
+| FR-082 | Weekly Macro Summary (Meal Plan View) |
+| FR-083 | Ingredient Macro Verification Flag |
+| FR-084 | Recipe Ingredient Gram Equivalent (Frontend + Backend) |
 
 ## Completed - Finish
 
@@ -214,103 +236,23 @@
 
 ---
 
-### FR-008: Browse Recipes by Meal Category
-**Priority:** High
-
-**Description:** Users can browse recipes filtered by meal type using tab navigation
-
-**User Story:** As a user, I want to browse recipes by meal category (Breakfast, Lunch, Dinner, Snacks) so that I can quickly find appropriate recipes for each meal.
-
-**Acceptance Criteria:**
-- **ONLY four tab buttons:** Breakfast, Lunch, Dinner, Snacks
-- **NO "All Recipes" tab** - users must select a specific meal category
-- Default tab on load is Breakfast
-- Clicking a tab filters and displays only recipes belonging to that meal type
-- **Each recipe MUST be assigned to at least one meal category** - recipes without a meal assignment will not display
-- Active tab is visually distinguished from inactive tabs
-- Recipes are sorted alphabetically within each category
-- Cheat meal recipes appear after regular recipes
-- Each recipe card displays:
-  - Recipe name
-  - Calories
-  - Servings control
-  - "View Details" button
-  - **Day-of-week assignment buttons** (see FR-014)
-
-**Source Evidence:**
-- `renderTabs()`
-- `selectMeal(meal)`
-- `renderRecipes(meal)`
-- `recipe_meals` junction table (links recipes to meal types)
+### FR-008: DUPLICATE
+**Status:** Removed - Duplicate of FR-002
 
 ---
 
-### FR-009: Search Recipes by Name
-**Priority:** Medium
-
-**Description:** Users can search for recipes using a text search input
-
-**User Story:** As a user, I want to search recipes by name so that I can quickly find a specific recipe without browsing categories.
-
-**Acceptance Criteria:**
-- Search bar is accessible from bottom navigation
-- Search filters recipes case-insensitively by recipe name
-- Results update as user types (real-time filtering)
-- "No recipes found" message displays when search yields no results
-- Clearing search returns user to previous meal category view
-
-**Source Evidence:**
-- `#recipe-search` element
-- Input event handler (lines 139-157)
-- `#search-bar` element
+### FR-009: DUPLICATE
+**Status:** Removed - Duplicate of FR-005
 
 ---
 
-### FR-010: View Recipe Details
-**Priority:** High
-
-**Description:** Users can expand recipe cards to view full ingredients list and cooking steps
-
-**User Story:** As a user, I want to view complete recipe details including ingredients and cooking instructions so that I can prepare the meal.
-
-**Acceptance Criteria:**
-- Each recipe card has a collapsible details section
-- Details section shows complete ingredients list with quantities and units
-- Details section shows numbered cooking steps
-- Toggle button switches between "Show Details" and "Hide Details"
-- Ingredient quantities are scaled based on current serving size
-
-**Source Evidence:**
-- `createCollapsibleContent(entry, servings)`
-- `createToggleButton()`
-- `recipeData[].ingredients`
-- `recipeData[].steps`
+### FR-010: DUPLICATE
+**Status:** Removed - Duplicate of FR-003
 
 ---
 
-### FR-011: Adjust Serving Sizes with Ingredient Scaling
-**Priority:** High
-
-**Description:** Users can adjust the number of servings and see ingredient quantities automatically recalculated
-
-**User Story:** As a user, I want to adjust the serving size of a recipe so that ingredient quantities automatically scale for my needs.
-
-**Acceptance Criteria:**
-- Each recipe displays a servings input control
-- **Default value is the user's Default Servings preference** (from profile, see FR-031)
-- If user has no preference set, default to 1 serving
-- Guest users default to 1 serving
-- Changing servings recalculates all ingredient quantities proportionally
-- Minimum serving size is 1
-- Maximum serving size is 10 (or reasonable max)
-- Scaled quantities show appropriate precision (whole numbers or 1 decimal)
-- Calorie display remains fixed (per-serving, does not scale) - see FR-036
-
-**Source Evidence:**
-- `createServingsInput(entry)`
-- `localServingsMap`
-- User's `default_servings` preference
-- Ingredient calculation: `quantity * (servings / defaultServings)`
+### FR-011: DUPLICATE
+**Status:** Removed - Duplicate of FR-004
 
 ---
 
@@ -1134,18 +1076,20 @@ CREATE TABLE recipe_family_members (
 **User Story:** As a user, I want my meal plan saved to my account so that I can access it from any device.
 
 **Acceptance Criteria:**
-- Authenticated users' meal plans sync to MySQL database via REST API
-- Plan loads from server on login
-- Guest users can browse recipes but cannot save meal plans
-- Changes sync to server after each modification
-- Corrupted data is handled gracefully with fallback to empty plan
-- localStorage used only for session tokens and temporary guest data
-- Meal plan data retained for rolling 6 months (older data auto-archived)
+- [x] Authenticated users' meal plans sync to MySQL database via REST API
+- [x] Plan loads from server on login
+- [x] Guest users can browse recipes but cannot save meal plans
+- [x] Changes sync to server after each modification
+- [x] Corrupted data is handled gracefully with fallback to empty plan
+- [x] localStorage used only for session tokens and temporary guest data
+- [x] Meal plan data retained for rolling 6 months (older data auto-archived)
 
 **Source Evidence:**
 - Server API: meal plan endpoints
 - JWT authentication for API calls
 - MySQL `meal_plan_entries` table
+
+**Status:** Completed
 
 ---
 
@@ -1216,12 +1160,12 @@ CREATE TABLE recipe_family_members (
 
 ## Mobile Features
 
-### FR-029: Screen Wake Lock During Cooking
+### FR-029: Screen Wake Lock During Cooking with Lock Emoji Animation
 **Priority:** Low
 
-**Description:** System keeps screen awake when viewing meal plan or fullscreen recipe
+**Description:** System keeps screen awake when viewing meal plan or fullscreen recipe. When the user opens the menu, a lock emoji animation plays to indicate the wake lock status.
 
-**User Story:** As a user, I want my screen to stay on while viewing recipes so that I don't have to keep unlocking my phone while cooking.
+**User Story:** As a user, I want my screen to stay on while viewing recipes so that I don't have to keep unlocking my phone while cooking, and I want to see a visual indicator (animated lock emoji) when the wake lock is active.
 
 **Acceptance Criteria:**
 - Wake lock requests when fullscreen recipe opens
@@ -1229,12 +1173,23 @@ CREATE TABLE recipe_family_members (
 - Wake lock releases when views close
 - Feature detection handles unsupported browsers gracefully
 - Errors are logged but don't interrupt user experience
+- [ ] When user opens the menu, display a lock emoji animation:
+  - [ ] Start with unlocked emoji (🔓) at 1x scale
+  - [ ] Scale up to 1.1x
+  - [ ] Scale down to 0.9x
+  - [ ] Flash white
+  - [ ] Transform to locked emoji (🔒)
+  - [ ] Return to 1x scale
+  - [ ] Total animation duration: 1 second
 
 **Source Evidence:**
 - `requestWakeLock()`
 - `releaseWakeLock()`
 - `navigator.wakeLock.request('screen')`
 - Feature detection: `if ('wakeLock' in navigator)`
+- CSS keyframe animation for lock emoji transition
+
+**Status:** In Progress
 
 ---
 
@@ -1469,22 +1424,24 @@ Each feature fades in, pauses 1.5 seconds, then fades out before the next:
 **User Story:** As a user, I want to log in with my Google account so that I can save my meal plans and access them from any device.
 
 **Acceptance Criteria:**
-- **Google Sign-In button only** - no GitHub or other providers
-- **Use official Google branding** - official Google "G" logo and styling
-- Button text must be "Sign in with Google" (not "Login with Google")
-- Follow Google's Brand Guidelines for the sign-in button
-- New users automatically registered on first Google OAuth login
-- JWT tokens stored in httpOnly cookies for session management
-- User profile displays name and email from Google
-- Logout button clears session and returns user to guest mode
-- Guest users can browse recipes but cannot save meal plans
-- Session persists across browser sessions until explicit logout
+- [x] **Google Sign-In button only** - no GitHub or other providers
+- [x] **Use official Google branding** - official Google "G" logo and styling
+- [x] Button text must be "Sign in with Google" (not "Login with Google")
+- [x] Follow Google's Brand Guidelines for the sign-in button
+- [x] New users automatically registered on first Google OAuth login
+- [x] JWT tokens stored in httpOnly cookies for session management
+- [x] User profile displays name and email from Google
+- [x] Logout button clears session and returns user to guest mode
+- [x] Guest users can browse recipes but cannot save meal plans
+- [x] Session persists across browser sessions until explicit logout
 
 **Source Evidence:**
 - Google OAuth callback handlers
 - JWT token storage in httpOnly cookies
 - User session state management
 - Google Sign-In button component
+
+**Status:** Completed
 
 ---
 
@@ -1524,17 +1481,19 @@ Each feature fades in, pauses 1.5 seconds, then fades out before the next:
 **User Story:** As an admin, I want special access so that I can manage and improve recipes for all users.
 
 **Acceptance Criteria:**
-- Admin role stored in database (`is_admin` flag on user record)
-- Admin status assigned directly in database (not self-service)
-- Admin users see "Edit Recipe" button on recipe cards
-- Admin users see "Add Recipe" button in recipe tabs area
-- Admin users can access recipe management functions
-- Non-admin users see recipes as read-only
+- [x] Admin role stored in database (`is_admin` flag on user record)
+- [x] Admin status assigned directly in database (not self-service)
+- [x] Admin users see "Edit Recipe" button on recipe cards
+- [x] Admin users see "Add Recipe" button in recipe tabs area
+- [x] Admin users can access recipe management functions
+- [x] Non-admin users see recipes as read-only
 
 **Source Evidence:**
 - `is_admin` column in users table
 - Admin role check middleware
 - Conditional UI rendering based on admin status
+
+**Status:** Completed
 
 ---
 
@@ -1624,19 +1583,21 @@ Each feature fades in, pauses 1.5 seconds, then fades out before the next:
 **User Story:** As an admin, I want to hide recipes from regular users so that I can prepare and review recipes before making them publicly available.
 
 **Acceptance Criteria:**
-- Each recipe has a visibility status: Live (1) or Hidden (0)
-- All new recipes default to Hidden (0)
-- Only admin (GOD mode) users can toggle visibility status
-- Hidden recipes are NOT visible to regular users in any view (browse, search, meal plan assignment)
-- Hidden recipes ARE visible to admin users with a visual indicator (e.g., "Hidden" badge)
-- Admin users see a toggle/button to change visibility status on recipe cards and edit form
-- Admin recipe management view can filter by Live/Hidden status
+- [x] Each recipe has a visibility status: Live (1) or Hidden (0)
+- [x] All new recipes default to Hidden (0)
+- [x] Only admin (GOD mode) users can toggle visibility status
+- [x] Hidden recipes are NOT visible to regular users in any view (browse, search, meal plan assignment)
+- [x] Hidden recipes ARE visible to admin users with a visual indicator (e.g., "Hidden" badge)
+- [x] Admin users see a toggle/button to change visibility status on recipe cards and edit form
+- [x] Admin recipe management view can filter by Live/Hidden status
 
 **Source Evidence:**
 - `is_live` column in recipes table
 - Admin-only visibility toggle UI component
 - Recipe query filters by `is_live=1` for non-admin users
 - Admin sees all recipes regardless of `is_live` value
+
+**Status:** Completed
 
 ---
 
@@ -2142,13 +2103,15 @@ Each feature fades in, pauses 1.5 seconds, then fades out before the next:
 **Description:** Primary data storage is server-side MySQL database; localStorage used only for local preferences
 
 **Measurable Criteria:**
-- Meal plans stored in MySQL database (authenticated users)
-- Recipe data stored in MySQL database (admin-managed)
-- localStorage used only for: JWT tokens, shopping list checkbox state, UI preferences
-- Application degrades gracefully if localStorage unavailable
-- Server database is single source of truth for user data
+- [x] Meal plans stored in MySQL database (authenticated users)
+- [x] Recipe data stored in MySQL database (admin-managed)
+- [x] localStorage used only for: JWT tokens, shopping list checkbox state, UI preferences
+- [x] Application degrades gracefully if localStorage unavailable
+- [x] Server database is single source of truth for user data
 
 **Source Evidence:** MySQL database schema; Server API for CRUD operations; localStorage for session tokens only
+
+**Status:** Completed
 
 ---
 
@@ -2174,17 +2137,17 @@ Each feature fades in, pauses 1.5 seconds, then fades out before the next:
 **Description:** All ingredient data is centralized in the database with validation to prevent duplicates
 
 **Measurable Criteria:**
-- Single source of truth: `ingredients` table (id, key, name, aisle_id)
-- **No duplicate ingredient names allowed** - enforced by:
+- [x] Single source of truth: `ingredients` table (id, key, name, aisle_id)
+- [x] **No duplicate ingredient names allowed** - enforced by:
   - Database UNIQUE constraint on `name` column (exact match)
   - `IngredientService` fuzzy matching (catches "Carrots" vs "Carrot")
-- All ingredient names should be singular form (e.g., "Carrot" not "Carrots")
-- Recipes reference ingredients by `ingredient_id` FK, not free-text
-- Single source of truth for aisle assignments via `aisle_id` FK
-- Adding new ingredient requires:
+- [x] All ingredient names should be singular form (e.g., "Carrot" not "Carrots")
+- [x] Recipes reference ingredients by `ingredient_id` FK, not free-text
+- [x] Single source of truth for aisle assignments via `aisle_id` FK
+- [x] Adding new ingredient requires:
   1. POST `/api/admin/ingredients/validate?name=` (pre-validation)
   2. POST `/api/admin/ingredients` (create with auto-generated key)
-- `IngredientService.validateAndGetByKey()` enforces key validation at recipe creation
+- [x] `IngredientService.validateAndGetByKey()` enforces key validation at recipe creation
 
 **Implementation:**
 - Database: `ingredients` table with 90 ingredients, 17 aisles
@@ -2197,6 +2160,8 @@ Each feature fades in, pauses 1.5 seconds, then fades out before the next:
 - `IngredientRepository.java` - search queries
 - `IngredientService.java` - validation logic
 - `IngredientController.java` - admin endpoints
+
+**Status:** Completed
 
 ---
 
@@ -2223,14 +2188,16 @@ Each feature fades in, pauses 1.5 seconds, then fades out before the next:
 **Description:** All measurement units are defined in the database to prevent duplicates in shopping lists
 
 **Measurable Criteria:**
-- Single source of truth: `units` table (id, key, value)
-- **No duplicate unit representations allowed** (e.g., cannot have both "unit" and "units")
-- All units are singular/invariant form (e.g., "piece" not "pieces", "g" not "grams")
-- Recipes reference units by `unit_id` FK, not free-text strings
-- Shopping list aggregation uses exact unit matching (same ingredient + same unit = combine quantities)
-- Different units for same ingredient display as separate line items but grouped together
+- [x] Single source of truth: `units` table (id, key, value)
+- [x] **No duplicate unit representations allowed** (e.g., cannot have both "unit" and "units")
+- [x] All units are singular/invariant form (e.g., "piece" not "pieces", "g" not "grams")
+- [x] Recipes reference units by `unit_id` FK, not free-text strings
+- [x] Shopping list aggregation uses exact unit matching (same ingredient + same unit = combine quantities)
+- [x] Different units for same ingredient display as separate line items but grouped together
 
 **Source Evidence:** `seed.sql` - units table with 18 standardized values (g, ml, tsp, tbsp, piece, small, medium, large, handful, clove, head, stalk, slice, leaf, tin, cup, pinch, oz)
+
+**Status:** Completed
 
 ---
 
@@ -2436,6 +2403,1713 @@ A registered user account (created via OAuth)
 **Storage:** MySQL `users` table
 
 **Relationships:** Has many MealPlanEntry (via user_id)
+
+---
+
+## Branding
+
+### FR-051: Update Site Favicon
+
+**Priority:** Low
+
+**Category:** Branding / UI
+
+**Description:** Update the website favicon to reflect the My Pantry Plan branding.
+
+**User Story:** As a user, I want to see a recognizable favicon in my browser tab so that I can easily identify the My Pantry Plan site.
+
+**Acceptance Criteria:**
+- [ ] Favicon displays in browser tab
+- [ ] Favicon displays in bookmarks
+- [ ] Multiple sizes provided for different devices (16x16, 32x32, 180x180 for Apple touch)
+- [ ] Favicon matches brand colors and identity
+- [ ] SVG version provided for modern browsers
+
+**Source Evidence:** Brand guidelines, UX context
+
+**Status:** Backlog
+
+---
+
+## Subscription System
+
+### FR-052: Free vs Paid Tier Access Control
+
+**Priority:** Critical
+
+**Category:** Subscription
+
+**Description:** The application enforces different access levels based on user subscription status. Free-tier users have limited functionality; paid users have full access.
+
+**User Story:** As a product owner, I want to restrict features based on subscription tier so that users are incentivized to subscribe.
+
+**Acceptance Criteria:**
+
+**Free Tier Restrictions:**
+- [ ] Only recipes marked `is_free = TRUE` are fully accessible
+- [ ] Premium recipes (`is_free = FALSE`) display as blurred cards with "🔒 Upgrade to unlock"
+- [ ] Clicking a locked recipe shows upgrade prompt modal
+- [ ] Calorie and macro information is hidden on all recipe cards
+- [ ] Meal planning limited to 2 days maximum
+- [ ] Shopping list feature completely disabled (shows upgrade prompt)
+- [ ] "Upgrade" button visible in header/profile area
+
+**Paid Tier Access:**
+- [ ] Full access to all recipes (current and future)
+- [ ] Full nutrition information displayed
+- [ ] Multi-week meal planning enabled
+- [ ] Meal plan history accessible
+- [ ] Full shopping list functionality
+- [ ] No upgrade prompts or locked content
+
+**Tier Determination Logic:**
+- IF user.subscription_status = 'active' OR user.subscription_status = 'trialing' → Paid tier access
+- ELSE → Free tier access
+
+**Source Evidence:** Subscription requirements addendum
+
+**Status:** Backlog
+
+---
+
+### FR-053: Premium Recipe Blurred Display
+
+**Priority:** High
+
+**Category:** Subscription / UI
+
+**Description:** Premium recipes are displayed to free-tier users as blurred cards showing only the recipe name, with a lock icon and upgrade prompt.
+
+**User Story:** As a free user, I want to see what premium recipes exist so that I understand the value of subscribing.
+
+**Acceptance Criteria:**
+- [ ] Premium recipe cards show recipe name (readable, not blurred)
+- [ ] Recipe card content (image area, details) is visually blurred (CSS `filter: blur(8px)`)
+- [ ] 🔒 lock icon overlays the blurred area (~48px size, centered)
+- [ ] "Premium Recipe" badge displayed on card (top-left corner, brand color)
+- [ ] Clicking anywhere on card opens upgrade modal
+- [ ] Calorie/macro info not shown (even blurred) for free users
+- [ ] Premium recipes appear in correct category tabs alongside free recipes
+- [ ] Premium recipes sorted after free recipes within each category
+
+**Source Evidence:** Subscription requirements addendum
+
+**Status:** Backlog
+
+---
+
+### FR-054: Two-Day Meal Planning Limit (Free Tier)
+
+**Priority:** High
+
+**Category:** Subscription / Meal Planning
+
+**Description:** Free-tier users can only plan meals for a maximum of 2 days. Additional days show upgrade prompts.
+
+**User Story:** As a free user, I can plan 2 days of meals to try the feature, and see that more days require a subscription.
+
+**Acceptance Criteria:**
+- [ ] Free users see all 7 day buttons but only 2 are interactive
+- [ ] First 2 days (from "From" date) are enabled
+- [ ] Days 3-7 display as disabled with lock icon
+- [ ] Clicking disabled day shows upgrade modal
+- [ ] Existing assignments on days 3-7 (from trial period) are hidden
+- [ ] Day calorie preview only shows for enabled days
+- [ ] Meal Plan calendar view only shows 2 days for free users
+- [ ] Preserve trial data (hidden, not deleted) in case user upgrades
+
+**Source Evidence:** Subscription requirements addendum
+
+**Status:** Backlog
+
+---
+
+### FR-055: Shopping List Paywall (Free Tier)
+
+**Priority:** High
+
+**Category:** Subscription / Shopping List
+
+**Description:** Free-tier users cannot access the shopping list feature. Clicking the Shopping button shows an upgrade prompt.
+
+**User Story:** As a free user, I understand that the shopping list is a premium feature worth subscribing for.
+
+**Acceptance Criteria:**
+- [ ] Shopping button in footer remains visible (not hidden)
+- [ ] Clicking Shopping button shows upgrade modal (not empty list)
+- [ ] Modal explains the feature benefits (aisle-organized, aggregated ingredients)
+- [ ] Modal includes "Start Free Trial" and "Subscribe" buttons
+- [ ] Shopping list API returns 403 for free-tier users
+
+**Source Evidence:** Subscription requirements addendum
+
+**Status:** Backlog
+
+---
+
+### FR-056: Hidden Nutrition Information (Free Tier)
+
+**Priority:** High
+
+**Category:** Subscription / Recipe Display
+
+**Description:** Free-tier users do not see calorie or macro information on any recipes, including free recipes.
+
+**User Story:** As a free user, I can browse and use free recipes but need to subscribe to see nutritional information.
+
+**Acceptance Criteria:**
+- [ ] Calorie display hidden on recipe cards for free users
+- [ ] "cal" text replaced with "🔒" or "Upgrade for nutrition info"
+- [ ] Fullscreen recipe view hides calorie information
+- [ ] Meal plan day totals hidden for free users
+- [ ] Day calorie preview (above day buttons) hidden for free users
+- [ ] Recipe variant dropdown hides calorie info (shows variant names only)
+- [ ] API responses exclude calorie data for free users (security)
+
+**Source Evidence:** Subscription requirements addendum
+
+**Status:** Backlog
+
+---
+
+## Trial System
+
+### FR-057: 7-Day Free Trial with Card Upfront
+
+**Priority:** Critical
+
+**Category:** Trial / Payments
+
+**Description:** New users receive a 7-day free trial with full paid-tier access. A valid payment method (credit card, Google Pay, Apple Pay) is required to start the trial. The subscription auto-converts to €4.99/month after trial ends unless cancelled.
+
+**User Story:** As a new user, I want to try all features free for 7 days so I can decide if the subscription is worth it.
+
+**Acceptance Criteria:**
+- [ ] New users see "Start 7-Day Free Trial" as primary CTA
+- [ ] Clicking opens Stripe Checkout with trial configuration
+- [ ] User must add valid payment method to start trial
+- [ ] Google Pay, Apple Pay, and card entry all supported
+- [ ] Trial starts immediately upon successful payment method validation
+- [ ] No charge during trial period
+- [ ] After 7 days: auto-charge €4.99 (monthly) unless cancelled
+- [ ] User can choose monthly (€4.99) or annual (€39.99) at checkout
+- [ ] Trial period clearly communicated: "Free until [date], then €X/month"
+- [ ] User receives welcome email with trial end date
+
+**Trial Status Values:**
+- `trialing` — Currently in trial period
+- `active` — Paying subscriber
+- `canceled` — Cancelled (access until period end)
+- `past_due` — Payment failed
+- `free` — Free tier (never subscribed or trial ended)
+
+**Source Evidence:** Subscription requirements addendum, Stripe integration
+
+**Status:** Backlog
+
+---
+
+### FR-058: Trial Extension via Referrals
+
+**Priority:** High
+
+**Category:** Trial / Referrals
+
+**Description:** Users can extend their trial period by referring friends. Each successful referral adds 5 days to the referrer's trial, up to a maximum of 28 total days (7 base + 21 bonus).
+
+**User Story:** As a trial user, I want to earn extra free days by sharing with friends so I have more time to evaluate the product.
+
+**Acceptance Criteria:**
+- [ ] Each successful referral adds +5 days to trial
+- [ ] Maximum total trial: 28 days (cap)
+- [ ] Referral bonus applied immediately when friend signs up for trial
+- [ ] User notified of bonus via in-app message and email
+- [ ] Bonus days stack (1 referral = 12 days, 2 = 17, 3 = 22, 4 = 27, 5+ = 28 cap)
+- [ ] Subscription charge date extends with bonus days
+- [ ] Referral stats visible in profile ("3 friends joined, +15 days earned")
+
+**Bonus Calculation:** `total_trial_days = min(7 + (referral_count × 5), 28)`
+
+**Source Evidence:** Subscription requirements addendum
+
+**Status:** Backlog
+
+---
+
+### FR-059: Trial Expiry Soft Lock Modal
+
+**Priority:** High
+
+**Category:** Trial / UX
+
+**Description:** When a user's trial expires and they haven't subscribed, a modal appears requiring them to choose: Subscribe or Continue with Free tier.
+
+**User Story:** As a user whose trial ended, I'm prompted to make a decision about subscribing rather than silently losing access.
+
+**Acceptance Criteria:**
+- [ ] Modal appears on first app interaction after trial expires
+- [ ] Modal is non-dismissable (must choose an option)
+- [ ] Modal shows what user is losing (premium features summary)
+- [ ] Two clear buttons: "Subscribe Now" and "Continue with Free"
+- [ ] "Subscribe Now" → Stripe checkout
+- [ ] "Continue with Free" → Downgrade to free tier, dismiss modal
+- [ ] Modal only appears once (choice is remembered)
+- [ ] If user had payment method, show "Your card was not charged"
+
+**Source Evidence:** Subscription requirements addendum
+
+**Status:** Backlog
+
+---
+
+### FR-060: Second Trial After 6 Months
+
+**Priority:** Medium
+
+**Category:** Trial
+
+**Description:** Users who declined to subscribe and have been on the free tier for 6+ months become eligible for a second trial.
+
+**User Story:** As a lapsed user who's been on free tier for 6 months, I want another chance to try premium features.
+
+**Acceptance Criteria:**
+- [ ] Track `last_trial_ended_at` timestamp in user record
+- [ ] If 6+ months since last trial ended, user eligible for new trial
+- [ ] Eligible users see "Try Premium Again — 7 Days Free" prompt
+- [ ] New trial follows same rules (7 days, card required, referral bonuses)
+- [ ] Maximum 2 trials per user lifetime (prevent infinite cycling)
+- [ ] `trial_count` tracked in user record
+
+**Eligibility Check:** `eligible = (trial_count < 2) AND (subscription_status = 'free') AND (last_trial_ended_at < now - 6 months)`
+
+**Source Evidence:** Subscription requirements addendum
+
+**Status:** Backlog
+
+---
+
+## Referral System
+
+### FR-061: Unique Referral Code Generation
+
+**Priority:** High
+
+**Category:** Referrals
+
+**Description:** Each user receives a unique, auto-generated referral code that creates their shareable referral link.
+
+**User Story:** As a user, I have a unique link I can share with friends to earn bonus trial days.
+
+**Acceptance Criteria:**
+- [ ] Referral code auto-generated on account creation
+- [ ] Format: 6 alphanumeric characters, uppercase (e.g., `ABC123`, `XK7M2P`)
+- [ ] Code is unique across all users
+- [ ] Referral link format: `mypantryplan.com/r/ABC123`
+- [ ] Code never changes (permanent for user)
+- [ ] Code visible in Profile → Referrals page
+- [ ] Link is easily copyable with one click
+
+**Source Evidence:** Subscription requirements addendum
+
+**Status:** Backlog
+
+---
+
+### FR-062: Referral Link Landing Page
+
+**Priority:** High
+
+**Category:** Referrals
+
+**Description:** When someone visits a referral link (`mypantryplan.com/r/ABC123`), they see a landing page explaining the offer and are tracked as referred by that user.
+
+**User Story:** As someone who clicked a friend's referral link, I see a welcome message and the referral is tracked when I sign up.
+
+**Acceptance Criteria:**
+- [ ] Referral code stored in localStorage on page visit
+- [ ] Landing page shows: "You've been invited to My Pantry Plan!"
+- [ ] Shows referrer's first name if available ("John invited you")
+- [ ] Explains trial offer: "Start your 7-day free trial"
+- [ ] Clear CTA: "Get Started" → Sign up flow
+- [ ] Referral code persists through signup flow (including OAuth redirect)
+- [ ] Referral code attached to new user record on signup
+- [ ] Invalid codes show standard homepage (no error)
+- [ ] Code expires after 30 days if not used
+
+**Source Evidence:** Subscription requirements addendum
+
+**Status:** Backlog
+
+---
+
+### FR-063: Referral Tracking and Credit
+
+**Priority:** High
+
+**Category:** Referrals
+
+**Description:** When a referred user signs up and starts a trial, the referrer receives their bonus days credit immediately.
+
+**User Story:** As a referrer, I receive +5 bonus days as soon as my friend signs up for their trial.
+
+**Acceptance Criteria:**
+- [ ] On referred user trial start: create referral record
+- [ ] Referral record links referrer_id → referred_id
+- [ ] Referrer's trial extended by 5 days (Stripe API call)
+- [ ] Referrer receives in-app notification: "🎉 [Name] joined! You earned +5 days"
+- [ ] Referrer receives email notification
+- [ ] Referral stats updated in referrer's profile
+- [ ] Referred user's record shows `referred_by` user ID
+- [ ] Bonus only awarded if referrer is still in trial period
+- [ ] No bonus if referrer is already paying subscriber or has hit 28-day cap
+
+**Source Evidence:** Subscription requirements addendum
+
+**Status:** Backlog
+
+---
+
+### FR-064: Referral Sharing UI
+
+**Priority:** High
+
+**Category:** Referrals / UI
+
+**Description:** Users can share their referral link via copy button, social media buttons, and native device share sheet.
+
+**User Story:** As a user, I want easy ways to share my referral link with friends across different platforms.
+
+**Acceptance Criteria:**
+- [ ] **Copy Link** — Copies `mypantryplan.com/r/CODE` to clipboard, shows "Copied!" confirmation
+- [ ] **WhatsApp** — Opens WhatsApp with pre-filled message
+- [ ] **Facebook** — Opens Facebook share dialog
+- [ ] **Twitter/X** — Opens Twitter with pre-filled tweet
+- [ ] **Native Share** — Uses `navigator.share()` API on supported devices
+- [ ] Use native share sheet on mobile (better UX)
+- [ ] Show social buttons on desktop (no native share)
+- [ ] Track which share method is used (analytics)
+
+**Share UI Location:**
+- Trial banner (prominent during trial)
+- Profile → Referrals page (permanent)
+
+**Source Evidence:** Subscription requirements addendum
+
+**Status:** Backlog
+
+---
+
+### FR-065: Referral Stats Dashboard
+
+**Priority:** Medium
+
+**Category:** Referrals / UI
+
+**Description:** Users can view their referral statistics in a dedicated page within their profile.
+
+**User Story:** As a user, I want to see how many friends I've referred and how many bonus days I've earned.
+
+**Acceptance Criteria:**
+- [ ] Total friends referred (count)
+- [ ] Bonus days earned (sum)
+- [ ] Days remaining in trial (if applicable)
+- [ ] Referral link (copyable)
+- [ ] Share buttons
+- [ ] Progress bar to cap (e.g., "3/5 referrals to max bonus")
+
+**Location:** Profile → "Invite Friends" or "Referrals" page
+
+**Source Evidence:** Subscription requirements addendum
+
+**Status:** Backlog
+
+---
+
+### FR-066: Trial Referral Banner
+
+**Priority:** High
+
+**Category:** Referrals / UI
+
+**Description:** During the trial period, a prominent banner encourages users to share their referral link to extend their trial.
+
+**User Story:** As a trial user, I see a clear prompt reminding me I can earn extra free days by sharing.
+
+**Acceptance Criteria:**
+- [ ] Banner visible at top of main views during trial
+- [ ] Banner text: "Get 5 more free days — invite a friend!"
+- [ ] Banner includes "Share" button (opens share modal/options)
+- [ ] Banner shows days remaining: "Trial ends in 5 days"
+- [ ] Banner dismissible (hide for session, reappears next day)
+- [ ] Banner NOT shown to paid subscribers
+- [ ] Banner NOT shown if user has hit 28-day cap
+
+**Source Evidence:** Subscription requirements addendum
+
+**Status:** Backlog
+
+---
+
+### FR-067: Paying Subscriber Referral (Goodwill)
+
+**Priority:** Low
+
+**Category:** Referrals
+
+**Description:** Paying subscribers can still share their referral link. Referred users get the standard trial offer, but the subscriber receives no reward.
+
+**User Story:** As a paying subscriber, I can share My Pantry Plan with friends even though I don't get a reward.
+
+**Acceptance Criteria:**
+- [ ] Subscribers have a referral code (same as everyone)
+- [ ] Share options available in profile
+- [ ] No banner prompts (only in profile)
+- [ ] Referred users get standard 7-day trial
+- [ ] No bonus awarded to subscriber (no trial to extend)
+- [ ] Referral still tracked (for analytics)
+
+**Source Evidence:** Subscription requirements addendum
+
+**Status:** Backlog
+
+---
+
+## Payment Integration
+
+### FR-068: Stripe Checkout Integration
+
+**Priority:** Critical
+
+**Category:** Payments
+
+**Description:** Subscription purchases are processed through Stripe Checkout, a hosted payment page that handles card entry, Google Pay, Apple Pay, and SCA compliance.
+
+**User Story:** As a user, I can securely subscribe using my preferred payment method through a trusted checkout experience.
+
+**Acceptance Criteria:**
+- [ ] "Subscribe" button redirects to Stripe Checkout
+- [ ] Checkout shows My Pantry Plan branding (logo, colors)
+- [ ] Price options: Monthly (€4.99) and Annual (€39.99)
+- [ ] Payment methods: Card, Google Pay, Apple Pay
+- [ ] Trial configuration: 7-day trial with card upfront
+- [ ] VAT calculated automatically via Stripe Tax
+- [ ] Success redirect: Return to app with success message
+- [ ] Cancel redirect: Return to app (no action taken)
+- [ ] Webhook receives `checkout.session.completed` event
+
+**Source Evidence:** Subscription requirements addendum, Stripe API
+
+**Status:** Backlog
+
+---
+
+### FR-069: Stripe Customer Portal (Manage Subscription)
+
+**Priority:** High
+
+**Category:** Payments
+
+**Description:** Users can manage their subscription (update payment method, cancel, view invoices) through Stripe's hosted Customer Portal.
+
+**User Story:** As a subscriber, I can manage my billing and cancel my subscription without contacting support.
+
+**Acceptance Criteria:**
+- [ ] "Manage Subscription" button in Profile/Settings
+- [ ] Button opens Stripe Customer Portal in new tab/redirect
+- [ ] Portal allows: Update payment method, Cancel subscription, View invoice history
+- [ ] Cancellation takes effect at end of billing period
+- [ ] Return URL brings user back to app
+- [ ] Portal styled with My Pantry Plan branding (configured in Stripe Dashboard)
+
+**Source Evidence:** Subscription requirements addendum, Stripe Customer Portal
+
+**Status:** Backlog
+
+---
+
+### FR-070: Stripe Webhook Handling
+
+**Priority:** Critical
+
+**Category:** Payments
+
+**Description:** The backend processes Stripe webhook events to keep subscription status synchronized.
+
+**User Story:** As the system, I need to update user subscription status when Stripe events occur (payment, cancellation, etc.).
+
+**Acceptance Criteria:**
+
+**Events to Handle:**
+- [ ] `checkout.session.completed` — New subscription created, update user status
+- [ ] `customer.subscription.created` — Subscription record created
+- [ ] `customer.subscription.updated` — Status change (trialing → active, etc.)
+- [ ] `customer.subscription.deleted` — Subscription cancelled
+- [ ] `invoice.payment_succeeded` — Record successful payment
+- [ ] `invoice.payment_failed` — Payment failed, send notification email
+
+**Webhook Processing:**
+- [ ] Verify webhook signature (prevent spoofing)
+- [ ] Idempotent handling (same event processed twice = same result)
+- [ ] Update `users.subscription_status` based on event
+- [ ] Update `users.subscription_ends_at` for period end
+- [ ] Log all webhook events for debugging
+
+**Source Evidence:** Subscription requirements addendum, Stripe Webhooks
+
+**Status:** Backlog
+
+---
+
+### FR-071: VAT Handling with Stripe Tax
+
+**Priority:** High
+
+**Category:** Payments / Legal
+
+**Description:** VAT is automatically calculated and applied to all EU customers using Stripe Tax.
+
+**User Story:** As a customer, I see the correct VAT for my country included in my subscription price.
+
+**Acceptance Criteria:**
+- [ ] Stripe Tax enabled on Checkout sessions
+- [ ] VAT calculated based on customer's location
+- [ ] VAT shown clearly in checkout (e.g., "€4.99 + €1.00 VAT")
+- [ ] Invoice includes VAT breakdown and registration number
+- [ ] Stripe Tax reporting available for accounting
+
+**Source Evidence:** Subscription requirements addendum, Stripe Tax
+
+**Status:** Backlog
+
+---
+
+### FR-072: Subscription Status Display
+
+**Priority:** High
+
+**Category:** Payments / UI
+
+**Description:** Users can see their current subscription status, renewal date, and manage their subscription from their profile.
+
+**User Story:** As a user, I want to see my subscription status and when my next payment is due.
+
+**Acceptance Criteria:**
+- [ ] Current plan: "Free", "Trial", "Monthly", or "Annual"
+- [ ] If trial: Days remaining, trial end date
+- [ ] If paid: Next billing date, amount
+- [ ] If cancelled: Access until date
+- [ ] "Manage Subscription" button → Stripe Portal
+- [ ] "Resubscribe" option for cancelled users
+
+**Source Evidence:** Subscription requirements addendum
+
+**Status:** Backlog
+
+---
+
+## Email System
+
+### FR-073: Welcome Email (Trial Start)
+
+**Priority:** High
+
+**Category:** Email
+
+**Description:** New users receive a welcome email when they sign up and start their free trial.
+
+**User Story:** As a new user, I receive a welcome email confirming my trial and explaining what to do next.
+
+**Acceptance Criteria:**
+- [ ] Email sent on `checkout.session.completed` with trial
+- [ ] Personalized with user's name
+- [ ] Clear trial end date
+- [ ] Lists trial features (recipes, nutrition, meal planning, shopping)
+- [ ] Includes referral CTA with share link
+
+**Source Evidence:** Subscription requirements addendum, Resend integration
+
+**Status:** Backlog
+
+---
+
+### FR-074: Trial Ending Soon Email
+
+**Priority:** High
+
+**Category:** Email
+
+**Description:** Users receive a reminder email 2 days before their trial expires.
+
+**User Story:** As a trial user, I'm reminded before my trial ends so I can decide whether to subscribe.
+
+**Acceptance Criteria:**
+- [ ] Email sent 2 days before `subscription.trial_end`
+- [ ] Clear date and pricing
+- [ ] Easy cancel link (EU requirement)
+- [ ] Referral option for extension
+- [ ] "No action needed to continue" message
+
+**Source Evidence:** Subscription requirements addendum
+
+**Status:** Backlog
+
+---
+
+### FR-075: Trial Ended Email
+
+**Priority:** High
+
+**Category:** Email
+
+**Description:** Users who don't subscribe receive an email when their trial ends explaining their options.
+
+**User Story:** As a user whose trial ended, I receive an email explaining what happens next.
+
+**Acceptance Criteria:**
+- [ ] Email sent when trial period ends
+- [ ] Explains subscription status (active if charged, free if not)
+- [ ] Lists free tier features
+- [ ] "Upgrade anytime" CTA
+
+**Source Evidence:** Subscription requirements addendum
+
+**Status:** Backlog
+
+---
+
+### FR-076: Referral Success Email
+
+**Priority:** Medium
+
+**Category:** Email
+
+**Description:** Users receive an email when their referral signs up, confirming bonus days earned.
+
+**User Story:** As a referrer, I receive confirmation that my friend joined and I earned bonus days.
+
+**Acceptance Criteria:**
+- [ ] Email sent when referred user starts trial
+- [ ] Shows friend's first name
+- [ ] Shows bonus days earned (+5)
+- [ ] Shows new trial end date
+- [ ] Shows referral stats (friends joined, total bonus)
+- [ ] Share link for more referrals
+
+**Source Evidence:** Subscription requirements addendum
+
+**Status:** Backlog
+
+---
+
+### FR-077: Payment Failed Email
+
+**Priority:** High
+
+**Category:** Email
+
+**Description:** Users receive an email if their subscription payment fails.
+
+**User Story:** As a subscriber, I'm notified if my payment fails so I can update my card.
+
+**Acceptance Criteria:**
+- [ ] Email sent on `invoice.payment_failed` webhook
+- [ ] Clear call to action (Update Payment button)
+- [ ] Deadline for resolution
+- [ ] Link to Stripe Portal for card update
+
+**Source Evidence:** Subscription requirements addendum
+
+**Status:** Backlog
+
+---
+
+### FR-078: Subscription Cancelled Email
+
+**Priority:** Medium
+
+**Category:** Email
+
+**Description:** Users receive confirmation when they cancel their subscription.
+
+**User Story:** As a user who cancelled, I receive confirmation and know when my access ends.
+
+**Acceptance Criteria:**
+- [ ] Email sent on `customer.subscription.deleted` webhook
+- [ ] Shows access end date
+- [ ] Lists free tier features
+- [ ] Resubscribe CTA
+- [ ] Feedback request
+
+**Source Evidence:** Subscription requirements addendum
+
+**Status:** Backlog
+
+---
+
+## Legal Requirements
+
+### FR-079: Legal Pages (Terms, Privacy, Cookies)
+
+**Priority:** High
+
+**Category:** Legal
+
+**Description:** The application includes required legal pages for subscription services operating in the EU.
+
+**User Story:** As a user, I can review the terms and privacy policy before subscribing.
+
+**Required Pages:**
+- [ ] **Terms of Service** (`/terms`) — Subscription terms, billing, cancellation, 14-day EU cooling-off period
+- [ ] **Privacy Policy** (`/privacy`) — Data collected, GDPR rights, third parties (Stripe, Google, Resend)
+- [ ] **Cookie Policy** (`/cookies`) — Cookies used, how to disable
+
+**Acceptance Criteria:**
+- [ ] Link to Terms and Privacy in signup flow
+- [ ] Checkbox: "I agree to Terms of Service and Privacy Policy"
+- [ ] Link to Terms in Stripe Checkout
+- [ ] Easy access to legal pages from footer
+- [ ] Right to cancel within 14 days (EU) — waived if user consents to immediate access
+- [ ] Clear pricing displayed before payment
+
+**Source Evidence:** EU legal requirements, GDPR
+
+**Status:** Backlog
+
+---
+
+## Non-Functional Requirements (Subscription)
+
+### NFR-017: Stripe Test Mode for Development
+
+**Category:** Development
+
+**Description:** Development and staging environments use Stripe test mode for safe payment testing without real charges.
+
+**Measurable Criteria:**
+- [ ] Separate API keys for test vs live mode
+- [ ] Test keys used in development/staging environments
+- [ ] Live keys used only in production
+- [ ] Test card numbers work in test mode (`4242424242424242` = success)
+- [ ] No real charges possible in test mode
+- [ ] Webhook endpoints configured for both modes
+
+**Source Evidence:** Stripe test mode documentation
+
+**Status:** Backlog
+
+---
+
+### NFR-018: Subscription Status Caching
+
+**Category:** Performance
+
+**Description:** User subscription status is cached to minimize API calls and improve response time.
+
+**Measurable Criteria:**
+- [ ] Subscription status cached in session/JWT on login
+- [ ] Cache invalidated on webhook events
+- [ ] Frontend caches status in state/context
+- [ ] Status check does not block page render
+- [ ] Cache TTL: 5 minutes (refresh on actions)
+
+**Source Evidence:** Performance optimization
+
+**Status:** Backlog
+
+---
+
+### NFR-019: Email Delivery Reliability
+
+**Category:** Reliability
+
+**Description:** Transactional emails are delivered reliably via Resend with retry logic.
+
+**Measurable Criteria:**
+- [ ] Resend API integration with retry on failure
+- [ ] Failed emails logged for monitoring
+- [ ] Email events tracked (sent, delivered, bounced)
+- [ ] Bounce handling (mark invalid emails)
+- [ ] Under 3,000 emails/month (free tier)
+
+**Source Evidence:** Resend integration
+
+**Status:** Backlog
+
+---
+
+### NFR-020: GDPR Compliance
+
+**Category:** Legal / Security
+
+**Description:** Application complies with EU General Data Protection Regulation.
+
+**Measurable Criteria:**
+- [ ] Privacy Policy accessible and up-to-date
+- [ ] Consent obtained before data collection
+- [ ] User can request data export
+- [ ] User can request account deletion
+- [ ] Data deletion completes within 30 days
+- [ ] Minimal data collection (only what's needed)
+- [ ] Third-party processors documented (Stripe, Google, Resend)
+
+**Source Evidence:** GDPR requirements
+
+**Status:** Backlog
+
+---
+
+### NFR-021: PCI Compliance via Stripe
+
+**Category:** Security
+
+**Description:** Payment card data is handled securely via Stripe, inheriting their PCI DSS compliance.
+
+**Measurable Criteria:**
+- [ ] No card numbers stored in application database
+- [ ] No card numbers logged or transmitted through app servers
+- [ ] All payment forms hosted by Stripe (Checkout/Elements)
+- [ ] Stripe handles SCA (Strong Customer Authentication)
+- [ ] Webhook signatures verified on all events
+
+**Source Evidence:** PCI DSS, Stripe compliance
+
+**Status:** Backlog
+
+---
+
+## Database Schema Changes (Subscription)
+
+### Entity: Users Table (Updated for Subscription)
+
+**Additional Fields:**
+
+| Field | Type | Constraints | Description |
+|-------|------|-------------|-------------|
+| subscription_status | ENUM | default 'free' | Values: free, trialing, active, cancelled, past_due |
+| stripe_customer_id | VARCHAR(255) | nullable, indexed | Stripe customer ID |
+| stripe_subscription_id | VARCHAR(255) | nullable | Stripe subscription ID |
+| trial_ends_at | DATETIME | nullable | Trial expiration timestamp |
+| subscription_ends_at | DATETIME | nullable | Subscription period end |
+| referral_code | VARCHAR(10) | unique, not null | User's referral code |
+| referred_by_user_id | BIGINT | nullable, FK | Who referred this user |
+| referral_bonus_days | INT | default 0 | Total bonus days earned |
+| trial_count | INT | default 0 | Number of trials used |
+| last_trial_ended_at | DATETIME | nullable | When last trial ended |
+
+---
+
+### Entity: Recipes Table (Updated)
+
+**Additional Field:**
+
+| Field | Type | Constraints | Description |
+|-------|------|-------------|-------------|
+| is_free | BOOLEAN | default FALSE | Whether recipe is free tier |
+
+---
+
+### Entity: Referrals Table (New)
+
+**Purpose:** Track referral relationships and rewards
+
+| Field | Type | Constraints | Description |
+|-------|------|-------------|-------------|
+| id | BIGINT | PK, auto-increment | Primary key |
+| referrer_id | BIGINT | FK → users.id | User who shared |
+| referred_id | BIGINT | FK → users.id | User who signed up |
+| bonus_days_awarded | INT | default 5 | Days awarded |
+| status | ENUM | default 'pending' | Values: pending, credited, expired |
+| created_at | TIMESTAMP | default now | Record creation |
+| credited_at | TIMESTAMP | nullable | When bonus credited |
+
+**Constraints:** UNIQUE (referrer_id, referred_id)
+
+---
+
+### Entity: Subscription Events Table (New)
+
+**Purpose:** Log subscription lifecycle events
+
+| Field | Type | Constraints | Description |
+|-------|------|-------------|-------------|
+| id | BIGINT | PK, auto-increment | Primary key |
+| user_id | BIGINT | FK → users.id | User record |
+| event_type | VARCHAR(100) | required | Event type |
+| stripe_event_id | VARCHAR(255) | nullable, indexed | Stripe event ID |
+| event_data | JSON | nullable | Full event payload |
+| created_at | TIMESTAMP | default now | Record creation |
+
+---
+
+## API Endpoints (Subscription)
+
+### Subscription Endpoints
+
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| POST | `/api/subscription/checkout` | Create Stripe Checkout session | User |
+| POST | `/api/subscription/portal` | Create Stripe Customer Portal session | User |
+| GET | `/api/subscription/status` | Get current subscription status | User |
+| POST | `/api/webhooks/stripe` | Handle Stripe webhook events | Stripe signature |
+
+### Referral Endpoints
+
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| GET | `/api/referral/code` | Get user's referral code and link | User |
+| GET | `/api/referral/stats` | Get referral statistics | User |
+| GET | `/api/referral/validate/:code` | Validate referral code | Public |
+| POST | `/api/referral/track` | Track referral code on signup | Public |
+
+### Recipe Endpoints (Updated)
+
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| GET | `/api/recipes` | Get recipes (filtered by subscription tier) | Public/User |
+| GET | `/api/recipes/free` | Get free recipes only | Public |
+
+---
+
+## Nutrition Tracking
+
+### FR-080: Ingredient Macro Data
+
+**Priority:** High
+
+**Category:** Nutrition / Data Model
+
+**Description:** Each ingredient in the database includes macronutrient data (protein, carbohydrates, fat) per 100g. This enables automatic macro calculation for recipes based on their ingredients.
+
+**User Story:** As a user, I want the app to calculate macros automatically so that I don't have to look up nutrition information manually.
+
+**Acceptance Criteria:**
+- [ ] `ingredients` table includes new columns: `protein_per_100g`, `carbs_per_100g`, `fat_per_100g`
+- [ ] All values stored as DECIMAL(5,2) to allow precision (e.g., 31.50g protein)
+- [ ] Macro data populated for all existing ingredients
+- [ ] Admin ingredient editing form includes macro input fields
+- [ ] Recipe macro totals calculated automatically: `SUM(ingredient.macro * quantity / 100)`
+- [ ] Per-serving macros calculated: `recipe_total_macro / default_servings`
+
+**Database Schema Update:**
+
+```sql
+ALTER TABLE ingredients ADD COLUMN protein_per_100g DECIMAL(5,2) DEFAULT 0;
+ALTER TABLE ingredients ADD COLUMN carbs_per_100g DECIMAL(5,2) DEFAULT 0;
+ALTER TABLE ingredients ADD COLUMN fat_per_100g DECIMAL(5,2) DEFAULT 0;
+```
+
+**Example Data:**
+
+| Ingredient | Protein/100g | Carbs/100g | Fat/100g |
+|------------|--------------|------------|----------|
+| Chicken Breast | 31 | 0 | 3.6 |
+| White Rice (cooked) | 2.7 | 28 | 0.3 |
+| Olive Oil | 0 | 0 | 100 |
+| Egg | 13 | 1.1 | 11 |
+| Butter | 0.9 | 0.1 | 81 |
+
+**Source Evidence:** User conversation - "ingredient-level macros is the way to go"
+
+**Status:** Completed
+
+---
+
+### FR-081: Daily Macro Popup (Meal Plan View)
+
+**Priority:** Medium
+
+**Category:** Nutrition / UI
+
+**Description:** In the Meal Plan view, the daily calorie display is clickable. Clicking it opens a popup showing the full macro breakdown (protein, carbs, fat) for that day.
+
+**User Story:** As a user, I want to click on a day's calorie total to see the detailed macro breakdown so that I can ensure I'm hitting my nutrition targets.
+
+**Acceptance Criteria:**
+- [ ] Daily calorie text in Meal Plan is clickable (cursor: pointer)
+- [ ] Clicking opens a popup/modal with macro breakdown
+- [ ] Popup displays:
+  - Day name and date
+  - Total calories
+  - Protein (grams and percentage of calories)
+  - Carbohydrates (grams and percentage of calories)
+  - Fat (grams and percentage of calories)
+- [ ] Macros calculated from ingredient data (see FR-080)
+- [ ] Popup closes on: backdrop click, X button, ESC key
+- [ ] Styling consistent with existing popups (brand colors)
+
+**Popup Content Example:**
+
+```
+Monday - 1,850 cal
+─────────────────────
+Protein:  130g  (28%)
+Carbs:    185g  (40%)
+Fat:       72g  (32%)
+```
+
+**DO:**
+- Reuse existing popup/modal component styling
+- Calculate percentages: protein/carbs = 4 cal/g, fat = 9 cal/g
+- Show all values rounded to whole numbers
+
+**DO NOT:**
+- Do NOT replace the calorie display — enhance it with click behavior
+- Do NOT require scrolling for the popup content
+- Do NOT show meal-by-meal breakdown (just daily total)
+
+**Source Evidence:** User conversation - "For days, we could have where we display the cal for the day, make that a button and once clicked we pop up with the info"
+
+**Status:** Completed
+
+---
+
+### FR-082: Weekly Macro Summary (Meal Plan View)
+
+**Priority:** Medium
+
+**Category:** Nutrition / UI
+
+**Description:** In the Meal Plan view, the weekly "Total" calorie display is clickable. Clicking it opens a popup showing the weekly macro summary and daily averages.
+
+**User Story:** As a user, I want to click on the weekly total to see my overall macro intake so that I can track my nutrition across the entire week.
+
+**Acceptance Criteria:**
+- [ ] Weekly "Total" text in Meal Plan is clickable (cursor: pointer)
+- [ ] Clicking opens a popup/modal with weekly macro summary
+- [ ] Popup displays:
+  - Week date range (e.g., "Dec 9 - Dec 15")
+  - Total weekly calories
+  - Total weekly protein, carbs, fat
+  - Daily averages for all macros
+- [ ] Macros calculated from ingredient data (see FR-080)
+- [ ] Popup closes on: backdrop click, X button, ESC key
+
+**Popup Content Example:**
+
+```
+Week: Dec 9 - Dec 15
+────────────────────────────
+Total:     12,950 cal
+           910g protein | 1,295g carbs | 504g fat
+
+Daily Average:
+           1,850 cal
+           130g protein (28%) | 185g carbs (40%) | 72g fat (32%)
+```
+
+**DO:**
+- Reuse existing popup/modal component styling
+- Calculate daily averages based on days with meals assigned (not always 7)
+- Show clear visual separation between weekly totals and daily averages
+
+**DO NOT:**
+- Do NOT replace the total display — enhance it with click behavior
+- Do NOT show day-by-day breakdown in this popup (use FR-081 for that)
+
+**Source Evidence:** User conversation - "for the week, same thing repurpose the 'Total' at the top"
+
+**Status:** Completed
+
+---
+
+### FR-083: Ingredient Macro Verification Flag
+
+**Priority:** High
+
+**Category:** Nutrition / Admin
+
+**Description:** Each ingredient has a `macros_verified` flag indicating whether its macro data has been verified. Recipes containing unverified ingredients cannot be published as live.
+
+**User Story:** As an admin, I want to track which ingredients have verified macro data so that only recipes with accurate nutrition information can be published.
+
+**Acceptance Criteria:**
+- [ ] `ingredients` table includes `macros_verified BOOLEAN DEFAULT FALSE`
+- [ ] New ingredients default to `macros_verified = FALSE`
+- [ ] Recipe cannot be set to `is_live = TRUE` if any ingredient has `macros_verified = FALSE`
+- [ ] Live recipe cannot be saved if it would contain unverified ingredients
+- [ ] Admin must enter `protein_per_100g`, `carbs_per_100g`, `fat_per_100g` to mark as verified
+- [ ] Admin ingredient form includes macro fields and verified checkbox
+- [ ] Admin UI shows warning when recipe has unverified ingredients
+- [ ] Admin can filter ingredients by verified/unverified status
+
+**Business Rules:**
+
+| Rule | Description |
+|------|-------------|
+| R1 | New ingredients default to `macros_verified = FALSE` |
+| R2 | Recipe cannot be `is_live = TRUE` if any ingredient has `macros_verified = FALSE` |
+| R3 | Live recipe cannot be saved if it would contain unverified ingredients |
+
+**Database Schema:**
+
+```sql
+ALTER TABLE ingredients ADD COLUMN macros_verified BOOLEAN DEFAULT FALSE;
+```
+
+**API Validation:**
+
+| Endpoint | Validation |
+|----------|------------|
+| `PUT /recipes/{id}` (set is_live=true) | Check all `recipe_ingredients` → `ingredients.macros_verified = TRUE` |
+| `PUT /ingredients/{id}` | If setting `macros_verified = TRUE`, require all 3 macro fields to be set |
+
+**Source Evidence:** User conversation - "Unverified recipes can't be made live, live recipes can't be saved as unverified"
+
+**Status:** Completed
+
+---
+
+### FR-084: Recipe Ingredient Gram Equivalent (Frontend + Backend)
+
+**Priority:** High
+
+**Category:** Nutrition / Data Model / Admin UI
+
+**Description:** Each recipe ingredient stores the gram equivalent alongside the display quantity and unit. This enables accurate macro calculation regardless of the display unit used (cups, tbsp, pieces, etc.). The admin recipe editor MUST include a visible input field for entering gram weights.
+
+**Note:** `quantity_grams` applies to both raw ingredients AND linked recipes (see FR-093). For linked recipes, `quantity_grams` represents the portion of the linked recipe's total yield to use (e.g., 280g of a 761g Pizza Dough batch).
+
+**User Story:** As a user, I want accurate macro calculations even when recipes use volume measurements so that my nutrition tracking is reliable.
+
+**Acceptance Criteria:**
+- [ ] `recipe_ingredients` table includes `quantity_grams DECIMAL(10,2) NOT NULL`
+- [ ] Admin enters display quantity + unit (e.g., `1 cup`) AND weighed grams (e.g., `185`)
+- [ ] If `unit_id` = grams (unit key = 'g'), `quantity_grams` auto-fills to match `quantity`
+- [ ] `quantity_grams` is required for all recipe ingredients
+- [ ] Macro calculation uses: `quantity_grams × (macro_per_100g / 100)`
+- [ ] **Frontend: `RecipeEditModal.jsx` includes `quantityGrams` input field for each ingredient row**
+- [ ] **Frontend: Field labeled "Weight (g)" positioned AFTER unit field, BEFORE delete button**
+- [ ] **Frontend: Auto-fill triggers when unit dropdown value has key = 'g'**
+- [ ] **Frontend: Field is always editable (admin can override auto-fill)**
+- [ ] **Frontend: Field included for BOTH existing ingredients AND new ingredients**
+- [ ] Chef Agent provides both display format and gram equivalent for new recipes
+
+**Example Data:**
+
+| Display Quantity | Unit | quantity_grams | Notes |
+|------------------|------|----------------|-------|
+| 1 | cup (rice) | 185 | Admin weighs 1 cup rice = 185g |
+| 200 | g (chicken) | 200 | Auto-filled (unit is grams) |
+| 1 | tbsp (oil) | 14 | Admin weighs 1 tbsp oil = 14g |
+| 2 | cloves (garlic) | 6 | Admin weighs 2 cloves = 6g |
+
+**Macro Calculation Formula:**
+
+```
+ingredient_macros = quantity_grams × (macro_per_100g / 100)
+recipe_macros = SUM(all ingredient_macros)
+per_serving_macros = recipe_macros / default_servings
+```
+
+**Database Schema:**
+
+```sql
+ALTER TABLE recipe_ingredients ADD COLUMN quantity_grams DECIMAL(10,2) NOT NULL;
+```
+
+**Workflow:**
+
+1. Admin creates/edits recipe ingredient
+2. Admin enters display quantity (e.g., `1`) and unit (e.g., `cup`)
+3. If unit = grams (key = 'g'): `quantity_grams` auto-fills with same value as quantity
+4. If unit ≠ grams: Admin weighs ingredient on scale and enters gram equivalent in "Weight (g)" field
+5. System calculates macros using `quantity_grams`
+
+**Frontend Implementation Details:**
+
+Each ingredient row in `RecipeEditModal.jsx` must have this field layout:
+```
+[Ingredient Name] [Quantity] [Unit Dropdown] [Weight (g)] [Delete Button]
+```
+
+The "Weight (g)" field:
+- Input type: number
+- Field name: `quantityGrams`
+- Minimum value: 0
+- Step: 0.01 (allows decimal grams)
+- Required: true (form cannot submit without value)
+- Placeholder: "g"
+
+Auto-fill logic (in unit onChange handler):
+```javascript
+if (selectedUnit.key === 'g') {
+  setQuantityGrams(quantity); // Copy quantity value to grams
+}
+```
+
+**DO:**
+- Add `quantityGrams` input field to EVERY ingredient row in `RecipeEditModal.jsx`
+- Position the field AFTER the unit dropdown, BEFORE any action buttons
+- Auto-fill `quantity_grams` when unit key = 'g' (check unit.key, not unit.value)
+- Keep field editable even after auto-fill (admin may need to adjust)
+- Include the field for new ingredients being added (not just existing ones)
+- Require `quantity_grams` for all ingredients (no null values)
+- Use `quantity_grams` for all macro calculations
+- Send `quantityGrams` in the API request payload for each ingredient
+
+**DO NOT:**
+- Do NOT implement backend validation without corresponding frontend input field
+- Do NOT allow saving recipe ingredient without `quantity_grams` value
+- Do NOT attempt automatic unit-to-gram conversion (density varies by ingredient)
+- Do NOT display `quantity_grams` to end users in recipe view (admin-only field)
+- Do NOT hide or conditionally show the grams field - it must ALWAYS be visible in admin edit mode
+- Do NOT make the field readonly when auto-filled (admin must be able to override)
+
+**Files to Modify:**
+- `client/src/components/admin/RecipeEditModal.jsx` - Add quantityGrams input field
+- `client/src/components/admin/RecipeEditModal.css` - Style the new field (if needed)
+- Backend DTO already has field: `foodbytes-api/src/main/java/com/foodbytes/dto/RecipeIngredientAdminDTO.java`
+
+**Source Evidence:**
+- User conversation - "if I am adding an ingredient I'll be in the kitchen and have a scale at hand so I can do it"
+- Implementation failure 2025-12-10: Backend had @NotNull validation on quantityGrams but frontend had no input field, causing 400 Bad Request on recipe save
+
+**Status:** Completed
+
+---
+
+### FR-085: Extras Meal Type
+
+**Category:** Recipe Management
+
+**Priority:** High
+
+**Description:** Add a new "Extras" meal type to the application. Extras are recipes that serve as components for other recipes (e.g., Pizza Dough, Pizza Sauce, Pesto). They appear in their own tab and can be browsed independently.
+
+**User Story:** As a user, I want to browse "Extras" recipes separately so that I can find component recipes that are used in other dishes.
+
+**Acceptance Criteria:**
+- [ ] New "Extras" tab appears in navigation: [Breakfast] [Lunch] [Dinner] [Snacks] [Extras]
+- [ ] Database `meals` table has new entry: `(5, 'extras', 'Extras', 5)`
+- [ ] Recipes can be assigned to the "extras" meal type
+- [ ] Extras recipes appear when Extras tab is selected
+- [ ] Extras recipes can be assigned to meal plan days (for standalone use)
+
+**Database Schema:**
+```sql
+INSERT INTO meals (id, `key`, name, display_order) VALUES (5, 'extras', 'Extras', 5);
+```
+
+**Source Evidence:** User conversation - linked recipes/extras feature request
+
+**Status:** In Progress
+
+---
+
+### FR-086: Recipe Extras Linking
+
+**Category:** Recipe Management
+
+**Priority:** High
+
+**Description:** Recipes can be linked to other recipes as "extras" (sub-recipes). This creates a parent-child relationship where the parent recipe (e.g., Pizza) links to child recipes (e.g., Pizza Dough, Pizza Sauce). Child recipes can themselves have children (Pizza Sauce → Pesto), creating a hierarchy.
+
+**User Story:** As an admin, I want to link recipes together so that when a user selects a parent recipe, they can see and manage its component sub-recipes.
+
+**Acceptance Criteria:**
+- [ ] New `recipe_extras` junction table created
+- [ ] Parent recipe can link to multiple child recipes
+- [ ] Child recipes can have their own children (nested hierarchy)
+- [ ] Display order controls the sequence in the popup
+- [ ] Circular references are prevented (Pizza cannot link to itself or to a recipe that links back to Pizza)
+- [ ] Deleting a recipe cascades to remove its extras links
+- [ ] Backend service builds hierarchical tree structure for API response
+- [ ] RecipeDTO includes `extras` array and `hasExtras` boolean flag
+
+**Database Schema:**
+```sql
+CREATE TABLE recipe_extras (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    parent_recipe_id BIGINT NOT NULL,
+    child_recipe_id BIGINT NOT NULL,
+    display_order INT DEFAULT 0,
+    UNIQUE KEY unique_parent_child (parent_recipe_id, child_recipe_id),
+    CONSTRAINT fk_re_parent FOREIGN KEY (parent_recipe_id) REFERENCES recipes(id) ON DELETE CASCADE,
+    CONSTRAINT fk_re_child FOREIGN KEY (child_recipe_id) REFERENCES recipes(id) ON DELETE CASCADE
+);
+```
+
+**API Endpoint:**
+- `GET /api/recipes/{id}/extras` - Returns hierarchical extras tree
+
+**Source Evidence:** User conversation - linked recipes/extras feature request
+
+**Status:** In Progress
+
+---
+
+### FR-087: Homemade Selection Popup
+
+**Category:** Meal Planning
+
+**Priority:** High
+
+**Description:** When a user assigns a recipe that has extras to their meal plan, a popup appears showing all linked extras as checkboxes. Each checkbox represents a "Home Made" choice - checked means the user will make it from scratch, unchecked means they'll buy it store-bought.
+
+**User Story:** As a user, I want to choose which recipe components I'll make homemade vs buy store-bought, so that my shopping list only includes ingredients I actually need.
+
+**Acceptance Criteria:**
+- [ ] Popup appears when clicking a day button for a recipe with `hasExtras = true`
+- [ ] Popup displays recipe name at top (e.g., "Choose Homemade or Store-Bought for: Pizza")
+- [ ] Hierarchical checkbox list shows all extras with proper indentation:
+  ```
+  [x] Pizza Dough
+  [x] Pizza Sauce
+     [x] Pesto
+  ```
+- [ ] All checkboxes default to checked (Home Made)
+- [ ] "Home Made" label appears next to each checkbox
+- [ ] Instruction text: "Uncheck if you wish to store buy and ingredients will be omitted from your shopping list"
+- [ ] "Confirm" button assigns recipe with selections
+- [ ] "Cancel" button closes popup without assigning
+- [ ] If no extras, recipe assigns directly (no popup)
+
+**UI Placement:** Modal overlay, centered, similar to existing recipe modals
+
+**Source Evidence:** User conversation - linked recipes/extras feature request
+
+**Status:** In Progress
+
+---
+
+### FR-088: Smart Checkbox Cascade
+
+**Category:** Meal Planning
+
+**Priority:** Medium
+
+**Description:** When a parent extra is unchecked (store-bought), all its children are automatically unchecked. This reflects reality - if you're buying store-bought Pizza Sauce, you don't need to make the Pesto that goes in it.
+
+**User Story:** As a user, I want child ingredients to automatically uncheck when I uncheck a parent, so I don't have to manually manage nested dependencies.
+
+**Acceptance Criteria:**
+- [ ] Unchecking Pizza Sauce automatically unchecks Pesto (its child)
+- [ ] Unchecking a parent with multiple children unchecks all descendants
+- [ ] Re-checking a parent does NOT automatically re-check children (user must manually re-check)
+- [ ] Visual feedback shows the cascade happening (children grey out or visually update)
+- [ ] Child checkboxes become disabled when parent is unchecked (optional - discuss)
+
+**Source Evidence:** User conversation - linked recipes/extras feature request
+
+**Status:** In Progress
+
+---
+
+### FR-089: Shopping List Extras Integration
+
+**Category:** Shopping List
+
+**Priority:** High
+
+**Description:** The shopping list aggregation considers homemade selections for extras. Homemade extras add their ingredients to the list. Store-bought extras add a single "Store Bought [Recipe Name]" item instead.
+
+**User Story:** As a user, I want my shopping list to reflect my homemade/store-bought choices, so I know exactly what to buy at the store.
+
+**Acceptance Criteria:**
+- [ ] Homemade extra (checked): All ingredients from that recipe added to shopping list
+- [ ] Store-bought extra (unchecked): Single item "Store Bought [Recipe Name]" added (e.g., "Store Bought Pesto")
+- [ ] Store-bought items go to appropriate aisle (same as where homemade version's main ingredient would go)
+- [ ] Nested extras follow the same logic recursively
+- [ ] If parent is store-bought, children are not processed (already covered by parent)
+- [ ] Ingredient quantities scale with servings as normal
+- [ ] If same extra is used in multiple recipes in same week, ingredients aggregate (no deduplication)
+- [ ] Calorie note appears in meal plan view if any extra is store-bought: "Calories and macro info will be based on everything being homemade"
+- [ ] **Linked Recipe Scaling (FR-093):** When extra is a linked ingredient (via `linked_recipe_id`), scale its raw ingredients by portion ratio
+- [ ] **Portion Ratio Calculation:** `parent_quantity_grams / extra_total_yield` where `extra_total_yield = SUM(quantity_grams)` from extra's ingredients
+- [ ] **Example:** Pizza Light uses 280g of 761g dough → flour added to shopping list as 280/761 = 36.8% of dough recipe amounts
+
+**Source Evidence:** User conversation - linked recipes/extras feature request
+
+**Status:** In Progress
+
+---
+
+### FR-090: Homemade Choices Persistence
+
+**Category:** Meal Planning
+
+**Priority:** Medium
+
+**Description:** Homemade/store-bought choices are saved to localStorage so they persist across sessions. When the popup opens, previous choices are pre-selected, but the user is still prompted to confirm or change.
+
+**User Story:** As a user, I want my homemade preferences remembered so I don't have to re-select them every time I add the same recipe.
+
+**Acceptance Criteria:**
+- [ ] Choices saved to localStorage with key `homemadeSelections_{userId}`
+- [ ] Structure: `{ recipeId: { extraRecipeId: boolean, ... }, ... }`
+- [ ] When popup opens, load saved choices for that recipe
+- [ ] Pre-populate checkboxes with saved values (or default to checked if no saved value)
+- [ ] User is always prompted (popup always shows) - choices are suggestions, not automatic
+- [ ] Choices update in localStorage when user confirms popup
+- [ ] Clearing browser data resets to defaults (all homemade)
+
+**localStorage Structure:**
+```json
+{
+  "100": {
+    "101": true,
+    "102": false,
+    "103": false
+  }
+}
+```
+
+**Source Evidence:** User conversation - linked recipes/extras feature request
+
+**Status:** In Progress
+
+---
+
+### FR-091: Recipe Step Linking
+
+**Category:** Recipe Management
+
+**Priority:** High
+
+**Description:** Individual recipe steps can link to an extras recipe. This allows a step like "Prepare the dough" to link to the Pizza Dough recipe. Steps also have an alternative instruction for when the linked extra is store-bought.
+
+**User Story:** As a user viewing a recipe, I want steps that use sub-recipes to link to those recipes so I can navigate to the detailed instructions.
+
+**Acceptance Criteria:**
+- [ ] `recipe_steps` table has new columns: `linked_recipe_id` (FK, nullable), `alt_instruction` (TEXT, nullable)
+- [ ] Admin can select a linked recipe when editing a step
+- [ ] Admin can provide alternative instruction text (e.g., "Prepare your store-bought dough")
+- [ ] If `linked_recipe_id` is set and extra is homemade: display `instruction` as clickable link
+- [ ] If `linked_recipe_id` is set and extra is store-bought: display `alt_instruction` as plain text
+- [ ] If `linked_recipe_id` is NULL: display `instruction` as normal text
+- [ ] Link text styling: underlined, brand color, cursor pointer
+
+**Database Schema:**
+```sql
+ALTER TABLE recipe_steps
+  ADD COLUMN linked_recipe_id BIGINT NULL,
+  ADD COLUMN alt_instruction TEXT NULL,
+  ADD CONSTRAINT fk_step_linked_recipe FOREIGN KEY (linked_recipe_id) REFERENCES recipes(id) ON DELETE SET NULL;
+```
+
+**Source Evidence:** User conversation - linked recipes/extras feature request
+
+**Status:** In Progress
+
+---
+
+### FR-092: Linked Recipe Navigation
+
+**Category:** Recipe Management
+
+**Priority:** High
+
+**Description:** Clicking a linked step opens the sub-recipe in the modal. A back button allows returning to the parent recipe. Navigation supports multiple levels (Pizza → Pizza Sauce → Pesto) with a full navigation stack.
+
+**User Story:** As a user, I want to navigate between linked recipes while cooking so I can follow sub-recipe instructions and return to the main recipe.
+
+**Acceptance Criteria:**
+- [ ] Clicking a linked step opens that recipe's details in the modal
+- [ ] Back button appears at top: "< [Previous Recipe Name]" (e.g., "< Pizza")
+- [ ] Clicking back returns to the previous recipe in the stack
+- [ ] Navigation stack supports unlimited depth: Pizza → Pizza Sauce → Pesto → back → back
+- [ ] Current recipe name displayed in modal header
+- [ ] Breadcrumb trail (optional): "Pizza > Pizza Sauce > Pesto"
+- [ ] Closing modal clears the navigation stack
+- [ ] Re-opening modal starts fresh at the originally selected recipe
+
+**UI Behavior:**
+```
+[Initial State]
+Modal shows: "Pizza"
+Steps include: "Prepare the sauce" (linked to Pizza Sauce)
+
+[After clicking "Prepare the sauce"]
+Modal shows: "< Pizza" (back button) + "Pizza Sauce"
+Steps include: "Make the pesto base" (linked to Pesto)
+
+[After clicking "Make the pesto base"]
+Modal shows: "< Pizza Sauce" (back button) + "Pesto"
+
+[After clicking back]
+Modal shows: "< Pizza" (back button) + "Pizza Sauce"
+
+[After clicking back again]
+Modal shows: "Pizza" (no back button)
+```
+
+**Source Evidence:** User conversation - linked recipes/extras feature request
+
+**Status:** In Progress
+
+---
+
+### FR-093: Linked Recipe Ingredients
+
+**Category:** Recipe Management
+
+**Priority:** High
+
+**Description:** Recipe ingredients can reference another recipe (an "extra") instead of a raw ingredient. This allows specifying the exact quantity of an extra used in a parent recipe (e.g., Pizza Light uses 280g of Pizza Dough). The linked recipe's macros are calculated proportionally based on the quantity used. This enables variant scaling where Light/Standard/Full portions use different amounts of the same extra.
+
+**User Story:** As a user, I want ingredient quantities for sub-recipes to scale with variants, so that macro calculations are accurate for Light/Standard/Full portions.
+
+**Acceptance Criteria:**
+- [ ] `recipe_ingredients` table has new column: `linked_recipe_id` (FK, nullable)
+- [ ] Constraint: Either `ingredient_id` OR `linked_recipe_id` must be set, not both (one must be NULL)
+- [ ] `ingredient_id` can be NULL when `linked_recipe_id` is set
+- [ ] `quantity_grams` specifies how much of the linked recipe is used (e.g., 280g of Pizza Dough)
+- [ ] Admin UI allows selecting a recipe instead of an ingredient
+- [ ] Display shows linked recipe name (e.g., "Pizza Dough — 280g")
+- [ ] Foreign key constraint: ON DELETE SET NULL (if linked recipe deleted, row becomes orphaned but not deleted)
+- [ ] Linked recipes must have meal_type = 'extras' (enforced in admin UI, not DB constraint)
+- [ ] RecipeIngredientDTO includes `linkedRecipeId` and `linkedRecipeName` fields
+
+**Database Schema:**
+```sql
+ALTER TABLE recipe_ingredients
+  MODIFY COLUMN ingredient_id BIGINT NULL,
+  ADD COLUMN linked_recipe_id BIGINT NULL,
+  ADD CONSTRAINT fk_ri_linked_recipe FOREIGN KEY (linked_recipe_id)
+    REFERENCES recipes(id) ON DELETE SET NULL,
+  ADD CONSTRAINT chk_ingredient_or_recipe
+    CHECK (
+      (ingredient_id IS NOT NULL AND linked_recipe_id IS NULL) OR
+      (ingredient_id IS NULL AND linked_recipe_id IS NOT NULL)
+    );
+```
+
+**Example Data:**
+
+| recipe_id | ingredient_id | linked_recipe_id | quantity_grams | Notes |
+|-----------|---------------|------------------|----------------|-------|
+| 13 (Pizza Light) | NULL | 11 (Pizza Dough) | 280 | Uses 280g of dough recipe |
+| 13 (Pizza Light) | NULL | 12 (Pizza Sauce) | 90 | Uses 90g of sauce recipe |
+| 13 (Pizza Light) | 37 (Mozzarella) | NULL | 120 | Regular ingredient |
+
+**Source Evidence:** User conversation - Pizza variants need different dough quantities with accurate macro calculation
+
+**Status:** In Progress
+
+---
+
+### FR-094: Linked Recipe Macro Calculation
+
+**Category:** Recipe Management / Nutrition
+
+**Priority:** High
+
+**Description:** When a recipe ingredient references a linked recipe (via `linked_recipe_id`), macros are calculated by determining the portion ratio and applying it to the linked recipe's total macros. The linked recipe's total yield is the sum of all its ingredient `quantity_grams`. This calculation is recursive — if a linked recipe has its own linked ingredients, those are calculated first.
+
+**User Story:** As a user, I want accurate calorie and macro information for recipes with sub-recipes, so I can trust the nutrition data regardless of which variant I choose.
+
+**Acceptance Criteria:**
+- [ ] Calculate linked recipe's total yield: `SUM(quantity_grams)` from all its `recipe_ingredients`
+- [ ] Calculate linked recipe's total macros: Sum of `(quantity_grams × macro_per_100g / 100)` for each raw ingredient
+- [ ] Calculate portion ratio: `this_row.quantity_grams / linked_recipe_total_yield`
+- [ ] Apply ratio to macros: `linked_recipe_macros × portion_ratio`
+- [ ] Recursive calculation: If linked recipe has its own linked ingredients, calculate those first (depth-first)
+- [ ] Display calculated macros in recipe detail view
+- [ ] Backend service provides macro breakdown in API response
+- [ ] Recipe total macros = SUM(all ingredient macros) + SUM(all linked recipe macros × their ratios)
+- [ ] Handle edge case: If linked recipe has 0 yield (no ingredients), treat as 0 macros with warning
+
+**Calculation Example:**
+```
+STEP 1: Calculate Pizza Dough macros
+  - Bread flour: 450g × (12/100) = 54g protein, (70/100) = 315g carbs, (1.5/100) = 6.75g fat
+  - Olive oil: 56g × (0/100) = 0g protein, (0/100) = 0g carbs, (100/100) = 56g fat
+  - Yeast: 3g × (40/100) = 1.2g protein, (41/100) = 1.23g carbs, (7/100) = 0.21g fat
+  - Salt: 12g × (0/100) = 0g protein, 0g carbs, 0g fat
+  - Water: 240g × (0/100) = 0g protein, 0g carbs, 0g fat
+  - TOTAL DOUGH: 55.2g protein, 316.2g carbs, 63g fat
+  - TOTAL YIELD: 450 + 56 + 3 + 12 + 240 = 761g
+
+STEP 2: Calculate Pizza Light dough portion
+  - Uses: 280g
+  - Ratio: 280 / 761 = 0.368
+  - Protein: 55.2 × 0.368 = 20.3g
+  - Carbs: 316.2 × 0.368 = 116.4g
+  - Fat: 63 × 0.368 = 23.2g
+  - Calories: (20.3×4) + (116.4×4) + (23.2×9) = 756 cal
+
+STEP 3: Add Pizza Light's other ingredients (sauce, cheese)
+  - (Similar calculation for sauce)
+  - Mozzarella: 120g × (22/100) = 26.4g protein, etc.
+
+STEP 4: Sum all = Pizza Light total macros
+```
+
+**API Response Structure:**
+```json
+{
+  "id": 13,
+  "name": "Pizza (Light)",
+  "ingredients": [
+    {
+      "linkedRecipeId": 11,
+      "linkedRecipeName": "Pizza Dough",
+      "quantityGrams": 280,
+      "calculatedMacros": {
+        "protein": 20.3,
+        "carbs": 116.4,
+        "fat": 23.2,
+        "calories": 756
+      }
+    },
+    {
+      "ingredientId": 37,
+      "ingredientName": "Mozzarella",
+      "quantityGrams": 120,
+      "calculatedMacros": {
+        "protein": 26.4,
+        "carbs": 2.4,
+        "fat": 25.2,
+        "calories": 336
+      }
+    }
+  ],
+  "totalMacros": {
+    "protein": 46.7,
+    "carbs": 118.8,
+    "fat": 48.4,
+    "calories": 1092
+  }
+}
+```
+
+**Source Evidence:** User conversation - macro calculation for variant portions of linked recipes
+
+**Status:** In Progress
+
+---
+
+### FR-095: Extras Recipe Servings Independence
+
+**Category:** Recipe Management
+
+**Priority:** High
+
+**Description:** When viewing a linked "extras" recipe (e.g., Pizza Dough, Pesto, Pizza Sauce) via the recipe navigation stack, the servings should reset to that recipe's own `defaultServings` rather than inheriting the parent recipe's servings. The servings badge should become a clickable dropdown (similar to the calorie/variant dropdown) allowing users to adjust servings for the current recipe independently. This ensures extras recipes display their full batch quantities correctly.
+
+**User Story:** As a user viewing a linked extras recipe, I want to see the full batch quantities (at default servings) so that I can prepare the complete sub-recipe correctly, and optionally adjust servings if I want to make a double batch.
+
+**Acceptance Criteria:**
+- [ ] When navigating to a linked recipe (via step link click), servings reset to that recipe's `defaultServings`
+- [ ] The servings badge ("X servings") becomes a clickable dropdown in RecipeViewModal
+- [ ] Dropdown displays serving options: 1, 2, 3, 4 (matching calorie dropdown styling)
+- [ ] Selecting a serving option updates ingredient quantities for the current recipe only
+- [ ] Each recipe in the navigation stack maintains its own independent servings state
+- [ ] Going back to the parent recipe restores the parent's original servings selection
+- [ ] Dropdown styling matches the existing calorie/variant dropdown pattern (purple theme)
+- [ ] Extras recipes always show at their own default servings when first navigated to
+
+**Technical Implementation:**
+- Add `currentServings` state to `RecipeViewModal.jsx` that tracks servings per recipe
+- Reset `currentServings` to `currentRecipe.defaultServings` when `stackRecipe` changes (navigation)
+- Convert servings badge to dropdown component (reuse calorie dropdown pattern)
+- Update `scaleQuantity` function to use `currentServings` instead of `servings` prop
+
+**Source Evidence:** User feedback - extras recipes (Pizza Dough, Pizza Sauce) showing incorrect scaled quantities (4x) when viewed from parent recipe (Pizza at 4 servings)
+
+**Related Requirements:** FR-091, FR-092, FR-093
+
+**Status:** In Progress
 
 ---
 

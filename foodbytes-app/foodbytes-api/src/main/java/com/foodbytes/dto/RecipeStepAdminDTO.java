@@ -23,4 +23,9 @@ public class RecipeStepAdminDTO {
     private String instruction;
 
     private String tip;  // Optional tip for this step
+
+    // FR-091: Links step to an extras recipe
+    private Long linkedRecipeId;     // Optional link to extras recipe
+    private String linkedRecipeName; // For display in frontend (read-only)
+    private String altInstruction;   // Alternative instruction when linked recipe is store-bought
 }

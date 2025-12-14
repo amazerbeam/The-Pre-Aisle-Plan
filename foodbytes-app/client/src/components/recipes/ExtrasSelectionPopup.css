@@ -1,0 +1,269 @@
+/* FR-087: ExtrasSelectionPopup - Homemade/Store-bought selection modal styles */
+
+.extras-popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: var(--spacing-md);
+  animation: extrasPopupFadeIn 0.2s ease;
+}
+
+@keyframes extrasPopupFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.extras-popup-modal {
+  background: var(--bg-primary);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  max-width: 480px;
+  width: 100%;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  animation: extrasPopupSlideUp 0.3s ease;
+  overflow: hidden;
+}
+
+@keyframes extrasPopupSlideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Header */
+.extras-popup-header {
+  padding: var(--spacing-lg);
+  background: var(--brand-primary);
+  color: #ffffff;
+  text-align: center;
+}
+
+.extras-popup-title {
+  margin: 0 0 var(--spacing-xs) 0;
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.extras-popup-recipe-name {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+/* Content */
+.extras-popup-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--spacing-lg);
+}
+
+.extras-popup-instruction {
+  margin: 0 0 var(--spacing-lg) 0;
+  padding: var(--spacing-md);
+  background: rgba(74, 63, 128, 0.08);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  text-align: center;
+}
+
+/* Extras Tree */
+.extras-tree-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.extras-tree-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.extras-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.extras-checkbox-label:hover:not(.disabled) {
+  background-color: rgba(74, 63, 128, 0.08);
+}
+
+.extras-checkbox-label.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Custom Checkbox */
+.extras-checkbox {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.extras-checkbox-custom {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  border: 2px solid var(--brand-primary);
+  border-radius: var(--radius-xs);
+  background: var(--bg-primary);
+  transition: all 0.2s ease;
+}
+
+.extras-checkbox:checked + .extras-checkbox-custom {
+  background: var(--brand-primary);
+}
+
+.extras-checkbox:checked + .extras-checkbox-custom::after {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 2px;
+  width: 5px;
+  height: 10px;
+  border: solid #ffffff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.extras-checkbox:disabled + .extras-checkbox-custom {
+  border-color: var(--border-color);
+  background: var(--bg-secondary);
+}
+
+.extras-checkbox:disabled:checked + .extras-checkbox-custom {
+  background: var(--text-secondary);
+  border-color: var(--text-secondary);
+}
+
+.extras-recipe-name {
+  flex: 1;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.extras-label-text {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  padding: 2px 8px;
+  background: rgba(74, 63, 128, 0.1);
+  border-radius: 10px;
+}
+
+.extras-checkbox:not(:checked) ~ .extras-label-text {
+  background: rgba(255, 152, 0, 0.15);
+  color: #e65100;
+}
+
+.extras-checkbox:not(:checked) ~ .extras-label-text::before {
+  content: 'Store Bought';
+}
+
+.extras-checkbox:not(:checked) ~ .extras-label-text:empty::before {
+  content: 'Store Bought';
+}
+
+.extras-checkbox:checked ~ .extras-label-text:empty::before {
+  content: 'Home Made';
+}
+
+/* Nested children */
+.extras-children {
+  display: flex;
+  flex-direction: column;
+  border-left: 2px solid var(--border-color);
+  margin-left: var(--spacing-md);
+}
+
+/* Footer */
+.extras-popup-footer {
+  display: flex;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+}
+
+.extras-popup-button {
+  flex: 1;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.extras-popup-button.cancel {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.extras-popup-button.cancel:hover {
+  background: var(--bg-secondary);
+}
+
+.extras-popup-button.confirm {
+  background: var(--brand-primary);
+  color: #ffffff;
+}
+
+.extras-popup-button.confirm:hover {
+  background: var(--brand-dark);
+}
+
+/* Mobile responsive */
+@media (max-width: 480px) {
+  .extras-popup-overlay {
+    padding: 0;
+    align-items: flex-end;
+  }
+
+  .extras-popup-modal {
+    max-height: 90vh;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  }
+
+  .extras-popup-header {
+    padding: var(--spacing-md);
+  }
+
+  .extras-popup-content {
+    padding: var(--spacing-md);
+  }
+
+  .extras-popup-footer {
+    padding: var(--spacing-md);
+  }
+
+  .extras-label-text {
+    display: none;
+  }
+}

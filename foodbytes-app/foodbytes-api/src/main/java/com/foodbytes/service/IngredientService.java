@@ -366,8 +366,27 @@ public class IngredientService {
         ingredient.setName(validation.getNormalizedName());
         ingredient.setAisle(aisle);
 
+        // FR-080: Set macro fields if provided
+        if (dto.getProteinPer100g() != null) {
+            ingredient.setProteinPer100g(dto.getProteinPer100g());
+        }
+        if (dto.getCarbsPer100g() != null) {
+            ingredient.setCarbsPer100g(dto.getCarbsPer100g());
+        }
+        if (dto.getFatPer100g() != null) {
+            ingredient.setFatPer100g(dto.getFatPer100g());
+        }
+
+        // FR-083: Set verification flag (defaults to false)
+        // Can only be verified if all macro fields are set
+        if (dto.getMacrosVerified() != null && dto.getMacrosVerified()) {
+            validateMacrosForVerification(dto);
+            ingredient.setMacrosVerified(true);
+        }
+
         Ingredient saved = ingredientRepository.save(ingredient);
-        log.info("Created new ingredient: {} (key: {})", saved.getName(), saved.getKey());
+        log.info("Created new ingredient: {} (key: {}, verified: {})",
+                saved.getName(), saved.getKey(), saved.getMacrosVerified());
 
         return toAdminDTO(saved);
     }
@@ -394,10 +413,43 @@ public class IngredientService {
             existing.setAisle(aisle);
         }
 
+        // FR-080: Update macro fields if provided
+        if (dto.getProteinPer100g() != null) {
+            existing.setProteinPer100g(dto.getProteinPer100g());
+        }
+        if (dto.getCarbsPer100g() != null) {
+            existing.setCarbsPer100g(dto.getCarbsPer100g());
+        }
+        if (dto.getFatPer100g() != null) {
+            existing.setFatPer100g(dto.getFatPer100g());
+        }
+
+        // FR-083: Update verification flag
+        if (dto.getMacrosVerified() != null && dto.getMacrosVerified()) {
+            validateMacrosForVerification(dto);
+            existing.setMacrosVerified(true);
+        } else if (dto.getMacrosVerified() != null && !dto.getMacrosVerified()) {
+            existing.setMacrosVerified(false);
+        }
+
         Ingredient saved = ingredientRepository.save(existing);
-        log.info("Updated ingredient: {} (key: {})", saved.getName(), saved.getKey());
+        log.info("Updated ingredient: {} (key: {}, verified: {})",
+                saved.getName(), saved.getKey(), saved.getMacrosVerified());
 
         return toAdminDTO(saved);
+    }
+
+    /**
+     * FR-083: Validates that all macro fields are set before marking as verified.
+     * Admin must enter protein, carbs, and fat values to verify an ingredient.
+     */
+    private void validateMacrosForVerification(IngredientAdminDTO dto) {
+        if (dto.getProteinPer100g() == null ||
+            dto.getCarbsPer100g() == null ||
+            dto.getFatPer100g() == null) {
+            throw new IllegalArgumentException(
+                    "Cannot mark ingredient as verified: protein_per_100g, carbs_per_100g, and fat_per_100g must all be set");
+        }
     }
 
     @Transactional
@@ -423,12 +475,18 @@ public class IngredientService {
     }
 
     private IngredientAdminDTO toAdminDTO(Ingredient ing) {
-        return new IngredientAdminDTO(
-                ing.getId(),
-                ing.getKey(),
-                ing.getName(),
-                ing.getAisle().getId(),
-                ing.getAisle().getName()
-        );
+        IngredientAdminDTO dto = new IngredientAdminDTO();
+        dto.setId(ing.getId());
+        dto.setKey(ing.getKey());
+        dto.setName(ing.getName());
+        dto.setAisleId(ing.getAisle().getId());
+        dto.setAisleName(ing.getAisle().getName());
+        // FR-080: Include macro fields
+        dto.setProteinPer100g(ing.getProteinPer100g());
+        dto.setCarbsPer100g(ing.getCarbsPer100g());
+        dto.setFatPer100g(ing.getFatPer100g());
+        // FR-083: Include verification flag
+        dto.setMacrosVerified(ing.getMacrosVerified());
+        return dto;
     }
 }

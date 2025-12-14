@@ -66,6 +66,39 @@
   background: #f8f9fa;
 }
 
+/* FR-093: Linked Recipe Ingredient Row */
+.ingredient-row.linked-recipe {
+  border-color: #17a2b8;
+  background: #e8f7fa;
+}
+
+.linked-recipe-container {
+  position: relative;
+}
+
+.linked-badge {
+  position: absolute;
+  top: 50%;
+  left: var(--spacing-sm);
+  transform: translateY(-50%);
+  font-size: 0.875rem;
+  z-index: 1;
+}
+
+.linked-recipe-input {
+  padding-left: calc(var(--spacing-sm) + 24px) !important;
+}
+
+.no-results-hint {
+  padding: var(--spacing-sm);
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-style: italic;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-sm);
+  margin-top: var(--spacing-xs);
+}
+
 /* Move Arrows */
 .row-arrows {
   display: flex;
@@ -213,6 +246,28 @@
   border-color: var(--brand-primary);
 }
 
+/* FR-084: Grams Input for macro calculation */
+.grams-input {
+  width: 65px;
+  padding: var(--spacing-sm);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  text-align: center;
+  background: #f8f9fa;
+}
+
+.grams-input:focus {
+  outline: none;
+  border-color: var(--brand-primary);
+  background: var(--bg-primary);
+}
+
+.grams-input::placeholder {
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+}
+
 /* Delete Button */
 .ingredient-row > .delete-button {
   width: 32px;
@@ -283,6 +338,33 @@
 .dialog p {
   margin: 0 0 var(--spacing-md) 0;
   color: var(--text-secondary);
+}
+
+/* FR-093: Dialog Sections */
+.dialog-section {
+  margin-bottom: var(--spacing-lg);
+}
+
+.dialog-section .section-label {
+  display: block;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
+  font-size: 0.875rem;
+}
+
+.dialog-section .type-options {
+  margin-bottom: var(--spacing-xs);
+}
+
+.linked-recipe-hint {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: #e8f7fa;
+  border-radius: var(--radius-sm);
+  margin-top: var(--spacing-xs);
+  border-left: 3px solid #17a2b8;
 }
 
 .dialog-options {
@@ -363,12 +445,17 @@
   }
 
   .autocomplete-container.unit-container {
-    flex: 1 1 calc(100% - 70px - 40px);
+    flex: 1 1 calc(50% - 40px);
     order: 3;
   }
 
-  .ingredient-row > .delete-button {
+  .grams-input {
+    flex: 0 0 55px;
     order: 4;
+  }
+
+  .ingredient-row > .delete-button {
+    order: 5;
   }
 
   .sticky-header {

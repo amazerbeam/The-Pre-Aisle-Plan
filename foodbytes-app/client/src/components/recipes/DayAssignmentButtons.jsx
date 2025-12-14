@@ -1,14 +1,18 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useMealPlan } from '../../contexts/MealPlanContext'
 import { useAuth } from '../../contexts/AuthContext'
+import { useHomemadeSelections } from '../../contexts/HomemadeSelectionsContext'
+import { recipeService } from '../../services/recipeService'
+import ExtrasSelectionPopup from './ExtrasSelectionPopup'
 // FR-041: Emojis are only shown in Meal Plan view, NOT on day assignment buttons
 import './DayAssignmentButtons.css'
 
 /**
- * DayAssignmentButtons - FR-014, FR-015, FR-037, NFR-016, FR-041, FR-043, FR-050
+ * DayAssignmentButtons - FR-014, FR-015, FR-037, NFR-016, FR-041, FR-043, FR-050, FR-087
  * Day-of-week buttons for recipe assignment with swap behavior
  * Hidden for guest users (as per user preference)
  * FR-050: Shows cumulative daily calories above each day button
+ * FR-087: Shows extras selection popup for recipes with linked extras
  *
  * Button States (NFR-016 - Legacy styling):
  * - unselected: No recipe assigned to this slot
@@ -23,7 +27,13 @@ function DayAssignmentButtons({ recipe, servings, currentMealType, selectedRecip
   const recipeIdToAssign = selectedRecipeId || recipe.id
   const { isAuthenticated } = useAuth()
   const { weekDays, weekPlan, assignRecipe, isRecipeAssigned, getDailyCalories } = useMealPlan()
+  const { saveSelections } = useHomemadeSelections()
   const [loading, setLoading] = useState(null) // Track which day is loading
+
+  // FR-087: State for extras popup
+  const [showExtrasPopup, setShowExtrasPopup] = useState(false)
+  const [pendingDate, setPendingDate] = useState(null) // Date waiting for popup confirmation
+  const [extrasData, setExtrasData] = useState(null) // Fetched extras hierarchy
 
   // Hidden for guest users
   if (!isAuthenticated) {
@@ -71,15 +81,9 @@ function DayAssignmentButtons({ recipe, servings, currentMealType, selectedRecip
   }
 
   /**
-   * FR-037: Handle day click with swap behavior
-   * - If unselected: Assign this recipe
-   * - If selected: Remove this recipe (toggle)
-   * - If already-selected: Replace with this recipe (swap - no confirmation)
-   * FR-043: Uses recipeIdToAssign (selected variant or base recipe)
+   * FR-087: Perform the actual recipe assignment
    */
-  const handleDayClick = async (dateStr) => {
-    if (loading) return // Prevent multiple clicks
-
+  const performAssignment = async (dateStr) => {
     setLoading(dateStr)
     try {
       const mealId = getMealId(currentMealType)
@@ -90,6 +94,71 @@ function DayAssignmentButtons({ recipe, servings, currentMealType, selectedRecip
     } finally {
       setLoading(null)
     }
+  }
+
+  /**
+   * FR-037, FR-087: Handle day click with swap behavior and extras popup
+   * - If recipe has extras: Show popup first, then assign after confirmation
+   * - If unselected: Assign this recipe
+   * - If selected: Remove this recipe (toggle)
+   * - If already-selected: Replace with this recipe (swap - no confirmation)
+   * FR-043: Uses recipeIdToAssign (selected variant or base recipe)
+   */
+  const handleDayClick = async (dateStr) => {
+    if (loading) return // Prevent multiple clicks
+
+    // Check if this is a toggle off (already selected) - no popup needed
+    const buttonClass = getButtonClass(dateStr)
+    if (buttonClass === 'selected') {
+      // Toggle off - remove recipe, no popup needed
+      await performAssignment(dateStr)
+      return
+    }
+
+    // FR-087: Check if recipe has extras - show popup if yes
+    if (recipe.hasExtras) {
+      // Fetch extras hierarchy if not already loaded
+      if (!extrasData || extrasData.parentRecipeId !== recipeIdToAssign) {
+        try {
+          const data = await recipeService.getRecipeExtras(recipeIdToAssign)
+          setExtrasData(data)
+        } catch (error) {
+          console.error('Failed to fetch extras:', error)
+          // If fetch fails, proceed without popup
+          await performAssignment(dateStr)
+          return
+        }
+      }
+
+      // Show popup
+      setPendingDate(dateStr)
+      setShowExtrasPopup(true)
+      return
+    }
+
+    // No extras - assign directly
+    await performAssignment(dateStr)
+  }
+
+  /**
+   * FR-087: Handle popup confirmation - save selections and assign recipe
+   */
+  const handleExtrasConfirm = async (selections) => {
+    setShowExtrasPopup(false)
+
+    if (pendingDate) {
+      // Selections are automatically saved to localStorage by the popup
+      await performAssignment(pendingDate)
+      setPendingDate(null)
+    }
+  }
+
+  /**
+   * FR-087: Handle popup cancel - close without assigning
+   */
+  const handleExtrasCancel = () => {
+    setShowExtrasPopup(false)
+    setPendingDate(null)
   }
 
   /**
@@ -106,32 +175,50 @@ function DayAssignmentButtons({ recipe, servings, currentMealType, selectedRecip
     }
   }
 
-  return (
-    <div className="day-buttons">
-      {weekDays.map((day) => {
-        const buttonClass = getButtonClass(day.date)
-        const isLoading = loading === day.date
-        // FR-041: NO emojis on day buttons - emojis only appear in Meal Plan view
-        // FR-050: Get daily calories for calorie preview
-        const dailyCalories = getDailyCalories(day.date)
+  // Build recipe object with extras for popup
+  const recipeWithExtras = extrasData ? {
+    ...recipe,
+    extras: extrasData.extras
+  } : recipe
 
-        return (
-          <div key={day.date} className="day-container">
-            {/* FR-050: Calorie preview above day button */}
-            <span className="day-calories">{dailyCalories} cal</span>
-            <button
-              className={`day-button ${buttonClass}`}
-              onClick={() => handleDayClick(day.date)}
-              disabled={isLoading}
-              title={getButtonTitle(day.date, day.dayName, buttonClass)}
-              aria-label={getButtonTitle(day.date, day.dayName, buttonClass)}
-            >
-              {day.dayName}
-            </button>
-          </div>
-        )
-      })}
-    </div>
+  return (
+    <>
+      <div className="day-buttons">
+        {weekDays.map((day) => {
+          const buttonClass = getButtonClass(day.date)
+          const isLoading = loading === day.date
+          // FR-041: NO emojis on day buttons - emojis only appear in Meal Plan view
+          // FR-050: Get daily calories for calorie preview
+          const dailyCalories = getDailyCalories(day.date)
+
+          return (
+            <div key={day.date} className="day-container">
+              {/* FR-050: Calorie preview above day button */}
+              <span className="day-calories">{dailyCalories} cal</span>
+              <button
+                className={`day-button ${buttonClass}`}
+                onClick={() => handleDayClick(day.date)}
+                disabled={isLoading}
+                title={getButtonTitle(day.date, day.dayName, buttonClass)}
+                aria-label={getButtonTitle(day.date, day.dayName, buttonClass)}
+              >
+                {day.dayName}
+              </button>
+            </div>
+          )
+        })}
+      </div>
+
+      {/* FR-087: Extras selection popup */}
+      {showExtrasPopup && extrasData && (
+        <ExtrasSelectionPopup
+          recipe={recipeWithExtras}
+          servings={servings}
+          onConfirm={handleExtrasConfirm}
+          onCancel={handleExtrasCancel}
+        />
+      )}
+    </>
   )
 }
 

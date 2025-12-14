@@ -2,12 +2,15 @@ package com.foodbytes.service;
 
 import com.foodbytes.dto.AggregatedShoppingListDTO;
 import com.foodbytes.dto.AisleDTO;
+import com.foodbytes.dto.HomemadeSelectionsDTO;
 import com.foodbytes.dto.IngredientBreakdownDTO;
 import com.foodbytes.dto.MealIngredientUsageDTO;
+import com.foodbytes.dto.RecipeExtraNodeDTO;
 import com.foodbytes.dto.ShoppingItemDTO;
 import com.foodbytes.dto.ShoppingListByAisleDTO;
 import com.foodbytes.model.*;
 import com.foodbytes.repository.MealPlanEntryRepository;
+import com.foodbytes.repository.RecipeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,25 +23,35 @@ import java.util.stream.Collectors;
 
 /**
  * Service for shopping list operations.
- * Implements FR-019 (aggregated 7-day shopping list) and FR-020 (group by aisle).
+ * Implements FR-019 (aggregated 7-day shopping list), FR-020 (group by aisle), FR-089 (extras integration).
  */
 @Service
 @RequiredArgsConstructor
 public class ShoppingListService {
 
     private final MealPlanEntryRepository mealPlanEntryRepository;
+    private final RecipeRepository recipeRepository;
+    private final RecipeExtrasService recipeExtrasService;
+
+    // Special aisle for store-bought items
+    private static final Long STORE_BOUGHT_AISLE_ID = -999L;
+    private static final String STORE_BOUGHT_AISLE_NAME = "Store Bought Items";
+    private static final Short STORE_BOUGHT_AISLE_ORDER = 0; // Show at top
 
     /**
      * Generate aggregated shopping list from 7-day meal plan.
      * FR-019: Aggregates ingredients with scaled quantities based on servings.
      * FR-020: Groups by grocery aisle with proper sorting.
+     * FR-089: Handles homemade/store-bought selections for extras.
      *
      * @param userId User ID
      * @param startDate Start date of the 7-day period
+     * @param homemadeSelections Optional selections from frontend (null = all homemade)
      * @return AggregatedShoppingListDTO with items grouped by aisle
      */
     @Transactional(readOnly = true)
-    public AggregatedShoppingListDTO getShoppingList(Long userId, LocalDate startDate) {
+    public AggregatedShoppingListDTO getShoppingList(Long userId, LocalDate startDate,
+                                                      HomemadeSelectionsDTO homemadeSelections) {
         // Calculate endDate = startDate + 7 days
         LocalDate endDate = startDate.plusDays(7);
 
@@ -59,47 +72,39 @@ public class ShoppingListService {
         // Map to store aggregated quantities: key = (ingredientId, unitId), value = totalQuantity
         Map<IngredientUnitKey, IngredientAggregate> aggregatedIngredients = new HashMap<>();
 
+        // FR-089: List to store store-bought items (extras marked as store-bought)
+        List<StoreBoughtItem> storeBoughtItems = new ArrayList<>();
+
+        // Extract selections map (null-safe)
+        Map<Long, Map<Long, Boolean>> selectionsMap = homemadeSelections != null
+            ? homemadeSelections.getSelections()
+            : null;
+
         // Process each meal plan entry
         for (MealPlanEntry entry : entries) {
             Recipe recipe = entry.getRecipe();
+            Long recipeId = recipe.getId();
             Integer entryServings = entry.getServings();
             Integer recipeDefaultServings = recipe.getDefaultServings();
 
-            // Process each ingredient in the recipe
-            for (RecipeIngredient recipeIngredient : recipe.getIngredients()) {
-                // Scale quantity: scaledQty = ingredient.quantity * entry.servings / recipe.defaultServings
-                BigDecimal originalQuantity = recipeIngredient.getQuantity();
-                BigDecimal scaledQuantity = originalQuantity
-                    .multiply(BigDecimal.valueOf(entryServings))
-                    .divide(BigDecimal.valueOf(recipeDefaultServings), 2, RoundingMode.HALF_UP);
+            // Process main recipe ingredients
+            processRecipeIngredients(recipe, entryServings, recipeDefaultServings, aggregatedIngredients);
 
-                // Create key for aggregation (ingredientId, unitId)
-                Long ingredientId = recipeIngredient.getIngredient().getId();
-                Long unitId = recipeIngredient.getUnit().getId();
-                IngredientUnitKey key = new IngredientUnitKey(ingredientId, unitId);
+            // FR-089: Process extras based on homemade selections
+            if (recipeExtrasService.hasExtras(recipeId)) {
+                List<RecipeExtraNodeDTO> extras = recipeExtrasService.buildExtrasTree(recipeId, new HashSet<>());
+                Map<Long, Boolean> recipeSelections = selectionsMap != null
+                    ? selectionsMap.get(recipeId)
+                    : null;
 
-                // Aggregate quantities
-                aggregatedIngredients.compute(key, (k, existing) -> {
-                    if (existing == null) {
-                        // First occurrence of this ingredient+unit combination
-                        Ingredient ingredient = recipeIngredient.getIngredient();
-                        Aisle aisle = ingredient.getAisle();
-                        return new IngredientAggregate(
-                            ingredientId,
-                            ingredient.getName(),
-                            scaledQuantity,
-                            recipeIngredient.getUnit().getValue(),
-                            aisle != null ? aisle.getId() : null,
-                            aisle != null ? aisle.getName() : "Other",
-                            aisle != null ? aisle.getDisplayOrder() : (short) 15
-                        );
-                    } else {
-                        // Add to existing quantity
-                        existing.totalQuantity = existing.totalQuantity.add(scaledQuantity);
-                        return existing;
-                    }
-                });
+                processExtras(extras, recipeSelections, entryServings, recipeDefaultServings,
+                             aggregatedIngredients, storeBoughtItems);
             }
+        }
+
+        // FR-089: Add store-bought items to aggregated list
+        if (!storeBoughtItems.isEmpty()) {
+            addStoreBoughtItems(storeBoughtItems, aggregatedIngredients);
         }
 
         // Convert aggregated data to DTOs and group by aisle
@@ -200,10 +205,15 @@ public class ShoppingListService {
 
             // Find the specific ingredient in this recipe
             for (RecipeIngredient recipeIngredient : recipe.getIngredients()) {
+                // FR-093: Skip linked recipe ingredients (they don't have an ingredient)
+                if (recipeIngredient.isLinkedRecipe()) {
+                    continue;
+                }
+
                 Ingredient ingredient = recipeIngredient.getIngredient();
 
                 // Check if this is the ingredient we're looking for
-                if (ingredient.getId().equals(ingredientId) &&
+                if (ingredient != null && ingredient.getId().equals(ingredientId) &&
                     recipeIngredient.getUnit().getValue().equalsIgnoreCase(unit)) {
 
                     // Capture ingredient name
@@ -309,6 +319,154 @@ public class ShoppingListService {
             this.aisleId = aisleId;
             this.aisleName = aisleName;
             this.displayOrder = displayOrder;
+        }
+    }
+
+    /**
+     * FR-089: Helper class for store-bought items.
+     */
+    private static class StoreBoughtItem {
+        private final Long recipeId;
+        private final String recipeName;
+        private int count;
+
+        public StoreBoughtItem(Long recipeId, String recipeName) {
+            this.recipeId = recipeId;
+            this.recipeName = recipeName;
+            this.count = 1;
+        }
+    }
+
+    /**
+     * FR-089: Process ingredients for a single recipe, adding to aggregated map.
+     * FR-093: Skip linked recipe ingredients (handled by extras system).
+     */
+    private void processRecipeIngredients(Recipe recipe, Integer entryServings, Integer defaultServings,
+                                          Map<IngredientUnitKey, IngredientAggregate> aggregatedIngredients) {
+        for (RecipeIngredient recipeIngredient : recipe.getIngredients()) {
+            // FR-093: Skip linked recipe ingredients - they are handled by extras system
+            if (recipeIngredient.isLinkedRecipe()) {
+                continue;
+            }
+
+            // Scale quantity: scaledQty = ingredient.quantity * entry.servings / recipe.defaultServings
+            BigDecimal originalQuantity = recipeIngredient.getQuantity();
+            BigDecimal scaledQuantity = originalQuantity
+                .multiply(BigDecimal.valueOf(entryServings))
+                .divide(BigDecimal.valueOf(defaultServings), 2, RoundingMode.HALF_UP);
+
+            // Create key for aggregation (ingredientId, unitId)
+            Long ingredientId = recipeIngredient.getIngredient().getId();
+            Long unitId = recipeIngredient.getUnit().getId();
+            IngredientUnitKey key = new IngredientUnitKey(ingredientId, unitId);
+
+            // Aggregate quantities
+            aggregatedIngredients.compute(key, (k, existing) -> {
+                if (existing == null) {
+                    // First occurrence of this ingredient+unit combination
+                    Ingredient ingredient = recipeIngredient.getIngredient();
+                    Aisle aisle = ingredient.getAisle();
+                    return new IngredientAggregate(
+                        ingredientId,
+                        ingredient.getName(),
+                        scaledQuantity,
+                        recipeIngredient.getUnit().getValue(),
+                        aisle != null ? aisle.getId() : null,
+                        aisle != null ? aisle.getName() : "Other",
+                        aisle != null ? aisle.getDisplayOrder() : (short) 15
+                    );
+                } else {
+                    // Add to existing quantity
+                    existing.totalQuantity = existing.totalQuantity.add(scaledQuantity);
+                    return existing;
+                }
+            });
+        }
+    }
+
+    /**
+     * FR-089: Process extras recursively, adding ingredients or store-bought items.
+     *
+     * @param extras List of extra nodes to process
+     * @param selections Map of extraRecipeId -> isHomemade (null = all homemade)
+     * @param entryServings Servings for the meal plan entry
+     * @param defaultServings Default servings for the parent recipe
+     * @param aggregatedIngredients Map to add ingredients to
+     * @param storeBoughtItems List to add store-bought items to
+     */
+    private void processExtras(List<RecipeExtraNodeDTO> extras,
+                               Map<Long, Boolean> selections,
+                               Integer entryServings,
+                               Integer defaultServings,
+                               Map<IngredientUnitKey, IngredientAggregate> aggregatedIngredients,
+                               List<StoreBoughtItem> storeBoughtItems) {
+        if (extras == null || extras.isEmpty()) {
+            return;
+        }
+
+        for (RecipeExtraNodeDTO extra : extras) {
+            Long extraRecipeId = extra.getRecipeId();
+
+            // Check if homemade (default true if no selection)
+            boolean isHomemade = selections == null || selections.get(extraRecipeId) == null
+                || selections.get(extraRecipeId);
+
+            if (isHomemade) {
+                // Add extra's ingredients to shopping list
+                Recipe extraRecipe = recipeRepository.findById(extraRecipeId).orElse(null);
+                if (extraRecipe != null) {
+                    processRecipeIngredients(extraRecipe, entryServings, defaultServings, aggregatedIngredients);
+                }
+
+                // Process children recursively
+                if (extra.getChildren() != null && !extra.getChildren().isEmpty()) {
+                    processExtras(extra.getChildren(), selections, entryServings, defaultServings,
+                                 aggregatedIngredients, storeBoughtItems);
+                }
+            } else {
+                // Add as store-bought item (don't process children - they're covered by parent)
+                storeBoughtItems.add(new StoreBoughtItem(extraRecipeId, extra.getRecipeName()));
+            }
+        }
+    }
+
+    /**
+     * FR-089: Add store-bought items to the shopping list.
+     */
+    private void addStoreBoughtItems(List<StoreBoughtItem> storeBoughtItems,
+                                     Map<IngredientUnitKey, IngredientAggregate> aggregatedIngredients) {
+        // Aggregate duplicate store-bought items
+        Map<Long, StoreBoughtItem> aggregated = new LinkedHashMap<>();
+        for (StoreBoughtItem item : storeBoughtItems) {
+            aggregated.compute(item.recipeId, (k, existing) -> {
+                if (existing == null) {
+                    return item;
+                } else {
+                    existing.count++;
+                    return existing;
+                }
+            });
+        }
+
+        // Add to aggregated ingredients as special items (negative IDs to avoid conflicts)
+        long storeBoughtIndex = -1000L;
+        for (StoreBoughtItem item : aggregated.values()) {
+            String itemName = "Store Bought " + item.recipeName;
+            if (item.count > 1) {
+                itemName += " (x" + item.count + ")";
+            }
+
+            IngredientUnitKey key = new IngredientUnitKey(storeBoughtIndex, storeBoughtIndex);
+            aggregatedIngredients.put(key, new IngredientAggregate(
+                storeBoughtIndex,
+                itemName,
+                BigDecimal.ONE,
+                "",  // No unit for store-bought items
+                STORE_BOUGHT_AISLE_ID,
+                STORE_BOUGHT_AISLE_NAME,
+                STORE_BOUGHT_AISLE_ORDER
+            ));
+            storeBoughtIndex--;
         }
     }
 }

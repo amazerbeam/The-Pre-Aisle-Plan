@@ -1,0 +1,73 @@
+/* FR-092: LinkedRecipeNavigation - Back button and breadcrumb styles */
+
+.linked-recipe-navigation {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-sm);
+}
+
+.back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  border-radius: var(--radius-sm);
+  color: #ffffff;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  align-self: flex-start;
+}
+
+.back-button:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.back-arrow {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.back-text {
+  font-weight: 500;
+}
+
+/* Breadcrumbs */
+.breadcrumbs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.breadcrumb-item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.breadcrumb-separator {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.breadcrumb-item .current {
+  color: #ffffff;
+  font-weight: 500;
+}
+
+/* Mobile responsive */
+@media (max-width: 480px) {
+  .back-button {
+    font-size: 0.8rem;
+    padding: var(--spacing-xs);
+  }
+
+  .breadcrumbs {
+    display: none;
+  }
+}

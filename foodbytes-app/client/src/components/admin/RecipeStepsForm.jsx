@@ -2,10 +2,17 @@ import { useState, useEffect, useRef } from 'react'
 import './RecipeStepsForm.css'
 
 /**
- * Form for editing recipe steps with reorder functionality (FR-046).
+ * Form for editing recipe steps with reorder functionality (FR-046, FR-091).
  * Features: up/down reorder arrows, add position selector, immediate removal.
+ * FR-091: Support for linking steps to extras recipes with alternative instructions.
  */
-function RecipeStepsForm({ steps: initialSteps, onSave, onCancel, setHasUnsavedChanges }) {
+function RecipeStepsForm({
+  steps: initialSteps,
+  onSave,
+  onCancel,
+  setHasUnsavedChanges,
+  availableExtras = []  // FR-091: List of recipes that can be linked as extras
+}) {
   const [steps, setSteps] = useState([])
   const [showAddDialog, setShowAddDialog] = useState(false)
   const [addPosition, setAddPosition] = useState('bottom')
@@ -62,6 +69,25 @@ function RecipeStepsForm({ steps: initialSteps, onSave, onCancel, setHasUnsavedC
     ))
   }
 
+  // FR-091: Update linked recipe for a step
+  const updateLinkedRecipe = (index, linkedRecipeId) => {
+    const linkedRecipe = availableExtras.find(r => r.id === linkedRecipeId)
+    setSteps(prev => prev.map((step, i) =>
+      i === index ? {
+        ...step,
+        linkedRecipeId: linkedRecipeId || null,
+        linkedRecipeName: linkedRecipe?.name || null
+      } : step
+    ))
+  }
+
+  // FR-091: Update alt instruction for a step
+  const updateAltInstruction = (index, altInstruction) => {
+    setSteps(prev => prev.map((step, i) =>
+      i === index ? { ...step, altInstruction } : step
+    ))
+  }
+
   // Add new step
   const handleAddStep = () => {
     const newStep = {
@@ -92,11 +118,16 @@ function RecipeStepsForm({ steps: initialSteps, onSave, onCancel, setHasUnsavedC
     setSaving(true)
     try {
       // Filter out completely empty steps before saving
+      // FR-091: Include linkedRecipeId and altInstruction
       const validSteps = steps
         .filter(step => step.instruction && step.instruction.trim())
         .map((step, idx) => ({
-          ...step,
-          stepNumber: idx + 1
+          id: step.id,
+          stepNumber: idx + 1,
+          instruction: step.instruction,
+          tip: step.tip,
+          linkedRecipeId: step.linkedRecipeId || null,
+          altInstruction: step.altInstruction || null
         }))
 
       await onSave(validSteps)
@@ -155,14 +186,54 @@ function RecipeStepsForm({ steps: initialSteps, onSave, onCancel, setHasUnsavedC
                 {index + 1}
               </div>
 
-              {/* Step instruction textarea */}
-              <textarea
-                value={step.instruction || ''}
-                onChange={(e) => updateStep(index, e.target.value)}
-                placeholder="Enter step instruction..."
-                className="step-textarea"
-                rows={2}
-              />
+              {/* Step content */}
+              <div className="step-content">
+                {/* Step instruction textarea */}
+                <textarea
+                  value={step.instruction || ''}
+                  onChange={(e) => updateStep(index, e.target.value)}
+                  placeholder="Enter step instruction..."
+                  className="step-textarea"
+                  rows={2}
+                />
+
+                {/* FR-091: Linked recipe section */}
+                {availableExtras.length > 0 && (
+                  <div className="step-link-section">
+                    <label className="step-link-label">
+                      Link to recipe:
+                      <select
+                        value={step.linkedRecipeId || ''}
+                        onChange={(e) => updateLinkedRecipe(index, e.target.value ? parseInt(e.target.value) : null)}
+                        className="step-link-select"
+                      >
+                        <option value="">-- No link --</option>
+                        {availableExtras.map(extra => (
+                          <option key={extra.id} value={extra.id}>
+                            {extra.name}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+
+                    {/* Show alt instruction field when linked recipe is selected */}
+                    {step.linkedRecipeId && (
+                      <div className="alt-instruction-row">
+                        <label className="alt-instruction-label">
+                          Store-bought alternative:
+                        </label>
+                        <input
+                          type="text"
+                          value={step.altInstruction || ''}
+                          onChange={(e) => updateAltInstruction(index, e.target.value)}
+                          placeholder="e.g., Prepare your store-bought dough"
+                          className="alt-instruction-input"
+                        />
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
 
               {/* Delete button */}
               <button
