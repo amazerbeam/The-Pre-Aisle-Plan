@@ -110,6 +110,7 @@ export const ShoppingListProvider = ({ children }) => {
 
   /**
    * FR-019: Fetch shopping list from API
+   * FR-096: Removed applySorting dependency to prevent refetch on checkbox toggle
    */
   const fetchShoppingList = useCallback(async (date) => {
     if (!isAuthenticated || !date) {
@@ -124,10 +125,7 @@ export const ShoppingListProvider = ({ children }) => {
     try {
       const data = await shoppingService.getShoppingList(date)
       setShoppingList(data)
-
-      // Apply sorting to the aisles
-      const sorted = applySorting(data.aisles || [])
-      setSortedAisles(sorted)
+      // Sorting will be applied by the checkStates useEffect
     } catch (err) {
       console.error('Failed to fetch shopping list:', err)
       setError('Failed to load shopping list')
@@ -136,7 +134,7 @@ export const ShoppingListProvider = ({ children }) => {
     } finally {
       setLoading(false)
     }
-  }, [isAuthenticated, applySorting])
+  }, [isAuthenticated])
 
   /**
    * Auto-refresh shopping list when startDate changes

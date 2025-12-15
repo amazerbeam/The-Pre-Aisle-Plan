@@ -7,11 +7,15 @@ import SearchView from './components/recipes/SearchView.jsx'
 import MealPlanCalendar from './components/mealplan/MealPlanCalendar.jsx'
 import ShoppingList from './components/shopping/ShoppingList.jsx'
 import LandingPageAnimation from './components/onboarding/LandingPageAnimation.jsx'
+import Toast from './components/common/Toast.jsx'
 import { useAuth } from './contexts/AuthContext'
+import { useMealPlan } from './contexts/MealPlanContext'
 import './styles/global.css'
 
 function App() {
   const { isAuthenticated, isGuest, loading } = useAuth()
+  // FR-098: Get assignment error for toast display
+  const { assignmentError, clearAssignmentError } = useMealPlan()
   const [showLanding, setShowLanding] = useState(false)
 
   useEffect(() => {
@@ -49,6 +53,8 @@ function App() {
         </Routes>
       </main>
       <Footer />
+      {/* FR-098: Toast for assignment errors */}
+      <Toast message={assignmentError} onClose={clearAssignmentError} />
     </div>
   )
 }

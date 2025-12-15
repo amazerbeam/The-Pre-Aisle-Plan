@@ -9,6 +9,15 @@
   overflow-x: auto;
   padding-bottom: var(--spacing-sm);
   -webkit-overflow-scrolling: touch;
+  /* Sticky meal tabs */
+  position: sticky;
+  top: 0;
+  background: var(--bg-secondary);
+  z-index: 90;
+  padding-top: var(--spacing-sm);
+  margin-top: calc(-1 * var(--spacing-md));
+  padding-left: var(--spacing-xs);
+  padding-right: var(--spacing-xs);
 }
 
 .meal-tab {

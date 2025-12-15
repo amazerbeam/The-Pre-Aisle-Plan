@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
+import { useMealPlan } from '../../contexts/MealPlanContext'
 import recipeService from '../../services/recipeService'
 import RecipeCard from './RecipeCard'
 import RecipeEditModal from '../admin/RecipeEditModal'
@@ -9,6 +10,7 @@ const MEAL_TYPES = ['breakfast', 'lunch', 'dinner', 'snacks', 'extras']
 
 function RecipeList() {
   const { isAdmin } = useAuth()
+  const { weekPlan } = useMealPlan()
   const [recipes, setRecipes] = useState([])
   const [activeMeal, setActiveMeal] = useState('breakfast')
   const [loading, setLoading] = useState(true)
@@ -17,11 +19,66 @@ function RecipeList() {
   const [editingRecipeId, setEditingRecipeId] = useState(null)
   const [showNewRecipe, setShowNewRecipe] = useState(false)
 
-  useEffect(() => {
-    loadRecipes(activeMeal)
-  }, [activeMeal, isAdmin])
+  /**
+   * Get all recipe IDs currently in the user's meal plan
+   */
+  const getMealPlanRecipeIds = useCallback(() => {
+    if (!weekPlan?.days) return new Set()
 
-  const loadRecipes = async (mealType) => {
+    const recipeIds = new Set()
+    weekPlan.days.forEach(day => {
+      if (day.mealsByType) {
+        Object.values(day.mealsByType).forEach(entries => {
+          entries.forEach(entry => {
+            if (entry.recipe?.id) {
+              recipeIds.add(entry.recipe.id)
+            }
+          })
+        })
+      }
+    })
+    return recipeIds
+  }, [weekPlan])
+
+  /**
+   * Swap recipes with variants if the variant is in the meal plan
+   */
+  const swapWithMealPlanVariants = useCallback(async (loadedRecipes) => {
+    const mealPlanRecipeIds = getMealPlanRecipeIds()
+    if (mealPlanRecipeIds.size === 0) return loadedRecipes
+
+    const swappedRecipes = await Promise.all(
+      loadedRecipes.map(async (recipe) => {
+        // Check if this recipe has variants
+        if (!recipe.variants || recipe.variants.length < 2) return recipe
+
+        // Check if any variant (other than current) is in the meal plan
+        const variantInPlan = recipe.variants.find(
+          v => v.recipeId !== recipe.id && mealPlanRecipeIds.has(v.recipeId)
+        )
+
+        if (variantInPlan) {
+          // Fetch and return the variant instead
+          try {
+            const variantRecipe = await recipeService.getRecipeById(variantInPlan.recipeId)
+            return variantRecipe || recipe
+          } catch (err) {
+            console.error('Failed to load variant:', err)
+            return recipe
+          }
+        }
+
+        return recipe
+      })
+    )
+
+    return swappedRecipes
+  }, [getMealPlanRecipeIds])
+
+  /**
+   * Load recipes and swap with meal plan variants
+   */
+  const loadRecipes = useCallback(async (mealType) => {
     setLoading(true)
     setError(null)
     try {
@@ -29,14 +86,21 @@ function RecipeList() {
       const data = isAdmin
         ? await recipeService.getAllRecipesAdmin(mealType)
         : await recipeService.getRecipesByMealType(mealType)
-      setRecipes(data)
+
+      // Swap default recipes with variants if variant is in meal plan
+      const swappedData = await swapWithMealPlanVariants(data)
+      setRecipes(swappedData)
     } catch (err) {
       setError('Failed to load recipes. Please try again.')
       console.error('Error loading recipes:', err)
     } finally {
       setLoading(false)
     }
-  }
+  }, [isAdmin, swapWithMealPlanVariants])
+
+  useEffect(() => {
+    loadRecipes(activeMeal)
+  }, [activeMeal, loadRecipes])
 
   // FR-033: Handle edit button click
   const handleEdit = (recipeId) => {
