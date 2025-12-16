@@ -8,11 +8,12 @@ import ExtrasSelectionPopup from './ExtrasSelectionPopup'
 import './DayAssignmentButtons.css'
 
 /**
- * DayAssignmentButtons - FR-014, FR-015, FR-037, NFR-016, FR-041, FR-043, FR-050, FR-087
+ * DayAssignmentButtons - FR-014, FR-015, FR-037, NFR-016, FR-041, FR-043, FR-050, FR-087, FR-098
  * Day-of-week buttons for recipe assignment with swap behavior
  * Hidden for guest users (as per user preference)
  * FR-050: Shows cumulative daily calories above each day button
  * FR-087: Shows extras selection popup for recipes with linked extras
+ * FR-098: Optimistic UI - no loading state, instant feedback
  *
  * Button States (NFR-016 - Legacy styling):
  * - unselected: No recipe assigned to this slot
@@ -28,7 +29,7 @@ function DayAssignmentButtons({ recipe, servings, currentMealType, selectedRecip
   const { isAuthenticated } = useAuth()
   const { weekDays, weekPlan, assignRecipe, isRecipeAssigned, getDailyCalories } = useMealPlan()
   const { saveSelections } = useHomemadeSelections()
-  const [loading, setLoading] = useState(null) // Track which day is loading
+  // FR-098: Removed loading state - using optimistic UI instead
 
   // FR-087: State for extras popup
   const [showExtrasPopup, setShowExtrasPopup] = useState(false)
@@ -81,37 +82,30 @@ function DayAssignmentButtons({ recipe, servings, currentMealType, selectedRecip
   }
 
   /**
-   * FR-087: Perform the actual recipe assignment
+   * FR-087, FR-098: Perform the actual recipe assignment with optimistic UI
    */
-  const performAssignment = async (dateStr) => {
-    setLoading(dateStr)
-    try {
-      const mealId = getMealId(currentMealType)
-      // FR-043: Use recipeIdToAssign to assign selected variant
-      await assignRecipe(recipeIdToAssign, dateStr, mealId, servings)
-    } catch (error) {
-      console.error('Failed to assign recipe:', error)
-    } finally {
-      setLoading(null)
-    }
+  const performAssignment = (dateStr) => {
+    const mealId = getMealId(currentMealType)
+    // FR-043: Use recipeIdToAssign to assign selected variant
+    // FR-098: Pass recipe data for optimistic calorie calculation
+    assignRecipe(recipeIdToAssign, dateStr, mealId, servings, recipe)
   }
 
   /**
-   * FR-037, FR-087: Handle day click with swap behavior and extras popup
+   * FR-037, FR-087, FR-098: Handle day click with swap behavior and extras popup
    * - If recipe has extras: Show popup first, then assign after confirmation
    * - If unselected: Assign this recipe
    * - If selected: Remove this recipe (toggle)
    * - If already-selected: Replace with this recipe (swap - no confirmation)
    * FR-043: Uses recipeIdToAssign (selected variant or base recipe)
+   * FR-098: No loading check - optimistic UI handles instantly
    */
   const handleDayClick = async (dateStr) => {
-    if (loading) return // Prevent multiple clicks
-
     // Check if this is a toggle off (already selected) - no popup needed
     const buttonClass = getButtonClass(dateStr)
     if (buttonClass === 'selected') {
       // Toggle off - remove recipe, no popup needed
-      await performAssignment(dateStr)
+      performAssignment(dateStr)
       return
     }
 
@@ -125,7 +119,7 @@ function DayAssignmentButtons({ recipe, servings, currentMealType, selectedRecip
         } catch (error) {
           console.error('Failed to fetch extras:', error)
           // If fetch fails, proceed without popup
-          await performAssignment(dateStr)
+          performAssignment(dateStr)
           return
         }
       }
@@ -137,7 +131,7 @@ function DayAssignmentButtons({ recipe, servings, currentMealType, selectedRecip
     }
 
     // No extras - assign directly
-    await performAssignment(dateStr)
+    performAssignment(dateStr)
   }
 
   /**
@@ -186,7 +180,6 @@ function DayAssignmentButtons({ recipe, servings, currentMealType, selectedRecip
       <div className="day-buttons">
         {weekDays.map((day) => {
           const buttonClass = getButtonClass(day.date)
-          const isLoading = loading === day.date
           // FR-041: NO emojis on day buttons - emojis only appear in Meal Plan view
           // FR-050: Get daily calories for calorie preview
           const dailyCalories = getDailyCalories(day.date)
@@ -195,10 +188,10 @@ function DayAssignmentButtons({ recipe, servings, currentMealType, selectedRecip
             <div key={day.date} className="day-container">
               {/* FR-050: Calorie preview above day button */}
               <span className="day-calories">{dailyCalories} cal</span>
+              {/* FR-098: Never disabled - optimistic UI provides instant feedback */}
               <button
                 className={`day-button ${buttonClass}`}
                 onClick={() => handleDayClick(day.date)}
-                disabled={isLoading}
                 title={getButtonTitle(day.date, day.dayName, buttonClass)}
                 aria-label={getButtonTitle(day.date, day.dayName, buttonClass)}
               >

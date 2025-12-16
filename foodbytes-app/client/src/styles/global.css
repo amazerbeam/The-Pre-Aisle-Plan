@@ -74,7 +74,9 @@ body {
 }
 
 .app {
+  /* Use dvh for mobile browser compatibility (dynamic viewport height) */
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
 }

@@ -1834,3 +1834,174 @@ INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_lab
 (12, 41, TRUE, 'Standard', 1),   -- Standard is default
 (12, 40, FALSE, 'Light', 2),
 (12, 42, FALSE, 'Full', 3);
+
+-- =============================================
+-- BURGER PATTIES (Extra)
+-- =============================================
+
+-- New Ingredients for Burger Patties
+INSERT INTO ingredients (id, `key`, name, aisle_id, protein_per_100g, carbs_per_100g, fat_per_100g, macros_verified) VALUES
+(62, 'beef_mince_5', 'Beef mince (5% fat)', 1, 21.00, 0.00, 5.00, TRUE),
+(63, 'breadcrumbs', 'Breadcrumbs', 13, 13.00, 72.00, 5.00, TRUE),
+(64, 'onion_powder', 'Onion powder', 8, 10.00, 79.00, 1.00, TRUE),
+(65, 'paprika', 'Paprika', 8, 14.00, 54.00, 13.00, TRUE);
+
+-- Recipe 43: Burger Patties (Extra) - ~852 cal total, makes 4 patties (~565g yield)
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+(43, 'Burger Patties', 4, 852, FALSE, TRUE);
+
+-- Assign to 'extras' meal type (meal_id = 5)
+INSERT INTO recipe_meals (recipe_id, meal_id) VALUES (43, 5);
+
+-- Burger Patties Ingredients
+-- Total yield: 565g, Per patty: ~141g, 213 cal, 26.5g protein, 7.5g carbs, 7.5g fat
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
+(43, 62, NULL, 454, 1, 454.00, 1),    -- Beef mince 5% fat, 454g (1 lb)
+(43, 63, NULL, 0.25, 16, 30.00, 2),   -- Breadcrumbs, 1/4 cup (30g)
+(43, 64, NULL, 1, 3, 2.00, 3),        -- Onion powder, 1 tsp (2g)
+(43, 13, NULL, 1, 10, 3.00, 4),       -- Garlic, 1 clove (3g)
+(43, 39, NULL, 1, 4, 17.00, 5),       -- Worcestershire sauce, 1 tbsp (17g)
+(43, 5, NULL, 1, 3, 6.00, 6),         -- Salt, 1 tsp (6g)
+(43, 50, NULL, 0.5, 3, 1.50, 7),      -- Black pepper, 0.5 tsp (1.5g)
+(43, 65, NULL, 0.5, 3, 1.50, 8),      -- Paprika, 0.5 tsp (1.5g)
+(43, 59, NULL, 1, 7, 50.00, 9);       -- Egg, 1 medium (50g)
+
+-- Burger Patties Steps
+INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
+(43, 1, 'Combine beef mince, breadcrumbs, onion powder, minced garlic, Worcestershire sauce, salt, pepper, paprika, and beaten egg in a large bowl.', NULL, NULL),
+(43, 2, 'Mix gently with your hands until just combined — don''t overwork or patties will be tough.', NULL, NULL),
+(43, 3, 'Divide into 4 equal portions (~141g each). Form into patties about 2cm thick, slightly thinner in the center (they puff up when cooking).', NULL, NULL),
+(43, 4, 'Make a small dimple in the center of each patty with your thumb to prevent doming.', NULL, NULL),
+(43, 5, 'Cook on grill or pan over medium-high heat, 4-5 minutes per side until internal temp reaches 71°C (160°F).', NULL, NULL),
+(43, 6, 'Rest 2-3 minutes before serving.', NULL, NULL);
+
+-- =============================================
+-- STROMBOLI FAMILY (with Linked Recipe Extras)
+-- =============================================
+
+-- New Ingredients for Stromboli
+INSERT INTO ingredients (id, `key`, name, aisle_id, protein_per_100g, carbs_per_100g, fat_per_100g, macros_verified) VALUES
+(66, 'garlic_granules', 'Garlic granules', 8, 17.00, 73.00, 0.50, TRUE),
+(67, 'italian_seasoning', 'Italian seasoning', 8, 5.00, 60.00, 6.00, TRUE);
+
+-- Stromboli Recipes (3 variants, serves 2 each)
+-- Uses linked recipes: Pizza Dough (11), Pizza Sauce (12), Burger Patties (43)
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+(44, 'Stromboli (Light)', 2, 1344, FALSE, TRUE),
+(45, 'Stromboli', 2, 1664, FALSE, TRUE),
+(46, 'Stromboli (Full)', 2, 2098, FALSE, TRUE);
+
+-- Assign to Dinner meal type
+INSERT INTO recipe_meals (recipe_id, meal_id) VALUES
+(44, 3),  -- Light: Dinner
+(45, 3),  -- Standard: Dinner
+(46, 3);  -- Full: Dinner
+
+-- =============================================
+-- STROMBOLI RECIPE EXTRAS (for popup hierarchy)
+-- =============================================
+INSERT INTO recipe_extras (parent_recipe_id, child_recipe_id, display_order) VALUES
+-- Light variant extras
+(44, 11, 0),  -- Pizza Dough
+(44, 12, 1),  -- Pizza Sauce
+(44, 43, 2),  -- Burger Patties
+-- Standard variant extras
+(45, 11, 0),  -- Pizza Dough
+(45, 12, 1),  -- Pizza Sauce
+(45, 43, 2),  -- Burger Patties
+-- Full variant extras
+(46, 11, 0),  -- Pizza Dough
+(46, 12, 1),  -- Pizza Sauce
+(46, 43, 2); -- Burger Patties
+
+-- =============================================
+-- STROMBOLI (LIGHT) INGREDIENTS
+-- Total: 1344 cal, Per serving: 672 cal, 30.4g protein, 60g carbs, 34.5g fat
+-- =============================================
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
+(44, NULL, 11, 250, 1, 250.00, 1),    -- Pizza Dough (linked), 250g
+(44, NULL, 12, 38, 1, 38.00, 2),      -- Pizza Sauce (linked), 38g (~2.5 tbsp)
+(44, 37, NULL, 80, 1, 80.00, 3),      -- Mozzarella, 80g
+(44, 30, NULL, 15, 1, 15.00, 4),      -- Parmesan, 15g
+(44, NULL, 43, 100, 1, 100.00, 5),    -- Burger Patties (linked), 100g
+(44, 12, NULL, 40, 1, 40.00, 6),      -- Onion (grilled), 40g
+(44, 66, NULL, 1, 3, 2.50, 7),        -- Garlic granules, 1 tsp (2.5g)
+(44, 67, NULL, 2, 3, 2.00, 8),        -- Italian seasoning, 2 tsp (2g)
+(44, 22, NULL, 1.5, 4, 21.00, 9);     -- Olive oil, 1.5 tbsp (21g)
+
+-- =============================================
+-- STROMBOLI (STANDARD) INGREDIENTS
+-- Total: 1664 cal, Per serving: 832 cal, 37.7g protein, 72g carbs, 43.7g fat
+-- =============================================
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
+(45, NULL, 11, 300, 1, 300.00, 1),    -- Pizza Dough (linked), 300g
+(45, NULL, 12, 45, 1, 45.00, 2),      -- Pizza Sauce (linked), 45g (3 tbsp)
+(45, 37, NULL, 100, 1, 100.00, 3),    -- Mozzarella, 100g
+(45, 30, NULL, 20, 1, 20.00, 4),      -- Parmesan, 20g
+(45, NULL, 43, 125, 1, 125.00, 5),    -- Burger Patties (linked), 125g
+(45, 12, NULL, 50, 1, 50.00, 6),      -- Onion (grilled), 50g
+(45, 66, NULL, 1, 3, 3.00, 7),        -- Garlic granules, 1 tsp (3g)
+(45, 67, NULL, 2, 3, 2.00, 8),        -- Italian seasoning, 2 tsp (2g)
+(45, 22, NULL, 2, 4, 28.00, 9);       -- Olive oil, 2 tbsp (28g)
+
+-- =============================================
+-- STROMBOLI (FULL) INGREDIENTS
+-- Total: 2098 cal, Per serving: 1049 cal, 48.6g protein, 89g carbs, 55.6g fat
+-- =============================================
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
+(46, NULL, 11, 370, 1, 370.00, 1),    -- Pizza Dough (linked), 370g
+(46, NULL, 12, 55, 1, 55.00, 2),      -- Pizza Sauce (linked), 55g (4 tbsp)
+(46, 37, NULL, 130, 1, 130.00, 3),    -- Mozzarella, 130g
+(46, 30, NULL, 30, 1, 30.00, 4),      -- Parmesan, 30g
+(46, NULL, 43, 160, 1, 160.00, 5),    -- Burger Patties (linked), 160g
+(46, 12, NULL, 60, 1, 60.00, 6),      -- Onion (grilled), 60g
+(46, 66, NULL, 1, 3, 3.00, 7),        -- Garlic granules, 1 tsp (3g)
+(46, 67, NULL, 2, 3, 2.00, 8),        -- Italian seasoning, 2 tsp (2g)
+(46, 22, NULL, 2.5, 4, 35.00, 9);     -- Olive oil, 2.5 tbsp (35g)
+
+-- =============================================
+-- STROMBOLI RECIPE STEPS (Light)
+-- =============================================
+INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
+(44, 1, 'Prepare the pizza dough according to the linked recipe. Use 250g dough.', 11, 'Use 250g store-bought pizza dough, brought to room temperature.'),
+(44, 2, 'Prepare the burger patty mixture according to the linked recipe. You will need 100g of the mixture (crumbled, not formed into patties).', 43, 'Use 100g cooked ground beef, crumbled.'),
+(44, 3, 'Grill the onion slices until softened and lightly charred, about 3-4 minutes per side.', NULL, NULL),
+(44, 4, 'Roll the dough into a 30 x 20 cm rectangle on a floured surface. Spread the pizza sauce over the dough, leaving a 2cm border. Layer the crumbled burger meat, grilled onion, mozzarella, and parmesan.', 12, 'Roll the dough into a 30 x 20 cm rectangle. Spread 38g store-bought pizza sauce over the dough. Layer the meat, onion, and cheeses.'),
+(44, 5, 'Roll the stromboli tightly from the long edge, sealing the seam and tucking the ends underneath. Place seam-side down on a lined baking tray.', NULL, NULL),
+(44, 6, 'Mix olive oil with garlic granules and Italian seasoning. Brush generously over the top and sides of the stromboli. Cut 3-4 small slits on top for steam.', NULL, NULL),
+(44, 7, 'Bake at 200°C for 25-30 minutes until golden brown. Rest 5 minutes before slicing.', NULL, NULL);
+
+-- =============================================
+-- STROMBOLI RECIPE STEPS (Standard)
+-- =============================================
+INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
+(45, 1, 'Prepare the pizza dough according to the linked recipe. Use 300g dough.', 11, 'Use 300g store-bought pizza dough, brought to room temperature.'),
+(45, 2, 'Prepare the burger patty mixture according to the linked recipe. You will need 125g of the mixture (crumbled, not formed into patties).', 43, 'Use 125g cooked ground beef, crumbled.'),
+(45, 3, 'Grill the onion slices until softened and lightly charred, about 3-4 minutes per side.', NULL, NULL),
+(45, 4, 'Roll the dough into a 30 x 20 cm rectangle on a floured surface. Spread the pizza sauce over the dough, leaving a 2cm border. Layer the crumbled burger meat, grilled onion, mozzarella, and parmesan.', 12, 'Roll the dough into a 30 x 20 cm rectangle. Spread 45g store-bought pizza sauce over the dough. Layer the meat, onion, and cheeses.'),
+(45, 5, 'Roll the stromboli tightly from the long edge, sealing the seam and tucking the ends underneath. Place seam-side down on a lined baking tray.', NULL, NULL),
+(45, 6, 'Mix olive oil with garlic granules and Italian seasoning. Brush generously over the top and sides of the stromboli. Cut 3-4 small slits on top for steam.', NULL, NULL),
+(45, 7, 'Bake at 200°C for 25-30 minutes until golden brown. Rest 5 minutes before slicing.', NULL, NULL);
+
+-- =============================================
+-- STROMBOLI RECIPE STEPS (Full)
+-- =============================================
+INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
+(46, 1, 'Prepare the pizza dough according to the linked recipe. Use 370g dough.', 11, 'Use 370g store-bought pizza dough, brought to room temperature.'),
+(46, 2, 'Prepare the burger patty mixture according to the linked recipe. You will need 160g of the mixture (crumbled, not formed into patties).', 43, 'Use 160g cooked ground beef, crumbled.'),
+(46, 3, 'Grill the onion slices until softened and lightly charred, about 3-4 minutes per side.', NULL, NULL),
+(46, 4, 'Roll the dough into a 30 x 20 cm rectangle on a floured surface. Spread the pizza sauce over the dough, leaving a 2cm border. Layer the crumbled burger meat, grilled onion, mozzarella, and parmesan.', 12, 'Roll the dough into a 30 x 20 cm rectangle. Spread 55g store-bought pizza sauce over the dough. Layer the meat, onion, and cheeses.'),
+(46, 5, 'Roll the stromboli tightly from the long edge, sealing the seam and tucking the ends underneath. Place seam-side down on a lined baking tray.', NULL, NULL),
+(46, 6, 'Mix olive oil with garlic granules and Italian seasoning. Brush generously over the top and sides of the stromboli. Cut 3-4 small slits on top for steam.', NULL, NULL),
+(46, 7, 'Bake at 200°C for 25-30 minutes until golden brown. Rest 5 minutes before slicing.', NULL, NULL);
+
+-- =============================================
+-- STROMBOLI RECIPE FAMILY
+-- =============================================
+INSERT INTO recipe_families (id, family_name, description) VALUES
+(13, 'Stromboli', 'Rolled pizza dough stuffed with seasoned beef, mozzarella, parmesan, grilled onion, and pizza sauce. Brushed with garlic and Italian herb olive oil.');
+
+INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_label, display_order) VALUES
+(13, 45, TRUE, 'Standard', 1),   -- Standard is default
+(13, 44, FALSE, 'Light', 2),
+(13, 46, FALSE, 'Full', 3);

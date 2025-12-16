@@ -2,9 +2,8 @@
   background-color: var(--brand-primary);
   color: white;
   padding: var(--spacing-md);
-  position: sticky;
-  top: 0;
-  z-index: 100;
+  /* Removed sticky - meal tabs are sticky instead */
+  z-index: 50;
   box-shadow: var(--shadow-md);
 }
 

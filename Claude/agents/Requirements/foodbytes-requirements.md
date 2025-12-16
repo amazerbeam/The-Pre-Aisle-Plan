@@ -36,17 +36,6 @@
 
 | Req # | Description |
 |-------|-------------|
-| FR-085 | Extras Meal Type |
-| FR-086 | Recipe Extras Linking |
-| FR-087 | Homemade Selection Popup |
-| FR-088 | Smart Checkbox Cascade |
-| FR-089 | Shopping List Extras Integration |
-| FR-090 | Homemade Choices Persistence |
-| FR-091 | Recipe Step Linking |
-| FR-092 | Linked Recipe Navigation |
-| FR-093 | Linked Recipe Ingredients |
-| FR-094 | Linked Recipe Macro Calculation |
-| FR-095 | Extras Recipe Servings Independence |
 
 ## In Progress - Finish
 
@@ -104,6 +93,20 @@
 | FR-082 | Weekly Macro Summary (Meal Plan View) |
 | FR-083 | Ingredient Macro Verification Flag |
 | FR-084 | Recipe Ingredient Gram Equivalent (Frontend + Backend) |
+| FR-085 | Extras Meal Type |
+| FR-086 | Recipe Extras Linking |
+| FR-087 | Homemade Selection Popup |
+| FR-088 | Smart Checkbox Cascade |
+| FR-089 | Shopping List Extras Integration |
+| FR-090 | Homemade Choices Persistence |
+| FR-091 | Recipe Step Linking |
+| FR-092 | Linked Recipe Navigation |
+| FR-093 | Linked Recipe Ingredients |
+| FR-094 | Linked Recipe Macro Calculation |
+| FR-095 | Extras Recipe Servings Independence |
+| FR-096 | Shopping List Background Sync (No Reload) |
+| FR-097 | Variant Pre-Selection from Meal Plan |
+| FR-098 | Recipe Day Assignment Optimistic UI |
 
 ## Completed - Finish
 
@@ -1109,6 +1112,85 @@ CREATE TABLE recipe_family_members (
 **Source Evidence:**
 - `shoppingListState` Map
 - `localStorage.setItem("shoppingListState", JSON.stringify([...shoppingListState]))`
+
+---
+
+### FR-096: Shopping List Background Sync (No Reload)
+
+**Category:** Shopping List / Performance
+
+**Description:** When users check or uncheck shopping list items, the UI updates instantly without reloading the page. The checkbox state saves to the backend asynchronously in the background. If the save fails due to network issues, the checkbox reverts to its previous state and an error message is displayed.
+
+**User Story:** As a user, I want to check off shopping list items without the page reloading, so that I can quickly mark items as purchased while shopping without interruption.
+
+**Acceptance Criteria:**
+- [x] Checking/unchecking an item instantly toggles the checkbox (optimistic UI update)
+- [x] No page reload or "Loading" state when toggling checkboxes
+- [x] Works offline with localStorage fallback (existing FR-026 behavior preserved)
+
+**Source Evidence:** User feedback - current page reload on checkbox change disrupts shopping flow
+
+**Priority:** High
+
+**Status:** Complete
+
+**Implementation:** Fixed dependency chain in ShoppingListContext.jsx - removed `applySorting` from `fetchShoppingList` dependencies to prevent refetch on checkbox toggle. Checkbox state remains localStorage-only per user preference.
+
+**Related Requirements:** FR-021 (Check Off Purchased Items), FR-026 (Persist Shopping List State to Local Storage)
+
+---
+
+### FR-097: Variant Pre-Selection from Meal Plan
+
+**Category:** Recipe Management / Variants
+
+**Description:** When browsing recipes, if a recipe variant is already assigned to the user's current week meal plan, that variant is automatically displayed instead of the default recipe. This ensures consistency between what the user sees in the recipe list and what they have planned.
+
+**User Story:** As a user, I want to see the recipe variant I've already selected when browsing recipes, so that I don't have to re-select my preferred variant every time I navigate back to the recipes view.
+
+**Acceptance Criteria:**
+- [x] Recipe list checks current week's meal plan for assigned recipe IDs
+- [x] For recipes with variants, if a non-default variant is in the meal plan, display that variant
+- [x] Variant dropdown shows the correct variant as selected
+- [x] When meal plan changes (recipe assigned/removed), recipe list updates accordingly
+- [x] Works across all meal type tabs (Breakfast, Lunch, Dinner, Snacks, Extras)
+
+**Source Evidence:** User feedback - variant selection was lost when navigating away and back
+
+**Priority:** Medium
+
+**Status:** Complete
+
+**Related Requirements:** FR-043 (Linked Recipe Variants)
+
+**Implementation:** RecipeList.jsx - `swapWithMealPlanVariants()` function cross-references loaded recipes with `weekPlan` from MealPlanContext
+
+---
+
+### FR-098: Recipe Day Assignment Optimistic UI
+
+**Category:** Meal Planning / Performance
+
+**Description:** When users assign a recipe to a day, the UI updates immediately without waiting for the backend to respond. The day button shows the selected state instantly, daily calories recalculate immediately, and the backend save happens asynchronously in the background. If the save fails, the assignment reverts and an error message is displayed.
+
+**User Story:** As a user, I want to assign recipes to days without the button going grey/disabled while waiting, so that meal planning feels fast and responsive.
+
+**Acceptance Criteria:**
+- [ ] Clicking a day button immediately toggles its visual state (no grey/disabled waiting state)
+- [ ] Daily calorie totals update immediately without waiting for backend
+- [ ] Backend save happens asynchronously in background
+- [ ] On save failure: assignment reverts to previous state
+- [ ] On save failure: error message displayed (e.g., "Failed to save. Please try again.")
+- [ ] Multiple rapid assignments are handled correctly (queued or debounced)
+- [ ] Works for both assigning and removing recipes from days
+
+**Source Evidence:** User feedback - day buttons go grey/disabled while waiting for server response, feels slow
+
+**Priority:** High
+
+**Status:** In Progress
+
+**Related Requirements:** FR-014 (Assign Recipes to Days), FR-017 (Calculate Daily Calorie Totals)
 
 ---
 
