@@ -1,0 +1,68 @@
+/**
+ * FR-029: Lock Emoji Animation Styles
+ * Animation sequence for wake lock visual indicator
+ */
+
+.lock-emoji-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10000;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lock-emoji {
+  font-size: 64px;
+  transition: transform 0.15s ease-out, filter 0.1s ease-out;
+}
+
+/* Phase 1: Initial unlocked state */
+.lock-emoji-container.unlocked .lock-emoji {
+  transform: scale(1);
+}
+
+/* Phase 2: Scale up to 1.1x */
+.lock-emoji-container.scale-up .lock-emoji {
+  transform: scale(1.1);
+}
+
+/* Phase 3: Scale down to 0.9x */
+.lock-emoji-container.scale-down .lock-emoji {
+  transform: scale(0.9);
+}
+
+/* Phase 4: Flash white */
+.lock-emoji-container.flash .lock-emoji {
+  transform: scale(0.9);
+  filter: brightness(2) drop-shadow(0 0 20px rgba(255, 255, 255, 0.9));
+}
+
+/* Phase 5: Locked state */
+.lock-emoji-container.locked .lock-emoji {
+  transform: scale(1.05);
+  filter: brightness(1);
+}
+
+/* Phase 6: Return to normal scale */
+.lock-emoji-container.scale-normal .lock-emoji {
+  transform: scale(1);
+}
+
+/* Phase 7: Fade out */
+.lock-emoji-container.fade-out {
+  opacity: 0;
+  transition: opacity 0.1s ease-out;
+}
+
+.lock-emoji-container.fade-out .lock-emoji {
+  transform: scale(1);
+}
+
+/* Hidden state */
+.lock-emoji-container.hidden {
+  display: none;
+}

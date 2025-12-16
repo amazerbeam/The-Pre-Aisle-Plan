@@ -36,6 +36,7 @@
 
 | Req # | Description |
 |-------|-------------|
+| FR-029 | Screen Wake Lock with Persistent Clickable Lock Icon (Next to Ingredients) |
 
 ## In Progress - Finish
 
@@ -107,7 +108,6 @@
 | FR-096 | Shopping List Background Sync (No Reload) |
 | FR-097 | Variant Pre-Selection from Meal Plan |
 | FR-098 | Recipe Day Assignment Optimistic UI |
-
 ## Completed - Finish
 
 ---
@@ -1242,34 +1242,56 @@ CREATE TABLE recipe_family_members (
 
 ## Mobile Features
 
-### FR-029: Screen Wake Lock During Cooking with Lock Emoji Animation
+### FR-029: Screen Wake Lock with Persistent Clickable Lock Icon (Next to Ingredients)
 **Priority:** Low
 
-**Description:** System keeps screen awake when viewing meal plan or fullscreen recipe. When the user opens the menu, a lock emoji animation plays to indicate the wake lock status.
+**Category:** Mobile Features
 
-**User Story:** As a user, I want my screen to stay on while viewing recipes so that I don't have to keep unlocking my phone while cooking, and I want to see a visual indicator (animated lock emoji) when the wake lock is active.
+**Description:** System keeps screen awake when viewing fullscreen recipe. A small lock icon appears **next to the "Ingredients" header** inside RecipeViewModal. When wake lock activates, the icon animates from unlocked to locked. The icon remains visible and is **clickable to toggle** the wake lock on/off.
+
+**User Story:** As a user, I want my screen to stay on while viewing recipes so that I don't have to keep unlocking my phone while cooking. I want to see a small lock icon next to "Ingredients" that shows the lock status, and I want to click it to turn the wake lock on or off.
 
 **Acceptance Criteria:**
-- Wake lock requests when fullscreen recipe opens
-- Wake lock requests when meal plan modal becomes visible
-- Wake lock releases when views close
-- Feature detection handles unsupported browsers gracefully
-- Errors are logged but don't interrupt user experience
-- [ ] When user opens the menu, display a lock emoji animation:
-  - [ ] Start with unlocked emoji (🔓) at 1x scale
-  - [ ] Scale up to 1.1x
-  - [ ] Scale down to 0.9x
-  - [ ] Flash white
+- [ ] Wake lock requests when fullscreen recipe opens (RecipeViewModal)
+- [ ] Small lock icon (🔒/🔓) displays **inline next to "Ingredients" header**
+- [ ] Icon size: approximately 20-24px (small, not distracting)
+- [ ] When wake lock activates, animation plays at that location:
+  - [ ] Start with unlocked emoji (🔓)
+  - [ ] Scale up slightly (1.1x)
+  - [ ] Scale down slightly (0.9x)
+  - [ ] Flash/glow effect
   - [ ] Transform to locked emoji (🔒)
-  - [ ] Return to 1x scale
-  - [ ] Total animation duration: 1 second
+  - [ ] Return to normal scale
+  - [ ] Total animation duration: ~1 second
+- [ ] Icon remains visible after animation (shows current state: 🔒 or 🔓)
+- [ ] Clicking the icon toggles wake lock:
+  - [ ] If locked (🔒): releases wake lock, shows 🔓
+  - [ ] If unlocked (🔓): requests wake lock, shows 🔒 with animation
+- [ ] Feature detection handles unsupported browsers gracefully
+- [ ] If wake lock not supported, icon is hidden or shows disabled state
+
+**DO:**
+- Place the lock icon **inside RecipeViewModal.jsx**, inline with the "Ingredients" section header
+- Use a small icon size (~20-24px) that doesn't dominate the UI
+- Make the icon clickable with `cursor: pointer` and hover feedback
+- Keep the icon visible at all times while the modal is open (persistent indicator)
+- Play the animation at the icon's location (not centered on screen)
+- Show 🔒 when wake lock is active, 🔓 when inactive
+
+**DO NOT:**
+- Do NOT place the animation as a centered fullscreen overlay
+- Do NOT hide the icon after the animation completes
+- Do NOT make the icon purely decorative (it must be interactive)
+- Do NOT place the icon in the header, footer, or floating position
+- Do NOT make the icon larger than ~24px
+- Do NOT show the icon on MealPlanCalendar (only RecipeViewModal)
 
 **Source Evidence:**
-- `requestWakeLock()`
-- `releaseWakeLock()`
+- User feedback: "I wanted the lock icon to always show beside the Ingredients, smaller than the mockup. I want to see the animation there, then the lock and for the user to be able to click it to deactivate the lock"
+- `hooks/useWakeLock.js` - Custom hook for Screen Wake Lock API
+- `components/recipes/RecipeViewModal.jsx` - Target component for lock icon placement
 - `navigator.wakeLock.request('screen')`
 - Feature detection: `if ('wakeLock' in navigator)`
-- CSS keyframe animation for lock emoji transition
 
 **Status:** In Progress
 

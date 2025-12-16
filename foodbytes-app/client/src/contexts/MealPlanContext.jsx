@@ -155,6 +155,23 @@ export const MealPlanProvider = ({ children }) => {
   }, [weekPlan])
 
   /**
+   * FR-014: Check if a recipe is assigned to a specific date and meal type
+   * @param {number} recipeId
+   * @param {string} planDate - ISO format
+   * @param {string} mealType - 'breakfast', 'lunch', 'dinner', 'snacks'
+   * @returns {boolean}
+   */
+  const isRecipeAssigned = useCallback((recipeId, planDate, mealType) => {
+    if (!weekPlan || !weekPlan.days) return false
+
+    const day = weekPlan.days.find(d => d.date === planDate)
+    if (!day || !day.mealsByType) return false
+
+    const entries = day.mealsByType[mealType] || []
+    return entries.some(entry => entry.recipe?.id === recipeId)
+  }, [weekPlan])
+
+  /**
    * FR-014, FR-098: Assign recipe to a date with optimistic UI
    * @param {number} recipeId
    * @param {string} planDate - ISO format
@@ -226,23 +243,6 @@ export const MealPlanProvider = ({ children }) => {
       throw err
     }
   }, [isAuthenticated, fetchWeekPlan])
-
-  /**
-   * FR-014: Check if a recipe is assigned to a specific date and meal type
-   * @param {number} recipeId
-   * @param {string} planDate - ISO format
-   * @param {string} mealType - 'breakfast', 'lunch', 'dinner', 'snacks'
-   * @returns {boolean}
-   */
-  const isRecipeAssigned = useCallback((recipeId, planDate, mealType) => {
-    if (!weekPlan || !weekPlan.days) return false
-
-    const day = weekPlan.days.find(d => d.date === planDate)
-    if (!day || !day.mealsByType) return false
-
-    const entries = day.mealsByType[mealType] || []
-    return entries.some(entry => entry.recipe?.id === recipeId)
-  }, [weekPlan])
 
   /**
    * Get all entries for a specific date
