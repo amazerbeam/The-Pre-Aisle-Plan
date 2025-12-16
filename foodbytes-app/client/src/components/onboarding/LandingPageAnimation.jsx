@@ -209,7 +209,7 @@ function LandingPageAnimation({ onComplete }) {
               The Solution
             </h1>
             <h2 className="solution-secondary animate-fade-in delay-1s">
-              Join MyPantryPlan
+              Join My Pantry Plan
             </h2>
           </div>
         )}
@@ -226,7 +226,7 @@ function LandingPageAnimation({ onComplete }) {
         {/* Phase 5: Summary & CTA */}
         {currentPhase === 4 && (
           <div className="phase-5">
-            <ul className="summary-list" role="list" aria-label="MyPantryPlan features">
+            <ul className="summary-list" role="list" aria-label="My Pantry Plan features">
               {PHASE_5_BENEFITS.map((benefit, index) => (
                 <li
                   className="summary-item"

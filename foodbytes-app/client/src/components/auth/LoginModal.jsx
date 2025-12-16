@@ -24,7 +24,7 @@ function LoginModal({ onClose }) {
         </button>
 
         <div className="modal-header">
-          <h2>Welcome to MyPantryPlan</h2>
+          <h2>Welcome to My Pantry Plan</h2>
           <p>Sign in to unlock all features</p>
         </div>
 

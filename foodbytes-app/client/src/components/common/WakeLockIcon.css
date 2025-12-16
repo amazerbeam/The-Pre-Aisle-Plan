@@ -1,0 +1,75 @@
+/**
+ * FR-029: Wake Lock Icon Styles
+ * Small inline icon that shows next to "Ingredients" header
+ */
+
+.wake-lock-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: 2px 4px;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  vertical-align: middle;
+  transition: transform 0.15s ease-out, opacity 0.15s ease-out;
+  opacity: 0.8;
+}
+
+.wake-lock-icon:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.wake-lock-icon:active {
+  transform: scale(0.95);
+}
+
+.wake-lock-icon .lock-emoji {
+  display: inline-block;
+  transition: transform 0.15s ease-out, filter 0.1s ease-out;
+}
+
+/* Locked state - slightly more prominent */
+.wake-lock-icon.locked {
+  opacity: 1;
+}
+
+/* Unlocked state - slightly faded */
+.wake-lock-icon.unlocked {
+  opacity: 0.6;
+}
+
+.wake-lock-icon.unlocked:hover {
+  opacity: 0.9;
+}
+
+/* Animation keyframes */
+@keyframes lockAnimation {
+  0% {
+    transform: scale(1);
+  }
+  20% {
+    transform: scale(1.2);
+  }
+  40% {
+    transform: scale(0.9);
+  }
+  50% {
+    filter: brightness(1.5) drop-shadow(0 0 4px rgba(255, 255, 255, 0.8));
+  }
+  60% {
+    transform: scale(1.1);
+    filter: brightness(1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Animation state */
+.wake-lock-icon.animating .lock-emoji {
+  animation: lockAnimation 0.8s ease-out forwards;
+}

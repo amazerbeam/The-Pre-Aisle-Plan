@@ -1,16 +1,19 @@
 import { useEffect, useState, useRef, useMemo, useCallback } from 'react'
 import { recipeService } from '../../services/recipeService'
 import useRecipeNavigationStack from '../../hooks/useRecipeNavigationStack'
+import useWakeLock from '../../hooks/useWakeLock'
 import { useHomemadeSelections } from '../../contexts/HomemadeSelectionsContext'
 import LinkedRecipeNavigation from './LinkedRecipeNavigation'
+import WakeLockIcon from '../common/WakeLockIcon'
 import './RecipeViewModal.css'
 
 /**
- * FR-013, FR-091, FR-092, FR-095: RecipeViewModal - Fullscreen recipe view popup
+ * FR-013, FR-029, FR-091, FR-092, FR-095: RecipeViewModal - Fullscreen recipe view popup
  * - White text on dark background
  * - Variant dropdown for recipe families (same as RecipeCard)
  * - Keeps popup open when variant changes (updates content in-place)
  * - 99vh height with 0.5vh even margins
+ * - FR-029: Screen wake lock activates when modal opens
  * - FR-091: Linked steps display as clickable links
  * - FR-092: Navigation stack for browsing linked recipes
  * - FR-095: Independent servings per recipe (extras show at their default servings)
@@ -38,6 +41,9 @@ function RecipeViewModal({
   // FR-090: Get homemade selections to determine display for linked steps
   const { getSelections } = useHomemadeSelections()
   const homemadeSelections = parentRecipeId ? getSelections(parentRecipeId) : {}
+
+  // FR-029: Screen wake lock with clickable icon next to Ingredients
+  const { isLocked, isSupported, isAnimating, toggle: toggleWakeLock } = useWakeLock(true)
 
   // State for variant dropdown
   const [selectedVariantId, setSelectedVariantId] = useState(recipe?.id)
@@ -268,7 +274,16 @@ function RecipeViewModal({
         <div className="recipe-view-content">
           {/* Ingredients */}
           <section className="ingredients-section">
-            <h3>Ingredients</h3>
+            <h3>
+              Ingredients
+              {/* FR-029: Wake lock icon - clickable to toggle screen lock */}
+              <WakeLockIcon
+                isLocked={isLocked}
+                isAnimating={isAnimating}
+                isSupported={isSupported}
+                onToggle={toggleWakeLock}
+              />
+            </h3>
             {currentRecipe.ingredients && currentRecipe.ingredients.length > 0 ? (
               <ul className="ingredients-list">
                 {currentRecipe.ingredients.map((ing, idx) => (
