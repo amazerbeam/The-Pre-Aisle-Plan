@@ -2005,3 +2005,112 @@ INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_lab
 (13, 45, TRUE, 'Standard', 1),   -- Standard is default
 (13, 44, FALSE, 'Light', 2),
 (13, 46, FALSE, 'Full', 3);
+
+-- =============================================
+-- STEAK & AIR-FRIED CHIPS FAMILY
+-- =============================================
+
+-- New Ingredients for Steak & Chips
+INSERT INTO ingredients (id, `key`, name, aisle_id, protein_per_100g, carbs_per_100g, fat_per_100g, macros_verified) VALUES
+(68, 'sirloin_steak', 'Sirloin steak', 1, 21.00, 0.00, 5.00, TRUE),
+(69, 'potatoes', 'Potatoes', 3, 2.00, 17.00, 0.10, TRUE),
+(70, 'mushrooms', 'Mushrooms', 3, 2.50, 0.40, 0.30, TRUE),
+(71, 'fresh_rosemary', 'Fresh rosemary', 5, 3.30, 21.00, 5.90, TRUE);
+
+-- Steak & Chips Recipes (3 variants, serves 2 each)
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+(47, 'Steak & Chips (Light)', 2, 766, FALSE, TRUE),
+(48, 'Steak & Chips', 2, 1102, FALSE, TRUE),
+(49, 'Steak & Chips (Full)', 2, 1437, FALSE, TRUE);
+
+-- Assign to Dinner meal type
+INSERT INTO recipe_meals (recipe_id, meal_id) VALUES
+(47, 3),  -- Light: Dinner
+(48, 3),  -- Standard: Dinner
+(49, 3);  -- Full: Dinner
+
+-- =============================================
+-- STEAK & CHIPS (LIGHT) INGREDIENTS
+-- Total: 766 cal, Per serving: 383 cal, 25.5g protein, 26.5g carbs, 19.5g fat
+-- =============================================
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
+(47, 68, NULL, 200, 1, 200.00, 1),    -- Sirloin steak, 200g
+(47, 69, NULL, 300, 1, 300.00, 2),    -- Potatoes, 300g
+(47, 70, NULL, 120, 1, 120.00, 3),    -- Mushrooms, 120g
+(47, 22, NULL, 2, 4, 28.00, 4),       -- Olive oil, 2 tbsp (28g)
+(47, 71, NULL, 2, 12, 4.00, 5),       -- Fresh rosemary, 2 sprigs (4g)
+(47, 5, NULL, 0.5, 3, 3.00, 6),       -- Salt, 0.5 tsp (3g)
+(47, 50, NULL, 0.25, 3, 0.75, 7);     -- Black pepper, 0.25 tsp
+
+-- =============================================
+-- STEAK & CHIPS (STANDARD) INGREDIENTS
+-- Total: 1102 cal, Per serving: 551 cal, 37.5g protein, 35g carbs, 29g fat
+-- =============================================
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
+(48, 68, NULL, 300, 1, 300.00, 1),    -- Sirloin steak, 300g
+(48, 69, NULL, 400, 1, 400.00, 2),    -- Potatoes, 400g
+(48, 70, NULL, 150, 1, 150.00, 3),    -- Mushrooms, 150g
+(48, 22, NULL, 3, 4, 42.00, 4),       -- Olive oil, 3 tbsp (42g)
+(48, 71, NULL, 2, 12, 4.00, 5),       -- Fresh rosemary, 2 sprigs (4g)
+(48, 5, NULL, 0.5, 3, 3.00, 6),       -- Salt, 0.5 tsp (3g)
+(48, 50, NULL, 0.25, 3, 1.00, 7);     -- Black pepper, 0.25 tsp
+
+-- =============================================
+-- STEAK & CHIPS (FULL) INGREDIENTS
+-- Total: 1437 cal, Per serving: 719 cal, 49.5g protein, 43.5g carbs, 38.5g fat
+-- =============================================
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
+(49, 68, NULL, 400, 1, 400.00, 1),    -- Sirloin steak, 400g
+(49, 69, NULL, 500, 1, 500.00, 2),    -- Potatoes, 500g
+(49, 70, NULL, 200, 1, 200.00, 3),    -- Mushrooms, 200g
+(49, 22, NULL, 4, 4, 56.00, 4),       -- Olive oil, 4 tbsp (56g)
+(49, 71, NULL, 2, 12, 4.00, 5),       -- Fresh rosemary, 2 sprigs (4g)
+(49, 5, NULL, 0.5, 3, 3.00, 6),       -- Salt, 0.5 tsp (3g)
+(49, 50, NULL, 0.5, 3, 1.50, 7);      -- Black pepper, 0.5 tsp
+
+-- =============================================
+-- STEAK & CHIPS RECIPE STEPS (Light)
+-- =============================================
+INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
+(47, 1, 'Par-boil the potatoes: Peel and cut potatoes into thick chips (~2cm). Place in cold salted water, bring to boil, then simmer 8-10 minutes until just tender but not falling apart. Drain and let steam dry for 5 minutes.', NULL, NULL),
+(47, 2, 'Rough up the chips: Shake the drained chips gently in the colander to roughen the edges — this creates extra crispy surface area.', NULL, NULL),
+(47, 3, 'Season and air fry: Toss chips with 1 tbsp olive oil and a pinch of salt. Air fry at 200°C for 20-25 minutes, shaking halfway, until golden and crispy.', NULL, NULL),
+(47, 4, 'Prep the steak: Remove steaks from fridge 20 minutes before cooking. Pat completely dry with kitchen paper. Season generously with salt on both sides.', NULL, NULL),
+(47, 5, 'Sear the steak: Heat ½ tbsp olive oil in a heavy pan over high heat until smoking. Add steaks and cook 2-3 minutes per side for medium-rare (adjust for thickness and preference). Remove and rest on a warm plate for 5 minutes.', NULL, NULL),
+(47, 6, 'Cook the mushrooms: Slice mushrooms. In the same pan over medium-high heat, add remaining ½ tbsp olive oil. Add mushrooms and rosemary sprigs. Season with salt and pepper. Sauté 4-5 minutes until golden and tender.', NULL, NULL),
+(47, 7, 'Serve: Plate the rested steak with air-fried chips and rosemary mushrooms alongside.', NULL, NULL);
+
+-- =============================================
+-- STEAK & CHIPS RECIPE STEPS (Standard)
+-- =============================================
+INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
+(48, 1, 'Par-boil the potatoes: Peel and cut potatoes into thick chips (~2cm). Place in cold salted water, bring to boil, then simmer 8-10 minutes until just tender but not falling apart. Drain and let steam dry for 5 minutes.', NULL, NULL),
+(48, 2, 'Rough up the chips: Shake the drained chips gently in the colander to roughen the edges — this creates extra crispy surface area.', NULL, NULL),
+(48, 3, 'Season and air fry: Toss chips with 1.5 tbsp olive oil and a pinch of salt. Air fry at 200°C for 20-25 minutes, shaking halfway, until golden and crispy.', NULL, NULL),
+(48, 4, 'Prep the steak: Remove steaks from fridge 20 minutes before cooking. Pat completely dry with kitchen paper. Season generously with salt on both sides.', NULL, NULL),
+(48, 5, 'Sear the steak: Heat 1 tbsp olive oil in a heavy pan over high heat until smoking. Add steaks and cook 2-3 minutes per side for medium-rare (adjust for thickness and preference). Remove and rest on a warm plate for 5 minutes.', NULL, NULL),
+(48, 6, 'Cook the mushrooms: Slice mushrooms. In the same pan over medium-high heat, add remaining ½ tbsp olive oil. Add mushrooms and rosemary sprigs. Season with salt and pepper. Sauté 4-5 minutes until golden and tender.', NULL, NULL),
+(48, 7, 'Serve: Plate the rested steak with air-fried chips and rosemary mushrooms alongside.', NULL, NULL);
+
+-- =============================================
+-- STEAK & CHIPS RECIPE STEPS (Full)
+-- =============================================
+INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
+(49, 1, 'Par-boil the potatoes: Peel and cut potatoes into thick chips (~2cm). Place in cold salted water, bring to boil, then simmer 8-10 minutes until just tender but not falling apart. Drain and let steam dry for 5 minutes.', NULL, NULL),
+(49, 2, 'Rough up the chips: Shake the drained chips gently in the colander to roughen the edges — this creates extra crispy surface area.', NULL, NULL),
+(49, 3, 'Season and air fry: Toss chips with 2 tbsp olive oil and a pinch of salt. Air fry at 200°C for 20-25 minutes, shaking halfway, until golden and crispy.', NULL, NULL),
+(49, 4, 'Prep the steak: Remove steaks from fridge 20 minutes before cooking. Pat completely dry with kitchen paper. Season generously with salt on both sides.', NULL, NULL),
+(49, 5, 'Sear the steak: Heat 1.5 tbsp olive oil in a heavy pan over high heat until smoking. Add steaks and cook 3-4 minutes per side for medium-rare (adjust for thickness and preference). Remove and rest on a warm plate for 5 minutes.', NULL, NULL),
+(49, 6, 'Cook the mushrooms: Slice mushrooms. In the same pan over medium-high heat, add remaining ½ tbsp olive oil. Add mushrooms and rosemary sprigs. Season with salt and pepper. Sauté 4-5 minutes until golden and tender.', NULL, NULL),
+(49, 7, 'Serve: Plate the rested steak with air-fried chips and rosemary mushrooms alongside.', NULL, NULL);
+
+-- =============================================
+-- STEAK & CHIPS RECIPE FAMILY
+-- =============================================
+INSERT INTO recipe_families (id, family_name, description) VALUES
+(14, 'Steak & Chips', 'Pan-seared sirloin steak with par-boiled, air-fried chips and rosemary mushrooms. Classic steakhouse dinner made at home.');
+
+INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_label, display_order) VALUES
+(14, 48, TRUE, 'Standard', 1),   -- Standard is default
+(14, 47, FALSE, 'Light', 2),
+(14, 49, FALSE, 'Full', 3);

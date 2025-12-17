@@ -1,0 +1,1034 @@
+Y<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Header Design Mockups - Logo Only</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --brand-primary: #4a3f80;
+      --brand-primary-dark: #3a3266;
+      --brand-primary-light: #6b5fa0;
+      --text-primary: #2c3e50;
+      --text-secondary: #5a6c7d;
+      --bg-secondary: #f8f9fa;
+      --border-color: #e5e7eb;
+      --white: #ffffff;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #f0f0f5;
+      padding: 20px;
+    }
+
+    .mockup-container {
+      max-width: 420px;
+      margin: 0 auto 40px;
+      background: white;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+
+    .mockup-label {
+      background: #2c3e50;
+      color: white;
+      padding: 12px 16px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .mockup-label span {
+      opacity: 0.7;
+      font-weight: 400;
+      margin-left: 8px;
+    }
+
+    .content-placeholder {
+      height: 200px;
+      background: repeating-linear-gradient(
+        45deg,
+        #f8f9fa,
+        #f8f9fa 10px,
+        #fff 10px,
+        #fff 20px
+      );
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #aaa;
+      font-size: 14px;
+    }
+
+    /* Shared Header Styles */
+    .header {
+      background: var(--brand-primary);
+      color: white;
+      padding: 12px 16px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      width: 44px;
+      height: 44px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 10px;
+      transition: background 0.2s;
+    }
+
+    .logo:hover {
+      background: rgba(255,255,255,0.2);
+    }
+
+    .logo-icon {
+      width: 28px;
+      height: 28px;
+    }
+
+    .date-picker {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,255,255,0.15);
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .date-picker:hover {
+      background: rgba(255,255,255,0.25);
+    }
+
+    .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .chevron {
+      width: 16px;
+      height: 16px;
+      opacity: 0.8;
+    }
+
+    .icon-btn {
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.1);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .icon-btn:hover {
+      background: rgba(255,255,255,0.2);
+    }
+
+    .icon-btn svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    /* Section Titles */
+    h2.section-title {
+      max-width: 420px;
+      margin: 40px auto 16px;
+      font-size: 1.5rem;
+      color: var(--text-primary);
+    }
+
+    p.section-desc {
+      max-width: 420px;
+      margin: 0 auto 16px;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    /* Function Legend */
+    .legend {
+      max-width: 420px;
+      margin: 0 auto 40px;
+      background: white;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .legend h3 {
+      font-size: 0.9rem;
+      margin-bottom: 12px;
+      color: var(--text-primary);
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .legend-item:last-child {
+      border-bottom: none;
+    }
+
+    .legend-icon {
+      width: 32px;
+      height: 32px;
+      background: var(--bg-secondary);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .legend-text strong {
+      display: block;
+      font-size: 0.85rem;
+      color: var(--text-primary);
+    }
+
+    .legend-text span {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+
+    /* ========== DESIGN 1: Balanced Center ========== */
+    .header-1 .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header-1 .center-section {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+    }
+
+    /* ========== DESIGN 2: Date Prominent ========== */
+    .header-2 .header-content {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-2 .date-picker {
+      flex: 1;
+      justify-content: center;
+      background: rgba(255,255,255,0.2);
+      font-weight: 600;
+    }
+
+    /* ========== DESIGN 3: Pill Bar ========== */
+    .header-3 {
+      padding: 8px 12px;
+    }
+
+    .header-3 .header-content {
+      display: flex;
+      align-items: center;
+      background: rgba(0,0,0,0.15);
+      border-radius: 28px;
+      padding: 4px;
+    }
+
+    .header-3 .logo {
+      border-radius: 24px;
+    }
+
+    .header-3 .date-picker {
+      flex: 1;
+      justify-content: center;
+      background: transparent;
+      margin: 0 4px;
+    }
+
+    .header-3 .avatar {
+      width: 36px;
+      height: 36px;
+    }
+
+    /* ========== DESIGN 4: Split Actions ========== */
+    .header-4 .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header-4 .left-actions,
+    .header-4 .right-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .header-4 .date-picker {
+      background: white;
+      color: var(--brand-primary);
+      font-weight: 600;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    .header-4 .date-picker .chevron {
+      color: var(--brand-primary);
+    }
+
+    /* ========== DESIGN 5: Gradient Banner ========== */
+    .header-5 {
+      background: linear-gradient(135deg, #4a3f80 0%, #6b5fa0 100%);
+      padding: 10px 16px;
+    }
+
+    .header-5 .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header-5 .center-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(255,255,255,0.1);
+      padding: 4px 4px 4px 12px;
+      border-radius: 24px;
+    }
+
+    .header-5 .date-text {
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .header-5 .change-btn {
+      background: white;
+      color: var(--brand-primary);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    /* ========== DESIGN 6: Floating Date Card ========== */
+    .header-6 {
+      padding: 12px 16px 20px;
+      position: relative;
+    }
+
+    .header-6 .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header-6 .floating-date {
+      position: absolute;
+      bottom: -14px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: white;
+      color: var(--text-primary);
+      padding: 10px 20px;
+      border-radius: 24px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+
+    .header-6 .floating-date svg {
+      color: var(--brand-primary);
+    }
+
+    .header-6-spacer {
+      height: 20px;
+      background: white;
+    }
+
+    /* ========== DESIGN 7: Compact Row ========== */
+    .header-7 {
+      padding: 8px 12px;
+    }
+
+    .header-7 .header-content {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .header-7 .logo {
+      width: 38px;
+      height: 38px;
+    }
+
+    .header-7 .logo-icon {
+      width: 22px;
+      height: 22px;
+    }
+
+    .header-7 .date-picker {
+      flex: 1;
+      padding: 6px 12px;
+      font-size: 0.85rem;
+    }
+
+    .header-7 .avatar {
+      width: 32px;
+      height: 32px;
+      font-size: 12px;
+    }
+
+    /* ========== DESIGN 8: Icon Bar ========== */
+    .header-8 {
+      padding: 8px 16px;
+    }
+
+    .header-8 .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header-8 .icon-group {
+      display: flex;
+      gap: 4px;
+    }
+
+    .header-8 .date-display {
+      text-align: center;
+    }
+
+    .header-8 .date-label {
+      font-size: 0.65rem;
+      opacity: 0.7;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .header-8 .date-value {
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    /* ========== DESIGN 9: Segmented Control ========== */
+    .header-9 {
+      padding: 10px 12px;
+    }
+
+    .header-9 .header-content {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .header-9 .segment-control {
+      flex: 1;
+      display: flex;
+      background: rgba(0,0,0,0.2);
+      border-radius: 8px;
+      padding: 3px;
+    }
+
+    .header-9 .segment {
+      flex: 1;
+      padding: 8px 12px;
+      text-align: center;
+      font-size: 0.8rem;
+      font-weight: 500;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .header-9 .segment.active {
+      background: white;
+      color: var(--brand-primary);
+      font-weight: 600;
+    }
+
+    /* ========== DESIGN 10: Two-Level ========== */
+    .header-10 {
+      padding: 0;
+    }
+
+    .header-10 .header-main {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 16px;
+    }
+
+    .header-10 .header-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .header-10 .date-bar {
+      background: var(--brand-primary-dark);
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .header-10 .date-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .header-10 .date-info svg {
+      width: 18px;
+      height: 18px;
+      opacity: 0.7;
+    }
+
+    .header-10 .date-text {
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .header-10 .week-nav {
+      display: flex;
+      gap: 4px;
+    }
+
+    .header-10 .nav-btn {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.1);
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .header-10 .nav-btn:hover {
+      background: rgba(255,255,255,0.2);
+    }
+
+    /* ========== BONUS DESIGNS ========== */
+
+    /* DESIGN 11: Glass Morphism */
+    .header-11 {
+      background: rgba(74, 63, 128, 0.85);
+      backdrop-filter: blur(10px);
+      padding: 10px 16px;
+    }
+
+    .header-11 .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header-11 .glass-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(5px);
+      padding: 6px 6px 6px 14px;
+      border-radius: 24px;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .header-11 .date-text {
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .header-11 .avatar {
+      width: 32px;
+      height: 32px;
+      font-size: 12px;
+    }
+
+    /* DESIGN 12: Minimal Line */
+    .header-12 {
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.15);
+    }
+
+    .header-12 .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header-12 .logo {
+      background: transparent;
+    }
+
+    .header-12 .date-picker {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+
+    .header-12 .icon-btn {
+      background: transparent;
+    }
+  </style>
+</head>
+<body>
+
+  <h2 class="section-title">Logo-Only Header Designs</h2>
+  <div class="legend">
+    <h3>All headers preserve these functions:</h3>
+    <div class="legend-item">
+      <div class="legend-icon">
+        <svg width="20" height="20" viewBox="0 0 100 100" fill="none">
+          <rect x="15" y="20" width="70" height="65" rx="8" stroke="#4a3f80" stroke-width="6"/>
+          <line x1="15" y1="38" x2="85" y2="38" stroke="#4a3f80" stroke-width="6"/>
+        </svg>
+      </div>
+      <div class="legend-text">
+        <strong>Logo Icon (Clickable)</strong>
+        <span>Navigates to Recipe browser / home view</span>
+      </div>
+    </div>
+    <div class="legend-item">
+      <div class="legend-icon">
+        <svg width="20" height="20" fill="none" stroke="#4a3f80" stroke-width="2">
+          <rect x="3" y="4" width="14" height="12" rx="2"/>
+          <line x1="3" y1="8" x2="17" y2="8"/>
+        </svg>
+      </div>
+      <div class="legend-text">
+        <strong>Date Range Picker</strong>
+        <span>Select meal plan date range</span>
+      </div>
+    </div>
+    <div class="legend-item">
+      <div class="legend-icon">
+        <svg width="20" height="20" fill="none" stroke="#4a3f80" stroke-width="2">
+          <circle cx="10" cy="7" r="4"/>
+          <path d="M2 18c0-4 4-6 8-6s8 2 8 6"/>
+        </svg>
+      </div>
+      <div class="legend-text">
+        <strong>User Avatar</strong>
+        <span>Opens dropdown with email + sign out</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- DESIGN 1: Balanced Center -->
+  <h2 class="section-title">1. Balanced Center</h2>
+  <p class="section-desc">Logo left, date centered, user right. Clean symmetry with date as focal point.</p>
+  <div class="mockup-container">
+    <div class="mockup-label">Balanced Center <span>Classic layout</span></div>
+    <header class="header header-1">
+      <div class="header-content">
+        <div class="logo">
+          <svg class="logo-icon" viewBox="0 0 100 100" fill="none">
+            <rect x="15" y="20" width="70" height="65" rx="8" stroke="currentColor" stroke-width="6"/>
+            <line x1="15" y1="38" x2="85" y2="38" stroke="currentColor" stroke-width="6"/>
+            <line x1="30" y1="12" x2="30" y2="28" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+            <line x1="70" y1="12" x2="70" y2="28" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+            <text x="50" y="70" font-family="Georgia" font-size="32" font-weight="bold" fill="currentColor" text-anchor="middle">P</text>
+          </svg>
+        </div>
+        <div class="center-section">
+          <div class="date-picker">
+            Dec 10 - Dec 16
+            <svg class="chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </div>
+        </div>
+        <div class="avatar">J</div>
+      </div>
+    </header>
+    <div class="content-placeholder">Page Content</div>
+  </div>
+
+  <!-- DESIGN 2: Date Prominent -->
+  <h2 class="section-title">2. Date Prominent</h2>
+  <p class="section-desc">Date picker takes maximum space. Best when date selection is the primary action.</p>
+  <div class="mockup-container">
+    <div class="mockup-label">Date Prominent <span>Date-focused</span></div>
+    <header class="header header-2">
+      <div class="header-content">
+        <div class="logo">
+          <svg class="logo-icon" viewBox="0 0 100 100" fill="none">
+            <rect x="15" y="20" width="70" height="65" rx="8" stroke="currentColor" stroke-width="6"/>
+            <line x1="15" y1="38" x2="85" y2="38" stroke="currentColor" stroke-width="6"/>
+            <line x1="30" y1="12" x2="30" y2="28" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+            <line x1="70" y1="12" x2="70" y2="28" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+            <text x="50" y="70" font-family="Georgia" font-size="32" font-weight="bold" fill="currentColor" text-anchor="middle">P</text>
+          </svg>
+        </div>
+        <div class="date-picker">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="3" width="14" height="12" rx="1"/>
+            <line x1="2" y1="7" x2="16" y2="7"/>
+            <line x1="6" y1="1" x2="6" y2="3"/>
+            <line x1="12" y1="1" x2="12" y2="3"/>
+          </svg>
+          Dec 10 - Dec 16
+          <svg class="chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </div>
+        <div class="avatar">J</div>
+      </div>
+    </header>
+    <div class="content-placeholder">Page Content</div>
+  </div>
+
+  <!-- DESIGN 3: Pill Bar -->
+  <h2 class="section-title">3. Pill Bar</h2>
+  <p class="section-desc">All elements contained in a rounded pill shape. Modern, app-like feel.</p>
+  <div class="mockup-container">
+    <div class="mockup-label">Pill Bar <span>App-like</span></div>
+    <header class="header header-3">
+      <div class="header-content">
+        <div class="logo">
+          <svg class="logo-icon" viewBox="0 0 100 100" fill="none">
+            <rect x="15" y="20" width="70" height="65" rx="8" stroke="currentColor" stroke-width="6"/>
+            <line x1="15" y1="38" x2="85" y2="38" stroke="currentColor" stroke-width="6"/>
+            <line x1="30" y1="12" x2="30" y2="28" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+            <line x1="70" y1="12" x2="70" y2="28" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+            <text x="50" y="70" font-family="Georgia" font-size="32" font-weight="bold" fill="currentColor" text-anchor="middle">P</text>
+          </svg>
+        </div>
+        <div class="date-picker">
+          Dec 10 - Dec 16
+          <svg class="chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </div>
+        <div class="avatar">J</div>
+      </div>
+    </header>
+    <div class="content-placeholder">Page Content</div>
+  </div>
+
+  <!-- DESIGN 4: Split Actions -->
+  <h2 class="section-title">4. Split Actions</h2>
+  <p class="section-desc">White date picker pops against purple. Clear visual hierarchy, premium feel.</p>
+  <div class="mockup-container">
+    <div class="mockup-label">Split Actions <span>High contrast</span></div>
+    <header class="header header-4">
+      <div class="header-content">
+        <div class="left-actions">
+          <div class="logo">
+            <svg class="logo-icon" viewBox="0 0 100 100" fill="none">
+              <rect x="15" y="20" width="70" height="65" rx="8" stroke="currentColor" stroke-width="6"/>
+              <line x1="15" y1="38" x2="85" y2="38" stroke="currentColor" stroke-width="6"/>
+              <line x1="30" y1="12" x2="30" y2="28" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+              <line x1="70" y1="12" x2="70" y2="28" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+              <text x="50" y="70" font-family="Georgia" font-size="32" font-weight="bold" fill="currentColor" text-anchor="middle">P</text>
+            </svg>
+          </div>
+        </div>
+        <div class="date-picker">
+          Dec 10 - Dec 16
+          <svg class="chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </div>
+        <div class="right-actions">
+          <div class="avatar">J</div>
+        </div>
+      </div>
+    </header>
+    <div class="content-placeholder">Page Content</div>
+  </div>
+
+  <!-- DESIGN 5: Gradient Banner -->
+  <h2 class="section-title">5. Gradient Banner</h2>
+  <p class="section-desc">Date and action grouped in center pill with explicit "Change" button.</p>
+  <div class="mockup-container">
+    <div class="mockup-label">Gradient Banner <span>Grouped actions</span></div>
+    <header class="header header-5">
+      <div class="header-content">
+        <div class="logo">
+          <svg class="logo-icon" viewBox="0 0 100 100" fill="none">
+            <rect x="15" y="20" width="70" height="65" rx="8" stroke="currentColor" stroke-width="6"/>
+            <line x1="15" y1="38" x2="85" y2="38" stroke="currentColor" stroke-width="6"/>
+            <line x1="30" y1="12" x2="30" y2="28" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+            <line x1="70" y1="12" x2="70" y2="28" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+            <text x="50" y="70" font-family="Georgia" font-size="32" font-weight="bold" fill="currentColor" text-anchor="middle">P</text>
+          </svg>
+        </div>
+        <div class="center-group">
+          <span class="date-text">Dec 10 - Dec 16</span>
+          <button class="change-btn">Change</button>
+        </div>
+        <div class="avatar">J</div>
+      </div>
+    </header>
+    <div class="content-placeholder">Page Content</div>
+  </div>
+
+  <!-- DESIGN 6: Floating Date Card -->
+  <h2 class="section-title">6. Floating Card</h2>
+  <p class="section-desc">Date floats as white card over content edge. Creates visual depth and emphasis.</p>
+  <div class="mockup-container">
+    <div class="mockup-label">Floating Card <span>Visual depth</span></div>
+    <header class="header header-6">
+      <div class="header-content">
+        <div class="logo">
+          <svg class="logo-icon" viewBox="0 0 100 100" fill="none">
+            <rect x="15" y="20" width="70" height="65" rx="8" stroke="currentColor" stroke-width="6"/>
+            <line x1="15" y1="38" x2="85" y2="38" stroke="currentColor" stroke-width="6"/>
+            <line x1="30" y1="12" x2="30" y2="28" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+            <line x1="70" y1="12" x2="70" y2="28" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+            <text x="50" y="70" font-family="Georgia" font-size="32" font-weight="bold" fill="currentColor" text-anchor="middle">P</text>
+          </svg>
+        </div>
+        <div class="avatar">J</div>
+      </div>
+      <div class="floating-date">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="3" width="14" height="12" rx="1"/>
+          <line x1="2" y1="7" x2="16" y2="7"/>
+        </svg>
+        Dec 10 - Dec 16
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="opacity: 0.5">
+          <path d="M4 6l4 4 4-4"/>
+        </svg>
+      </div>
+    </header>
+    <div class="header-6-spacer"></div>
+    <div class="content-placeholder">Page Content</div>
+  </div>
+
+  <!-- DESIGN 7: Compact Row -->
+  <h2 class="section-title">7. Compact Row</h2>
+  <p class="section-desc">Minimal height, all elements inline. Maximizes content area.</p>
+  <div class="mockup-container">
+    <div class="mockup-label">Compact Row <span>Space efficient</span></div>
+    <header class="header header-7">
+      <div class="header-content">
+        <div class="logo">
+          <svg class="logo-icon" viewBox="0 0 100 100" fill="none">
+            <rect x="15" y="20" width="70" height="65" rx="8" stroke="currentColor" stroke-width="6"/>
+            <line x1="15" y1="38" x2="85" y2="38" stroke="currentColor" stroke-width="6"/>
+            <line x1="30" y1="12" x2="30" y2="28" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+            <line x1="70" y1="12" x2="70" y2="28" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+            <text x="50" y="70" font-family="Georgia" font-size="32" font-weight="bold" fill="currentColor" text-anchor="middle">P</text>
+          </svg>
+        </div>
+        <div class="date-picker">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="3" width="12" height="10" rx="1"/>
+            <line x1="2" y1="6" x2="14" y2="6"/>
+          </svg>
+          Dec 10 - 16
+          <svg class="chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </div>
+        <div class="avatar">J</div>
+      </div>
+    </header>
+    <div class="content-placeholder">Page Content</div>
+  </div>
+
+  <!-- DESIGN 8: Icon Bar -->
+  <h2 class="section-title">8. Icon Bar</h2>
+  <p class="section-desc">Icon buttons on sides, date display in center. Dashboard-style layout.</p>
+  <div class="mockup-container">
+    <div class="mockup-label">Icon Bar <span>Dashboard style</span></div>
+    <header class="header header-8">
+      <div class="header-content">
+        <div class="icon-group">
+          <div class="logo">
+            <svg class="logo-icon" viewBox="0 0 100 100" fill="none">
+              <rect x="15" y="20" width="70" height="65" rx="8" stroke="currentColor" stroke-width="6"/>
+              <line x1="15" y1="38" x2="85" y2="38" stroke="currentColor" stroke-width="6"/>
+              <line x1="30" y1="12" x2="30" y2="28" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+              <line x1="70" y1="12" x2="70" y2="28" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+              <text x="50" y="70" font-family="Georgia" font-size="32" font-weight="bold" fill="currentColor" text-anchor="middle">P</text>
+            </svg>
+          </div>
+        </div>
+        <div class="date-display">
+          <div class="date-label">This Week</div>
+          <div class="date-value">Dec 10 - 16</div>
+        </div>
+        <div class="icon-group">
+          <div class="icon-btn">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <rect x="3" y="4" width="18" height="16" rx="2"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+          </div>
+          <div class="avatar">J</div>
+        </div>
+      </div>
+    </header>
+    <div class="content-placeholder">Page Content</div>
+  </div>
+
+  <!-- DESIGN 9: Segmented Control -->
+  <h2 class="section-title">9. Segmented Control</h2>
+  <p class="section-desc">iOS-style segmented control for quick week switching. Modern mobile pattern.</p>
+  <div class="mockup-container">
+    <div class="mockup-label">Segmented Control <span>iOS style</span></div>
+    <header class="header header-9">
+      <div class="header-content">
+        <div class="logo">
+          <svg class="logo-icon" viewBox="0 0 100 100" fill="none">
+            <rect x="15" y="20" width="70" height="65" rx="8" stroke="currentColor" stroke-width="6"/>
+            <line x1="15" y1="38" x2="85" y2="38" stroke="currentColor" stroke-width="6"/>
+            <line x1="30" y1="12" x2="30" y2="28" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+            <line x1="70" y1="12" x2="70" y2="28" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+            <text x="50" y="70" font-family="Georgia" font-size="32" font-weight="bold" fill="currentColor" text-anchor="middle">P</text>
+          </svg>
+        </div>
+        <div class="segment-control">
+          <div class="segment">Last</div>
+          <div class="segment active">Dec 10-16</div>
+          <div class="segment">Next</div>
+        </div>
+        <div class="avatar">J</div>
+      </div>
+    </header>
+    <div class="content-placeholder">Page Content</div>
+  </div>
+
+  <!-- DESIGN 10: Two-Level -->
+  <h2 class="section-title">10. Two-Level Nav</h2>
+  <p class="section-desc">Separate date bar with week navigation arrows. Best for week-based workflows.</p>
+  <div class="mockup-container">
+    <div class="mockup-label">Two-Level Nav <span>Week navigation</span></div>
+    <header class="header header-10">
+      <div class="header-main">
+        <div class="logo">
+          <svg class="logo-icon" viewBox="0 0 100 100" fill="none">
+            <rect x="15" y="20" width="70" height="65" rx="8" stroke="currentColor" stroke-width="6"/>
+            <line x1="15" y1="38" x2="85" y2="38" stroke="currentColor" stroke-width="6"/>
+            <line x1="30" y1="12" x2="30" y2="28" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+            <line x1="70" y1="12" x2="70" y2="28" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+            <text x="50" y="70" font-family="Georgia" font-size="32" font-weight="bold" fill="currentColor" text-anchor="middle">P</text>
+          </svg>
+        </div>
+        <div class="header-actions">
+          <div class="icon-btn">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <circle cx="11" cy="11" r="8"/>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+          </div>
+          <div class="avatar">J</div>
+        </div>
+      </div>
+      <div class="date-bar">
+        <div class="date-info">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <rect x="3" y="4" width="18" height="16" rx="2"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+          <span class="date-text">Dec 10 - Dec 16, 2024</span>
+        </div>
+        <div class="week-nav">
+          <div class="nav-btn">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10 4l-6 6 6 6"/>
+            </svg>
+          </div>
+          <div class="nav-btn">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M6 4l6 6-6 6"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </header>
+    <div class="content-placeholder">Page Content</div>
+  </div>
+
+  <!-- BONUS: Glass Morphism -->
+  <h2 class="section-title">BONUS: Glass Morphism</h2>
+  <p class="section-desc">Trendy glass effect with blur. Modern, premium feel.</p>
+  <div class="mockup-container">
+    <div class="mockup-label">Glass Morphism <span>Trendy</span></div>
+    <header class="header header-11">
+      <div class="header-content">
+        <div class="logo">
+          <svg class="logo-icon" viewBox="0 0 100 100" fill="none">
+            <rect x="15" y="20" width="70" height="65" rx="8" stroke="currentColor" stroke-width="6"/>
+            <line x1="15" y1="38" x2="85" y2="38" stroke="currentColor" stroke-width="6"/>
+            <line x1="30" y1="12" x2="30" y2="28" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+            <line x1="70" y1="12" x2="70" y2="28" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+            <text x="50" y="70" font-family="Georgia" font-size="32" font-weight="bold" fill="currentColor" text-anchor="middle">P</text>
+          </svg>
+        </div>
+        <div class="glass-pill">
+          <span class="date-text">Dec 10 - Dec 16</span>
+          <div class="avatar">J</div>
+        </div>
+      </div>
+    </header>
+    <div class="content-placeholder">Page Content</div>
+  </div>
+
+  <!-- BONUS: Minimal Line -->
+  <h2 class="section-title">BONUS: Minimal Line</h2>
+  <p class="section-desc">Ultra clean with transparent backgrounds and subtle border.</p>
+  <div class="mockup-container">
+    <div class="mockup-label">Minimal Line <span>Ultra clean</span></div>
+    <header class="header header-12">
+      <div class="header-content">
+        <div class="logo">
+          <svg class="logo-icon" viewBox="0 0 100 100" fill="none">
+            <rect x="15" y="20" width="70" height="65" rx="8" stroke="currentColor" stroke-width="6"/>
+            <line x1="15" y1="38" x2="85" y2="38" stroke="currentColor" stroke-width="6"/>
+            <line x1="30" y1="12" x2="30" y2="28" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+            <line x1="70" y1="12" x2="70" y2="28" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+            <text x="50" y="70" font-family="Georgia" font-size="32" font-weight="bold" fill="currentColor" text-anchor="middle">P</text>
+          </svg>
+        </div>
+        <div class="date-picker">
+          Dec 10 - Dec 16
+          <svg class="chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </div>
+        <div class="icon-btn">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <circle cx="12" cy="8" r="4"/>
+            <path d="M4 20c0-4 4-6 8-6s8 2 8 6"/>
+          </svg>
+        </div>
+      </div>
+    </header>
+    <div class="content-placeholder">Page Content</div>
+  </div>
+
+</body>
+</html>

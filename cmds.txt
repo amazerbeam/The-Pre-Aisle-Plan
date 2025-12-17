@@ -1,0 +1,2 @@
+#Rebuild front end
+docker-compose -f foodbytes-app/docker-compose.yml up -d --build frontend
