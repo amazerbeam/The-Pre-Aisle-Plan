@@ -1,86 +1,80 @@
-/* DayAssignmentButtons - FR-014, FR-015, FR-037, NFR-016, FR-050
- * Legacy-style flat day buttons with three states
- * No animations, no circles - simple flat design
- * FR-050: Includes calorie preview above each day button
+/* DayAssignmentButtons - Pill Bar Design
+ * 7-column grid with calories inside each day button
  */
 
-/* FR-050: Day container - wraps calorie text and button */
-.day-container {
+/* Days grid - 7 columns */
+.days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+
+/* Day button - vertical layout with calories inside */
+.day-btn {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
-}
-
-/* FR-050: Calorie preview text above day button */
-.day-calories {
-  font-size: 11px;
-  color: #666;
-  font-weight: 400;
-  white-space: nowrap;
-}
-
-.day-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 12px;
-}
-
-.day-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 8px 14px;
-  min-width: 48px;
-  border: none;
-  border-radius: 6px;
+  padding: 8px 4px;
+  background: var(--bg-secondary, #f8f9fa);
+  border: 2px solid transparent;
+  border-radius: 10px;
   cursor: pointer;
-  font-weight: 500;
-  font-size: 12px;
-  /* NFR-016: Override global button transitions - must be flat with no animations */
-  transition: none !important;
-  transform: none !important;
+  transition: all 0.15s;
 }
 
-/* Day label styling - no emojis per FR-041 (emojis only in Meal Plan view) */
-.day-label {
-  font-weight: 500;
+.day-btn:hover {
+  border-color: var(--brand-primary-light, #6b5fa0);
+  background: #f0eef5;
 }
 
-/* NFR-016: Unselected state - slot is available */
-.day-button.unselected {
-  background-color: #eee;
-  color: #333;
+/* Calorie value inside button */
+.day-cal {
+  font-size: 0.65rem;
+  font-weight: 600;
+  margin-bottom: 2px;
+  opacity: 0.9;
 }
 
-.day-button.unselected:hover:not(:disabled) {
-  background-color: #e0e0e0;
+/* Day name inside button */
+.day-name {
+  font-size: 0.75rem;
+  font-weight: 600;
 }
 
-/* NFR-016: Selected state - THIS recipe is assigned */
-.day-button.selected {
-  background-color: #4a3f80;
+/* Selected state - THIS recipe is assigned (purple) */
+.day-btn.selected {
+  background: var(--brand-primary, #4a3f80);
   color: white;
-  font-weight: bold;
 }
 
-.day-button.selected:hover:not(:disabled) {
-  background-color: #3d336d;
+.day-btn.selected:hover {
+  background: var(--brand-primary-dark, #3a3266);
+  border-color: transparent;
 }
 
-/* NFR-016: Already-selected state - ANOTHER recipe is assigned (greyed out) */
-.day-button.already-selected {
-  background-color: #ccc;
-  color: #666;
+.day-btn.selected .day-cal,
+.day-btn.selected .day-name {
+  color: white;
 }
 
-.day-button.already-selected:hover:not(:disabled) {
-  background-color: #bbb;
+/* Unselected state - slot is available (gray) */
+.day-btn.unselected {
+  background: var(--bg-secondary, #f8f9fa);
+  color: var(--text-primary, #2c3e50);
 }
 
-/* NFR-016: Disabled state - simple opacity reduction, no animations */
-.day-button:disabled {
+/* Already-selected state - ANOTHER recipe is assigned (green) */
+.day-btn.already-selected {
+  background: #e8f5e9;
+  color: var(--text-primary, #2c3e50);
+}
+
+.day-btn.already-selected:hover {
+  background: #c8e6c9;
+}
+
+/* Disabled state */
+.day-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
   pointer-events: none;
@@ -88,22 +82,19 @@
 
 /* Mobile responsive */
 @media (max-width: 480px) {
-  .day-buttons {
-    justify-content: space-between;
+  .days-grid {
     gap: 4px;
   }
 
-  .day-button {
-    padding: 6px 10px;
-    font-size: 12px;
-    flex: 1;
-    min-width: 40px;
-    max-width: 50px;
-    text-align: center;
+  .day-btn {
+    padding: 6px 2px;
   }
 
-  /* FR-050: Smaller calorie text on mobile */
-  .day-calories {
-    font-size: 10px;
+  .day-cal {
+    font-size: 0.6rem;
+  }
+
+  .day-name {
+    font-size: 0.7rem;
   }
 }
