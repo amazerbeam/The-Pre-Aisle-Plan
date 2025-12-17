@@ -80,82 +80,103 @@ function RecipeCard({ recipe, currentMealType, onSelectVariant, onEdit }) {
 
   return (
     <article className="recipe-card">
-      {/* Expand to fullscreen button */}
-      <button
-        className="expand-button"
-        onClick={() => setShowFullscreen(true)}
-        title="View fullscreen"
-        aria-label="Expand recipe to fullscreen"
-      >
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-          <path d="M1.5 1h4v1.5h-2.793l3.146 3.146-1.061 1.061-3.146-3.146v2.793h-1.5v-4.854zm13 0v4.854h-1.5v-2.793l-3.146 3.146-1.061-1.061 3.146-3.146h-2.793v-1.5h4.854zm-13 14v-4.854h1.5v2.793l3.146-3.146 1.061 1.061-3.146 3.146h2.793v1.5h-4.854zm13 0h-4.854v-1.5h2.793l-3.146-3.146 1.061-1.061 3.146 3.146v-2.793h1.5v4.854z"/>
-        </svg>
-      </button>
-
-      <header className="recipe-header">
-        <div className="recipe-title-row">
-          <h3 className="recipe-name">{recipe.name}</h3>
+      {/* Dark header with recipe name and action buttons */}
+      <div className="card-header">
+        <h3 className="recipe-name">{recipe.name}</h3>
+        <div className="header-actions">
           {recipe.isCheat && <span className="cheat-badge">Cheat</span>}
           {/* FR-033: Edit button for admins - uses selected variant ID */}
           {isAdmin && onEdit && (
             <button
-              className="edit-button"
+              className="header-icon-btn edit-btn"
               onClick={() => onEdit(selectedVariantId)}
               title="Edit recipe"
+              aria-label="Edit recipe"
             >
-              Edit
+              <svg fill="none" viewBox="0 0 24 24">
+                <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
             </button>
           )}
+          {/* Expand to fullscreen button */}
+          <button
+            className="header-icon-btn"
+            onClick={() => setShowFullscreen(true)}
+            title="View fullscreen"
+            aria-label="Expand recipe to fullscreen"
+          >
+            <svg fill="none" viewBox="0 0 24 24">
+              <path d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
+            </svg>
+          </button>
         </div>
-        <div className="recipe-meta">
-          {/* FR-043: Calorie badge with dropdown for variants */}
-          {hasVariants ? (
-            <div className="calorie-dropdown-container" ref={dropdownRef}>
-              <button
-                className="calorie-dropdown-trigger"
-                onClick={() => setShowCalorieDropdown(!showCalorieDropdown)}
-                aria-expanded={showCalorieDropdown}
-                aria-haspopup="listbox"
-              >
-                <span className="calories">{getCurrentVariantCalories()} cal</span>
-                <span className="dropdown-chevron">▼</span>
-              </button>
-              {showCalorieDropdown && (
-                <ul className="calorie-dropdown-menu" role="listbox">
-                  {sortedVariants.map((variant) => (
-                    <li
-                      key={variant.recipeId}
-                      className={`calorie-dropdown-item ${variant.recipeId === selectedVariantId ? 'selected' : ''}`}
-                      onClick={() => handleVariantSelect(variant.recipeId)}
-                      role="option"
-                      aria-selected={variant.recipeId === selectedVariantId}
-                    >
-                      <span className="variant-name">{variant.variantLabel || 'Standard'}</span>
-                      <span className="variant-calories">{variant.caloriesPerServing} cal</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          ) : (
-            <span className="calories">{perServingCalories} cal</span>
-          )}
-          {recipe.variantLabel && (
-            <span className="variant-label">{recipe.variantLabel}</span>
-          )}
-        </div>
-      </header>
+      </div>
 
-      <div className="servings-control">
-        <label htmlFor={`servings-${recipe.id}`}>Servings:</label>
-        <input
-          id={`servings-${recipe.id}`}
-          type="number"
-          min="1"
-          max="20"
-          value={servings}
-          onChange={(e) => setServings(Math.max(1, parseInt(e.target.value) || 1))}
-        />
+      {/* Meta Pill Bar: Calories | Variant | Servings */}
+      <div className="meta-pill">
+        {/* FR-043: Calorie dropdown with variants */}
+        {hasVariants ? (
+          <div className="calorie-dropdown-container" ref={dropdownRef}>
+            <button
+              className="cal-dropdown"
+              onClick={() => setShowCalorieDropdown(!showCalorieDropdown)}
+              aria-expanded={showCalorieDropdown}
+              aria-haspopup="listbox"
+            >
+              {getCurrentVariantCalories()} cal
+              <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path d="M19 9l-7 7-7-7"/>
+              </svg>
+            </button>
+            {showCalorieDropdown && (
+              <ul className="calorie-dropdown-menu" role="listbox">
+                {sortedVariants.map((variant) => (
+                  <li
+                    key={variant.recipeId}
+                    className={`calorie-dropdown-item ${variant.recipeId === selectedVariantId ? 'selected' : ''}`}
+                    onClick={() => handleVariantSelect(variant.recipeId)}
+                    role="option"
+                    aria-selected={variant.recipeId === selectedVariantId}
+                  >
+                    <span className="variant-name">{variant.variantLabel || 'Standard'}</span>
+                    <span className="variant-calories">{variant.caloriesPerServing} cal</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        ) : (
+          <button className="cal-dropdown" disabled>
+            {perServingCalories} cal
+          </button>
+        )}
+
+        {/* Variant label in center */}
+        <span className="variant-badge">
+          {recipe.variantLabel || 'Standard'}
+        </span>
+
+        {/* Servings pill with +/- buttons */}
+        <div className="servings-pill">
+          <button
+            className="servings-btn"
+            onClick={() => setServings(Math.max(1, servings - 1))}
+            disabled={servings <= 1}
+            aria-label="Decrease servings"
+          >
+            −
+          </button>
+          <span className="servings-value">{servings}</span>
+          <button
+            className="servings-btn"
+            onClick={() => setServings(Math.min(20, servings + 1))}
+            disabled={servings >= 20}
+            aria-label="Increase servings"
+          >
+            +
+          </button>
+        </div>
       </div>
 
       {/* FR-014, FR-015, FR-043: Day assignment buttons (hidden for guests) */}

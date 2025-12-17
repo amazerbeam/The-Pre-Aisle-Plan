@@ -1,8 +1,7 @@
 .header {
   background-color: var(--brand-primary);
   color: white;
-  padding: var(--spacing-md);
-  /* Removed sticky - meal tabs are sticky instead */
+  padding: 8px 12px;
   z-index: 50;
   box-shadow: var(--shadow-md);
 }
@@ -10,123 +9,191 @@
 .header-content {
   max-width: 1200px;
   margin: 0 auto;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 }
 
-.logo {
+/* Pill Bar Container */
+.header-pill {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 28px;
+  padding: 4px;
+  gap: 4px;
 }
 
-.logo-icon {
-  width: 36px;
-  height: 36px;
-  color: white;
-  flex-shrink: 0;
-}
-
-.logo h1 {
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin: 0;
-}
-
-/* FR-039: Clickable logo */
-.logo.clickable {
-  cursor: pointer;
-}
-
-.logo.clickable:hover {
-  opacity: 0.9;
-}
-
-.logo.clickable:focus-visible {
-  outline: 2px solid white;
-  outline-offset: 4px;
-  border-radius: var(--radius-sm);
-}
-
-.header-right {
+/* Logo Button */
+.logo-btn {
   display: flex;
   align-items: center;
-  gap: var(--spacing-md);
-}
-
-.sign-in-btn {
-  background-color: white;
-  color: var(--brand-primary);
-  padding: var(--spacing-sm) var(--spacing-lg);
-  font-weight: 600;
-  border-radius: var(--radius-sm);
-}
-
-.sign-in-btn:hover {
-  background-color: var(--bg-secondary);
-}
-
-.user-menu-container {
-  position: relative;
-}
-
-.user-button {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
+  justify-content: center;
+  width: 44px;
+  height: 44px;
   background: rgba(255, 255, 255, 0.1);
-  padding: var(--spacing-xs) var(--spacing-sm);
-  border-radius: var(--radius-md);
+  border-radius: 22px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  flex-shrink: 0;
   color: white;
 }
 
-.user-button:hover {
+.logo-btn:hover {
   background: rgba(255, 255, 255, 0.2);
 }
 
+.logo-btn:focus-visible {
+  outline: 2px solid white;
+  outline-offset: 2px;
+}
+
+.logo-icon {
+  width: 26px;
+  height: 26px;
+  color: white;
+}
+
+/* Center Section - Date Picker */
+.header-pill-center {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  min-width: 0;
+}
+
+/* Override DateRangePicker styles within pill */
+.header-pill-center .date-range-picker {
+  background: transparent;
+  border: none;
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.header-pill-center .date-range-picker:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+}
+
+/* Right Section - Avatar/Sign In */
+.header-pill-right {
+  flex-shrink: 0;
+}
+
+/* Avatar Button */
+.avatar-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.avatar-btn:hover {
+  transform: scale(1.05);
+}
+
+.avatar-btn:focus-visible {
+  outline: 2px solid white;
+  outline-offset: 2px;
+}
+
 .avatar {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.3);
 }
 
 .avatar-placeholder {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.3);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 600;
+  font-size: 14px;
+  color: white;
 }
 
-.user-name {
-  font-size: 0.875rem;
-  font-weight: 500;
+/* Sign In Button for Pill Layout */
+.sign-in-btn-pill {
+  background: white;
+  color: var(--brand-primary);
+  padding: 8px 16px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  border-radius: 20px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
+.sign-in-btn-pill:hover {
+  background: var(--bg-secondary);
+  transform: scale(1.02);
+}
+
+.sign-in-btn-pill:focus-visible {
+  outline: 2px solid white;
+  outline-offset: 2px;
+}
+
+/* User Menu Container */
+.user-menu-container {
+  position: relative;
+}
+
+/* User Dropdown */
 .user-dropdown {
   position: absolute;
-  top: 100%;
+  top: calc(100% + 8px);
   right: 0;
-  margin-top: var(--spacing-sm);
   background: white;
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-lg);
-  min-width: 200px;
+  min-width: 220px;
   overflow: hidden;
+  z-index: 100;
+  animation: dropdownFade 0.15s ease;
+}
+
+@keyframes dropdownFade {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .user-info {
   padding: var(--spacing-md);
   border-bottom: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.user-name-full {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
 }
 
 .user-email {
-  font-size: 0.875rem;
+  font-size: 0.8rem;
   color: var(--text-secondary);
 }
 
@@ -135,16 +202,91 @@
   padding: var(--spacing-md);
   text-align: left;
   background: none;
+  border: none;
   color: var(--text-primary);
   font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s ease;
 }
 
 .logout-btn:hover {
   background: var(--bg-secondary);
 }
 
+/* Mobile Adjustments */
 @media (max-width: 480px) {
-  .user-name {
-    display: none;
+  .header {
+    padding: 6px 10px;
+  }
+
+  .header-pill {
+    padding: 3px;
+    border-radius: 24px;
+  }
+
+  .logo-btn {
+    width: 40px;
+    height: 40px;
+  }
+
+  .logo-icon {
+    width: 22px;
+    height: 22px;
+  }
+
+  .header-pill-center .date-range-picker {
+    font-size: 0.8rem;
+    padding: 6px 8px;
+  }
+
+  .avatar,
+  .avatar-placeholder {
+    width: 32px;
+    height: 32px;
+    font-size: 12px;
+  }
+
+  .avatar-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .sign-in-btn-pill {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+  }
+}
+
+/* Tablet and up */
+@media (min-width: 768px) {
+  .header {
+    padding: 10px 16px;
+  }
+
+  .header-pill {
+    padding: 5px;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .logo-btn {
+    width: 48px;
+    height: 48px;
+  }
+
+  .logo-icon {
+    width: 28px;
+    height: 28px;
+  }
+
+  .avatar,
+  .avatar-placeholder {
+    width: 40px;
+    height: 40px;
+  }
+
+  .avatar-btn {
+    width: 44px;
+    height: 44px;
   }
 }

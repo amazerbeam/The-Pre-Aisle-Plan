@@ -177,27 +177,23 @@ function DayAssignmentButtons({ recipe, servings, currentMealType, selectedRecip
 
   return (
     <>
-      <div className="day-buttons">
+      <div className="days-grid">
         {weekDays.map((day) => {
           const buttonClass = getButtonClass(day.date)
-          // FR-041: NO emojis on day buttons - emojis only appear in Meal Plan view
-          // FR-050: Get daily calories for calorie preview
+          // FR-050: Get daily calories for display inside button
           const dailyCalories = getDailyCalories(day.date)
 
           return (
-            <div key={day.date} className="day-container">
-              {/* FR-050: Calorie preview above day button */}
-              <span className="day-calories">{dailyCalories} cal</span>
-              {/* FR-098: Never disabled - optimistic UI provides instant feedback */}
-              <button
-                className={`day-button ${buttonClass}`}
-                onClick={() => handleDayClick(day.date)}
-                title={getButtonTitle(day.date, day.dayName, buttonClass)}
-                aria-label={getButtonTitle(day.date, day.dayName, buttonClass)}
-              >
-                {day.dayName}
-              </button>
-            </div>
+            <button
+              key={day.date}
+              className={`day-btn ${buttonClass}`}
+              onClick={() => handleDayClick(day.date)}
+              title={getButtonTitle(day.date, day.dayName, buttonClass)}
+              aria-label={getButtonTitle(day.date, day.dayName, buttonClass)}
+            >
+              <span className="day-cal">{dailyCalories}</span>
+              <span className="day-name">{day.dayName}</span>
+            </button>
           )
         })}
       </div>

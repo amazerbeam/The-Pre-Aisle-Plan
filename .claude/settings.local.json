@@ -65,7 +65,11 @@
       "Bash(sort:*)",
       "Bash(python -c:*)",
       "Bash(docker cp:*)",
-      "Bash(del \"C:\\Users\\jossd\\Documents\\MyWebSites\\FoodBytes\\temp_soup.sql\" \"C:\\Users\\jossd\\Documents\\MyWebSites\\FoodBytes\\temp_soup2.sql\")"
+      "Bash(del \"C:\\Users\\jossd\\Documents\\MyWebSites\\FoodBytes\\temp_soup.sql\" \"C:\\Users\\jossd\\Documents\\MyWebSites\\FoodBytes\\temp_soup2.sql\")",
+      "Bash(cmd //c \"taskkill /PID 14244 /F\")",
+      "Bash(cmd //c \"taskkill /PID 12384 /F\")",
+      "Bash(cmd //c \"start \"\"\"\" \"\"C:\\Program Files\\Docker\\Docker\\Docker Desktop.exe\"\"\")",
+      "Bash(docker info:*)"
     ],
     "deny": [],
     "ask": []
