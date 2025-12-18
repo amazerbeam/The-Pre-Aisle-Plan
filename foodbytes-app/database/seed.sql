@@ -63,7 +63,7 @@ INSERT INTO ingredients (id, `key`, name, aisle_id, protein_per_100g, carbs_per_
 (1, 'rolled_oats', 'Rolled oats', 11, 13.00, 67.00, 7.00, TRUE),
 
 -- Dairy (aisle 6)
-(2, 'milk', 'Milk', 6, 3.40, 5.00, 3.60, TRUE),
+(2, 'low_fat_milk', 'Low fat milk', 6, 3.40, 4.50, 1.30, TRUE),
 
 -- Fruit (aisle 4)
 (3, 'mixed_berries', 'Mixed berries', 4, 1.00, 12.00, 0.40, TRUE),
@@ -1174,18 +1174,20 @@ INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id,
 -- =============================================
 -- SALMON SANDWICH FAMILY
 -- =============================================
+-- Bread: Fixed at 4 slices @ 50g each (200g) for Standard, 8 slices for Full
+-- Standard = 1 sandwich per person, Full = 2 sandwiches per person
 
--- Recipe 27: Salmon Sandwich (Light) - ~650 cal total, ~325 cal/serving
+-- Recipe 27: Salmon Sandwich (Light) - REMOVED (no longer used)
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
-(27, 'Salmon Sandwich (Light)', 2, 650, FALSE, TRUE);
+(27, 'Salmon Sandwich (Light)', 2, 650, FALSE, FALSE);
 
--- Recipe 28: Salmon Sandwich (Standard) - ~839 cal total, ~419 cal/serving
+-- Recipe 28: Salmon Sandwich (Standard) - ~920 cal total, ~460 cal/serving (1 sandwich per person)
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
-(28, 'Salmon Sandwich', 2, 839, FALSE, TRUE);
+(28, 'Salmon Sandwich', 2, 920, FALSE, TRUE);
 
--- Recipe 29: Salmon Sandwich (Full) - ~1020 cal total, ~510 cal/serving
+-- Recipe 29: Salmon Sandwich (Full) - ~1840 cal total, ~920 cal/serving (2 sandwiches per person)
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
-(29, 'Salmon Sandwich (Full)', 2, 1020, FALSE, TRUE);
+(29, 'Salmon Sandwich (Full)', 2, 1840, FALSE, TRUE);
 
 -- =============================================
 -- SALMON SANDWICH RECIPE MEALS (Lunch)
@@ -1207,68 +1209,69 @@ INSERT INTO recipe_extras (parent_recipe_id, child_recipe_id, display_order) VAL
 -- SALMON SANDWICH RECIPE INGREDIENTS
 -- =============================================
 
--- Recipe 27: Salmon Sandwich (Light) - ~620 cal total
+-- Recipe 27: Salmon Sandwich (Light) - REMOVED (kept for FK integrity)
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
-(27, NULL, 26, 120, 1, 120.00, 1),     -- Milk Bread (linked), 120g (4 slices)
+(27, NULL, 26, 120, 1, 120.00, 1),     -- Milk Bread (linked), 120g
 (27, 54, NULL, 160, 1, 160.00, 2),     -- Tinned salmon, 160g
 (27, 53, NULL, 15, 1, 15.00, 3),       -- Salted butter, 15g
 (27, 47, NULL, 40, 1, 40.00, 4);       -- Lettuce, 40g
 
--- Recipe 28: Salmon Sandwich (Standard) - ~780 cal total
+-- Recipe 28: Salmon Sandwich (Standard) - ~920 cal total (1 sandwich per person)
+-- 4 slices @ 50g each (200g), 213g salmon, 15g butter, 40g lettuce
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
-(28, NULL, 26, 150, 1, 150.00, 1),     -- Milk Bread (linked), 150g (4 slices)
+(28, NULL, 26, 200, 1, 200.00, 1),     -- Milk Bread (linked), 4 slices @ 50g each (200g)
 (28, 54, NULL, 213, 1, 213.00, 2),     -- Tinned salmon, 213g (1 large tin)
-(28, 53, NULL, 20, 1, 20.00, 3),       -- Salted butter, 20g
+(28, 53, NULL, 15, 1, 15.00, 3),       -- Salted butter, 15g
 (28, 47, NULL, 40, 1, 40.00, 4);       -- Lettuce, 40g
 
--- Recipe 29: Salmon Sandwich (Full) - ~940 cal total
+-- Recipe 29: Salmon Sandwich (Full) - ~1840 cal total (2 sandwiches per person)
+-- 8 slices @ 50g each (400g), 426g salmon, 30g butter, 80g lettuce
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
-(29, NULL, 26, 180, 1, 180.00, 1),     -- Milk Bread (linked), 180g (4 slices)
-(29, 54, NULL, 260, 1, 260.00, 2),     -- Tinned salmon, 260g
-(29, 53, NULL, 25, 1, 25.00, 3),       -- Salted butter, 25g
-(29, 47, NULL, 40, 1, 40.00, 4);       -- Lettuce, 40g
+(29, NULL, 26, 400, 1, 400.00, 1),     -- Milk Bread (linked), 8 slices @ 50g each (400g)
+(29, 54, NULL, 426, 1, 426.00, 2),     -- Tinned salmon, 426g (2 large tins)
+(29, 53, NULL, 30, 1, 30.00, 3),       -- Salted butter, 30g
+(29, 47, NULL, 80, 1, 80.00, 4);       -- Lettuce, 80g
 
 -- =============================================
 -- SALMON SANDWICH RECIPE STEPS
 -- =============================================
 
--- Recipe 27: Salmon Sandwich (Light)
+-- Recipe 27: Salmon Sandwich (Light) - REMOVED (kept for FK integrity)
 INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
-(27, 1, 'Prepare the milk bread according to the linked recipe. Slice into pieces (~30g each).', 26, 'Use 4 slices of store-bought bread (~30g each).'),
+(27, 1, 'Prepare the milk bread according to the linked recipe.', 26, 'Use 4 slices of store-bought bread.'),
 (27, 2, 'Drain the tinned salmon. Tip into a bowl and mash with a fork. Check carefully for any bones and remove.', NULL, NULL),
 (27, 3, 'Butter each slice of bread.', NULL, NULL),
 (27, 4, 'Wash and dry the lettuce leaves.', NULL, NULL),
 (27, 5, 'Assemble: Place lettuce on 2 slices of buttered bread. Divide the mashed salmon between them. Top with remaining bread slices.', NULL, NULL),
 (27, 6, 'Cut in half and serve.', NULL, NULL);
 
--- Recipe 28: Salmon Sandwich (Standard)
+-- Recipe 28: Salmon Sandwich (Standard) - 1 sandwich per person
 INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
-(28, 1, 'Prepare the milk bread according to the linked recipe. Slice into pieces (~37g each).', 26, 'Use 4 slices of store-bought bread (~37g each).'),
+(28, 1, 'Prepare the milk bread according to the linked recipe. Use 4 slices @ 50g each (2 per person).', 26, 'Use 4 slices of store-bought bread (~50g each).'),
 (28, 2, 'Drain the tinned salmon. Tip into a bowl and mash with a fork. Check carefully for any bones and remove.', NULL, NULL),
-(28, 3, 'Butter each slice of bread.', NULL, NULL),
+(28, 3, 'Butter each slice of bread with the 15g butter.', NULL, NULL),
 (28, 4, 'Wash and dry the lettuce leaves.', NULL, NULL),
-(28, 5, 'Assemble: Place lettuce on 2 slices of buttered bread. Divide the mashed salmon between them. Top with remaining bread slices.', NULL, NULL),
+(28, 5, 'Assemble: Place lettuce on 2 slices of buttered bread. Divide the mashed salmon between them (~106g per sandwich). Top with remaining bread slices.', NULL, NULL),
 (28, 6, 'Cut in half and serve.', NULL, NULL);
 
--- Recipe 29: Salmon Sandwich (Full)
+-- Recipe 29: Salmon Sandwich (Full) - 2 sandwiches per person
 INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
-(29, 1, 'Prepare the milk bread according to the linked recipe. Slice into pieces (~45g each).', 26, 'Use 4 slices of store-bought bread (~45g each).'),
-(29, 2, 'Drain the tinned salmon. Tip into a bowl and mash with a fork. Check carefully for any bones and remove.', NULL, NULL),
-(29, 3, 'Butter each slice of bread.', NULL, NULL),
+(29, 1, 'Prepare the milk bread according to the linked recipe. Use 8 slices @ 50g each (4 per person).', 26, 'Use 8 slices of store-bought bread (~50g each).'),
+(29, 2, 'Drain both tins of salmon. Tip into a bowl and mash with a fork. Check carefully for any bones and remove.', NULL, NULL),
+(29, 3, 'Butter each slice of bread with the 30g butter.', NULL, NULL),
 (29, 4, 'Wash and dry the lettuce leaves.', NULL, NULL),
-(29, 5, 'Assemble: Place lettuce on 2 slices of buttered bread. Divide the mashed salmon between them. Top with remaining bread slices.', NULL, NULL),
-(29, 6, 'Cut in half and serve.', NULL, NULL);
+(29, 5, 'Assemble 4 sandwiches: Place lettuce on 4 slices of buttered bread. Divide the mashed salmon between them (~106g per sandwich). Top with remaining bread slices.', NULL, NULL),
+(29, 6, 'Cut in half and serve 2 sandwiches per person.', NULL, NULL);
 
 -- =============================================
 -- SALMON SANDWICH RECIPE FAMILY
 -- =============================================
 INSERT INTO recipe_families (id, family_name, description) VALUES
-(8, 'Salmon Sandwich', 'Simple salmon sandwich with homemade milk bread, salted butter, and fresh lettuce.');
+(8, 'Salmon Sandwich', 'Simple salmon sandwich with homemade milk bread, salted butter, and fresh lettuce. Standard = 1 sandwich per person, Full = 2 sandwiches per person.');
 
 INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_label, display_order) VALUES
-(8, 28, TRUE, 'Standard', 1),   -- Standard is default
-(8, 27, FALSE, 'Light', 2),
-(8, 29, FALSE, 'Full', 3);
+(8, 28, TRUE, 'Standard', 1),   -- Standard is default (1 sandwich per person)
+(8, 29, FALSE, 'Full', 2);      -- Full (2 sandwiches per person)
 
 -- =============================================
 -- LENTIL STEW INGREDIENTS (IDs 55-58)
@@ -2114,3 +2117,240 @@ INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_lab
 (14, 48, TRUE, 'Standard', 1),   -- Standard is default
 (14, 47, FALSE, 'Light', 2),
 (14, 49, FALSE, 'Full', 3);
+
+-- =============================================
+-- SCRAMBLED EGGS & TOAST RECIPE FAMILY
+-- =============================================
+-- Toast: Fixed at 4 slices @ 50g each (200g) for all variants
+-- Scaling: Eggs and butter only
+
+-- =============================================
+-- SCRAMBLED EGGS & TOAST RECIPES (3 variants)
+-- =============================================
+
+-- Recipe 50: Scrambled Eggs & Toast (Light) - ~1006 cal total, ~503 cal/serving
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+(50, 'Scrambled Eggs & Toast (Light)', 2, 1006, FALSE, TRUE);
+
+-- Recipe 51: Scrambled Eggs & Toast (Standard) - ~1198 cal total, ~599 cal/serving
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+(51, 'Scrambled Eggs & Toast', 2, 1198, FALSE, TRUE);
+
+-- Recipe 52: Scrambled Eggs & Toast (Full) - ~1426 cal total, ~713 cal/serving
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+(52, 'Scrambled Eggs & Toast (Full)', 2, 1426, FALSE, TRUE);
+
+-- Assign to Breakfast meal type (meal_id = 1)
+INSERT INTO recipe_meals (recipe_id, meal_id) VALUES
+(50, 1),  -- Light: Breakfast
+(51, 1),  -- Standard: Breakfast
+(52, 1);  -- Full: Breakfast
+
+-- =============================================
+-- SCRAMBLED EGGS & TOAST EXTRAS (link to Milk Bread)
+-- =============================================
+INSERT INTO recipe_extras (parent_recipe_id, child_recipe_id, display_order) VALUES
+(50, 26, 0),  -- Light -> Milk Bread
+(51, 26, 0),  -- Standard -> Milk Bread
+(52, 26, 0);  -- Full -> Milk Bread
+
+-- =============================================
+-- SCRAMBLED EGGS & TOAST (LIGHT) INGREDIENTS
+-- 4 eggs (2 per person), 4 slices bread @ 50g (2 per person), 20g butter
+-- Total: 1006 cal, Per serving: 503 cal, 22g protein, 50g carbs, 27g fat
+-- =============================================
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
+(50, 59, NULL, 4, 5, 200.00, 1),           -- Eggs, 4 medium (200g) - 2 per person
+(50, NULL, 26, 200, 1, 200.00, 2),         -- Milk Bread (linked), 4 slices @ 50g each (200g)
+(50, 53, NULL, 20, 1, 20.00, 3),           -- Salted butter, 20g
+(50, 5, NULL, 0.25, 3, 1.50, 4),           -- Salt, pinch
+(50, 50, NULL, 0.25, 3, 0.75, 5);          -- Black pepper, pinch
+
+-- =============================================
+-- SCRAMBLED EGGS & TOAST (STANDARD) INGREDIENTS
+-- 6 eggs (3 per person), 4 slices bread @ 50g (2 per person), 30g butter
+-- Total: 1198 cal, Per serving: 599 cal, 28g protein, 51g carbs, 35g fat
+-- =============================================
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
+(51, 59, NULL, 6, 5, 300.00, 1),           -- Eggs, 6 medium (300g) - 3 per person
+(51, NULL, 26, 200, 1, 200.00, 2),         -- Milk Bread (linked), 4 slices @ 50g each (200g)
+(51, 53, NULL, 30, 1, 30.00, 3),           -- Salted butter, 30g
+(51, 5, NULL, 0.25, 3, 1.50, 4),           -- Salt, pinch
+(51, 50, NULL, 0.25, 3, 0.75, 5);          -- Black pepper, pinch
+
+-- =============================================
+-- SCRAMBLED EGGS & TOAST (FULL) INGREDIENTS
+-- 8 eggs (4 per person), 4 slices bread @ 50g (2 per person), 40g butter
+-- Total: 1426 cal, Per serving: 713 cal, 35g protein, 51g carbs, 44g fat
+-- =============================================
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
+(52, 59, NULL, 8, 5, 400.00, 1),           -- Eggs, 8 medium (400g) - 4 per person
+(52, NULL, 26, 200, 1, 200.00, 2),         -- Milk Bread (linked), 4 slices @ 50g each (200g)
+(52, 53, NULL, 40, 1, 40.00, 3),           -- Salted butter, 40g
+(52, 5, NULL, 0.25, 3, 1.50, 4),           -- Salt, pinch
+(52, 50, NULL, 0.25, 3, 0.75, 5);          -- Black pepper, pinch
+
+-- =============================================
+-- SCRAMBLED EGGS & TOAST STEPS
+-- =============================================
+
+-- Recipe 50: Scrambled Eggs & Toast (Light)
+INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
+(50, 1, 'Toast the bread according to the linked recipe. Use 4 slices @ 50g each (2 per person).', 26, 'Toast 4 slices of store-bought bread (~50g each).'),
+(50, 2, 'Crack 4 eggs into a cold non-stick pan with half the butter (10g). Place over low heat.', NULL, NULL),
+(50, 3, 'Stir constantly with a spatula, scraping the bottom. Cook 5-7 minutes, removing from heat occasionally to prevent overcooking.', NULL, NULL),
+(50, 4, 'When eggs form soft, creamy curds with no liquid remaining, remove from heat. Season with salt and pepper.', NULL, NULL),
+(50, 5, 'Butter the toast with remaining butter (10g).', NULL, NULL),
+(50, 6, 'Serve scrambled eggs on or alongside buttered toast.', NULL, NULL);
+
+-- Recipe 51: Scrambled Eggs & Toast (Standard)
+INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
+(51, 1, 'Toast the bread according to the linked recipe. Use 4 slices @ 50g each (2 per person).', 26, 'Toast 4 slices of store-bought bread (~50g each).'),
+(51, 2, 'Crack 6 eggs into a cold non-stick pan with half the butter (15g). Place over low heat.', NULL, NULL),
+(51, 3, 'Stir constantly with a spatula, scraping the bottom. Cook 5-7 minutes, removing from heat occasionally to prevent overcooking.', NULL, NULL),
+(51, 4, 'When eggs form soft, creamy curds with no liquid remaining, remove from heat. Season with salt and pepper.', NULL, NULL),
+(51, 5, 'Butter the toast with remaining butter (15g).', NULL, NULL),
+(51, 6, 'Serve scrambled eggs on or alongside buttered toast.', NULL, NULL);
+
+-- Recipe 52: Scrambled Eggs & Toast (Full)
+INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
+(52, 1, 'Toast the bread according to the linked recipe. Use 4 slices @ 50g each (2 per person).', 26, 'Toast 4 slices of store-bought bread (~50g each).'),
+(52, 2, 'Crack 8 eggs into a cold non-stick pan with half the butter (20g). Place over low heat.', NULL, NULL),
+(52, 3, 'Stir constantly with a spatula, scraping the bottom. Cook 5-7 minutes, removing from heat occasionally to prevent overcooking.', NULL, NULL),
+(52, 4, 'When eggs form soft, creamy curds with no liquid remaining, remove from heat. Season with salt and pepper.', NULL, NULL),
+(52, 5, 'Butter the toast with remaining butter (20g).', NULL, NULL),
+(52, 6, 'Serve scrambled eggs on or alongside buttered toast.', NULL, NULL);
+
+-- =============================================
+-- SCRAMBLED EGGS & TOAST RECIPE FAMILY
+-- =============================================
+INSERT INTO recipe_families (id, family_name, description) VALUES
+(15, 'Scrambled Eggs & Toast', 'Soft, creamy scrambled eggs cooked low and slow with butter, served on buttered toast. Classic British breakfast.');
+
+INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_label, display_order) VALUES
+(15, 51, TRUE, 'Standard', 1),   -- Standard is default
+(15, 50, FALSE, 'Light', 2),
+(15, 52, FALSE, 'Full', 3);
+
+-- =============================================
+-- AVOCADO TOAST RECIPE FAMILY
+-- =============================================
+-- Bread: Fixed at 4 slices @ 50g each (200g) for all variants
+-- Butter: Fixed at 15g
+-- Avocado: Scales
+-- Full: Adds fried egg
+
+-- New Ingredient for Avocado Toast
+INSERT INTO ingredients (id, `key`, name, aisle_id, protein_per_100g, carbs_per_100g, fat_per_100g, macros_verified) VALUES
+(72, 'avocado', 'Avocado', 4, 2.00, 9.00, 15.00, TRUE);
+
+-- =============================================
+-- AVOCADO TOAST RECIPES (3 variants)
+-- =============================================
+
+-- Recipe 53: Avocado Toast (Light) - ~826 cal total, ~413 cal/serving
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+(53, 'Avocado Toast (Light)', 2, 826, FALSE, TRUE);
+
+-- Recipe 54: Avocado Toast (Standard) - ~906 cal total, ~453 cal/serving
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+(54, 'Avocado Toast', 2, 906, FALSE, TRUE);
+
+-- Recipe 55: Avocado Toast (Full) - ~1061 cal total, ~531 cal/serving (with fried egg)
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+(55, 'Avocado Toast (Full)', 2, 1061, FALSE, TRUE);
+
+-- Assign to Breakfast meal type (meal_id = 1)
+INSERT INTO recipe_meals (recipe_id, meal_id) VALUES
+(53, 1),  -- Light: Breakfast
+(54, 1),  -- Standard: Breakfast
+(55, 1);  -- Full: Breakfast
+
+-- =============================================
+-- AVOCADO TOAST EXTRAS (link to Milk Bread)
+-- =============================================
+INSERT INTO recipe_extras (parent_recipe_id, child_recipe_id, display_order) VALUES
+(53, 26, 0),  -- Light -> Milk Bread
+(54, 26, 0),  -- Standard -> Milk Bread
+(55, 26, 0);  -- Full -> Milk Bread
+
+-- =============================================
+-- AVOCADO TOAST (LIGHT) INGREDIENTS
+-- 4 slices bread @ 50g (2 per person), 150g avocado (½ per person), 15g butter
+-- Total: 826 cal, Per serving: 413 cal
+-- =============================================
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
+(53, NULL, 26, 200, 1, 200.00, 1),         -- Milk Bread (linked), 4 slices @ 50g each (200g)
+(53, 72, NULL, 150, 1, 150.00, 2),         -- Avocado, 150g (½ per person)
+(53, 53, NULL, 15, 1, 15.00, 3),           -- Salted butter, 15g
+(53, 5, NULL, 0.25, 3, 1.50, 4),           -- Salt, pinch
+(53, 50, NULL, 0.25, 3, 0.75, 5);          -- Black pepper, pinch
+
+-- =============================================
+-- AVOCADO TOAST (STANDARD) INGREDIENTS
+-- 4 slices bread @ 50g (2 per person), 200g avocado (1 per person), 15g butter
+-- Total: 906 cal, Per serving: 453 cal
+-- =============================================
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
+(54, NULL, 26, 200, 1, 200.00, 1),         -- Milk Bread (linked), 4 slices @ 50g each (200g)
+(54, 72, NULL, 200, 1, 200.00, 2),         -- Avocado, 200g (1 per person)
+(54, 53, NULL, 15, 1, 15.00, 3),           -- Salted butter, 15g
+(54, 5, NULL, 0.25, 3, 1.50, 4),           -- Salt, pinch
+(54, 50, NULL, 0.25, 3, 0.75, 5);          -- Black pepper, pinch
+
+-- =============================================
+-- AVOCADO TOAST (FULL) INGREDIENTS
+-- 4 slices bread @ 50g (2 per person), 200g avocado (1 per person), 15g butter, 2 fried eggs
+-- Total: 1061 cal, Per serving: 531 cal
+-- =============================================
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
+(55, NULL, 26, 200, 1, 200.00, 1),         -- Milk Bread (linked), 4 slices @ 50g each (200g)
+(55, 72, NULL, 200, 1, 200.00, 2),         -- Avocado, 200g (1 per person)
+(55, 53, NULL, 15, 1, 15.00, 3),           -- Salted butter, 15g
+(55, 59, NULL, 2, 5, 100.00, 4),           -- Eggs, 2 medium (100g) - 1 per person, fried
+(55, 5, NULL, 0.25, 3, 1.50, 5),           -- Salt, pinch
+(55, 50, NULL, 0.25, 3, 0.75, 6);          -- Black pepper, pinch
+
+-- =============================================
+-- AVOCADO TOAST STEPS
+-- =============================================
+
+-- Recipe 53: Avocado Toast (Light)
+INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
+(53, 1, 'Toast the bread according to the linked recipe. Use 4 slices @ 50g each (2 per person).', 26, 'Toast 4 slices of store-bought bread (~50g each).'),
+(53, 2, 'Butter each slice of toast with the 15g butter.', NULL, NULL),
+(53, 3, 'Halve avocados, remove pit, and scoop flesh into a bowl.', NULL, NULL),
+(53, 4, 'Mash avocado with a fork. Season with salt and pepper.', NULL, NULL),
+(53, 5, 'Spread mashed avocado evenly on buttered toast (~75g per person).', NULL, NULL),
+(53, 6, 'Serve immediately.', NULL, NULL);
+
+-- Recipe 54: Avocado Toast (Standard)
+INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
+(54, 1, 'Toast the bread according to the linked recipe. Use 4 slices @ 50g each (2 per person).', 26, 'Toast 4 slices of store-bought bread (~50g each).'),
+(54, 2, 'Butter each slice of toast with the 15g butter.', NULL, NULL),
+(54, 3, 'Halve avocados, remove pit, and scoop flesh into a bowl.', NULL, NULL),
+(54, 4, 'Mash avocado with a fork. Season with salt and pepper.', NULL, NULL),
+(54, 5, 'Spread mashed avocado evenly on buttered toast (~100g per person).', NULL, NULL),
+(54, 6, 'Serve immediately.', NULL, NULL);
+
+-- Recipe 55: Avocado Toast (Full)
+INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
+(55, 1, 'Toast the bread according to the linked recipe. Use 4 slices @ 50g each (2 per person).', 26, 'Toast 4 slices of store-bought bread (~50g each).'),
+(55, 2, 'Butter each slice of toast with half the butter (7g).', NULL, NULL),
+(55, 3, 'Halve avocados, remove pit, and scoop flesh into a bowl.', NULL, NULL),
+(55, 4, 'Mash avocado with a fork. Season with salt and pepper.', NULL, NULL),
+(55, 5, 'Fry 2 eggs in remaining butter (8g) until whites are set but yolks still runny.', NULL, NULL),
+(55, 6, 'Spread mashed avocado evenly on buttered toast (~100g per person).', NULL, NULL),
+(55, 7, 'Top each serving with a fried egg.', NULL, NULL),
+(55, 8, 'Serve immediately.', NULL, NULL);
+
+-- =============================================
+-- AVOCADO TOAST RECIPE FAMILY
+-- =============================================
+INSERT INTO recipe_families (id, family_name, description) VALUES
+(16, 'Avocado Toast', 'Simple mashed avocado on buttered toast. Full variant adds a fried egg on top. Classic breakfast.');
+
+INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_label, display_order) VALUES
+(16, 54, TRUE, 'Standard', 1),   -- Standard is default
+(16, 53, FALSE, 'Light', 2),
+(16, 55, FALSE, 'Full', 3);

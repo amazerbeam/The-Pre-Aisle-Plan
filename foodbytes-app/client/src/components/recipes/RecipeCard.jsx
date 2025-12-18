@@ -78,39 +78,19 @@ function RecipeCard({ recipe, currentMealType, onSelectVariant, onEdit }) {
     setSelectedVariantId(variantId)
   }
 
+  // Generate consistent stripe color based on recipe id
+  const stripeColors = ['purple', 'teal', 'coral', 'gold', 'blue', 'rose']
+  const stripeColor = stripeColors[recipe.id % stripeColors.length]
+
   return (
     <article className="recipe-card">
-      {/* Dark header with recipe name and action buttons */}
-      <div className="card-header">
+      {/* Colored stripe at top */}
+      <div className={`card-stripe ${stripeColor}`}></div>
+
+      {/* Recipe title section */}
+      <div className="card-title-section">
         <h3 className="recipe-name">{recipe.name}</h3>
-        <div className="header-actions">
-          {recipe.isCheat && <span className="cheat-badge">Cheat</span>}
-          {/* FR-033: Edit button for admins - uses selected variant ID */}
-          {isAdmin && onEdit && (
-            <button
-              className="header-icon-btn edit-btn"
-              onClick={() => onEdit(selectedVariantId)}
-              title="Edit recipe"
-              aria-label="Edit recipe"
-            >
-              <svg fill="none" viewBox="0 0 24 24">
-                <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
-                <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
-              </svg>
-            </button>
-          )}
-          {/* Expand to fullscreen button */}
-          <button
-            className="header-icon-btn"
-            onClick={() => setShowFullscreen(true)}
-            title="View fullscreen"
-            aria-label="Expand recipe to fullscreen"
-          >
-            <svg fill="none" viewBox="0 0 24 24">
-              <path d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
-            </svg>
-          </button>
-        </div>
+        {recipe.isCheat && <span className="cheat-badge">Cheat</span>}
       </div>
 
       {/* Meta Pill Bar: Calories | Variant | Servings */}
@@ -186,6 +166,25 @@ function RecipeCard({ recipe, currentMealType, onSelectVariant, onEdit }) {
         currentMealType={currentMealType}
         selectedRecipeId={selectedVariantId}
       />
+
+      {/* Card footer with View Recipe and Edit buttons */}
+      <div className="card-footer">
+        <button
+          className="view-recipe-btn"
+          onClick={() => setShowFullscreen(true)}
+        >
+          View Recipe
+        </button>
+        {/* FR-033: Edit button for admins - uses selected variant ID */}
+        {isAdmin && onEdit && (
+          <button
+            className="edit-btn"
+            onClick={() => onEdit(selectedVariantId)}
+          >
+            Edit
+          </button>
+        )}
+      </div>
 
       {/* Show Details button hidden - users can use fullscreen modal instead
       <button
