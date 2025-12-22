@@ -123,19 +123,19 @@ INSERT INTO ingredients (id, `key`, name, aisle_id, protein_per_100g, carbs_per_
 -- =============================================
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
 -- Porridge with Berries & Nuts Family
-(1, 'Porridge with Berries & Nuts (Light)', 2, 716, FALSE, TRUE),
+(1, 'Porridge with Berries & Nuts', 2, 716, FALSE, TRUE),
 (2, 'Porridge with Berries & Nuts', 2, 972, FALSE, TRUE),
-(3, 'Porridge with Berries & Nuts (Balanced)', 2, 1236, FALSE, TRUE),
+(3, 'Porridge with Berries & Nuts', 2, 1236, FALSE, TRUE),
 
 -- Peanut Butter Banana Smoothie Family
-(4, 'Peanut Butter Banana Smoothie (Light)', 2, 849, FALSE, TRUE),
+(4, 'Peanut Butter Banana Smoothie', 2, 849, FALSE, TRUE),
 (5, 'Peanut Butter Banana Smoothie', 2, 1123, FALSE, TRUE),
-(6, 'Peanut Butter Banana Smoothie (Balanced)', 2, 1404, FALSE, TRUE),
+(6, 'Peanut Butter Banana Smoothie', 2, 1404, FALSE, TRUE),
 
 -- Irish Chicken Curry Family
-(7, 'Irish Chicken Curry (Light)', 2, 1395, FALSE, TRUE),
+(7, 'Irish Chicken Curry', 2, 1395, FALSE, TRUE),
 (8, 'Irish Chicken Curry', 2, 1662, FALSE, TRUE),
-(9, 'Irish Chicken Curry (Balanced)', 2, 2035, FALSE, TRUE);
+(9, 'Irish Chicken Curry', 2, 2035, FALSE, TRUE);
 
 -- =============================================
 -- RECIPE MEALS
@@ -532,7 +532,7 @@ INSERT INTO recipe_extras (parent_recipe_id, child_recipe_id, display_order) VAL
 
 -- Recipe 13: Pizza (Light) - ~1148 cal total (2 servings, 574 cal each)
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
-(13, 'Pizza (Light)', 2, 1148, FALSE, TRUE);
+(13, 'Pizza', 2, 1148, FALSE, TRUE);
 
 INSERT INTO recipe_meals (recipe_id, meal_id) VALUES (13, 3);  -- 3 = dinner
 
@@ -580,7 +580,7 @@ INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id,
 
 -- Recipe 15: Pizza (Balanced) - ~2124 cal total (2 servings, 1062 cal each)
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
-(15, 'Pizza (Balanced)', 2, 2124, FALSE, TRUE);
+(15, 'Pizza', 2, 2124, FALSE, TRUE);
 
 INSERT INTO recipe_meals (recipe_id, meal_id) VALUES (15, 3);  -- 3 = dinner
 
@@ -631,7 +631,7 @@ INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_lab
 
 -- Recipe 16: Chicken Satay (Light) - ~1100 cal total, ~550 cal/serving
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
-(16, 'Chicken Satay (Light)', 2, 1100, FALSE, TRUE);
+(16, 'Chicken Satay', 2, 1100, FALSE, TRUE);
 
 -- Recipe 17: Chicken Satay (Moderate) - ~1460 cal total, ~730 cal/serving
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
@@ -639,7 +639,7 @@ INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VA
 
 -- Recipe 18: Chicken Satay (Balanced) - ~1900 cal total, ~950 cal/serving
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
-(18, 'Chicken Satay (Balanced)', 2, 1900, FALSE, TRUE);
+(18, 'Chicken Satay', 2, 1900, FALSE, TRUE);
 
 -- =============================================
 -- CHICKEN SATAY RECIPE MEALS (Dinner)
@@ -831,7 +831,7 @@ INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id,
 
 -- Recipe 20: Black Bean Chicken Wrap (Light) - ~1313 cal total, ~656 cal/serving
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
-(20, 'Black Bean Chicken Wrap (Light)', 2, 1313, FALSE, TRUE);
+(20, 'Black Bean Chicken Wrap', 2, 1313, FALSE, TRUE);
 
 -- Recipe 21: Black Bean Chicken Wrap (Moderate) - ~1699 cal total, ~849 cal/serving
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
@@ -839,7 +839,7 @@ INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VA
 
 -- Recipe 22: Black Bean Chicken Wrap (Balanced) - ~2136 cal total, ~1068 cal/serving
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
-(22, 'Black Bean Chicken Wrap (Balanced)', 2, 2136, FALSE, TRUE);
+(22, 'Black Bean Chicken Wrap', 2, 2136, FALSE, TRUE);
 
 -- =============================================
 -- BLACK BEAN WRAP RECIPE MEALS (Lunch)
@@ -1003,7 +1003,7 @@ INSERT INTO ingredients (id, `key`, name, aisle_id, protein_per_100g, carbs_per_
 
 -- Recipe 23: Chicken & Vegetable Soup (Light) - ~868 cal total, ~434 cal/serving
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
-(23, 'Chicken & Vegetable Soup (Light)', 2, 868, FALSE, TRUE);
+(23, 'Chicken & Vegetable Soup', 2, 868, FALSE, TRUE);
 
 -- Recipe 24: Chicken & Vegetable Soup (Moderate) - ~1135 cal total, ~567 cal/serving
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
@@ -1011,7 +1011,7 @@ INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VA
 
 -- Recipe 25: Chicken & Vegetable Soup (Balanced) - ~1398 cal total, ~699 cal/serving
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
-(25, 'Chicken & Vegetable Soup (Balanced)', 2, 1398, FALSE, TRUE);
+(25, 'Chicken & Vegetable Soup', 2, 1398, FALSE, TRUE);
 
 -- =============================================
 -- CHICKEN & VEGETABLE SOUP RECIPE MEALS (Lunch)
@@ -1179,7 +1179,7 @@ INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id,
 
 -- Recipe 27: Salmon Sandwich (Light) - REMOVED (no longer used)
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
-(27, 'Salmon Sandwich (Light)', 2, 650, FALSE, FALSE);
+(27, 'Salmon Sandwich', 2, 650, FALSE, FALSE);
 
 -- Recipe 28: Salmon Sandwich (Moderate) - ~920 cal total, ~460 cal/serving (1 sandwich per person)
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
@@ -1187,7 +1187,7 @@ INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VA
 
 -- Recipe 29: Salmon Sandwich (Balanced) - ~1840 cal total, ~920 cal/serving (2 sandwiches per person)
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
-(29, 'Salmon Sandwich (Balanced)', 2, 1840, FALSE, TRUE);
+(29, 'Salmon Sandwich', 2, 1840, FALSE, TRUE);
 
 -- =============================================
 -- SALMON SANDWICH RECIPE MEALS (Lunch)
@@ -1288,7 +1288,7 @@ INSERT INTO ingredients (id, `key`, name, aisle_id, protein_per_100g, carbs_per_
 
 -- Recipe 30: Lentil Stew (Light) - ~708 cal total, ~354 cal/serving
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
-(30, 'Lentil Stew (Light)', 2, 708, FALSE, TRUE);
+(30, 'Lentil Stew', 2, 708, FALSE, TRUE);
 
 -- Recipe 31: Lentil Stew (Moderate) - ~852 cal total, ~426 cal/serving
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
@@ -1296,7 +1296,7 @@ INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VA
 
 -- Recipe 32: Lentil Stew (Balanced) - ~963 cal total, ~481 cal/serving
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
-(32, 'Lentil Stew (Balanced)', 2, 963, FALSE, TRUE);
+(32, 'Lentil Stew', 2, 963, FALSE, TRUE);
 
 -- =============================================
 -- LENTIL STEW RECIPE MEALS (Lunch)
@@ -1409,7 +1409,7 @@ INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_lab
 
 -- Recipe 33: Lentil Stuffed Peppers (Light) - ~782 cal total, ~391 cal/serving
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
-(33, 'Lentil Stuffed Peppers (Light)', 2, 782, FALSE, TRUE);
+(33, 'Lentil Stuffed Peppers', 2, 782, FALSE, TRUE);
 
 -- Recipe 34: Lentil Stuffed Peppers (Moderate) - ~969 cal total, ~484 cal/serving
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
@@ -1417,7 +1417,7 @@ INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VA
 
 -- Recipe 35: Lentil Stuffed Peppers (Balanced) - ~1217 cal total, ~608 cal/serving
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
-(35, 'Lentil Stuffed Peppers (Balanced)', 2, 1217, FALSE, TRUE);
+(35, 'Lentil Stuffed Peppers', 2, 1217, FALSE, TRUE);
 
 -- =============================================
 -- LENTIL STUFFED PEPPERS RECIPE MEALS (Lunch)
@@ -1570,7 +1570,7 @@ INSERT INTO ingredients (id, `key`, name, aisle_id, protein_per_100g, carbs_per_
 
 -- Recipe 37: Pink Sauce Pasta (Light) - ~1150 cal total, ~575 cal/serving
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
-(37, 'Pink Sauce Pasta (Light)', 2, 1150, FALSE, TRUE);
+(37, 'Pink Sauce Pasta', 2, 1150, FALSE, TRUE);
 
 -- Recipe 38: Pink Sauce Pasta (Moderate) - ~1404 cal total, ~702 cal/serving
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
@@ -1578,7 +1578,7 @@ INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VA
 
 -- Recipe 39: Pink Sauce Pasta (Balanced) - ~1773 cal total, ~886 cal/serving
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
-(39, 'Pink Sauce Pasta (Balanced)', 2, 1773, FALSE, TRUE);
+(39, 'Pink Sauce Pasta', 2, 1773, FALSE, TRUE);
 
 -- =============================================
 -- PINK SAUCE PASTA RECIPE MEALS (Dinner)
@@ -1708,9 +1708,9 @@ INSERT INTO ingredients (id, `key`, name, aisle_id, protein_per_100g, carbs_per_
 -- CHICKEN TIKKA MASALA RECIPES
 -- =============================================
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
-(40, 'Chicken Tikka Masala (Light)', 2, 1258, FALSE, TRUE),
+(40, 'Chicken Tikka Masala', 2, 1258, FALSE, TRUE),
 (41, 'Chicken Tikka Masala', 2, 1493, FALSE, TRUE),
-(42, 'Chicken Tikka Masala (Balanced)', 2, 1792, FALSE, TRUE);
+(42, 'Chicken Tikka Masala', 2, 1792, FALSE, TRUE);
 
 -- =============================================
 -- CHICKEN TIKKA MASALA RECIPE MEALS (Dinner)
@@ -1890,9 +1890,9 @@ INSERT INTO ingredients (id, `key`, name, aisle_id, protein_per_100g, carbs_per_
 -- Stromboli Recipes (3 variants, serves 2 each)
 -- Uses linked recipes: Pizza Dough (11), Pizza Sauce (12), Burger Patties (43)
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
-(44, 'Stromboli (Light)', 2, 1344, FALSE, TRUE),
+(44, 'Stromboli', 2, 1344, FALSE, TRUE),
 (45, 'Stromboli', 2, 1664, FALSE, TRUE),
-(46, 'Stromboli (Balanced)', 2, 2098, FALSE, TRUE);
+(46, 'Stromboli', 2, 2098, FALSE, TRUE);
 
 -- Assign to Dinner meal type
 INSERT INTO recipe_meals (recipe_id, meal_id) VALUES
@@ -2025,9 +2025,9 @@ INSERT INTO ingredients (id, `key`, name, aisle_id, protein_per_100g, carbs_per_
 
 -- Steak & Chips Recipes (3 variants, serves 2 each)
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
-(47, 'Steak & Chips (Light)', 2, 766, FALSE, TRUE),
+(47, 'Steak & Chips', 2, 766, FALSE, TRUE),
 (48, 'Steak & Chips', 2, 1102, FALSE, TRUE),
-(49, 'Steak & Chips (Balanced)', 2, 1437, FALSE, TRUE);
+(49, 'Steak & Chips', 2, 1437, FALSE, TRUE);
 
 -- Assign to Dinner meal type
 INSERT INTO recipe_meals (recipe_id, meal_id) VALUES
@@ -2133,7 +2133,7 @@ INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_lab
 
 -- Recipe 50: Scrambled Eggs & Toast (Light) - ~1006 cal total, ~503 cal/serving
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
-(50, 'Scrambled Eggs & Toast (Light)', 2, 1006, FALSE, TRUE);
+(50, 'Scrambled Eggs & Toast', 2, 1006, FALSE, TRUE);
 
 -- Recipe 51: Scrambled Eggs & Toast (Moderate) - ~1198 cal total, ~599 cal/serving
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
@@ -2141,7 +2141,7 @@ INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VA
 
 -- Recipe 52: Scrambled Eggs & Toast (Balanced) - ~1426 cal total, ~713 cal/serving
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
-(52, 'Scrambled Eggs & Toast (Balanced)', 2, 1426, FALSE, TRUE);
+(52, 'Scrambled Eggs & Toast', 2, 1426, FALSE, TRUE);
 
 -- Assign to Breakfast meal type (meal_id = 1)
 INSERT INTO recipe_meals (recipe_id, meal_id) VALUES
@@ -2260,7 +2260,7 @@ INSERT INTO ingredients (id, `key`, name, aisle_id, protein_per_100g, carbs_per_
 
 -- Recipe 53: Avocado Toast (Light) - ~826 cal total, ~413 cal/serving
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
-(53, 'Avocado Toast (Light)', 2, 826, FALSE, TRUE);
+(53, 'Avocado Toast', 2, 826, FALSE, TRUE);
 
 -- Recipe 54: Avocado Toast (Moderate) - ~906 cal total, ~453 cal/serving
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
@@ -2268,7 +2268,7 @@ INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VA
 
 -- Recipe 55: Avocado Toast (Balanced) - ~1061 cal total, ~531 cal/serving (with fried egg)
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
-(55, 'Avocado Toast (Balanced)', 2, 1061, FALSE, TRUE);
+(55, 'Avocado Toast', 2, 1061, FALSE, TRUE);
 
 -- Assign to Breakfast meal type (meal_id = 1)
 INSERT INTO recipe_meals (recipe_id, meal_id) VALUES
