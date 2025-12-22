@@ -11,8 +11,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * REST Controller for meal plan operations.
@@ -178,12 +180,14 @@ public class MealPlanController {
 
     /**
      * FR-042: Get breakdown of which meals use a specific ingredient.
-     * GET /api/meal-plan/shopping-list/ingredient-breakdown?ingredientId=123&unit=tbsp&startDate=2025-12-01
+     * FR-102: Added sourceChain parameter for finding ingredients from extras.
+     * GET /api/meal-plan/shopping-list/ingredient-breakdown?ingredientId=123&unit=tbsp&startDate=2025-12-01&sourceChain=10,12,13
      *
      * @param userPrincipal Authenticated user (required)
      * @param ingredientId The ingredient ID to look up
      * @param unit The unit string (e.g., "tbsp", "g")
      * @param startDate Start date of the 7-day period
+     * @param sourceChain Optional comma-separated recipe IDs showing provenance
      * @return IngredientBreakdownDTO with meal breakdown list
      */
     @GetMapping("/shopping-list/ingredient-breakdown")
@@ -191,13 +195,24 @@ public class MealPlanController {
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @RequestParam Long ingredientId,
             @RequestParam String unit,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate) {
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) String sourceChain) {
+
+        // FR-102: Parse sourceChain from comma-separated string to List<Long>
+        List<Long> sourceChainList = null;
+        if (sourceChain != null && !sourceChain.isEmpty()) {
+            sourceChainList = Arrays.stream(sourceChain.split(","))
+                .map(String::trim)
+                .map(Long::parseLong)
+                .collect(Collectors.toList());
+        }
 
         IngredientBreakdownDTO breakdown = shoppingListService.getIngredientBreakdown(
             userPrincipal.getId(),
             ingredientId,
             unit,
-            startDate
+            startDate,
+            sourceChainList
         );
         return ResponseEntity.ok(breakdown);
     }

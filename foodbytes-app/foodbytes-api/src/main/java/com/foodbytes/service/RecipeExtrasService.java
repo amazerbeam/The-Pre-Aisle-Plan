@@ -42,6 +42,7 @@ public class RecipeExtrasService {
 
     /**
      * Recursively build extras tree with cycle detection.
+     * FR-103: Also looks up store-bought ingredient IDs from recipe_ingredients.
      * @param recipeId The recipe to get extras for
      * @param visited Set of recipe IDs already visited (prevents infinite loops)
      * @return List of extra nodes with nested children
@@ -56,13 +57,29 @@ public class RecipeExtrasService {
         List<RecipeExtra> extras = recipeExtraRepository
                 .findByParentRecipeIdOrderByDisplayOrderAsc(recipeId);
 
+        // FR-103: Get parent recipe's ingredients to find store-bought options
+        Recipe parentRecipe = recipeRepository.findWithDetailsById(recipeId).orElse(null);
+        Map<Long, Long> storeBoughtMap = new HashMap<>();
+        if (parentRecipe != null) {
+            for (var ri : parentRecipe.getIngredients()) {
+                // If both ingredient_id AND linked_recipe_id are set, this is a store-bought option
+                if (ri.getIngredient() != null && ri.getLinkedRecipe() != null) {
+                    storeBoughtMap.put(ri.getLinkedRecipe().getId(), ri.getIngredient().getId());
+                }
+            }
+        }
+
         return extras.stream()
-                .map(extra -> RecipeExtraNodeDTO.builder()
-                        .recipeId(extra.getChildRecipe().getId())
-                        .recipeName(extra.getChildRecipe().getName())
-                        .displayOrder(extra.getDisplayOrder())
-                        .children(buildExtrasTree(extra.getChildRecipe().getId(), new HashSet<>(visited)))
-                        .build())
+                .map(extra -> {
+                    Long childId = extra.getChildRecipe().getId();
+                    return RecipeExtraNodeDTO.builder()
+                            .recipeId(childId)
+                            .recipeName(extra.getChildRecipe().getName())
+                            .displayOrder(extra.getDisplayOrder())
+                            .storeBoughtIngredientId(storeBoughtMap.get(childId))
+                            .children(buildExtrasTree(childId, new HashSet<>(visited)))
+                            .build();
+                })
                 .collect(Collectors.toList());
     }
 

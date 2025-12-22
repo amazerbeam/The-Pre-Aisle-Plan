@@ -152,14 +152,14 @@ Variants are the **same recipe with different portion sizes** — NOT different 
 
 | Variant | Portion Adjustment | Target Calories |
 |---------|-------------------|-----------------|
-| **Light** | Smaller portions | ~450-550 cal |
-| **Standard** | Normal portions | ~550-650 cal |
-| **Full** | Larger portions | ~700-800 cal |
+| **Light** | Smallest portions (bigger deficit) | ~450-550 cal |
+| **Moderate** | Medium portions (gentle deficit) | ~550-650 cal |
+| **Balanced** | Full portions (maintenance) | ~700-800 cal |
 
 **Example: Chicken & Rice**
 
-| Component | Light | Standard | Full |
-|-----------|-------|----------|------|
+| Component | Light | Moderate | Balanced |
+|-----------|-------|----------|----------|
 | Chicken breast | 120g | 150g | 200g |
 | Rice (cooked) | ¾ cup | 1 cup | 1.5 cups |
 | Vegetables | 1 cup | 1 cup | 1 cup |
@@ -259,7 +259,7 @@ Recipes display friendly units (cups, tbsp, pieces) but store gram equivalents f
 When reviewing recipes, I verify:
 
 1. **Math is correct** — Gram weights × macros = accurate totals
-2. **Recipe fits variant system** — Hits calorie targets (Light/Standard/Full)
+2. **Recipe fits variant system** — Hits calorie targets (Light/Moderate/Balanced)
 3. **No obvious errors** — Typos like 1000g chicken when recipe serves 2
 
 ---
@@ -310,9 +310,9 @@ One day doesn't matter much. Weekly average determines results:
 
 | Goal | Weekly Target | Strategy |
 |------|---------------|----------|
-| Lose | ~12,600 cal/week | Mostly Light variants, some Standard |
-| Maintain | ~15,400 cal/week | Mostly Standard, flex as needed |
-| Gain | ~18,200 cal/week | Mostly Full variants, add extras |
+| Lose (aggressive) | ~12,600 cal/week | Mostly Light variants |
+| Lose (steady) | ~14,000 cal/week | Mostly Moderate variants |
+| Maintain | ~15,400 cal/week | Mostly Balanced variants |
 
 **If Monday was heavy, pick more Light variants Tuesday-Wednesday. It balances out.**
 
@@ -321,9 +321,9 @@ One day doesn't matter much. Weekly average determines results:
 | Scenario | Breakfast | Lunch | Dinner | Why |
 |----------|-----------|-------|--------|-----|
 | Big lunch meeting | Light | (ate out) | Light | Compensate for large meal |
-| Morning workout | Full | Standard | Standard | Extra fuel for activity |
-| Light activity day | Light | Light | Standard | Lower overall intake |
-| Weekend indulgence recovery | Standard | Standard | Light | Balance the week |
+| Morning workout | Balanced | Moderate | Moderate | Extra fuel for activity |
+| Light activity day | Light | Light | Moderate | Lower overall intake |
+| Weekend indulgence recovery | Moderate | Moderate | Light | Balance the week |
 
 **Same meals, different portions. No special "diet food." No restriction. No guilt.**
 
@@ -331,19 +331,19 @@ One day doesn't matter much. Weekly average determines results:
 
 Given a day with three meals (Breakfast, Lunch, Dinner):
 
-**Weight Loss:** Pick mostly Light + one Standard
+**Aggressive Weight Loss:** Pick mostly Light
 ```
-Light (380) + Standard (620) + Light (450) = ~1,450 cal
-```
-
-**Maintenance:** Pick all Standard
-```
-Standard (520) + Standard (620) + Standard (600) = ~1,740 cal
+Light (380) + Light (450) + Light (450) = ~1,280 cal
 ```
 
-**Weight Gain:** Pick mostly Full
+**Steady Weight Loss:** Pick mostly Moderate
 ```
-Full (680) + Full (780) + Full (780) = ~2,240 cal
+Moderate (500) + Moderate (580) + Moderate (550) = ~1,630 cal
+```
+
+**Maintenance:** Pick mostly Balanced
+```
+Balanced (680) + Balanced (720) + Balanced (700) = ~2,100 cal
 ```
 
 **Same three meals. Different portions. Any goal.**

@@ -37,6 +37,10 @@
 | Req # | Description |
 |-------|-------------|
 | FR-029 | Screen Wake Lock with Persistent Clickable Lock Icon (Next to Ingredients) |
+| FR-042 | Ingredient Breakdown Popup - Extras Support |
+| FR-089 | Shopping List Extras Integration - Store-Bought Items |
+| FR-099 | Default Variant Selection to Balanced |
+| FR-100 | Active Tab Line Indicator (Footer Navigation) |
 
 ## In Progress - Finish
 
@@ -108,6 +112,7 @@
 | FR-096 | Shopping List Background Sync (No Reload) |
 | FR-097 | Variant Pre-Selection from Meal Plan |
 | FR-098 | Recipe Day Assignment Optimistic UI |
+| FR-099 | Default Variant Selection to Balanced |
 ## Completed - Finish
 
 ---
@@ -1019,6 +1024,9 @@ CREATE TABLE recipe_family_members (
   - List of meals that use this ingredient
   - Quantity required for each meal
   - Meal name with quantity (e.g., "Pizza: 1 tbsp", "Stir Fry: 3 tbsp")
+- **Extras Support:** Ingredients from extras show source as "ExtraName (ParentRecipe)" format
+  - Example: Tinned Tomatoes from Pizza Sauce shows "Pizza Sauce (Pizza)"
+  - Nested extras show chain: "Pesto (Pizza Sauce → Pizza)"
 - Popup closes when user clicks/taps anywhere (on popup or outside)
 - Popup positioned near the ingredient item (above or below, based on available space)
 - Visual feedback during long press (e.g., subtle highlight or progress indicator)
@@ -1034,6 +1042,9 @@ CREATE TABLE recipe_family_members (
 - Close popup on any click/tap event (add overlay with click handler)
 - Position popup dynamically based on viewport space available
 - Add visual feedback during long press (e.g., opacity change or border highlight)
+- **Extras:** When ingredient comes from a linked recipe (extra), display format: `extraRecipeName (parentRecipeName)`
+- **Extras:** Trace the full recipe chain: ingredient → extra → parent recipe
+- **Extras:** Handle nested extras by showing chain with arrow: `childExtra (parentExtra → grandparentRecipe)`
 
 **DO NOT:**
 - Do NOT trigger popup on normal click (< 3 seconds) - preserve checkbox toggle behavior
@@ -1044,6 +1055,8 @@ CREATE TABLE recipe_family_members (
 - Do NOT show popup for checked (purchased) items - only unchecked items need breakdown
 - Do NOT use conflicting positioning (e.g., inline absolute positioning WITH flex centering on overlay)
 - Do NOT make popup too small on desktop - use min-width: 320px, max-width: 500px
+- **Extras:** Do NOT show "Unknown Ingredient" when ingredient source is an extra recipe
+- **Extras:** Do NOT show just the parent recipe name without the extra name
 
 **Desktop Layout:**
 - Center popup using overlay's `display: flex; align-items: center; justify-content: center;`
@@ -1061,11 +1074,13 @@ CREATE TABLE recipe_family_members (
 - User request: "If the user presses and holds an Ingredient for 3 seconds in the shopping list (Mouse down or finger down) all the meals and quantities will show in a pop up"
 - Example: "[] 8 Tbsp of Olive Oil → Pizza: 1 tbsp, Stir Fry: 3 tbsp"
 
-**Status:** Completed
-
 **Implementation:**
 - Backend: Created `IngredientBreakdownDTO.java`, `MealIngredientUsageDTO.java`, `ShoppingListService.getIngredientBreakdown()` method, and `GET /api/meal-plan/shopping-list/ingredient-breakdown` endpoint
 - Frontend: Created `IngredientBreakdownPopup.jsx` component with long-press detection in `ShoppingListItem.jsx` (3-second timer, visual feedback, mobile/desktop support)
+
+**Update (2025-12-22):** Extras support needed - ingredients from extras must show "ExtraName (ParentRecipe)" format instead of "Unknown Ingredient"
+
+**Status:** In Progress
 
 ---
 
@@ -1194,6 +1209,38 @@ CREATE TABLE recipe_family_members (
 
 ---
 
+### FR-099: Default Variant Selection to Balanced
+
+**Category:** Recipe Management / Variants
+
+**Description:** When displaying recipes with variants, if no variant has been assigned to the user's meal plan for the current week, the dropdown should default to showing the "Balanced" variant (largest portion, maintenance calories) instead of "Moderate". This ensures users see maintenance-level portions by default, with lighter options available via dropdown.
+
+**User Story:** As a user, I want to see the Balanced (maintenance) variant by default when browsing recipes, so that I start from a full-portion baseline and can choose lighter options if needed.
+
+**Acceptance Criteria:**
+- [ ] Recipe cards display the "Balanced" variant by default when no meal plan assignment exists
+- [ ] Variant dropdown shows "Balanced" as the pre-selected option
+- [ ] If user has assigned a different variant (Light/Moderate) to meal plan, that variant displays instead (per FR-097)
+- [ ] Default applies across all meal type tabs (Breakfast, Lunch, Dinner, Snacks)
+- [ ] Admin can still set which recipe is the "default" in a family, but frontend defaults to Balanced for display
+
+**Source Evidence:** User feedback - "If there is no selected value from the meal plan the default value should be Balanced"
+
+**Priority:** Medium
+
+**Status:** In Progress
+
+**Related Requirements:**
+- FR-043 (Linked Recipe Variants)
+- FR-097 (Variant Pre-Selection from Meal Plan)
+
+**Technical Notes:**
+- Modify `RecipeList.jsx` to select Balanced variant when no meal plan match exists
+- May require updating `swapWithMealPlanVariants()` logic
+- Database `is_default` flag may need to be reconsidered (currently marks Moderate as default)
+
+---
+
 ### FR-027: Generate Shareable Meal Plan URL
 **Priority:** Low
 
@@ -1264,9 +1311,11 @@ CREATE TABLE recipe_family_members (
   - [ ] Return to normal scale
   - [ ] Total animation duration: ~1 second
 - [ ] Icon remains visible after animation (shows current state: 🔒 or 🔓)
+- [ ] **Unlock icon (🔓) displays in RED color** to indicate screen can turn off
+- [ ] **Lock icon (🔒) displays in default/white color** to indicate screen stays on
 - [ ] Clicking the icon toggles wake lock:
-  - [ ] If locked (🔒): releases wake lock, shows 🔓
-  - [ ] If unlocked (🔓): requests wake lock, shows 🔒 with animation
+  - [ ] If locked (🔒): releases wake lock, shows 🔓 (red)
+  - [ ] If unlocked (🔓): requests wake lock, shows 🔒 (white) with animation
 - [ ] Feature detection handles unsupported browsers gracefully
 - [ ] If wake lock not supported, icon is hidden or shows disabled state
 
@@ -1277,6 +1326,8 @@ CREATE TABLE recipe_family_members (
 - Keep the icon visible at all times while the modal is open (persistent indicator)
 - Play the animation at the icon's location (not centered on screen)
 - Show 🔒 when wake lock is active, 🔓 when inactive
+- **Style unlock icon (🔓) in RED color** (e.g., `color: red` or `color: #ff4444`)
+- **Keep lock icon (🔒) in default/white color** (no special styling needed)
 
 **DO NOT:**
 - Do NOT place the animation as a centered fullscreen overlay
@@ -1353,6 +1404,42 @@ CREATE TABLE recipe_family_members (
 **Source Evidence:** User request - "Clicking on FoodBytes Logo should bring user back to Recipes too"
 
 **Status:** Completed
+
+---
+
+### FR-100: Active Tab Line Indicator (Footer Navigation)
+**Priority:** Low
+
+**Category:** Navigation / UX
+
+**Description:** Display a horizontal line indicator beneath the currently selected tab in the footer navigation bar. The line visually reinforces which section the user is viewing.
+
+**User Story:** As a user, I want to see a line under the active footer tab so that I can clearly identify which section I'm currently viewing.
+
+**Acceptance Criteria:**
+- [ ] Horizontal line appears directly below the active footer tab
+- [ ] Line uses brand color (#4a3f80) for consistency
+- [ ] Line width matches the tab icon/label width (not full button width)
+- [ ] Line is approximately 2-3px thick
+- [ ] Line animates/transitions smoothly when switching tabs
+- [ ] Only one tab shows the line indicator at a time
+
+**DO:**
+- Place line indicator inside `Footer.jsx` component
+- Apply to all footer tabs: Recipes, Meal Plan, Search, Shopping
+- Use CSS transition for smooth tab switching (e.g., `transition: all 0.2s ease`)
+- Match existing active state styling behavior
+
+**DO NOT:**
+- Do NOT use a full-width line spanning the entire footer
+- Do NOT make the line thicker than 3px
+- Do NOT use colors other than brand color (#4a3f80)
+
+**Source Evidence:**
+- User screenshot showing line indicator under "Recipes" tab
+- `components/layout/Footer.jsx` - Target component
+
+**Status:** In Progress
 
 ---
 
@@ -3911,8 +3998,9 @@ CREATE TABLE recipe_extras (
 
 **Acceptance Criteria:**
 - [ ] Homemade extra (checked): All ingredients from that recipe added to shopping list
-- [ ] Store-bought extra (unchecked): Single item "Store Bought [Recipe Name]" added (e.g., "Store Bought Pesto")
-- [ ] Store-bought items go to appropriate aisle (same as where homemade version's main ingredient would go)
+- [ ] Store-bought extra (unchecked): Single item "[Recipe Name]" added (e.g., "Pizza Sauce") — NO "Store Bought" prefix
+- [ ] Store-bought item shows source as "(ParentRecipe)" when long-pressed (e.g., source shows "Pizza")
+- [ ] Store-bought items go to appropriate aisle (Condiments for sauces, Bakery for dough, etc.)
 - [ ] Nested extras follow the same logic recursively
 - [ ] If parent is store-bought, children are not processed (already covered by parent)
 - [ ] Ingredient quantities scale with servings as normal
@@ -3922,7 +4010,19 @@ CREATE TABLE recipe_extras (
 - [ ] **Portion Ratio Calculation:** `parent_quantity_grams / extra_total_yield` where `extra_total_yield = SUM(quantity_grams)` from extra's ingredients
 - [ ] **Example:** Pizza Light uses 280g of 761g dough → flour added to shopping list as 280/761 = 36.8% of dough recipe amounts
 
-**Source Evidence:** User conversation - linked recipes/extras feature request
+**DO:**
+- When extra is unchecked (store-bought), add single shopping list item with `name = extraRecipeName`
+- Link store-bought item to parent recipe for source tracking
+- Assign aisle based on extra type (e.g., Pizza Sauce → Condiments, Pizza Dough → Bakery)
+
+**DO NOT:**
+- Do NOT prefix store-bought items with "Store Bought" — just use the recipe name (e.g., "Pizza Sauce" not "Store Bought Pizza Sauce")
+- Do NOT omit store-bought extras from shopping list entirely
+- Do NOT lose the link to parent recipe when adding store-bought item
+
+**Source Evidence:**
+- User conversation - linked recipes/extras feature request
+- User feedback (2025-12-22): Store-bought extras not appearing in shopping list, should show as "[ExtraName]" linked to parent recipe
 
 **Status:** In Progress
 

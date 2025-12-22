@@ -14,7 +14,7 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
 
     @EntityGraph(attributePaths = {
         "ingredients", "ingredients.ingredient", "ingredients.ingredient.aisle",
-        "ingredients.unit", "steps", "meals", "meals.meal"
+        "ingredients.unit", "meals", "meals.meal"
     })
     Optional<Recipe> findWithDetailsById(Long id);
 

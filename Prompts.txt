@@ -1,4 +1,4 @@
-Using > @Claude\agents\CEO\agent-ceo.md plan to execute the requirements currently in # In Progress. 
+Using  @Claude\agents\agent-ceo\agent-ceo-SKILL.md to execute the requirements currently in # In Progress. 
 
 plan using @Claude\agents\Requirements\agent-failed-requirements.md to look at
 FR-050

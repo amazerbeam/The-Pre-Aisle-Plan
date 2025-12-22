@@ -9,6 +9,7 @@ import com.foodbytes.dto.RecipeExtraNodeDTO;
 import com.foodbytes.dto.ShoppingItemDTO;
 import com.foodbytes.dto.ShoppingListByAisleDTO;
 import com.foodbytes.model.*;
+import com.foodbytes.repository.IngredientRepository;
 import com.foodbytes.repository.MealPlanEntryRepository;
 import com.foodbytes.repository.RecipeRepository;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +33,7 @@ public class ShoppingListService {
     private final MealPlanEntryRepository mealPlanEntryRepository;
     private final RecipeRepository recipeRepository;
     private final RecipeExtrasService recipeExtrasService;
+    private final IngredientRepository ingredientRepository;
 
     // Special aisle for store-bought items
     private static final Long STORE_BOUGHT_AISLE_ID = -999L;
@@ -87,8 +89,12 @@ public class ShoppingListService {
             Integer entryServings = entry.getServings();
             Integer recipeDefaultServings = recipe.getDefaultServings();
 
+            // FR-102: Create source chain starting with the main recipe
+            List<Long> mainRecipeChain = Collections.singletonList(recipeId);
+
             // Process main recipe ingredients
-            processRecipeIngredients(recipe, entryServings, recipeDefaultServings, aggregatedIngredients);
+            processRecipeIngredients(recipe, entryServings, recipeDefaultServings,
+                                    aggregatedIngredients, mainRecipeChain);
 
             // FR-089: Process extras based on homemade selections
             if (recipeExtrasService.hasExtras(recipeId)) {
@@ -98,7 +104,7 @@ public class ShoppingListService {
                     : null;
 
                 processExtras(extras, recipeSelections, entryServings, recipeDefaultServings,
-                             aggregatedIngredients, storeBoughtItems);
+                             aggregatedIngredients, storeBoughtItems, mainRecipeChain);
             }
         }
 
@@ -116,6 +122,7 @@ public class ShoppingListService {
                 .unit(agg.unit)
                 .aisleId(agg.aisleId)
                 .aisleName(agg.aisleName)
+                .sourceChain(agg.sourceChain)  // FR-102: Include source chain
                 .build())
             .sorted(Comparator.comparing(ShoppingItemDTO::getIngredientName)) // Sort alphabetically within aisle
             .collect(Collectors.groupingBy(
@@ -176,17 +183,20 @@ public class ShoppingListService {
 
     /**
      * FR-042: Get breakdown of which meals use a specific ingredient.
+     * FR-102: Added sourceChain support for finding ingredients in extras.
      * Shows each meal that uses the ingredient and how much it requires.
      *
      * @param userId User ID
      * @param ingredientId Ingredient ID
      * @param unit Unit string (e.g., "tbsp", "g")
      * @param startDate Start date of the 7-day period
+     * @param sourceChain Optional chain of recipe IDs showing provenance (first = extra, last = main recipe)
      * @return IngredientBreakdownDTO with meal breakdown list
      */
     @Transactional(readOnly = true)
     public IngredientBreakdownDTO getIngredientBreakdown(Long userId, Long ingredientId,
-                                                          String unit, LocalDate startDate) {
+                                                          String unit, LocalDate startDate,
+                                                          List<Long> sourceChain) {
         LocalDate endDate = startDate.plusDays(7);
 
         // Fetch meal plan entries for user in date range
@@ -197,14 +207,33 @@ public class ShoppingListService {
         BigDecimal totalQuantity = BigDecimal.ZERO;
         String ingredientName = null;
 
+        // FR-102: Determine which recipe contains the ingredient
+        // If sourceChain is provided, the first ID is the extra recipe that contains it
+        // and the last ID is the main recipe to match against meal plan entries
+        Long extraRecipeId = (sourceChain != null && !sourceChain.isEmpty()) ? sourceChain.get(0) : null;
+        Long mainRecipeId = (sourceChain != null && sourceChain.size() > 1)
+            ? sourceChain.get(sourceChain.size() - 1) : null;
+
         // Process each meal plan entry
         for (MealPlanEntry entry : entries) {
             Recipe recipe = entry.getRecipe();
             Integer entryServings = entry.getServings();
             Integer recipeDefaultServings = recipe.getDefaultServings();
 
-            // Find the specific ingredient in this recipe
-            for (RecipeIngredient recipeIngredient : recipe.getIngredients()) {
+            // FR-102: If sourceChain provided, only process entries matching the main recipe
+            if (mainRecipeId != null && !recipe.getId().equals(mainRecipeId)) {
+                continue;
+            }
+
+            // FR-102: Determine which recipe to search for the ingredient
+            Recipe searchRecipe = recipe;
+            if (extraRecipeId != null) {
+                // Ingredient is in an extra recipe, load it
+                searchRecipe = recipeRepository.findById(extraRecipeId).orElse(recipe);
+            }
+
+            // Find the specific ingredient in the search recipe
+            for (RecipeIngredient recipeIngredient : searchRecipe.getIngredients()) {
                 // FR-093: Skip linked recipe ingredients (they don't have an ingredient)
                 if (recipeIngredient.isLinkedRecipe()) {
                     continue;
@@ -230,9 +259,12 @@ public class ShoppingListService {
                     // Add to total
                     totalQuantity = totalQuantity.add(scaledQuantity);
 
+                    // FR-102: Display the main recipe name (not the extra)
+                    String displayName = recipe.getName();
+
                     // Add meal breakdown entry
                     mealBreakdown.add(new MealIngredientUsageDTO(
-                        recipe.getName(),
+                        displayName,
                         entry.getMeal().getKey(),
                         entry.getPlanDate(),
                         scaledQuantity,
@@ -285,6 +317,7 @@ public class ShoppingListService {
 
     /**
      * Helper class to store aggregated ingredient data.
+     * FR-102: Added sourceChain for tracking ingredient provenance.
      */
     private static class IngredientAggregate {
         private final Long ingredientId;
@@ -294,9 +327,11 @@ public class ShoppingListService {
         private final Long aisleId;
         private final String aisleName;
         private final Short displayOrder;
+        private final List<Long> sourceChain;  // FR-102: Recipe chain for provenance
 
         public IngredientAggregate(Long ingredientId, String ingredientName, BigDecimal totalQuantity,
-                                   String unit, Long aisleId, String aisleName, Short displayOrder) {
+                                   String unit, Long aisleId, String aisleName, Short displayOrder,
+                                   List<Long> sourceChain) {
             this.ingredientId = ingredientId;
             this.ingredientName = ingredientName;
             this.totalQuantity = totalQuantity;
@@ -304,6 +339,11 @@ public class ShoppingListService {
             this.aisleId = aisleId;
             this.aisleName = aisleName;
             this.displayOrder = displayOrder;
+            this.sourceChain = sourceChain;
+        }
+
+        public void addQuantity(BigDecimal quantity) {
+            this.totalQuantity = this.totalQuantity.add(quantity);
         }
     }
 
@@ -340,9 +380,12 @@ public class ShoppingListService {
     /**
      * FR-089: Process ingredients for a single recipe, adding to aggregated map.
      * FR-093: Skip linked recipe ingredients (handled by extras system).
+     * FR-102: Added sourceChain parameter for tracking ingredient provenance.
+     * @param sourceChain Chain of recipe IDs for provenance (null for main recipes)
      */
     private void processRecipeIngredients(Recipe recipe, Integer entryServings, Integer defaultServings,
-                                          Map<IngredientUnitKey, IngredientAggregate> aggregatedIngredients) {
+                                          Map<IngredientUnitKey, IngredientAggregate> aggregatedIngredients,
+                                          List<Long> sourceChain) {
         for (RecipeIngredient recipeIngredient : recipe.getIngredients()) {
             // FR-093: Skip linked recipe ingredients - they are handled by extras system
             if (recipeIngredient.isLinkedRecipe()) {
@@ -361,6 +404,7 @@ public class ShoppingListService {
             IngredientUnitKey key = new IngredientUnitKey(ingredientId, unitId);
 
             // Aggregate quantities
+            final List<Long> finalSourceChain = sourceChain;
             aggregatedIngredients.compute(key, (k, existing) -> {
                 if (existing == null) {
                     // First occurrence of this ingredient+unit combination
@@ -373,7 +417,8 @@ public class ShoppingListService {
                         recipeIngredient.getUnit().getValue(),
                         aisle != null ? aisle.getId() : null,
                         aisle != null ? aisle.getName() : "Other",
-                        aisle != null ? aisle.getDisplayOrder() : (short) 15
+                        aisle != null ? aisle.getDisplayOrder() : (short) 15,
+                        finalSourceChain
                     );
                 } else {
                     // Add to existing quantity
@@ -386,6 +431,7 @@ public class ShoppingListService {
 
     /**
      * FR-089: Process extras recursively, adding ingredients or store-bought items.
+     * FR-102: Added sourceChain parameter for tracking ingredient provenance.
      *
      * @param extras List of extra nodes to process
      * @param selections Map of extraRecipeId -> isHomemade (null = all homemade)
@@ -393,13 +439,15 @@ public class ShoppingListService {
      * @param defaultServings Default servings for the parent recipe
      * @param aggregatedIngredients Map to add ingredients to
      * @param storeBoughtItems List to add store-bought items to
+     * @param parentSourceChain Source chain from parent (to build upon)
      */
     private void processExtras(List<RecipeExtraNodeDTO> extras,
                                Map<Long, Boolean> selections,
                                Integer entryServings,
                                Integer defaultServings,
                                Map<IngredientUnitKey, IngredientAggregate> aggregatedIngredients,
-                               List<StoreBoughtItem> storeBoughtItems) {
+                               List<StoreBoughtItem> storeBoughtItems,
+                               List<Long> parentSourceChain) {
         if (extras == null || extras.isEmpty()) {
             return;
         }
@@ -407,26 +455,77 @@ public class ShoppingListService {
         for (RecipeExtraNodeDTO extra : extras) {
             Long extraRecipeId = extra.getRecipeId();
 
+            // FR-102: Build source chain for this extra (prepend extra recipe ID to parent chain)
+            List<Long> currentSourceChain = new ArrayList<>();
+            currentSourceChain.add(extraRecipeId);
+            if (parentSourceChain != null) {
+                currentSourceChain.addAll(parentSourceChain);
+            }
+
             // Check if homemade (default true if no selection)
-            boolean isHomemade = selections == null || selections.get(extraRecipeId) == null
-                || selections.get(extraRecipeId);
+            Boolean selectionValue = selections != null ? selections.get(extraRecipeId) : null;
+            boolean isHomemade = selections == null || selectionValue == null || selectionValue;
 
             if (isHomemade) {
                 // Add extra's ingredients to shopping list
                 Recipe extraRecipe = recipeRepository.findById(extraRecipeId).orElse(null);
                 if (extraRecipe != null) {
-                    processRecipeIngredients(extraRecipe, entryServings, defaultServings, aggregatedIngredients);
+                    processRecipeIngredients(extraRecipe, entryServings, defaultServings,
+                                           aggregatedIngredients, currentSourceChain);
                 }
 
                 // Process children recursively
                 if (extra.getChildren() != null && !extra.getChildren().isEmpty()) {
                     processExtras(extra.getChildren(), selections, entryServings, defaultServings,
-                                 aggregatedIngredients, storeBoughtItems);
+                                 aggregatedIngredients, storeBoughtItems, currentSourceChain);
                 }
             } else {
-                // Add as store-bought item (don't process children - they're covered by parent)
-                storeBoughtItems.add(new StoreBoughtItem(extraRecipeId, extra.getRecipeName()));
+                // FR-103: Store-bought selected - use the actual ingredient if available
+                Long storeBoughtIngredientId = extra.getStoreBoughtIngredientId();
+                if (storeBoughtIngredientId != null) {
+                    // Add the actual store-bought ingredient with proper aisle
+                    addStoreBoughtIngredient(storeBoughtIngredientId, aggregatedIngredients, currentSourceChain);
+                } else {
+                    // Fallback to old behavior (special aisle) for extras without store-bought ingredient
+                    storeBoughtItems.add(new StoreBoughtItem(extraRecipeId, extra.getRecipeName()));
+                }
+                // Don't process children - they're covered by the store-bought parent
             }
+        }
+    }
+
+    /**
+     * FR-103: Add a store-bought ingredient to the shopping list with its proper aisle.
+     * FR-102: Added sourceChain parameter for tracking ingredient provenance.
+     */
+    private void addStoreBoughtIngredient(Long ingredientId,
+                                          Map<IngredientUnitKey, IngredientAggregate> aggregatedIngredients,
+                                          List<Long> sourceChain) {
+        Ingredient ingredient = ingredientRepository.findById(ingredientId).orElse(null);
+        if (ingredient == null) {
+            return;
+        }
+
+        // Use "piece" as the unit for store-bought extras
+        IngredientUnitKey key = new IngredientUnitKey(ingredientId, 0L); // 0 = no specific unit
+        IngredientAggregate existing = aggregatedIngredients.get(key);
+
+        if (existing != null) {
+            // Aggregate with existing
+            existing.addQuantity(BigDecimal.ONE);
+        } else {
+            // Create new entry
+            Aisle aisle = ingredient.getAisle();
+            aggregatedIngredients.put(key, new IngredientAggregate(
+                ingredientId,
+                ingredient.getName(),
+                BigDecimal.ONE,
+                "",  // No unit display for store-bought items
+                aisle != null ? aisle.getId() : null,
+                aisle != null ? aisle.getName() : "Other",
+                aisle != null ? aisle.getDisplayOrder() : Short.MAX_VALUE,
+                sourceChain
+            ));
         }
     }
 
@@ -464,7 +563,8 @@ public class ShoppingListService {
                 "",  // No unit for store-bought items
                 STORE_BOUGHT_AISLE_ID,
                 STORE_BOUGHT_AISLE_NAME,
-                STORE_BOUGHT_AISLE_ORDER
+                STORE_BOUGHT_AISLE_ORDER,
+                null  // FR-102: No source chain for fallback store-bought items
             ));
             storeBoughtIndex--;
         }

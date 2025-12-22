@@ -13,11 +13,11 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <BrowserRouter>
       <AuthProvider>
         <MealPlanProvider>
-          <ShoppingListProvider>
-            <HomemadeSelectionsProvider>
+          <HomemadeSelectionsProvider>
+            <ShoppingListProvider>
               <App />
-            </HomemadeSelectionsProvider>
-          </ShoppingListProvider>
+            </ShoppingListProvider>
+          </HomemadeSelectionsProvider>
         </MealPlanProvider>
       </AuthProvider>
     </BrowserRouter>

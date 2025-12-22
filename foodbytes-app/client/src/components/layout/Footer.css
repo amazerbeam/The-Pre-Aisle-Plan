@@ -29,6 +29,7 @@
 }
 
 .footer-btn {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -47,6 +48,19 @@
 
 .footer-btn.active {
   color: var(--brand-primary);
+}
+
+/* Active indicator bar underneath the active nav item */
+.footer-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 32px;
+  height: 3px;
+  background: var(--brand-primary);
+  border-radius: 3px 3px 0 0;
 }
 
 .footer-btn svg {

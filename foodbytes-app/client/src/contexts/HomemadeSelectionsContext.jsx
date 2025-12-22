@@ -10,6 +10,7 @@ const HomemadeSelectionsContext = createContext()
 export const HomemadeSelectionsProvider = ({ children }) => {
   const { user } = useAuth()
   const [selections, setSelections] = useState({})
+  const [selectionsLoaded, setSelectionsLoaded] = useState(false)
 
   // Storage key based on user ID (or 'guest' for guests)
   const getStorageKey = useCallback(() => {
@@ -18,6 +19,7 @@ export const HomemadeSelectionsProvider = ({ children }) => {
 
   // Load from localStorage on mount and when user changes
   useEffect(() => {
+    setSelectionsLoaded(false)
     try {
       const stored = localStorage.getItem(getStorageKey())
       if (stored) {
@@ -29,6 +31,7 @@ export const HomemadeSelectionsProvider = ({ children }) => {
       console.error('Error loading homemade selections:', err)
       setSelections({})
     }
+    setSelectionsLoaded(true)
   }, [getStorageKey])
 
   /**
@@ -71,6 +74,7 @@ export const HomemadeSelectionsProvider = ({ children }) => {
 
   const value = {
     selections,
+    selectionsLoaded,
     saveSelections,
     getSelections,
     clearSelections

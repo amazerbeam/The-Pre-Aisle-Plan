@@ -37,13 +37,21 @@
   opacity: 1;
 }
 
-/* Unlocked state - slightly faded */
+/* FR-029: Unlocked state - red color to indicate inactive */
 .wake-lock-icon.unlocked {
-  opacity: 0.6;
+  opacity: 0.9;
+}
+
+.wake-lock-icon.unlocked .lock-emoji {
+  filter: saturate(0) brightness(0.6) sepia(1) hue-rotate(-50deg) saturate(6);
 }
 
 .wake-lock-icon.unlocked:hover {
-  opacity: 0.9;
+  opacity: 1;
+}
+
+.wake-lock-icon.unlocked:hover .lock-emoji {
+  filter: saturate(0) brightness(0.7) sepia(1) hue-rotate(-50deg) saturate(7);
 }
 
 /* Animation keyframes */

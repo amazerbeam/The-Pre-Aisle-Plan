@@ -47,10 +47,12 @@ const ShoppingListItem = ({ item }) => {
     longPressTimer.current = setTimeout(async () => {
       // Fetch breakdown from API
       try {
+        // FR-102: Pass sourceChain for finding ingredients from extras
         const data = await shoppingService.getIngredientBreakdown(
           item.ingredientId,
           item.unit,
-          startDate
+          startDate,
+          item.sourceChain
         )
         setBreakdown(data)
         setShowBreakdown(true)
@@ -59,7 +61,7 @@ const ShoppingListItem = ({ item }) => {
       }
       setIsLongPressing(false)
     }, LONG_PRESS_DURATION)
-  }, [checked, item.ingredientId, item.unit, startDate])
+  }, [checked, item.ingredientId, item.unit, startDate, item.sourceChain])
 
   // FR-042: Cancel long press timer
   const cancelLongPress = useCallback(() => {

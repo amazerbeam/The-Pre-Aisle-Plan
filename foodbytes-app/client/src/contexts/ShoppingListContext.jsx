@@ -13,6 +13,8 @@ const ShoppingListContext = createContext()
 export const ShoppingListProvider = ({ children }) => {
   const { isAuthenticated, user } = useAuth()
   const { startDate } = useMealPlan()
+  // Note: We read selections directly from localStorage in fetchShoppingList
+  // to avoid React state timing issues
 
   // Shopping list data
   const [shoppingList, setShoppingList] = useState(null)
@@ -110,7 +112,7 @@ export const ShoppingListProvider = ({ children }) => {
 
   /**
    * FR-019: Fetch shopping list from API
-   * FR-096: Removed applySorting dependency to prevent refetch on checkbox toggle
+   * FR-101: Read selections directly from localStorage to avoid React state race conditions
    */
   const fetchShoppingList = useCallback(async (date) => {
     if (!isAuthenticated || !date) {
@@ -123,9 +125,20 @@ export const ShoppingListProvider = ({ children }) => {
     setError(null)
 
     try {
-      const data = await shoppingService.getShoppingList(date)
+      // FR-101: Read selections directly from localStorage to avoid timing issues
+      const storageKey = `homemadeSelections_${user?.id || 'guest'}`
+      let currentSelections = {}
+      try {
+        const stored = localStorage.getItem(storageKey)
+        if (stored) {
+          currentSelections = JSON.parse(stored)
+        }
+      } catch (e) {
+        console.error('Error reading selections from localStorage:', e)
+      }
+
+      const data = await shoppingService.getShoppingListWithSelections(date, currentSelections)
       setShoppingList(data)
-      // Sorting will be applied by the checkStates useEffect
     } catch (err) {
       console.error('Failed to fetch shopping list:', err)
       setError('Failed to load shopping list')
@@ -134,16 +147,17 @@ export const ShoppingListProvider = ({ children }) => {
     } finally {
       setLoading(false)
     }
-  }, [isAuthenticated])
+  }, [isAuthenticated, user?.id])
 
   /**
-   * Auto-refresh shopping list when startDate changes
+   * Auto-refresh shopping list when startDate or auth changes
+   * FR-101: Reads selections directly from localStorage in fetchShoppingList
    */
   useEffect(() => {
-    if (startDate) {
+    if (startDate && isAuthenticated) {
       fetchShoppingList(startDate)
     }
-  }, [startDate, fetchShoppingList])
+  }, [startDate, isAuthenticated, fetchShoppingList])
 
   /**
    * Re-sort aisles when checkStates change

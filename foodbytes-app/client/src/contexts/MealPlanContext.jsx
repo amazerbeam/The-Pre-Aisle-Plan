@@ -22,6 +22,28 @@ const MEAL_ID_TO_TYPE = {
   5: 'extras'
 }
 
+// localStorage key for persisting startDate
+const START_DATE_STORAGE_KEY = 'foodbytes_startDate'
+
+/**
+ * Get initial start date from localStorage or default to today
+ */
+const getInitialStartDate = () => {
+  try {
+    const saved = localStorage.getItem(START_DATE_STORAGE_KEY)
+    if (saved) {
+      // Validate it's a valid date string
+      const date = new Date(saved)
+      if (!isNaN(date.getTime())) {
+        return saved
+      }
+    }
+  } catch (err) {
+    console.error('Failed to read startDate from localStorage:', err)
+  }
+  return getTodayISO()
+}
+
 /**
  * MealPlanProvider - Manages global meal plan state
  * Supports FR-007 (date range), FR-014 (assign), FR-015 (remove), FR-016 (calendar), FR-017 (calories)
@@ -30,10 +52,11 @@ const MEAL_ID_TO_TYPE = {
 export const MealPlanProvider = ({ children }) => {
   const { isAuthenticated } = useAuth()
 
-  // FR-007: Date range state
-  const [startDate, setStartDateState] = useState(getTodayISO())
-  const [endDate, setEndDate] = useState(formatDateISO(addDays(new Date(), 6)))
-  const [weekDays, setWeekDays] = useState(getWeekDays(getTodayISO()))
+  // FR-007: Date range state - initialize from localStorage
+  const initialDate = getInitialStartDate()
+  const [startDate, setStartDateState] = useState(initialDate)
+  const [endDate, setEndDate] = useState(formatDateISO(addDays(initialDate, 6)))
+  const [weekDays, setWeekDays] = useState(getWeekDays(initialDate))
 
   // Meal plan entries
   const [weekPlan, setWeekPlan] = useState(null)
@@ -48,11 +71,19 @@ export const MealPlanProvider = ({ children }) => {
 
   /**
    * FR-007: Update start date and recalculate week
+   * Persists to localStorage for use across Recipes, Meal Plan, and Shopping List
    */
   const setStartDate = useCallback((newStartDate) => {
     setStartDateState(newStartDate)
     setEndDate(formatDateISO(addDays(newStartDate, 6)))
     setWeekDays(getWeekDays(newStartDate))
+
+    // Persist to localStorage
+    try {
+      localStorage.setItem(START_DATE_STORAGE_KEY, newStartDate)
+    } catch (err) {
+      console.error('Failed to save startDate to localStorage:', err)
+    }
   }, [])
 
   /**

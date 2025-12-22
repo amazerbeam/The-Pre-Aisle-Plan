@@ -125,17 +125,17 @@ INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VA
 -- Porridge with Berries & Nuts Family
 (1, 'Porridge with Berries & Nuts (Light)', 2, 716, FALSE, TRUE),
 (2, 'Porridge with Berries & Nuts', 2, 972, FALSE, TRUE),
-(3, 'Porridge with Berries & Nuts (Full)', 2, 1236, FALSE, TRUE),
+(3, 'Porridge with Berries & Nuts (Balanced)', 2, 1236, FALSE, TRUE),
 
 -- Peanut Butter Banana Smoothie Family
 (4, 'Peanut Butter Banana Smoothie (Light)', 2, 849, FALSE, TRUE),
 (5, 'Peanut Butter Banana Smoothie', 2, 1123, FALSE, TRUE),
-(6, 'Peanut Butter Banana Smoothie (Full)', 2, 1404, FALSE, TRUE),
+(6, 'Peanut Butter Banana Smoothie (Balanced)', 2, 1404, FALSE, TRUE),
 
 -- Irish Chicken Curry Family
 (7, 'Irish Chicken Curry (Light)', 2, 1395, FALSE, TRUE),
 (8, 'Irish Chicken Curry', 2, 1662, FALSE, TRUE),
-(9, 'Irish Chicken Curry (Full)', 2, 2035, FALSE, TRUE);
+(9, 'Irish Chicken Curry (Balanced)', 2, 2035, FALSE, TRUE);
 
 -- =============================================
 -- RECIPE MEALS
@@ -175,7 +175,7 @@ INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quan
 (1, 7, NULL, 10, 1, 10.00, 8),      -- Almonds, 10g
 (1, 8, NULL, 10, 1, 10.00, 9);      -- Walnuts, 10g
 
--- Recipe 2: Porridge with Berries & Nuts (Standard) - ~972 cal total, ~486 cal/serving
+-- Recipe 2: Porridge with Berries & Nuts (Moderate) - ~972 cal total, ~486 cal/serving
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
 (2, 1, NULL, 80, 1, 80.00, 1),      -- Rolled oats, 80g
 (2, 2, NULL, 330, 2, 340.00, 2),    -- Milk, 330ml
@@ -187,7 +187,7 @@ INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quan
 (2, 7, NULL, 13, 1, 13.00, 8),      -- Almonds, 13g
 (2, 8, NULL, 13, 1, 13.00, 9);      -- Walnuts, 13g
 
--- Recipe 3: Porridge with Berries & Nuts (Full) - ~1236 cal total, ~618 cal/serving
+-- Recipe 3: Porridge with Berries & Nuts (Balanced) - ~1236 cal total, ~618 cal/serving
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
 (3, 1, NULL, 100, 1, 100.00, 1),    -- Rolled oats, 100g
 (3, 2, NULL, 415, 2, 427.00, 2),    -- Milk, 415ml
@@ -206,14 +206,14 @@ INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quan
 (4, 6, NULL, 45, 1, 45.00, 3),      -- Peanut butter, 45g
 (4, 5, NULL, 1, 17, 0.50, 4);       -- Salt, 1 pinch
 
--- Recipe 5: Peanut Butter Banana Smoothie (Standard) - ~1080 cal total, ~540 cal/serving
+-- Recipe 5: Peanut Butter Banana Smoothie (Moderate) - ~1080 cal total, ~540 cal/serving
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
 (5, 10, NULL, 400, 1, 400.00, 1),   -- Banana (frozen), 400g
 (5, 2, NULL, 520, 2, 536.00, 2),    -- Milk, 520ml
 (5, 6, NULL, 60, 1, 60.00, 3),      -- Peanut butter, 60g
 (5, 5, NULL, 1, 17, 0.50, 4);       -- Salt, 1 pinch
 
--- Recipe 6: Peanut Butter Banana Smoothie (Full) - ~1360 cal total, ~680 cal/serving
+-- Recipe 6: Peanut Butter Banana Smoothie (Balanced) - ~1360 cal total, ~680 cal/serving
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
 (6, 10, NULL, 500, 1, 500.00, 1),   -- Banana (frozen), 500g
 (6, 2, NULL, 650, 2, 670.00, 2),    -- Milk, 650ml
@@ -243,7 +243,7 @@ INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quan
 (7, 16, NULL, 0.5, 16, 72.00, 19),    -- Frozen peas, 0.5 cup
 (7, 26, NULL, 111, 1, 111.00, 20);    -- Jasmine rice (uncooked), 111g
 
--- Recipe 8: Irish Chicken Curry (Standard) - ~1240 cal total, ~620 cal/serving
+-- Recipe 8: Irish Chicken Curry (Moderate) - ~1240 cal total, ~620 cal/serving
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
 (8, 11, NULL, 300, 1, 300.00, 1),     -- Chicken breast, 300g (150g x 2)
 (8, 22, NULL, 1, 4, 14.00, 2),        -- Olive oil, 1 tbsp
@@ -266,7 +266,7 @@ INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quan
 (8, 16, NULL, 0.5, 16, 72.00, 19),    -- Frozen peas, 0.5 cup
 (8, 26, NULL, 148, 1, 148.00, 20);    -- Jasmine rice (uncooked), 148g
 
--- Recipe 9: Irish Chicken Curry (Full) - ~1560 cal total, ~780 cal/serving
+-- Recipe 9: Irish Chicken Curry (Balanced) - ~1560 cal total, ~780 cal/serving
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
 (9, 11, NULL, 400, 1, 400.00, 1),     -- Chicken breast, 400g (200g x 2)
 (9, 22, NULL, 1, 4, 14.00, 2),        -- Olive oil, 1 tbsp
@@ -300,14 +300,14 @@ INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
 (1, 3, 'While oats cook, roughly chop almonds and walnuts. Give them a light pinch of salt.'),
 (1, 4, 'Transfer porridge to bowls. Drizzle honey over hot oats, add peanut butter, then top with chopped nuts and berries.');
 
--- Recipe 2: Porridge with Berries & Nuts (Standard)
+-- Recipe 2: Porridge with Berries & Nuts (Moderate)
 INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
 (2, 1, 'Set heat to 7/9. Bring milk, water, and salt to a boil in a saucepan.'),
 (2, 2, 'Stir in rolled oats. Reduce heat to medium-low. Cook 4-5 minutes, stirring occasionally, until oats absorb liquid and reach desired consistency.'),
 (2, 3, 'While oats cook, roughly chop almonds and walnuts. Give them a light pinch of salt.'),
 (2, 4, 'Transfer porridge to bowls. Drizzle honey over hot oats, add peanut butter, then top with chopped nuts and berries.');
 
--- Recipe 3: Porridge with Berries & Nuts (Full)
+-- Recipe 3: Porridge with Berries & Nuts (Balanced)
 INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
 (3, 1, 'Set heat to 7/9. Bring milk, water, and salt to a boil in a saucepan.'),
 (3, 2, 'Stir in rolled oats. Reduce heat to medium-low. Cook 4-5 minutes, stirring occasionally, until oats absorb liquid and reach desired consistency.'),
@@ -322,7 +322,7 @@ INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
 (4, 4, 'Add a pinch of salt to enhance sweetness. Pulse briefly to combine.'),
 (4, 5, 'Pour into glasses and serve immediately while thick and cold.');
 
--- Recipe 5: Peanut Butter Banana Smoothie (Standard)
+-- Recipe 5: Peanut Butter Banana Smoothie (Moderate)
 INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
 (5, 1, 'Peel bananas, break into chunks, and freeze for at least 2 hours (or overnight) until solid.'),
 (5, 2, 'Add frozen banana chunks, milk, and peanut butter to a blender.'),
@@ -330,7 +330,7 @@ INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
 (5, 4, 'Add a pinch of salt to enhance sweetness. Pulse briefly to combine.'),
 (5, 5, 'Pour into glasses and serve immediately while thick and cold.');
 
--- Recipe 6: Peanut Butter Banana Smoothie (Full)
+-- Recipe 6: Peanut Butter Banana Smoothie (Balanced)
 INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
 (6, 1, 'Peel bananas, break into chunks, and freeze for at least 2 hours (or overnight) until solid.'),
 (6, 2, 'Add frozen banana chunks, milk, and peanut butter to a blender.'),
@@ -352,7 +352,7 @@ INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
 (7, 10, 'Finish: Return sliced chicken to the sauce. Add frozen peas and roasted sweet potato. Simmer 3-4 minutes until heated through.'),
 (7, 11, 'Taste and adjust: Add more salt, honey, or soy sauce as needed. Serve over rice.');
 
--- Recipe 8: Irish Chicken Curry (Standard)
+-- Recipe 8: Irish Chicken Curry (Moderate)
 INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
 (8, 1, 'Brine the chicken: Dissolve 2 tbsp salt in 1 litre cold water. Submerge chicken breasts, refrigerate 20-30 minutes. Rinse and pat dry.'),
 (8, 2, 'Roast sweet potatoes: Preheat oven to 200°C. Toss cubed sweet potato with a drizzle of olive oil and pinch of salt. Roast 25-30 minutes until golden.'),
@@ -366,7 +366,7 @@ INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
 (8, 10, 'Finish: Return sliced chicken to the sauce. Add frozen peas and roasted sweet potato. Simmer 3-4 minutes until heated through.'),
 (8, 11, 'Taste and adjust: Add more salt, honey, or soy sauce as needed. Serve over rice.');
 
--- Recipe 9: Irish Chicken Curry (Full)
+-- Recipe 9: Irish Chicken Curry (Balanced)
 INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
 (9, 1, 'Brine the chicken: Dissolve 2 tbsp salt in 1 litre cold water. Submerge chicken breasts, refrigerate 20-30 minutes. Rinse and pat dry.'),
 (9, 2, 'Roast sweet potatoes: Preheat oven to 200°C. Toss cubed sweet potato with a drizzle of olive oil and pinch of salt. Roast 25-30 minutes until golden.'),
@@ -390,19 +390,19 @@ INSERT INTO recipe_families (id, family_name, description) VALUES
 
 -- Link recipes to family
 INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_label, display_order) VALUES
-(1, 2, TRUE, 'Standard', 1),   -- Standard is default
+(1, 2, FALSE, 'Moderate', 1),
 (1, 1, FALSE, 'Light', 2),
-(1, 3, FALSE, 'Full', 3),
+(1, 3, TRUE, 'Balanced', 3),   -- FR-099: Balanced is default
 
 -- Peanut Butter Banana Smoothie Family
-(2, 5, TRUE, 'Standard', 1),   -- Standard is default
+(2, 5, FALSE, 'Moderate', 1),
 (2, 4, FALSE, 'Light', 2),
-(2, 6, FALSE, 'Full', 3),
+(2, 6, TRUE, 'Balanced', 3),   -- FR-099: Balanced is default
 
 -- Irish Chicken Curry Family
-(3, 8, TRUE, 'Standard', 1),   -- Standard is default
+(3, 8, FALSE, 'Moderate', 1),
 (3, 7, FALSE, 'Light', 2),
-(3, 9, FALSE, 'Full', 3);
+(3, 9, TRUE, 'Balanced', 3);
 
 -- =============================================
 -- PIZZA FAMILY (with Extras System)
@@ -506,7 +506,7 @@ INSERT INTO recipe_meals (recipe_id, meal_id) VALUES (12, 5);  -- 5 = extras
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
 (12, 33, NULL, 1, 15, 400.00, 1),    -- Tinned tomatoes, 1 tin (400g)
 (12, 22, NULL, 1, 4, 14.00, 2),      -- Olive oil, 1 tbsp (14g)
-(12, NULL, 10, 1, 4, 15.00, 3),      -- Pesto (linked recipe), 1 tbsp (15g) - FR-093
+(12, 74, 10, 1, 4, 15.00, 3),        -- Pesto (linked OR store-bought), 1 tbsp (15g) - FR-103
 (12, 13, NULL, 2, 10, 6.00, 4),      -- Garlic, 2 cloves (6g)
 (12, 34, NULL, 1, 14, 1.00, 5),      -- Bay leaf, 1 leaf
 (12, 5, NULL, 1, 3, 6.00, 6),        -- Salt, 1 tsp
@@ -536,10 +536,10 @@ INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VA
 
 INSERT INTO recipe_meals (recipe_id, meal_id) VALUES (13, 3);  -- 3 = dinner
 
--- FR-093: Pizza Light uses linked_recipe_id for dough and sauce
+-- FR-103: Pizza Light uses linked_recipe_id with ingredient_id for store-bought option
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
-(13, NULL, 11, 280, 1, 280.00, 1),   -- Pizza Dough (linked recipe), 280g (140g x 2)
-(13, NULL, 12, 90, 1, 90.00, 2),     -- Pizza Sauce (linked recipe), 90g (45g x 2)
+(13, 75, 11, 280, 1, 280.00, 1),     -- Pizza Dough (linked OR store-bought), 280g (140g x 2)
+(13, 76, 12, 90, 1, 90.00, 2),       -- Pizza Sauce (linked OR store-bought), 90g (45g x 2)
 (13, 37, NULL, 120, 1, 120.00, 3);   -- Mozzarella (raw ingredient), 120g (60g x 2)
 
 INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
@@ -554,16 +554,16 @@ INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id,
 (13, 9, 'Bake for 10-12 minutes until crust is golden and puffed, cheese is bubbling with golden spots.', NULL, NULL),
 (13, 10, 'Remove from oven. Let rest 2 minutes before slicing.', NULL, NULL);
 
--- Recipe 14: Pizza (Standard) - ~1636 cal total (2 servings, 818 cal each)
+-- Recipe 14: Pizza (Moderate) - ~1636 cal total (2 servings, 818 cal each)
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
 (14, 'Pizza', 2, 1636, FALSE, TRUE);
 
 INSERT INTO recipe_meals (recipe_id, meal_id) VALUES (14, 3);  -- 3 = dinner
 
--- FR-093: Pizza Standard uses linked_recipe_id for dough and sauce
+-- FR-103: Pizza Standard uses linked_recipe_id with ingredient_id for store-bought option
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
-(14, NULL, 11, 370, 1, 370.00, 1),   -- Pizza Dough (linked recipe), 370g (185g x 2)
-(14, NULL, 12, 120, 1, 120.00, 2),   -- Pizza Sauce (linked recipe), 120g (60g x 2)
+(14, 75, 11, 370, 1, 370.00, 1),     -- Pizza Dough (linked OR store-bought), 370g (185g x 2)
+(14, 76, 12, 120, 1, 120.00, 2),     -- Pizza Sauce (linked OR store-bought), 120g (60g x 2)
 (14, 37, NULL, 200, 1, 200.00, 3);   -- Mozzarella (raw ingredient), 200g (100g x 2)
 
 INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
@@ -578,16 +578,16 @@ INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id,
 (14, 9, 'Bake for 12-14 minutes until crust is golden and puffed, cheese is bubbling with golden spots.', NULL, NULL),
 (14, 10, 'Remove from oven. Let rest 2 minutes before slicing.', NULL, NULL);
 
--- Recipe 15: Pizza (Full) - ~2124 cal total (2 servings, 1062 cal each)
+-- Recipe 15: Pizza (Balanced) - ~2124 cal total (2 servings, 1062 cal each)
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
-(15, 'Pizza (Full)', 2, 2124, FALSE, TRUE);
+(15, 'Pizza (Balanced)', 2, 2124, FALSE, TRUE);
 
 INSERT INTO recipe_meals (recipe_id, meal_id) VALUES (15, 3);  -- 3 = dinner
 
--- FR-093: Pizza Full uses linked_recipe_id for dough and sauce
+-- FR-103: Pizza Full uses linked_recipe_id with ingredient_id for store-bought option
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
-(15, NULL, 11, 460, 1, 460.00, 1),   -- Pizza Dough (linked recipe), 460g (230g x 2)
-(15, NULL, 12, 150, 1, 150.00, 2),   -- Pizza Sauce (linked recipe), 150g (75g x 2)
+(15, 75, 11, 460, 1, 460.00, 1),     -- Pizza Dough (linked OR store-bought), 460g (230g x 2)
+(15, 76, 12, 150, 1, 150.00, 2),     -- Pizza Sauce (linked OR store-bought), 150g (75g x 2)
 (15, 37, NULL, 280, 1, 280.00, 3);   -- Mozzarella (raw ingredient), 280g (140g x 2)
 
 INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
@@ -607,10 +607,10 @@ INSERT INTO recipe_extras (parent_recipe_id, child_recipe_id, display_order) VAL
 -- Pizza (Light) links to Dough and Sauce
 (13, 11, 0),  -- Pizza Light → Pizza Dough
 (13, 12, 1),  -- Pizza Light → Pizza Sauce
--- Pizza (Standard) links to Dough and Sauce
+-- Pizza (Moderate) links to Dough and Sauce
 (14, 11, 0),  -- Pizza Standard → Pizza Dough
 (14, 12, 1),  -- Pizza Standard → Pizza Sauce
--- Pizza (Full) links to Dough and Sauce
+-- Pizza (Balanced) links to Dough and Sauce
 (15, 11, 0),  -- Pizza Full → Pizza Dough
 (15, 12, 1);  -- Pizza Full → Pizza Sauce
 
@@ -621,9 +621,9 @@ INSERT INTO recipe_families (id, family_name, description) VALUES
 (4, 'Pizza', 'Classic homemade pizza with from-scratch dough and sauce. Scales from light to full portions.');
 
 INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_label, display_order) VALUES
-(4, 14, TRUE, 'Standard', 1),   -- Standard is default
+(4, 14, FALSE, 'Moderate', 1),
 (4, 13, FALSE, 'Light', 2),
-(4, 15, FALSE, 'Full', 3);
+(4, 15, TRUE, 'Balanced', 3);
 
 -- =============================================
 -- CHICKEN SATAY FAMILY
@@ -633,13 +633,13 @@ INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_lab
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
 (16, 'Chicken Satay (Light)', 2, 1100, FALSE, TRUE);
 
--- Recipe 17: Chicken Satay (Standard) - ~1460 cal total, ~730 cal/serving
+-- Recipe 17: Chicken Satay (Moderate) - ~1460 cal total, ~730 cal/serving
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
 (17, 'Chicken Satay', 2, 1460, FALSE, TRUE);
 
--- Recipe 18: Chicken Satay (Full) - ~1900 cal total, ~950 cal/serving
+-- Recipe 18: Chicken Satay (Balanced) - ~1900 cal total, ~950 cal/serving
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
-(18, 'Chicken Satay (Full)', 2, 1900, FALSE, TRUE);
+(18, 'Chicken Satay (Balanced)', 2, 1900, FALSE, TRUE);
 
 -- =============================================
 -- CHICKEN SATAY RECIPE MEALS (Dinner)
@@ -678,7 +678,7 @@ INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quan
 (16, 26, NULL, 56, 1, 56.00, 17),       -- Jasmine rice (uncooked), 56g
 (16, 5, NULL, 0.5, 3, 3.00, 18);        -- Salt, 0.5 tsp
 
--- Recipe 17: Chicken Satay (Standard) - ~1460 cal total
+-- Recipe 17: Chicken Satay (Moderate) - ~1460 cal total
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
 -- Chicken & Marinade
 (17, 41, NULL, 280, 1, 280.00, 1),      -- Chicken thigh, 280g
@@ -703,7 +703,7 @@ INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quan
 (17, 26, NULL, 74, 1, 74.00, 17),       -- Jasmine rice (uncooked), 74g
 (17, 5, NULL, 0.5, 3, 3.00, 18);        -- Salt, 0.5 tsp
 
--- Recipe 18: Chicken Satay (Full) - ~1900 cal total
+-- Recipe 18: Chicken Satay (Balanced) - ~1900 cal total
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
 -- Chicken & Marinade
 (18, 41, NULL, 360, 1, 360.00, 1),      -- Chicken thigh, 360g
@@ -745,7 +745,7 @@ INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
 (16, 9, 'Combine: Return vegetables to the pan with the chicken. Toss briefly to combine.'),
 (16, 10, 'Serve: Spoon chicken and vegetables over jasmine rice. Drizzle generously with peanut sauce.');
 
--- Recipe 17: Chicken Satay (Standard)
+-- Recipe 17: Chicken Satay (Moderate)
 INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
 (17, 1, 'Brine the chicken: Cut chicken thigh into 1-inch cubes. Dissolve 1 tbsp salt in 500ml cold water. Submerge chicken, refrigerate 15-20 minutes. Rinse and pat dry.'),
 (17, 2, 'Make the marinade: In a bowl, combine minced garlic, grated ginger, soy sauce, honey, and olive oil. Whisk until honey dissolves. Toss brined chicken in marinade. Set aside while you prep other ingredients.'),
@@ -758,7 +758,7 @@ INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
 (17, 9, 'Combine: Return vegetables to the pan with the chicken. Toss briefly to combine.'),
 (17, 10, 'Serve: Spoon chicken and vegetables over jasmine rice. Drizzle generously with peanut sauce.');
 
--- Recipe 18: Chicken Satay (Full)
+-- Recipe 18: Chicken Satay (Balanced)
 INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
 (18, 1, 'Brine the chicken: Cut chicken thigh into 1-inch cubes. Dissolve 1 tbsp salt in 500ml cold water. Submerge chicken, refrigerate 15-20 minutes. Rinse and pat dry.'),
 (18, 2, 'Make the marinade: In a bowl, combine minced garlic, grated ginger, soy sauce, honey, and olive oil. Whisk until honey dissolves. Toss brined chicken in marinade. Set aside while you prep other ingredients.'),
@@ -778,9 +778,9 @@ INSERT INTO recipe_families (id, family_name, description) VALUES
 (5, 'Chicken Satay', 'Thai-style grilled chicken skewers with onion and red pepper, served with a creamy peanut dipping sauce over jasmine rice.');
 
 INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_label, display_order) VALUES
-(5, 17, TRUE, 'Standard', 1),   -- Standard is default
+(5, 17, FALSE, 'Moderate', 1),
 (5, 16, FALSE, 'Light', 2),
-(5, 18, FALSE, 'Full', 3);
+(5, 18, TRUE, 'Balanced', 3);
 
 -- =============================================
 -- BLACK BEAN CHICKEN WRAP INGREDIENTS (IDs 43-50)
@@ -833,13 +833,13 @@ INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id,
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
 (20, 'Black Bean Chicken Wrap (Light)', 2, 1313, FALSE, TRUE);
 
--- Recipe 21: Black Bean Chicken Wrap (Standard) - ~1699 cal total, ~849 cal/serving
+-- Recipe 21: Black Bean Chicken Wrap (Moderate) - ~1699 cal total, ~849 cal/serving
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
 (21, 'Black Bean Chicken Wrap', 2, 1699, FALSE, TRUE);
 
--- Recipe 22: Black Bean Chicken Wrap (Full) - ~2136 cal total, ~1068 cal/serving
+-- Recipe 22: Black Bean Chicken Wrap (Balanced) - ~2136 cal total, ~1068 cal/serving
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
-(22, 'Black Bean Chicken Wrap (Full)', 2, 2136, FALSE, TRUE);
+(22, 'Black Bean Chicken Wrap (Balanced)', 2, 2136, FALSE, TRUE);
 
 -- =============================================
 -- BLACK BEAN WRAP RECIPE MEALS (Lunch)
@@ -887,7 +887,7 @@ INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quan
 (20, 48, NULL, 60, 1, 60.00, 17),      -- Tomato, 60g
 (20, 12, NULL, 40, 1, 40.00, 18);      -- Onion, 40g
 
--- Recipe 21: Black Bean Chicken Wrap (Standard) - ~1400 cal total
+-- Recipe 21: Black Bean Chicken Wrap (Moderate) - ~1400 cal total
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
 -- Flatbread (linked recipe)
 (21, NULL, 19, 180, 1, 180.00, 1),     -- Flatbread, 180g (90g x 2)
@@ -913,7 +913,7 @@ INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quan
 (21, 48, NULL, 80, 1, 80.00, 17),      -- Tomato, 80g
 (21, 12, NULL, 50, 1, 50.00, 18);      -- Onion, 50g
 
--- Recipe 22: Black Bean Chicken Wrap (Full) - ~1700 cal total
+-- Recipe 22: Black Bean Chicken Wrap (Balanced) - ~1700 cal total
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
 -- Flatbread (linked recipe)
 (22, NULL, 19, 220, 1, 220.00, 1),     -- Flatbread, 220g (110g x 2)
@@ -955,7 +955,7 @@ INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id,
 (20, 8, 'Assemble wraps: Warm flatbreads briefly. Spread black bean dip down the center, add rice, sliced chicken, lettuce, tomato, and onion. Drizzle with yogurt sauce.', NULL, NULL),
 (20, 9, 'Roll burrito-style: Fold bottom edge up over filling, fold sides in, then roll tightly from bottom to top. Cut in half diagonally to serve.', NULL, NULL);
 
--- Recipe 21: Black Bean Chicken Wrap (Standard)
+-- Recipe 21: Black Bean Chicken Wrap (Moderate)
 INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
 (21, 1, 'Prepare the flatbread according to the linked recipe. Use 90g dough per wrap.', 19, 'Use 2 store-bought tortillas or wraps (about 90g each).'),
 (21, 2, 'Cook the rice: Rinse jasmine rice until water runs clear. Cook according to package directions with a pinch of salt. Keep warm.', NULL, NULL),
@@ -967,7 +967,7 @@ INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id,
 (21, 8, 'Assemble wraps: Warm flatbreads briefly. Spread black bean dip down the center, add rice, sliced chicken, lettuce, tomato, and onion. Drizzle with yogurt sauce.', NULL, NULL),
 (21, 9, 'Roll burrito-style: Fold bottom edge up over filling, fold sides in, then roll tightly from bottom to top. Cut in half diagonally to serve.', NULL, NULL);
 
--- Recipe 22: Black Bean Chicken Wrap (Full)
+-- Recipe 22: Black Bean Chicken Wrap (Balanced)
 INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
 (22, 1, 'Prepare the flatbread according to the linked recipe. Use 110g dough per wrap.', 19, 'Use 2 large store-bought tortillas or wraps (about 110g each).'),
 (22, 2, 'Cook the rice: Rinse jasmine rice until water runs clear. Cook according to package directions with a pinch of salt. Keep warm.', NULL, NULL),
@@ -986,9 +986,9 @@ INSERT INTO recipe_families (id, family_name, description) VALUES
 (6, 'Black Bean Chicken Wrap', 'Grilled spiced chicken with smoky black bean dip, Greek yogurt sauce, fresh veg, and rice wrapped in homemade flatbread.');
 
 INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_label, display_order) VALUES
-(6, 21, TRUE, 'Standard', 1),   -- Standard is default
+(6, 21, FALSE, 'Moderate', 1),
 (6, 20, FALSE, 'Light', 2),
-(6, 22, FALSE, 'Full', 3);
+(6, 22, TRUE, 'Balanced', 3);
 
 -- =============================================
 -- CHICKEN & VEGETABLE SOUP INGREDIENTS (IDs 51-52)
@@ -1005,13 +1005,13 @@ INSERT INTO ingredients (id, `key`, name, aisle_id, protein_per_100g, carbs_per_
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
 (23, 'Chicken & Vegetable Soup (Light)', 2, 868, FALSE, TRUE);
 
--- Recipe 24: Chicken & Vegetable Soup (Standard) - ~1135 cal total, ~567 cal/serving
+-- Recipe 24: Chicken & Vegetable Soup (Moderate) - ~1135 cal total, ~567 cal/serving
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
 (24, 'Chicken & Vegetable Soup', 2, 1135, FALSE, TRUE);
 
--- Recipe 25: Chicken & Vegetable Soup (Full) - ~1398 cal total, ~699 cal/serving
+-- Recipe 25: Chicken & Vegetable Soup (Balanced) - ~1398 cal total, ~699 cal/serving
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
-(25, 'Chicken & Vegetable Soup (Full)', 2, 1398, FALSE, TRUE);
+(25, 'Chicken & Vegetable Soup (Balanced)', 2, 1398, FALSE, TRUE);
 
 -- =============================================
 -- CHICKEN & VEGETABLE SOUP RECIPE MEALS (Lunch)
@@ -1044,7 +1044,7 @@ INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quan
 (23, 52, NULL, 150, 1, 150.00, 11),    -- Baby potatoes, 150g
 (23, 22, NULL, 0.5, 4, 7.00, 12);      -- Olive oil (for potatoes), 0.5 tbsp
 
--- Recipe 24: Chicken & Vegetable Soup (Standard) - ~1100 cal total
+-- Recipe 24: Chicken & Vegetable Soup (Moderate) - ~1100 cal total
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
 -- Soup base (fried, then blended)
 (24, 12, NULL, 1, 7, 110.00, 1),       -- Onion, 1 medium (110g)
@@ -1063,7 +1063,7 @@ INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quan
 (24, 52, NULL, 200, 1, 200.00, 11),    -- Baby potatoes, 200g
 (24, 22, NULL, 1, 4, 14.00, 12);       -- Olive oil (for potatoes), 1 tbsp
 
--- Recipe 25: Chicken & Vegetable Soup (Full) - ~1400 cal total
+-- Recipe 25: Chicken & Vegetable Soup (Balanced) - ~1400 cal total
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
 -- Soup base (fried, then blended)
 (25, 12, NULL, 1, 8, 150.00, 1),       -- Onion, 1 large (150g)
@@ -1098,7 +1098,7 @@ INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
 (23, 8, 'Add peas: Stir in frozen peas. Simmer for 3 minutes until peas are cooked but still bright green. Taste and adjust seasoning.'),
 (23, 9, 'Serve: Ladle soup into bowls. Top with crispy roasted potatoes.');
 
--- Recipe 24: Chicken & Vegetable Soup (Standard)
+-- Recipe 24: Chicken & Vegetable Soup (Moderate)
 INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
 (24, 1, 'Start the potatoes: Preheat oven to 200°C. Halve the baby potatoes, toss with olive oil and a pinch of salt. Spread on a baking tray and roast for 25-30 minutes until golden and crispy.'),
 (24, 2, 'While potatoes roast, prep the soup base: Dice onion, mince garlic, roughly chop red bell pepper and broccoli.'),
@@ -1110,7 +1110,7 @@ INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
 (24, 8, 'Add peas: Stir in frozen peas. Simmer for 3 minutes until peas are cooked but still bright green. Taste and adjust seasoning.'),
 (24, 9, 'Serve: Ladle soup into bowls. Top with crispy roasted potatoes.');
 
--- Recipe 25: Chicken & Vegetable Soup (Full)
+-- Recipe 25: Chicken & Vegetable Soup (Balanced)
 INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
 (25, 1, 'Start the potatoes: Preheat oven to 200°C. Halve the baby potatoes, toss with olive oil and a pinch of salt. Spread on a baking tray and roast for 25-30 minutes until golden and crispy.'),
 (25, 2, 'While potatoes roast, prep the soup base: Dice onion, mince garlic, roughly chop red bell pepper and broccoli.'),
@@ -1129,9 +1129,9 @@ INSERT INTO recipe_families (id, family_name, description) VALUES
 (7, 'Chicken & Vegetable Soup', 'Hearty blended soup with chunky chicken and peas, topped with crispy roasted baby potatoes.');
 
 INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_label, display_order) VALUES
-(7, 24, TRUE, 'Standard', 1),   -- Standard is default
+(7, 24, FALSE, 'Moderate', 1),
 (7, 23, FALSE, 'Light', 2),
-(7, 25, FALSE, 'Full', 3);
+(7, 25, TRUE, 'Balanced', 3);
 
 -- =============================================
 -- MILK BREAD & SALMON SANDWICH INGREDIENTS (IDs 53-54)
@@ -1181,13 +1181,13 @@ INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id,
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
 (27, 'Salmon Sandwich (Light)', 2, 650, FALSE, FALSE);
 
--- Recipe 28: Salmon Sandwich (Standard) - ~920 cal total, ~460 cal/serving (1 sandwich per person)
+-- Recipe 28: Salmon Sandwich (Moderate) - ~920 cal total, ~460 cal/serving (1 sandwich per person)
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
 (28, 'Salmon Sandwich', 2, 920, FALSE, TRUE);
 
--- Recipe 29: Salmon Sandwich (Full) - ~1840 cal total, ~920 cal/serving (2 sandwiches per person)
+-- Recipe 29: Salmon Sandwich (Balanced) - ~1840 cal total, ~920 cal/serving (2 sandwiches per person)
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
-(29, 'Salmon Sandwich (Full)', 2, 1840, FALSE, TRUE);
+(29, 'Salmon Sandwich (Balanced)', 2, 1840, FALSE, TRUE);
 
 -- =============================================
 -- SALMON SANDWICH RECIPE MEALS (Lunch)
@@ -1216,7 +1216,7 @@ INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quan
 (27, 53, NULL, 15, 1, 15.00, 3),       -- Salted butter, 15g
 (27, 47, NULL, 40, 1, 40.00, 4);       -- Lettuce, 40g
 
--- Recipe 28: Salmon Sandwich (Standard) - ~920 cal total (1 sandwich per person)
+-- Recipe 28: Salmon Sandwich (Moderate) - ~920 cal total (1 sandwich per person)
 -- 4 slices @ 50g each (200g), 213g salmon, 15g butter, 40g lettuce
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
 (28, NULL, 26, 200, 1, 200.00, 1),     -- Milk Bread (linked), 4 slices @ 50g each (200g)
@@ -1224,7 +1224,7 @@ INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quan
 (28, 53, NULL, 15, 1, 15.00, 3),       -- Salted butter, 15g
 (28, 47, NULL, 40, 1, 40.00, 4);       -- Lettuce, 40g
 
--- Recipe 29: Salmon Sandwich (Full) - ~1840 cal total (2 sandwiches per person)
+-- Recipe 29: Salmon Sandwich (Balanced) - ~1840 cal total (2 sandwiches per person)
 -- 8 slices @ 50g each (400g), 426g salmon, 30g butter, 80g lettuce
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
 (29, NULL, 26, 400, 1, 400.00, 1),     -- Milk Bread (linked), 8 slices @ 50g each (400g)
@@ -1245,7 +1245,7 @@ INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id,
 (27, 5, 'Assemble: Place lettuce on 2 slices of buttered bread. Divide the mashed salmon between them. Top with remaining bread slices.', NULL, NULL),
 (27, 6, 'Cut in half and serve.', NULL, NULL);
 
--- Recipe 28: Salmon Sandwich (Standard) - 1 sandwich per person
+-- Recipe 28: Salmon Sandwich (Moderate) - 1 sandwich per person
 INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
 (28, 1, 'Prepare the milk bread according to the linked recipe. Use 4 slices @ 50g each (2 per person).', 26, 'Use 4 slices of store-bought bread (~50g each).'),
 (28, 2, 'Drain the tinned salmon. Tip into a bowl and mash with a fork. Check carefully for any bones and remove.', NULL, NULL),
@@ -1254,7 +1254,7 @@ INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id,
 (28, 5, 'Assemble: Place lettuce on 2 slices of buttered bread. Divide the mashed salmon between them (~106g per sandwich). Top with remaining bread slices.', NULL, NULL),
 (28, 6, 'Cut in half and serve.', NULL, NULL);
 
--- Recipe 29: Salmon Sandwich (Full) - 2 sandwiches per person
+-- Recipe 29: Salmon Sandwich (Balanced) - 2 sandwiches per person
 INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
 (29, 1, 'Prepare the milk bread according to the linked recipe. Use 8 slices @ 50g each (4 per person).', 26, 'Use 8 slices of store-bought bread (~50g each).'),
 (29, 2, 'Drain both tins of salmon. Tip into a bowl and mash with a fork. Check carefully for any bones and remove.', NULL, NULL),
@@ -1270,8 +1270,8 @@ INSERT INTO recipe_families (id, family_name, description) VALUES
 (8, 'Salmon Sandwich', 'Simple salmon sandwich with homemade milk bread, salted butter, and fresh lettuce. Standard = 1 sandwich per person, Full = 2 sandwiches per person.');
 
 INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_label, display_order) VALUES
-(8, 28, TRUE, 'Standard', 1),   -- Standard is default (1 sandwich per person)
-(8, 29, FALSE, 'Full', 2);      -- Full (2 sandwiches per person)
+(8, 28, FALSE, 'Moderate', 1), (1 sandwich per person)
+(8, 29, TRUE, 'Balanced', 2);      -- Full (2 sandwiches per person)
 
 -- =============================================
 -- LENTIL STEW INGREDIENTS (IDs 55-58)
@@ -1290,13 +1290,13 @@ INSERT INTO ingredients (id, `key`, name, aisle_id, protein_per_100g, carbs_per_
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
 (30, 'Lentil Stew (Light)', 2, 708, FALSE, TRUE);
 
--- Recipe 31: Lentil Stew (Standard) - ~852 cal total, ~426 cal/serving
+-- Recipe 31: Lentil Stew (Moderate) - ~852 cal total, ~426 cal/serving
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
 (31, 'Lentil Stew', 2, 852, FALSE, TRUE);
 
--- Recipe 32: Lentil Stew (Full) - ~963 cal total, ~481 cal/serving
+-- Recipe 32: Lentil Stew (Balanced) - ~963 cal total, ~481 cal/serving
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
-(32, 'Lentil Stew (Full)', 2, 963, FALSE, TRUE);
+(32, 'Lentil Stew (Balanced)', 2, 963, FALSE, TRUE);
 
 -- =============================================
 -- LENTIL STEW RECIPE MEALS (Lunch)
@@ -1324,7 +1324,7 @@ INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quan
 (30, 5, NULL, 0.5, 3, 3.00, 10),       -- Salt, 0.5 tsp
 (30, 22, NULL, 1, 4, 14.00, 11);       -- Olive oil, 1 tbsp
 
--- Recipe 31: Lentil Stew (Standard) - ~1100 cal total
+-- Recipe 31: Lentil Stew (Moderate) - ~1100 cal total
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
 (31, 55, NULL, 400, 1, 400.00, 1),     -- Brown lentils (tinned), 400g (1 tin)
 (31, 12, NULL, 1, 7, 110.00, 2),       -- Onion, 1 medium (110g)
@@ -1338,7 +1338,7 @@ INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quan
 (31, 5, NULL, 0.5, 3, 3.00, 10),       -- Salt, 0.5 tsp
 (31, 22, NULL, 1, 4, 14.00, 11);       -- Olive oil, 1 tbsp
 
--- Recipe 32: Lentil Stew (Full) - ~1300 cal total
+-- Recipe 32: Lentil Stew (Balanced) - ~1300 cal total
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
 (32, 55, NULL, 400, 1, 400.00, 1),     -- Brown lentils (tinned), 400g (1 tin)
 (32, 12, NULL, 1, 8, 150.00, 2),       -- Onion, 1 large (150g)
@@ -1368,7 +1368,7 @@ INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
 (30, 8, 'Add the pak choi stems first, cook 2 minutes. Then add the leaves and cook another 2 minutes until wilted.'),
 (30, 9, 'Season with salt to taste. Serve in bowls.');
 
--- Recipe 31: Lentil Stew (Standard)
+-- Recipe 31: Lentil Stew (Moderate)
 INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
 (31, 1, 'Prep the vegetables: Dice the onion, mince the garlic, and dice the carrot into small cubes. Roughly chop the pak choi, keeping stems and leaves separate.'),
 (31, 2, 'Heat olive oil in a large pot over medium heat. Add onion and cook 4-5 minutes until softened.'),
@@ -1380,7 +1380,7 @@ INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
 (31, 8, 'Add the pak choi stems first, cook 2 minutes. Then add the leaves and cook another 2 minutes until wilted.'),
 (31, 9, 'Season with salt to taste. Serve in bowls.');
 
--- Recipe 32: Lentil Stew (Full)
+-- Recipe 32: Lentil Stew (Balanced)
 INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
 (32, 1, 'Prep the vegetables: Dice the onion, mince the garlic, and dice the carrot into small cubes. Roughly chop the pak choi, keeping stems and leaves separate.'),
 (32, 2, 'Heat olive oil in a large pot over medium heat. Add onion and cook 4-5 minutes until softened.'),
@@ -1399,9 +1399,9 @@ INSERT INTO recipe_families (id, family_name, description) VALUES
 (9, 'Lentil Stew', 'Hearty vegetarian stew with brown lentils, tomatoes, carrots, and pak choi, spiced with smoked paprika and cumin.');
 
 INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_label, display_order) VALUES
-(9, 31, TRUE, 'Standard', 1),   -- Standard is default
+(9, 31, FALSE, 'Moderate', 1),
 (9, 30, FALSE, 'Light', 2),
-(9, 32, FALSE, 'Full', 3);
+(9, 32, TRUE, 'Balanced', 3);
 
 -- =============================================
 -- LENTIL STUFFED PEPPERS FAMILY
@@ -1411,13 +1411,13 @@ INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_lab
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
 (33, 'Lentil Stuffed Peppers (Light)', 2, 782, FALSE, TRUE);
 
--- Recipe 34: Lentil Stuffed Peppers (Standard) - ~969 cal total, ~484 cal/serving
+-- Recipe 34: Lentil Stuffed Peppers (Moderate) - ~969 cal total, ~484 cal/serving
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
 (34, 'Lentil Stuffed Peppers', 2, 969, FALSE, TRUE);
 
--- Recipe 35: Lentil Stuffed Peppers (Full) - ~1217 cal total, ~608 cal/serving
+-- Recipe 35: Lentil Stuffed Peppers (Balanced) - ~1217 cal total, ~608 cal/serving
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
-(35, 'Lentil Stuffed Peppers (Full)', 2, 1217, FALSE, TRUE);
+(35, 'Lentil Stuffed Peppers (Balanced)', 2, 1217, FALSE, TRUE);
 
 -- =============================================
 -- LENTIL STUFFED PEPPERS RECIPE MEALS (Lunch)
@@ -1445,7 +1445,7 @@ INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quan
 (33, 5, NULL, 0.5, 3, 3.00, 10),       -- Salt, 0.5 tsp
 (33, 50, NULL, 0.25, 3, 0.75, 11);     -- Black pepper, 0.25 tsp
 
--- Recipe 34: Lentil Stuffed Peppers (Standard) - ~800 cal total
+-- Recipe 34: Lentil Stuffed Peppers (Moderate) - ~800 cal total
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
 (34, 42, NULL, 4, 7, 600.00, 1),       -- Red bell peppers, 4 medium (600g)
 (34, 55, NULL, 400, 1, 400.00, 2),     -- Brown lentils (tinned), 400g (1 tin)
@@ -1459,7 +1459,7 @@ INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quan
 (34, 5, NULL, 0.5, 3, 3.00, 10),       -- Salt, 0.5 tsp
 (34, 50, NULL, 0.25, 3, 0.75, 11);     -- Black pepper, 0.25 tsp
 
--- Recipe 35: Lentil Stuffed Peppers (Full) - ~1040 cal total
+-- Recipe 35: Lentil Stuffed Peppers (Balanced) - ~1040 cal total
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
 (35, 42, NULL, 4, 8, 700.00, 1),       -- Red bell peppers, 4 large (700g)
 (35, 55, NULL, 500, 1, 500.00, 2),     -- Brown lentils (tinned), 500g
@@ -1490,7 +1490,7 @@ INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
 (33, 9, 'Bake for 25-30 minutes until peppers are soft and slightly charred at the edges.'),
 (33, 10, 'Serve hot.');
 
--- Recipe 34: Lentil Stuffed Peppers (Standard)
+-- Recipe 34: Lentil Stuffed Peppers (Moderate)
 INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
 (34, 1, 'Preheat oven to 190C.'),
 (34, 2, 'Halve the peppers lengthways, remove seeds and white membrane. Place cut-side up on a baking tray.'),
@@ -1503,7 +1503,7 @@ INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
 (34, 9, 'Bake for 25-30 minutes until peppers are soft and slightly charred at the edges.'),
 (34, 10, 'Serve hot.');
 
--- Recipe 35: Lentil Stuffed Peppers (Full)
+-- Recipe 35: Lentil Stuffed Peppers (Balanced)
 INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
 (35, 1, 'Preheat oven to 190C.'),
 (35, 2, 'Halve the peppers lengthways, remove seeds and white membrane. Place cut-side up on a baking tray.'),
@@ -1523,9 +1523,9 @@ INSERT INTO recipe_families (id, family_name, description) VALUES
 (10, 'Lentil Stuffed Peppers', 'Roasted red peppers stuffed with lentil bolognese - a hearty vegetarian take on the Italian classic.');
 
 INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_label, display_order) VALUES
-(10, 34, TRUE, 'Standard', 1),   -- Standard is default
+(10, 34, FALSE, 'Moderate', 1),
 (10, 33, FALSE, 'Light', 2),
-(10, 35, FALSE, 'Full', 3);
+(10, 35, TRUE, 'Balanced', 3);
 
 -- =============================================
 -- FRESH PASTA INGREDIENT (ID 59)
@@ -1572,13 +1572,13 @@ INSERT INTO ingredients (id, `key`, name, aisle_id, protein_per_100g, carbs_per_
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
 (37, 'Pink Sauce Pasta (Light)', 2, 1150, FALSE, TRUE);
 
--- Recipe 38: Pink Sauce Pasta (Standard) - ~1404 cal total, ~702 cal/serving
+-- Recipe 38: Pink Sauce Pasta (Moderate) - ~1404 cal total, ~702 cal/serving
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
 (38, 'Pink Sauce Pasta', 2, 1404, FALSE, TRUE);
 
--- Recipe 39: Pink Sauce Pasta (Full) - ~1773 cal total, ~886 cal/serving
+-- Recipe 39: Pink Sauce Pasta (Balanced) - ~1773 cal total, ~886 cal/serving
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
-(39, 'Pink Sauce Pasta (Full)', 2, 1773, FALSE, TRUE);
+(39, 'Pink Sauce Pasta (Balanced)', 2, 1773, FALSE, TRUE);
 
 -- =============================================
 -- PINK SAUCE PASTA RECIPE MEALS (Dinner)
@@ -1616,7 +1616,7 @@ INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quan
 (37, 46, NULL, 0.5, 3, 1.50, 9),          -- Smoked paprika, 0.5 tsp
 (37, 30, NULL, 20, 1, 20.00, 10);         -- Parmesan, 20g
 
--- Recipe 38: Pink Sauce Pasta (Standard) - ~1404 cal total
+-- Recipe 38: Pink Sauce Pasta (Moderate) - ~1404 cal total
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
 -- Fresh Pasta (linked recipe)
 (38, NULL, 36, 140, 1, 140.00, 1),        -- Fresh Pasta, 140g
@@ -1632,7 +1632,7 @@ INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quan
 (38, 46, NULL, 1, 3, 3.00, 9),            -- Smoked paprika, 1 tsp
 (38, 30, NULL, 25, 1, 25.00, 10);         -- Parmesan, 25g
 
--- Recipe 39: Pink Sauce Pasta (Full) - ~1773 cal total
+-- Recipe 39: Pink Sauce Pasta (Balanced) - ~1773 cal total
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
 -- Fresh Pasta (linked recipe)
 (39, NULL, 36, 160, 1, 160.00, 1),        -- Fresh Pasta, 160g
@@ -1663,7 +1663,7 @@ INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id,
 (37, 7, 'Stir in grated parmesan until melted. Add a splash of pasta water to loosen if needed.', NULL, NULL),
 (37, 8, 'Toss cooked pasta in the sauce. Top with sliced chicken. Serve immediately.', NULL, NULL);
 
--- Recipe 38: Pink Sauce Pasta (Standard)
+-- Recipe 38: Pink Sauce Pasta (Moderate)
 INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
 (38, 1, 'Prepare the fresh pasta according to the linked recipe. Use 70g dough per person.', 36, 'Cook 140g dried pasta (fettuccine or tagliatelle) according to package directions.'),
 (38, 2, 'Soak cashews in boiling water for 15 minutes to soften. Drain.', NULL, NULL),
@@ -1674,7 +1674,7 @@ INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id,
 (38, 7, 'Stir in grated parmesan until melted. Add a splash of pasta water to loosen if needed.', NULL, NULL),
 (38, 8, 'Toss cooked pasta in the sauce. Top with sliced chicken. Serve immediately.', NULL, NULL);
 
--- Recipe 39: Pink Sauce Pasta (Full)
+-- Recipe 39: Pink Sauce Pasta (Balanced)
 INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
 (39, 1, 'Prepare the fresh pasta according to the linked recipe. Use 80g dough per person.', 36, 'Cook 160g dried pasta (fettuccine or tagliatelle) according to package directions.'),
 (39, 2, 'Soak cashews in boiling water for 15 minutes to soften. Drain.', NULL, NULL),
@@ -1692,9 +1692,9 @@ INSERT INTO recipe_families (id, family_name, description) VALUES
 (11, 'Pink Sauce Pasta', 'Creamy cashew-based pink sauce with smoked paprika, parmesan, and sliced chicken over fresh pasta.');
 
 INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_label, display_order) VALUES
-(11, 38, TRUE, 'Standard', 1),   -- Standard is default
+(11, 38, FALSE, 'Moderate', 1),
 (11, 37, FALSE, 'Light', 2),
-(11, 39, FALSE, 'Full', 3);
+(11, 39, TRUE, 'Balanced', 3);
 
 -- =============================================
 -- CHICKEN TIKKA MASALA FAMILY
@@ -1710,7 +1710,7 @@ INSERT INTO ingredients (id, `key`, name, aisle_id, protein_per_100g, carbs_per_
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
 (40, 'Chicken Tikka Masala (Light)', 2, 1258, FALSE, TRUE),
 (41, 'Chicken Tikka Masala', 2, 1493, FALSE, TRUE),
-(42, 'Chicken Tikka Masala (Full)', 2, 1792, FALSE, TRUE);
+(42, 'Chicken Tikka Masala (Balanced)', 2, 1792, FALSE, TRUE);
 
 -- =============================================
 -- CHICKEN TIKKA MASALA RECIPE MEALS (Dinner)
@@ -1744,7 +1744,7 @@ INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quan
 (40, 61, NULL, 1, 3, 3.00, 16),          -- Garam masala, 1 tsp
 (40, 26, NULL, 120, 1, 120.00, 17);      -- Jasmine rice (uncooked), 120g
 
--- Recipe 41: Chicken Tikka Masala (Standard) - ~1493 cal total, ~747 cal/serving
+-- Recipe 41: Chicken Tikka Masala (Moderate) - ~1493 cal total, ~747 cal/serving
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
 (41, 11, NULL, 300, 1, 300.00, 1),       -- Chicken breast, 300g
 (41, 22, NULL, 1.5, 4, 21.00, 2),        -- Olive oil, 1.5 tbsp
@@ -1764,7 +1764,7 @@ INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quan
 (41, 61, NULL, 1, 3, 3.00, 16),          -- Garam masala, 1 tsp
 (41, 26, NULL, 160, 1, 160.00, 17);      -- Jasmine rice (uncooked), 160g
 
--- Recipe 42: Chicken Tikka Masala (Full) - ~1792 cal total, ~896 cal/serving
+-- Recipe 42: Chicken Tikka Masala (Balanced) - ~1792 cal total, ~896 cal/serving
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
 (42, 11, NULL, 400, 1, 400.00, 1),       -- Chicken breast, 400g
 (42, 22, NULL, 1.5, 4, 21.00, 2),        -- Olive oil, 1.5 tbsp
@@ -1801,7 +1801,7 @@ INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
 (40, 9, 'Return chicken to the sauce. Simmer gently for 5-10 minutes until chicken is cooked through (74°C internal).'),
 (40, 10, 'Meanwhile, cook rice according to package directions. Serve curry over rice.');
 
--- Recipe 41: Chicken Tikka Masala (Standard)
+-- Recipe 41: Chicken Tikka Masala (Moderate)
 INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
 (41, 1, 'Cut chicken into bite-sized pieces. Season with salt, pepper, and half the garam masala.'),
 (41, 2, 'Heat 1 tbsp olive oil in a large pan over medium-high heat. Cook chicken until golden on all sides, about 5 minutes. Remove and set aside.'),
@@ -1814,7 +1814,7 @@ INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
 (41, 9, 'Return chicken to the sauce. Simmer gently for 5-10 minutes until chicken is cooked through (74°C internal).'),
 (41, 10, 'Meanwhile, cook rice according to package directions. Serve curry over rice.');
 
--- Recipe 42: Chicken Tikka Masala (Full)
+-- Recipe 42: Chicken Tikka Masala (Balanced)
 INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
 (42, 1, 'Cut chicken into bite-sized pieces. Season with salt, pepper, and half the garam masala.'),
 (42, 2, 'Heat 1 tbsp olive oil in a large pan over medium-high heat. Cook chicken until golden on all sides, about 5 minutes. Remove and set aside.'),
@@ -1834,9 +1834,9 @@ INSERT INTO recipe_families (id, family_name, description) VALUES
 (12, 'Chicken Tikka Masala', 'Creamy tomato-based curry with tender chicken, Greek yogurt, and aromatic spices. Served over jasmine rice.');
 
 INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_label, display_order) VALUES
-(12, 41, TRUE, 'Standard', 1),   -- Standard is default
+(12, 41, FALSE, 'Moderate', 1),
 (12, 40, FALSE, 'Light', 2),
-(12, 42, FALSE, 'Full', 3);
+(12, 42, TRUE, 'Balanced', 3);
 
 -- =============================================
 -- BURGER PATTIES (Extra)
@@ -1892,7 +1892,7 @@ INSERT INTO ingredients (id, `key`, name, aisle_id, protein_per_100g, carbs_per_
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
 (44, 'Stromboli (Light)', 2, 1344, FALSE, TRUE),
 (45, 'Stromboli', 2, 1664, FALSE, TRUE),
-(46, 'Stromboli (Full)', 2, 2098, FALSE, TRUE);
+(46, 'Stromboli (Balanced)', 2, 2098, FALSE, TRUE);
 
 -- Assign to Dinner meal type
 INSERT INTO recipe_meals (recipe_id, meal_id) VALUES
@@ -1921,9 +1921,10 @@ INSERT INTO recipe_extras (parent_recipe_id, child_recipe_id, display_order) VAL
 -- STROMBOLI (LIGHT) INGREDIENTS
 -- Total: 1344 cal, Per serving: 672 cal, 30.4g protein, 60g carbs, 34.5g fat
 -- =============================================
+-- FR-103: Stromboli uses linked_recipe_id with ingredient_id for store-bought option
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
-(44, NULL, 11, 250, 1, 250.00, 1),    -- Pizza Dough (linked), 250g
-(44, NULL, 12, 38, 1, 38.00, 2),      -- Pizza Sauce (linked), 38g (~2.5 tbsp)
+(44, 75, 11, 250, 1, 250.00, 1),      -- Pizza Dough (linked OR store-bought), 250g
+(44, 76, 12, 38, 1, 38.00, 2),        -- Pizza Sauce (linked OR store-bought), 38g (~2.5 tbsp)
 (44, 37, NULL, 80, 1, 80.00, 3),      -- Mozzarella, 80g
 (44, 30, NULL, 15, 1, 15.00, 4),      -- Parmesan, 15g
 (44, NULL, 43, 100, 1, 100.00, 5),    -- Burger Patties (linked), 100g
@@ -1936,9 +1937,10 @@ INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quan
 -- STROMBOLI (STANDARD) INGREDIENTS
 -- Total: 1664 cal, Per serving: 832 cal, 37.7g protein, 72g carbs, 43.7g fat
 -- =============================================
+-- FR-103: Stromboli uses linked_recipe_id with ingredient_id for store-bought option
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
-(45, NULL, 11, 300, 1, 300.00, 1),    -- Pizza Dough (linked), 300g
-(45, NULL, 12, 45, 1, 45.00, 2),      -- Pizza Sauce (linked), 45g (3 tbsp)
+(45, 75, 11, 300, 1, 300.00, 1),      -- Pizza Dough (linked OR store-bought), 300g
+(45, 76, 12, 45, 1, 45.00, 2),        -- Pizza Sauce (linked OR store-bought), 45g (3 tbsp)
 (45, 37, NULL, 100, 1, 100.00, 3),    -- Mozzarella, 100g
 (45, 30, NULL, 20, 1, 20.00, 4),      -- Parmesan, 20g
 (45, NULL, 43, 125, 1, 125.00, 5),    -- Burger Patties (linked), 125g
@@ -1951,9 +1953,10 @@ INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quan
 -- STROMBOLI (FULL) INGREDIENTS
 -- Total: 2098 cal, Per serving: 1049 cal, 48.6g protein, 89g carbs, 55.6g fat
 -- =============================================
+-- FR-103: Stromboli uses linked_recipe_id with ingredient_id for store-bought option
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
-(46, NULL, 11, 370, 1, 370.00, 1),    -- Pizza Dough (linked), 370g
-(46, NULL, 12, 55, 1, 55.00, 2),      -- Pizza Sauce (linked), 55g (4 tbsp)
+(46, 75, 11, 370, 1, 370.00, 1),      -- Pizza Dough (linked OR store-bought), 370g
+(46, 76, 12, 55, 1, 55.00, 2),        -- Pizza Sauce (linked OR store-bought), 55g (4 tbsp)
 (46, 37, NULL, 130, 1, 130.00, 3),    -- Mozzarella, 130g
 (46, 30, NULL, 30, 1, 30.00, 4),      -- Parmesan, 30g
 (46, NULL, 43, 160, 1, 160.00, 5),    -- Burger Patties (linked), 160g
@@ -1975,7 +1978,7 @@ INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id,
 (44, 7, 'Bake at 200°C for 25-30 minutes until golden brown. Rest 5 minutes before slicing.', NULL, NULL);
 
 -- =============================================
--- STROMBOLI RECIPE STEPS (Standard)
+-- STROMBOLI RECIPE STEPS (Moderate)
 -- =============================================
 INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
 (45, 1, 'Prepare the pizza dough according to the linked recipe. Use 300g dough.', 11, 'Use 300g store-bought pizza dough, brought to room temperature.'),
@@ -1987,7 +1990,7 @@ INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id,
 (45, 7, 'Bake at 200°C for 25-30 minutes until golden brown. Rest 5 minutes before slicing.', NULL, NULL);
 
 -- =============================================
--- STROMBOLI RECIPE STEPS (Full)
+-- STROMBOLI RECIPE STEPS (Balanced)
 -- =============================================
 INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
 (46, 1, 'Prepare the pizza dough according to the linked recipe. Use 370g dough.', 11, 'Use 370g store-bought pizza dough, brought to room temperature.'),
@@ -2005,9 +2008,9 @@ INSERT INTO recipe_families (id, family_name, description) VALUES
 (13, 'Stromboli', 'Rolled pizza dough stuffed with seasoned beef, mozzarella, parmesan, grilled onion, and pizza sauce. Brushed with garlic and Italian herb olive oil.');
 
 INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_label, display_order) VALUES
-(13, 45, TRUE, 'Standard', 1),   -- Standard is default
+(13, 45, FALSE, 'Moderate', 1),
 (13, 44, FALSE, 'Light', 2),
-(13, 46, FALSE, 'Full', 3);
+(13, 46, TRUE, 'Balanced', 3);
 
 -- =============================================
 -- STEAK & AIR-FRIED CHIPS FAMILY
@@ -2024,7 +2027,7 @@ INSERT INTO ingredients (id, `key`, name, aisle_id, protein_per_100g, carbs_per_
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
 (47, 'Steak & Chips (Light)', 2, 766, FALSE, TRUE),
 (48, 'Steak & Chips', 2, 1102, FALSE, TRUE),
-(49, 'Steak & Chips (Full)', 2, 1437, FALSE, TRUE);
+(49, 'Steak & Chips (Balanced)', 2, 1437, FALSE, TRUE);
 
 -- Assign to Dinner meal type
 INSERT INTO recipe_meals (recipe_id, meal_id) VALUES
@@ -2084,7 +2087,7 @@ INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id,
 (47, 7, 'Serve: Plate the rested steak with air-fried chips and rosemary mushrooms alongside.', NULL, NULL);
 
 -- =============================================
--- STEAK & CHIPS RECIPE STEPS (Standard)
+-- STEAK & CHIPS RECIPE STEPS (Moderate)
 -- =============================================
 INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
 (48, 1, 'Par-boil the potatoes: Peel and cut potatoes into thick chips (~2cm). Place in cold salted water, bring to boil, then simmer 8-10 minutes until just tender but not falling apart. Drain and let steam dry for 5 minutes.', NULL, NULL),
@@ -2096,7 +2099,7 @@ INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id,
 (48, 7, 'Serve: Plate the rested steak with air-fried chips and rosemary mushrooms alongside.', NULL, NULL);
 
 -- =============================================
--- STEAK & CHIPS RECIPE STEPS (Full)
+-- STEAK & CHIPS RECIPE STEPS (Balanced)
 -- =============================================
 INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
 (49, 1, 'Par-boil the potatoes: Peel and cut potatoes into thick chips (~2cm). Place in cold salted water, bring to boil, then simmer 8-10 minutes until just tender but not falling apart. Drain and let steam dry for 5 minutes.', NULL, NULL),
@@ -2114,9 +2117,9 @@ INSERT INTO recipe_families (id, family_name, description) VALUES
 (14, 'Steak & Chips', 'Pan-seared sirloin steak with par-boiled, air-fried chips and rosemary mushrooms. Classic steakhouse dinner made at home.');
 
 INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_label, display_order) VALUES
-(14, 48, TRUE, 'Standard', 1),   -- Standard is default
+(14, 48, FALSE, 'Moderate', 1),
 (14, 47, FALSE, 'Light', 2),
-(14, 49, FALSE, 'Full', 3);
+(14, 49, TRUE, 'Balanced', 3);
 
 -- =============================================
 -- SCRAMBLED EGGS & TOAST RECIPE FAMILY
@@ -2132,13 +2135,13 @@ INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_lab
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
 (50, 'Scrambled Eggs & Toast (Light)', 2, 1006, FALSE, TRUE);
 
--- Recipe 51: Scrambled Eggs & Toast (Standard) - ~1198 cal total, ~599 cal/serving
+-- Recipe 51: Scrambled Eggs & Toast (Moderate) - ~1198 cal total, ~599 cal/serving
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
 (51, 'Scrambled Eggs & Toast', 2, 1198, FALSE, TRUE);
 
--- Recipe 52: Scrambled Eggs & Toast (Full) - ~1426 cal total, ~713 cal/serving
+-- Recipe 52: Scrambled Eggs & Toast (Balanced) - ~1426 cal total, ~713 cal/serving
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
-(52, 'Scrambled Eggs & Toast (Full)', 2, 1426, FALSE, TRUE);
+(52, 'Scrambled Eggs & Toast (Balanced)', 2, 1426, FALSE, TRUE);
 
 -- Assign to Breakfast meal type (meal_id = 1)
 INSERT INTO recipe_meals (recipe_id, meal_id) VALUES
@@ -2203,7 +2206,7 @@ INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id,
 (50, 5, 'Butter the toast with remaining butter (10g).', NULL, NULL),
 (50, 6, 'Serve scrambled eggs on or alongside buttered toast.', NULL, NULL);
 
--- Recipe 51: Scrambled Eggs & Toast (Standard)
+-- Recipe 51: Scrambled Eggs & Toast (Moderate)
 INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
 (51, 1, 'Toast the bread according to the linked recipe. Use 4 slices @ 50g each (2 per person).', 26, 'Toast 4 slices of store-bought bread (~50g each).'),
 (51, 2, 'Crack 6 eggs into a cold non-stick pan with half the butter (15g). Place over low heat.', NULL, NULL),
@@ -2212,7 +2215,7 @@ INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id,
 (51, 5, 'Butter the toast with remaining butter (15g).', NULL, NULL),
 (51, 6, 'Serve scrambled eggs on or alongside buttered toast.', NULL, NULL);
 
--- Recipe 52: Scrambled Eggs & Toast (Full)
+-- Recipe 52: Scrambled Eggs & Toast (Balanced)
 INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
 (52, 1, 'Toast the bread according to the linked recipe. Use 4 slices @ 50g each (2 per person).', 26, 'Toast 4 slices of store-bought bread (~50g each).'),
 (52, 2, 'Crack 8 eggs into a cold non-stick pan with half the butter (20g). Place over low heat.', NULL, NULL),
@@ -2228,9 +2231,9 @@ INSERT INTO recipe_families (id, family_name, description) VALUES
 (15, 'Scrambled Eggs & Toast', 'Soft, creamy scrambled eggs cooked low and slow with butter, served on buttered toast. Classic British breakfast.');
 
 INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_label, display_order) VALUES
-(15, 51, TRUE, 'Standard', 1),   -- Standard is default
+(15, 51, FALSE, 'Moderate', 1),
 (15, 50, FALSE, 'Light', 2),
-(15, 52, FALSE, 'Full', 3);
+(15, 52, TRUE, 'Balanced', 3);
 
 -- =============================================
 -- AVOCADO TOAST RECIPE FAMILY
@@ -2244,6 +2247,13 @@ INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_lab
 INSERT INTO ingredients (id, `key`, name, aisle_id, protein_per_100g, carbs_per_100g, fat_per_100g, macros_verified) VALUES
 (72, 'avocado', 'Avocado', 4, 2.00, 9.00, 15.00, TRUE);
 
+-- FR-103: Store-bought ingredient options for extras
+-- These enable store-bought selections in the shopping list
+INSERT INTO ingredients (id, `key`, name, aisle_id, protein_per_100g, carbs_per_100g, fat_per_100g, macros_verified) VALUES
+(74, 'pesto_store', 'Pesto', 12, 4.00, 5.00, 45.00, FALSE),              -- Condiments & Sauces
+(75, 'pizza_dough_store', 'Pizza Dough', 13, 8.00, 50.00, 2.00, FALSE),  -- Bakery
+(76, 'pizza_sauce_store', 'Pizza Sauce', 12, 1.50, 8.00, 0.50, FALSE);   -- Condiments & Sauces
+
 -- =============================================
 -- AVOCADO TOAST RECIPES (3 variants)
 -- =============================================
@@ -2252,13 +2262,13 @@ INSERT INTO ingredients (id, `key`, name, aisle_id, protein_per_100g, carbs_per_
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
 (53, 'Avocado Toast (Light)', 2, 826, FALSE, TRUE);
 
--- Recipe 54: Avocado Toast (Standard) - ~906 cal total, ~453 cal/serving
+-- Recipe 54: Avocado Toast (Moderate) - ~906 cal total, ~453 cal/serving
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
 (54, 'Avocado Toast', 2, 906, FALSE, TRUE);
 
--- Recipe 55: Avocado Toast (Full) - ~1061 cal total, ~531 cal/serving (with fried egg)
+-- Recipe 55: Avocado Toast (Balanced) - ~1061 cal total, ~531 cal/serving (with fried egg)
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
-(55, 'Avocado Toast (Full)', 2, 1061, FALSE, TRUE);
+(55, 'Avocado Toast (Balanced)', 2, 1061, FALSE, TRUE);
 
 -- Assign to Breakfast meal type (meal_id = 1)
 INSERT INTO recipe_meals (recipe_id, meal_id) VALUES
@@ -2324,7 +2334,7 @@ INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id,
 (53, 5, 'Spread mashed avocado evenly on buttered toast (~75g per person).', NULL, NULL),
 (53, 6, 'Serve immediately.', NULL, NULL);
 
--- Recipe 54: Avocado Toast (Standard)
+-- Recipe 54: Avocado Toast (Moderate)
 INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
 (54, 1, 'Toast the bread according to the linked recipe. Use 4 slices @ 50g each (2 per person).', 26, 'Toast 4 slices of store-bought bread (~50g each).'),
 (54, 2, 'Butter each slice of toast with the 15g butter.', NULL, NULL),
@@ -2333,7 +2343,7 @@ INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id,
 (54, 5, 'Spread mashed avocado evenly on buttered toast (~100g per person).', NULL, NULL),
 (54, 6, 'Serve immediately.', NULL, NULL);
 
--- Recipe 55: Avocado Toast (Full)
+-- Recipe 55: Avocado Toast (Balanced)
 INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
 (55, 1, 'Toast the bread according to the linked recipe. Use 4 slices @ 50g each (2 per person).', 26, 'Toast 4 slices of store-bought bread (~50g each).'),
 (55, 2, 'Butter each slice of toast with half the butter (7g).', NULL, NULL),
@@ -2351,6 +2361,61 @@ INSERT INTO recipe_families (id, family_name, description) VALUES
 (16, 'Avocado Toast', 'Simple mashed avocado on buttered toast. Full variant adds a fried egg on top. Classic breakfast.');
 
 INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_label, display_order) VALUES
-(16, 54, TRUE, 'Standard', 1),   -- Standard is default
+(16, 54, FALSE, 'Moderate', 1),
 (16, 53, FALSE, 'Light', 2),
-(16, 55, FALSE, 'Full', 3);
+(16, 55, TRUE, 'Balanced', 3);
+
+-- =============================================
+-- STUFFING BALLS (EXTRA) - Christmas Recipe
+-- =============================================
+
+-- New Ingredients for Stuffing Balls
+INSERT INTO ingredients (id, `key`, name, aisle_id, protein_per_100g, carbs_per_100g, fat_per_100g, macros_verified) VALUES
+(77, 'pork_sausage_meat', 'Pork sausage meat', 1, 13.00, 2.00, 22.00, TRUE),
+(78, 'italian_herbs', 'Italian herbs seasoning', 8, 9.00, 69.00, 4.00, TRUE),
+(79, 'dried_thyme', 'Dried thyme', 8, 9.00, 64.00, 1.70, TRUE);
+
+-- Recipe 56: Stuffing Balls - ~2570 cal total for 12 balls (~214 cal per ball)
+-- Macros per ball: 9g protein, 19g carbs, 13g fat
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+(56, 'Stuffing Balls', 12, 2570, FALSE, TRUE);
+
+-- Assign to 'extras' meal type (meal_id = 5)
+INSERT INTO recipe_meals (recipe_id, meal_id) VALUES (56, 5);
+
+-- =============================================
+-- STUFFING BALLS INGREDIENTS
+-- =============================================
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
+-- For the mash
+(56, 69, NULL, 250, 1, 250.00, 1),      -- Potatoes, 250g raw (peeled)
+(56, 53, NULL, 15, 1, 15.00, 2),        -- Salted butter (for mash), 15g
+-- For the stuffing
+(56, 63, NULL, 120, 1, 120.00, 3),      -- Breadcrumbs (for mixture), 120g
+(56, 12, NULL, 1, 7, 110.00, 4),        -- Onion, 1 medium (110g)
+(56, 53, NULL, 30, 1, 30.00, 5),        -- Salted butter (for stuffing), 30g
+(56, 78, NULL, 1, 3, 2.00, 6),          -- Italian herbs seasoning, 1 tsp (2g)
+(56, 79, NULL, 1, 3, 2.00, 7),          -- Dried thyme, 1 tsp (2g)
+(56, 24, NULL, 60, 2, 60.00, 8),        -- Chicken stock, 60ml
+(56, 5, NULL, 0.5, 3, 3.00, 9),         -- Salt, 0.5 tsp
+(56, 50, NULL, 0.25, 3, 0.50, 10),      -- Black pepper, 0.25 tsp
+-- For the balls
+(56, 77, NULL, 450, 1, 450.00, 11),     -- Pork sausage meat, 1 lb (450g)
+-- For coating
+(56, 59, NULL, 2, 7, 100.00, 12),       -- Eggs, 2 medium (100g)
+(56, 63, NULL, 100, 1, 100.00, 13);     -- Breadcrumbs (for coating), 100g
+
+-- =============================================
+-- STUFFING BALLS STEPS
+-- =============================================
+INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
+(56, 1, 'Make the mash: Peel and chop potatoes into chunks. Boil in salted water 15-20 minutes until tender. Drain well.', NULL, NULL),
+(56, 2, 'Mash with 15g butter until smooth. Season lightly. Spread on a plate and refrigerate until cold.', NULL, NULL),
+(56, 3, 'Make the stuffing: Melt 30g butter in a pan over medium heat. Add diced onion and cook 6-7 minutes until soft and lightly golden.', NULL, NULL),
+(56, 4, 'Add Italian herbs and thyme. Stir for 30 seconds until fragrant.', NULL, NULL),
+(56, 5, 'Tip onion mixture into a bowl with 120g breadcrumbs. Pour over warm stock and mix well. Season with salt and pepper. Let cool completely.', NULL, NULL),
+(56, 6, 'Form the balls: Combine sausage meat, cold mash (~200g), and cooled stuffing in a large bowl. Mix thoroughly with your hands until evenly combined.', NULL, NULL),
+(56, 7, 'Roll into 12 balls, about golf-ball sized (~65g each). Chill 15 minutes to firm up.', NULL, NULL),
+(56, 8, 'Coat the balls: Set up breading station - beaten eggs in one bowl, 100g breadcrumbs in another.', NULL, NULL),
+(56, 9, 'Dip each ball in egg wash, then roll in breadcrumbs until fully coated.', NULL, NULL),
+(56, 10, 'Bake at 190C for 25-30 minutes until golden and cooked through (internal temp 74C).', NULL, NULL);

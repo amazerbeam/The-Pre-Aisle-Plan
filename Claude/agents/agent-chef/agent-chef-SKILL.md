@@ -62,7 +62,7 @@ Calculate macros for EVERY recipe. See `references/diet-guardrails.md` for guida
 **Important:** Provide gram equivalents for all ingredients (see Macro Data System section below).
 
 ### 6. Create Variant Family
-Create Light/Standard/Full variants by scaling portions. See `references/variant-system.md`.
+Create Light/Moderate/Balanced variants by scaling portions. See `references/variant-system.md`.
 
 ### 7. Identify & Create Extras (FR-085 to FR-094)
 If recipe uses sub-components that can be homemade (dough, sauce, pesto, etc.):
@@ -73,7 +73,30 @@ If recipe uses sub-components that can be homemade (dough, sauce, pesto, etc.):
 
 See **Extras System** and **Linked Recipe Ingredients** sections below for details.
 
-### 8. Offer Database Save
+### 8. Nutrition Review (Required)
+Before finalizing any recipe, consult the Nutrition Agent for review:
+
+1. Use the `Task` tool to spawn the Nutrition Agent with the complete recipe (ingredients, macros, variants)
+2. The Nutrition Agent will verify:
+   - Math is correct (gram weights × macros = accurate totals)
+   - Recipe fits variant system (Light/Moderate/Balanced calorie targets)
+   - Macro balance is reasonable (adequate protein, reasonable fat)
+   - Portions feel natural and practical
+
+3. **User Approval Required:** If the Nutrition Agent suggests ANY changes:
+   - Present each suggestion to the user using `AskUserQuestion`
+   - Only apply changes the user explicitly approves
+   - Do NOT automatically implement Nutrition Agent recommendations
+
+**Example consultation:**
+```
+Task: Ask Nutrition Agent to review [Recipe Name]
+- Light variant: XXX cal (XXg protein, XXg carbs, XXg fat)
+- Moderate variant: XXX cal (XXg protein, XXg carbs, XXg fat)
+- Balanced variant: XXX cal (XXg protein, XXg carbs, XXg fat)
+```
+
+### 9. Offer Database Save
 Ask if user wants recipe saved. Generate SQL following schema in `seed.sql`.
 
 ## Output Format
@@ -85,7 +108,7 @@ Ask if user wants recipe saved. Generate SQL following schema in `seed.sql`.
 ### Why This Works
 [1-2 sentences on technique]
 
-### Ingredients (Standard)
+### Ingredients (Moderate)
 - [ ] Ingredient (quantity)
 
 ### Instructions
@@ -96,8 +119,8 @@ Ask if user wants recipe saved. Generate SQL following schema in `seed.sql`.
 | Variant | Cal | Protein | Fat | Carbs | Key Portions |
 |---------|-----|---------|-----|-------|--------------|
 | Light | XXX | XXg | XXg | XXg | 120g protein, ¾ cup carb |
-| Standard | XXX | XXg | XXg | XXg | 150g protein, 1 cup carb |
-| Full | XXX | XXg | XXg | XXg | 200g protein, 1.5 cups carb |
+| Moderate | XXX | XXg | XXg | XXg | 150g protein, 1 cup carb |
+| Balanced | XXX | XXg | XXg | XXg | 200g protein, 1.5 cups carb |
 ```
 
 For complete examples, see `references/examples/recipe-example.md`.
@@ -109,10 +132,12 @@ For complete examples, see `references/examples/recipe-example.md`.
 - Include sensory cues ("until golden", "until fragrant")
 - Calculate and display macros for every recipe
 - Create variant families with different portion sizes
-- Use ~150g meat/fish per person for Standard variant
+- Use ~150g meat/fish per person for Moderate variant
 - Provide supermarket alternatives for specialty items
 - Use quality fats in reasonable amounts
 - Make the dish taste good first, report macros second
+- Consult Nutrition Agent before finalizing any recipe
+- Ask user approval for ANY changes suggested by Nutrition Agent
 
 **DO NOT:**
 - Use seed oils or margarine
@@ -122,6 +147,8 @@ For complete examples, see `references/examples/recipe-example.md`.
 - Create variants by removing ingredients (scale portions instead)
 - Skip macro calculation
 - Use specialty ingredients without accessible alternatives
+- Skip Nutrition Agent review before finalizing recipes
+- Automatically apply Nutrition Agent suggestions without user approval
 
 ## Macro Data System
 
@@ -132,7 +159,7 @@ FoodBytes calculates macros from gram weights. When creating recipes, provide **
 **Output format for ingredients:**
 
 ```markdown
-### Ingredients (Standard)
+### Ingredients (Moderate)
 - [ ] Chicken breast — 150g
 - [ ] Rice (cooked) — 1 cup (185g)
 - [ ] Olive oil — 1 tbsp (14g)
@@ -245,17 +272,27 @@ Pizza (200)
 
 The `recipe_extras` table only defines the **hierarchy** (which extras belong to which parent). It does NOT specify **how much** of an extra is used.
 
-**Problem:** Pizza Light uses 280g dough, Pizza Standard uses 370g, Pizza Full uses 460g. Where do we store this?
+**Problem:** Pizza Light uses 280g dough, Pizza Moderate uses 370g, Pizza Balanced uses 460g. Where do we store this?
 
 **Solution:** Use `linked_recipe_id` in `recipe_ingredients` to reference a recipe instead of a raw ingredient.
 
-### How It Works
+### How It Works (FR-103 Updated)
 
-Each ingredient row can reference EITHER:
-- A raw ingredient (`ingredient_id`) — e.g., Mozzarella
-- A recipe (`linked_recipe_id`) — e.g., Pizza Dough
+Each ingredient row can reference:
+- **Raw ingredient only** (`ingredient_id` set, `linked_recipe_id` NULL) — e.g., Mozzarella
+- **Homemade-only extra** (`ingredient_id` NULL, `linked_recipe_id` set) — e.g., Fresh Pasta (no store-bought equivalent)
+- **Extra with store-bought option** (`ingredient_id` AND `linked_recipe_id` both set) — e.g., Pizza Dough, Pesto
 
-**One must be NULL, the other must be set.**
+**Logic:**
+| ingredient_id | linked_recipe_id | Meaning |
+|---------------|------------------|---------|
+| SET | NULL | Raw ingredient (Mozzarella) |
+| NULL | SET | Homemade-only extra (Fresh Pasta) |
+| SET | SET | Extra with store-bought option (Pizza Dough) |
+
+When both are set:
+- **Homemade selected** → Use `linked_recipe_id` → Process recipe's ingredients
+- **Store-bought selected** → Use `ingredient_id` → Add store-bought ingredient with its aisle
 
 ### Macro Calculation for Linked Recipes
 
@@ -279,39 +316,47 @@ Pizza (Light) uses 280g dough:
 - Calories: 2033 × 0.368 = 748 cal
 ```
 
-### SQL for Linked Recipe Ingredients
+### SQL for Linked Recipe Ingredients (FR-103 Updated)
 
 ```sql
--- Pizza (Light) ingredients - uses linked_recipe_id for extras
+-- Pizza (Light) ingredients - extras have BOTH ingredient_id AND linked_recipe_id
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
--- Linked to Pizza Dough recipe (280g portion)
-(13, NULL, 11, 280, 1, 280.00, 1),
--- Linked to Pizza Sauce recipe (90g portion)
-(13, NULL, 12, 90, 1, 90.00, 2),
--- Regular ingredient (mozzarella)
+-- Pizza Dough: linked_recipe_id=11 (homemade), ingredient_id=75 (store-bought dough)
+(13, 75, 11, 280, 1, 280.00, 1),
+-- Pizza Sauce: linked_recipe_id=12 (homemade), ingredient_id=76 (store-bought sauce)
+(13, 76, 12, 90, 1, 90.00, 2),
+-- Regular ingredient (mozzarella) - only ingredient_id
 (13, 37, NULL, 120, 1, 120.00, 3);
 ```
 
 **Key points:**
-- `ingredient_id = NULL` when using `linked_recipe_id`
-- `linked_recipe_id` points to the extra recipe
+- Extras with store-bought option: BOTH `ingredient_id` AND `linked_recipe_id` are set
+- Homemade-only extras: `ingredient_id = NULL`, only `linked_recipe_id` set
+- Raw ingredients: `linked_recipe_id = NULL`, only `ingredient_id` set
 - `quantity_grams` specifies how much of the extra to use
-- System calculates macros using the portion ratio
+- System calculates macros using the portion ratio (homemade) or ingredient macros (store-bought)
 
-### Complete Pizza Example
+### Complete Pizza Example (FR-103 Updated)
 
 ```sql
 -- =============================================
 -- PIZZA FAMILY WITH LINKED RECIPE INGREDIENTS
+-- FR-103: Extras have both ingredient_id AND linked_recipe_id
 -- =============================================
 
--- Step 1: Create extras (must exist first)
+-- Step 1: Create store-bought ingredients for extras
+INSERT INTO ingredients (id, `key`, name, aisle_id, protein_per_100g, carbs_per_100g, fat_per_100g, macros_verified) VALUES
+(74, 'pesto_store', 'Pesto', 12, 4.00, 5.00, 45.00, FALSE),           -- Condiments aisle
+(75, 'pizza_dough_store', 'Pizza Dough', 13, 8.00, 50.00, 2.00, FALSE), -- Bakery aisle
+(76, 'pizza_sauce_store', 'Pizza Sauce', 12, 1.50, 8.00, 0.50, FALSE);  -- Condiments aisle
+
+-- Step 2: Create extras (must exist first)
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
 (10, 'Pesto', 11, 879, FALSE, TRUE),
 (11, 'Pizza Dough', 4, 2033, FALSE, TRUE),
 (12, 'Pizza Sauce', 7, 313, FALSE, TRUE);
 
--- Step 2: Add extras' ingredients (raw ingredients only)
+-- Step 3: Add extras' ingredients (raw ingredients only)
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
 -- Pizza Dough ingredients
 (11, 31, NULL, 1, 3, 3.00, 1),      -- Dry yeast
@@ -321,33 +366,33 @@ INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quan
 (11, 9, NULL, 240, 2, 240.00, 5);   -- Water
 -- Total yield: 761g
 
--- Step 3: Create parent recipe variants
+-- Step 4: Create parent recipe variants
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
 (13, 'Pizza (Light)', 2, 1220, FALSE, TRUE),
-(14, 'Pizza', 2, 1680, FALSE, TRUE),
-(15, 'Pizza (Full)', 2, 2140, FALSE, TRUE);
+(14, 'Pizza (Moderate)', 2, 1680, FALSE, TRUE),
+(15, 'Pizza (Balanced)', 2, 2140, FALSE, TRUE);
 
--- Step 4: Link extras to parents (for popup hierarchy)
+-- Step 5: Link extras to parents (for popup hierarchy)
 INSERT INTO recipe_extras (parent_recipe_id, child_recipe_id, display_order) VALUES
 (13, 11, 0), (13, 12, 1),  -- Light → Dough, Sauce
-(14, 11, 0), (14, 12, 1),  -- Standard → Dough, Sauce
-(15, 11, 0), (15, 12, 1);  -- Full → Dough, Sauce
+(14, 11, 0), (14, 12, 1),  -- Moderate → Dough, Sauce
+(15, 11, 0), (15, 12, 1);  -- Balanced → Dough, Sauce
 
--- Step 5: Add parent ingredients WITH LINKED RECIPES
+-- Step 6: Add parent ingredients WITH LINKED RECIPES (FR-103: both fields set)
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
 -- Pizza (Light) - 280g dough, 90g sauce, 120g cheese
-(13, NULL, 11, 280, 1, 280.00, 1),  -- Pizza Dough (linked)
-(13, NULL, 12, 90, 1, 90.00, 2),    -- Pizza Sauce (linked)
-(13, 37, NULL, 120, 1, 120.00, 3),  -- Mozzarella (raw ingredient)
+(13, 75, 11, 280, 1, 280.00, 1),  -- Pizza Dough (homemade=11, store-bought=75)
+(13, 76, 12, 90, 1, 90.00, 2),    -- Pizza Sauce (homemade=12, store-bought=76)
+(13, 37, NULL, 120, 1, 120.00, 3),  -- Mozzarella (raw ingredient only)
 
--- Pizza (Standard) - 370g dough, 120g sauce, 200g cheese
-(14, NULL, 11, 370, 1, 370.00, 1),
-(14, NULL, 12, 120, 1, 120.00, 2),
+-- Pizza (Moderate) - 370g dough, 120g sauce, 200g cheese
+(14, 75, 11, 370, 1, 370.00, 1),
+(14, 76, 12, 120, 1, 120.00, 2),
 (14, 37, NULL, 200, 1, 200.00, 3),
 
--- Pizza (Full) - 460g dough, 150g sauce, 280g cheese
-(15, NULL, 11, 460, 1, 460.00, 1),
-(15, NULL, 12, 150, 1, 150.00, 2),
+-- Pizza (Balanced) - 460g dough, 150g sauce, 280g cheese
+(15, 75, 11, 460, 1, 460.00, 1),
+(15, 76, 12, 150, 1, 150.00, 2),
 (15, 37, NULL, 280, 1, 280.00, 3);
 ```
 
@@ -356,8 +401,8 @@ INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quan
 | Variant | Dough | Sauce | Cheese | Cal/serving |
 |---------|-------|-------|--------|-------------|
 | Light | 280g (of 761g batch) | 90g | 120g | 610 |
-| Standard | 370g (of 761g batch) | 120g | 200g | 840 |
-| Full | 460g (of 761g batch) | 150g | 280g | 1070 |
+| Moderate | 370g (of 761g batch) | 120g | 200g | 840 |
+| Balanced | 460g (of 761g batch) | 150g | 280g | 1070 |
 
 The system calculates macros by:
 1. Getting Pizza Dough's total macros from its ingredients
@@ -399,7 +444,7 @@ When creating a recipe with extras, include an Extras section AND specify gram a
 - **Pizza Dough** — 370g (from 761g batch)
 - **Pizza Sauce** — 120g (from 440g batch)
 
-### Ingredients (Standard)
+### Ingredients (Moderate)
 - [ ] Pizza Dough — 370g (linked recipe)
 - [ ] Pizza Sauce — 120g (linked recipe)
 - [ ] Mozzarella — 200g
@@ -421,13 +466,13 @@ When creating a recipe with extras, include an Extras section AND specify gram a
 | Variant | Dough | Sauce | Cheese | Cal | Protein | Fat | Carbs |
 |---------|-------|-------|--------|-----|---------|-----|-------|
 | Light | 280g | 90g | 120g | 1220 | 44g | 56g | 120g |
-| Standard | 370g | 120g | 200g | 1680 | 62g | 76g | 156g |
-| Full | 460g | 150g | 280g | 2140 | 80g | 98g | 194g |
+| Moderate | 370g | 120g | 200g | 1680 | 62g | 76g | 156g |
+| Balanced | 460g | 150g | 280g | 2140 | 80g | 98g | 194g |
 ```
 
 ---
 
-### Important Rules
+### Important Rules (FR-103 Updated)
 
 1. **Extras must be created BEFORE parent** — Foreign keys require extras to exist first
 2. **No circular references** — Pizza cannot link to Pizza Sauce which links back to Pizza
@@ -435,7 +480,9 @@ When creating a recipe with extras, include an Extras section AND specify gram a
 4. **Each extra is a complete recipe** — With its own ingredients, steps, and macros
 5. **Reuse extras across recipes** — Pizza Dough can be linked from multiple pizza recipes
 6. **Use `linked_recipe_id` for quantities** — Not just `recipe_extras` (which is for hierarchy only)
-7. **Either `ingredient_id` OR `linked_recipe_id`** — One must be NULL, never both set
+7. **For extras with store-bought option** — Set BOTH `ingredient_id` (store-bought) AND `linked_recipe_id` (homemade)
+8. **Create store-bought ingredients first** — Before linking them in `recipe_ingredients`
+9. **Assign store-bought ingredients to correct aisle** — Pizza Dough → Bakery, Pesto → Condiments, etc.
 
 ---
 
@@ -451,21 +498,30 @@ When creating a recipe with extras, include an Extras section AND specify gram a
 | `../agent-nutrition/agent-nutrition-SKILL.md` | For nutrition questions |
 | `foodbytes-app/database/schema.sql` | For `recipe_extras` and `recipe_steps` linked fields |
 
-## Key Tables for Extras & Linked Recipes
+## Key Tables for Extras & Linked Recipes (FR-103 Updated)
 
 | Table | Purpose |
 |-------|---------|
 | `recipes` | All recipes including extras (extras have meal_type = 'extras') |
 | `recipe_extras` | Links parent recipes to child extras (for popup hierarchy) |
-| `recipe_ingredients` | Ingredients with `linked_recipe_id` for recipe-as-ingredient (for quantities/macros) |
+| `recipe_ingredients` | FR-103: Both `ingredient_id` AND `linked_recipe_id` can be set for extras with store-bought option |
 | `recipe_steps` | Steps with `linked_recipe_id` and `alt_instruction` |
 | `meals` | Meal types including `extras` (id=5) |
+| `ingredients` | Include store-bought versions of extras (e.g., 'Pizza Dough' ingredient for store-bought) |
 
-### Two Types of Linking (Don't Confuse!)
+### Two Types of Linking (FR-103 Updated)
 
 | Table | Column | Purpose | Example |
 |-------|--------|---------|---------|
 | `recipe_extras` | `child_recipe_id` | Hierarchy for popup | "Pizza has extras: Dough, Sauce" |
-| `recipe_ingredients` | `linked_recipe_id` | Quantity for macros | "Pizza Light uses 280g of Dough" |
+| `recipe_ingredients` | `linked_recipe_id` | Quantity for macros (homemade) | "Pizza (Light) uses 280g of Dough recipe" |
+| `recipe_ingredients` | `ingredient_id` | Store-bought option | "Pizza Dough (store-bought ingredient)" |
 
-**Both are needed:** `recipe_extras` tells the UI which extras to show in the popup. `recipe_ingredients` with `linked_recipe_id` tells the system how much of each extra is used for macro calculation.
+**All three are needed for FR-103:**
+- `recipe_extras` tells the UI which extras to show in the popup
+- `recipe_ingredients.linked_recipe_id` tells the system how much of each extra is used (homemade path)
+- `recipe_ingredients.ingredient_id` provides the store-bought ingredient (store-bought path)
+
+**Shopping List Behavior:**
+- User selects **Homemade** → Shopping list shows ingredients FROM the linked recipe (flour, yeast, etc.)
+- User selects **Store-bought** → Shopping list shows the store-bought ingredient in its correct aisle (Pizza Dough → Bakery)

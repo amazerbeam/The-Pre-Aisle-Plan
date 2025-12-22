@@ -9,7 +9,10 @@ import java.math.BigDecimal;
 /**
  * Recipe ingredient entity representing either a raw ingredient or a linked recipe.
  * FR-093: Supports linked_recipe_id for sub-recipes (e.g., Pizza Dough in Pizza).
- * Constraint: Either ingredient_id OR linked_recipe_id must be set, not both.
+ * FR-103: BOTH ingredient_id AND linked_recipe_id can be set for extras with store-bought option.
+ *         - ingredient_id only: Raw ingredient (standard case)
+ *         - linked_recipe_id only: Extra, homemade only (no store-bought equivalent)
+ *         - BOTH set: Extra with store-bought option (homemade uses linked recipe, store-bought uses ingredient)
  */
 @Entity
 @Table(name = "recipe_ingredients")
