@@ -1,4 +1,4 @@
-# Recipe Variants Context (Light / Standard / Full)
+# Recipe Variants Context (Light / Moderate / Balanced)
 
 ## Overview
 
@@ -28,8 +28,8 @@ This system is implemented through **Recipe Families** (FR-043).
 | Tier | Protein | Carbs | Calories | When to Use |
 |------|---------|-------|----------|-------------|
 | **Light** | Meat + Veg | None (no rice/potato) | ~450-550 cal | Deficit days, run days |
-| **Standard** | Meat + Veg | Moderate | ~550-650 cal | Normal days |
-| **Full** | Meat + Carbs | Rice/Potato/Naan | ~650-750 cal | High activity, Friday |
+| **Moderate** | Meat + Veg | Moderate | ~550-650 cal | Normal days |
+| **Balanced** | Meat + Carbs | Rice/Potato/Naan | ~650-750 cal | High activity, Friday |
 
 ### Key Rule: Protein Stays Constant
 
@@ -38,13 +38,13 @@ This system is implemented through **Recipe Families** (FR-043).
 ```
 CORRECT:
 ├── Light:    200g chicken + vegetables (no rice)
-├── Standard: 200g chicken + vegetables + light carbs
-└── Full:     200g chicken + vegetables + rice
+├── Moderate: 200g chicken + vegetables + light carbs
+└── Balanced: 200g chicken + vegetables + rice
 
 INCORRECT:
 ├── Light:    Tofu + vegetables ← WRONG (protein dropped)
-├── Standard: Chicken + vegetables
-└── Full:     Chicken + rice
+├── Moderate: Chicken + vegetables
+└── Balanced: Chicken + rice
 ```
 
 ---
@@ -68,18 +68,18 @@ Since user eats 3 meals with no snacks:
 ## How Tiers Are Created
 
 ### Light Version (Lowest Carbs)
-- **Keep:** Full protein portion (same meat/fish as Standard)
+- **Keep:** Full protein portion (same meat/fish as Moderate)
 - **Remove:** All starchy carbs (rice, potato, naan, bread)
 - **Add:** Extra vegetables for volume
 - **Protein must stay ≥45g** — non-negotiable
 
-### Standard Version (Default)
+### Moderate Version (Default)
 - The "normal" version of the recipe
 - Full protein portion
 - Moderate carbs from vegetables
 - Marked as `is_default = TRUE`
 
-### Full Version (With Carbs)
+### Balanced Version (With Carbs)
 - **Keep:** Full protein portion
 - **Add:** Rice (150g cooked) OR potato (150g) OR naan
 - Good for high activity days or Friday
@@ -196,7 +196,7 @@ When creating recipes, verify fat doesn't blow the budget:
 | Butter (1 tbsp) | 12g | 102 cal | 1 tbsp |
 | Full-fat coconut milk (100ml) | 24g | 230 cal | Use LITE instead |
 | Cheese (30g) | 10g | 120 cal | 30g max |
-| Cashews/nuts (30g) | 15g | 170 cal | 15g (Full variant only) |
+| Cashews/nuts (30g) | 15g | 170 cal | 15g (Balanced variant only) |
 | Salmon (150g) | 20g | 312 cal | Counts toward fat budget |
 | Chicken thigh skin-on (150g) | 12g | 195 cal | Account for skin fat |
 
@@ -236,16 +236,16 @@ Diet Plan Check:
 
 ```
 variant_label: "Light"     — No carbs, meat + veg
-variant_label: "Standard"  — Default (is_default = TRUE)
-variant_label: "Full"      — With rice/potato
+variant_label: "Moderate"  — Default (is_default = TRUE)
+variant_label: "Balanced"  — With rice/potato
 ```
 
 The dropdown displays:
 ```
 [Thai Green Curry ▾]
-├── Standard ← (default, shown first)
+├── Moderate ← (default, shown first)
 ├── Light
-└── Full
+└── Balanced
 ```
 
 ---
@@ -268,7 +268,7 @@ The dropdown displays:
 
 ## Creating a Recipe Family
 
-### Step 1: Design Standard Version First
+### Step 1: Design Moderate Version First
 - Full protein (200g meat/fish per person)
 - Balanced vegetables
 - Moderate fat (≤21g per serving)
@@ -277,23 +277,23 @@ The dropdown displays:
 ### Step 2: Create Light Version
 Remove carbs, keep everything else:
 ```
-Standard: Chicken Curry + Rice = 650 cal | 50g P | 18g F
+Moderate: Chicken Curry + Rice = 650 cal | 50g P | 18g F
 Light:    Chicken Curry (no rice) = 450 cal | 50g P | 18g F
           Reduction: -200 cal (removed rice)
           Protein: UNCHANGED ✓
 ```
 
-### Step 3: Create Full Version (if needed)
-Add carbs to Standard:
+### Step 3: Create Balanced Version (if needed)
+Add carbs to Moderate:
 ```
-Standard: Chicken Curry = 450 cal | 50g P | 18g F
-Full:     Chicken Curry + Rice + Naan = 750 cal | 52g P | 22g F
+Moderate: Chicken Curry = 450 cal | 50g P | 18g F
+Balanced: Chicken Curry + Rice + Naan = 750 cal | 52g P | 22g F
           Addition: +300 cal (rice + naan)
 ```
 
 ### Step 4: Verify All Variants
 
-| Check | Light | Standard | Full |
+| Check | Light | Moderate | Balanced |
 |-------|-------|----------|------|
 | Protein ≥45g | ✓ | ✓ | ✓ |
 | Fat ≤25g | ✓ | ✓ | ✓ |
@@ -306,13 +306,13 @@ Full:     Chicken Curry + Rice + Naan = 750 cal | 52g P | 22g F
 ```sql
 -- Recipe Family
 INSERT INTO recipe_families (id, family_name, description) VALUES
-(X, 'Thai Green Curry', 'Aromatic Thai curry - Light no rice, Standard default, Full with rice');
+(X, 'Thai Green Curry', 'Aromatic Thai curry - Light no rice, Moderate default, Balanced with rice');
 
--- Link variants (Standard is default)
+-- Link variants (Moderate is default)
 INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_label, display_order) VALUES
-(X, [standard_id], TRUE, 'Standard', 1),
+(X, [moderate_id], TRUE, 'Moderate', 1),
 (X, [light_id], FALSE, 'Light', 2),
-(X, [full_id], FALSE, 'Full', 3);
+(X, [balanced_id], FALSE, 'Balanced', 3);
 ```
 
 ---
@@ -322,8 +322,8 @@ INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_lab
 | Variant | Chicken | Rice | Cal | Protein | Fat |
 |---------|---------|------|-----|---------|-----|
 | **Light** | 200g pp | None | 395 | 47g | 10g |
-| **Standard** | 200g pp | 75g | 590 | 51g | 10g |
-| **Full** | 200g pp | 100g + cashews | 720 | 54g | 17g |
+| **Moderate** | 200g pp | 75g | 590 | 51g | 10g |
+| **Balanced** | 200g pp | 100g + cashews | 720 | 54g | 17g |
 
 All variants: Same chicken, same sauce. Only carbs change.
 
@@ -360,8 +360,8 @@ All variants: Same chicken, same sauce. Only carbs change.
 ```
 VARIANT RULES:
 ├── Light:    Meat + Veg, NO carbs (~500 cal, 50g P)
-├── Standard: Meat + Veg, moderate (~600 cal, 50g P)  [DEFAULT]
-└── Full:     Meat + Carbs (rice/potato) (~700 cal, 50g P)
+├── Moderate: Meat + Veg, moderate (~600 cal, 50g P)  [DEFAULT]
+└── Balanced: Meat + Carbs (rice/potato) (~700 cal, 50g P)
 
 PER MEAL LIMITS:
 ├── Calories: ~550-650 (flexible)

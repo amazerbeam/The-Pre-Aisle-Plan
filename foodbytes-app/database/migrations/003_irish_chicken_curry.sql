@@ -185,6 +185,6 @@ INSERT INTO recipe_families (id, family_name, description) VALUES
 (3, 'Irish Chicken Curry', 'Sweet and mild chicken curry with banana, warm spices, roasted sweet potato, and peas. Served over rice.');
 
 INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_label, display_order) VALUES
-(3, 8, TRUE, 'Standard', 1),
+(3, 8, TRUE, 'Moderate', 1),
 (3, 7, FALSE, 'Light', 2),
-(3, 9, FALSE, 'Full', 3);
+(3, 9, FALSE, 'Balanced', 3);

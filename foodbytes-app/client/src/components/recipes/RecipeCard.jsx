@@ -48,7 +48,7 @@ function RecipeCard({ recipe, currentMealType, onSelectVariant, onEdit }) {
   // FR-043: Check if recipe has variants
   const hasVariants = recipe.variants && recipe.variants.length >= 2
 
-  // FR-043: Sort variants by display order (Standard first, then Light, then Full)
+  // FR-043: Sort variants by display order (Moderate first, then Light, then Balanced)
   const sortedVariants = useMemo(() => {
     if (!hasVariants) return []
     return [...recipe.variants].sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0))
@@ -119,7 +119,7 @@ function RecipeCard({ recipe, currentMealType, onSelectVariant, onEdit }) {
                     role="option"
                     aria-selected={variant.recipeId === selectedVariantId}
                   >
-                    <span className="variant-name">{variant.variantLabel || 'Standard'}</span>
+                    <span className="variant-name">{variant.variantLabel || 'Moderate'}</span>
                     <span className="variant-calories">{variant.caloriesPerServing} cal</span>
                   </li>
                 ))}
@@ -134,7 +134,7 @@ function RecipeCard({ recipe, currentMealType, onSelectVariant, onEdit }) {
 
         {/* Variant label in center */}
         <span className="variant-badge">
-          {recipe.variantLabel || 'Standard'}
+          {recipe.variantLabel || 'Moderate'}
         </span>
 
         {/* Servings pill with +/- buttons */}

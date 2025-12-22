@@ -72,7 +72,8 @@
       "Bash(docker info:*)",
       "Bash(cmd //c \"start \"\" \"C:Program FilesDockerDockerDocker Desktop.exe\"\")",
       "Bash(start \"\" \"C:\\\\Program Files\\\\Docker\\\\Docker\\\\Docker Desktop.exe\")",
-      "Bash(start chrome:*)"
+      "Bash(start chrome:*)",
+      "Bash(curl.exe:*)"
     ],
     "deny": [],
     "ask": []

@@ -87,6 +87,6 @@ INSERT INTO recipe_families (id, family_name, description) VALUES
 
 -- Link recipes to family
 INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_label, display_order) VALUES
-(2, 5, TRUE, 'Standard', 1),   -- Standard is default
+(2, 5, TRUE, 'Moderate', 1),   -- Moderate is default
 (2, 4, FALSE, 'Light', 2),
-(2, 6, FALSE, 'Full', 3);
+(2, 6, FALSE, 'Balanced', 3);

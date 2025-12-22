@@ -234,7 +234,7 @@ function RecipeViewModal({
                           role="option"
                           aria-selected={variant.recipeId === selectedVariantId}
                         >
-                          <span className="variant-name">{variant.variantLabel || 'Standard'}</span>
+                          <span className="variant-name">{variant.variantLabel || 'Moderate'}</span>
                           <span className="variant-calories">{variant.caloriesPerServing} cal</span>
                         </li>
                       ))}

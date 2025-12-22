@@ -372,7 +372,7 @@
 - Each recipe family has ONE recipe marked as the "default" (Standard version)
 - **Cheat meals (is_cheat = TRUE) are excluded** — no variants for treats
 - Dropdown appears next to recipe name ONLY if the recipe has linked variants
-- Dropdown lists variants using **standard labels: "Light", "Standard", "Full"**
+- Dropdown lists variants using **standard labels: "Light", "Moderate", "Balanced"**
 - Standard (default) recipe appears first in dropdown
 - Selecting a variant from dropdown:
   - Replaces current recipe card with selected variant
@@ -386,14 +386,14 @@
 | Tier | Target Calories | When To Choose |
 |------|-----------------|----------------|
 | **Light** | ~400-500 cal | Big breakfast/lunch, calorie-saving day |
-| **Standard** | ~550-700 cal | Normal day (default) |
-| **Full** | ~750-900 cal | Light earlier meals, training day |
+| **Moderate** | ~550-700 cal | Normal day (default) |
+| **Balanced** | ~750-900 cal | Light earlier meals, training day |
 
 **Example Use Case:**
 **Recipe Family:** "Chicken Curry"
 - **Light:** Chicken Curry (no rice) — 550 cal
-- **Standard:** Chicken Curry + Rice — 700 cal (Default)
-- **Full:** Chicken Curry + Rice + Naan — 850 cal
+- **Moderate:** Chicken Curry + Rice — 700 cal (Default)
+- **Balanced:** Chicken Curry + Rice + Naan — 850 cal
 
 User's day: Big breakfast (500 cal) → sees "Chicken Curry" with dropdown → selects "Light" → gets curry without rice (550 cal) → stays within daily budget
 
@@ -417,8 +417,8 @@ CREATE TABLE recipe_family_members (
     family_id BIGINT NOT NULL,
     recipe_id BIGINT NOT NULL,
     is_default BOOLEAN DEFAULT FALSE,
-    variant_label VARCHAR(100) NULL,  -- MUST be: "Light", "Standard", or "Full"
-    display_order INT DEFAULT 0,      -- Order: Standard (1), Light (2), Full (3)
+    variant_label VARCHAR(100) NULL,  -- MUST be: "Light", "Moderate", or "Balanced"
+    display_order INT DEFAULT 0,      -- Order: Moderate (1), Light (2), Balanced (3)
     CONSTRAINT fk_family FOREIGN KEY (family_id) REFERENCES recipe_families(id) ON DELETE CASCADE,
     CONSTRAINT fk_recipe FOREIGN KEY (recipe_id) REFERENCES recipes(id) ON DELETE CASCADE,
     UNIQUE KEY unique_recipe_in_family (family_id, recipe_id),
@@ -431,11 +431,11 @@ CREATE TABLE recipe_family_members (
 
 **DO:**
 - Show dropdown ONLY if recipe has linked variants (check `recipe_family_members` table)
-- Display Standard (default) recipe first in dropdown
-- Use ONLY these variant labels: **"Light", "Standard", "Full"**
+- Display Moderate (default) recipe first in dropdown
+- Use ONLY these variant labels: **"Light", "Moderate", "Balanced"**
 - **Exclude cheat meals** — recipes with `is_cheat = TRUE` cannot be added to families
 - Allow admin to create families and link recipes via admin panel
-- Validate that each family has exactly one default recipe (Standard)
+- Validate that each family has exactly one default recipe (Moderate)
 - When switching variants, carry over current servings value
 - Show family indicator badge (e.g., "3 variants" or link icon) on recipe cards
 - Log variant switches in analytics (optional - track popular variants)
@@ -446,7 +446,7 @@ CREATE TABLE recipe_family_members (
 - Do NOT allow multiple default recipes in same family (validation error)
 - Do NOT allow a recipe to belong to multiple families (1 recipe = 1 family maximum)
 - Do NOT add cheat meals to recipe families (is_cheat = TRUE recipes are excluded)
-- Do NOT use variant labels other than "Light", "Standard", "Full"
+- Do NOT use variant labels other than "Light", "Moderate", "Balanced"
 - Do NOT automatically switch variants when navigating between views (preserve user selection)
 - Do NOT show non-default variant recipes as separate cards in browse/list views (only default variant shows as card, others appear only in dropdown)
 - Do NOT merge recipe IDs (each variant is a distinct recipe with its own ID, ingredients, steps)
