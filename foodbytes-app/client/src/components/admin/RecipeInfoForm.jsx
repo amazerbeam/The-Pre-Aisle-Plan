@@ -3,7 +3,7 @@ import './RecipeInfoForm.css'
 
 /**
  * Form for editing recipe basic info (FR-033).
- * Fields: name, default servings, calories, meal types, cheat flag, visibility.
+ * Fields: name, default servings, calories, meal types, cheat flag, extra flag, visibility.
  */
 function RecipeInfoForm({ recipe, isNew, onSave, onCancel, setHasUnsavedChanges }) {
   const [name, setName] = useState('')
@@ -11,6 +11,7 @@ function RecipeInfoForm({ recipe, isNew, onSave, onCancel, setHasUnsavedChanges 
   const [calories, setCalories] = useState(0)
   const [mealTypes, setMealTypes] = useState([])
   const [isCheat, setIsCheat] = useState(false)
+  const [isExtra, setIsExtra] = useState(false)
   const [isLive, setIsLive] = useState(false)
   const [errors, setErrors] = useState({})
   const [saving, setSaving] = useState(false)
@@ -19,7 +20,8 @@ function RecipeInfoForm({ recipe, isNew, onSave, onCancel, setHasUnsavedChanges 
     { key: 'breakfast', label: 'Breakfast' },
     { key: 'lunch', label: 'Lunch' },
     { key: 'dinner', label: 'Dinner' },
-    { key: 'snacks', label: 'Snacks' }
+    { key: 'snacks', label: 'Snacks' },
+    { key: 'extras', label: 'Extras' }
   ]
 
   // Initialize form with recipe data
@@ -30,6 +32,7 @@ function RecipeInfoForm({ recipe, isNew, onSave, onCancel, setHasUnsavedChanges 
       setCalories(recipe.calories || 0)
       setMealTypes(recipe.mealTypes || [])
       setIsCheat(recipe.isCheat || false)
+      setIsExtra(recipe.isExtra || false)
       setIsLive(recipe.isLive || false)
     }
   }, [recipe])
@@ -42,10 +45,11 @@ function RecipeInfoForm({ recipe, isNew, onSave, onCancel, setHasUnsavedChanges 
       calories !== (recipe?.calories || 0) ||
       JSON.stringify(mealTypes.sort()) !== JSON.stringify((recipe?.mealTypes || []).sort()) ||
       isCheat !== (recipe?.isCheat || false) ||
+      isExtra !== (recipe?.isExtra || false) ||
       isLive !== (recipe?.isLive || false)
 
     setHasUnsavedChanges(hasChanges)
-  }, [name, defaultServings, calories, mealTypes, isCheat, isLive, recipe, setHasUnsavedChanges])
+  }, [name, defaultServings, calories, mealTypes, isCheat, isExtra, isLive, recipe, setHasUnsavedChanges])
 
   // Handle meal type toggle
   const handleMealTypeChange = (mealKey) => {
@@ -92,6 +96,7 @@ function RecipeInfoForm({ recipe, isNew, onSave, onCancel, setHasUnsavedChanges 
         calories,
         mealTypes,
         isCheat,
+        isExtra,
         isLive: isNew ? false : isLive // FR-047: New recipes can't be live
       })
     } finally {
@@ -177,6 +182,19 @@ function RecipeInfoForm({ recipe, isNew, onSave, onCancel, setHasUnsavedChanges 
           <span>Cheat Meal</span>
         </label>
         <p className="help-text">Cheat meals are limited to one per meal type per week.</p>
+      </div>
+
+      {/* Extra */}
+      <div className="form-group">
+        <label className="checkbox-label">
+          <input
+            type="checkbox"
+            checked={isExtra}
+            onChange={(e) => setIsExtra(e.target.checked)}
+          />
+          <span>Extra</span>
+        </label>
+        <p className="help-text">Extra items are add-ons that complement main meals.</p>
       </div>
 
       {/* Visibility - only for existing recipes */}

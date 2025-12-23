@@ -452,7 +452,7 @@ INSERT INTO ingredients (id, `key`, name, aisle_id, protein_per_100g, carbs_per_
 
 -- Recipe 10: Pesto (Extras) - ~895 cal total, makes ~165g
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
-(10, 'Pesto', 11, 895, FALSE, TRUE);
+(10, 'Pesto', 10, 895, FALSE, TRUE);
 
 INSERT INTO recipe_meals (recipe_id, meal_id) VALUES (10, 5);  -- 5 = extras
 
@@ -498,7 +498,7 @@ INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id,
 
 -- Recipe 12: Pizza Sauce (Extras) - ~246 cal total, makes ~440g
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
-(12, 'Pizza Sauce', 7, 246, FALSE, TRUE);
+(12, 'Pizza Sauce', 8, 246, FALSE, TRUE);
 
 INSERT INTO recipe_meals (recipe_id, meal_id) VALUES (12, 5);  -- 5 = extras
 
@@ -806,7 +806,7 @@ INSERT INTO ingredients (id, `key`, name, aisle_id, protein_per_100g, carbs_per_
 
 -- Recipe 19: Flatbread - ~1368 cal total, makes ~486g (5-6 wraps)
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
-(19, 'Flatbread', 5, 1368, FALSE, TRUE);
+(19, 'Flatbread', 6, 1368, FALSE, TRUE);
 
 INSERT INTO recipe_meals (recipe_id, meal_id) VALUES (19, 5);  -- 5 = extras
 
@@ -2419,3 +2419,174 @@ INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id,
 (56, 8, 'Coat the balls: Set up breading station - beaten eggs in one bowl, 100g breadcrumbs in another.', NULL, NULL),
 (56, 9, 'Dip each ball in egg wash, then roll in breadcrumbs until fully coated.', NULL, NULL),
 (56, 10, 'Bake at 190C for 25-30 minutes until golden and cooked through (internal temp 74C).', NULL, NULL);
+
+-- =============================================
+-- BRIOCHE BUNS (Extras Recipe)
+-- Recipe 57: ~3068 cal total for 12 buns (~256 cal per bun)
+-- Macros per bun: 7g protein, 29g carbs, 12g fat
+-- =============================================
+
+-- New Ingredient for Brioche Buns
+INSERT INTO ingredients (id, `key`, name, aisle_id, protein_per_100g, carbs_per_100g, fat_per_100g, macros_verified) VALUES
+(81, 'sesame_seeds', 'Sesame seeds', 6, 17.00, 23.00, 50.00, TRUE);
+
+-- Recipe: Brioche Buns
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+(60, 'Brioche Buns', 12, 3068, FALSE, TRUE);
+
+-- Assign to 'extras' meal type (meal_id = 5)
+INSERT INTO recipe_meals (recipe_id, meal_id) VALUES (60, 5);
+
+-- =============================================
+-- BRIOCHE BUNS INGREDIENTS
+-- =============================================
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
+(60, 32, NULL, 400, 1, 400.00, 1),     -- Bread flour, 400g
+(60, 53, NULL, 140, 1, 140.00, 2),     -- Salted butter, 140g
+(60, 36, NULL, 50, 1, 50.00, 3),       -- Sugar, 50g
+(60, 2, NULL, 134, 2, 134.00, 4),      -- Low fat milk, 134ml
+(60, 59, NULL, 3, 5, 200.00, 5),       -- Eggs, 3 (200g including yolks for dough + wash)
+(60, 5, NULL, 1.5, 3, 9.00, 6),        -- Salt, 1.5 tsp (9g)
+(60, 31, NULL, 1.25, 3, 4.00, 7),      -- Dry yeast, 1.25 tsp (4g)
+(60, 81, NULL, 20, 1, 20.00, 8);       -- Sesame seeds, 20g
+
+-- =============================================
+-- BRIOCHE BUNS STEPS (Hand-Kneading Method)
+-- =============================================
+INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
+(60, 1, 'Warm 134ml milk until lukewarm (37°C). Sprinkle yeast over milk and let bloom for 5-10 minutes until frothy.', NULL, NULL),
+(60, 2, 'In a large bowl, whisk together 400g bread flour, 50g sugar, and 1½ tsp salt.', NULL, NULL),
+(60, 3, 'Make a well in the centre. Add 2 whole eggs and 2 egg yolks, then pour in the yeast mixture. Stir with a wooden spoon until a shaggy dough forms.', NULL, NULL),
+(60, 4, 'Turn dough onto a clean work surface (do not flour). Knead for 10-12 minutes using the slap-and-fold technique: stretch dough away from you, fold it back, slap it down, rotate 90°. Dough will be sticky at first but will become smooth and elastic.', NULL, NULL),
+(60, 5, 'Cut 140g softened butter into small cubes. With dough still on the surface, add butter a few pieces at a time, squeezing and kneading to incorporate. This takes 8-10 minutes. The dough will become slippery — keep working until butter is fully absorbed and dough is smooth, shiny, and passes the windowpane test.', NULL, NULL),
+(60, 6, 'Form dough into a ball and place in a lightly oiled bowl. Cover with cling film and leave at room temperature for 1.5-2 hours until doubled. Alternatively, refrigerate overnight for better flavour.', NULL, NULL),
+(60, 7, 'Punch down dough and turn onto a lightly floured surface. Divide into 12 equal pieces (approximately 70g each). Roll each piece into a tight ball by cupping your hand over it and moving in circular motions on an unfloured surface.', NULL, NULL),
+(60, 8, 'Place buns on a lined baking tray with 3cm spacing. Cover loosely with cling film and leave for 45 minutes to 1 hour until puffed and nearly doubled.', NULL, NULL),
+(60, 9, 'Preheat oven to 180°C (fan). Beat remaining egg with a pinch of salt. Gently brush each bun with egg wash, then sprinkle with sesame seeds.', NULL, NULL),
+(60, 10, 'Bake for 15-18 minutes until deep golden brown (internal temp 88-90°C). Cool on a wire rack for 10 minutes before serving.', NULL, NULL);
+
+-- =============================================
+-- RECIPE 62: MAYONNAISE (Hellmann's-Style)
+-- Extras recipe - homemade from-scratch mayo
+-- Immersion blender method (foolproof, 2 minutes)
+-- Total yield: ~300g (10 servings of 30g)
+-- Total macros: 7g protein, 2g carbs, 225g fat
+-- Calories: ~2055 total (~206 cal per serving)
+-- =============================================
+
+-- New Ingredients for Mayonnaise
+INSERT INTO ingredients (id, `key`, name, aisle_id, protein_per_100g, carbs_per_100g, fat_per_100g, macros_verified) VALUES
+(84, 'sunflower_oil', 'Sunflower Oil', 9, 0.00, 0.00, 100.00, TRUE),
+(85, 'white_wine_vinegar', 'White Wine Vinegar', 9, 0.00, 0.00, 0.00, TRUE),
+(86, 'dijon_mustard', 'Dijon Mustard', 12, 4.00, 4.00, 4.00, TRUE),
+(87, 'mayonnaise_store', 'Mayonnaise', 12, 1.00, 1.00, 79.00, TRUE),
+(88, 'lemon', 'Lemon', 1, 1.10, 9.30, 0.30, TRUE);
+
+-- Recipe: Mayonnaise
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+(62, 'Mayonnaise', 10, 2055, FALSE, TRUE);
+
+-- Assign to 'extras' meal type (meal_id = 5)
+INSERT INTO recipe_meals (recipe_id, meal_id) VALUES (62, 5);
+
+-- =============================================
+-- MAYONNAISE INGREDIENTS
+-- Uses whole egg (works better with immersion blender)
+-- =============================================
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
+(62, 59, NULL, 1, 7, 50.00, 1),      -- Egg, 1 whole (50g)
+(62, 84, NULL, 240, 2, 220.00, 2),   -- Sunflower oil, 240ml (220g)
+(62, 85, NULL, 1, 4, 15.00, 3),      -- White wine vinegar, 1 tbsp (15g)
+(62, 88, NULL, 0.25, 7, 15.00, 4),   -- Lemon, 1/4 (juiced, ~15g fruit)
+(62, 86, NULL, 1, 3, 5.00, 5),       -- Dijon mustard, 1 tsp (5g)
+(62, 5, NULL, 0.5, 3, 3.00, 6),      -- Salt, 0.5 tsp (3g)
+(62, 36, NULL, 0.25, 3, 1.00, 7);    -- Sugar, 0.25 tsp (1g)
+
+-- =============================================
+-- MAYONNAISE STEPS (Immersion Blender Method)
+-- =============================================
+INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
+(62, 1, 'Get a tall, narrow container — the cup that came with your immersion blender or a wide-mouth mason jar works perfectly. The container should be just slightly wider than the blender head.', NULL, NULL),
+(62, 2, 'Crack the egg into the bottom of the container. Add Dijon mustard, salt, sugar, white wine vinegar, and lemon juice directly on top of the egg.', NULL, NULL),
+(62, 3, 'Pour 240ml sunflower oil on top. Don''t stir — let it sit in layers with the egg mixture at the bottom and oil floating on top.', NULL, NULL),
+(62, 4, 'Place the immersion blender at the very bottom of the container, making sure the blade is touching the egg. Press down firmly to create a seal.', NULL, NULL),
+(62, 5, 'Turn the blender on high and hold it at the bottom without moving for 10-15 seconds. You''ll see mayo start to form at the bottom, pushing the oil up.', NULL, NULL),
+(62, 6, 'Slowly — very slowly — lift the blender upward through the remaining oil. The mayo will emulsify as you go. Once you reach the top, you can move the blender up and down to incorporate any remaining oil. Total time: about 60 seconds.', NULL, NULL),
+(62, 7, 'Taste and adjust salt if needed. Transfer to a clean jar. Refrigerate immediately and use within 1 week.', NULL, NULL);
+
+-- =============================================
+-- RECIPE 63: HOMEMADE BIG MAC + AIR FRIED CHIPS
+-- Links to: Brioche Buns (60), Burger Patties (43), Mayonnaise (62)
+-- Serves 2 (1 burger + chips per person)
+-- Total: ~3,290 cal (~1,645 per serving)
+-- =============================================
+
+-- New Ingredients for Big Mac
+INSERT INTO ingredients (id, `key`, name, aisle_id, protein_per_100g, carbs_per_100g, fat_per_100g, macros_verified) VALUES
+(89, 'iceberg_lettuce', 'Iceberg Lettuce', 1, 0.90, 3.00, 0.10, TRUE),
+(90, 'cheddar', 'Cheddar Cheese', 8, 25.00, 1.30, 33.00, TRUE),
+(91, 'gherkins', 'Gherkins', 12, 0.50, 2.00, 0.20, TRUE),
+-- NOTE: onion_powder already exists at ID 64, no duplicate needed
+(93, 'garlic_powder', 'Garlic Powder', 6, 17.00, 73.00, 0.70, TRUE),
+(94, 'mustard_seeds', 'Mustard Seeds', 6, 26.00, 28.00, 36.00, TRUE),
+(95, 'brioche_buns_store', 'Brioche Burger Buns', 13, 8.00, 45.00, 12.00, TRUE),
+(96, 'burger_patties_store', 'Beef Burger Patties', 7, 17.00, 0.00, 20.00, TRUE);
+
+-- Recipe: Homemade Big Mac
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+(63, 'Homemade Big Mac', 2, 2850, FALSE, TRUE);
+
+-- Assign to dinner (meal_id = 3)
+INSERT INTO recipe_meals (recipe_id, meal_id) VALUES (63, 3);
+
+-- Link extras (for homemade/store-bought popup)
+INSERT INTO recipe_extras (parent_recipe_id, child_recipe_id, display_order) VALUES
+(63, 60, 0),  -- Brioche Buns
+(63, 43, 1),  -- Burger Patties
+(63, 62, 2);  -- Mayonnaise
+
+-- =============================================
+-- BIG MAC INGREDIENTS
+-- =============================================
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
+-- Linked extras (both ingredient_id AND linked_recipe_id per FR-103)
+(63, 95, 60, 4, 7, 280.00, 1),      -- Brioche Buns (store=95, homemade=60), 4 buns
+(63, 96, 43, 4, 7, 227.00, 2),      -- Burger Patties (4 x 56.7g = 227g, 1/8 lb each)
+(63, 87, 62, 120, 1, 120.00, 3),    -- Mayonnaise (store=87, homemade=62), 120g
+
+-- Quick pickle relish ingredients
+(63, 91, NULL, 40, 1, 40.00, 4),    -- Gherkins (for relish), 40g
+(63, 85, NULL, 1, 3, 5.00, 5),      -- White wine vinegar, 1 tsp
+(63, 36, NULL, 1, 3, 4.00, 6),      -- Sugar, 1 tsp
+(63, 94, NULL, 0.25, 3, 1.00, 7),   -- Mustard seeds, 1/4 tsp
+(63, 5, NULL, 0.25, 3, 1.50, 8),    -- Salt (for relish), 1/4 tsp
+
+-- Rest of Big Mac sauce
+(63, 86, NULL, 20, 1, 20.00, 9),    -- Dijon mustard, 20g
+(63, 64, NULL, 1, 3, 2.00, 10),     -- Onion powder (ID 64), 1 tsp
+(63, 93, NULL, 1, 3, 3.00, 11),     -- Garlic powder, 1 tsp
+
+-- Burger toppings
+(63, 90, NULL, 80, 1, 80.00, 12),   -- Cheddar cheese, 80g
+(63, 89, NULL, 0.5, 7, 60.00, 13),  -- Iceberg lettuce, 1/2 head (60g)
+(63, 12, NULL, 0.5, 7, 55.00, 14),  -- Onion, 1/2 medium (55g)
+(63, 91, NULL, 30, 1, 30.00, 15),   -- Gherkins (for topping), 30g
+
+-- Side: Air fried chips
+(63, 69, NULL, 400, 1, 400.00, 16); -- Potatoes, 400g
+
+-- =============================================
+-- BIG MAC STEPS
+-- =============================================
+INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
+(63, 1, 'Air fry chips: Cut 400g potatoes into chips. Toss with 1 tbsp oil and salt. Air fry at 200°C for 20-25 minutes, shaking halfway through.', NULL, NULL),
+(63, 2, 'Make quick pickle relish: Finely dice 40g gherkins. Mix with 1 tsp white wine vinegar, 1 tsp sugar, ¼ tsp mustard seeds, ¼ tsp salt. Set aside 5-10 minutes.', NULL, NULL),
+(63, 3, 'Make Big Mac sauce: Combine 120g mayo, the pickle relish, 20g Dijon mustard, 1 tsp onion powder, 1 tsp garlic powder. Mix well and refrigerate.', 62, 'Make Big Mac sauce: Combine 120g store-bought mayo, the pickle relish, 20g Dijon mustard, 1 tsp onion powder, 1 tsp garlic powder. Mix well and refrigerate.'),
+(63, 4, 'Prepare the buns: For each burger, use 2 buns. From bun 1, use the bottom as-is. From bun 2, slice the bottom horizontally to make the middle club + top. Save top domes for breadcrumbs or snacking.', 60, 'Prepare the buns: For each burger, use 2 store-bought brioche buns. From bun 1, use the bottom as-is. From bun 2, slice the bottom horizontally to make the middle club + top.'),
+(63, 5, 'Toast buns: Toast all cut sides in a dry pan over medium heat until golden, about 1-2 minutes.', NULL, NULL),
+(63, 6, 'Prepare toppings: Finely dice the onion, shred lettuce into thin strips, slice 30g gherkins for topping.', NULL, NULL),
+(63, 7, 'Cook patties: Follow linked Burger Patties recipe or form 4 thin 1/8-pound patties (56.7g each). Season with salt and pepper. High heat, 2-3 min first side. Flip, immediately add ~20g cheddar to each patty, cook 2-3 min more until cheese melts.', 43, 'Cook patties: Season 4 store-bought 1/8-pound beef patties with salt and pepper. High heat, 2-3 min first side. Flip, immediately add ~20g cheddar to each patty, cook 2-3 min more until cheese melts.'),
+(63, 8, 'Assemble bottom half: Bottom bun → sauce → lettuce → onion → cheesy patty.', NULL, NULL),
+(63, 9, 'Add middle and top: Middle bun (club) → sauce → lettuce → onion → gherkins → cheesy patty → top bun.', NULL, NULL),
+(63, 10, 'Serve immediately with air fried chips.', NULL, NULL),
+(63, 11, 'LAYER ORDER (bottom to top): Bottom bun | Sauce | Lettuce | Onion | Patty+Cheese | Middle bun | Sauce | Lettuce | Onion | Gherkins | Patty+Cheese | Top bun', NULL, NULL);
