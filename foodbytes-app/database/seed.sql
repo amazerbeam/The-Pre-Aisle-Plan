@@ -2756,13 +2756,13 @@ INSERT INTO recipe_families (id, family_name, description) VALUES
 (18, 'Miso Glazed Salmon', 'Japanese-style salmon with sweet-savoury miso glaze');
 
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
-(66, 'Miso Glazed Salmon', 2, 780, FALSE, TRUE),
-(67, 'Miso Glazed Salmon', 2, 876, FALSE, TRUE),
-(68, 'Miso Glazed Salmon', 2, 1084, FALSE, TRUE);
+(66, 'Miso Glazed Salmon', 2, 1040, FALSE, TRUE),
+(67, 'Miso Glazed Salmon', 2, 1266, FALSE, TRUE),
+(68, 'Miso Glazed Salmon', 2, 1565, FALSE, TRUE);
 
 INSERT INTO recipe_meals (recipe_id, meal_id) VALUES (66, 3), (67, 3), (68, 3);
 
--- Miso Glazed Salmon (Light) - 120g salmon per person
+-- Miso Glazed Salmon (Light) - 120g salmon per person + 75g rice
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
 (66, 109, NULL, 240, 1, 240.00, 1),    -- Salmon fillet, 240g (2×120g)
 (66, 110, NULL, 2, 4, 36.00, 2),       -- White miso, 2 tbsp (36g)
@@ -2770,9 +2770,10 @@ INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quan
 (66, 112, NULL, 1, 4, 15.00, 4),       -- Sake, 1 tbsp (15g)
 (66, 4, NULL, 1, 4, 21.00, 5),         -- Honey, 1 tbsp (21g)
 (66, 25, NULL, 1, 3, 6.00, 6),         -- Soy sauce, 1 tsp (6g)
-(66, 57, NULL, 200, 1, 200.00, 7);     -- Pak choi, 200g
+(66, 57, NULL, 200, 1, 200.00, 7),     -- Pak choi, 200g
+(66, 26, NULL, 150, 1, 150.00, 8);     -- Jasmine rice, 150g (cooked)
 
--- Miso Glazed Salmon (Moderate) - 150g salmon per person
+-- Miso Glazed Salmon (Moderate) - 150g salmon per person + 100g rice
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
 (67, 109, NULL, 300, 1, 300.00, 1),    -- Salmon fillet, 300g (2×150g)
 (67, 110, NULL, 2, 4, 36.00, 2),       -- White miso, 2 tbsp (36g)
@@ -2780,9 +2781,10 @@ INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quan
 (67, 112, NULL, 1, 4, 15.00, 4),       -- Sake, 1 tbsp (15g)
 (67, 4, NULL, 1, 4, 21.00, 5),         -- Honey, 1 tbsp (21g)
 (67, 25, NULL, 1, 3, 6.00, 6),         -- Soy sauce, 1 tsp (6g)
-(67, 57, NULL, 200, 1, 200.00, 7);     -- Pak choi, 200g
+(67, 57, NULL, 200, 1, 200.00, 7),     -- Pak choi, 200g
+(67, 26, NULL, 200, 1, 200.00, 8);     -- Jasmine rice, 200g (cooked)
 
--- Miso Glazed Salmon (Balanced) - 200g salmon per person
+-- Miso Glazed Salmon (Balanced) - 200g salmon per person + 150g rice
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
 (68, 109, NULL, 400, 1, 400.00, 1),    -- Salmon fillet, 400g (2×200g)
 (68, 110, NULL, 2, 4, 36.00, 2),       -- White miso, 2 tbsp (36g)
@@ -2790,35 +2792,39 @@ INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quan
 (68, 112, NULL, 1, 4, 15.00, 4),       -- Sake, 1 tbsp (15g)
 (68, 4, NULL, 1, 4, 21.00, 5),         -- Honey, 1 tbsp (21g)
 (68, 25, NULL, 1, 3, 6.00, 6),         -- Soy sauce, 1 tsp (6g)
-(68, 57, NULL, 200, 1, 200.00, 7);     -- Pak choi, 200g
+(68, 57, NULL, 200, 1, 200.00, 7),     -- Pak choi, 200g
+(68, 26, NULL, 300, 1, 300.00, 8);     -- Jasmine rice, 300g (cooked)
 
 -- Miso Glazed Salmon Steps (shared across variants)
 INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
-(66, 1, 'Mix white miso, mirin, sake, honey, and soy sauce in a bowl until smooth.', NULL, NULL),
-(66, 2, 'Place salmon fillets in a dish and coat with half the marinade. Marinate 10 minutes (or up to overnight in fridge).', NULL, NULL),
-(66, 3, 'Preheat grill/broiler to high. Line a baking tray with foil.', NULL, NULL),
-(66, 4, 'Place salmon skin-side down on tray. Brush with remaining marinade.', NULL, NULL),
-(66, 5, 'Grill 8-10 minutes until glaze is caramelized and fish flakes easily. Watch carefully to prevent burning.', NULL, NULL),
-(66, 6, 'Meanwhile, steam or stir-fry pak choi until just wilted, about 2-3 minutes.', NULL, NULL),
-(66, 7, 'Serve salmon on pak choi, spooning any pan juices over the top.', NULL, NULL);
+(66, 1, 'Cook jasmine rice according to packet instructions. Keep warm.', NULL, NULL),
+(66, 2, 'Mix white miso, mirin, sake, honey, and soy sauce in a bowl until smooth.', NULL, NULL),
+(66, 3, 'Place salmon fillets in a dish and coat with half the marinade. Marinate 10 minutes (or up to overnight in fridge).', NULL, NULL),
+(66, 4, 'Preheat grill/broiler to high. Line a baking tray with foil.', NULL, NULL),
+(66, 5, 'Place salmon skin-side down on tray. Brush with remaining marinade.', NULL, NULL),
+(66, 6, 'Grill 8-10 minutes until glaze is caramelized and fish flakes easily. Watch carefully to prevent burning.', NULL, NULL),
+(66, 7, 'Meanwhile, steam or stir-fry pak choi until just wilted, about 2-3 minutes.', NULL, NULL),
+(66, 8, 'Serve salmon on rice with pak choi, spooning any pan juices over the top.', NULL, NULL);
 
 INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
-(67, 1, 'Mix white miso, mirin, sake, honey, and soy sauce in a bowl until smooth.', NULL, NULL),
-(67, 2, 'Place salmon fillets in a dish and coat with half the marinade. Marinate 10 minutes (or up to overnight in fridge).', NULL, NULL),
-(67, 3, 'Preheat grill/broiler to high. Line a baking tray with foil.', NULL, NULL),
-(67, 4, 'Place salmon skin-side down on tray. Brush with remaining marinade.', NULL, NULL),
-(67, 5, 'Grill 8-10 minutes until glaze is caramelized and fish flakes easily. Watch carefully to prevent burning.', NULL, NULL),
-(67, 6, 'Meanwhile, steam or stir-fry pak choi until just wilted, about 2-3 minutes.', NULL, NULL),
-(67, 7, 'Serve salmon on pak choi, spooning any pan juices over the top.', NULL, NULL);
+(67, 1, 'Cook jasmine rice according to packet instructions. Keep warm.', NULL, NULL),
+(67, 2, 'Mix white miso, mirin, sake, honey, and soy sauce in a bowl until smooth.', NULL, NULL),
+(67, 3, 'Place salmon fillets in a dish and coat with half the marinade. Marinate 10 minutes (or up to overnight in fridge).', NULL, NULL),
+(67, 4, 'Preheat grill/broiler to high. Line a baking tray with foil.', NULL, NULL),
+(67, 5, 'Place salmon skin-side down on tray. Brush with remaining marinade.', NULL, NULL),
+(67, 6, 'Grill 8-10 minutes until glaze is caramelized and fish flakes easily. Watch carefully to prevent burning.', NULL, NULL),
+(67, 7, 'Meanwhile, steam or stir-fry pak choi until just wilted, about 2-3 minutes.', NULL, NULL),
+(67, 8, 'Serve salmon on rice with pak choi, spooning any pan juices over the top.', NULL, NULL);
 
 INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
-(68, 1, 'Mix white miso, mirin, sake, honey, and soy sauce in a bowl until smooth.', NULL, NULL),
-(68, 2, 'Place salmon fillets in a dish and coat with half the marinade. Marinate 10 minutes (or up to overnight in fridge).', NULL, NULL),
-(68, 3, 'Preheat grill/broiler to high. Line a baking tray with foil.', NULL, NULL),
-(68, 4, 'Place salmon skin-side down on tray. Brush with remaining marinade.', NULL, NULL),
-(68, 5, 'Grill 8-10 minutes until glaze is caramelized and fish flakes easily. Watch carefully to prevent burning.', NULL, NULL),
-(68, 6, 'Meanwhile, steam or stir-fry pak choi until just wilted, about 2-3 minutes.', NULL, NULL),
-(68, 7, 'Serve salmon on pak choi, spooning any pan juices over the top.', NULL, NULL);
+(68, 1, 'Cook jasmine rice according to packet instructions. Keep warm.', NULL, NULL),
+(68, 2, 'Mix white miso, mirin, sake, honey, and soy sauce in a bowl until smooth.', NULL, NULL),
+(68, 3, 'Place salmon fillets in a dish and coat with half the marinade. Marinate 10 minutes (or up to overnight in fridge).', NULL, NULL),
+(68, 4, 'Preheat grill/broiler to high. Line a baking tray with foil.', NULL, NULL),
+(68, 5, 'Place salmon skin-side down on tray. Brush with remaining marinade.', NULL, NULL),
+(68, 6, 'Grill 8-10 minutes until glaze is caramelized and fish flakes easily. Watch carefully to prevent burning.', NULL, NULL),
+(68, 7, 'Meanwhile, steam or stir-fry pak choi until just wilted, about 2-3 minutes.', NULL, NULL),
+(68, 8, 'Serve salmon on rice with pak choi, spooning any pan juices over the top.', NULL, NULL);
 
 -- =============================================
 -- RECIPE FAMILY 19: SALMON & ASPARAGUS
@@ -2827,13 +2833,13 @@ INSERT INTO recipe_families (id, family_name, description) VALUES
 (19, 'Salmon & Asparagus', 'Pan-seared salmon with lemon-caper butter and asparagus');
 
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
-(69, 'Salmon & Asparagus', 2, 660, FALSE, TRUE),
-(70, 'Salmon & Asparagus', 2, 792, FALSE, TRUE),
-(71, 'Salmon & Asparagus', 2, 1056, FALSE, TRUE);
+(69, 'Salmon & Asparagus', 2, 891, FALSE, TRUE),
+(70, 'Salmon & Asparagus', 2, 1100, FALSE, TRUE),
+(71, 'Salmon & Asparagus', 2, 1518, FALSE, TRUE);
 
 INSERT INTO recipe_meals (recipe_id, meal_id) VALUES (69, 3), (70, 3), (71, 3);
 
--- Salmon & Asparagus (Light) - 120g salmon, 20g butter
+-- Salmon & Asparagus (Light) - 120g salmon, 20g butter + 150g potatoes
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
 (69, 109, NULL, 240, 1, 240.00, 1),    -- Salmon fillet, 240g
 (69, 113, NULL, 200, 1, 200.00, 2),    -- Asparagus, 200g
@@ -2841,9 +2847,10 @@ INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quan
 (69, 13, NULL, 2, 7, 6.00, 4),         -- Garlic, 2 cloves (6g)
 (69, 88, NULL, 1, 7, 60.00, 5),        -- Lemon, 1 (60g juice + zest)
 (69, 114, NULL, 1, 4, 15.00, 6),       -- Capers, 1 tbsp (15g)
-(69, 22, NULL, 1, 4, 14.00, 7);        -- Olive oil, 1 tbsp (14g)
+(69, 22, NULL, 1, 4, 14.00, 7),        -- Olive oil, 1 tbsp (14g)
+(69, 52, NULL, 200, 1, 200.00, 8);     -- Baby potatoes, 200g
 
--- Salmon & Asparagus (Moderate) - 150g salmon, 30g butter
+-- Salmon & Asparagus (Moderate) - 150g salmon, 30g butter + 200g potatoes
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
 (70, 109, NULL, 300, 1, 300.00, 1),    -- Salmon fillet, 300g
 (70, 113, NULL, 200, 1, 200.00, 2),    -- Asparagus, 200g
@@ -2851,9 +2858,10 @@ INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quan
 (70, 13, NULL, 2, 7, 6.00, 4),         -- Garlic, 2 cloves (6g)
 (70, 88, NULL, 1, 7, 60.00, 5),        -- Lemon, 1 (60g juice + zest)
 (70, 114, NULL, 1, 4, 15.00, 6),       -- Capers, 1 tbsp (15g)
-(70, 22, NULL, 1, 4, 14.00, 7);        -- Olive oil, 1 tbsp (14g)
+(70, 22, NULL, 1, 4, 14.00, 7),        -- Olive oil, 1 tbsp (14g)
+(70, 52, NULL, 300, 1, 300.00, 8);     -- Baby potatoes, 300g
 
--- Salmon & Asparagus (Balanced) - 200g salmon, 40g butter
+-- Salmon & Asparagus (Balanced) - 200g salmon, 40g butter + 300g potatoes
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
 (71, 109, NULL, 400, 1, 400.00, 1),    -- Salmon fillet, 400g
 (71, 113, NULL, 200, 1, 200.00, 2),    -- Asparagus, 200g
@@ -2861,38 +2869,42 @@ INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quan
 (71, 13, NULL, 2, 7, 6.00, 4),         -- Garlic, 2 cloves (6g)
 (71, 88, NULL, 1, 7, 60.00, 5),        -- Lemon, 1 (60g juice + zest)
 (71, 114, NULL, 1, 4, 15.00, 6),       -- Capers, 1 tbsp (15g)
-(71, 22, NULL, 1, 4, 14.00, 7);        -- Olive oil, 1 tbsp (14g)
+(71, 22, NULL, 1, 4, 14.00, 7),        -- Olive oil, 1 tbsp (14g)
+(71, 52, NULL, 400, 1, 400.00, 8);     -- Baby potatoes, 400g
 
 -- Salmon & Asparagus Steps
 INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
-(69, 1, 'Pat salmon dry and season with salt and pepper.', NULL, NULL),
-(69, 2, 'Heat olive oil in a large pan over medium-high heat.', NULL, NULL),
-(69, 3, 'Place salmon skin-side down. Press gently for 30 seconds to prevent curling. Cook 4-5 minutes until skin is crispy.', NULL, NULL),
-(69, 4, 'Flip salmon, add asparagus to the pan. Cook 3-4 minutes until salmon is just cooked through.', NULL, NULL),
-(69, 5, 'Remove salmon and asparagus to plates.', NULL, NULL),
-(69, 6, 'Reduce heat to medium. Add butter and garlic to pan, cook 30 seconds until fragrant.', NULL, NULL),
-(69, 7, 'Add lemon juice and capers, swirl to combine. Season with pepper.', NULL, NULL),
-(69, 8, 'Spoon lemon-caper butter over salmon and asparagus. Serve immediately.', NULL, NULL);
+(69, 1, 'Boil baby potatoes in salted water until tender, about 15-20 minutes. Drain and keep warm.', NULL, NULL),
+(69, 2, 'Pat salmon dry and season with salt and pepper.', NULL, NULL),
+(69, 3, 'Heat olive oil in a large pan over medium-high heat.', NULL, NULL),
+(69, 4, 'Place salmon skin-side down. Press gently for 30 seconds to prevent curling. Cook 4-5 minutes until skin is crispy.', NULL, NULL),
+(69, 5, 'Flip salmon, add asparagus to the pan. Cook 3-4 minutes until salmon is just cooked through.', NULL, NULL),
+(69, 6, 'Remove salmon and asparagus to plates with potatoes.', NULL, NULL),
+(69, 7, 'Reduce heat to medium. Add butter and garlic to pan, cook 30 seconds until fragrant.', NULL, NULL),
+(69, 8, 'Add lemon juice and capers, swirl to combine. Season with pepper.', NULL, NULL),
+(69, 9, 'Spoon lemon-caper butter over salmon, asparagus and potatoes. Serve immediately.', NULL, NULL);
 
 INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
-(70, 1, 'Pat salmon dry and season with salt and pepper.', NULL, NULL),
-(70, 2, 'Heat olive oil in a large pan over medium-high heat.', NULL, NULL),
-(70, 3, 'Place salmon skin-side down. Press gently for 30 seconds to prevent curling. Cook 4-5 minutes until skin is crispy.', NULL, NULL),
-(70, 4, 'Flip salmon, add asparagus to the pan. Cook 3-4 minutes until salmon is just cooked through.', NULL, NULL),
-(70, 5, 'Remove salmon and asparagus to plates.', NULL, NULL),
-(70, 6, 'Reduce heat to medium. Add butter and garlic to pan, cook 30 seconds until fragrant.', NULL, NULL),
-(70, 7, 'Add lemon juice and capers, swirl to combine. Season with pepper.', NULL, NULL),
-(70, 8, 'Spoon lemon-caper butter over salmon and asparagus. Serve immediately.', NULL, NULL);
+(70, 1, 'Boil baby potatoes in salted water until tender, about 15-20 minutes. Drain and keep warm.', NULL, NULL),
+(70, 2, 'Pat salmon dry and season with salt and pepper.', NULL, NULL),
+(70, 3, 'Heat olive oil in a large pan over medium-high heat.', NULL, NULL),
+(70, 4, 'Place salmon skin-side down. Press gently for 30 seconds to prevent curling. Cook 4-5 minutes until skin is crispy.', NULL, NULL),
+(70, 5, 'Flip salmon, add asparagus to the pan. Cook 3-4 minutes until salmon is just cooked through.', NULL, NULL),
+(70, 6, 'Remove salmon and asparagus to plates with potatoes.', NULL, NULL),
+(70, 7, 'Reduce heat to medium. Add butter and garlic to pan, cook 30 seconds until fragrant.', NULL, NULL),
+(70, 8, 'Add lemon juice and capers, swirl to combine. Season with pepper.', NULL, NULL),
+(70, 9, 'Spoon lemon-caper butter over salmon, asparagus and potatoes. Serve immediately.', NULL, NULL);
 
 INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
-(71, 1, 'Pat salmon dry and season with salt and pepper.', NULL, NULL),
-(71, 2, 'Heat olive oil in a large pan over medium-high heat.', NULL, NULL),
-(71, 3, 'Place salmon skin-side down. Press gently for 30 seconds to prevent curling. Cook 4-5 minutes until skin is crispy.', NULL, NULL),
-(71, 4, 'Flip salmon, add asparagus to the pan. Cook 3-4 minutes until salmon is just cooked through.', NULL, NULL),
-(71, 5, 'Remove salmon and asparagus to plates.', NULL, NULL),
-(71, 6, 'Reduce heat to medium. Add butter and garlic to pan, cook 30 seconds until fragrant.', NULL, NULL),
-(71, 7, 'Add lemon juice and capers, swirl to combine. Season with pepper.', NULL, NULL),
-(71, 8, 'Spoon lemon-caper butter over salmon and asparagus. Serve immediately.', NULL, NULL);
+(71, 1, 'Boil baby potatoes in salted water until tender, about 15-20 minutes. Drain and keep warm.', NULL, NULL),
+(71, 2, 'Pat salmon dry and season with salt and pepper.', NULL, NULL),
+(71, 3, 'Heat olive oil in a large pan over medium-high heat.', NULL, NULL),
+(71, 4, 'Place salmon skin-side down. Press gently for 30 seconds to prevent curling. Cook 4-5 minutes until skin is crispy.', NULL, NULL),
+(71, 5, 'Flip salmon, add asparagus to the pan. Cook 3-4 minutes until salmon is just cooked through.', NULL, NULL),
+(71, 6, 'Remove salmon and asparagus to plates with potatoes.', NULL, NULL),
+(71, 7, 'Reduce heat to medium. Add butter and garlic to pan, cook 30 seconds until fragrant.', NULL, NULL),
+(71, 8, 'Add lemon juice and capers, swirl to combine. Season with pepper.', NULL, NULL),
+(71, 9, 'Spoon lemon-caper butter over salmon, asparagus and potatoes. Serve immediately.', NULL, NULL);
 
 -- =============================================
 -- RECIPE FAMILY 20: TERIYAKI SALMON
@@ -2901,13 +2913,13 @@ INSERT INTO recipe_families (id, family_name, description) VALUES
 (20, 'Teriyaki Salmon', 'Low-sugar teriyaki glazed salmon with stir-fried greens');
 
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
-(72, 'Teriyaki Salmon', 2, 690, FALSE, TRUE),
-(73, 'Teriyaki Salmon', 2, 822, FALSE, TRUE),
-(74, 'Teriyaki Salmon', 2, 1086, FALSE, TRUE);
+(72, 'Teriyaki Salmon', 2, 1070, FALSE, TRUE),
+(73, 'Teriyaki Salmon', 2, 1340, FALSE, TRUE),
+(74, 'Teriyaki Salmon', 2, 1716, FALSE, TRUE);
 
 INSERT INTO recipe_meals (recipe_id, meal_id) VALUES (72, 3), (73, 3), (74, 3);
 
--- Teriyaki Salmon (Light) - 120g salmon
+-- Teriyaki Salmon (Light) - 120g salmon + 150g rice + edamame
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
 (72, 109, NULL, 240, 1, 240.00, 1),    -- Salmon fillet, 240g
 (72, 25, NULL, 3, 4, 54.00, 2),        -- Soy sauce, 3 tbsp (54g)
@@ -2916,9 +2928,11 @@ INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quan
 (72, 4, NULL, 1, 4, 21.00, 5),         -- Honey, 1 tbsp (21g)
 (72, 14, NULL, 1, 7, 10.00, 6),        -- Ginger, 1 thumb (10g)
 (72, 13, NULL, 2, 7, 6.00, 7),         -- Garlic, 2 cloves (6g)
-(72, 51, NULL, 200, 1, 200.00, 8);     -- Broccoli, 200g
+(72, 51, NULL, 200, 1, 200.00, 8),     -- Broccoli, 200g
+(72, 26, NULL, 150, 1, 150.00, 9),     -- Jasmine rice, 150g (cooked)
+(72, 119, NULL, 100, 1, 100.00, 10);   -- Edamame, 100g
 
--- Teriyaki Salmon (Moderate) - 150g salmon
+-- Teriyaki Salmon (Moderate) - 150g salmon + 200g rice + edamame
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
 (73, 109, NULL, 300, 1, 300.00, 1),    -- Salmon fillet, 300g
 (73, 25, NULL, 3, 4, 54.00, 2),        -- Soy sauce, 3 tbsp (54g)
@@ -2927,9 +2941,11 @@ INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quan
 (73, 4, NULL, 1, 4, 21.00, 5),         -- Honey, 1 tbsp (21g)
 (73, 14, NULL, 1, 7, 10.00, 6),        -- Ginger, 1 thumb (10g)
 (73, 13, NULL, 2, 7, 6.00, 7),         -- Garlic, 2 cloves (6g)
-(73, 51, NULL, 200, 1, 200.00, 8);     -- Broccoli, 200g
+(73, 51, NULL, 200, 1, 200.00, 8),     -- Broccoli, 200g
+(73, 26, NULL, 200, 1, 200.00, 9),     -- Jasmine rice, 200g (cooked)
+(73, 119, NULL, 150, 1, 150.00, 10);   -- Edamame, 150g
 
--- Teriyaki Salmon (Balanced) - 200g salmon
+-- Teriyaki Salmon (Balanced) - 200g salmon + 300g rice + edamame
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
 (74, 109, NULL, 400, 1, 400.00, 1),    -- Salmon fillet, 400g
 (74, 25, NULL, 3, 4, 54.00, 2),        -- Soy sauce, 3 tbsp (54g)
@@ -2938,38 +2954,46 @@ INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quan
 (74, 4, NULL, 1, 4, 21.00, 5),         -- Honey, 1 tbsp (21g)
 (74, 14, NULL, 1, 7, 10.00, 6),        -- Ginger, 1 thumb (10g)
 (74, 13, NULL, 2, 7, 6.00, 7),         -- Garlic, 2 cloves (6g)
-(74, 51, NULL, 200, 1, 200.00, 8);     -- Broccoli, 200g
+(74, 51, NULL, 200, 1, 200.00, 8),     -- Broccoli, 200g
+(74, 26, NULL, 300, 1, 300.00, 9),     -- Jasmine rice, 300g (cooked)
+(74, 119, NULL, 200, 1, 200.00, 10);   -- Edamame, 200g
 
 -- Teriyaki Salmon Steps
 INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
-(72, 1, 'Grate ginger and mince garlic. Combine soy sauce, mirin, sake, honey, ginger, and garlic in a bowl.', NULL, NULL),
-(72, 2, 'Heat a non-stick pan over medium-high heat. Pat salmon dry.', NULL, NULL),
-(72, 3, 'Sear salmon skin-side down for 4 minutes until crispy. Flip and cook 2 minutes more.', NULL, NULL),
-(72, 4, 'Remove salmon and set aside. Wipe pan clean.', NULL, NULL),
-(72, 5, 'Pour teriyaki sauce into pan. Simmer 2-3 minutes until glossy and slightly thickened.', NULL, NULL),
-(72, 6, 'Return salmon to pan, spooning sauce over to coat. Cook 1-2 minutes.', NULL, NULL),
-(72, 7, 'Meanwhile, steam or stir-fry broccoli until tender-crisp, about 3-4 minutes.', NULL, NULL),
-(72, 8, 'Serve salmon over broccoli, drizzling remaining sauce on top.', NULL, NULL);
+(72, 1, 'Cook jasmine rice according to packet instructions. Keep warm.', NULL, NULL),
+(72, 2, 'Cook edamame in boiling water for 3-4 minutes. Drain and set aside.', NULL, NULL),
+(72, 3, 'Grate ginger and mince garlic. Combine soy sauce, mirin, sake, honey, ginger, and garlic in a bowl.', NULL, NULL),
+(72, 4, 'Heat a non-stick pan over medium-high heat. Pat salmon dry.', NULL, NULL),
+(72, 5, 'Sear salmon skin-side down for 4 minutes until crispy. Flip and cook 2 minutes more.', NULL, NULL),
+(72, 6, 'Remove salmon and set aside. Wipe pan clean.', NULL, NULL),
+(72, 7, 'Pour teriyaki sauce into pan. Simmer 2-3 minutes until glossy and slightly thickened.', NULL, NULL),
+(72, 8, 'Return salmon to pan, spooning sauce over to coat. Cook 1-2 minutes.', NULL, NULL),
+(72, 9, 'Meanwhile, steam or stir-fry broccoli until tender-crisp, about 3-4 minutes.', NULL, NULL),
+(72, 10, 'Serve salmon over rice with broccoli and edamame, drizzling remaining sauce on top.', NULL, NULL);
 
 INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
-(73, 1, 'Grate ginger and mince garlic. Combine soy sauce, mirin, sake, honey, ginger, and garlic in a bowl.', NULL, NULL),
-(73, 2, 'Heat a non-stick pan over medium-high heat. Pat salmon dry.', NULL, NULL),
-(73, 3, 'Sear salmon skin-side down for 4 minutes until crispy. Flip and cook 2 minutes more.', NULL, NULL),
-(73, 4, 'Remove salmon and set aside. Wipe pan clean.', NULL, NULL),
-(73, 5, 'Pour teriyaki sauce into pan. Simmer 2-3 minutes until glossy and slightly thickened.', NULL, NULL),
-(73, 6, 'Return salmon to pan, spooning sauce over to coat. Cook 1-2 minutes.', NULL, NULL),
-(73, 7, 'Meanwhile, steam or stir-fry broccoli until tender-crisp, about 3-4 minutes.', NULL, NULL),
-(73, 8, 'Serve salmon over broccoli, drizzling remaining sauce on top.', NULL, NULL);
+(73, 1, 'Cook jasmine rice according to packet instructions. Keep warm.', NULL, NULL),
+(73, 2, 'Cook edamame in boiling water for 3-4 minutes. Drain and set aside.', NULL, NULL),
+(73, 3, 'Grate ginger and mince garlic. Combine soy sauce, mirin, sake, honey, ginger, and garlic in a bowl.', NULL, NULL),
+(73, 4, 'Heat a non-stick pan over medium-high heat. Pat salmon dry.', NULL, NULL),
+(73, 5, 'Sear salmon skin-side down for 4 minutes until crispy. Flip and cook 2 minutes more.', NULL, NULL),
+(73, 6, 'Remove salmon and set aside. Wipe pan clean.', NULL, NULL),
+(73, 7, 'Pour teriyaki sauce into pan. Simmer 2-3 minutes until glossy and slightly thickened.', NULL, NULL),
+(73, 8, 'Return salmon to pan, spooning sauce over to coat. Cook 1-2 minutes.', NULL, NULL),
+(73, 9, 'Meanwhile, steam or stir-fry broccoli until tender-crisp, about 3-4 minutes.', NULL, NULL),
+(73, 10, 'Serve salmon over rice with broccoli and edamame, drizzling remaining sauce on top.', NULL, NULL);
 
 INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
-(74, 1, 'Grate ginger and mince garlic. Combine soy sauce, mirin, sake, honey, ginger, and garlic in a bowl.', NULL, NULL),
-(74, 2, 'Heat a non-stick pan over medium-high heat. Pat salmon dry.', NULL, NULL),
-(74, 3, 'Sear salmon skin-side down for 4 minutes until crispy. Flip and cook 2 minutes more.', NULL, NULL),
-(74, 4, 'Remove salmon and set aside. Wipe pan clean.', NULL, NULL),
-(74, 5, 'Pour teriyaki sauce into pan. Simmer 2-3 minutes until glossy and slightly thickened.', NULL, NULL),
-(74, 6, 'Return salmon to pan, spooning sauce over to coat. Cook 1-2 minutes.', NULL, NULL),
-(74, 7, 'Meanwhile, steam or stir-fry broccoli until tender-crisp, about 3-4 minutes.', NULL, NULL),
-(74, 8, 'Serve salmon over broccoli, drizzling remaining sauce on top.', NULL, NULL);
+(74, 1, 'Cook jasmine rice according to packet instructions. Keep warm.', NULL, NULL),
+(74, 2, 'Cook edamame in boiling water for 3-4 minutes. Drain and set aside.', NULL, NULL),
+(74, 3, 'Grate ginger and mince garlic. Combine soy sauce, mirin, sake, honey, ginger, and garlic in a bowl.', NULL, NULL),
+(74, 4, 'Heat a non-stick pan over medium-high heat. Pat salmon dry.', NULL, NULL),
+(74, 5, 'Sear salmon skin-side down for 4 minutes until crispy. Flip and cook 2 minutes more.', NULL, NULL),
+(74, 6, 'Remove salmon and set aside. Wipe pan clean.', NULL, NULL),
+(74, 7, 'Pour teriyaki sauce into pan. Simmer 2-3 minutes until glossy and slightly thickened.', NULL, NULL),
+(74, 8, 'Return salmon to pan, spooning sauce over to coat. Cook 1-2 minutes.', NULL, NULL),
+(74, 9, 'Meanwhile, steam or stir-fry broccoli until tender-crisp, about 3-4 minutes.', NULL, NULL),
+(74, 10, 'Serve salmon over rice with broccoli and edamame, drizzling remaining sauce on top.', NULL, NULL);
 
 -- =============================================
 -- RECIPE FAMILY 21: SALMON EN PAPILLOTE
@@ -2978,13 +3002,13 @@ INSERT INTO recipe_families (id, family_name, description) VALUES
 (21, 'Salmon en Papillote', 'French-style salmon baked in parchment with Mediterranean vegetables');
 
 INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
-(75, 'Salmon en Papillote', 2, 540, FALSE, TRUE),
-(76, 'Salmon en Papillote', 2, 672, FALSE, TRUE),
-(77, 'Salmon en Papillote', 2, 936, FALSE, TRUE);
+(75, 'Salmon en Papillote', 2, 848, FALSE, TRUE),
+(76, 'Salmon en Papillote', 2, 1134, FALSE, TRUE),
+(77, 'Salmon en Papillote', 2, 1552, FALSE, TRUE);
 
 INSERT INTO recipe_meals (recipe_id, meal_id) VALUES (75, 3), (76, 3), (77, 3);
 
--- Salmon en Papillote (Light) - 120g salmon
+-- Salmon en Papillote (Light) - 120g salmon + 200g baby potatoes
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
 (75, 109, NULL, 240, 1, 240.00, 1),    -- Salmon fillet, 240g
 (75, 116, NULL, 150, 1, 150.00, 2),    -- Cherry tomatoes, 150g
@@ -2993,9 +3017,10 @@ INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quan
 (75, 115, NULL, 100, 1, 100.00, 5),    -- Fennel, 100g (1/2 bulb)
 (75, 118, NULL, 2, 4, 30.00, 6),       -- White wine, 2 tbsp (30g)
 (75, 98, NULL, 4, 7, 4.00, 7),         -- Fresh thyme, 4 sprigs (4g)
-(75, 88, NULL, 0.5, 7, 30.00, 8);      -- Lemon, 1/2 (30g, sliced)
+(75, 88, NULL, 0.5, 7, 30.00, 8),      -- Lemon, 1/2 (30g, sliced)
+(75, 52, NULL, 200, 1, 200.00, 9);     -- Baby potatoes, 200g
 
--- Salmon en Papillote (Moderate) - 150g salmon
+-- Salmon en Papillote (Moderate) - 150g salmon + 300g baby potatoes
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
 (76, 109, NULL, 300, 1, 300.00, 1),    -- Salmon fillet, 300g
 (76, 116, NULL, 150, 1, 150.00, 2),    -- Cherry tomatoes, 150g
@@ -3004,9 +3029,10 @@ INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quan
 (76, 115, NULL, 100, 1, 100.00, 5),    -- Fennel, 100g (1/2 bulb)
 (76, 118, NULL, 2, 4, 30.00, 6),       -- White wine, 2 tbsp (30g)
 (76, 98, NULL, 4, 7, 4.00, 7),         -- Fresh thyme, 4 sprigs (4g)
-(76, 88, NULL, 0.5, 7, 30.00, 8);      -- Lemon, 1/2 (30g, sliced)
+(76, 88, NULL, 0.5, 7, 30.00, 8),      -- Lemon, 1/2 (30g, sliced)
+(76, 52, NULL, 300, 1, 300.00, 9);     -- Baby potatoes, 300g
 
--- Salmon en Papillote (Balanced) - 200g salmon
+-- Salmon en Papillote (Balanced) - 200g salmon + 400g baby potatoes
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
 (77, 109, NULL, 400, 1, 400.00, 1),    -- Salmon fillet, 400g
 (77, 116, NULL, 150, 1, 150.00, 2),    -- Cherry tomatoes, 150g
@@ -3015,38 +3041,42 @@ INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quan
 (77, 115, NULL, 100, 1, 100.00, 5),    -- Fennel, 100g (1/2 bulb)
 (77, 118, NULL, 2, 4, 30.00, 6),       -- White wine, 2 tbsp (30g)
 (77, 98, NULL, 4, 7, 4.00, 7),         -- Fresh thyme, 4 sprigs (4g)
-(77, 88, NULL, 0.5, 7, 30.00, 8);      -- Lemon, 1/2 (30g, sliced)
+(77, 88, NULL, 0.5, 7, 30.00, 8),      -- Lemon, 1/2 (30g, sliced)
+(77, 52, NULL, 400, 1, 400.00, 9);     -- Baby potatoes, 400g
 
 -- Salmon en Papillote Steps
 INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
 (75, 1, 'Preheat oven to 200°C. Cut 2 large rectangles of parchment paper (about 40cm × 30cm).', NULL, NULL),
-(75, 2, 'Thinly slice the fennel. Halve the cherry tomatoes. Slice lemon into thin rounds.', NULL, NULL),
-(75, 3, 'Place each salmon fillet in the center of a parchment rectangle. Season with salt and pepper.', NULL, NULL),
-(75, 4, 'Divide fennel, tomatoes, olives, and capers between the parcels, arranging around and on top of salmon.', NULL, NULL),
-(75, 5, 'Top each with lemon slices and thyme sprigs. Drizzle with white wine.', NULL, NULL),
-(75, 6, 'Fold parchment over salmon, then crimp and fold edges tightly to seal into a parcel.', NULL, NULL),
-(75, 7, 'Place parcels on a baking tray. Bake 15-18 minutes until parchment is puffed and golden.', NULL, NULL),
-(75, 8, 'Serve parcels on plates, cutting open at the table for dramatic presentation.', NULL, NULL);
+(75, 2, 'Halve baby potatoes and parboil for 8 minutes until just tender. Drain well.', NULL, NULL),
+(75, 3, 'Thinly slice the fennel. Halve the cherry tomatoes. Slice lemon into thin rounds.', NULL, NULL),
+(75, 4, 'Create a bed of potatoes in the center of each parchment rectangle. Place salmon on top. Season with salt and pepper.', NULL, NULL),
+(75, 5, 'Divide fennel, tomatoes, olives, and capers between the parcels, arranging around and on top of salmon.', NULL, NULL),
+(75, 6, 'Top each with lemon slices and thyme sprigs. Drizzle with white wine.', NULL, NULL),
+(75, 7, 'Fold parchment over salmon, then crimp and fold edges tightly to seal into a parcel.', NULL, NULL),
+(75, 8, 'Place parcels on a baking tray. Bake 15-18 minutes until parchment is puffed and golden.', NULL, NULL),
+(75, 9, 'Serve parcels on plates, cutting open at the table for dramatic presentation.', NULL, NULL);
 
 INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
 (76, 1, 'Preheat oven to 200°C. Cut 2 large rectangles of parchment paper (about 40cm × 30cm).', NULL, NULL),
-(76, 2, 'Thinly slice the fennel. Halve the cherry tomatoes. Slice lemon into thin rounds.', NULL, NULL),
-(76, 3, 'Place each salmon fillet in the center of a parchment rectangle. Season with salt and pepper.', NULL, NULL),
-(76, 4, 'Divide fennel, tomatoes, olives, and capers between the parcels, arranging around and on top of salmon.', NULL, NULL),
-(76, 5, 'Top each with lemon slices and thyme sprigs. Drizzle with white wine.', NULL, NULL),
-(76, 6, 'Fold parchment over salmon, then crimp and fold edges tightly to seal into a parcel.', NULL, NULL),
-(76, 7, 'Place parcels on a baking tray. Bake 15-18 minutes until parchment is puffed and golden.', NULL, NULL),
-(76, 8, 'Serve parcels on plates, cutting open at the table for dramatic presentation.', NULL, NULL);
+(76, 2, 'Halve baby potatoes and parboil for 8 minutes until just tender. Drain well.', NULL, NULL),
+(76, 3, 'Thinly slice the fennel. Halve the cherry tomatoes. Slice lemon into thin rounds.', NULL, NULL),
+(76, 4, 'Create a bed of potatoes in the center of each parchment rectangle. Place salmon on top. Season with salt and pepper.', NULL, NULL),
+(76, 5, 'Divide fennel, tomatoes, olives, and capers between the parcels, arranging around and on top of salmon.', NULL, NULL),
+(76, 6, 'Top each with lemon slices and thyme sprigs. Drizzle with white wine.', NULL, NULL),
+(76, 7, 'Fold parchment over salmon, then crimp and fold edges tightly to seal into a parcel.', NULL, NULL),
+(76, 8, 'Place parcels on a baking tray. Bake 15-18 minutes until parchment is puffed and golden.', NULL, NULL),
+(76, 9, 'Serve parcels on plates, cutting open at the table for dramatic presentation.', NULL, NULL);
 
 INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
 (77, 1, 'Preheat oven to 200°C. Cut 2 large rectangles of parchment paper (about 40cm × 30cm).', NULL, NULL),
-(77, 2, 'Thinly slice the fennel. Halve the cherry tomatoes. Slice lemon into thin rounds.', NULL, NULL),
-(77, 3, 'Place each salmon fillet in the center of a parchment rectangle. Season with salt and pepper.', NULL, NULL),
-(77, 4, 'Divide fennel, tomatoes, olives, and capers between the parcels, arranging around and on top of salmon.', NULL, NULL),
-(77, 5, 'Top each with lemon slices and thyme sprigs. Drizzle with white wine.', NULL, NULL),
-(77, 6, 'Fold parchment over salmon, then crimp and fold edges tightly to seal into a parcel.', NULL, NULL),
-(77, 7, 'Place parcels on a baking tray. Bake 15-18 minutes until parchment is puffed and golden.', NULL, NULL),
-(77, 8, 'Serve parcels on plates, cutting open at the table for dramatic presentation.', NULL, NULL);
+(77, 2, 'Halve baby potatoes and parboil for 8 minutes until just tender. Drain well.', NULL, NULL),
+(77, 3, 'Thinly slice the fennel. Halve the cherry tomatoes. Slice lemon into thin rounds.', NULL, NULL),
+(77, 4, 'Create a bed of potatoes in the center of each parchment rectangle. Place salmon on top. Season with salt and pepper.', NULL, NULL),
+(77, 5, 'Divide fennel, tomatoes, olives, and capers between the parcels, arranging around and on top of salmon.', NULL, NULL),
+(77, 6, 'Top each with lemon slices and thyme sprigs. Drizzle with white wine.', NULL, NULL),
+(77, 7, 'Fold parchment over salmon, then crimp and fold edges tightly to seal into a parcel.', NULL, NULL),
+(77, 8, 'Place parcels on a baking tray. Bake 15-18 minutes until parchment is puffed and golden.', NULL, NULL),
+(77, 9, 'Serve parcels on plates, cutting open at the table for dramatic presentation.', NULL, NULL);
 
 -- =============================================
 -- SALMON RECIPE FAMILY MEMBERS
