@@ -2590,3 +2590,142 @@ INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id,
 (63, 9, 'Add middle and top: Middle bun (club) → sauce → lettuce → onion → gherkins → cheesy patty → top bun.', NULL, NULL),
 (63, 10, 'Serve immediately with air fried chips.', NULL, NULL),
 (63, 11, 'LAYER ORDER (bottom to top): Bottom bun | Sauce | Lettuce | Onion | Patty+Cheese | Middle bun | Sauce | Lettuce | Onion | Gherkins | Patty+Cheese | Top bun', NULL, NULL);
+
+-- =============================================
+-- RECIPE 64: HONEY HAM (EXTRAS)
+-- Classic British poached and glazed ham
+-- Serves 10 (250g per person from 2.5kg joint)
+-- Total: ~3,826 cal (~383 per serving)
+-- =============================================
+
+-- New Ingredients for Honey Ham
+INSERT INTO ingredients (id, `key`, name, aisle_id, protein_per_100g, carbs_per_100g, fat_per_100g, macros_verified) VALUES
+(97, 'ham_fillet', 'Ham Fillet', 1, 21.00, 0.50, 6.80, TRUE),
+(98, 'thyme_fresh', 'Fresh Thyme', 8, 5.60, 24.00, 1.70, TRUE),
+(99, 'celery', 'Celery', 3, 0.70, 3.00, 0.20, TRUE),
+(100, 'whole_cloves', 'Whole Cloves', 8, 6.00, 65.00, 13.00, TRUE),
+(101, 'english_mustard', 'English Mustard', 12, 8.00, 5.00, 10.00, TRUE);
+
+-- Recipe: Honey Ham
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+(64, 'Honey Ham', 10, 3826, FALSE, TRUE);
+
+-- Assign to extras (meal_id = 5)
+INSERT INTO recipe_meals (recipe_id, meal_id) VALUES (64, 5);
+
+-- =============================================
+-- HONEY HAM INGREDIENTS
+-- =============================================
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
+(64, 97, NULL, 2500, 1, 2500.00, 1),  -- Ham fillet, 2500g (2.5kg)
+(64, 12, NULL, 1, 7, 110.00, 2),      -- Onion, 1 (110g)
+(64, 56, NULL, 2, 7, 160.00, 3),      -- Carrots, 2 (160g)
+(64, 99, NULL, 1, 7, 40.00, 4),       -- Celery, 1 stick (40g)
+(64, 98, NULL, 1, 7, 3.00, 5),        -- Fresh thyme, 1 sprig (3g)
+(64, 50, NULL, 1, 4, 6.00, 6),        -- Black peppercorns, 1 tbsp (6g)
+(64, 100, NULL, 1, 3, 2.00, 7),       -- Whole cloves, 1 tsp (2g)
+(64, 4, NULL, 70, 1, 70.00, 8),       -- Honey, 70g
+(64, 101, NULL, 1.5, 4, 25.00, 9);    -- English mustard, 1.5 tbsp (25g)
+
+-- =============================================
+-- HONEY HAM STEPS
+-- =============================================
+INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
+(64, 1, 'Place ham in large pot. Add onion (halved), carrots (chunked), celery, thyme, peppercorns, and cloves. Cover with cold water.', NULL, NULL),
+(64, 2, 'Bring to boil, then reduce to gentle simmer. Cook for 1hr 15min.', NULL, NULL),
+(64, 3, 'Turn off heat. Let ham rest in the water for 30 minutes.', NULL, NULL),
+(64, 4, 'Preheat oven to 200°C. Remove ham from pot and pat dry thoroughly with kitchen paper.', NULL, NULL),
+(64, 5, 'Place ham on baking tray. Mix honey and mustard in small bowl until combined.', NULL, NULL),
+(64, 6, 'Brush half the glaze over the ham, getting into any crevices.', NULL, NULL),
+(64, 7, 'Roast for 15 minutes until glaze starts to caramelize.', NULL, NULL),
+(64, 8, 'Remove, brush with remaining glaze. Roast another 20 minutes until deep golden and sticky.', NULL, NULL),
+(64, 9, 'Rest 10 minutes before carving.', NULL, NULL);
+
+-- =============================================
+-- RECIPE 65: PASTICHIO (LASAGNA)
+-- Beef and ham lasagna with béchamel
+-- Links to: Fresh Pasta (36), Honey Ham (64)
+-- Serves 8
+-- Total: ~5,200 cal (~650 per serving)
+-- =============================================
+
+-- New Ingredients for Pastichio
+INSERT INTO ingredients (id, `key`, name, aisle_id, protein_per_100g, carbs_per_100g, fat_per_100g, macros_verified) VALUES
+(102, 'beef_mince', 'Beef Mince', 1, 17.00, 0.00, 20.00, TRUE),
+(103, 'butter', 'Butter', 6, 0.85, 0.06, 81.00, TRUE),
+(104, 'milk', 'Whole Milk', 6, 3.40, 4.80, 3.60, TRUE),
+(105, 'nutmeg', 'Ground Nutmeg', 8, 6.00, 49.00, 36.00, TRUE),
+(106, 'red_wine', 'Red Wine', 16, 0.00, 2.60, 0.00, TRUE),
+(107, 'lasagna_sheets_store', 'Lasagna Sheets', 11, 12.00, 71.00, 1.50, TRUE),
+(108, 'sliced_ham_store', 'Sliced Ham', 1, 18.00, 1.50, 3.00, TRUE);
+
+-- Recipe: Pastichio (Lasagna)
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+(65, 'Pastichio (Lasagna)', 8, 5200, FALSE, TRUE);
+
+-- Assign to dinner (meal_id = 3)
+INSERT INTO recipe_meals (recipe_id, meal_id) VALUES (65, 3);
+
+-- Link extras (for homemade/store-bought popup)
+INSERT INTO recipe_extras (parent_recipe_id, child_recipe_id, display_order) VALUES
+(65, 36, 0),  -- Fresh Pasta (lasagna sheets)
+(65, 64, 1);  -- Honey Ham
+
+-- =============================================
+-- PASTICHIO INGREDIENTS
+-- =============================================
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
+-- Meat sauce
+(65, 22, NULL, 2, 4, 28.00, 1),        -- Olive oil, 2 tbsp (28g)
+(65, 12, NULL, 1, 7, 110.00, 2),       -- Onion, 1 medium (110g)
+(65, 13, NULL, 4, 7, 12.00, 3),        -- Garlic, 4 cloves (12g)
+(65, 102, NULL, 454, 1, 454.00, 4),    -- Beef mince, 1 lb (454g)
+(65, 5, NULL, 0.5, 3, 3.00, 5),        -- Salt, 1/2 tsp (3g)
+(65, 50, NULL, 0.25, 3, 1.00, 6),      -- Black pepper, 1/4 tsp (1g)
+(65, 23, NULL, 2, 4, 32.00, 7),        -- Tomato paste, 2 tbsp (32g)
+(65, 25, NULL, 1, 4, 18.00, 8),        -- Soy sauce, 1 tbsp (18g)
+(65, 106, NULL, 0.5, 6, 120.00, 9),    -- Red wine, 1/2 cup (120g)
+(65, 33, NULL, 1, 7, 400.00, 10),      -- Tinned tomatoes, 1 can (400g)
+(65, 35, NULL, 1, 4, 3.00, 11),        -- Dried oregano, 1 tbsp (3g)
+(65, 34, NULL, 1, 7, 1.00, 12),        -- Bay leaf, 1 (1g)
+(65, 36, NULL, 1, 4, 12.00, 13),       -- Sugar, 1 tbsp (12g)
+(65, 29, NULL, 9, 1, 9.00, 14),        -- Fresh basil, 9g
+(65, 39, NULL, 2, 3, 10.00, 15),       -- Worcestershire sauce, 2 tsp (10g)
+-- Béchamel
+(65, 103, NULL, 105, 1, 105.00, 16),   -- Butter, 105g
+(65, 43, NULL, 0.5, 6, 60.00, 17),     -- Plain flour, 1/2 cup (60g)
+(65, 104, NULL, 1000, 2, 1000.00, 18), -- Milk, 1L (1000g)
+(65, 5, NULL, 0.5, 3, 3.00, 19),       -- Salt, 1/2 tsp (3g) - béchamel
+(65, 50, NULL, 0.25, 3, 1.00, 20),     -- Black pepper, 1/4 tsp (1g) - béchamel
+(65, 105, NULL, 0.25, 3, 1.00, 21),    -- Nutmeg, 1/4 tsp (1g)
+-- Assembly (linked extras with store-bought options)
+(65, 107, 36, 454, 1, 454.00, 22),     -- Lasagna sheets (store=107, homemade=36), 454g
+(65, 108, 64, 400, 1, 400.00, 23),     -- Sliced ham (store=108, homemade=64), 400g
+(65, 37, NULL, 340, 1, 340.00, 24),    -- Mozzarella, 340g
+(65, 30, NULL, 114, 1, 114.00, 25);    -- Parmesan, 114g
+
+-- =============================================
+-- PASTICHIO STEPS
+-- =============================================
+INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
+(65, 1, 'Heat olive oil in a large pan over high heat.', NULL, NULL),
+(65, 2, 'Add onion and cook until softened. Add garlic, cook 1 minute until fragrant.', NULL, NULL),
+(65, 3, 'Add beef mince, break apart and cook until browned. Season with salt and pepper.', NULL, NULL),
+(65, 4, 'Add tomato paste, soy sauce, Worcestershire sauce, and red wine. Cook until nearly evaporated.', NULL, NULL),
+(65, 5, 'Add tinned tomatoes, oregano, sugar, bay leaf, and basil. Bring to boil, then reduce to simmer.', NULL, NULL),
+(65, 6, 'Cook 40 minutes, stirring occasionally, until tomatoes break apart easily. Remove bay leaf.', NULL, NULL),
+(65, 7, 'Make béchamel: Melt butter in saucepan over medium heat. Whisk in flour, cook 1-2 minutes.', NULL, NULL),
+(65, 8, 'Slowly add milk, whisking constantly to prevent lumps. Add salt, pepper, nutmeg. Cook until thickened, about 10 minutes.', NULL, NULL),
+(65, 9, 'Prepare lasagna sheets according to linked Fresh Pasta recipe.', 36, 'Cook store-bought lasagna sheets according to packet instructions, or use no-boil sheets.'),
+(65, 10, 'Slice 400g from the Honey Ham for layering.', 64, 'Use 400g store-bought sliced ham.'),
+(65, 11, 'Preheat oven to 190°C. Lightly grease baking dish with butter.', NULL, NULL),
+(65, 12, 'LAYER 1: Spread thin layer of béchamel on bottom. Top with noodles.', NULL, NULL),
+(65, 13, 'LAYER 2: Spread half the beef ragù, cover with half the ham (200g).', NULL, NULL),
+(65, 14, 'LAYER 3: Add béchamel, then 1/3 of the cheese.', NULL, NULL),
+(65, 15, 'LAYER 4: Add noodles, remaining beef ragù, remaining ham (200g).', NULL, NULL),
+(65, 16, 'LAYER 5: Top with béchamel, 1/3 of the cheese.', NULL, NULL),
+(65, 17, 'LAYER 6: Final layer of noodles, remaining béchamel, remaining cheese.', NULL, NULL),
+(65, 18, 'Cover with foil. Bake 30 minutes.', NULL, NULL),
+(65, 19, 'Remove foil, bake 20 minutes until golden and bubbling.', NULL, NULL),
+(65, 20, 'Rest 10 minutes before serving.', NULL, NULL),
+(65, 21, 'LAYER ORDER: Béchamel | Noodles | Half beef | Half ham | Béchamel | 1/3 cheese | Noodles | Remaining beef | Remaining ham | Béchamel | 1/3 cheese | Noodles | Remaining béchamel | Remaining cheese', NULL, NULL);

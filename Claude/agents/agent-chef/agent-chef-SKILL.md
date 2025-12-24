@@ -129,15 +129,16 @@ Read `../agent-nutrition/agent-nutrition-SKILL.md` for the full nutrition philos
 ### 2. Check Live Database Before Adding Data
 **IMPORTANT:** The seed.sql file is large. Always ask the user to run SELECT queries on the live database instead of reading files.
 
-**Required SELECT queries before adding recipes:**
+**Required SELECT query before adding recipes (single combined query):**
 ```sql
--- Check highest IDs
-SELECT MAX(id) AS max_ingredient_id FROM ingredients;
-SELECT MAX(id) AS max_recipe_id FROM recipes;
-SELECT MAX(id) AS max_family_id FROM recipe_families;
-
--- Check if ingredients already exist (replace with actual ingredient keys)
-SELECT * FROM ingredients WHERE `key` IN ('ingredient_key_1', 'ingredient_key_2');
+-- Get all IDs and check existing ingredients in ONE query
+SELECT 'max_ingredient_id' AS query, MAX(id) AS value, NULL AS `key`, NULL AS name FROM ingredients
+UNION ALL
+SELECT 'max_recipe_id', MAX(id), NULL, NULL FROM recipes
+UNION ALL
+SELECT 'max_family_id', MAX(id), NULL, NULL FROM recipe_families
+UNION ALL
+SELECT 'ingredient', id, `key`, name FROM ingredients WHERE `key` IN ('ingredient_key_1', 'ingredient_key_2');
 ```
 
 **Rules:**
