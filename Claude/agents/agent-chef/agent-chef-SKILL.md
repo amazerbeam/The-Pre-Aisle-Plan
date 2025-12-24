@@ -608,6 +608,83 @@ When creating a recipe with extras, include an Extras section AND specify gram a
 | `meals` | Meal types including `extras` (id=5) |
 | `ingredients` | Include store-bought versions of extras (e.g., 'Pizza Dough' ingredient for store-bought) |
 
+## Database Column Reference
+
+**IMPORTANT:** Use correct column names when generating SQL.
+
+### CRITICAL RULES FOR VARIANT RECIPES
+
+1. **Recipe names must NOT include variant labels**
+   - CORRECT: `'Miso Glazed Salmon'`
+   - WRONG: `'Miso Glazed Salmon (Light)'`, `'Miso Glazed Salmon (Moderate)'`
+   - All variants of a recipe share the SAME name - the variant label comes from `recipe_family_members.variant_label`
+
+2. **Balanced is ALWAYS the default variant**
+   - Set `is_default = TRUE` for the Balanced variant only
+   - Set `is_default = FALSE` for Light and Moderate variants
+
+### recipes table
+```sql
+-- CORRECT: All variants have the SAME name (no variant label!)
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+(66, 'Miso Glazed Salmon', 2, 1040, FALSE, TRUE),  -- Light variant
+(67, 'Miso Glazed Salmon', 2, 1266, FALSE, TRUE),  -- Moderate variant
+(68, 'Miso Glazed Salmon', 2, 1565, FALSE, TRUE);  -- Balanced variant
+
+-- WRONG: Don't add variant to name!
+INSERT INTO recipes ... VALUES (66, 'Miso Glazed Salmon (Light)', ...);
+
+-- WRONG: These columns don't exist!
+INSERT INTO recipes (id, name, ..., family_id, is_default) VALUES ...
+```
+
+| Column | Type | Notes |
+|--------|------|-------|
+| `id` | BIGINT | Primary key |
+| `name` | VARCHAR(255) | Recipe name - **NO variant label** |
+| `default_servings` | INT | Default 2 |
+| `calories` | INT | Total recipe calories |
+| `is_cheat` | BOOLEAN | Default FALSE |
+| `is_live` | BOOLEAN | Default TRUE |
+
+**Family membership is via `recipe_family_members` table, NOT columns on `recipes`.**
+
+### recipe_families table
+```sql
+-- CORRECT:
+INSERT INTO recipe_families (id, family_name, description) VALUES
+(18, 'Miso Glazed Salmon', 'Japanese-style salmon...');
+
+-- WRONG (will error):
+INSERT INTO recipe_families (id, name, description) VALUES ...
+```
+
+| Column | Type | Notes |
+|--------|------|-------|
+| `id` | BIGINT | Primary key |
+| `family_name` | VARCHAR(255) | **NOT `name`** |
+| `description` | TEXT | Optional |
+
+### recipe_family_members table
+```sql
+-- CORRECT: Balanced (recipe 68) is the default!
+INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_label, display_order) VALUES
+(18, 67, FALSE, 'Moderate', 1),
+(18, 66, FALSE, 'Light', 2),
+(18, 68, TRUE, 'Balanced', 3);   -- Balanced is ALWAYS default
+
+-- WRONG: Never set Moderate or Light as default!
+(18, 67, TRUE, 'Moderate', 1),   -- Don't do this!
+```
+
+| Column | Type | Notes |
+|--------|------|-------|
+| `family_id` | BIGINT | FK to recipe_families |
+| `recipe_id` | BIGINT | FK to recipes |
+| `is_default` | BOOLEAN | **Balanced = TRUE, others = FALSE** |
+| `variant_label` | VARCHAR(50) | Light/Moderate/Balanced |
+| `display_order` | INT | Sort order |
+
 ### Two Types of Linking (FR-103 Updated)
 
 | Table | Column | Purpose | Example |

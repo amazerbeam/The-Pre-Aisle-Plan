@@ -73,7 +73,8 @@
       "Bash(cmd //c \"start \"\" \"C:Program FilesDockerDockerDocker Desktop.exe\"\")",
       "Bash(start \"\" \"C:\\\\Program Files\\\\Docker\\\\Docker\\\\Docker Desktop.exe\")",
       "Bash(start chrome:*)",
-      "Bash(curl.exe:*)"
+      "Bash(curl.exe:*)",
+      "WebFetch(domain:www.asiamarket.ie)"
     ],
     "deny": [],
     "ask": []
