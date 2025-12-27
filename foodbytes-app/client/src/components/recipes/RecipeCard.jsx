@@ -14,14 +14,7 @@ function RecipeCard({ recipe, currentMealType, onSelectVariant, onEdit }) {
   const [showCalorieDropdown, setShowCalorieDropdown] = useState(false)
   // Fullscreen recipe view state
   const [showFullscreen, setShowFullscreen] = useState(false)
-  // FR-013: Track the recipe to display in fullscreen modal (may change on variant selection)
-  const [modalRecipe, setModalRecipe] = useState(recipe)
   const dropdownRef = useRef(null)
-
-  // FR-013: Sync modal recipe when recipe prop changes
-  useEffect(() => {
-    setModalRecipe(recipe)
-  }, [recipe])
 
   // FR-043: Close dropdown when clicking outside
   useEffect(() => {
@@ -221,12 +214,15 @@ function RecipeCard({ recipe, currentMealType, onSelectVariant, onEdit }) {
       )}
       */}
 
-      {/* FR-013: Fullscreen Recipe View Modal with variant support */}
+      {/* FR-013, FR-102: Fullscreen Recipe View Modal with on-demand loading */}
       {showFullscreen && (
         <RecipeViewModal
-          recipe={modalRecipe}
+          recipeId={selectedVariantId}
+          recipeName={recipe.name}
           servings={servings}
           caloriesPerServing={getCurrentVariantCalories()}
+          isCheat={recipe.isCheat}
+          hasExtras={recipe.hasExtras}
           onClose={() => setShowFullscreen(false)}
           variants={recipe.variants}
           onSelectVariant={handleModalVariantSelect}

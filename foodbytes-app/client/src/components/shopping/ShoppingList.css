@@ -202,6 +202,23 @@
   color: var(--text-secondary);
 }
 
+/* FR-103: Generating State (shows with minimum 2s display) */
+.generating {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: var(--spacing-xl);
+  gap: var(--spacing-md);
+  min-height: 200px;
+}
+
+.generating p {
+  color: var(--brand-primary);
+  font-weight: 500;
+  font-size: 1.1rem;
+}
+
 /* Error State */
 .error {
   padding: var(--spacing-lg);

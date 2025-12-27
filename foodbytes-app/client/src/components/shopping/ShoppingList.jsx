@@ -5,10 +5,22 @@ import './ShoppingList.css'
 
 /**
  * ShoppingList - Main container for shopping list feature
- * Supports FR-019 (display shopping list), FR-020 (aisle grouping)
+ * Supports FR-019 (display shopping list), FR-020 (aisle grouping), FR-103 (cache)
  */
 const ShoppingList = () => {
-  const { sortedAisles, loading, error } = useShoppingList()
+  const { sortedAisles, loading, error, isGenerating } = useShoppingList()
+
+  // FR-103: Show "Generating shopping list..." when generating (with 2s minimum)
+  if (isGenerating) {
+    return (
+      <div className="shopping-list-page">
+        <div className="generating">
+          <div className="spinner"></div>
+          <p>Generating shopping list...</p>
+        </div>
+      </div>
+    )
+  }
 
   if (loading) {
     return (

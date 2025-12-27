@@ -74,7 +74,9 @@
       "Bash(start \"\" \"C:\\\\Program Files\\\\Docker\\\\Docker\\\\Docker Desktop.exe\")",
       "Bash(start chrome:*)",
       "Bash(curl.exe:*)",
-      "WebFetch(domain:www.asiamarket.ie)"
+      "WebFetch(domain:www.asiamarket.ie)",
+      "Bash(cmd //c \"taskkill /PID 16472 /F\")",
+      "Bash(cmd //c \"taskkill /PID 18608 /F\")"
     ],
     "deny": [],
     "ask": []

@@ -1,9 +1,25 @@
 import { createContext, useState, useContext, useCallback, useEffect } from 'react'
 import { useAuth } from './AuthContext'
 
+// FR-103: Shopping list cache key (shared with ShoppingListContext and MealPlanContext)
+const SHOPPING_LIST_INVALIDATED_KEY = 'shoppingListInvalidated'
+
+/**
+ * FR-103: Invalidate shopping list cache when homemade selections change
+ * Called directly to avoid circular dependency with ShoppingListContext
+ */
+const invalidateShoppingListCache = () => {
+  try {
+    localStorage.setItem(SHOPPING_LIST_INVALIDATED_KEY, 'true')
+  } catch (err) {
+    console.error('Failed to invalidate shopping list cache:', err)
+  }
+}
+
 /**
  * FR-090: Context for managing homemade/store-bought selections for recipe extras.
  * Persists choices to localStorage and pre-populates popup with saved preferences.
+ * FR-103: Invalidates shopping list cache when selections change.
  */
 const HomemadeSelectionsContext = createContext()
 
@@ -36,6 +52,7 @@ export const HomemadeSelectionsProvider = ({ children }) => {
 
   /**
    * Save selections for a specific recipe.
+   * FR-103: Invalidates shopping list cache when selections change.
    * @param recipeId - The parent recipe ID
    * @param newSelections - Map of extraRecipeId -> isHomemade (boolean)
    */
@@ -44,6 +61,8 @@ export const HomemadeSelectionsProvider = ({ children }) => {
       const updated = { ...prev, [recipeId]: newSelections }
       try {
         localStorage.setItem(getStorageKey(), JSON.stringify(updated))
+        // FR-103: Invalidate shopping list cache when selections change
+        invalidateShoppingListCache()
       } catch (err) {
         console.error('Error saving homemade selections:', err)
       }

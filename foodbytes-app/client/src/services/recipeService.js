@@ -2,7 +2,38 @@ import api from './api'
 
 export const recipeService = {
   // ========================================
-  // PUBLIC ENDPOINTS (for all users)
+  // FR-102: SUMMARY ENDPOINTS (Lightweight data for list views)
+  // ========================================
+
+  /**
+   * FR-102: Get all recipe summaries (no ingredients/steps).
+   * Use for list views to reduce data transfer.
+   */
+  async getAllRecipeSummaries() {
+    const response = await api.get('/recipes/summaries')
+    return response.data
+  },
+
+  /**
+   * FR-102: Get recipe summaries filtered by meal type.
+   * Use for list views to reduce data transfer.
+   */
+  async getRecipeSummariesByMealType(mealType) {
+    const response = await api.get(`/recipes/summaries?mealType=${mealType}`)
+    return response.data
+  },
+
+  /**
+   * FR-102: Search recipes and return summaries.
+   * Use for search results to reduce data transfer.
+   */
+  async searchRecipeSummaries(query) {
+    const response = await api.get(`/recipes/summaries/search?query=${encodeURIComponent(query)}`)
+    return response.data
+  },
+
+  // ========================================
+  // PUBLIC ENDPOINTS (for all users) - Full data
   // ========================================
 
   async getAllRecipes() {
@@ -20,6 +51,10 @@ export const recipeService = {
     return response.data
   },
 
+  /**
+   * Get full recipe data including ingredients and steps.
+   * FR-102: Use this when user clicks "View Recipe" to get full data.
+   */
   async getRecipeById(id) {
     const response = await api.get(`/recipes/${id}`)
     return response.data

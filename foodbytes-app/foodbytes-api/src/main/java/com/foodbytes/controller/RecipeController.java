@@ -3,6 +3,7 @@ package com.foodbytes.controller;
 import com.foodbytes.dto.RecipeAdminDTO;
 import com.foodbytes.dto.RecipeDTO;
 import com.foodbytes.dto.RecipeExtrasHierarchyDTO;
+import com.foodbytes.dto.RecipeSummaryDTO;
 import com.foodbytes.service.RecipeService;
 import com.foodbytes.service.RecipeExtrasService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -43,6 +44,28 @@ public class RecipeController {
     @Operation(summary = "Get recipe by ID (admin)", description = "Returns recipe details for editing")
     public ResponseEntity<RecipeAdminDTO> getRecipeByIdAdmin(@PathVariable Long id) {
         return ResponseEntity.ok(recipeService.getRecipeByIdAdmin(id));
+    }
+
+    // ========================================
+    // FR-102: SUMMARY ENDPOINTS (Lightweight data for list views)
+    // ========================================
+
+    @GetMapping("/summaries")
+    @Operation(summary = "Get recipe summaries",
+            description = "Returns lightweight recipe data (no ingredients/steps) for list views. FR-102.")
+    public ResponseEntity<List<RecipeSummaryDTO>> getRecipeSummaries(
+            @RequestParam(required = false) String mealType) {
+        if (mealType != null && !mealType.isEmpty()) {
+            return ResponseEntity.ok(recipeService.getRecipeSummariesByMealType(mealType));
+        }
+        return ResponseEntity.ok(recipeService.getAllRecipeSummaries());
+    }
+
+    @GetMapping("/summaries/search")
+    @Operation(summary = "Search recipe summaries",
+            description = "Search recipes and return lightweight summaries. FR-102.")
+    public ResponseEntity<List<RecipeSummaryDTO>> searchRecipeSummaries(@RequestParam String query) {
+        return ResponseEntity.ok(recipeService.searchRecipeSummaries(query));
     }
 
     // ========================================

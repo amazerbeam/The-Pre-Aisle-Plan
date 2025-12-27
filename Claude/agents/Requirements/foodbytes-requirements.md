@@ -36,11 +36,9 @@
 
 | Req # | Description |
 |-------|-------------|
-| FR-029 | Screen Wake Lock with Persistent Clickable Lock Icon (Next to Ingredients) |
-| FR-042 | Ingredient Breakdown Popup - Extras Support |
-| FR-089 | Shopping List Extras Integration - Store-Bought Items |
-| FR-099 | Default Variant Selection to Balanced |
-| FR-100 | Active Tab Line Indicator (Footer Navigation) |
+| FR-101 | Prevent Recipe List Reload on Day Assignment (Double Spinner Bug) |
+| FR-102 | Lightweight Recipe Loading (Summary + On-Demand Full Data) |
+| FR-103 | Shopping List Generation Cache (Invalidate on Meal Plan Change) |
 
 ## In Progress - Finish
 
@@ -112,7 +110,9 @@
 | FR-096 | Shopping List Background Sync (No Reload) |
 | FR-097 | Variant Pre-Selection from Meal Plan |
 | FR-098 | Recipe Day Assignment Optimistic UI |
-| FR-099 | Default Variant Selection to Balanced |
+| FR-099 | Default Variant Selection from Database |
+| FR-029 | Screen Wake Lock with Persistent Clickable Lock Icon |
+| FR-100 | Active Tab Line Indicator (Footer Navigation) |
 ## Completed - Finish
 
 ---
@@ -1209,35 +1209,34 @@ CREATE TABLE recipe_family_members (
 
 ---
 
-### FR-099: Default Variant Selection to Balanced
+### FR-099: Default Variant Selection from Database
 
 **Category:** Recipe Management / Variants
 
-**Description:** When displaying recipes with variants, if no variant has been assigned to the user's meal plan for the current week, the dropdown should default to showing the "Balanced" variant (largest portion, maintenance calories) instead of "Moderate". This ensures users see maintenance-level portions by default, with lighter options available via dropdown.
+**Description:** When displaying recipes with variants, the selected variant is determined by: (1) the variant assigned to the user's meal plan for the current week, OR (2) the `isDefault` variant from the database if no meal plan assignment exists. This ensures consistency between admin-configured defaults and user selections.
 
-**User Story:** As a user, I want to see the Balanced (maintenance) variant by default when browsing recipes, so that I start from a full-portion baseline and can choose lighter options if needed.
+**User Story:** As a user, I want to see the correct variant when browsing recipes - either my meal plan selection or the admin-configured default.
 
 **Acceptance Criteria:**
-- [ ] Recipe cards display the "Balanced" variant by default when no meal plan assignment exists
-- [ ] Variant dropdown shows "Balanced" as the pre-selected option
-- [ ] If user has assigned a different variant (Light/Moderate) to meal plan, that variant displays instead (per FR-097)
-- [ ] Default applies across all meal type tabs (Breakfast, Lunch, Dinner, Snacks)
-- [ ] Admin can still set which recipe is the "default" in a family, but frontend defaults to Balanced for display
+- [x] If variant is assigned to user's meal plan for current week → show that variant
+- [x] If no meal plan assignment → show the `isDefault` variant from database
+- [x] Variant dropdown shows the correct variant as pre-selected
+- [x] Works across all meal type tabs (Breakfast, Lunch, Dinner, Snacks, Extras)
+- [x] Admin sets `isDefault` flag in recipe family configuration
 
-**Source Evidence:** User feedback - "If there is no selected value from the meal plan the default value should be Balanced"
+**Variant Selection Priority:**
+1. **Meal Plan Selection** - User has assigned a specific variant to their week
+2. **Database Default** - `isDefault=true` variant from `recipe_family_members` table
+
+**Source Evidence:** User clarification - "if there is a variant selected for that day of the week we show the selected variant... other than that we show the isDefault from the database"
 
 **Priority:** Medium
 
-**Status:** In Progress
+**Status:** Complete
 
 **Related Requirements:**
 - FR-043 (Linked Recipe Variants)
 - FR-097 (Variant Pre-Selection from Meal Plan)
-
-**Technical Notes:**
-- Modify `RecipeList.jsx` to select Balanced variant when no meal plan match exists
-- May require updating `swapWithMealPlanVariants()` logic
-- Database `is_default` flag may need to be reconsidered (currently marks Moderate as default)
 
 ---
 
@@ -1344,7 +1343,7 @@ CREATE TABLE recipe_family_members (
 - `navigator.wakeLock.request('screen')`
 - Feature detection: `if ('wakeLock' in navigator)`
 
-**Status:** In Progress
+**Status:** Complete
 
 ---
 
@@ -1438,6 +1437,297 @@ CREATE TABLE recipe_family_members (
 **Source Evidence:**
 - User screenshot showing line indicator under "Recipes" tab
 - `components/layout/Footer.jsx` - Target component
+
+**Status:** Complete
+
+---
+
+### FR-101: Prevent Recipe List Reload on Day Assignment (Double Spinner Bug)
+**Priority:** High
+
+**Category:** Performance / Bug Fix
+
+**Description:** When a user clicks a day button to assign a recipe, TWO loading spinners appear instead of none. This is caused by a cascading dependency chain where the optimistic UI update to `weekPlan` triggers unnecessary recipe list reloads.
+
+**User Story:** As a user, I want to assign recipes to days without seeing loading spinners, so that the UI feels fast and responsive as intended by FR-098.
+
+**Problem Analysis:**
+
+The issue is a cascade of useCallback/useEffect dependencies in `RecipeList.jsx`:
+
+1. `weekPlan` changes (from optimistic update in `assignRecipe`)
+2. `getMealPlanRecipeIds` recreates (depends on `weekPlan`)
+3. `swapWithMealPlanVariants` recreates (depends on `getMealPlanRecipeIds`)
+4. `loadRecipes` recreates (depends on `swapWithMealPlanVariants`)
+5. `useEffect` fires because `loadRecipes` changed → **Spinner #1** (recipe list reloads)
+6. After API succeeds, `fetchWeekPlan()` is called → changes `weekPlan` again
+7. The cascade repeats → **Spinner #2**
+
+**Root Cause:**
+
+The `swapWithMealPlanVariants` function (FR-097) is designed to show recipe variants that are in the user's meal plan. This is a valid feature, but it runs on EVERY `weekPlan` change, including:
+- Optimistic UI updates when assigning a recipe
+- Background syncs from `fetchWeekPlan()`
+
+**Acceptance Criteria:**
+- [ ] Clicking a day button shows NO loading spinners (optimistic UI as per FR-098)
+- [ ] Recipe list does NOT reload when assigning a recipe to a day
+- [ ] Variant pre-selection (FR-097) still works on initial load and tab change
+- [ ] Daily calorie totals update immediately without triggering recipe reload
+- [ ] No visual flicker or recipe card re-rendering on assignment
+
+**Proposed Fix:**
+
+Stabilize the dependency chain by:
+1. Moving variant swap logic OUT of the `loadRecipes` callback chain
+2. Only run variant swapping on:
+   - Initial component mount
+   - Meal tab changes (breakfast → lunch → dinner)
+3. Do NOT re-run variant swapping when:
+   - User assigns/removes a recipe from a day
+   - Background `fetchWeekPlan()` syncs
+
+**Technical Implementation:**
+- Use `useRef` to store `weekPlan` snapshot for variant checking (avoids dependency)
+- OR separate variant swapping into its own effect that only runs on tab change
+- OR use a flag to skip variant checking during assignment operations
+
+**DO:**
+- Preserve FR-097 functionality (variant pre-selection on initial load/tab change)
+- Preserve FR-098 functionality (optimistic UI, no spinners)
+- Test that recipe cards don't flicker or reload on day assignment
+
+**DO NOT:**
+- Do NOT break variant pre-selection feature
+- Do NOT introduce race conditions between assignment and variant swapping
+- Do NOT add loading states to day buttons (violates NFR-016)
+
+**Related Requirements:**
+- FR-097 (Variant Pre-Selection from Meal Plan) - Root cause
+- FR-098 (Recipe Day Assignment Optimistic UI) - Intended behavior
+- NFR-016 (Simplified Day Button Styling) - No loading effects
+
+**Source Evidence:**
+- User feedback: "I get 1 'spinning' loader, then that closes and another pops up. So I get 2 loaders instead of none"
+- Code analysis: `RecipeList.jsx` lines 25-103, `MealPlanContext.jsx` lines 236-257
+
+**Status:** In Progress
+
+---
+
+### FR-102: Lightweight Recipe Loading (Summary + On-Demand Full Data)
+**Priority:** High
+
+**Category:** Performance
+
+**Description:** Optimize recipe loading by returning only summary data when browsing recipe lists (tab switches, search). Full recipe data (ingredients, steps) is fetched on-demand only when the user opens the recipe view modal. This significantly reduces payload size and improves tab switching performance.
+
+**User Story:** As a user, I want fast tab switching between meal types so that I can quickly browse recipes without waiting for unnecessary data to load.
+
+**Problem Analysis:**
+
+Currently, switching from "Breakfast" to "Lunch" tab fetches ALL recipe data including ingredients and steps for every recipe. This is wasteful because:
+- Recipe cards only display: name, calories, servings, variant badge
+- Ingredients/steps are only needed when user clicks "View Recipe"
+- Most users browse multiple tabs but only view 1-2 recipes in detail
+
+**Acceptance Criteria:**
+
+**Summary Data (Tab Switch / Search):**
+- [ ] `GET /recipes?mealType={type}` returns summary only
+- [ ] `GET /recipes/admin?mealType={type}` returns summary only
+- [ ] `GET /recipes/search?query=` returns summary only
+- [ ] Summary includes: `id`, `name`, `defaultServings`, `calories`, `isCheat`, `hasExtras`, `isLive`, `variantLabel`, `variants[]`
+- [ ] Summary does NOT include: `ingredients[]`, `steps[]`
+
+**Full Data (Modal View):**
+- [ ] `GET /recipes/{id}` returns full recipe data (existing behavior)
+- [ ] RecipeViewModal fetches full data when opened
+- [ ] Modal header (name, calories, servings) displays immediately from passed summary data
+- [ ] Modal content area shows loading spinner while fetching ingredients/steps
+- [ ] Variant switch in modal fetches new variant's full data
+
+**Summary Response Structure:**
+```javascript
+{
+  id: number,
+  name: string,
+  defaultServings: number,
+  calories: number,
+  isCheat: boolean,
+  hasExtras: boolean,
+  isLive: boolean,           // Admin only
+  variantLabel: string,      // From isDefault OR meal plan selection
+  variants: [{
+    recipeId: number,
+    variantLabel: string,
+    caloriesPerServing: number,
+    displayOrder: number,
+    isDefault: boolean
+  }]
+  // NO ingredients
+  // NO steps
+}
+```
+
+**Modal Data Flow:**
+```
+User clicks "View Recipe"
+    ↓
+Modal opens with header populated (from summary: name, calories, servings)
+    ↓
+Content area shows spinner
+    ↓
+Fetch GET /recipes/{selectedVariantId}
+    ↓
+Display ingredients + steps
+    ↓
+User selects different variant → fetch that variant → spinner → display
+```
+
+**DO:**
+- Pass summary data (name, calories, servings, variants) from RecipeCard to RecipeViewModal
+- Show modal header immediately using passed data
+- Show spinner ONLY in content area (ingredients/steps section)
+- Fetch full recipe data using selected variant's ID
+- On variant switch in modal, fetch new variant's full data
+
+**DO NOT:**
+- Do NOT show full-modal loading spinner (header should appear immediately)
+- Do NOT cache fetched recipe data (always fetch fresh)
+- Do NOT include ingredients/steps in summary endpoints
+- Do NOT break existing `GET /recipes/{id}` endpoint behavior
+
+**Backend Changes Required:**
+1. Modify `RecipeController.getRecipes()` to return summary projection
+2. Modify `RecipeController.getRecipesAdmin()` to return summary projection
+3. Modify `RecipeController.searchRecipes()` to return summary projection
+4. Keep `RecipeController.getRecipeById()` returning full data
+
+**Frontend Changes Required:**
+1. Update `RecipeCard.jsx` - works with summary data only
+2. Update `RecipeViewModal.jsx` - fetches full data, shows content spinner
+3. Update `SearchView.jsx` - works with summary data only
+
+**Related Requirements:**
+- FR-101 (Prevent Recipe List Reload) - Fixes double spinner on assignment
+- FR-097 (Variant Pre-Selection) - Determines which variant to show
+- FR-099 (Default Variant from Database) - Fallback when no meal plan selection
+
+**Source Evidence:**
+- User feedback: "we are getting back too much information when we move to a meal tab"
+- User feedback: "If the user clicks 'View' recipe we then go get the selected variant only"
+
+**Status:** In Progress
+
+---
+
+### FR-103: Shopping List Generation Cache (Invalidate on Meal Plan Change)
+**Priority:** High
+
+**Category:** Performance / Shopping List
+
+**Description:** Implement a cache mechanism for the shopping list to avoid unnecessary regeneration. The shopping list should only be fetched from the backend when the cache is invalid. Cache invalidation occurs when the meal plan changes (recipe assigned/removed) or when homemade selections change.
+
+**User Story:** As a user, I want the shopping list to load quickly when I navigate to the Shopping tab, without unnecessary API calls when nothing has changed.
+
+**Current Problem:**
+
+Shopping list fetches on every `startDate` or `isAuthenticated` change via useEffect, even when no meal plan changes occurred. This is wasteful and causes unnecessary loading spinners.
+
+**Proposed Solution:**
+
+Track cache validity in localStorage:
+```javascript
+// localStorage keys
+shoppingListGeneratedDate: "2025-12-27"   // Date when list was generated (day only)
+shoppingListStartDate: "2025-12-23"       // Which week's start date this list is for
+```
+
+**Acceptance Criteria:**
+
+**Cache Check on Shopping Tab Navigation:**
+- [ ] If `shoppingListGeneratedDate` is null → generate shopping list
+- [ ] If `shoppingListStartDate` !== current `startDate` → generate shopping list
+- [ ] Otherwise → use cached list (no API call)
+
+**Cache Update After Generation:**
+- [ ] Set `shoppingListGeneratedDate` = today (day only, e.g., "2025-12-27")
+- [ ] Set `shoppingListStartDate` = current start date
+
+**Cache Invalidation (set `shoppingListGeneratedDate` = null):**
+- [ ] When user assigns a recipe to a day (day button click)
+- [ ] When user removes a recipe from a day
+- [ ] When user changes homemade/store-bought selection for an extra
+
+**Date Change on Shopping List Screen:**
+- [ ] User changes start date → generate new list → update both cache values
+
+**Loading State UX:**
+- [ ] Show "Generating shopping list..." message during fetch
+- [ ] Loading state displays for **minimum 2 seconds** (even if API returns faster)
+- [ ] Prevents jarring flash for quick API responses
+
+**Logic Flow:**
+```
+┌─────────────────────────────────────────────────────────────┐
+│  User Navigates to Shopping Tab                              │
+├─────────────────────────────────────────────────────────────┤
+│  IF shoppingListGeneratedDate === null                      │
+│     → Fetch shopping list from API                          │
+│     → Set shoppingListGeneratedDate = today                 │
+│     → Set shoppingListStartDate = current startDate         │
+│  ELSE IF shoppingListStartDate !== current startDate        │
+│     → Fetch shopping list (different week)                  │
+│     → Update both cache values                              │
+│  ELSE                                                       │
+│     → Use cached list (no fetch)                            │
+└─────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│  User Assigns/Removes Recipe (day button click)              │
+├─────────────────────────────────────────────────────────────┤
+│  → Set shoppingListGeneratedDate = null (invalidate)        │
+│  → Next Shopping tab visit will regenerate                  │
+└─────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│  User Changes Homemade Selection (ExtrasSelectionPopup)      │
+├─────────────────────────────────────────────────────────────┤
+│  → Set shoppingListGeneratedDate = null (invalidate)        │
+│  → Next Shopping tab visit will regenerate                  │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**DO:**
+- Use single cache keys (not per-user): `shoppingListGeneratedDate`, `shoppingListStartDate`
+- Store date as day-only string (e.g., "2025-12-27"), no time component
+- Expose `invalidateShoppingListCache()` function from ShoppingListContext
+- Call invalidate from MealPlanContext when recipe is assigned/removed
+- Call invalidate from HomemadeSelectionsContext when selection changes
+- Use `Promise.all([fetchPromise, delay(2000)])` to ensure minimum 2 second loading display
+
+**DO NOT:**
+- Do NOT use per-user cache keys (all users share same localStorage keys)
+- Do NOT fetch shopping list on every useEffect trigger
+- Do NOT invalidate on servings change alone (only when actually assigned)
+
+**Files to Change:**
+
+| File | Change |
+|------|--------|
+| `ShoppingListContext.jsx` | Add cache check logic, expose `invalidateShoppingListCache()` |
+| `MealPlanContext.jsx` | Import and call `invalidateShoppingListCache()` in `assignRecipe()` |
+| `HomemadeSelectionsContext.jsx` | Call `invalidateShoppingListCache()` when selections change |
+| `ShoppingList.jsx` | Trigger cache check on component mount/navigation |
+
+**Related Requirements:**
+- FR-019 (Generate Aggregated Shopping List) - Core shopping list functionality
+- FR-087 (Homemade Selection Popup) - Extras selection affects ingredients
+- FR-014 (Assign Recipes to Days) - Triggers cache invalidation
+
+**Source Evidence:**
+- User feedback: "If we add a new recipe to the meal plan we set 'ShoppingListGeneratedDate' to null so when moving back to the shopping list tab we generate a new list"
 
 **Status:** In Progress
 

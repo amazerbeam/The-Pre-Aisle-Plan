@@ -25,6 +25,21 @@ const MEAL_ID_TO_TYPE = {
 // localStorage key for persisting startDate
 const START_DATE_STORAGE_KEY = 'foodbytes_startDate'
 
+// FR-103: Shopping list cache key (shared with ShoppingListContext)
+const SHOPPING_LIST_INVALIDATED_KEY = 'shoppingListInvalidated'
+
+/**
+ * FR-103: Invalidate shopping list cache when meal plan changes
+ * Called directly to avoid circular dependency with ShoppingListContext
+ */
+const invalidateShoppingListCache = () => {
+  try {
+    localStorage.setItem(SHOPPING_LIST_INVALIDATED_KEY, 'true')
+  } catch (err) {
+    console.error('Failed to invalidate shopping list cache:', err)
+  }
+}
+
 /**
  * Get initial start date from localStorage or default to today
  */
@@ -236,6 +251,8 @@ export const MealPlanProvider = ({ children }) => {
     // Fire API call in background (don't await)
     mealPlanService.assignRecipe(planDate, mealId, recipeId, servings)
       .then(() => {
+        // FR-103: Invalidate shopping list cache on successful meal plan change
+        invalidateShoppingListCache()
         // Success - silently refresh to sync with server (gets real IDs, etc.)
         return fetchWeekPlan()
       })
@@ -267,6 +284,8 @@ export const MealPlanProvider = ({ children }) => {
 
     try {
       await mealPlanService.removeEntry(entryId)
+      // FR-103: Invalidate shopping list cache on successful removal
+      invalidateShoppingListCache()
       // Refresh the week plan
       await fetchWeekPlan()
     } catch (err) {

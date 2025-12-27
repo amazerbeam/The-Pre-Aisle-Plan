@@ -71,6 +71,49 @@ public class RecipeService {
                 .collect(Collectors.toList());
     }
 
+    // ========================================
+    // FR-102: SUMMARY ENDPOINTS (Lightweight data for list views)
+    // ========================================
+
+    /**
+     * FR-102: Get lightweight recipe summaries for all recipes.
+     * Does not include ingredients or steps.
+     */
+    @Transactional(readOnly = true)
+    public List<RecipeSummaryDTO> getAllRecipeSummaries() {
+        Set<Long> hiddenRecipeIds = new HashSet<>(recipeFamilyMemberRepository.findNonDefaultRecipeIds());
+        return recipeRepository.findAllLiveRecipes().stream()
+                .filter(recipe -> !hiddenRecipeIds.contains(recipe.getId()))
+                .map(this::convertToSummaryDTO)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * FR-102: Get lightweight recipe summaries filtered by meal type.
+     * Does not include ingredients or steps.
+     */
+    @Transactional(readOnly = true)
+    public List<RecipeSummaryDTO> getRecipeSummariesByMealType(String mealType) {
+        Set<Long> hiddenRecipeIds = new HashSet<>(recipeFamilyMemberRepository.findNonDefaultRecipeIds());
+        return recipeRepository.findByMealKey(mealType.toLowerCase()).stream()
+                .filter(recipe -> !hiddenRecipeIds.contains(recipe.getId()))
+                .map(this::convertToSummaryDTO)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * FR-102: Search recipes and return lightweight summaries.
+     * Does not include ingredients or steps.
+     */
+    @Transactional(readOnly = true)
+    public List<RecipeSummaryDTO> searchRecipeSummaries(String query) {
+        Set<Long> hiddenRecipeIds = new HashSet<>(recipeFamilyMemberRepository.findNonDefaultRecipeIds());
+        return recipeRepository.searchByName(query).stream()
+                .filter(recipe -> !hiddenRecipeIds.contains(recipe.getId()))
+                .map(this::convertToSummaryDTO)
+                .collect(Collectors.toList());
+    }
+
     @Transactional(readOnly = true)
     public RecipeDTO getRecipeById(Long id) {
         Recipe recipe = recipeRepository.findById(id)
@@ -111,6 +154,75 @@ public class RecipeService {
         addExtrasInfo(dto, recipe.getId());
 
         return dto;
+    }
+
+    /**
+     * FR-102: Convert Recipe entity to lightweight summary DTO.
+     * Does NOT include ingredients or steps - only summary data needed for list views.
+     */
+    private RecipeSummaryDTO convertToSummaryDTO(Recipe recipe) {
+        RecipeSummaryDTO dto = RecipeSummaryDTO.builder()
+                .id(recipe.getId())
+                .name(recipe.getName())
+                .defaultServings(recipe.getDefaultServings())
+                .calories(recipe.getCalories())
+                .isCheat(recipe.getIsCheat())
+                .mealTypes(recipe.getMeals().stream()
+                        .map(m -> m.getMeal().getKey())
+                        .collect(Collectors.toList()))
+                .build();
+
+        // FR-043, FR-099: Add variant information
+        addVariantInfoToSummary(dto, recipe.getId());
+
+        // FR-086: Add extras flag (no tree, just boolean)
+        dto.setHasExtras(recipeExtrasService.hasExtras(recipe.getId()));
+
+        return dto;
+    }
+
+    /**
+     * FR-102: Add variant information to summary DTO.
+     * Similar to addVariantInfo but for RecipeSummaryDTO.
+     */
+    private void addVariantInfoToSummary(RecipeSummaryDTO dto, Long recipeId) {
+        Optional<RecipeFamilyMember> membership = recipeFamilyMemberRepository.findByRecipeId(recipeId);
+
+        if (membership.isPresent()) {
+            RecipeFamilyMember member = membership.get();
+            dto.setVariantLabel(member.getVariantLabel());
+            dto.setIsDefault(member.getIsDefault());
+
+            // Get all variants in the family
+            List<RecipeFamilyMember> allMembers = recipeFamilyMemberRepository
+                .findVariantsForRecipe(recipeId);
+
+            // Only include variants if 2+ members
+            if (allMembers.size() >= 2) {
+                dto.setVariants(allMembers.stream()
+                    .map(m -> {
+                        Recipe variantRecipe = m.getRecipe();
+                        Integer caloriesPerServing = variantRecipe.getDefaultServings() > 0
+                            ? variantRecipe.getCalories() / variantRecipe.getDefaultServings()
+                            : variantRecipe.getCalories();
+                        return new RecipeVariantDTO(
+                            variantRecipe.getId(),
+                            variantRecipe.getName(),
+                            m.getVariantLabel(),
+                            m.getIsDefault(),
+                            m.getDisplayOrder(),
+                            caloriesPerServing
+                        );
+                    })
+                    .collect(Collectors.toList()));
+            } else {
+                dto.setVariants(new ArrayList<>());
+            }
+        } else {
+            dto.setVariantLabel(null);
+            dto.setIsDefault(null);
+            dto.setVariants(new ArrayList<>());
+        }
     }
 
     /**

@@ -8,7 +8,7 @@ import WakeLockIcon from '../common/WakeLockIcon'
 import './RecipeViewModal.css'
 
 /**
- * FR-013, FR-029, FR-091, FR-092, FR-095: RecipeViewModal - Fullscreen recipe view popup
+ * FR-013, FR-029, FR-091, FR-092, FR-095, FR-102: RecipeViewModal - Fullscreen recipe view popup
  * - White text on dark background
  * - Variant dropdown for recipe families (same as RecipeCard)
  * - Keeps popup open when variant changes (updates content in-place)
@@ -17,16 +17,25 @@ import './RecipeViewModal.css'
  * - FR-091: Linked steps display as clickable links
  * - FR-092: Navigation stack for browsing linked recipes
  * - FR-095: Independent servings per recipe (extras show at their default servings)
+ * - FR-102: On-demand loading - header displays immediately, content fetches full data
  */
 function RecipeViewModal({
-  recipe,
+  recipeId,           // FR-102: Recipe ID to fetch full data
+  recipeName,         // FR-102: For immediate header display
   servings,
   caloriesPerServing,
+  isCheat,            // FR-102: For immediate header display
+  hasExtras,          // FR-102: For extras indicator
   onClose,
   variants,           // Array of variant objects from recipe family
   onSelectVariant,    // Callback when variant is selected: (variantId, servings) => void
   parentRecipeId = null  // FR-091: Parent recipe ID for homemade selection lookup
 }) {
+  // FR-102: Full recipe data state (loaded on mount)
+  const [fullRecipe, setFullRecipe] = useState(null)
+  const [contentLoading, setContentLoading] = useState(true)
+  const [contentError, setContentError] = useState(null)
+
   // FR-092: Navigation stack for linked recipes
   const {
     currentRecipe: stackRecipe,
@@ -36,7 +45,7 @@ function RecipeViewModal({
     canGoBack,
     previousRecipeName,
     breadcrumbs
-  } = useRecipeNavigationStack(recipe)
+  } = useRecipeNavigationStack(fullRecipe)
 
   // FR-090: Get homemade selections to determine display for linked steps
   const { getSelections } = useHomemadeSelections()
@@ -46,29 +55,48 @@ function RecipeViewModal({
   const { isLocked, isSupported, isAnimating, toggle: toggleWakeLock } = useWakeLock(true)
 
   // State for variant dropdown
-  const [selectedVariantId, setSelectedVariantId] = useState(recipe?.id)
+  const [selectedVariantId, setSelectedVariantId] = useState(recipeId)
   const [showCalorieDropdown, setShowCalorieDropdown] = useState(false)
-  const [currentRecipe, setCurrentRecipe] = useState(recipe)
+  const [currentRecipeName, setCurrentRecipeName] = useState(recipeName)
   const [currentCalories, setCurrentCalories] = useState(caloriesPerServing)
+  const [currentIsCheat, setCurrentIsCheat] = useState(isCheat)
   const dropdownRef = useRef(null)
 
   // FR-095: Independent servings state per recipe in navigation stack
   const [currentServings, setCurrentServings] = useState(servings)
 
-  // Update current recipe when prop changes
+  // FR-102: Fetch full recipe data on mount and when recipeId changes
   useEffect(() => {
-    setCurrentRecipe(recipe)
-    setSelectedVariantId(recipe?.id)
-    resetStack(recipe)
-  }, [recipe, resetStack])
+    const fetchFullRecipe = async () => {
+      if (!recipeId) return
+
+      setContentLoading(true)
+      setContentError(null)
+
+      try {
+        const data = await recipeService.getRecipeById(recipeId)
+        setFullRecipe(data)
+        setCurrentRecipeName(data.name)
+        resetStack(data)
+      } catch (err) {
+        console.error('Failed to fetch recipe:', err)
+        setContentError('Failed to load recipe details')
+      } finally {
+        setContentLoading(false)
+      }
+    }
+
+    fetchFullRecipe()
+  }, [recipeId, resetStack])
 
   // FR-092, FR-095: Sync current recipe with stack when navigating
   // Reset servings to the linked recipe's defaultServings when navigating
-  // Only trigger when stackRecipe changes (not when currentRecipe changes from variant selection)
+  // Only trigger when stackRecipe changes (not when fullRecipe changes from variant selection)
   const prevStackRecipeId = useRef(stackRecipe?.id)
   useEffect(() => {
     if (stackRecipe && stackRecipe.id !== prevStackRecipeId.current) {
-      setCurrentRecipe(stackRecipe)
+      setFullRecipe(stackRecipe)
+      setCurrentRecipeName(stackRecipe.name)
       // FR-095: Reset servings to linked recipe's default (not parent's servings)
       setCurrentServings(stackRecipe.defaultServings || 1)
       prevStackRecipeId.current = stackRecipe.id
@@ -153,34 +181,43 @@ function RecipeViewModal({
   }
 
   // Handle variant selection - update in-place without closing popup
-  // FR-013: Fetch variant recipe data internally to keep modal open
+  // FR-013, FR-102: Fetch variant recipe data internally to keep modal open
   const handleVariantSelect = async (variantId) => {
     setSelectedVariantId(variantId)
     setShowCalorieDropdown(false)
 
-    // Update calories immediately from variant data
+    // Update calories and header immediately from variant data
     const selectedVariant = sortedVariants.find(v => v.recipeId === variantId)
     if (selectedVariant) {
       setCurrentCalories(selectedVariant.caloriesPerServing)
+      setCurrentRecipeName(selectedVariant.recipeName)
     }
 
-    // Fetch full recipe data for the variant (ingredients, steps) internally
+    // FR-102: Fetch full recipe data for the variant (ingredients, steps) internally
     // Do NOT call parent's onSelectVariant - that would cause unmount/remount
-    if (variantId !== currentRecipe?.id) {
+    if (variantId !== fullRecipe?.id) {
+      setContentLoading(true)
       try {
         const variantRecipe = await recipeService.getRecipeById(variantId)
-        setCurrentRecipe(variantRecipe)
+        setFullRecipe(variantRecipe)
+        setCurrentIsCheat(variantRecipe.isCheat)
       } catch (err) {
         console.error('Failed to fetch variant recipe:', err)
+        setContentError('Failed to load variant')
+      } finally {
+        setContentLoading(false)
       }
     }
   }
 
-  if (!currentRecipe) return null
+  // FR-102: Don't block render - show header immediately even without full data
+  if (!recipeId) return null
 
   // FR-095: Scale quantity based on currentServings (independent per recipe)
+  // FR-102: Only scale when fullRecipe is loaded
   const scaleQuantity = (originalQty) => {
-    const scaled = (originalQty / currentRecipe.defaultServings) * currentServings
+    if (!fullRecipe?.defaultServings) return originalQty
+    const scaled = (originalQty / fullRecipe.defaultServings) * currentServings
     return Number.isInteger(scaled) ? scaled : scaled.toFixed(2)
   }
 
@@ -193,7 +230,7 @@ function RecipeViewModal({
   return (
     <div className="recipe-view-overlay" onClick={onClose}>
       <div className="recipe-view-modal" onClick={(e) => e.stopPropagation()}>
-        {/* Header */}
+        {/* Header - FR-102: Displays immediately from summary props */}
         <header className="recipe-view-header">
           <div className="header-content">
             {/* FR-092: Back navigation for linked recipes */}
@@ -204,7 +241,7 @@ function RecipeViewModal({
               onBack={popRecipe}
               showBreadcrumbs={false}
             />
-            <h2 className="recipe-title">{currentRecipe.name}</h2>
+            <h2 className="recipe-title">{currentRecipeName}</h2>
             <div className="recipe-meta">
               {/* FR-013: Variant dropdown OR plain calories badge */}
               {hasVariants ? (
@@ -258,7 +295,7 @@ function RecipeViewModal({
                 />
                 <span className="servings-label">serving{currentServings !== 1 ? 's' : ''}</span>
               </div>
-              {currentRecipe.isCheat && <span className="cheat-badge">Cheat</span>}
+              {currentIsCheat && <span className="cheat-badge">Cheat</span>}
             </div>
           </div>
           <button
@@ -270,78 +307,91 @@ function RecipeViewModal({
           </button>
         </header>
 
-        {/* Content */}
+        {/* Content - FR-102: Shows spinner while loading, then ingredients/steps */}
         <div className="recipe-view-content">
-          {/* Ingredients */}
-          <section className="ingredients-section">
-            <h3>
-              Ingredients
-              {/* FR-029: Wake lock icon - clickable to toggle screen lock */}
-              <WakeLockIcon
-                isLocked={isLocked}
-                isAnimating={isAnimating}
-                isSupported={isSupported}
-                onToggle={toggleWakeLock}
-              />
-            </h3>
-            {currentRecipe.ingredients && currentRecipe.ingredients.length > 0 ? (
-              <ul className="ingredients-list">
-                {currentRecipe.ingredients.map((ing, idx) => (
-                  <li key={idx} className="ingredient-item">
-                    <span className="ingredient-quantity">{scaleQuantity(ing.quantity)}</span>
-                    <span className="ingredient-unit">{ing.unit}</span>
-                    <span className="ingredient-name">{ing.name}</span>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="no-content">No ingredients listed</p>
-            )}
-          </section>
+          {contentLoading ? (
+            <div className="content-loading">
+              <div className="spinner"></div>
+              <p>Loading recipe details...</p>
+            </div>
+          ) : contentError ? (
+            <div className="content-error">
+              <p>{contentError}</p>
+            </div>
+          ) : (
+            <>
+              {/* Ingredients */}
+              <section className="ingredients-section">
+                <h3>
+                  Ingredients
+                  {/* FR-029: Wake lock icon - clickable to toggle screen lock */}
+                  <WakeLockIcon
+                    isLocked={isLocked}
+                    isAnimating={isAnimating}
+                    isSupported={isSupported}
+                    onToggle={toggleWakeLock}
+                  />
+                </h3>
+                {fullRecipe?.ingredients && fullRecipe.ingredients.length > 0 ? (
+                  <ul className="ingredients-list">
+                    {fullRecipe.ingredients.map((ing, idx) => (
+                      <li key={idx} className="ingredient-item">
+                        <span className="ingredient-quantity">{scaleQuantity(ing.quantity)}</span>
+                        <span className="ingredient-unit">{ing.unit}</span>
+                        <span className="ingredient-name">{ing.name}</span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="no-content">No ingredients listed</p>
+                )}
+              </section>
 
-          {/* Steps - FR-091: Handle linked steps */}
-          <section className="steps-section">
-            <h3>Instructions</h3>
-            {currentRecipe.steps && currentRecipe.steps.length > 0 ? (
-              <ol className="steps-list">
-                {currentRecipe.steps.map((step, idx) => {
-                  // Handle both old format (string) and new format (object)
-                  const stepObj = typeof step === 'string'
-                    ? { instruction: step }
-                    : step
+              {/* Steps - FR-091: Handle linked steps */}
+              <section className="steps-section">
+                <h3>Instructions</h3>
+                {fullRecipe?.steps && fullRecipe.steps.length > 0 ? (
+                  <ol className="steps-list">
+                    {fullRecipe.steps.map((step, idx) => {
+                      // Handle both old format (string) and new format (object)
+                      const stepObj = typeof step === 'string'
+                        ? { instruction: step }
+                        : step
 
-                  // FR-091: Determine what to display based on linked recipe state
-                  const hasLink = stepObj.linkedRecipeId != null
-                  const homemade = hasLink ? isHomemade(stepObj.linkedRecipeId) : true
+                      // FR-091: Determine what to display based on linked recipe state
+                      const hasLink = stepObj.linkedRecipeId != null
+                      const homemade = hasLink ? isHomemade(stepObj.linkedRecipeId) : true
 
-                  // Show alt instruction if linked and store-bought
-                  const displayText = hasLink && !homemade && stepObj.altInstruction
-                    ? stepObj.altInstruction
-                    : stepObj.instruction
+                      // Show alt instruction if linked and store-bought
+                      const displayText = hasLink && !homemade && stepObj.altInstruction
+                        ? stepObj.altInstruction
+                        : stepObj.instruction
 
-                  return (
-                    <li key={idx} className="step-item">
-                      {hasLink && homemade ? (
-                        // Linked and homemade - show as clickable link
-                        <button
-                          className="linked-step-button"
-                          onClick={() => handleLinkedStepClick(stepObj.linkedRecipeId)}
-                          title={`View ${stepObj.linkedRecipeName} recipe`}
-                        >
-                          {displayText}
-                        </button>
-                      ) : (
-                        // No link or store-bought - show as plain text
-                        <span>{displayText}</span>
-                      )}
-                    </li>
-                  )
-                })}
-              </ol>
-            ) : (
-              <p className="no-content">No instructions listed</p>
-            )}
-          </section>
+                      return (
+                        <li key={idx} className="step-item">
+                          {hasLink && homemade ? (
+                            // Linked and homemade - show as clickable link
+                            <button
+                              className="linked-step-button"
+                              onClick={() => handleLinkedStepClick(stepObj.linkedRecipeId)}
+                              title={`View ${stepObj.linkedRecipeName} recipe`}
+                            >
+                              {displayText}
+                            </button>
+                          ) : (
+                            // No link or store-bought - show as plain text
+                            <span>{displayText}</span>
+                          )}
+                        </li>
+                      )
+                    })}
+                  </ol>
+                ) : (
+                  <p className="no-content">No instructions listed</p>
+                )}
+              </section>
+            </>
+          )}
         </div>
       </div>
     </div>

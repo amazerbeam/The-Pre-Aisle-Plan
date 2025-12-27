@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import { useMealPlan } from '../../contexts/MealPlanContext'
 import recipeService from '../../services/recipeService'
@@ -19,14 +19,23 @@ function RecipeList() {
   const [editingRecipeId, setEditingRecipeId] = useState(null)
   const [showNewRecipe, setShowNewRecipe] = useState(false)
 
+  // FR-101: Use ref to track weekPlan without causing callback recreation
+  // This breaks the dependency chain that causes double spinner
+  const weekPlanRef = useRef(weekPlan)
+  useEffect(() => {
+    weekPlanRef.current = weekPlan
+  }, [weekPlan])
+
   /**
-   * Get all recipe IDs currently in the user's meal plan
+   * FR-101: Get all recipe IDs currently in the user's meal plan.
+   * Uses ref instead of direct dependency to avoid recreation on weekPlan changes.
    */
   const getMealPlanRecipeIds = useCallback(() => {
-    if (!weekPlan?.days) return new Set()
+    const currentWeekPlan = weekPlanRef.current
+    if (!currentWeekPlan?.days) return new Set()
 
     const recipeIds = new Set()
-    weekPlan.days.forEach(day => {
+    currentWeekPlan.days.forEach(day => {
       if (day.mealsByType) {
         Object.values(day.mealsByType).forEach(entries => {
           entries.forEach(entry => {
@@ -38,57 +47,58 @@ function RecipeList() {
       }
     })
     return recipeIds
-  }, [weekPlan])
+  }, []) // Empty deps - reads from ref
 
   /**
-   * Swap recipes with variants if the variant is in the meal plan
+   * FR-102: Swap recipes with variants if the variant is in the meal plan.
+   * Uses summary data - only needs to check variant IDs, no full data fetch needed.
    */
-  const swapWithMealPlanVariants = useCallback(async (loadedRecipes) => {
+  const swapWithMealPlanVariants = useCallback((loadedRecipes) => {
     const mealPlanRecipeIds = getMealPlanRecipeIds()
     if (mealPlanRecipeIds.size === 0) return loadedRecipes
 
-    const swappedRecipes = await Promise.all(
-      loadedRecipes.map(async (recipe) => {
-        // Check if this recipe has variants
-        if (!recipe.variants || recipe.variants.length < 2) return recipe
+    return loadedRecipes.map((recipe) => {
+      // Check if this recipe has variants
+      if (!recipe.variants || recipe.variants.length < 2) return recipe
 
-        // Check if any variant (other than current) is in the meal plan
-        const variantInPlan = recipe.variants.find(
-          v => v.recipeId !== recipe.id && mealPlanRecipeIds.has(v.recipeId)
-        )
+      // Check if any variant (other than current) is in the meal plan
+      const variantInPlan = recipe.variants.find(
+        v => v.recipeId !== recipe.id && mealPlanRecipeIds.has(v.recipeId)
+      )
 
-        if (variantInPlan) {
-          // Fetch and return the variant instead
-          try {
-            const variantRecipe = await recipeService.getRecipeById(variantInPlan.recipeId)
-            return variantRecipe || recipe
-          } catch (err) {
-            console.error('Failed to load variant:', err)
-            return recipe
-          }
+      if (variantInPlan) {
+        // FR-102: Create a summary-like object from variant info
+        // This avoids needing to fetch full recipe data
+        return {
+          ...recipe,
+          id: variantInPlan.recipeId,
+          name: variantInPlan.recipeName,
+          variantLabel: variantInPlan.variantLabel,
+          isDefault: variantInPlan.isDefault,
+          calories: variantInPlan.caloriesPerServing * recipe.defaultServings
         }
+      }
 
-        return recipe
-      })
-    )
-
-    return swappedRecipes
+      return recipe
+    })
   }, [getMealPlanRecipeIds])
 
   /**
-   * Load recipes and swap with meal plan variants
+   * FR-102: Load lightweight recipe summaries (no ingredients/steps).
+   * FR-101: Only depends on isAdmin, not on weekPlan.
    */
   const loadRecipes = useCallback(async (mealType) => {
     setLoading(true)
     setError(null)
     try {
+      // FR-102: Use summary endpoint for lightweight data
       // Admin users see all recipes (including hidden), regular users see only live recipes
       const data = isAdmin
         ? await recipeService.getAllRecipesAdmin(mealType)
-        : await recipeService.getRecipesByMealType(mealType)
+        : await recipeService.getRecipeSummariesByMealType(mealType)
 
       // Swap default recipes with variants if variant is in meal plan
-      const swappedData = await swapWithMealPlanVariants(data)
+      const swappedData = swapWithMealPlanVariants(data)
       setRecipes(swappedData)
     } catch (err) {
       setError('Failed to load recipes. Please try again.')
@@ -98,6 +108,7 @@ function RecipeList() {
     }
   }, [isAdmin, swapWithMealPlanVariants])
 
+  // FR-101: Only reload on tab change, not on weekPlan changes
   useEffect(() => {
     loadRecipes(activeMeal)
   }, [activeMeal, loadRecipes])
