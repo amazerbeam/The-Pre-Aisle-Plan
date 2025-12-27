@@ -447,6 +447,16 @@ INSERT INTO ingredients (id, `key`, name, aisle_id, protein_per_100g, carbs_per_
 (42, 'red_bell_pepper', 'Red bell pepper', 3, 1.00, 6.00, 0.30, TRUE);
 
 -- =============================================
+-- FR-103: Store-bought ingredient options for extras
+-- These enable store-bought selections in the shopping list
+-- Must be defined BEFORE recipes that use them
+-- =============================================
+INSERT INTO ingredients (id, `key`, name, aisle_id, protein_per_100g, carbs_per_100g, fat_per_100g, macros_verified) VALUES
+(74, 'pesto_store', 'Pesto', 12, 4.00, 5.00, 45.00, FALSE),              -- Condiments & Sauces
+(75, 'pizza_dough_store', 'Pizza Dough', 13, 8.00, 50.00, 2.00, FALSE),  -- Bakery
+(76, 'pizza_sauce_store', 'Pizza Sauce', 12, 1.50, 8.00, 0.50, FALSE);   -- Condiments & Sauces
+
+-- =============================================
 -- EXTRAS RECIPES (must be created BEFORE parent)
 -- =============================================
 
@@ -1270,7 +1280,7 @@ INSERT INTO recipe_families (id, family_name, description) VALUES
 (8, 'Salmon Sandwich', 'Simple salmon sandwich with homemade milk bread, salted butter, and fresh lettuce. Standard = 1 sandwich per person, Full = 2 sandwiches per person.');
 
 INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_label, display_order) VALUES
-(8, 28, FALSE, 'Moderate', 1), (1 sandwich per person)
+(8, 28, FALSE, 'Moderate', 1),     -- Standard (1 sandwich per person)
 (8, 29, TRUE, 'Balanced', 2);      -- Full (2 sandwiches per person)
 
 -- =============================================
@@ -2246,13 +2256,6 @@ INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_lab
 -- New Ingredient for Avocado Toast
 INSERT INTO ingredients (id, `key`, name, aisle_id, protein_per_100g, carbs_per_100g, fat_per_100g, macros_verified) VALUES
 (72, 'avocado', 'Avocado', 4, 2.00, 9.00, 15.00, TRUE);
-
--- FR-103: Store-bought ingredient options for extras
--- These enable store-bought selections in the shopping list
-INSERT INTO ingredients (id, `key`, name, aisle_id, protein_per_100g, carbs_per_100g, fat_per_100g, macros_verified) VALUES
-(74, 'pesto_store', 'Pesto', 12, 4.00, 5.00, 45.00, FALSE),              -- Condiments & Sauces
-(75, 'pizza_dough_store', 'Pizza Dough', 13, 8.00, 50.00, 2.00, FALSE),  -- Bakery
-(76, 'pizza_sauce_store', 'Pizza Sauce', 12, 1.50, 8.00, 0.50, FALSE);   -- Condiments & Sauces
 
 -- =============================================
 -- AVOCADO TOAST RECIPES (3 variants)
