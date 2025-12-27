@@ -161,7 +161,9 @@ export const MealPlanProvider = ({ children }) => {
             // Remove the recipe
             const entryToRemove = currentEntries.find(e => e.recipe?.id === recipeId)
             if (entryToRemove) {
-              caloriesDelta = -(entryToRemove.recipe?.calories || 0) * (entryToRemove.servings || 1) / (entryToRemove.recipe?.defaultServings || 1)
+              // Backend calculates per-serving calories: recipe.calories / recipe.defaultServings
+              const entryCalories = (entryToRemove.recipe?.calories || 0) / (entryToRemove.recipe?.defaultServings || 1)
+              caloriesDelta = -entryCalories
             }
             newEntries = currentEntries.filter(e => e.recipe?.id !== recipeId)
           } else {
@@ -169,12 +171,14 @@ export const MealPlanProvider = ({ children }) => {
             // First remove any existing entry for this meal slot (swap behavior)
             const existingEntry = currentEntries[0]
             if (existingEntry) {
-              caloriesDelta -= (existingEntry.recipe?.calories || 0) * (existingEntry.servings || 1) / (existingEntry.recipe?.defaultServings || 1)
+              // Backend calculates per-serving calories: recipe.calories / recipe.defaultServings
+              const existingCalories = (existingEntry.recipe?.calories || 0) / (existingEntry.recipe?.defaultServings || 1)
+              caloriesDelta -= existingCalories
             }
-            // Add new entry
+            // Add new entry - per-serving calories (matches backend calculation)
             const recipeCalories = recipeData?.calories || 0
             const defaultServings = recipeData?.defaultServings || 1
-            caloriesDelta += (recipeCalories * servings) / defaultServings
+            caloriesDelta += recipeCalories / defaultServings
 
             newEntries = [{
               id: Date.now(), // Temporary ID
