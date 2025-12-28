@@ -58,12 +58,15 @@ function MealPlanEntry({ entry }) {
         </button>
       </div>
 
-      {/* FR-013/FR-014: Recipe View Modal with variant support */}
-      {showRecipeView && entry.recipe && (
+      {/* FR-013/FR-014/FR-102: Recipe View Modal with on-demand loading */}
+      {showRecipeView && entry.recipe?.id && (
         <RecipeViewModal
-          recipe={entry.recipe}
+          recipeId={entry.recipe.id}
+          recipeName={entry.recipe.name}
           servings={entry.servings}
           caloriesPerServing={entry.caloriesPerServing}
+          isCheat={entry.recipe.isCheat}
+          hasExtras={entry.recipe.hasExtras}
           onClose={() => setShowRecipeView(false)}
           variants={entry.recipe.variants}
           parentRecipeId={entry.recipe.id}

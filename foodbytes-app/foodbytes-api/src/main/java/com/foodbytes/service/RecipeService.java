@@ -121,6 +121,17 @@ public class RecipeService {
         return convertToDTO(recipe);
     }
 
+    /**
+     * FR-102: Get lightweight recipe summary by ID.
+     * Used by MealPlanService for efficient meal plan responses.
+     */
+    @Transactional(readOnly = true)
+    public RecipeSummaryDTO getRecipeSummaryById(Long id) {
+        Recipe recipe = recipeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Recipe not found"));
+        return convertToSummaryDTO(recipe);
+    }
+
     private RecipeDTO convertToDTO(Recipe recipe) {
         RecipeDTO dto = new RecipeDTO();
         dto.setId(recipe.getId());

@@ -244,6 +244,7 @@ public class MealPlanService {
 
     /**
      * Convert MealPlanEntry entity to DTO.
+     * FR-102: Uses RecipeSummaryDTO for lightweight response (no ingredients/steps).
      */
     private MealPlanEntryDTO convertToDTO(MealPlanEntry entry) {
         MealPlanEntryDTO dto = new MealPlanEntryDTO();
@@ -251,7 +252,7 @@ public class MealPlanService {
         dto.setPlanDate(entry.getPlanDate());
         dto.setMealType(entry.getMeal().getKey());
         dto.setMealId(entry.getMeal().getId());
-        dto.setRecipe(recipeService.getRecipeById(entry.getRecipe().getId()));
+        dto.setRecipe(recipeService.getRecipeSummaryById(entry.getRecipe().getId()));
         dto.setServings(entry.getServings());
         dto.setCaloriesPerServing(calculateCaloriesPerServing(entry.getRecipe()));
         return dto;
