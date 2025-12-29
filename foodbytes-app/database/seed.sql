@@ -3097,3 +3097,122 @@ INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_lab
 (21, 76, FALSE, 'Moderate', 1),
 (21, 75, FALSE, 'Light', 2),
 (21, 77, TRUE, 'Balanced', 3);
+
+-- =============================================
+-- SPAGHETTI BOLOGNESE FAMILY
+-- No wine, 1 tsp sugar, links to Fresh Pasta extra (id 36)
+-- Reviewed by Nutrition Agent - corrected macros
+-- =============================================
+
+-- New ingredients (NO calories_per_100g column - calculated from macros)
+-- Note: Fresh basil already exists as id 29, so not created here
+INSERT INTO ingredients (id, `key`, name, aisle_id, protein_per_100g, carbs_per_100g, fat_per_100g, macros_verified) VALUES
+(125, 'beef_mince_3pct', 'Beef Mince (3% fat)', 1, 22.00, 0.00, 3.00, TRUE),
+(126, 'spaghetti_dried', 'Spaghetti (dried)', 11, 12.00, 72.00, 1.50, TRUE);
+
+-- Recipe family
+INSERT INTO recipe_families (id, family_name, description) VALUES
+(23, 'Spaghetti Bolognese', 'Classic Italian meat sauce with lean 3% beef, slow-simmered with soffritto and tomatoes. Served with fresh or dried pasta.');
+
+-- Recipe variants (same name, no variant label in name)
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+(81, 'Spaghetti Bolognese', 2, 1040, FALSE, TRUE),   -- Light
+(82, 'Spaghetti Bolognese', 2, 1230, FALSE, TRUE),   -- Moderate
+(83, 'Spaghetti Bolognese', 2, 1560, FALSE, TRUE);   -- Balanced
+
+-- Family members (Balanced = default)
+INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_label, display_order) VALUES
+(23, 81, FALSE, 'Light', 1),
+(23, 82, FALSE, 'Moderate', 2),
+(23, 83, TRUE, 'Balanced', 3);
+
+-- Assign to Dinner (meal_id = 3)
+INSERT INTO recipe_meals (recipe_id, meal_id) VALUES
+(81, 3), (82, 3), (83, 3);
+
+-- Link Fresh Pasta extra (recipe id 36) to all variants
+INSERT INTO recipe_extras (parent_recipe_id, child_recipe_id, display_order) VALUES
+(81, 36, 0), (82, 36, 0), (83, 36, 0);
+
+-- Recipe ingredients
+-- Light: 250g mince, 180g pasta (dry), 20g parmesan (1040 cal total, 520/serving)
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
+(81, 125, NULL, 250, 1, 250.00, 1),      -- Beef mince 3%
+(81, 126, 36, 180, 1, 180.00, 2),        -- Pasta (store=dried id 126, homemade=Fresh Pasta recipe 36)
+(81, 12, NULL, 1, 7, 110.00, 3),         -- Onion (1 medium)
+(81, 56, NULL, 1, 7, 80.00, 4),          -- Carrot (1 medium)
+(81, 99, NULL, 1, 12, 50.00, 5),         -- Celery (1 stalk)
+(81, 13, NULL, 2, 10, 6.00, 6),          -- Garlic (2 cloves)
+(81, 33, NULL, 1, 15, 400.00, 7),        -- Tinned tomatoes (1 tin)
+(81, 23, NULL, 2, 4, 30.00, 8),          -- Tomato paste (2 tbsp)
+(81, 122, NULL, 300, 2, 300.00, 9),      -- Beef stock
+(81, 22, NULL, 1, 4, 14.00, 10),         -- Olive oil (1 tbsp)
+(81, 36, NULL, 1, 3, 4.00, 11),          -- Sugar (1 tsp)
+(81, 35, NULL, 1, 3, 1.00, 12),          -- Oregano (1 tsp)
+(81, 34, NULL, 1, 5, 1.00, 13),          -- Bay leaf (1 piece)
+(81, 30, NULL, 20, 1, 20.00, 14),        -- Parmesan
+(81, 29, NULL, 1, 9, 5.00, 15);          -- Fresh basil (id 29, 1 handful)
+
+-- Moderate: 300g mince, 200g pasta (dry), 30g parmesan (1230 cal total, 615/serving)
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
+(82, 125, NULL, 300, 1, 300.00, 1),
+(82, 126, 36, 200, 1, 200.00, 2),
+(82, 12, NULL, 1, 7, 110.00, 3),
+(82, 56, NULL, 1, 7, 80.00, 4),
+(82, 99, NULL, 1, 12, 50.00, 5),
+(82, 13, NULL, 2, 10, 6.00, 6),
+(82, 33, NULL, 1, 15, 400.00, 7),
+(82, 23, NULL, 2, 4, 30.00, 8),
+(82, 122, NULL, 300, 2, 300.00, 9),
+(82, 22, NULL, 1, 4, 14.00, 10),
+(82, 36, NULL, 1, 3, 4.00, 11),
+(82, 35, NULL, 1, 3, 1.00, 12),
+(82, 34, NULL, 1, 5, 1.00, 13),
+(82, 30, NULL, 30, 1, 30.00, 14),
+(82, 29, NULL, 1, 9, 5.00, 15);
+
+-- Balanced: 400g mince, 250g pasta (dry), 40g parmesan (1560 cal total, 780/serving)
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
+(83, 125, NULL, 400, 1, 400.00, 1),
+(83, 126, 36, 250, 1, 250.00, 2),
+(83, 12, NULL, 1, 7, 110.00, 3),
+(83, 56, NULL, 1, 7, 80.00, 4),
+(83, 99, NULL, 1, 12, 50.00, 5),
+(83, 13, NULL, 2, 10, 6.00, 6),
+(83, 33, NULL, 1, 15, 400.00, 7),
+(83, 23, NULL, 2, 4, 30.00, 8),
+(83, 122, NULL, 300, 2, 300.00, 9),
+(83, 22, NULL, 1, 4, 14.00, 10),
+(83, 36, NULL, 1, 3, 4.00, 11),
+(83, 35, NULL, 1, 3, 1.00, 12),
+(83, 34, NULL, 1, 5, 1.00, 13),
+(83, 30, NULL, 40, 1, 40.00, 14),
+(83, 29, NULL, 1, 9, 5.00, 15);
+
+-- Recipe steps (written for Moderate, copied to Light and Balanced)
+INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
+(82, 1, 'Finely dice onion, carrot, and celery. Mince garlic.', NULL, NULL),
+(82, 2, 'Heat olive oil in a heavy pan over high heat. Brown mince 5-6 minutes, breaking up with wooden spoon. Set aside.', NULL, NULL),
+(82, 3, 'In same pan over medium heat, cook soffritto 8-10 minutes until soft and lightly golden.', NULL, NULL),
+(82, 4, 'Return mince to pan. Add tinned tomatoes, tomato paste, beef stock, sugar, oregano, and bay leaf. Stir well.', NULL, NULL),
+(82, 5, 'Reduce heat to low, partially cover, and simmer 90 minutes, stirring occasionally until thick and rich.', NULL, NULL),
+(82, 6, 'Prepare fresh pasta according to linked recipe.', 36, 'Cook dried spaghetti in salted boiling water according to package directions.'),
+(82, 7, 'Remove bay leaf. Season with salt and pepper. Toss pasta with sauce. Serve topped with grated Parmesan and fresh basil.', NULL, NULL);
+
+INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
+(81, 1, 'Finely dice onion, carrot, and celery. Mince garlic.', NULL, NULL),
+(81, 2, 'Heat olive oil in a heavy pan over high heat. Brown mince 5-6 minutes, breaking up with wooden spoon. Set aside.', NULL, NULL),
+(81, 3, 'In same pan over medium heat, cook soffritto 8-10 minutes until soft and lightly golden.', NULL, NULL),
+(81, 4, 'Return mince to pan. Add tinned tomatoes, tomato paste, beef stock, sugar, oregano, and bay leaf. Stir well.', NULL, NULL),
+(81, 5, 'Reduce heat to low, partially cover, and simmer 90 minutes, stirring occasionally until thick and rich.', NULL, NULL),
+(81, 6, 'Prepare fresh pasta according to linked recipe.', 36, 'Cook dried spaghetti in salted boiling water according to package directions.'),
+(81, 7, 'Remove bay leaf. Season with salt and pepper. Toss pasta with sauce. Serve topped with grated Parmesan and fresh basil.', NULL, NULL);
+
+INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id, alt_instruction) VALUES
+(83, 1, 'Finely dice onion, carrot, and celery. Mince garlic.', NULL, NULL),
+(83, 2, 'Heat olive oil in a heavy pan over high heat. Brown mince 5-6 minutes, breaking up with wooden spoon. Set aside.', NULL, NULL),
+(83, 3, 'In same pan over medium heat, cook soffritto 8-10 minutes until soft and lightly golden.', NULL, NULL),
+(83, 4, 'Return mince to pan. Add tinned tomatoes, tomato paste, beef stock, sugar, oregano, and bay leaf. Stir well.', NULL, NULL),
+(83, 5, 'Reduce heat to low, partially cover, and simmer 90 minutes, stirring occasionally until thick and rich.', NULL, NULL),
+(83, 6, 'Prepare fresh pasta according to linked recipe.', 36, 'Cook dried spaghetti in salted boiling water according to package directions.'),
+(83, 7, 'Remove bay leaf. Season with salt and pepper. Toss pasta with sauce. Serve topped with grated Parmesan and fresh basil.', NULL, NULL);
