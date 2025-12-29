@@ -127,25 +127,45 @@ Read `../agent-nutrition/agent-nutrition-SKILL.md` for the full nutrition philos
 - Use `AskUserQuestion` if critical info missing
 
 ### 2. Check Live Database Before Adding Data
-**IMPORTANT:** The seed.sql file is large. Always ask the user to run SELECT queries on the live database instead of reading files.
+**CRITICAL:** NEVER generate INSERT statements until you have SELECT query results from the live database. This prevents errors from wrong column names, duplicate ingredients, or ID conflicts.
 
-**Required SELECT query before adding recipes (single combined query):**
+**Required SELECT query before adding recipes:**
 ```sql
--- Get all IDs and check existing ingredients in ONE query
-SELECT 'max_ingredient_id' AS query, MAX(id) AS value, NULL AS `key`, NULL AS name FROM ingredients
+-- MUST RUN BEFORE ANY INSERTS: Get IDs, schema, existing data
+SELECT 'max_ingredient_id' AS query, MAX(id) AS value, NULL AS col1, NULL AS col2, NULL AS col3 FROM ingredients
 UNION ALL
-SELECT 'max_recipe_id', MAX(id), NULL, NULL FROM recipes
+SELECT 'max_recipe_id', MAX(id), NULL, NULL, NULL FROM recipes
 UNION ALL
-SELECT 'max_family_id', MAX(id), NULL, NULL FROM recipe_families
+SELECT 'max_family_id', MAX(id), NULL, NULL, NULL FROM recipe_families
 UNION ALL
-SELECT 'ingredient', id, `key`, name FROM ingredients WHERE `key` IN ('ingredient_key_1', 'ingredient_key_2');
+SELECT 'ingredient_columns', NULL, COLUMN_NAME, DATA_TYPE, IS_NULLABLE
+FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'ingredients'
+UNION ALL
+SELECT 'extras', id, NULL, name, NULL FROM recipes WHERE id IN (SELECT recipe_id FROM recipe_meals WHERE meal_id = 5)
+UNION ALL
+SELECT 'existing_ingredient', id, `key`, name, NULL FROM ingredients WHERE `key` IN ('ingredient_key_1', 'ingredient_key_2');
+```
+
+**Before creating new ingredients, check for duplicates:**
+```sql
+-- Check for duplicate ingredients by key OR name variations
+SELECT 'duplicate_check' AS query, id, `key`, name FROM ingredients
+WHERE `key` IN ('new_key_1', 'new_key_2')
+   OR name IN ('New Name 1', 'New Name 2', 'Name Variation');
 ```
 
 **Rules:**
+- **NEVER generate INSERT statements before seeing SELECT results** — This is mandatory
+- **Verify table schema** — The `ingredients` table has NO `calories_per_100g` column (calories calculated from macros)
 - **Avoid ID conflicts** — Use MAX(id) + 1 for new records
-- **Reuse existing ingredients** — Check if ingredient exists before creating new one
+- **Reuse existing ingredients** — Check by key AND name variations before creating new ones
 - **Use existing lookup tables** — Never recreate aisles, units, or meals; reference by ID
 - **Wait for SELECT results** — Do not generate INSERT statements until you have the query results
+
+**Ingredients table columns (verified):**
+- `id`, `key`, `name`, `aisle_id`
+- `protein_per_100g`, `carbs_per_100g`, `fat_per_100g` (NO calories_per_100g!)
+- `macros_verified`
 
 ### 3. Search When Needed
 Use `WebSearch` for authentic techniques:
@@ -172,8 +192,8 @@ If recipe uses sub-components that can be homemade (dough, sauce, pesto, etc.):
 
 See **Extras System** and **Linked Recipe Ingredients** sections below for details.
 
-### 8. Nutrition Review (Required)
-Before finalizing any recipe, consult the Nutrition Agent for review:
+### 8. Nutrition Review (Required) — BEFORE ANY SQL
+**CRITICAL:** Nutrition Agent review must happen BEFORE generating any SQL.
 
 1. Use the `Task` tool to spawn the Nutrition Agent with the complete recipe (ingredients, macros, variants)
 2. The Nutrition Agent will verify:
@@ -187,6 +207,8 @@ Before finalizing any recipe, consult the Nutrition Agent for review:
    - Only apply changes the user explicitly approves
    - Do NOT automatically implement Nutrition Agent recommendations
 
+4. **Only after user approves final numbers** → Proceed to step 9
+
 **Example consultation:**
 ```
 Task: Ask Nutrition Agent to review [Recipe Name]
@@ -195,8 +217,15 @@ Task: Ask Nutrition Agent to review [Recipe Name]
 - Balanced variant: XXX cal (XXg protein, XXg carbs, XXg fat)
 ```
 
-### 9. Offer Database Save
-Ask if user wants recipe saved. Generate SQL following schema in `seed.sql`.
+### 9. Generate SQL & Save to Database
+**After Nutrition Agent review and user approval:**
+
+1. **Provide SQL to run on live database** — Give user complete SQL they can copy and run
+2. **Update seed.sql** — Append the same SQL to the seed file for version control
+3. **Provide verification queries** — Give SELECT queries to confirm successful insert
+
+**Correct workflow order:**
+1. Recipe design → 2. Nutrition review → 3. User approval → 4. SELECT queries (schema + duplicates) → 5. Generate INSERT SQL → 6. User runs on live DB → 7. Update seed.sql
 
 ## Output Format
 
