@@ -8,7 +8,7 @@ update context with anything that is broadly applicable
 
   mysql -u root -prootpassword
 
-
+Think sequentially and ask any clarfying questions and don't code until i give you the go ahead. 
 
 The If we select Monday the text should be #4a3f80, the other days should be grey, like the recipe cal count. 
 
