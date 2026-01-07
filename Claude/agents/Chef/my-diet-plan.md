@@ -11,6 +11,43 @@
 
 ---
 
+## Starting Measurements (2 Jan 2026)
+
+| Measurement | Value |
+|-------------|-------|
+| Weight | 13st 6lb (86.2kg / 190lb) |
+| Waist (at navel) | 41.5" |
+| Waist (stomach) | 37.5" |
+
+**Note:** Post-Christmas measurement. Running 7-day baseline at maintenance before starting deficit.
+
+---
+
+## Measurement Schedule
+
+| When | Action |
+|------|--------|
+| This week (2-8 Jan) | Daily weigh-ins, maintenance eating, calculate 7-day average |
+| Day 1 of deficit | Weigh + measure waist — official start point |
+| Every 2 weeks | Weigh + measure waist |
+
+---
+
+## Weight Log
+
+| Date | Weight | Notes |
+|------|--------|-------|
+| 2 Jan 2026 | 13st 6lb | Day 1 baseline |
+| | | |
+| | | |
+| | | |
+| | | |
+| | | |
+| | | |
+| **7-Day Average** | | |
+
+---
+
 ## Maintenance Phase
 
 Currently testing recipes and eating at maintenance.
@@ -134,4 +171,4 @@ Or stay in deficit:
 
 ## Current Phase
 
-**Maintenance** - Testing recipes for a few weeks before starting weight loss.
+**Baseline Week (2-8 Jan 2026)** - Daily weigh-ins at maintenance to establish true starting weight before deficit.
