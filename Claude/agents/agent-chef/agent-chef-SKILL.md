@@ -126,41 +126,77 @@ Read `../agent-nutrition/agent-nutrition-SKILL.md` for the full nutrition philos
 - Clarify cuisine, constraints, dietary needs
 - Use `AskUserQuestion` if critical info missing
 
-### 2. Check Live Database Before Adding Data
-**CRITICAL:** NEVER generate INSERT statements until you have SELECT query results from the live database. This prevents errors from wrong column names, duplicate ingredients, or ID conflicts.
+### 2. Live Database Workflow (MANDATORY)
 
-**Required SELECT query before adding recipes:**
+**CRITICAL:** Follow this exact workflow when creating recipes. SQL must work first time on live database.
+
+#### Step 1: Design Recipe First
+- Decide ingredients needed (correct ones for the dish — don't compromise)
+- Draft portions, steps, and variants with macro calculations
+
+#### Step 2: Check for Duplicate Ingredients (SELECT Query #1)
+- Give user SQL to run on live database
+- **Purpose: Avoid duplicates only** — NOT to limit ingredient choices
+- If I want Sesame Oil but only Sunflower Oil exists → Create Sesame Oil
+- If I want Sirloin but only Beef Mince exists → Create Sirloin
+- If I want Banana and Banana exists → Use existing Banana (avoid duplicate)
+- User runs query, gives results
+- Identify: which ingredients exist (reuse ID) vs. which to create (new)
+
+**IMPORTANT: Use LIKE patterns to catch variations** (e.g., 'rosemary' vs 'fresh_rosemary' vs 'dried_rosemary')
+
+**Example duplicate check query:**
 ```sql
--- MUST RUN BEFORE ANY INSERTS: Get IDs, schema, existing data
-SELECT 'max_ingredient_id' AS query, MAX(id) AS value, NULL AS col1, NULL AS col2, NULL AS col3 FROM ingredients
-UNION ALL
-SELECT 'max_recipe_id', MAX(id), NULL, NULL, NULL FROM recipes
-UNION ALL
-SELECT 'max_family_id', MAX(id), NULL, NULL, NULL FROM recipe_families
-UNION ALL
-SELECT 'ingredient_columns', NULL, COLUMN_NAME, DATA_TYPE, IS_NULLABLE
-FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'ingredients'
-UNION ALL
-SELECT 'extras', id, NULL, name, NULL FROM recipes WHERE id IN (SELECT recipe_id FROM recipe_meals WHERE meal_id = 5)
-UNION ALL
-SELECT 'existing_ingredient', id, `key`, name, NULL FROM ingredients WHERE `key` IN ('ingredient_key_1', 'ingredient_key_2');
+-- Check for existing ingredients (duplicate prevention only)
+-- Use LIKE patterns to catch variations like fresh_X, dried_X, X_raw, etc.
+SELECT id, `key`, name, protein_per_100g, carbs_per_100g, fat_per_100g
+FROM ingredients
+WHERE `key` LIKE '%rosemary%'
+   OR `key` LIKE '%chicken_wing%'
+   OR name LIKE '%Rosemary%'
+   OR name LIKE '%Chicken wing%';
 ```
 
-**Before creating new ingredients, check for duplicates:**
+#### Step 3: Recipe Approval
+- Present full recipe design (ingredients, portions, steps, variants, macros)
+- User approves
+
+#### Step 4: Nutrition Agent Review
+- Spawn Nutrition Agent to verify:
+  - Math is correct (gram weights × macros = accurate totals)
+  - Variants hit calorie targets (Light ~450-550, Moderate ~550-650, Balanced ~700-800)
+  - Macro balance reasonable (adequate protein)
+  - Portions feel natural
+
+#### Step 5: User Approval of Nutrition Changes
+- Present any Nutrition Agent suggestions
+- User approves/rejects each change
+- Do NOT automatically apply suggestions
+
+#### Step 6: Get IDs for INSERT (SELECT Query #2)
+- Give user **ONE combined SQL query** — user should only run a single query
+- Gets: max recipe ID, max family ID, max ingredient ID, unit IDs, aisle IDs, meal ID
+
+**Example combined ID query:**
 ```sql
--- Check for duplicate ingredients by key OR name variations
-SELECT 'duplicate_check' AS query, id, `key`, name FROM ingredients
-WHERE `key` IN ('new_key_1', 'new_key_2')
-   OR name IN ('New Name 1', 'New Name 2', 'Name Variation');
+SELECT 'max_recipe_id' AS query, MAX(id) AS id, NULL AS `key`, NULL AS name FROM recipes
+UNION ALL SELECT 'max_family_id', MAX(id), NULL, NULL FROM recipe_families
+UNION ALL SELECT 'max_ingredient_id', MAX(id), NULL, NULL FROM ingredients
+UNION ALL SELECT 'unit', id, `key`, value FROM units
+UNION ALL SELECT 'aisle', id, `key`, name FROM aisles
+UNION ALL SELECT 'meal', id, `key`, name FROM meals;
 ```
 
-**Rules:**
-- **NEVER generate INSERT statements before seeing SELECT results** — This is mandatory
-- **Verify table schema** — The `ingredients` table has NO `calories_per_100g` column (calories calculated from macros)
-- **Avoid ID conflicts** — Use MAX(id) + 1 for new records
-- **Reuse existing ingredients** — Check by key AND name variations before creating new ones
-- **Use existing lookup tables** — Never recreate aisles, units, or meals; reference by ID
-- **Wait for SELECT results** — Do not generate INSERT statements until you have the query results
+#### Step 7: Generate Final INSERT SQL
+- Must work first time on live database
+- Includes: ingredients (if new), recipes, recipe_meals, recipe_ingredients, recipe_steps, recipe_families, recipe_family_members
+
+**DO NOT:**
+- Read seed.sql to get current state
+- Guess at IDs or existing ingredients
+- Generate INSERT statements before seeing live SELECT results
+- Substitute ingredients just because something similar exists
+- Automatically apply Nutrition Agent suggestions without user approval
 
 **Ingredients table columns (verified):**
 - `id`, `key`, `name`, `aisle_id`

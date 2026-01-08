@@ -3216,3 +3216,121 @@ INSERT INTO recipe_steps (recipe_id, step_number, instruction, linked_recipe_id,
 (83, 5, 'Reduce heat to low, partially cover, and simmer 90 minutes, stirring occasionally until thick and rich.', NULL, NULL),
 (83, 6, 'Prepare fresh pasta according to linked recipe.', 36, 'Cook dried spaghetti in salted boiling water according to package directions.'),
 (83, 7, 'Remove bay leaf. Season with salt and pepper. Toss pasta with sauce. Serve topped with grated Parmesan and fresh basil.', NULL, NULL);
+
+-- =============================================
+-- BLACK PEPPER BEEF STIR FRY
+-- Added: 2026-01-07
+-- =============================================
+
+-- New Ingredients
+INSERT INTO ingredients (id, `key`, name, aisle_id, protein_per_100g, carbs_per_100g, fat_per_100g, macros_verified) VALUES
+(127, 'green_bell_pepper', 'Green bell pepper', 3, 0.90, 4.60, 0.20, TRUE),
+(128, 'spring_onions', 'Spring onions', 3, 1.80, 7.00, 0.20, TRUE),
+(129, 'sesame_oil', 'Sesame oil', 9, 0.00, 0.00, 100.00, TRUE),
+(130, 'dry_sherry', 'Dry sherry', 16, 0.00, 5.00, 0.00, TRUE);
+
+-- Recipes (3 variants, same name)
+INSERT INTO recipes (id, name, default_servings, calories, is_cheat, is_live) VALUES
+(84, 'Black Pepper Beef Stir Fry', 2, 920, FALSE, TRUE),
+(85, 'Black Pepper Beef Stir Fry', 2, 1200, FALSE, TRUE),
+(86, 'Black Pepper Beef Stir Fry', 2, 1660, FALSE, TRUE);
+
+-- Recipe Meals (all dinner)
+INSERT INTO recipe_meals (recipe_id, meal_id) VALUES
+(84, 3),
+(85, 3),
+(86, 3);
+
+-- Recipe Family
+INSERT INTO recipe_families (id, family_name, description) VALUES
+(24, 'Black Pepper Beef Stir Fry', 'Wok-fried sirloin with coarsely cracked black pepper, bell peppers, and onions in a savoury Worcestershire sauce. Served over jasmine rice.');
+
+-- Recipe Family Members (Balanced = default)
+INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_label, display_order) VALUES
+(24, 85, FALSE, 'Moderate', 1),
+(24, 84, FALSE, 'Light', 2),
+(24, 86, TRUE, 'Balanced', 3);
+
+-- Recipe Ingredients - LIGHT (recipe 84)
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
+(84, 68, NULL, 180, 1, 180.00, 1),
+(84, 25, NULL, 15, 1, 15.00, 2),
+(84, 27, NULL, 8, 1, 8.00, 3),
+(84, 129, NULL, 5, 1, 5.00, 4),
+(84, 84, NULL, 14, 1, 14.00, 5),
+(84, 13, NULL, 9, 1, 9.00, 6),
+(84, 14, NULL, 10, 1, 10.00, 7),
+(84, 12, NULL, 80, 1, 80.00, 8),
+(84, 42, NULL, 100, 1, 100.00, 9),
+(84, 127, NULL, 100, 1, 100.00, 10),
+(84, 128, NULL, 40, 1, 40.00, 11),
+(84, 39, NULL, 27, 1, 27.00, 12),
+(84, 25, NULL, 15, 1, 15.00, 13),
+(84, 50, NULL, 6, 1, 6.00, 14),
+(84, 130, NULL, 30, 1, 30.00, 15),
+(84, 36, NULL, 6, 1, 6.00, 16),
+(84, 27, NULL, 3, 1, 3.00, 17),
+(84, 26, NULL, 70, 1, 70.00, 18);
+
+-- Recipe Ingredients - MODERATE (recipe 85)
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
+(85, 68, NULL, 240, 1, 240.00, 1),
+(85, 25, NULL, 15, 1, 15.00, 2),
+(85, 27, NULL, 8, 1, 8.00, 3),
+(85, 129, NULL, 5, 1, 5.00, 4),
+(85, 84, NULL, 21, 1, 21.00, 5),
+(85, 13, NULL, 9, 1, 9.00, 6),
+(85, 14, NULL, 10, 1, 10.00, 7),
+(85, 12, NULL, 110, 1, 110.00, 8),
+(85, 42, NULL, 120, 1, 120.00, 9),
+(85, 127, NULL, 120, 1, 120.00, 10),
+(85, 128, NULL, 40, 1, 40.00, 11),
+(85, 39, NULL, 27, 1, 27.00, 12),
+(85, 25, NULL, 15, 1, 15.00, 13),
+(85, 50, NULL, 6, 1, 6.00, 14),
+(85, 130, NULL, 30, 1, 30.00, 15),
+(85, 36, NULL, 6, 1, 6.00, 16),
+(85, 27, NULL, 3, 1, 3.00, 17),
+(85, 26, NULL, 90, 1, 90.00, 18);
+
+-- Recipe Ingredients - BALANCED (recipe 86)
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
+(86, 68, NULL, 320, 1, 320.00, 1),
+(86, 25, NULL, 15, 1, 15.00, 2),
+(86, 27, NULL, 8, 1, 8.00, 3),
+(86, 129, NULL, 5, 1, 5.00, 4),
+(86, 84, NULL, 28, 1, 28.00, 5),
+(86, 13, NULL, 9, 1, 9.00, 6),
+(86, 14, NULL, 10, 1, 10.00, 7),
+(86, 12, NULL, 110, 1, 110.00, 8),
+(86, 42, NULL, 120, 1, 120.00, 9),
+(86, 127, NULL, 120, 1, 120.00, 10),
+(86, 128, NULL, 40, 1, 40.00, 11),
+(86, 39, NULL, 27, 1, 27.00, 12),
+(86, 25, NULL, 15, 1, 15.00, 13),
+(86, 50, NULL, 6, 1, 6.00, 14),
+(86, 130, NULL, 30, 1, 30.00, 15),
+(86, 36, NULL, 6, 1, 6.00, 16),
+(86, 27, NULL, 3, 1, 3.00, 17),
+(86, 26, NULL, 140, 1, 140.00, 18);
+
+-- Recipe Steps (Moderate)
+INSERT INTO recipe_steps (recipe_id, step_number, instruction, tip) VALUES
+(85, 1, 'Cook the rice: Rinse jasmine rice. Add to pot with 1.5x water. Bring to boil, reduce to low, cover and cook 12 minutes. Rest 5 minutes.', NULL),
+(85, 2, 'Velvet the beef: Slice sirloin thin against the grain. Toss with 1 tbsp soy sauce, 1 tbsp cornflour, and 1 tsp sesame oil. Set aside 15 minutes.', 'Slicing against the grain makes the beef more tender'),
+(85, 3, 'Prep aromatics: Mince garlic, julienne ginger. Cut onion into wedges. Slice peppers into strips. Cut spring onions into 2-inch pieces, separating whites from greens.', NULL),
+(85, 4, 'Mix sauce: Combine Worcestershire sauce, 1 tbsp soy sauce, sugar, and cracked black pepper in a small bowl. Mix cornflour with water separately for slurry.', NULL),
+(85, 5, 'Heat wok until smoking. Add 1 tbsp sunflower oil, swirl to coat.', 'Wok must be very hot for proper sear'),
+(85, 6, 'Sear beef: Add beef in single layer. Do not touch for 30 seconds until seared. Flip, sear 30 seconds more. Remove to plate (beef will be 70% cooked).', 'Do not overcrowd - sear in batches if needed'),
+(85, 7, 'Cook aromatics: Add remaining oil. Add garlic, ginger, spring onion whites. Stir 30 seconds until fragrant.', NULL),
+(85, 8, 'Add vegetables: Add onion, cook 1 minute. Add peppers, cook 2 minutes until crisp-tender.', NULL),
+(85, 9, 'Finish: Return beef to wok. Add dry sherry (it will sizzle). Pour sauce over, toss. Add cornflour slurry, toss until glossy and thickened (30 seconds).', 'The sizzle when adding sherry is wok hei'),
+(85, 10, 'Serve immediately over jasmine rice, topped with spring onion greens.', NULL);
+
+-- Copy steps to Light variant
+INSERT INTO recipe_steps (recipe_id, step_number, instruction, tip)
+SELECT 84, step_number, instruction, tip FROM recipe_steps WHERE recipe_id = 85;
+
+-- Copy steps to Balanced variant
+INSERT INTO recipe_steps (recipe_id, step_number, instruction, tip)
+SELECT 86, step_number, instruction, tip FROM recipe_steps WHERE recipe_id = 85;
