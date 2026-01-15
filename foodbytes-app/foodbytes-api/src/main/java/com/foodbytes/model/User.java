@@ -34,6 +34,9 @@ public class User {
     @Column(name = "default_servings")
     private Integer defaultServings = 1;
 
+    @Column(name = "meal_plan_owner_id")
+    private Long mealPlanOwnerId;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 

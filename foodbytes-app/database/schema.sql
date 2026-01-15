@@ -25,10 +25,12 @@ CREATE TABLE users (
     avatar_url VARCHAR(500) NULL,
     is_admin BOOLEAN DEFAULT FALSE,
     default_servings INT DEFAULT 1,
+    meal_plan_owner_id BIGINT NULL COMMENT 'If set, user shares meal plans with this user (sync mode)',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     last_login TIMESTAMP NULL,
     UNIQUE KEY unique_email (email),
-    UNIQUE KEY unique_google_id (google_id)
+    UNIQUE KEY unique_google_id (google_id),
+    CONSTRAINT fk_meal_plan_owner FOREIGN KEY (meal_plan_owner_id) REFERENCES users(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Aisles lookup table (for shopping list organization)

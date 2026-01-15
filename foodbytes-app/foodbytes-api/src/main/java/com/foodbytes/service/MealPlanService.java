@@ -28,6 +28,20 @@ public class MealPlanService {
     private final MacroCalculationService macroCalculationService;
 
     /**
+     * Get the effective meal plan owner ID for a user.
+     * If the user has meal_plan_owner_id set, they share another user's meal plans (sync mode).
+     * Otherwise, they use their own meal plans.
+     *
+     * @param userId The authenticated user's ID
+     * @return The effective owner ID to use for meal plan queries/operations
+     */
+    private Long getEffectiveMealPlanOwnerId(Long userId) {
+        return userRepository.findById(userId)
+            .map(user -> user.getMealPlanOwnerId() != null ? user.getMealPlanOwnerId() : userId)
+            .orElse(userId);
+    }
+
+    /**
      * FR-007, FR-016, FR-081, FR-082: Get 7-day meal plan starting from a given date.
      * Always returns exactly 7 days, even if some are empty.
      * Includes daily and weekly macro totals.
@@ -38,11 +52,12 @@ public class MealPlanService {
      */
     @Transactional(readOnly = true)
     public MealPlanWeekDTO getWeekPlan(Long userId, LocalDate startDate) {
+        Long effectiveOwnerId = getEffectiveMealPlanOwnerId(userId);
         LocalDate endDate = startDate.plusDays(7); // Exclusive end
         LocalDate today = LocalDate.now();
 
         List<MealPlanEntry> entries = mealPlanEntryRepository
-            .findByUserIdAndDateRange(userId, startDate, endDate);
+            .findByUserIdAndDateRange(effectiveOwnerId, startDate, endDate);
 
         // Group entries by date
         Map<LocalDate, List<MealPlanEntry>> byDate = entries.stream()
@@ -124,10 +139,12 @@ public class MealPlanService {
      */
     @Transactional
     public MealPlanEntryDTO assignRecipe(Long userId, MealPlanCreateRequest request) {
+        Long effectiveOwnerId = getEffectiveMealPlanOwnerId(userId);
+
         // FR-037: Check if THIS recipe is already assigned (toggle off case)
         Optional<MealPlanEntry> sameRecipeEntry = mealPlanEntryRepository
             .findByUserIdAndPlanDateAndMealIdAndRecipeId(
-                userId, request.getPlanDate(), request.getMealId(), request.getRecipeId()
+                effectiveOwnerId, request.getPlanDate(), request.getMealId(), request.getRecipeId()
             );
 
         if (sameRecipeEntry.isPresent()) {
@@ -138,15 +155,15 @@ public class MealPlanService {
 
         // FR-037: Check if ANY other recipe is assigned to this slot (swap case)
         Optional<MealPlanEntry> existingSlotEntry = mealPlanEntryRepository
-            .findByUserIdAndPlanDateAndMealId(userId, request.getPlanDate(), request.getMealId());
+            .findByUserIdAndPlanDateAndMealId(effectiveOwnerId, request.getPlanDate(), request.getMealId());
 
         if (existingSlotEntry.isPresent()) {
             // Swap - remove the existing recipe before adding the new one
             mealPlanEntryRepository.delete(existingSlotEntry.get());
         }
 
-        // Create new entry
-        User user = userRepository.findById(userId)
+        // Create new entry - assign to the effective owner (sync mode)
+        User user = userRepository.findById(effectiveOwnerId)
             .orElseThrow(() -> new RuntimeException("User not found"));
         Meal meal = mealRepository.findById(request.getMealId())
             .orElseThrow(() -> new RuntimeException("Meal type not found"));
@@ -174,7 +191,8 @@ public class MealPlanService {
      */
     @Transactional
     public boolean removeEntry(Long userId, Long entryId) {
-        Optional<MealPlanEntry> entry = mealPlanEntryRepository.findByIdAndUserId(entryId, userId);
+        Long effectiveOwnerId = getEffectiveMealPlanOwnerId(userId);
+        Optional<MealPlanEntry> entry = mealPlanEntryRepository.findByIdAndUserId(entryId, effectiveOwnerId);
         if (entry.isPresent()) {
             mealPlanEntryRepository.delete(entry.get());
             return true;
@@ -193,9 +211,10 @@ public class MealPlanService {
      */
     @Transactional(readOnly = true)
     public List<MealPlanEntryDTO> getRecipeAssignments(Long userId, Long recipeId, LocalDate startDate) {
+        Long effectiveOwnerId = getEffectiveMealPlanOwnerId(userId);
         LocalDate endDate = startDate.plusDays(7);
         List<MealPlanEntry> entries = mealPlanEntryRepository
-            .findByUserIdAndRecipeIdAndDateRange(userId, recipeId, startDate, endDate);
+            .findByUserIdAndRecipeIdAndDateRange(effectiveOwnerId, recipeId, startDate, endDate);
         return entries.stream()
             .map(this::convertToDTO)
             .collect(Collectors.toList());

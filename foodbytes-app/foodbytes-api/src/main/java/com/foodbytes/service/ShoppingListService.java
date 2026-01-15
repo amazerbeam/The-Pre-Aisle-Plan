@@ -12,6 +12,7 @@ import com.foodbytes.model.*;
 import com.foodbytes.repository.IngredientRepository;
 import com.foodbytes.repository.MealPlanEntryRepository;
 import com.foodbytes.repository.RecipeRepository;
+import com.foodbytes.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,11 +35,26 @@ public class ShoppingListService {
     private final RecipeRepository recipeRepository;
     private final RecipeExtrasService recipeExtrasService;
     private final IngredientRepository ingredientRepository;
+    private final UserRepository userRepository;
 
     // Special aisle for store-bought items
     private static final Long STORE_BOUGHT_AISLE_ID = -999L;
     private static final String STORE_BOUGHT_AISLE_NAME = "Store Bought Items";
     private static final Short STORE_BOUGHT_AISLE_ORDER = 0; // Show at top
+
+    /**
+     * Get the effective meal plan owner ID for a user.
+     * If the user has meal_plan_owner_id set, they share another user's meal plans (sync mode).
+     * Otherwise, they use their own meal plans.
+     *
+     * @param userId The authenticated user's ID
+     * @return The effective owner ID to use for meal plan queries
+     */
+    private Long getEffectiveMealPlanOwnerId(Long userId) {
+        return userRepository.findById(userId)
+            .map(user -> user.getMealPlanOwnerId() != null ? user.getMealPlanOwnerId() : userId)
+            .orElse(userId);
+    }
 
     /**
      * Generate aggregated shopping list from 7-day meal plan.
@@ -54,12 +70,13 @@ public class ShoppingListService {
     @Transactional(readOnly = true)
     public AggregatedShoppingListDTO getShoppingList(Long userId, LocalDate startDate,
                                                       HomemadeSelectionsDTO homemadeSelections) {
+        Long effectiveOwnerId = getEffectiveMealPlanOwnerId(userId);
         // Calculate endDate = startDate + 7 days
         LocalDate endDate = startDate.plusDays(7);
 
         // Fetch meal plan entries for user in date range
         List<MealPlanEntry> entries = mealPlanEntryRepository
-            .findByUserIdAndDateRange(userId, startDate, endDate);
+            .findByUserIdAndDateRange(effectiveOwnerId, startDate, endDate);
 
         // If no entries, return empty shopping list
         if (entries.isEmpty()) {
@@ -197,11 +214,12 @@ public class ShoppingListService {
     public IngredientBreakdownDTO getIngredientBreakdown(Long userId, Long ingredientId,
                                                           String unit, LocalDate startDate,
                                                           List<Long> sourceChain) {
+        Long effectiveOwnerId = getEffectiveMealPlanOwnerId(userId);
         LocalDate endDate = startDate.plusDays(7);
 
         // Fetch meal plan entries for user in date range
         List<MealPlanEntry> entries = mealPlanEntryRepository
-            .findByUserIdAndDateRange(userId, startDate, endDate);
+            .findByUserIdAndDateRange(effectiveOwnerId, startDate, endDate);
 
         List<MealIngredientUsageDTO> mealBreakdown = new ArrayList<>();
         BigDecimal totalQuantity = BigDecimal.ZERO;
