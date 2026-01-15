@@ -1,6 +1,5 @@
 import { useState, useRef, useCallback } from 'react'
 import { useShoppingList } from '../../contexts/ShoppingListContext'
-import { useMealPlan } from '../../contexts/MealPlanContext'
 import { shoppingService } from '../../services/shoppingService'
 import IngredientBreakdownPopup from './IngredientBreakdownPopup'
 
@@ -8,10 +7,9 @@ import IngredientBreakdownPopup from './IngredientBreakdownPopup'
  * ShoppingListItem - Individual shopping list item with checkbox
  * Supports FR-021 (check-off items), FR-024 (sorting), FR-042 (long press breakdown)
  */
-const ShoppingListItem = ({ item }) => {
-  const { toggleItem, isItemChecked } = useShoppingList()
-  const { startDate } = useMealPlan()
-  const checked = isItemChecked(item.ingredientId, item.unit)
+const ShoppingListItem = ({ item, startDate }) => {
+  const { toggleItem } = useShoppingList()
+  const checked = item.isChecked
 
   // FR-042: Long press state
   const [isLongPressing, setIsLongPressing] = useState(false)
@@ -25,14 +23,14 @@ const ShoppingListItem = ({ item }) => {
   const handleClick = () => {
     // Only toggle if not in long press mode
     if (!isLongPressing) {
-      toggleItem(item.ingredientId, item.unit)
+      toggleItem(item.id)
     }
   }
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault()
-      toggleItem(item.ingredientId, item.unit)
+      toggleItem(item.id)
     }
   }
 
@@ -61,7 +59,7 @@ const ShoppingListItem = ({ item }) => {
       }
       setIsLongPressing(false)
     }, LONG_PRESS_DURATION)
-  }, [checked, item.ingredientId, item.unit, startDate, item.sourceChain])
+  }, [checked, item.ingredientId, item.unit, startDate, item.sourceChain, item.id])
 
   // FR-042: Cancel long press timer
   const cancelLongPress = useCallback(() => {
@@ -138,7 +136,7 @@ const ShoppingListItem = ({ item }) => {
         />
         <span className="item-name">{item.ingredientName}</span>
         <span className="item-quantity">
-          {formatQuantity(item.totalQuantity)} {item.unit}
+          {formatQuantity(item.quantity)} {item.unit}
         </span>
         {/* FR-042: Visual feedback during long press */}
         {isLongPressing && !checked && (

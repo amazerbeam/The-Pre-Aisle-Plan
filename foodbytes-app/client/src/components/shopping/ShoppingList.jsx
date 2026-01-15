@@ -1,16 +1,20 @@
+import { useState } from 'react'
 import { useShoppingList } from '../../contexts/ShoppingListContext'
 import ShoppingListHeader from './ShoppingListHeader'
 import ShoppingListAisle from './ShoppingListAisle'
+import GenerateShoppingListModal from './GenerateShoppingListModal'
 import './ShoppingList.css'
 
 /**
  * ShoppingList - Main container for shopping list feature
- * Supports FR-019 (display shopping list), FR-020 (aisle grouping), FR-103 (cache)
+ * Supports FR-019 (display shopping list), FR-020 (aisle grouping)
+ * Now uses persisted shopping list from database
  */
 const ShoppingList = () => {
-  const { sortedAisles, loading, error, isGenerating } = useShoppingList()
+  const { shoppingList, sortedAisles, loading, error, isGenerating, listExists } = useShoppingList()
+  const [showGenerateModal, setShowGenerateModal] = useState(false)
 
-  // FR-103: Show "Generating shopping list..." when generating (with 2s minimum)
+  // Show generating spinner
   if (isGenerating) {
     return (
       <div className="shopping-list-page">
@@ -22,6 +26,7 @@ const ShoppingList = () => {
     )
   }
 
+  // Show loading spinner
   if (loading) {
     return (
       <div className="shopping-list-page">
@@ -33,39 +38,92 @@ const ShoppingList = () => {
     )
   }
 
+  // Show error state
   if (error) {
     return (
       <div className="shopping-list-page">
         <div className="error">
           <p>{error}</p>
+          <button
+            className="btn-primary generate-btn"
+            onClick={() => setShowGenerateModal(true)}
+          >
+            Generate Shopping List
+          </button>
         </div>
+        {showGenerateModal && (
+          <GenerateShoppingListModal
+            onClose={() => setShowGenerateModal(false)}
+            showWarning={false}
+          />
+        )}
       </div>
     )
   }
 
-  if (!sortedAisles || sortedAisles.length === 0) {
+  // Show "no list" state with generate button
+  if (!listExists) {
     return (
       <div className="shopping-list-page">
         <h1>Shopping List</h1>
-        <div className="empty-state">
-          <p>No items in shopping list.</p>
-          <p>Add recipes to your meal plan to get started!</p>
+        <div className="empty-state no-list">
+          <p>You don't have a shopping list yet.</p>
+          <p>Generate one based on your meal plan!</p>
+          <button
+            className="btn-primary generate-btn"
+            onClick={() => setShowGenerateModal(true)}
+          >
+            Generate Shopping List
+          </button>
         </div>
+        {showGenerateModal && (
+          <GenerateShoppingListModal
+            onClose={() => setShowGenerateModal(false)}
+            showWarning={false}
+          />
+        )}
       </div>
     )
   }
 
+  // Show empty list state (list exists but has no items)
+  if (!sortedAisles || sortedAisles.length === 0) {
+    return (
+      <div className="shopping-list-page">
+        <ShoppingListHeader onGenerateClick={() => setShowGenerateModal(true)} />
+        <div className="empty-state">
+          <p>Your shopping list is empty.</p>
+          <p>Add recipes to your meal plan and regenerate!</p>
+        </div>
+        {showGenerateModal && (
+          <GenerateShoppingListModal
+            onClose={() => setShowGenerateModal(false)}
+            showWarning={true}
+          />
+        )}
+      </div>
+    )
+  }
+
+  // Show full shopping list
   return (
     <div className="shopping-list-page">
-      <ShoppingListHeader />
+      <ShoppingListHeader onGenerateClick={() => setShowGenerateModal(true)} />
       <div className="shopping-list-content">
         {sortedAisles.map(aisleData => (
           <ShoppingListAisle
-            key={aisleData.aisle.id}
+            key={aisleData.aisleId || 'other'}
             aisleData={aisleData}
+            startDate={shoppingList?.startDate}
           />
         ))}
       </div>
+      {showGenerateModal && (
+        <GenerateShoppingListModal
+          onClose={() => setShowGenerateModal(false)}
+          showWarning={true}
+        />
+      )}
     </div>
   )
 }

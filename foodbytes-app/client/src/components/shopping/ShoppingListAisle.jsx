@@ -5,9 +5,9 @@ import ShoppingListItem from './ShoppingListItem'
  * ShoppingListAisle - Collapsible aisle section with items
  * Supports FR-020 (aisle grouping)
  */
-const ShoppingListAisle = ({ aisleData }) => {
+const ShoppingListAisle = ({ aisleData, startDate }) => {
   const [isExpanded, setIsExpanded] = useState(true)
-  const { aisle, items } = aisleData
+  const { aisleName, items } = aisleData
 
   return (
     <div className="shopping-aisle">
@@ -25,7 +25,7 @@ const ShoppingListAisle = ({ aisleData }) => {
         }}
       >
         <h2 className="aisle-name">
-          {aisle.name} ({items.length})
+          {aisleName} ({items.length})
         </h2>
         <span className="expand-icon" aria-hidden="true">
           {isExpanded ? '▼' : '▶'}
@@ -35,8 +35,9 @@ const ShoppingListAisle = ({ aisleData }) => {
         <div className="aisle-items">
           {items.map(item => (
             <ShoppingListItem
-              key={`${item.ingredientId}_${item.unit}`}
+              key={item.id}
               item={item}
+              startDate={startDate}
             />
           ))}
         </div>

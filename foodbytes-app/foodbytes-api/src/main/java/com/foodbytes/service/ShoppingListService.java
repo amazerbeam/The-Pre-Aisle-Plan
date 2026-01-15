@@ -226,11 +226,23 @@ public class ShoppingListService {
         String ingredientName = null;
 
         // FR-102: Determine which recipe contains the ingredient
-        // If sourceChain is provided, the first ID is the extra recipe that contains it
-        // and the last ID is the main recipe to match against meal plan entries
-        Long extraRecipeId = (sourceChain != null && !sourceChain.isEmpty()) ? sourceChain.get(0) : null;
-        Long mainRecipeId = (sourceChain != null && sourceChain.size() > 1)
-            ? sourceChain.get(sourceChain.size() - 1) : null;
+        // sourceChain format: [extraRecipeId, ..., mainRecipeId]
+        // - If 1 element: it's the main recipe (ingredient is in the main recipe, not an extra)
+        // - If 2+ elements: first is the extra recipe containing the ingredient, last is the main recipe
+        Long extraRecipeId = null;
+        Long mainRecipeId = null;
+
+        if (sourceChain != null && !sourceChain.isEmpty()) {
+            if (sourceChain.size() == 1) {
+                // Single element = main recipe only (no extra involved)
+                mainRecipeId = sourceChain.get(0);
+                extraRecipeId = null;
+            } else {
+                // Multiple elements: first = extra recipe, last = main recipe
+                extraRecipeId = sourceChain.get(0);
+                mainRecipeId = sourceChain.get(sourceChain.size() - 1);
+            }
+        }
 
         // Process each meal plan entry
         for (MealPlanEntry entry : entries) {
