@@ -18,7 +18,7 @@ const ShoppingListItem = ({ item, startDate }) => {
   const longPressTimer = useRef(null)
   const touchMoved = useRef(false)
 
-  const LONG_PRESS_DURATION = 3000 // 3 seconds
+  const LONG_PRESS_DURATION = 1000 // 1 second
 
   const handleClick = () => {
     // Only toggle if not in long press mode

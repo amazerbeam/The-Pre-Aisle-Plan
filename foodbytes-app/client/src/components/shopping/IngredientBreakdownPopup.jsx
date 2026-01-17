@@ -1,36 +1,19 @@
-import { useEffect, useRef } from 'react'
 import './IngredientBreakdownPopup.css'
 
 /**
  * FR-042: Ingredient Breakdown Popup
  * Shows which meals use an ingredient and how much each requires
+ * - Closes via X button or clicking the grey overlay area
+ * - Does NOT close on scroll or clicking inside the popup
  */
-function IngredientBreakdownPopup({ breakdown, position, onClose }) {
-  const popupRef = useRef(null)
-
-  // Close on click outside
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (popupRef.current && !popupRef.current.contains(e.target)) {
-        onClose()
-      }
-    }
-
-    // Cancel on scroll/drag
-    const handleScroll = () => {
+function IngredientBreakdownPopup({ breakdown, onClose }) {
+  // Handle overlay click (grey area) - close popup
+  const handleOverlayClick = (e) => {
+    // Only close if clicking directly on the overlay, not the popup content
+    if (e.target.classList.contains('breakdown-popup-overlay')) {
       onClose()
     }
-
-    document.addEventListener('mousedown', handleClickOutside)
-    document.addEventListener('touchstart', handleClickOutside)
-    document.addEventListener('scroll', handleScroll, true)
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-      document.removeEventListener('touchstart', handleClickOutside)
-      document.removeEventListener('scroll', handleScroll, true)
-    }
-  }, [onClose])
+  }
 
   if (!breakdown) return null
 
@@ -49,17 +32,22 @@ function IngredientBreakdownPopup({ breakdown, position, onClose }) {
   }
 
   return (
-    <div className="breakdown-popup-overlay">
-      {/* FR-042 FIX: Removed inline positioning - let overlay flex centering handle it */}
-      <div
-        ref={popupRef}
-        className="breakdown-popup"
-      >
+    <div className="breakdown-popup-overlay" onClick={handleOverlayClick}>
+      <div className="breakdown-popup">
         <header className="breakdown-header">
-          <h4>{breakdown.ingredientName}</h4>
-          <span className="breakdown-total">
-            {formatQuantity(breakdown.totalQuantity)} {breakdown.unit}
-          </span>
+          <div className="breakdown-title-row">
+            <h4>{breakdown.ingredientName}</h4>
+            <span className="breakdown-total">
+              {formatQuantity(breakdown.totalQuantity)} {breakdown.unit}
+            </span>
+          </div>
+          <button
+            className="breakdown-close-btn"
+            onClick={onClose}
+            aria-label="Close breakdown"
+          >
+            &times;
+          </button>
         </header>
 
         <ul className="breakdown-list">
@@ -75,8 +63,6 @@ function IngredientBreakdownPopup({ breakdown, position, onClose }) {
             </li>
           ))}
         </ul>
-
-        <p className="breakdown-hint">Tap anywhere to close</p>
       </div>
     </div>
   )
