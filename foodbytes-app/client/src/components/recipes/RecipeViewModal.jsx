@@ -64,6 +64,8 @@ function RecipeViewModal({
 
   // FR-095: Independent servings state per recipe in navigation stack
   const [currentServings, setCurrentServings] = useState(servings)
+  // Display value for input - allows empty while typing
+  const [servingsDisplay, setServingsDisplay] = useState(String(servings))
 
   // FR-102: Fetch full recipe data on mount and when recipeId changes
   useEffect(() => {
@@ -98,7 +100,9 @@ function RecipeViewModal({
       setFullRecipe(stackRecipe)
       setCurrentRecipeName(stackRecipe.name)
       // FR-095: Reset servings to linked recipe's default (not parent's servings)
-      setCurrentServings(stackRecipe.defaultServings || 1)
+      const newServings = stackRecipe.defaultServings || 1
+      setCurrentServings(newServings)
+      setServingsDisplay(String(newServings))
       prevStackRecipeId.current = stackRecipe.id
     }
   }, [stackRecipe])
@@ -222,9 +226,23 @@ function RecipeViewModal({
   }
 
   // FR-095: Handle servings input change
+  // Allow empty display while typing, but keep last valid value for calculations
   const handleServingsChange = (e) => {
-    const value = Math.max(1, parseInt(e.target.value) || 1)
-    setCurrentServings(value)
+    const inputValue = e.target.value
+    setServingsDisplay(inputValue)
+
+    // Only update actual servings if valid number >= 1
+    const parsed = parseInt(inputValue)
+    if (!isNaN(parsed) && parsed >= 1) {
+      setCurrentServings(parsed)
+    }
+  }
+
+  // Handle blur - restore display to actual value if empty
+  const handleServingsBlur = () => {
+    if (servingsDisplay === '' || isNaN(parseInt(servingsDisplay))) {
+      setServingsDisplay(String(currentServings))
+    }
   }
 
   return (
@@ -287,8 +305,9 @@ function RecipeViewModal({
                   type="number"
                   min="1"
                   max="20"
-                  value={currentServings}
+                  value={servingsDisplay}
                   onChange={handleServingsChange}
+                  onBlur={handleServingsBlur}
                   onClick={(e) => e.stopPropagation()}
                   className="servings-input"
                   aria-label="Number of servings"
