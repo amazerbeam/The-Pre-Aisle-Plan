@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useMealPlan } from '../../contexts/MealPlanContext'
 import { useAuth } from '../../contexts/AuthContext'
 import { useNavigate } from 'react-router-dom'
@@ -12,6 +12,7 @@ import './MealPlanCalendar.css'
  * MealPlanCalendar - FR-016: 7-day calendar view of meal plan
  * FR-082: Clickable week total showing macro summary popup
  * Swap days feature: Click day header to swap with another day
+ * Auto-scrolls to today on mobile
  * Shows recipes organized by date and meal type
  */
 function MealPlanCalendar() {
@@ -20,6 +21,24 @@ function MealPlanCalendar() {
   const navigate = useNavigate()
   const [showWeeklyPopup, setShowWeeklyPopup] = useState(false)
   const [swapSourceDay, setSwapSourceDay] = useState(null)
+  const todayRef = useRef(null)
+
+  // Auto-scroll to today on mobile when weekPlan loads
+  useEffect(() => {
+    if (weekPlan && todayRef.current) {
+      // Only scroll on mobile (screen width <= 768px)
+      const isMobile = window.innerWidth <= 768
+      if (isMobile) {
+        // Small delay to ensure DOM is ready
+        setTimeout(() => {
+          todayRef.current?.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          })
+        }, 100)
+      }
+    }
+  }, [weekPlan])
 
   // Redirect to home if not authenticated
   if (!isAuthenticated) {
@@ -83,6 +102,7 @@ function MealPlanCalendar() {
             day={day}
             onSwapClick={handleSwapClick}
             isSwapSource={swapSourceDay?.date === day.date}
+            ref={day.isToday ? todayRef : null}
           />
         ))}
       </div>

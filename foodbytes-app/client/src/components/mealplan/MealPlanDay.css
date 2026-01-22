@@ -146,6 +146,45 @@
   font-style: italic;
 }
 
+/* Missing meal buttons - clickable links to add meals */
+.missing-meals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px;
+  margin-top: auto;
+}
+
+.missing-meals-empty {
+  flex-direction: column;
+  align-items: stretch;
+  padding: 12px 8px;
+}
+
+.missing-meal-link {
+  display: inline-block;
+  padding: 6px 10px;
+  background-color: #f0f0f0;
+  border: 1px dashed #ccc;
+  border-radius: 4px;
+  color: #666;
+  font-size: 11px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.missing-meal-link:hover {
+  background-color: rgba(74, 63, 128, 0.1);
+  border-color: var(--primary-color, #4a3f80);
+  color: var(--primary-color, #4a3f80);
+}
+
+.missing-meals-empty .missing-meal-link {
+  text-align: center;
+  padding: 10px;
+  font-size: 12px;
+}
+
 .day-footer {
   padding: 8px 12px;
   background-color: #f8f9fa;

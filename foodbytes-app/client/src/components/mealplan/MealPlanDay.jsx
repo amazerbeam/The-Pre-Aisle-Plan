@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, forwardRef } from 'react'
+import { Link } from 'react-router-dom'
 import MealPlanEntry from './MealPlanEntry'
 import DailyMacroPopup from './DailyMacroPopup'
 import { formatDateShort } from '../../utils/dateUtils'
@@ -12,8 +13,9 @@ import './MealPlanDay.css'
  * FR-041: Uses dynamic food emojis per meal type
  * FR-081: Clickable calories showing macro breakdown popup
  * Clickable day header to initiate day swap
+ * Supports ref forwarding for scroll-to-today on mobile
  */
-function MealPlanDay({ day, onSwapClick, isSwapSource }) {
+const MealPlanDay = forwardRef(function MealPlanDay({ day, onSwapClick, isSwapSource }, ref) {
   const [showMacroPopup, setShowMacroPopup] = useState(false)
 
   const mealTypes = [
@@ -27,6 +29,13 @@ function MealPlanDay({ day, onSwapClick, isSwapSource }) {
   const activeMealTypes = mealTypes.filter(({ key }) => {
     const entries = day.mealsByType?.[key] || []
     return entries.length > 0
+  })
+
+  // Find missing meal types (excluding snacks - only show breakfast, lunch, dinner as missing)
+  const coreMealTypes = mealTypes.filter(m => m.key !== 'snacks')
+  const missingMealTypes = coreMealTypes.filter(({ key }) => {
+    const entries = day.mealsByType?.[key] || []
+    return entries.length === 0
   })
 
   const handleHeaderClick = () => {
@@ -43,7 +52,10 @@ function MealPlanDay({ day, onSwapClick, isSwapSource }) {
   }
 
   return (
-    <div className={`meal-plan-day ${day.isToday ? 'today' : ''} ${isSwapSource ? 'swap-source' : ''}`}>
+    <div
+      ref={ref}
+      className={`meal-plan-day ${day.isToday ? 'today' : ''} ${isSwapSource ? 'swap-source' : ''}`}
+    >
       <header
         className="day-header day-header-clickable"
         onClick={handleHeaderClick}
@@ -60,27 +72,53 @@ function MealPlanDay({ day, onSwapClick, isSwapSource }) {
       <div className="day-meals">
         {/* FR-040: Only render meal types with assigned recipes */}
         {activeMealTypes.length > 0 ? (
-          activeMealTypes.map(({ key, label }) => {
-            const entries = day.mealsByType?.[key] || []
-            // FR-041: Get dynamic emoji based on date and meal type
-            const mealEmoji = getEmojiForMeal(day.date, key)
-            return (
-              <div key={key} className="meal-section">
-                <div className="meal-header">
-                  <span className="meal-icon">{mealEmoji}</span>
-                  <span className="meal-label">{label}</span>
+          <>
+            {activeMealTypes.map(({ key, label }) => {
+              const entries = day.mealsByType?.[key] || []
+              // FR-041: Get dynamic emoji based on date and meal type
+              const mealEmoji = getEmojiForMeal(day.date, key)
+              return (
+                <div key={key} className="meal-section">
+                  <div className="meal-header">
+                    <span className="meal-icon">{mealEmoji}</span>
+                    <span className="meal-label">{label}</span>
+                  </div>
+                  <div className="meal-entries">
+                    {entries.map((entry) => (
+                      <MealPlanEntry key={entry.id} entry={entry} />
+                    ))}
+                  </div>
                 </div>
-                <div className="meal-entries">
-                  {entries.map((entry) => (
-                    <MealPlanEntry key={entry.id} entry={entry} />
-                  ))}
-                </div>
+              )
+            })}
+            {/* Show missing meal types as clickable links */}
+            {missingMealTypes.length > 0 && (
+              <div className="missing-meals">
+                {missingMealTypes.map(({ key, label }) => (
+                  <Link
+                    key={key}
+                    to={`/?mealType=${key}`}
+                    className="missing-meal-link"
+                  >
+                    + {label}
+                  </Link>
+                ))}
               </div>
-            )
-          })
+            )}
+          </>
         ) : (
-          /* FR-040: Show placeholder when day is completely empty */
-          <div className="empty-day-message">No meals planned</div>
+          /* FR-040: Show all meal types as clickable links when day is completely empty */
+          <div className="missing-meals missing-meals-empty">
+            {coreMealTypes.map(({ key, label }) => (
+              <Link
+                key={key}
+                to={`/?mealType=${key}`}
+                className="missing-meal-link"
+              >
+                + {label}
+              </Link>
+            ))}
+          </div>
         )}
       </div>
 
@@ -112,6 +150,6 @@ function MealPlanDay({ day, onSwapClick, isSwapSource }) {
       )}
     </div>
   )
-}
+})
 
 export default MealPlanDay

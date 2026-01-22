@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { useMealPlan } from '../../contexts/MealPlanContext'
 import recipeService from '../../services/recipeService'
@@ -11,8 +12,21 @@ const MEAL_TYPES = ['breakfast', 'lunch', 'dinner', 'snacks', 'extras']
 function RecipeList() {
   const { isAdmin } = useAuth()
   const { weekPlan } = useMealPlan()
+  const [searchParams, setSearchParams] = useSearchParams()
   const [recipes, setRecipes] = useState([])
-  const [activeMeal, setActiveMeal] = useState('breakfast')
+
+  // Read initial meal type from URL params, default to 'breakfast'
+  const urlMealType = searchParams.get('mealType')
+  const initialMeal = MEAL_TYPES.includes(urlMealType) ? urlMealType : 'breakfast'
+  const [activeMeal, setActiveMeal] = useState(initialMeal)
+
+  // Clear the mealType param from URL after reading it (keeps URL clean)
+  useEffect(() => {
+    if (urlMealType && MEAL_TYPES.includes(urlMealType)) {
+      searchParams.delete('mealType')
+      setSearchParams(searchParams, { replace: true })
+    }
+  }, []) // Run once on mount
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   // FR-033: Admin edit modal state
