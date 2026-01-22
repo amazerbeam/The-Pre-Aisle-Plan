@@ -1,3 +1,6 @@
+import { useRef, useCallback } from 'react'
+import { usePullToDismiss } from '../../hooks/usePullToDismiss'
+import PullToDismissUI from '../common/PullToDismissUI'
 import './IngredientBreakdownPopup.css'
 
 /**
@@ -5,8 +8,28 @@ import './IngredientBreakdownPopup.css'
  * Shows which meals use an ingredient and how much each requires
  * - Closes via X button or clicking the grey overlay area
  * - Does NOT close on scroll or clicking inside the popup
+ * - Supports pull-to-dismiss gesture on mobile
  */
 function IngredientBreakdownPopup({ breakdown, onClose }) {
+  const popupRef = useRef(null)
+
+  // Pull-to-dismiss hook
+  const {
+    isDragging,
+    circlePosition,
+    isOverTarget,
+    dragDirection,
+    handlers: dismissHandlers,
+    setScrollableRef,
+    targetPosition
+  } = usePullToDismiss(onClose)
+
+  // Combine refs for the popup element
+  const setPopupRef = useCallback((el) => {
+    popupRef.current = el
+    setScrollableRef(el)
+  }, [setScrollableRef])
+
   // Handle overlay click (grey area) - close popup
   const handleOverlayClick = (e) => {
     // Only close if clicking directly on the overlay, not the popup content
@@ -33,7 +56,11 @@ function IngredientBreakdownPopup({ breakdown, onClose }) {
 
   return (
     <div className="breakdown-popup-overlay" onClick={handleOverlayClick}>
-      <div className="breakdown-popup">
+      <div
+        ref={setPopupRef}
+        className="breakdown-popup"
+        {...dismissHandlers}
+      >
         <header className="breakdown-header">
           <div className="breakdown-title-row">
             <h4>{breakdown.ingredientName}</h4>
@@ -64,6 +91,15 @@ function IngredientBreakdownPopup({ breakdown, onClose }) {
           ))}
         </ul>
       </div>
+
+      {/* Pull-to-dismiss UI */}
+      <PullToDismissUI
+        isDragging={isDragging}
+        circlePosition={circlePosition}
+        isOverTarget={isOverTarget}
+        targetPosition={targetPosition}
+        dragDirection={dragDirection}
+      />
     </div>
   )
 }

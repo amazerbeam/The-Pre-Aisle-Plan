@@ -1,13 +1,33 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useCallback } from 'react'
 import { formatDateShort } from '../../utils/dateUtils'
+import { usePullToDismiss } from '../../hooks/usePullToDismiss'
+import PullToDismissUI from '../common/PullToDismissUI'
 import './SwapDaysModal.css'
 
 /**
  * SwapDaysModal - Popup for swapping meals between two days
  * Shows all other days in the week as selectable options
+ * Supports pull-to-dismiss gesture on mobile
  */
 function SwapDaysModal({ sourceDay, allDays, onSwap, onClose }) {
   const popupRef = useRef(null)
+
+  // Pull-to-dismiss hook
+  const {
+    isDragging,
+    circlePosition,
+    isOverTarget,
+    dragDirection,
+    handlers: dismissHandlers,
+    setScrollableRef,
+    targetPosition
+  } = usePullToDismiss(onClose)
+
+  // Combine refs for the popup element
+  const setPopupRef = useCallback((el) => {
+    popupRef.current = el
+    setScrollableRef(el)
+  }, [setScrollableRef])
 
   // Filter out the source day from available swap targets
   const targetDays = allDays.filter(d => d.date !== sourceDay.date)
@@ -56,7 +76,11 @@ function SwapDaysModal({ sourceDay, allDays, onSwap, onClose }) {
 
   return (
     <div className="swap-modal-overlay">
-      <div ref={popupRef} className="swap-modal">
+      <div
+        ref={setPopupRef}
+        className="swap-modal"
+        {...dismissHandlers}
+      >
         <header className="swap-modal-header">
           <div className="swap-modal-title">
             <h4>Swap with what day?</h4>
@@ -97,6 +121,15 @@ function SwapDaysModal({ sourceDay, allDays, onSwap, onClose }) {
 
         <p className="swap-modal-hint">Press ESC or tap outside to cancel</p>
       </div>
+
+      {/* Pull-to-dismiss UI */}
+      <PullToDismissUI
+        isDragging={isDragging}
+        circlePosition={circlePosition}
+        isOverTarget={isOverTarget}
+        targetPosition={targetPosition}
+        dragDirection={dragDirection}
+      />
     </div>
   )
 }

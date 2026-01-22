@@ -1,13 +1,33 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useCallback } from 'react'
 import { formatDateRange } from '../../utils/dateUtils'
+import { usePullToDismiss } from '../../hooks/usePullToDismiss'
+import PullToDismissUI from '../common/PullToDismissUI'
 import './WeeklyMacroPopup.css'
 
 /**
  * FR-082: Weekly Macro Summary Popup
  * Displays weekly macro totals and daily averages when clicking on week total
+ * Supports pull-to-dismiss gesture on mobile
  */
 function WeeklyMacroPopup({ weekData, onClose }) {
   const popupRef = useRef(null)
+
+  // Pull-to-dismiss hook
+  const {
+    isDragging,
+    circlePosition,
+    isOverTarget,
+    dragDirection,
+    handlers: dismissHandlers,
+    setScrollableRef,
+    targetPosition
+  } = usePullToDismiss(onClose)
+
+  // Combine refs for the popup element
+  const setPopupRef = useCallback((el) => {
+    popupRef.current = el
+    setScrollableRef(el)
+  }, [setScrollableRef])
 
   // Close on click outside, ESC key, scroll
   useEffect(() => {
@@ -77,7 +97,11 @@ function WeeklyMacroPopup({ weekData, onClose }) {
 
   return (
     <div className="macro-popup-overlay">
-      <div ref={popupRef} className="macro-popup macro-popup-wide">
+      <div
+        ref={setPopupRef}
+        className="macro-popup macro-popup-wide"
+        {...dismissHandlers}
+      >
         <header className="macro-popup-header">
           <div className="macro-popup-title">
             <h4>Weekly Summary</h4>
@@ -169,6 +193,15 @@ function WeeklyMacroPopup({ weekData, onClose }) {
 
         <p className="macro-popup-hint">Press ESC or tap anywhere to close</p>
       </div>
+
+      {/* Pull-to-dismiss UI */}
+      <PullToDismissUI
+        isDragging={isDragging}
+        circlePosition={circlePosition}
+        isOverTarget={isOverTarget}
+        targetPosition={targetPosition}
+        dragDirection={dragDirection}
+      />
     </div>
   )
 }

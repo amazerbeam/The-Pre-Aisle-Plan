@@ -1,13 +1,33 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useCallback } from 'react'
 import { formatDateShort } from '../../utils/dateUtils'
+import { usePullToDismiss } from '../../hooks/usePullToDismiss'
+import PullToDismissUI from '../common/PullToDismissUI'
 import './DailyMacroPopup.css'
 
 /**
  * FR-081: Daily Macro Popup
  * Displays macro breakdown for a single day when clicking on daily calories
+ * Supports pull-to-dismiss gesture on mobile
  */
 function DailyMacroPopup({ day, onClose }) {
   const popupRef = useRef(null)
+
+  // Pull-to-dismiss hook
+  const {
+    isDragging,
+    circlePosition,
+    isOverTarget,
+    dragDirection,
+    handlers: dismissHandlers,
+    setScrollableRef,
+    targetPosition
+  } = usePullToDismiss(onClose)
+
+  // Combine refs for the popup element
+  const setPopupRef = useCallback((el) => {
+    popupRef.current = el
+    setScrollableRef(el)
+  }, [setScrollableRef])
 
   // Close on click outside, ESC key, or scroll
   useEffect(() => {
@@ -66,7 +86,11 @@ function DailyMacroPopup({ day, onClose }) {
 
   return (
     <div className="macro-popup-overlay">
-      <div ref={popupRef} className="macro-popup">
+      <div
+        ref={setPopupRef}
+        className="macro-popup"
+        {...dismissHandlers}
+      >
         <header className="macro-popup-header">
           <div className="macro-popup-title">
             <h4>{day.dayOfWeek}</h4>
@@ -125,6 +149,15 @@ function DailyMacroPopup({ day, onClose }) {
 
         <p className="macro-popup-hint">Press ESC or tap anywhere to close</p>
       </div>
+
+      {/* Pull-to-dismiss UI */}
+      <PullToDismissUI
+        isDragging={isDragging}
+        circlePosition={circlePosition}
+        isOverTarget={isOverTarget}
+        targetPosition={targetPosition}
+        dragDirection={dragDirection}
+      />
     </div>
   )
 }
