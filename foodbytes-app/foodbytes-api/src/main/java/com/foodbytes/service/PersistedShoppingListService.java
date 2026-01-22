@@ -91,9 +91,9 @@ public class PersistedShoppingListService {
         User user = userRepository.findById(effectiveOwnerId)
             .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Delete existing shopping list if present
-        shoppingListRepository.findByUserId(effectiveOwnerId)
-            .ifPresent(existing -> shoppingListRepository.delete(existing));
+        // Delete existing shopping list if present (flush to ensure delete completes before insert)
+        shoppingListRepository.deleteByUserId(effectiveOwnerId);
+        shoppingListRepository.flush();
 
         // Generate aggregated shopping list using existing service
         // Note: We pass endDate + 1 day because the existing service uses exclusive end date

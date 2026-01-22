@@ -58,6 +58,17 @@ export const mealPlanService = {
   async getRecipeAssignments(recipeId, startDate) {
     const response = await api.get(`/meal-plan/recipe/${recipeId}?startDate=${startDate}`)
     return response.data
+  },
+
+  /**
+   * Swap all meals between two dates
+   * @param {string} sourceDate - ISO format date string (YYYY-MM-DD)
+   * @param {string} targetDate - ISO format date string (YYYY-MM-DD)
+   * @returns {Promise<boolean>} true if swapped successfully
+   */
+  async swapDays(sourceDate, targetDate) {
+    const response = await api.post(`/meal-plan/swap?sourceDate=${sourceDate}&targetDate=${targetDate}`)
+    return response.status === 204
   }
 }
 

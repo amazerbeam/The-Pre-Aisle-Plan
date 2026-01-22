@@ -106,6 +106,30 @@ public class MealPlanController {
     }
 
     /**
+     * Swap all meals between two dates.
+     * POST /api/meal-plan/swap?sourceDate=2025-01-16&targetDate=2025-01-17
+     *
+     * @param userPrincipal Authenticated user (required)
+     * @param sourceDate First date
+     * @param targetDate Second date
+     * @return 204 No Content on success
+     */
+    @PostMapping("/swap")
+    public ResponseEntity<?> swapDays(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate sourceDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate targetDate) {
+
+        if (userPrincipal == null) {
+            return ResponseEntity.status(403)
+                .body(Map.of("error", "Authentication required to modify meal plan"));
+        }
+
+        mealPlanService.swapDays(userPrincipal.getId(), sourceDate, targetDate);
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
      * FR-014: Get which days a recipe is assigned to within the current date range.
      * GET /api/meal-plan/recipe/{recipeId}?startDate=2025-12-01
      * Used to highlight day buttons on RecipeCard.

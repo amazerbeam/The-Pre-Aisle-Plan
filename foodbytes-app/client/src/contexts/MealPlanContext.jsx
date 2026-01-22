@@ -299,6 +299,67 @@ export const MealPlanProvider = ({ children }) => {
   }, [isAuthenticated, fetchWeekPlan])
 
   /**
+   * Swap all meals between two dates
+   * @param {string} sourceDateISO - ISO format date string (YYYY-MM-DD)
+   * @param {string} targetDateISO - ISO format date string (YYYY-MM-DD)
+   */
+  const swapDayMeals = useCallback(async (sourceDateISO, targetDateISO) => {
+    if (!isAuthenticated) {
+      throw new Error('Authentication required')
+    }
+
+    // Apply optimistic UI update by swapping days in state
+    const previousWeekPlan = weekPlan
+    setWeekPlan(currentPlan => {
+      if (!currentPlan || !currentPlan.days) return currentPlan
+
+      const sourceIndex = currentPlan.days.findIndex(d => d.date === sourceDateISO)
+      const targetIndex = currentPlan.days.findIndex(d => d.date === targetDateISO)
+
+      if (sourceIndex === -1 || targetIndex === -1) return currentPlan
+
+      const newDays = [...currentPlan.days]
+      const sourceDay = { ...newDays[sourceIndex] }
+      const targetDay = { ...newDays[targetIndex] }
+
+      // Swap the meal data but keep the date metadata
+      newDays[sourceIndex] = {
+        ...sourceDay,
+        mealsByType: targetDay.mealsByType,
+        totalCalories: targetDay.totalCalories,
+        totalProtein: targetDay.totalProtein,
+        totalCarbs: targetDay.totalCarbs,
+        totalFat: targetDay.totalFat
+      }
+      newDays[targetIndex] = {
+        ...targetDay,
+        mealsByType: sourceDay.mealsByType,
+        totalCalories: sourceDay.totalCalories,
+        totalProtein: sourceDay.totalProtein,
+        totalCarbs: sourceDay.totalCarbs,
+        totalFat: sourceDay.totalFat
+      }
+
+      return { ...currentPlan, days: newDays }
+    })
+
+    try {
+      await mealPlanService.swapDays(sourceDateISO, targetDateISO)
+      // FR-103: Invalidate shopping list cache on successful swap
+      invalidateShoppingListCache()
+      // Refresh to sync with server
+      await fetchWeekPlan()
+    } catch (err) {
+      console.error('Failed to swap days:', err)
+      // Rollback on error
+      setWeekPlan(previousWeekPlan)
+      setAssignmentError('Failed to swap days. Please try again.')
+      setTimeout(() => setAssignmentError(null), 3000)
+      throw err
+    }
+  }, [isAuthenticated, weekPlan, fetchWeekPlan])
+
+  /**
    * Get all entries for a specific date
    * @param {string} planDate - ISO format
    * @returns {Object} Map of mealType to entries
@@ -342,6 +403,7 @@ export const MealPlanProvider = ({ children }) => {
     fetchWeekPlan,
     assignRecipe,
     removeEntry,
+    swapDayMeals,
 
     // Helpers
     isRecipeAssigned,

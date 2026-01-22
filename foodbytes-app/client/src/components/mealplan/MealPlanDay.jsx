@@ -11,8 +11,9 @@ import './MealPlanDay.css'
  * FR-040: Only shows meal types that have assigned recipes
  * FR-041: Uses dynamic food emojis per meal type
  * FR-081: Clickable calories showing macro breakdown popup
+ * Clickable day header to initiate day swap
  */
-function MealPlanDay({ day }) {
+function MealPlanDay({ day, onSwapClick, isSwapSource }) {
   const [showMacroPopup, setShowMacroPopup] = useState(false)
 
   const mealTypes = [
@@ -28,9 +29,29 @@ function MealPlanDay({ day }) {
     return entries.length > 0
   })
 
+  const handleHeaderClick = () => {
+    if (onSwapClick) {
+      onSwapClick(day)
+    }
+  }
+
+  const handleHeaderKeyDown = (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault()
+      handleHeaderClick()
+    }
+  }
+
   return (
-    <div className={`meal-plan-day ${day.isToday ? 'today' : ''}`}>
-      <header className="day-header">
+    <div className={`meal-plan-day ${day.isToday ? 'today' : ''} ${isSwapSource ? 'swap-source' : ''}`}>
+      <header
+        className="day-header day-header-clickable"
+        onClick={handleHeaderClick}
+        role="button"
+        tabIndex={0}
+        onKeyDown={handleHeaderKeyDown}
+        aria-label={`Swap ${day.dayOfWeek} ${formatDateShort(day.date)} with another day`}
+      >
         <span className="day-name">{day.dayOfWeek}</span>
         <span className="day-date">{formatDateShort(day.date)}</span>
         {day.isToday && <span className="today-badge">Today</span>}

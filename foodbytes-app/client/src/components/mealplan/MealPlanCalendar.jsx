@@ -4,19 +4,22 @@ import { useAuth } from '../../contexts/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import MealPlanDay from './MealPlanDay'
 import WeeklyMacroPopup from './WeeklyMacroPopup'
+import SwapDaysModal from './SwapDaysModal'
 import { formatDateRange } from '../../utils/dateUtils'
 import './MealPlanCalendar.css'
 
 /**
  * MealPlanCalendar - FR-016: 7-day calendar view of meal plan
  * FR-082: Clickable week total showing macro summary popup
+ * Swap days feature: Click day header to swap with another day
  * Shows recipes organized by date and meal type
  */
 function MealPlanCalendar() {
   const { isAuthenticated } = useAuth()
-  const { weekPlan, startDate, endDate, loading, error } = useMealPlan()
+  const { weekPlan, startDate, endDate, loading, error, swapDayMeals } = useMealPlan()
   const navigate = useNavigate()
   const [showWeeklyPopup, setShowWeeklyPopup] = useState(false)
+  const [swapSourceDay, setSwapSourceDay] = useState(null)
 
   // Redirect to home if not authenticated
   if (!isAuthenticated) {
@@ -75,7 +78,12 @@ function MealPlanCalendar() {
 
       <div className="calendar-grid">
         {weekPlan?.days?.map((day) => (
-          <MealPlanDay key={day.date} day={day} />
+          <MealPlanDay
+            key={day.date}
+            day={day}
+            onSwapClick={handleSwapClick}
+            isSwapSource={swapSourceDay?.date === day.date}
+          />
         ))}
       </div>
 
@@ -95,8 +103,32 @@ function MealPlanCalendar() {
           onClose={() => setShowWeeklyPopup(false)}
         />
       )}
+
+      {/* Swap Days Modal */}
+      {swapSourceDay && weekPlan && (
+        <SwapDaysModal
+          sourceDay={swapSourceDay}
+          allDays={weekPlan.days}
+          onSwap={handleSwap}
+          onClose={() => setSwapSourceDay(null)}
+        />
+      )}
     </div>
   )
+
+  // Handler when a day header is clicked to initiate swap
+  function handleSwapClick(day) {
+    setSwapSourceDay(day)
+  }
+
+  // Handler when a target day is selected in the swap modal
+  async function handleSwap(sourceDateISO, targetDateISO) {
+    try {
+      await swapDayMeals(sourceDateISO, targetDateISO)
+    } catch (err) {
+      // Error already handled in context
+    }
+  }
 }
 
 export default MealPlanCalendar

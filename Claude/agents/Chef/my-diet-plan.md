@@ -35,16 +35,64 @@
 
 ## Weight Log
 
+### Week 1 (Baseline)
+
 | Date | Weight | Notes |
 |------|--------|-------|
-| 2 Jan 2026 | 13st 6lb | Day 1 baseline |
-| | | |
-| | | |
-| | | |
-| | | |
-| | | |
-| | | |
-| **7-Day Average** | | |
+| 2 Jan | 13st 6lb | Day 1 baseline |
+| 3 Jan | 13st 5lb | |
+| 4 Jan | 13st 5lb | |
+| 5 Jan | 13st 3lb | |
+| 6 Jan | 13st 3lb | |
+| 7 Jan | 13st 2lb | |
+| 8 Jan | 13st 2lb | |
+| **Week 1 Avg** | **13st 4lb** | Baseline established |
+
+### Week 2
+
+| Date | Weight | Notes |
+|------|--------|-------|
+| 9 Jan | 13st 3lb | |
+| 10 Jan | ~13st 5lb | *(estimated - birthday weekend)* |
+| 11 Jan | ~13st 5lb | *(estimated - birthday weekend)* |
+| 12 Jan | 13st 7lb | Post-birthday water retention |
+| 13 Jan | 13st 6lb | |
+| 14 Jan | 13st 1lb | Whoosh after birthday |
+| 15 Jan | 13st 2lb | |
+| **Week 2 Avg** | **13st 4lb** | Birthday bounce evened out |
+
+### Week 3 (In Progress)
+
+| Date | Weight | Notes |
+|------|--------|-------|
+| 16 Jan | 13st 1lb | |
+| 17 Jan | 12st 13lb | New low! |
+| 18 Jan | 12st 13lb | |
+| 19 Jan | 12st 13lb | |
+| 20 Jan | 13st 1lb | Normal fluctuation |
+| 21 Jan | 13st 0lb | |
+| 22 Jan | 13st 1lb | Sodium/water - ate 1,883 avg, still in deficit |
+| **Week 3 Avg** | **~13st 0lb** | *(complete)* |
+
+### Progress Summary
+
+| Metric | Value |
+|--------|-------|
+| Starting weight | 13st 6lb (2 Jan) |
+| Current weight | 12st 13lb (19 Jan) |
+| **Total lost** | **7 lbs** |
+| Week 1 → Week 3 avg | 13st 4lb → 13st 0lb = **4 lbs** |
+
+### Goals
+
+| Goal | Weight | To Lose | Status |
+|------|--------|---------|--------|
+| **Goal 1** | 12st 0lb | 13 lbs from now | In progress |
+| **Goal 2** | 11st 0lb | 27 lbs from now | — |
+
+**Stats at goal (5'9" male):**
+- 12st = BMI 24.7 (top of healthy range)
+- 11st = BMI 22.7 (middle of healthy range)
 
 ---
 
@@ -171,4 +219,10 @@ Or stay in deficit:
 
 ## Current Phase
 
-**Baseline Week (2-8 Jan 2026)** - Daily weigh-ins at maintenance to establish true starting weight before deficit.
+**Weight Loss Phase (Started ~9 Jan 2026)**
+
+- Baseline established: 13st 4lb weekly average
+- Currently: 12st 13lb (down 7 lbs from Day 1, down 4 lbs from weekly average)
+- Rate: Losing faster than expected (~0.5 stone in 2.5 weeks vs predicted 14 weeks)
+
+**Next check:** Waist measurement due (last was 41.5" at navel on 2 Jan)

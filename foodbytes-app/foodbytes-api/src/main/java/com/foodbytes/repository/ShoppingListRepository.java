@@ -2,6 +2,7 @@ package com.foodbytes.repository;
 
 import com.foodbytes.model.ShoppingList;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -38,6 +39,7 @@ public interface ShoppingListRepository extends JpaRepository<ShoppingList, Long
      *
      * @param userId User ID
      */
+    @Modifying
     void deleteByUserId(Long userId);
 
     /**

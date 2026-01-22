@@ -201,6 +201,37 @@ public class MealPlanService {
     }
 
     /**
+     * Swap all meal plan entries between two dates.
+     * All meals from sourceDate move to targetDate and vice versa.
+     *
+     * @param userId User ID
+     * @param sourceDate First date
+     * @param targetDate Second date
+     */
+    @Transactional
+    public void swapDays(Long userId, LocalDate sourceDate, LocalDate targetDate) {
+        Long effectiveOwnerId = getEffectiveMealPlanOwnerId(userId);
+
+        // Get all entries for both dates
+        List<MealPlanEntry> sourceEntries = mealPlanEntryRepository.findByUserIdAndPlanDate(effectiveOwnerId, sourceDate);
+        List<MealPlanEntry> targetEntries = mealPlanEntryRepository.findByUserIdAndPlanDate(effectiveOwnerId, targetDate);
+
+        // Update source entries to target date
+        for (MealPlanEntry entry : sourceEntries) {
+            entry.setPlanDate(targetDate);
+        }
+
+        // Update target entries to source date
+        for (MealPlanEntry entry : targetEntries) {
+            entry.setPlanDate(sourceDate);
+        }
+
+        // Save all changes
+        mealPlanEntryRepository.saveAll(sourceEntries);
+        mealPlanEntryRepository.saveAll(targetEntries);
+    }
+
+    /**
      * FR-014: Get which days a recipe is assigned to within the current date range.
      * Used to highlight day buttons on RecipeCard.
      *

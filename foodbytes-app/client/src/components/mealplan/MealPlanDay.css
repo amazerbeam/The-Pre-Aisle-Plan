@@ -29,6 +29,44 @@
   background-color: rgba(74, 63, 128, 0.08);
 }
 
+/* Clickable day header for swap feature */
+.day-header-clickable {
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s ease;
+}
+
+.day-header-clickable:hover {
+  background-color: rgba(74, 63, 128, 0.12);
+}
+
+.day-header-clickable:active {
+  background-color: rgba(74, 63, 128, 0.18);
+}
+
+.day-header-clickable:focus {
+  outline: 2px solid var(--primary-color, #4a3f80);
+  outline-offset: -2px;
+}
+
+.meal-plan-day.today .day-header-clickable:hover {
+  background-color: rgba(74, 63, 128, 0.15);
+}
+
+/* Highlight when day is selected as swap source */
+.meal-plan-day.swap-source {
+  box-shadow: 0 0 0 3px var(--primary-color, #4a3f80);
+}
+
+.meal-plan-day.swap-source .day-header {
+  background-color: var(--primary-color, #4a3f80);
+}
+
+.meal-plan-day.swap-source .day-name,
+.meal-plan-day.swap-source .day-date {
+  color: #fff;
+}
+
 .day-name {
   font-weight: 600;
   color: #333;
