@@ -92,14 +92,27 @@ function RecipeEditModal({ recipeId, isNew, onClose, onSave }) {
   // Handle form save
   const handleFormSave = async (updatedData, formType) => {
     try {
-      // Merge updated data into recipe
-      const newRecipe = { ...recipe, ...updatedData }
-
-      // Save to server
       let savedRecipe
+
       if (isNew) {
+        // New recipe: merge all data and create
+        const newRecipe = { ...recipe, ...updatedData }
         savedRecipe = await recipeService.createRecipe(newRecipe)
+      } else if (formType === 'Ingredients') {
+        // Existing recipe: only update ingredients
+        savedRecipe = await recipeService.updateRecipeIngredients(recipeId, {
+          ingredients: updatedData.ingredients,
+          newIngredients: updatedData.newIngredients,
+          newUnits: updatedData.newUnits
+        })
+      } else if (formType === 'Steps') {
+        // Existing recipe: only update steps
+        savedRecipe = await recipeService.updateRecipeSteps(recipeId, {
+          steps: updatedData.steps
+        })
       } else {
+        // Recipe info: full update
+        const newRecipe = { ...recipe, ...updatedData }
         savedRecipe = await recipeService.updateRecipe(recipeId, newRecipe)
       }
 

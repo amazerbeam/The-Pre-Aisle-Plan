@@ -94,6 +94,16 @@ export const recipeService = {
     return response.data
   },
 
+  async updateRecipeIngredients(id, data) {
+    const response = await api.patch(`/recipes/admin/${id}/ingredients`, data)
+    return response.data
+  },
+
+  async updateRecipeSteps(id, data) {
+    const response = await api.patch(`/recipes/admin/${id}/steps`, data)
+    return response.data
+  },
+
   async deleteRecipe(id) {
     await api.delete(`/recipes/admin/${id}`)
   },

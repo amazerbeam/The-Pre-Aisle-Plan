@@ -3,6 +3,8 @@ package com.foodbytes.controller;
 import com.foodbytes.dto.RecipeAdminDTO;
 import com.foodbytes.dto.RecipeDTO;
 import com.foodbytes.dto.RecipeExtrasHierarchyDTO;
+import com.foodbytes.dto.RecipeIngredientsUpdateDTO;
+import com.foodbytes.dto.RecipeStepsUpdateDTO;
 import com.foodbytes.dto.RecipeSummaryDTO;
 import com.foodbytes.service.RecipeService;
 import com.foodbytes.service.RecipeExtrasService;
@@ -115,6 +117,25 @@ public class RecipeController {
     public ResponseEntity<Void> deleteRecipe(@PathVariable Long id) {
         recipeService.deleteRecipe(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/admin/{id}/ingredients")
+    @Operation(summary = "Update recipe ingredients only (admin)",
+            description = "Updates only the ingredients of a recipe without touching meal types or steps")
+    public ResponseEntity<RecipeAdminDTO> updateRecipeIngredients(
+            @PathVariable Long id,
+            @Valid @RequestBody RecipeIngredientsUpdateDTO dto) {
+        return ResponseEntity.ok(recipeService.updateRecipeIngredients(
+                id, dto.getIngredients(), dto.getNewIngredients(), dto.getNewUnits()));
+    }
+
+    @PatchMapping("/admin/{id}/steps")
+    @Operation(summary = "Update recipe steps only (admin)",
+            description = "Updates only the steps of a recipe without touching meal types or ingredients")
+    public ResponseEntity<RecipeAdminDTO> updateRecipeSteps(
+            @PathVariable Long id,
+            @Valid @RequestBody RecipeStepsUpdateDTO dto) {
+        return ResponseEntity.ok(recipeService.updateRecipeSteps(id, dto.getSteps()));
     }
 
     @PatchMapping("/admin/{id}/visibility")

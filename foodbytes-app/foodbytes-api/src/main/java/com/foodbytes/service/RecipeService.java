@@ -418,6 +418,44 @@ public class RecipeService {
     }
 
     /**
+     * Update only the ingredients of an existing recipe.
+     * Does not touch meal types or steps.
+     */
+    @Transactional
+    public RecipeAdminDTO updateRecipeIngredients(Long id, List<RecipeIngredientAdminDTO> ingredients,
+                                                   List<NewIngredientDTO> newIngredients, List<NewUnitDTO> newUnits) {
+        Recipe recipe = recipeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Recipe not found with id: " + id));
+
+        Map<String, Ingredient> newIngredientMap = createNewIngredients(newIngredients);
+        Map<String, Unit> newUnitMap = createNewUnits(newUnits);
+
+        recipe.getIngredients().clear();
+        entityManager.flush();
+
+        addIngredients(recipe, ingredients, newIngredientMap, newUnitMap);
+        recipe = recipeRepository.save(recipe);
+        return convertToRecipeAdminDTO(recipe);
+    }
+
+    /**
+     * Update only the steps of an existing recipe.
+     * Does not touch meal types or ingredients.
+     */
+    @Transactional
+    public RecipeAdminDTO updateRecipeSteps(Long id, List<RecipeStepAdminDTO> steps) {
+        Recipe recipe = recipeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Recipe not found with id: " + id));
+
+        recipe.getSteps().clear();
+        entityManager.flush();
+
+        addSteps(recipe, steps);
+        recipe = recipeRepository.save(recipe);
+        return convertToRecipeAdminDTO(recipe);
+    }
+
+    /**
      * Delete a recipe (FR-033 - hard delete).
      */
     @Transactional
