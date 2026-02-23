@@ -76,7 +76,8 @@
       "Bash(curl.exe:*)",
       "WebFetch(domain:www.asiamarket.ie)",
       "Bash(cmd //c \"taskkill /PID 16472 /F\")",
-      "Bash(cmd //c \"taskkill /PID 18608 /F\")"
+      "Bash(cmd //c \"taskkill /PID 18608 /F\")",
+      "Bash(python:*)"
     ],
     "deny": [],
     "ask": []

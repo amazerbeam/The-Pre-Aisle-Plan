@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Betting Report - 7 Feb 2026</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0f1923;
+            color: #e0e6ed;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 30px 20px;
+            background: linear-gradient(135deg, #1a2a3a, #0d4f3c);
+            border-radius: 16px;
+            margin-bottom: 24px;
+            border: 1px solid #2a4a3a;
+        }
+        .header h1 { font-size: 28px; margin-bottom: 8px; color: #4ade80; }
+        .header .subtitle { color: #94a3b8; font-size: 14px; }
+        .header .bankroll {
+            display: flex; justify-content: center; gap: 40px;
+            margin-top: 20px; flex-wrap: wrap;
+        }
+        .header .bankroll .stat {
+            text-align: center;
+        }
+        .header .bankroll .stat .value {
+            font-size: 32px; font-weight: 700; color: #fff;
+        }
+        .header .bankroll .stat .label {
+            font-size: 12px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px;
+        }
+
+        /* Live Tracker */
+        .tracker {
+            background: #1a2636;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+            border: 1px solid #2a3a4a;
+        }
+        .tracker h2 { font-size: 18px; margin-bottom: 16px; color: #4ade80; }
+        .tracker-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 12px;
+        }
+        .tracker-item {
+            background: #0f1923;
+            border-radius: 10px;
+            padding: 14px;
+            border: 2px solid #2a3a4a;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+        .tracker-item:hover { border-color: #4ade80; }
+        .tracker-item.won { border-color: #4ade80; background: #0f2918; }
+        .tracker-item.lost { border-color: #ef4444; background: #2a1012; }
+        .tracker-item.void { border-color: #f59e0b; background: #2a2010; }
+        .tracker-item .match-time {
+            font-size: 11px; color: #64748b; margin-bottom: 6px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .tracker-item .match-time .league-badge {
+            background: #2a3a4a; padding: 2px 8px; border-radius: 4px;
+            font-size: 10px; color: #94a3b8;
+        }
+        .tracker-item .teams {
+            font-size: 14px; font-weight: 600; margin-bottom: 8px;
+        }
+        .tracker-item .pick-line {
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .tracker-item .pick {
+            background: #4ade80; color: #0f1923; padding: 3px 10px;
+            border-radius: 6px; font-size: 12px; font-weight: 700;
+        }
+        .tracker-item .odds { color: #fbbf24; font-weight: 700; font-size: 15px; }
+        .tracker-item .stake { color: #94a3b8; font-size: 12px; margin-top: 6px; }
+        .tracker-item .result-buttons {
+            display: flex; gap: 6px; margin-top: 10px;
+        }
+        .result-btn {
+            flex: 1; padding: 6px; border: none; border-radius: 6px;
+            font-size: 11px; font-weight: 700; cursor: pointer;
+            transition: all 0.2s; text-transform: uppercase;
+        }
+        .result-btn.win-btn { background: #166534; color: #4ade80; }
+        .result-btn.win-btn:hover { background: #4ade80; color: #0f1923; }
+        .result-btn.lose-btn { background: #7f1d1d; color: #ef4444; }
+        .result-btn.lose-btn:hover { background: #ef4444; color: #fff; }
+        .result-btn.reset-btn { background: #2a3a4a; color: #94a3b8; }
+        .result-btn.reset-btn:hover { background: #3a4a5a; }
+        .tracker-item .result-badge {
+            position: absolute; top: 10px; right: 10px;
+            font-size: 18px;
+        }
+        .tracker-item .return-info {
+            font-size: 12px; color: #4ade80; margin-top: 6px; font-weight: 600;
+            display: none;
+        }
+        .tracker-item.won .return-info { display: block; }
+        .tracker-item.lost .return-info { display: block; color: #ef4444; }
+
+        /* Summary Bar */
+        .summary-bar {
+            background: #1a2636;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+            border: 1px solid #2a3a4a;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .summary-stat { text-align: center; }
+        .summary-stat .val { font-size: 24px; font-weight: 700; }
+        .summary-stat .val.green { color: #4ade80; }
+        .summary-stat .val.red { color: #ef4444; }
+        .summary-stat .val.yellow { color: #fbbf24; }
+        .summary-stat .lbl { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* Schedule Timeline */
+        .timeline {
+            background: #1a2636;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+            border: 1px solid #2a3a4a;
+        }
+        .timeline h2 { font-size: 18px; margin-bottom: 16px; color: #fbbf24; }
+        .timeline-row {
+            display: flex; align-items: center; padding: 10px 0;
+            border-bottom: 1px solid #1f2f3f;
+        }
+        .timeline-row:last-child { border-bottom: none; }
+        .timeline-time {
+            font-size: 20px; font-weight: 700; color: #fbbf24;
+            width: 70px; flex-shrink: 0;
+        }
+        .timeline-matches { flex: 1; }
+        .timeline-match {
+            display: inline-block;
+            background: #0f1923;
+            padding: 6px 12px;
+            border-radius: 8px;
+            margin: 3px 6px 3px 0;
+            font-size: 13px;
+            border: 1px solid #2a3a4a;
+        }
+
+        /* Picks Detail */
+        .picks-section {
+            background: #1a2636;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+            border: 1px solid #2a3a4a;
+        }
+        .picks-section h2 { font-size: 18px; margin-bottom: 16px; }
+        .pick-card {
+            background: #0f1923;
+            border-radius: 10px;
+            padding: 18px;
+            margin-bottom: 12px;
+            border: 1px solid #2a3a4a;
+        }
+        .pick-card .pick-header {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            margin-bottom: 12px;
+        }
+        .pick-card .pick-num {
+            background: #4ade80; color: #0f1923; width: 28px; height: 28px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 14px; flex-shrink: 0;
+        }
+        .pick-card .pick-title { flex: 1; margin-left: 12px; }
+        .pick-card .pick-title .match { font-weight: 700; font-size: 16px; }
+        .pick-card .pick-title .league { font-size: 12px; color: #64748b; }
+        .pick-card .confidence {
+            padding: 4px 12px; border-radius: 20px; font-size: 11px;
+            font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .confidence.high { background: #166534; color: #4ade80; }
+        .confidence.medium { background: #854d0e; color: #fbbf24; }
+        .confidence.low { background: #7f1d1d; color: #ef4444; }
+
+        .pick-card .pick-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+        .pick-stat-box {
+            background: #1a2636; padding: 10px; border-radius: 8px; text-align: center;
+        }
+        .pick-stat-box .psv { font-size: 18px; font-weight: 700; color: #fff; }
+        .pick-stat-box .psl { font-size: 10px; color: #64748b; text-transform: uppercase; }
+        .pick-stat-box .psv.green { color: #4ade80; }
+        .pick-stat-box .psv.yellow { color: #fbbf24; }
+
+        .pick-card .reasoning {
+            font-size: 13px; color: #94a3b8; line-height: 1.6;
+            margin-bottom: 10px;
+        }
+        .pick-card .risk {
+            font-size: 12px; color: #f87171; padding: 8px 12px;
+            background: #1a1012; border-radius: 6px; border-left: 3px solid #ef4444;
+        }
+        .pick-card .hyperthink {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 8px; margin-top: 12px;
+        }
+        .ht-item {
+            font-size: 11px; color: #64748b; padding: 6px 10px;
+            background: #1a2636; border-radius: 6px;
+        }
+        .ht-item strong { color: #94a3b8; }
+
+        /* Skip List */
+        .skip-section {
+            background: #1a2636;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+            border: 1px solid #2a3a4a;
+        }
+        .skip-section h2 { font-size: 18px; margin-bottom: 16px; color: #ef4444; }
+        .skip-table { width: 100%; border-collapse: collapse; }
+        .skip-table th {
+            text-align: left; padding: 8px 12px; font-size: 11px;
+            color: #64748b; text-transform: uppercase; border-bottom: 1px solid #2a3a4a;
+        }
+        .skip-table td {
+            padding: 10px 12px; font-size: 13px; border-bottom: 1px solid #1f2f3f;
+        }
+        .skip-table .skip-reason { color: #94a3b8; font-size: 12px; }
+
+        /* Outcomes Table */
+        .outcomes {
+            background: #1a2636;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+            border: 1px solid #2a3a4a;
+        }
+        .outcomes h2 { font-size: 18px; margin-bottom: 16px; color: #818cf8; }
+        .outcome-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 14px; border-radius: 8px; margin-bottom: 6px;
+        }
+        .outcome-row:nth-child(even) { background: #0f1923; }
+        .outcome-row .scenario { font-size: 14px; }
+        .outcome-row .return { font-weight: 700; font-size: 14px; }
+        .outcome-row .return.profit { color: #4ade80; }
+        .outcome-row .return.loss { color: #ef4444; }
+        .outcome-row .return.even { color: #fbbf24; }
+
+        /* Acca Section */
+        .acca-card {
+            background: linear-gradient(135deg, #1a2636, #1a1040);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+            border: 1px solid #4338ca;
+            text-align: center;
+        }
+        .acca-card h2 { color: #818cf8; font-size: 18px; margin-bottom: 8px; }
+        .acca-odds { font-size: 48px; font-weight: 800; color: #fbbf24; }
+        .acca-return { font-size: 14px; color: #94a3b8; margin-top: 4px; }
+        .acca-return span { color: #4ade80; font-weight: 700; font-size: 18px; }
+
+        /* Lessons sidebar */
+        .lessons {
+            background: #1a2636;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+            border: 1px solid #2a3a4a;
+        }
+        .lessons h2 { font-size: 18px; margin-bottom: 16px; color: #f472b6; }
+        .lesson-item {
+            padding: 10px 14px; margin-bottom: 8px;
+            background: #0f1923; border-radius: 8px;
+            font-size: 13px; color: #94a3b8; line-height: 1.5;
+            border-left: 3px solid #f472b6;
+        }
+        .lesson-item strong { color: #f472b6; }
+
+        /* Footer */
+        .footer {
+            text-align: center; padding: 20px;
+            color: #475569; font-size: 12px;
+        }
+
+        /* Mobile */
+        @media (max-width: 600px) {
+            .pick-card .pick-stats { grid-template-columns: repeat(2, 1fr); }
+            .pick-card .hyperthink { grid-template-columns: 1fr; }
+            .header .bankroll { gap: 20px; }
+            .summary-bar { flex-direction: column; align-items: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>Group Bet Week</h1>
+            <div class="subtitle">Saturday 7 February 2026 | 6 Value Picks from 60+ Matches Analyzed</div>
+            <div class="bankroll">
+                <div class="stat">
+                    <div class="value">&#8364;50</div>
+                    <div class="label">Total Staked</div>
+                </div>
+                <div class="stat">
+                    <div class="value">&#8364;137.60</div>
+                    <div class="label">Max Singles Return</div>
+                </div>
+                <div class="stat">
+                    <div class="value">&#8364;516</div>
+                    <div class="label">Acca Dream</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Summary Bar -->
+        <div class="summary-bar" id="summaryBar">
+            <div class="summary-stat">
+                <div class="val" id="winsCount">0</div>
+                <div class="lbl">Wins</div>
+            </div>
+            <div class="summary-stat">
+                <div class="val" id="lossesCount">0</div>
+                <div class="lbl">Losses</div>
+            </div>
+            <div class="summary-stat">
+                <div class="val" id="pendingCount">6</div>
+                <div class="lbl">Pending</div>
+            </div>
+            <div class="summary-stat">
+                <div class="val green" id="totalReturn">&#8364;0.00</div>
+                <div class="lbl">Total Return</div>
+            </div>
+            <div class="summary-stat">
+                <div class="val" id="profitLoss">&#8364;0.00</div>
+                <div class="lbl">Profit / Loss</div>
+            </div>
+        </div>
+
+        <!-- Live Tracker -->
+        <div class="tracker">
+            <h2>Live Tracker (click to mark results)</h2>
+            <div class="tracker-grid" id="trackerGrid">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+
+        <!-- Schedule Timeline -->
+        <div class="timeline">
+            <h2>Schedule</h2>
+            <div class="timeline-row">
+                <div class="timeline-time">14:30</div>
+                <div class="timeline-matches">
+                    <span class="timeline-match">Freiburg vs Bremen</span>
+                    <span class="timeline-match">Mainz vs Augsburg</span>
+                </div>
+            </div>
+            <div class="timeline-row">
+                <div class="timeline-time">17:00</div>
+                <div class="timeline-matches">
+                    <span class="timeline-match">Genoa vs Napoli</span>
+                </div>
+            </div>
+            <div class="timeline-row">
+                <div class="timeline-time">17:30</div>
+                <div class="timeline-matches">
+                    <span class="timeline-match">Newcastle vs Brentford</span>
+                    <span class="timeline-match">Sevilla vs Girona</span>
+                    <span class="timeline-match">Gladbach vs Leverkusen</span>
+                </div>
+            </div>
+            <div class="timeline-row">
+                <div class="timeline-time">~19:15</div>
+                <div class="timeline-matches">
+                    <span class="timeline-match" style="color: #4ade80;">All results in</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Acca Card -->
+        <div class="acca-card">
+            <h2>6-Fold Accumulator</h2>
+            <div class="acca-odds">515/1</div>
+            <div class="acca-return">&#8364;1 stake &rarr; <span>&#8364;516.46</span> if all 6 hit</div>
+        </div>
+
+        <!-- Potential Outcomes -->
+        <div class="outcomes">
+            <h2>Potential Outcomes</h2>
+            <div class="outcome-row">
+                <span class="scenario">All 6 hit (singles + acca)</span>
+                <span class="return profit">+&#8364;604.06</span>
+            </div>
+            <div class="outcome-row">
+                <span class="scenario">All 6 hit (singles only)</span>
+                <span class="return profit">+&#8364;87.60</span>
+            </div>
+            <div class="outcome-row">
+                <span class="scenario">Both HIGH picks + 1 draw</span>
+                <span class="return profit">+&#8364;17 to +&#8364;28</span>
+            </div>
+            <div class="outcome-row">
+                <span class="scenario">Both HIGH picks only</span>
+                <span class="return loss">-&#8364;10</span>
+            </div>
+            <div class="outcome-row">
+                <span class="scenario">2 draws hit, nothing else</span>
+                <span class="return even">~Breakeven</span>
+            </div>
+            <div class="outcome-row">
+                <span class="scenario">1 pick hits</span>
+                <span class="return loss">-&#8364;22 to -&#8364;30</span>
+            </div>
+            <div class="outcome-row">
+                <span class="scenario">0 hits (worst case)</span>
+                <span class="return loss">-&#8364;50</span>
+            </div>
+        </div>
+
+        <!-- Detailed Picks -->
+        <div class="picks-section">
+            <h2>Detailed Analysis</h2>
+
+            <!-- Pick 1 -->
+            <div class="pick-card">
+                <div class="pick-header">
+                    <div class="pick-num">1</div>
+                    <div class="pick-title">
+                        <div class="match">Freiburg vs Werder Bremen</div>
+                        <div class="league">Bundesliga | 14:30</div>
+                    </div>
+                    <span class="confidence high">High</span>
+                </div>
+                <div class="pick-stats">
+                    <div class="pick-stat-box"><div class="psv green">Freiburg Win</div><div class="psl">Pick</div></div>
+                    <div class="pick-stat-box"><div class="psv yellow">1/1</div><div class="psl">Odds (2.00)</div></div>
+                    <div class="pick-stat-box"><div class="psv">&#8364;10</div><div class="psl">Stake</div></div>
+                    <div class="pick-stat-box"><div class="psv green">+7-10%</div><div class="psl">Edge</div></div>
+                </div>
+                <div class="reasoning">
+                    Freiburg are <strong>unbeaten at home since September</strong>. Bremen are <strong>winless in 10 matches</strong> and all THREE senior centre-backs (Pieper, Stark, Wober) are injured. Freiburg have won the last 3 H2H. A fundamental defensive mismatch.
+                </div>
+                <div class="risk">Risk: Freiburg lost their last 2 away games. Bremen could park the bus for 0-0.</div>
+                <div class="hyperthink">
+                    <div class="ht-item"><strong>Key uncertainty:</strong> Freiburg's own form wobble</div>
+                    <div class="ht-item"><strong>Counter-case:</strong> Weak</div>
+                    <div class="ht-item"><strong>Bias check:</strong> Clean - data driven</div>
+                    <div class="ht-item"><strong>Implied vs Est:</strong> 50% vs 57-60%</div>
+                </div>
+            </div>
+
+            <!-- Pick 2 -->
+            <div class="pick-card">
+                <div class="pick-header">
+                    <div class="pick-num">2</div>
+                    <div class="pick-title">
+                        <div class="match">Gladbach vs Bayer Leverkusen</div>
+                        <div class="league">Bundesliga | 17:30</div>
+                    </div>
+                    <span class="confidence high">High</span>
+                </div>
+                <div class="pick-stats">
+                    <div class="pick-stat-box"><div class="psv green">Leverkusen Win</div><div class="psl">Pick</div></div>
+                    <div class="pick-stat-box"><div class="psv yellow">1/1</div><div class="psl">Odds (2.00)</div></div>
+                    <div class="pick-stat-box"><div class="psv">&#8364;10</div><div class="psl">Stake</div></div>
+                    <div class="pick-stat-box"><div class="psv green">+6-10%</div><div class="psl">Edge</div></div>
+                </div>
+                <div class="reasoning">
+                    Leverkusen have won <strong>7 consecutive matches at Borussia-Park</strong>. Gladbach have only <strong>2 home wins all season</strong> (conceding 20 in 10 home games). Leverkusen beat Frankfurt 3-1 last weekend and are chasing Champions League spots.
+                </div>
+                <div class="risk">Risk: Leverkusen have 6 losses this season. Missing GK Flekken. Derby atmosphere could galvanize Gladbach.</div>
+                <div class="hyperthink">
+                    <div class="ht-item"><strong>Key uncertainty:</strong> Leverkusen's 6 losses this season</div>
+                    <div class="ht-item"><strong>Counter-case:</strong> Moderate</div>
+                    <div class="ht-item"><strong>Bias check:</strong> Possible H2H anchoring</div>
+                    <div class="ht-item"><strong>Implied vs Est:</strong> 50% vs 56-60%</div>
+                </div>
+            </div>
+
+            <!-- Pick 3 -->
+            <div class="pick-card">
+                <div class="pick-header">
+                    <div class="pick-num">3</div>
+                    <div class="pick-title">
+                        <div class="match">Newcastle vs Brentford</div>
+                        <div class="league">Premier League | 17:30</div>
+                    </div>
+                    <span class="confidence medium">Medium</span>
+                </div>
+                <div class="pick-stats">
+                    <div class="pick-stat-box"><div class="psv green">Draw</div><div class="psl">Pick</div></div>
+                    <div class="pick-stat-box"><div class="psv yellow">5/2</div><div class="psl">Odds (3.50)</div></div>
+                    <div class="pick-stat-box"><div class="psv">&#8364;8</div><div class="psl">Stake</div></div>
+                    <div class="pick-stat-box"><div class="psv green">+5-8%</div><div class="psl">Edge</div></div>
+                </div>
+                <div class="reasoning">
+                    Newcastle battered <strong>4-1 by Liverpool</strong> then <strong>3-1 by Man City</strong> this week. Missing Gordon (hamstring), Guimaraes (ankle doubt), Joelinton, Schar, Livramento. Confidence shattered. Brentford in form (beat Villa 1-0 away) but inconsistent on the road with 10 losses.
+                </div>
+                <div class="risk">Risk: St James' Park is hostile. Newcastle could bounce back at home. Brentford missing Schade (suspended).</div>
+                <div class="hyperthink">
+                    <div class="ht-item"><strong>Key uncertainty:</strong> Newcastle bounce-back factor</div>
+                    <div class="ht-item"><strong>Counter-case:</strong> Moderate</div>
+                    <div class="ht-item"><strong>Bias check:</strong> Clean - injury driven</div>
+                    <div class="ht-item"><strong>Implied vs Est:</strong> 28.6% vs 34-37%</div>
+                </div>
+            </div>
+
+            <!-- Pick 4 -->
+            <div class="pick-card">
+                <div class="pick-header">
+                    <div class="pick-num">4</div>
+                    <div class="pick-title">
+                        <div class="match">Genoa vs Napoli</div>
+                        <div class="league">Serie A | 17:00</div>
+                    </div>
+                    <span class="confidence medium">Medium</span>
+                </div>
+                <div class="pick-stats">
+                    <div class="pick-stat-box"><div class="psv green">Draw</div><div class="psl">Pick</div></div>
+                    <div class="pick-stat-box"><div class="psv yellow">21/10</div><div class="psl">Odds (3.10)</div></div>
+                    <div class="pick-stat-box"><div class="psv">&#8364;8</div><div class="psl">Stake</div></div>
+                    <div class="pick-stat-box"><div class="psv green">+4-8%</div><div class="psl">Edge</div></div>
+                </div>
+                <div class="reasoning">
+                    Napoli's injury list is <strong>staggering: 8+ key players out</strong> including KDB, Anguissa, Gilmour, Di Lorenzo, Neres, Politano. Genoa have scored <strong>6 goals in their last 2 home games</strong> and are near full strength. Serie A home advantage is historically strong.
+                </div>
+                <div class="risk">Risk: Conte is the master of organized squads. Napoli beat Fiorentina 2-1 despite injuries last week.</div>
+                <div class="hyperthink">
+                    <div class="ht-item"><strong>Key uncertainty:</strong> Conte's tactical genius</div>
+                    <div class="ht-item"><strong>Counter-case:</strong> Moderate</div>
+                    <div class="ht-item"><strong>Bias check:</strong> Clean - injury driven</div>
+                    <div class="ht-item"><strong>Implied vs Est:</strong> 32.3% vs 36-40%</div>
+                </div>
+            </div>
+
+            <!-- Pick 5 -->
+            <div class="pick-card">
+                <div class="pick-header">
+                    <div class="pick-num">5</div>
+                    <div class="pick-title">
+                        <div class="match">Sevilla vs Girona</div>
+                        <div class="league">La Liga | 17:30</div>
+                    </div>
+                    <span class="confidence medium">Medium</span>
+                </div>
+                <div class="pick-stats">
+                    <div class="pick-stat-box"><div class="psv green">Girona Win</div><div class="psl">Pick</div></div>
+                    <div class="pick-stat-box"><div class="psv yellow">12/5</div><div class="psl">Odds (3.40)</div></div>
+                    <div class="pick-stat-box"><div class="psv">&#8364;7</div><div class="psl">Stake</div></div>
+                    <div class="pick-stat-box"><div class="psv green">+6-9%</div><div class="psl">Edge</div></div>
+                </div>
+                <div class="reasoning">
+                    Girona have won their <strong>last 3 visits to the Sanchez Pizjuan</strong>, scoring exactly 2 each time. Sevilla are 15th, just 2 points above relegation. Hammered <strong>4-1 at Mallorca</strong> and have <strong>conceded in every game for 5 straight weeks</strong>. Market has Sevilla as slight favorites at home but data strongly favors Girona.
+                </div>
+                <div class="risk">Risk: Girona just lost 1-0 to Oviedo. Ter Stegen (loan GK) injured long-term. Sevilla desperate at home.</div>
+                <div class="hyperthink">
+                    <div class="ht-item"><strong>Key uncertainty:</strong> Girona's inconsistency</div>
+                    <div class="ht-item"><strong>Counter-case:</strong> Moderate</div>
+                    <div class="ht-item"><strong>Bias check:</strong> Possible pattern bias on venue record</div>
+                    <div class="ht-item"><strong>Implied vs Est:</strong> 29.4% vs 35-38%</div>
+                </div>
+            </div>
+
+            <!-- Pick 6 -->
+            <div class="pick-card">
+                <div class="pick-header">
+                    <div class="pick-num">6</div>
+                    <div class="pick-title">
+                        <div class="match">Mainz vs Augsburg</div>
+                        <div class="league">Bundesliga | 14:30</div>
+                    </div>
+                    <span class="confidence low">Low-Med</span>
+                </div>
+                <div class="pick-stats">
+                    <div class="pick-stat-box"><div class="psv green">Draw</div><div class="psl">Pick</div></div>
+                    <div class="pick-stat-box"><div class="psv yellow">5/2</div><div class="psl">Odds (3.50)</div></div>
+                    <div class="pick-stat-box"><div class="psv">&#8364;6</div><div class="psl">Stake</div></div>
+                    <div class="pick-stat-box"><div class="psv green">+3-6%</div><div class="psl">Edge</div></div>
+                </div>
+                <div class="reasoning">
+                    Both on identical hot streaks: Mainz won 2 straight (including at Leipzig), Augsburg won 2 straight (including <strong>at Bayern Munich</strong>). All-time H2H is dead level: <strong>16 wins each, 7 draws from 39 meetings</strong>. Both need points &mdash; Mainz fighting relegation (16th), Augsburg looking over their shoulder (11th).
+                </div>
+                <div class="risk">Risk: Both teams might be playing to WIN, not settle. Mainz unbeaten in 4 home vs Augsburg. Kohr suspended for Mainz.</div>
+                <div class="hyperthink">
+                    <div class="ht-item"><strong>Key uncertainty:</strong> Both teams might go for the win</div>
+                    <div class="ht-item"><strong>Counter-case:</strong> Strong</div>
+                    <div class="ht-item"><strong>Bias check:</strong> Possible BuLi draw pattern bias</div>
+                    <div class="ht-item"><strong>Implied vs Est:</strong> 28.6% vs 32-35%</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Skip List -->
+        <div class="skip-section">
+            <h2>Skip List (No Value Found)</h2>
+            <table class="skip-table">
+                <thead>
+                    <tr><th>Match</th><th>Considered</th><th>Why Skipped</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Man Utd vs Spurs</td>
+                        <td>Utd @ 3/5 (1.60)</td>
+                        <td class="skip-reason">Short-price trap. 1.60 implies 63% win rate needed. Our data shows favorites at this price disappoint repeatedly.</td>
+                    </tr>
+                    <tr>
+                        <td>Arsenal vs Sunderland</td>
+                        <td>Arsenal @ 3/10 (1.30)</td>
+                        <td class="skip-reason">No value. Even the draw at 9/2 doesn't have enough edge &mdash; Arsenal's home defence is the best in the league.</td>
+                    </tr>
+                    <tr>
+                        <td>Wolves vs Chelsea</td>
+                        <td>Chelsea @ 13/20 (1.65)</td>
+                        <td class="skip-reason">1.65 is the exact price range that burns. Wolves have drawn 5 times &mdash; they can frustrate better teams.</td>
+                    </tr>
+                    <tr>
+                        <td>Dortmund @ Wolfsburg</td>
+                        <td>Dortmund @ 8/11 (1.73)</td>
+                        <td class="skip-reason">Under 2.00 favorites consistently underperform vs implied probability. No bet despite 4 straight wins.</td>
+                    </tr>
+                    <tr>
+                        <td>Lyon @ Nantes</td>
+                        <td>Lyon @ 3/4 (1.75)</td>
+                        <td class="skip-reason">Hardest skip. 11 straight wins. But 1.75 doesn't compensate for the one bad night that kills the bet.</td>
+                    </tr>
+                    <tr>
+                        <td>Barcelona vs Mallorca</td>
+                        <td>Barca @ 2/11 (1.18)</td>
+                        <td class="skip-reason">&#8364;10 to win &#8364;1.80. Not worth the paper it's printed on.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Key Lessons Applied -->
+        <div class="lessons">
+            <h2>Key Rules Applied Today</h2>
+            <div class="lesson-item">
+                <strong>Short-priced favorites are traps:</strong> Skipped Man Utd (1.60), Chelsea (1.65), Dortmund (1.73), Lyon (1.75), Arsenal (1.30), Barca (1.18). History shows these prices need 57-77% win rates to profit long-term &mdash; they rarely deliver.
+            </div>
+            <div class="lesson-item">
+                <strong>Draw value in defensive/depleted contexts:</strong> 3 of 6 picks are draws, each with specific catalysts (injuries, form collapse, teams cancelling out). Not narrative-driven.
+            </div>
+            <div class="lesson-item">
+                <strong>Prediction &#8800; bet:</strong> We could predict Dortmund, Lyon, Chelsea, and Man Utd to win. Most probably will. But at those odds, you lose money long-term. Value &gt; prediction.
+            </div>
+            <div class="lesson-item">
+                <strong>Bigger fixture pool = better hunting:</strong> 60+ matches analyzed across 6+ leagues. Found 6 genuine edges. If we only had 10 matches, we'd be forcing action.
+            </div>
+        </div>
+
+        <div class="footer">
+            Generated by Football Betting Advisor | Group Bet Week | 7 Feb 2026
+        </div>
+    </div>
+
+    <script>
+        const bets = [
+            { id: 1, match: 'Freiburg vs Bremen', league: 'Bundesliga', time: '14:30', pick: 'Freiburg Win', odds: '1/1', oddsDecimal: 2.00, stake: 10, confidence: 'HIGH' },
+            { id: 2, match: 'Mainz vs Augsburg', league: 'Bundesliga', time: '14:30', pick: 'Draw', odds: '5/2', oddsDecimal: 3.50, stake: 6, confidence: 'LOW-MED' },
+            { id: 3, match: 'Genoa vs Napoli', league: 'Serie A', time: '17:00', pick: 'Draw', odds: '21/10', oddsDecimal: 3.10, stake: 8, confidence: 'MEDIUM' },
+            { id: 4, match: 'Newcastle vs Brentford', league: 'Prem', time: '17:30', pick: 'Draw', odds: '5/2', oddsDecimal: 3.50, stake: 8, confidence: 'MEDIUM' },
+            { id: 5, match: 'Sevilla vs Girona', league: 'La Liga', time: '17:30', pick: 'Girona Win', odds: '12/5', oddsDecimal: 3.40, stake: 7, confidence: 'MEDIUM' },
+            { id: 6, match: 'Gladbach vs Leverkusen', league: 'Bundesliga', time: '17:30', pick: 'Leverkusen Win', odds: '1/1', oddsDecimal: 2.00, stake: 10, confidence: 'HIGH' },
+        ];
+
+        const STATE_KEY = 'betResults_7feb2026';
+
+        function loadState() {
+            try {
+                return JSON.parse(localStorage.getItem(STATE_KEY)) || {};
+            } catch { return {}; }
+        }
+
+        function saveState(state) {
+            localStorage.setItem(STATE_KEY, JSON.stringify(state));
+        }
+
+        function renderTracker() {
+            const grid = document.getElementById('trackerGrid');
+            const state = loadState();
+            grid.innerHTML = '';
+
+            bets.forEach(bet => {
+                const result = state[bet.id] || 'pending';
+                const item = document.createElement('div');
+                item.className = `tracker-item ${result !== 'pending' ? result : ''}`;
+                const returnAmt = result === 'won' ? (bet.stake * bet.oddsDecimal).toFixed(2) : result === 'lost' ? (-bet.stake).toFixed(2) : '';
+                const badge = result === 'won' ? '&#9989;' : result === 'lost' ? '&#10060;' : '';
+
+                item.innerHTML = `
+                    ${badge ? `<div class="result-badge">${badge}</div>` : ''}
+                    <div class="match-time">
+                        <span>${bet.time}</span>
+                        <span class="league-badge">${bet.league}</span>
+                    </div>
+                    <div class="teams">${bet.match}</div>
+                    <div class="pick-line">
+                        <span class="pick">${bet.pick}</span>
+                        <span class="odds">${bet.odds}</span>
+                    </div>
+                    <div class="stake">&#8364;${bet.stake.toFixed(2)} stake | Returns &#8364;${(bet.stake * bet.oddsDecimal).toFixed(2)}</div>
+                    <div class="return-info">
+                        ${result === 'won' ? `&#9989; +&#8364;${(bet.stake * bet.oddsDecimal - bet.stake).toFixed(2)} profit` : ''}
+                        ${result === 'lost' ? `&#10060; -&#8364;${bet.stake.toFixed(2)} lost` : ''}
+                    </div>
+                    <div class="result-buttons">
+                        <button class="result-btn win-btn" onclick="markResult(${bet.id}, 'won')">Win</button>
+                        <button class="result-btn lose-btn" onclick="markResult(${bet.id}, 'lost')">Loss</button>
+                        <button class="result-btn reset-btn" onclick="markResult(${bet.id}, 'pending')">Reset</button>
+                    </div>
+                `;
+                grid.appendChild(item);
+            });
+
+            updateSummary(state);
+        }
+
+        function markResult(id, result) {
+            const state = loadState();
+            state[id] = result;
+            saveState(state);
+            renderTracker();
+        }
+
+        function updateSummary(state) {
+            let wins = 0, losses = 0, pending = 0, totalReturn = 0;
+
+            bets.forEach(bet => {
+                const result = state[bet.id] || 'pending';
+                if (result === 'won') {
+                    wins++;
+                    totalReturn += bet.stake * bet.oddsDecimal;
+                } else if (result === 'lost') {
+                    losses++;
+                } else {
+                    pending++;
+                }
+            });
+
+            const totalStaked = 50;
+            const profitLoss = totalReturn - totalStaked + (pending > 0 ? 0 : 0);
+
+            document.getElementById('winsCount').textContent = wins;
+            document.getElementById('winsCount').className = `val ${wins > 0 ? 'green' : ''}`;
+            document.getElementById('lossesCount').textContent = losses;
+            document.getElementById('lossesCount').className = `val ${losses > 0 ? 'red' : ''}`;
+            document.getElementById('pendingCount').textContent = pending;
+            document.getElementById('pendingCount').className = `val ${pending > 0 ? 'yellow' : ''}`;
+            document.getElementById('totalReturn').textContent = `\u20AC${totalReturn.toFixed(2)}`;
+            document.getElementById('totalReturn').className = `val ${totalReturn > 0 ? 'green' : ''}`;
+
+            const plEl = document.getElementById('profitLoss');
+            const settled = wins + losses;
+            if (settled === 0) {
+                plEl.textContent = '\u20AC0.00';
+                plEl.className = 'val';
+            } else {
+                const stakedOnSettled = bets.filter(b => (state[b.id] || 'pending') !== 'pending').reduce((s, b) => s + b.stake, 0);
+                const pl = totalReturn - stakedOnSettled;
+                plEl.textContent = `${pl >= 0 ? '+' : ''}\u20AC${pl.toFixed(2)}`;
+                plEl.className = `val ${pl >= 0 ? 'green' : 'red'}`;
+            }
+        }
+
+        renderTracker();
+    </script>
+</body>
+</html>

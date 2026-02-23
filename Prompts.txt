@@ -34,3 +34,4 @@ Stiry Fry: 3 tbls spoons
 Move FR-019 to inprogress with a note "Look at the new requirements on "formatting specifications"
 Move FR-007 to in progress and check the new requirements on "date ranges"
 
+#gamedev #indiedev #leveldesign #devlog #gamedesign

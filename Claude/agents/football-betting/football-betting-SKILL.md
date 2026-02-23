@@ -170,12 +170,12 @@ After this process, include in recommendation:
 | Metric | Value |
 |--------|-------|
 | **Starting Amount** | €15.00 |
-| **Current Balance** | €21.11 (€7.00 pending) |
+| **Current Balance** | €11.41 |
 | **Target (Cash Out)** | €200.00 |
 | **Floor (Stop Loss)** | €5.00 |
-| **Progress** | 11% → Target |
-| **Active Bets** | 4 draws (20-25 Jan) |
-| **Check Results** | Sunday 26 Jan |
+| **Progress** | -2% (below start) |
+| **Active Bets** | None |
+| **Last Updated** | 28 Jan 2026 |
 
 **Strategy:** Build €15 to €200 through disciplined value betting, then withdraw. If it drops to €5, stop and reassess.
 
@@ -476,48 +476,29 @@ Hard-won insights from actual losing bets:
 
 ---
 
-### Session: 19 Jan 2026 ⏳ PENDING
-**Bankroll:** €21.11 → Staking €3.50
-**Remaining if lose:** €17.61
+### Session: 19 Jan 2026 ✅ PARTIAL WIN
+**Bankroll:** €16.11 → Staking €3.50
+**Result:** +€2.30 profit
 
 #### Value Bets (Researched Edge)
 | Match | League | Pick | Odds | Stake | Edge | Result | Return |
 |-------|--------|------|------|-------|------|--------|--------|
-| Cremonese vs Verona | Serie A | Draw | 2.9 | €2.00 | +5-7% | ⏳ | - |
-| Lazio vs Como | Serie A | Draw | 2.9 | €1.50 | +3-5% | ⏳ | - |
+| Cremonese vs Verona | Serie A | Draw | 2.9 | €2.00 | +5-7% | ✅ **0-0** | €5.80 |
+| Lazio vs Como | Serie A | Draw | 2.9 | €1.50 | +3-5% | ❌ **0-3 Como** | €0 |
 
-#### Reasoning for Bets
+#### Post-Mortem
 
-**Cremonese vs Verona Draw:**
-- Both teams in awful form (Cremonese winless in 6, Verona winless in 5)
-- Cremonese scored once in last 6 matches
-- Verona failed to score in 3 of last 5
-- Last H2H: 0-0 draw (September)
-- 7 of last 8 H2H meetings: ≤2 goals
+**Cremonese vs Verona ✅ WIN:**
+- Thesis correct: Two terrible teams cancelled each other out
+- 0-0 scoreline validated the "both can't score" analysis
+- H2H pattern continued (low-scoring affairs)
 
-**Lazio vs Como Draw:**
-- Lazio winless in last 4 home games (3 draws!)
-- Como 6 points ABOVE Lazio in table (6th vs 9th)
-- Under 2.5 goals in 9 of last 10 Lazio matches
-- Lazio sold key players (Castellanos, Guendouzi)
-- Como beat Lazio 2-0 in reverse fixture
-
-#### Full Predictions - NOT BET (For Learning)
-| Match | League | Prediction | Odds | Why Skipped | Result | Correct? |
-|-------|--------|------------|------|-------------|--------|----------|
-| Brighton vs Bournemouth | EPL | Brighton Win | 1.85 | No draw in last 11 H2H, fair price | ⏳ | - |
-| Besiktas vs Kayserispor | Turkish Super Lig | Besiktas Win | 1.4 | Short-priced trap (needs 71%) | ⏳ | - |
-| Elche vs Sevilla | La Liga | Sevilla or Draw | 3.25 | Not enough research | ⏳ | - |
-| Goztepe vs Rizespor | Turkish Super Lig | Home Win | 1.95 | Insufficient edge | ⏳ | - |
-| Konyaspor vs Eyupspor | Turkish Super Lig | Home Win | 1.55 | Short price, no edge | ⏳ | - |
-
-#### Potential Outcomes
-| Scenario | Return | New Bankroll |
-|----------|--------|--------------|
-| Both draws hit | €10.15 | €27.76 |
-| Cremonese only | €5.80 | €24.41 |
-| Lazio only | €4.35 | €22.96 |
-| Both lose | €0 | €17.61 |
+**Lazio vs Como ❌ LOSS:**
+- Como scored in 2 MINUTES — game never became the cagey affair expected
+- Nico Paz brace (24', 49') — Como were simply the better team
+- **Mistake:** Overweighted Lazio's home draw streak, underweighted Como's quality
+- Como were 6th vs Lazio 9th — the BETTER team won decisively
+- **Lesson:** "Team struggling at home" ≠ "draw likely" when opponent is genuinely better
 
 ---
 

@@ -11,15 +11,28 @@
 
 ---
 
-## Starting Measurements (2 Jan 2026)
+## Measurements
 
-| Measurement | Value |
-|-------------|-------|
-| Weight | 13st 6lb (86.2kg / 190lb) |
-| Waist (at navel) | 41.5" |
-| Waist (stomach) | 37.5" |
+| Measurement | 2 Jan | 23 Jan | Change |
+|-------------|-------|--------|--------|
+| Weight | 86.2kg (13st 6lb) | 81.6kg (12st 12lb) | **-4.6kg / -8 lbs** |
+| Waist (at navel) | 41.5" (105cm) | 41.5" (105cm) | — |
+| Waist (upper stomach) | 37.5" (95cm) | 36" (91cm) | **-1.5" / -4cm** |
+| Neck | — | 36.5cm (14.4") | *(baseline)* |
 
-**Note:** Post-Christmas measurement. Running 7-day baseline at maintenance before starting deficit.
+**Height:** 173cm (5'8")
+
+**Note:** Waist at navel = around belly button (widest). Upper stomach = few inches above navel.
+
+### Body Composition (Navy Method)
+
+| Metric | 23 Jan |
+|--------|--------|
+| Body fat % | ~32% |
+| Fat mass | ~26kg |
+| Lean mass | ~56kg |
+
+*Body fat % will update once waist at navel starts dropping.*
 
 ---
 
@@ -61,7 +74,7 @@
 | 15 Jan | 13st 2lb | |
 | **Week 2 Avg** | **13st 4lb** | Birthday bounce evened out |
 
-### Week 3 (In Progress)
+### Week 3
 
 | Date | Weight | Notes |
 |------|--------|-------|
@@ -72,16 +85,36 @@
 | 20 Jan | 13st 1lb | Normal fluctuation |
 | 21 Jan | 13st 0lb | |
 | 22 Jan | 13st 1lb | Sodium/water - ate 1,883 avg, still in deficit |
-| **Week 3 Avg** | **~13st 0lb** | *(complete)* |
+| **Week 3 Avg** | **13st 0lb** | |
+
+### Week 4
+
+| Date | Weight | Notes |
+|------|--------|-------|
+| 23 Jan | 12st 12lb | New low! |
+| 24 Jan | 13st 1lb | |
+| 25 Jan | x | Saturday night out (8 pints + kebab) |
+| 26 Jan | 13st 2lb | Water retention peak |
+| 27 Jan | 13st 1lb | |
+| 28 Jan | 13st 0lb | |
+| 29 Jan | 12st 11lb | New low! |
+| **Week 4 Avg** | **13st 0lb** | Same as Week 3 (weekend offset deficit) |
+
+### Week 5 (In Progress)
+
+| Date | Weight | Notes |
+|------|--------|-------|
+| 30 Jan | 12st 13lb | |
 
 ### Progress Summary
 
 | Metric | Value |
 |--------|-------|
 | Starting weight | 13st 6lb (2 Jan) |
-| Current weight | 12st 13lb (19 Jan) |
+| Current weight | 12st 13lb (30 Jan) |
 | **Total lost** | **7 lbs** |
-| Week 1 → Week 3 avg | 13st 4lb → 13st 0lb = **4 lbs** |
+| Week 1 → Week 4 avg | 13st 4lb → 13st 0lb = **4 lbs** |
+| Lowest recorded | 12st 11lb (29 Jan) |
 
 ### Goals
 
@@ -90,9 +123,9 @@
 | **Goal 1** | 12st 0lb | 13 lbs from now | In progress |
 | **Goal 2** | 11st 0lb | 27 lbs from now | — |
 
-**Stats at goal (5'9" male):**
-- 12st = BMI 24.7 (top of healthy range)
-- 11st = BMI 22.7 (middle of healthy range)
+**Stats at goal (5'8" / 173cm male):**
+- 12st (76kg) = BMI 25.4, ~25% body fat
+- 11st (70kg) = BMI 23.4, ~20% body fat
 
 ---
 
@@ -222,7 +255,10 @@ Or stay in deficit:
 **Weight Loss Phase (Started ~9 Jan 2026)**
 
 - Baseline established: 13st 4lb weekly average
-- Currently: 12st 13lb (down 7 lbs from Day 1, down 4 lbs from weekly average)
-- Rate: Losing faster than expected (~0.5 stone in 2.5 weeks vs predicted 14 weeks)
+- Currently: 12st 13lb (down 7 lbs from Day 1)
+- Lowest: 12st 11lb (29 Jan)
+- Measurements: Navel holding (41.5"), upper stomach down 1.5" (37.5" → 36")
+- Week 4 avg same as Week 3 (maintenance week due to Saturday night out)
+- Trying 1,700 cal/day from 30 Jan to see faster progress
 
-**Next check:** Waist measurement due (last was 41.5" at navel on 2 Jan)
+**Next measurement check:** ~6 Feb (2 weeks)
