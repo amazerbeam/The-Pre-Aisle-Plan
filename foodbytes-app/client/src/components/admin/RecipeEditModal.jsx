@@ -131,7 +131,16 @@ function RecipeEditModal({ recipeId, isNew, onClose, onSave }) {
         onSave(savedRecipe)
       }
     } catch (err) {
-      setSaveMessage({ type: 'error', text: 'Failed to save. Please try again.' })
+      const data = err.response?.data
+      let message = 'Failed to save. Please try again.'
+
+      if (data?.errors?.length) {
+        message = data.errors.map(e => e.defaultMessage).join('. ')
+      } else if (data?.message) {
+        message = data.message
+      }
+
+      setSaveMessage({ type: 'error', text: message })
       console.error('Error saving recipe:', err)
     }
   }
