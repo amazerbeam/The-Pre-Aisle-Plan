@@ -69,6 +69,19 @@ export const mealPlanService = {
   async swapDays(sourceDate, targetDate) {
     const response = await api.post(`/meal-plan/swap?sourceDate=${sourceDate}&targetDate=${targetDate}`)
     return response.status === 204
+  },
+
+  /**
+   * Copy all meals from one week to another
+   * @param {string} sourceStartDate - ISO format date string (YYYY-MM-DD) of source week start
+   * @param {string} targetStartDate - ISO format date string (YYYY-MM-DD) of target week start
+   * @returns {Promise<Object>} MealPlanWeekDTO for the target week
+   */
+  async copyWeek(sourceStartDate, targetStartDate) {
+    const response = await api.post(
+      `/meal-plan/copy-week?sourceStartDate=${sourceStartDate}&targetStartDate=${targetStartDate}`
+    )
+    return response.data
   }
 }
 

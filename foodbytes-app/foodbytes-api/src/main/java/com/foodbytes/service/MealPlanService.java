@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.format.TextStyle;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -229,6 +230,56 @@ public class MealPlanService {
         // Save all changes
         mealPlanEntryRepository.saveAll(sourceEntries);
         mealPlanEntryRepository.saveAll(targetEntries);
+    }
+
+    /**
+     * Copy all meal plan entries from one week to another.
+     * Deletes all existing entries in the target week first, then copies source entries
+     * with adjusted dates (day offset preserved: Monday->Monday, Tuesday->Tuesday, etc.).
+     *
+     * @param userId User ID
+     * @param sourceStartDate Start date of source week
+     * @param targetStartDate Start date of target week
+     * @return MealPlanWeekDTO for the target week
+     */
+    @Transactional
+    public MealPlanWeekDTO copyWeek(Long userId, LocalDate sourceStartDate, LocalDate targetStartDate) {
+        Long effectiveOwnerId = getEffectiveMealPlanOwnerId(userId);
+
+        LocalDate sourceEndDate = sourceStartDate.plusDays(7);
+        LocalDate targetEndDate = targetStartDate.plusDays(7);
+
+        // 1. Delete all existing entries in target week
+        mealPlanEntryRepository.deleteByUserIdAndDateRange(effectiveOwnerId, targetStartDate, targetEndDate);
+
+        // 2. Fetch all source week entries
+        List<MealPlanEntry> sourceEntries = mealPlanEntryRepository
+            .findByUserIdAndDateRange(effectiveOwnerId, sourceStartDate, sourceEndDate);
+
+        // 3. Create new entries for target week with day offsets preserved
+        if (!sourceEntries.isEmpty()) {
+            User user = userRepository.findById(effectiveOwnerId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+            List<MealPlanEntry> newEntries = new ArrayList<>();
+            for (MealPlanEntry source : sourceEntries) {
+                long dayOffset = ChronoUnit.DAYS.between(sourceStartDate, source.getPlanDate());
+                LocalDate targetDate = targetStartDate.plusDays(dayOffset);
+
+                MealPlanEntry copy = new MealPlanEntry();
+                copy.setUser(user);
+                copy.setPlanDate(targetDate);
+                copy.setMeal(source.getMeal());
+                copy.setRecipe(source.getRecipe());
+                copy.setServings(source.getServings());
+                newEntries.add(copy);
+            }
+
+            mealPlanEntryRepository.saveAll(newEntries);
+        }
+
+        // 4. Return the target week plan
+        return getWeekPlan(userId, targetStartDate);
     }
 
     /**

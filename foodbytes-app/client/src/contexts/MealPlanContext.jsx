@@ -360,6 +360,29 @@ export const MealPlanProvider = ({ children }) => {
   }, [isAuthenticated, weekPlan, fetchWeekPlan])
 
   /**
+   * Copy all meals from the current week to a target week.
+   * On success, navigates to the target week.
+   * @param {string} targetStartDate - ISO format date string (YYYY-MM-DD) for target Monday
+   */
+  const copyWeek = useCallback(async (targetStartDate) => {
+    if (!isAuthenticated) {
+      throw new Error('Authentication required')
+    }
+
+    try {
+      const result = await mealPlanService.copyWeek(startDate, targetStartDate)
+      invalidateShoppingListCache()
+      setWeekPlan(result)
+      setStartDate(targetStartDate)
+    } catch (err) {
+      console.error('Failed to copy week:', err)
+      setAssignmentError('Failed to copy week. Please try again.')
+      setTimeout(() => setAssignmentError(null), 3000)
+      throw err
+    }
+  }, [isAuthenticated, startDate, setStartDate])
+
+  /**
    * Get all entries for a specific date
    * @param {string} planDate - ISO format
    * @returns {Object} Map of mealType to entries
@@ -404,6 +427,7 @@ export const MealPlanProvider = ({ children }) => {
     assignRecipe,
     removeEntry,
     swapDayMeals,
+    copyWeek,
 
     // Helpers
     isRecipeAssigned,

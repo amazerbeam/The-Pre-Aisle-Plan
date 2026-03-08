@@ -130,6 +130,28 @@ public class MealPlanController {
     }
 
     /**
+     * Copy all meal plan entries from one week to another.
+     * POST /api/meal-plan/copy-week?sourceStartDate=2026-02-16&targetStartDate=2026-03-09
+     *
+     * Deletes all target week entries, then copies source entries with day offsets preserved.
+     */
+    @PostMapping("/copy-week")
+    public ResponseEntity<?> copyWeek(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate sourceStartDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate targetStartDate) {
+
+        if (userPrincipal == null) {
+            return ResponseEntity.status(403)
+                .body(Map.of("error", "Authentication required to copy meal plan"));
+        }
+
+        MealPlanWeekDTO result = mealPlanService.copyWeek(
+            userPrincipal.getId(), sourceStartDate, targetStartDate);
+        return ResponseEntity.ok(result);
+    }
+
+    /**
      * FR-014: Get which days a recipe is assigned to within the current date range.
      * GET /api/meal-plan/recipe/{recipeId}?startDate=2025-12-01
      * Used to highlight day buttons on RecipeCard.

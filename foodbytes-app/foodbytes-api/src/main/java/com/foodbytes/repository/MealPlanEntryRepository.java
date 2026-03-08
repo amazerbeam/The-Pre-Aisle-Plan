@@ -2,6 +2,7 @@ package com.foodbytes.repository;
 
 import com.foodbytes.model.MealPlanEntry;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -102,6 +103,22 @@ public interface MealPlanEntryRepository extends JpaRepository<MealPlanEntry, Lo
     List<MealPlanEntry> findByUserIdAndRecipeIdAndDateRange(
         @Param("userId") Long userId,
         @Param("recipeId") Long recipeId,
+        @Param("startDate") LocalDate startDate,
+        @Param("endDate") LocalDate endDate
+    );
+
+    /**
+     * Delete all entries for a user within a date range.
+     * Used by copy-week to clear the target week before inserting copied entries.
+     *
+     * @param userId User ID
+     * @param startDate Start date (inclusive)
+     * @param endDate End date (exclusive)
+     */
+    @Modifying
+    @Query("DELETE FROM MealPlanEntry mpe WHERE mpe.user.id = :userId AND mpe.planDate >= :startDate AND mpe.planDate < :endDate")
+    void deleteByUserIdAndDateRange(
+        @Param("userId") Long userId,
         @Param("startDate") LocalDate startDate,
         @Param("endDate") LocalDate endDate
     );

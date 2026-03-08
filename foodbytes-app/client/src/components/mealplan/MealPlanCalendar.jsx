@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import MealPlanDay from './MealPlanDay'
 import WeeklyMacroPopup from './WeeklyMacroPopup'
 import SwapDaysModal from './SwapDaysModal'
+import CopyWeekModal from './CopyWeekModal'
 import { formatDateRange } from '../../utils/dateUtils'
 import './MealPlanCalendar.css'
 
@@ -17,10 +18,11 @@ import './MealPlanCalendar.css'
  */
 function MealPlanCalendar() {
   const { isAuthenticated } = useAuth()
-  const { weekPlan, startDate, endDate, loading, error, swapDayMeals } = useMealPlan()
+  const { weekPlan, startDate, endDate, loading, error, swapDayMeals, copyWeek } = useMealPlan()
   const navigate = useNavigate()
   const [showWeeklyPopup, setShowWeeklyPopup] = useState(false)
   const [swapSourceDay, setSwapSourceDay] = useState(null)
+  const [showCopyModal, setShowCopyModal] = useState(false)
   const todayRef = useRef(null)
 
   // Auto-scroll to today on mobile when weekPlan loads
@@ -74,6 +76,14 @@ function MealPlanCalendar() {
       <header className="calendar-header">
         {/* FR-038: Recipes button moved to Footer.jsx - DO NOT add navigation buttons here */}
         <h2>Meal Plan</h2>
+        <button
+          className="copy-week-button"
+          onClick={() => setShowCopyModal(true)}
+          title="Copy this week to another week"
+          aria-label="Copy week"
+        >
+          C
+        </button>
         <span className="date-range">{formatDateRange(startDate, endDate)}</span>
         {/* FR-082: Make week total clickable */}
         {weekPlan && (
@@ -133,8 +143,28 @@ function MealPlanCalendar() {
           onClose={() => setSwapSourceDay(null)}
         />
       )}
+
+      {/* Copy Week Modal */}
+      {showCopyModal && (
+        <CopyWeekModal
+          sourceStartDate={startDate}
+          sourceEndDate={endDate}
+          onCopy={handleCopyWeek}
+          onClose={() => setShowCopyModal(false)}
+        />
+      )}
     </div>
   )
+
+  // Handler when copy week is confirmed
+  async function handleCopyWeek(targetStartDate) {
+    try {
+      await copyWeek(targetStartDate)
+      setShowCopyModal(false)
+    } catch (err) {
+      // Error already handled in context
+    }
+  }
 
   // Handler when a day header is clicked to initiate swap
   function handleSwapClick(day) {
