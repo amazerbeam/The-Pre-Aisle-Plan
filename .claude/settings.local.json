@@ -79,7 +79,8 @@
       "Bash(cmd //c \"taskkill /PID 18608 /F\")",
       "Bash(python:*)",
       "Bash(./mvnw compile:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(node:*)"
     ],
     "deny": [],
     "ask": []
