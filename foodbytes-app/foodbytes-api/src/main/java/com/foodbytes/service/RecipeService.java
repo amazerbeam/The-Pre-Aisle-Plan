@@ -35,6 +35,7 @@ public class RecipeService {
     private final IngredientService ingredientService;
     private final RecipeFamilyMemberRepository recipeFamilyMemberRepository;
     private final RecipeExtrasService recipeExtrasService;
+    private final MacroCalculationService macroCalculationService;
     private final IngredientRepository ingredientRepository;
     private final UnitRepository unitRepository;
     private final MealRepository mealRepository;
@@ -138,6 +139,10 @@ public class RecipeService {
         dto.setName(recipe.getName());
         dto.setDefaultServings(recipe.getDefaultServings());
         dto.setCalories(recipe.getCalories());
+        int[] macros = macroCalculationService.calculatePerServingMacros(recipe);
+        dto.setProtein(macros[0]);
+        dto.setCarbs(macros[1]);
+        dto.setFat(macros[2]);
         dto.setIsCheat(recipe.getIsCheat());
 
         dto.setMealTypes(recipe.getMeals().stream()

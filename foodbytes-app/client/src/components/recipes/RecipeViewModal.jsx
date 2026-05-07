@@ -316,6 +316,14 @@ function RecipeViewModal({
               </div>
               {currentIsCheat && <span className="cheat-badge">Cheat</span>}
             </div>
+            {fullRecipe && (fullRecipe.protein != null || fullRecipe.carbs != null || fullRecipe.fat != null) && (
+              <div className="recipe-macros" aria-label="Macros per serving">
+                <span className="macro-badge"><strong>P</strong> {fullRecipe.protein ?? 0}g</span>
+                <span className="macro-badge"><strong>C</strong> {fullRecipe.carbs ?? 0}g</span>
+                <span className="macro-badge"><strong>F</strong> {fullRecipe.fat ?? 0}g</span>
+                <span className="macro-suffix">/ serving</span>
+              </div>
+            )}
           </div>
           <button
             className="close-button"
