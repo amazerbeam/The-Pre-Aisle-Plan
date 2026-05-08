@@ -1,172 +1,113 @@
-## 🚨 CRITICAL FAILURE LOG
+# CLAUDE.md
 
-### Failure 3: Incomplete Macro Checking - 29 JAN 2026
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-**I only checked calories, not full macro balance. AGAIN.**
+## Shared rules — always consult
 
-When creating Hash Browns & Eggs and Reina Arepa recipes:
-- Only verified calorie totals hit targets (450-550, 550-650, 700-800)
-- DID NOT check protein adequacy (35g+ per serving)
-- DID NOT check fat % (target 25-35%)
-- DID NOT check carb % (target 40-50%)
-- Only ran full macro check AFTER user explicitly asked "are you checking the protein fats and carb balance?"
+Project-wide rules live at `.claude/rules/`. Before acting on any task that touches recipes, ingredients, macros, meal plans, migrations, or other project data, scan that folder and Read any rule file whose topic matches the task. These rules apply whether or not a skill has been triggered. See `.claude/rules/README.md` for the index and convention.
 
-Both recipes were at 50-58% fat. User called me out.
+## Repository Layout
 
-Then I kept GIVING UP instead of solving the problem:
-- "Eggs are inherently fatty, accept it"
-- "Balance with lighter meals"
-- "This dish cannot hit targets"
+This repo contains the **FoodBytes** recipe / meal-planning app. The active project lives in `foodbytes-app/`. Top-level files outside that directory (`Legacy/`, `Recipes_Transfer/`, `mockups/`, `logo-options.html`, `mockup-copy-week.html`) are historical artifacts — do not touch unless explicitly asked.
 
-User had to tell me to stop caving and do my job.
-
-**Solution found:** Air fry hash browns, use egg whites + whole eggs, add toast for carbs. Recipe now passes.
-
-**MANDATORY for ALL recipe creation:**
-1. Check calories AND full macro balance EVERY TIME — not just when asked
-2. Verify: Protein 35g+, Fat 25-35%, Carbs 40-50%
-3. NEVER give up on a recipe — redesign until it passes
-4. NEVER make excuses ("that's how the dish is", "eggs are fatty")
-5. Do the math myself — stop spawning sub-agents for simple calculations
-6. If a recipe fails, FIX IT. Don't ask user if they want to "accept it"
-
----
-
-### Failure 1 & 2: Wrong Stored Calories - 28 JAN 2026
-
-**I failed the user on nutrition tracking. TWICE.**
-
-### Failure 1: Wrong stored calories
-- Many recipes had WRONG stored calories (didn't match ingredient calculations)
-- "Light" variants hitting 600-700 cal instead of 450-550 target
-- User followed this advice for 3 weeks thinking they were in deficit
-
-### Failure 2: Linked recipes (extras) NOT included
-- Recipes using extras (bread, pasta, dough) had calories calculated WITHOUT the extra
-- Example: Salmon Sandwich showed 446 cal but bread alone adds 458 cal → actual 904 cal
-- I "fixed" the database, told user it was correct, then discovered this second error
-- Affected recipes: Avocado Toast, Black Bean Chicken Wrap, Pink Sauce Pasta, Salmon Sandwich, Scrambled Eggs & Toast, Stromboli
-
-**MANDATORY before any recipe work:**
-1. Run the FULL verification query that includes linked_recipe_id contributions
-2. Never trust stored calories - always calculate from ingredients AND extras
-3. When calculating, check for `linked_recipe_id IS NOT NULL AND ingredient_id IS NULL` rows
-4. Extra calories = extra_recipe.calories × (quantity_used / extra_total_yield)
-5. Run monthly full database audit
-
-**Verification query MUST include:**
-```sql
--- Raw ingredients
-SELECT ... FROM recipe_ingredients WHERE ingredient_id IS NOT NULL
--- PLUS linked recipe extras
-SELECT ... FROM recipe_ingredients ri
-JOIN recipes lr ON lr.id = ri.linked_recipe_id
-WHERE ri.linked_recipe_id IS NOT NULL AND ri.ingredient_id IS NULL
+```
+foodbytes-app/
+  client/          React 18 + Vite frontend
+  foodbytes-api/   Spring Boot 3.2 / Java 17 backend
+  database/        MySQL schema + migrations (canonical SQL lives here, but is also tracked in the deployed Railway DB)
+  docker-compose.yml
+Claude/agents/     Per-domain agent prompts + context (Chef, React, Java, MySQL, UX, etc.)
+docker-compose.yml (root) — preferred compose file; mounts foodbytes-app/database/*.sql
 ```
 
-**Trust must be rebuilt through verified actions, not words.**
+There are **two `docker-compose.yml` files**: the root one (used by `cmds.txt`) and one inside `foodbytes-app/`. They are similar but not identical (service names differ: root uses `client`/`api`/`db`; nested uses `frontend`/`backend`/`mysql`). When running `docker-compose` commands check which compose file the user means — most active commands use the **root** compose file.
 
----
+## Common Commands
 
-## Recipe Creation: Hard Targets
+Run from the repo root unless noted.
 
-**Every recipe must pass ALL of these. No exceptions.**
+```bash
+# Frontend dev (hot reload, proxies /api, /oauth2, /login to :8080)
+cd foodbytes-app/client && npm install && npm run dev      # http://localhost:5173
 
-| Check | Target | Reject If |
-|-------|--------|-----------|
-| **Calories (Light)** | 450-550/serving | >600 |
-| **Calories (Moderate)** | 550-650/serving | >750 |
-| **Calories (Balanced)** | 700-800/serving | >900 |
-| **Protein** | 35g+ per serving | <35g |
-| **Fat %** | 25-35% of calories | >35% |
-| **Carbs %** | 40-50% of calories | <38% (1-2% variance OK) |
+# Frontend production build
+cd foodbytes-app/client && npm run build
 
-### Design Strategies That Work
+# Backend dev (Maven wrapper isn't checked in — use `mvn` directly or rebuild via Docker)
+cd foodbytes-app/foodbytes-api && mvn spring-boot:run      # http://localhost:8080
 
-| Problem | Solution |
-|---------|----------|
-| Fat too high from frying | Air fry with brushed olive oil (8-12g vs 35-50g) |
-| Eggs push fat % up | Use egg whites + 1-2 whole eggs for flavour |
-| Carbs too low | Add potato, toast, beans, or more grain |
-| Protein too low | More chicken/fish, add egg whites, Greek yogurt |
-| Dish "can't" hit targets | Redesign it. Every dish can be made to work. |
+# Backend tests
+cd foodbytes-app/foodbytes-api && mvn test
+# Single test class:
+cd foodbytes-app/foodbytes-api && mvn test -Dtest=ClassName
+# Single method:
+cd foodbytes-app/foodbytes-api && mvn test -Dtest=ClassName#methodName
 
-### Dishes That Need Careful Design
+# Full stack via Docker (root compose — frontend on :3000, api on :8080, mysql on :3306)
+docker-compose up --build
 
-These are inherently challenging — don't assume they'll pass without checking:
-- **Egg-heavy breakfasts** — eggs are 11g fat/100g
-- **Cheese-heavy dishes** — cheese is 33g fat/100g
-- **Avocado dishes** — avocado is 15g fat/100g
-- **Mayo-based fillings** — mayo is 79g fat/100g
-- **Fried foods** — even "light" frying absorbs 15-30g oil
+# Rebuild just the frontend container (per cmds.txt)
+docker-compose -f foodbytes-app/docker-compose.yml up -d --build frontend
+```
 
----
+There is no lint or test script wired into `client/package.json` — the frontend has no automated test suite at present.
 
-- Issues with google login maybe fixable with GOOGLE_CLIENT_SECRET refresh.
+## Architecture
 
-## Project Structure
+### Stack
+- **Frontend**: React 18 + Vite + React Router v6, Axios. No CSS framework — plain CSS in `src/styles/`.
+- **Backend**: Spring Boot 3.2, Spring Security + OAuth2 client (Google), Spring Data JPA, JJWT, springdoc OpenAPI.
+- **DB**: MySQL 8. Hibernate `ddl-auto: validate` — schema is **not** auto-managed; SQL migrations are applied manually.
+- **Auth**: Google OAuth → backend issues a JWT delivered as an httpOnly cookie. Frontend uses `withCredentials: true` and never sees the JWT directly. Guest mode is a localStorage flag handled entirely client-side.
 
-- **Frontend**: React app in `foodbytes-app/client/`
-- **Backend**: Spring Boot Java API in `foodbytes-app/foodbytes-api/`
-- **Database**: MySQL (hosted on Railway)
-- **Database Schema**: `foodbytes-app/database/schema.sql`
-- **Migrations**: `foodbytes-app/database/migrations/` - Run manually on live DB
+### Frontend structure (`client/src/`)
+- `App.jsx` is the root: it gates on auth (`useAuth`) and shows either `LandingPageAnimation` (first-time guests) or the routed app (`/`, `/search`, `/mealplan`, `/shopping`).
+- **Contexts** are the source of truth for cross-cutting state: `AuthContext`, `MealPlanContext`, `ShoppingListContext`, `HomemadeSelectionsContext`. Components subscribe rather than fetching directly.
+- **Services** (`services/api.js` + per-domain modules) wrap Axios. `api.js` sets `baseURL: '/api'` and `withCredentials: true`; Vite proxies `/api`, `/oauth2`, `/login` → `:8080` in dev.
+- Components are grouped by feature: `auth/`, `mealplan/`, `recipes/`, `shopping/`, `onboarding/`, `admin/`, plus `common/` and `layout/`.
 
-## Key Features
+### Backend structure (`foodbytes-api/src/main/java/com/foodbytes/`)
+Standard layered Spring layout: `controller/` → `service/` → `repository/` → `model/` (JPA entities). `security/` holds the OAuth2 success/failure handlers, JWT filter/provider, and `UserPrincipal`. `config/SecurityConfig.java` wires everything.
 
-### Meal Plan Sharing
-- `users.meal_plan_owner_id` - If set, user shares another user's meal plans (sync mode)
-- Both users see/edit the same meal plan entries
-- Set via direct DB update: `UPDATE users SET meal_plan_owner_id = 1 WHERE id = 2;`
+Key domain entities: `Recipe`, `RecipeIngredient`, `RecipeStep`, `RecipeExtra`, `RecipeFamily` (variants like Light/Moderate/Balanced), `MealPlanEntry`, `ShoppingList`/`ShoppingListItem`, `Ingredient`, `Aisle`, `Unit`, `User`. Controllers expose `/api/auth`, `/api/recipes`, `/api/recipe-families`, `/api/meal-plans`, `/api/shopping-list`, `/api/ingredients`, `/api/units`, `/api/aisles`, `/api/health`.
 
-### Persisted Shopping List
-- Shopping lists stored in `shopping_lists` and `shopping_list_items` tables
-- One list per user, generated on demand with date range
-- Checked state persisted to database (optimistic UI updates)
-- API: `/api/shopping-list/*` endpoints
+### Recipe modeling — important quirks
+- **Linked recipes (extras):** `recipe_ingredients` rows can reference either an `ingredient_id` OR a `linked_recipe_id` (e.g. a recipe pulls in "Bread" or "Pizza Dough" as an extra). Any nutrition/calorie computation MUST include both: raw ingredients **plus** the prorated contribution of linked recipes. Stored calorie totals on the `recipes` table have historically been wrong — re-derive from ingredients + extras rather than trusting the stored value.
+- **Recipe variants (FR-099):** A `RecipeFamily` groups Light / Moderate / Balanced versions of the same dish. Default rendering is the Balanced variant.
+- **Meal plan sharing:** `users.meal_plan_owner_id` — when set, a user reads/writes the owner's meal plan entries instead of their own. Toggled via a direct DB update; there is no admin UI.
+- **Persisted shopping list:** `shopping_lists` + `shopping_list_items`. One list per user; checked state is persisted with optimistic UI updates via `/api/shopping-list/*`.
 
-## Deployment
+### Recipe creation — non-negotiable targets
+When adding or modifying a recipe, every variant must satisfy:
 
-- **Railway** hosts both frontend and backend
-- Database migrations must be run manually on Railway MySQL
-- Backend auto-deploys on git push, but may need manual redeploy after DB changes
+| Check | Target | Reject if |
+|---|---|---|
+| Calories — Light | 450–550/serving | >600 |
+| Calories — Moderate | 550–650/serving | >750 |
+| Calories — Balanced | 700–800/serving | >900 |
+| Protein | ≥35 g/serving | <35 |
+| Fat % of kcal | 25–35 % | >35 |
+| Carbs % of kcal | 40–50 % | <38 (1–2% slack OK) |
 
-## User Preferences (Recipe Creation)
+Common levers: air-fry instead of pan-fry, sub egg whites for whole eggs, add a starch (toast/potato/rice) for carbs, scale lean protein. If a recipe fails, redesign — don't ship it with caveats. Verify macros for the **whole recipe including linked-recipe extras**, not just direct ingredients.
 
-### Health Considerations
-- **Gout history** — Limit high-purine ingredients:
-  - Avoid: Organ meats, anchovies, fish sauce, sardines
-  - Moderate: Red meat (smaller portions), shellfish, oyster sauce, yeast extract
-  - Chicken/turkey preferred over beef when possible
-  - Fish sauce → substitute with soy sauce (oyster sauce is also high-purine, avoid)
+### User health/diet preferences (relevant to recipe work)
+- **Gout history** — avoid organ meats, anchovies, fish sauce, sardines; moderate red meat, shellfish, oyster sauce, yeast extract. Prefer chicken/turkey over beef. Substitute fish sauce with soy sauce.
+- Prefers clean ingredients (e.g. pure tamarind block over jarred paste with stabilizers). Quality fats: butter, olive oil, ghee — not seed-oil blends.
+- Asia Market (asiamarket.ie) for Asian ingredients; Tesco Ireland for everyday.
 
-### Ingredient Philosophy
-- Prefers **clean ingredients** without unnecessary additives
-- Will accept safe additives (xanthan gum, potassium sorbate) but prefers purer options
-- Prioritizes: pure tamarind block over jarred paste with stabilizers
-- Quality fats: butter, olive oil, ghee — avoids seed oil blends
+Personal diet/weight files live in `Claude/agents/Chef/` (`my-diet-plan.md`, `wife-diet-plan.md`, `weight-progress-chart.html`) — read these before discussing weight progress.
 
-### Shopping Sources
-- **Asia Market** (asiamarket.ie) — Go-to for Asian ingredients:
-  - Cock Brand Pure Tamarind (100% tamarind, no additives)
-  - YangJiang Preserved Black Beans (douchi) — 454g lasts ~15 meals
-  - Lee Kum Kee Premium Oyster Sauce (40% oyster, no preservatives) — **use sparingly due to gout/purines**
-- Tesco Ireland for everyday ingredients
+## Database & Deployment
 
-## Weight Tracking & Diet Plans
+- Production frontend, backend, and MySQL all run on **Railway**. Backend redeploys on git push.
+- DB schema is in `foodbytes-app/database/schema.sql`; ad-hoc changes go into `foodbytes-app/database/migrations/` and must be **applied manually** to the Railway MySQL (Hibernate is in `validate` mode, so a migration that isn't applied to the live DB will break startup).
+- After a schema change, the backend may need a manual redeploy on Railway.
+- OAuth redirect URIs are environment-specific (`OAUTH_REDIRECT_URI` env var). Login flakiness has historically been fixable by refreshing `GOOGLE_CLIENT_SECRET`.
 
-Personal weight tracking files for the user and wife:
+## Conventions
 
-| File | Purpose |
-|------|---------|
-| `Claude/agents/Chef/my-diet-plan.md` | User's diet plan, calorie targets, weight log |
-| `Claude/agents/Chef/wife-diet-plan.md` | Wife's diet plan and weight log |
-| `Claude/agents/Chef/weight-progress-chart.html` | Visual chart of user's weight progress |
-
-**Key data (as of 19 Jan 2026):**
-- **User:** 5'9" male. Started 13st 6lb (2 Jan) → 12st 13lb (19 Jan) = 7 lbs lost
-  - Goal 1: 12st (13 lbs to go)
-  - Goal 2: 11st (27 lbs to go)
-- **Wife:** Started 10st 0lb → 9st 13lb = holding steady (~1 lb)
-
-When discussing weight progress, read these files for current data.
+- Frontend state for cross-cutting concerns lives in a Context — don't introduce a new global store.
+- Backend controllers stay thin; business logic in `service/`. Don't put queries in controllers.
+- New endpoints live under `/api/...` so the Vite proxy and Axios base URL keep working.
+- The `Claude/agents/` directory contains domain-specific agent prompts and notes. Treat it as reference material, not code — don't refactor it.

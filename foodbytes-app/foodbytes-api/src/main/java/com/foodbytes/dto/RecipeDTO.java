@@ -13,6 +13,9 @@ public class RecipeDTO {
     private String name;
     private Integer defaultServings;
     private Integer calories;
+    private Integer protein;   // grams per serving
+    private Integer carbs;     // grams per serving
+    private Integer fat;       // grams per serving
     private Boolean isCheat;
     private List<String> mealTypes;
     private List<IngredientDTO> ingredients;
