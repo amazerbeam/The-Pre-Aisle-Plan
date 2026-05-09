@@ -41,6 +41,18 @@ Evidence-based reference for weight-loss diet decisions in the FoodBytes app. So
 
 Reject if Light >600, Moderate >750, Balanced >900, protein <35 g, fat >35 % kcal, or carbs <38 % kcal. Compute on **whole recipe including linked-recipe extras**, not direct ingredients only — stored kcal totals are unreliable.
 
+### Storing kcal in `recipes.calories` — convention (do not get this wrong)
+
+The column is **whole-recipe kcal, not per-serving**. The frontend computes per-srv as `calories / default_servings`. So when you write a migration that inserts a recipe:
+
+```sql
+-- Per-serving target = 550 kcal, default_servings = 2
+INSERT INTO recipes (name, default_servings, calories, ...)
+VALUES ('Foo', 2, 1100, ...);   -- 550 × 2, NOT 550
+```
+
+Storing per-srv (550) here causes the UI to display **half** the real kcal in meal plans and the weekly summary's macro percentages to sum to ~120 %. After every recipe insert, run a sanity check that `calories ≈ computed_total_from_ingredients` (ratio in 0.85–1.15). Recipes with ratio ≈ 0.5 are the per-srv bug. Caught 2026-05-08 on the new "- Diet" recipes (ids 187–201) — required a follow-up fix migration.
+
 ## Shared rules (read on demand)
 
 Project-wide rules live at `.claude/rules/`. Before answering, **scan `.claude/rules/` (Glob `.claude/rules/*.md`) and Read any file whose topic matches the decision** — including rules added after this skill was written. Common matches for this skill: linked-recipe extras (prorated macros for pita / dough / sauce sub-components), gout substitutions, ingredient-quality constraints. See `.claude/rules/README.md` for the index.

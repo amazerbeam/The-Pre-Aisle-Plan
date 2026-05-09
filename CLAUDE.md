@@ -73,6 +73,7 @@ Key domain entities: `Recipe`, `RecipeIngredient`, `RecipeStep`, `RecipeExtra`, 
 
 ### Recipe modeling — important quirks
 - **Linked recipes (extras):** `recipe_ingredients` rows can reference either an `ingredient_id` OR a `linked_recipe_id` (e.g. a recipe pulls in "Bread" or "Pizza Dough" as an extra). Any nutrition/calorie computation MUST include both: raw ingredients **plus** the prorated contribution of linked recipes. Stored calorie totals on the `recipes` table have historically been wrong — re-derive from ingredients + extras rather than trusting the stored value.
+- **`recipes.calories` is whole-recipe kcal, NOT per-serving.** The frontend renders per-serving as `calories / default_servings`. When inserting a recipe, store `kcal_per_serving × default_servings` in this column. Storing per-serving instead causes the UI to display half the real kcal and macro percentages to overflow 100 % on the weekly summary (caught 2026-05-08 on recipes 187–201). Audit query: `SELECT id, name, calories, ROUND((SUM(quantity_grams×macro/100)*4 ...)) AS computed FROM ... HAVING calories/computed < 0.7` — anything ≈ 0.5 is the per-srv bug.
 - **Recipe variants (FR-099):** A `RecipeFamily` groups Light / Moderate / Balanced versions of the same dish. Default rendering is the Balanced variant.
 - **Meal plan sharing:** `users.meal_plan_owner_id` — when set, a user reads/writes the owner's meal plan entries instead of their own. Toggled via a direct DB update; there is no admin UI.
 - **Persisted shopping list:** `shopping_lists` + `shopping_list_items`. One list per user; checked state is persisted with optimistic UI updates via `/api/shopping-list/*`.
@@ -92,7 +93,6 @@ When adding or modifying a recipe, every variant must satisfy:
 Common levers: air-fry instead of pan-fry, sub egg whites for whole eggs, add a starch (toast/potato/rice) for carbs, scale lean protein. If a recipe fails, redesign — don't ship it with caveats. Verify macros for the **whole recipe including linked-recipe extras**, not just direct ingredients.
 
 ### User health/diet preferences (relevant to recipe work)
-- **Gout history** — avoid organ meats, anchovies, fish sauce, sardines; moderate red meat, shellfish, oyster sauce, yeast extract. Prefer chicken/turkey over beef. Substitute fish sauce with soy sauce.
 - Prefers clean ingredients (e.g. pure tamarind block over jarred paste with stabilizers). Quality fats: butter, olive oil, ghee — not seed-oil blends.
 - Asia Market (asiamarket.ie) for Asian ingredients; Tesco Ireland for everyday.
 

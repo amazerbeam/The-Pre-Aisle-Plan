@@ -3,8 +3,9 @@
 -- Generated 2026-05-07
 --
 -- Adds:
---   8 new ingredients (cottage cheese, cannellini beans, chickpeas, baby
---     spinach, sundried tomatoes, heavy cream, basmati rice, orange)
+--   6 new ingredients (cottage cheese, cannellini beans, chickpeas, baby
+--     spinach, sundried tomatoes, orange)
+--     (Jasmine rice id 26 reused for both new rice-based recipes — no basmati added)
 --   5 new recipes (Light-only "- Diet" variants), each in its own family
 --   recipe_meals, recipe_ingredients, recipe_steps for each
 --   meal_plan_entries for user_id=1 covering Mon 2026-05-11 → Sun 2026-05-17
@@ -29,15 +30,16 @@ START TRANSACTION;
 
 -- -----------------------------------------------------------------------------
 -- 0. New ingredients (verified macros from USDA / Tesco panels)
+--    INSERT IGNORE on the UNIQUE `key` — re-running this migration won't
+--    duplicate rows, and any ingredient that's been added in the meantime
+--    will simply be skipped.
 -- -----------------------------------------------------------------------------
-INSERT INTO ingredients (`key`, name, aisle_id, protein_per_100g, carbs_per_100g, fat_per_100g, macros_verified) VALUES
+INSERT IGNORE INTO ingredients (`key`, name, aisle_id, protein_per_100g, carbs_per_100g, fat_per_100g, macros_verified) VALUES
  ('cottage_cheese',     'Cottage cheese',                6, 11.00,  3.40,  1.50, 1),
  ('cannellini_beans',   'Cannellini beans (tinned)',    10,  7.50, 17.00,  0.90, 1),
  ('chickpeas_tinned',   'Chickpeas (tinned)',           10,  7.00, 14.00,  2.60, 1),
  ('baby_spinach',       'Baby spinach',                  3,  2.90,  3.60,  0.40, 1),
  ('sundried_tomatoes',  'Sundried tomatoes (in oil)',   10, 14.10, 23.30, 14.10, 1),
- ('heavy_cream',        'Heavy cream',                   6,  2.10,  2.70, 47.00, 1),
- ('basmati_rice',       'Basmati rice',                 11,  7.10, 78.00,  0.70, 1),
  ('orange',             'Orange',                        4,  0.90, 11.80,  0.10, 1);
 
 SET @ing_cottage_cheese    := (SELECT id FROM ingredients WHERE `key` = 'cottage_cheese');
@@ -45,9 +47,8 @@ SET @ing_cannellini        := (SELECT id FROM ingredients WHERE `key` = 'cannell
 SET @ing_chickpeas         := (SELECT id FROM ingredients WHERE `key` = 'chickpeas_tinned');
 SET @ing_spinach           := (SELECT id FROM ingredients WHERE `key` = 'baby_spinach');
 SET @ing_sundried_tomatoes := (SELECT id FROM ingredients WHERE `key` = 'sundried_tomatoes');
-SET @ing_heavy_cream       := (SELECT id FROM ingredients WHERE `key` = 'heavy_cream');
-SET @ing_basmati           := (SELECT id FROM ingredients WHERE `key` = 'basmati_rice');
 SET @ing_orange            := (SELECT id FROM ingredients WHERE `key` = 'orange');
+SET @ing_jasmine_rice      := 26;  -- existing — reused instead of adding a basmati duplicate
 
 -- Existing ingredient ids (frequently used)
 SET @ing_oats           := 1;
@@ -118,7 +119,7 @@ VALUES ('Protein Porridge with Berries', 'Stovetop oats with whey + Greek yogurt
 SET @rf_porridge := LAST_INSERT_ID();
 
 INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_label, display_order)
-VALUES (@rf_porridge, @r_porridge, 1, 'Light', 1);
+VALUES (@rf_porridge, @r_porridge, 0, 'Light', 1);
 
 INSERT INTO recipe_meals (recipe_id, meal_id) VALUES (@r_porridge, @meal_breakfast);
 
@@ -149,18 +150,18 @@ VALUES ('Greek Chicken Gyros Bowl - Diet', 2, 548, 0, 1);
 SET @r_gyros := LAST_INSERT_ID();
 
 INSERT INTO recipe_families (family_name, description)
-VALUES ('Greek Chicken Gyros Bowl', 'Sheet-pan oregano chicken thigh with chickpeas, basmati rice and a cucumber-feta-yogurt salad. Diet (Light) variant.');
+VALUES ('Greek Chicken Gyros Bowl', 'Sheet-pan oregano chicken thigh with chickpeas, jasmine rice and a cucumber-feta-yogurt salad. Diet (Light) variant.');
 SET @rf_gyros := LAST_INSERT_ID();
 
 INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_label, display_order)
-VALUES (@rf_gyros, @r_gyros, 1, 'Light', 1);
+VALUES (@rf_gyros, @r_gyros, 0, 'Light', 1);
 
 INSERT INTO recipe_meals (recipe_id, meal_id) VALUES (@r_gyros, @meal_lunch);
 
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
  (@r_gyros, @ing_chicken_thigh, NULL, 180, @u_g,  180, 1),
  (@r_gyros, @ing_chickpeas,     NULL, 130, @u_g,  130, 2),
- (@r_gyros, @ing_basmati,       NULL, 80,  @u_g,   80, 3),
+ (@r_gyros, @ing_jasmine_rice,       NULL, 80,  @u_g,   80, 3),
  (@r_gyros, @ing_red_onion,     NULL, 60,  @u_g,   60, 4),
  (@r_gyros, @ing_cherry_tom,    NULL, 200, @u_g,  200, 5),
  (@r_gyros, @ing_cucumber,      NULL, 200, @u_g,  200, 6),
@@ -179,7 +180,7 @@ INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quan
 INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
  (@r_gyros, 1, 'Heat oven to 220°C / 425°F. Dice chicken thigh, drain chickpeas, cut red onion into wedges.'),
  (@r_gyros, 2, 'Toss chicken, chickpeas and onion on a sheet pan with 6g olive oil, oregano, paprika, garlic powder, half the lemon juice, salt and pepper. Roast 22 min until chicken hits 75°C and chickpeas are crisp.'),
- (@r_gyros, 3, 'While roasting, cook the basmati rice per packet (about 12 min).'),
+ (@r_gyros, 3, 'While roasting, cook the jasmine rice per packet (about 12 min).'),
  (@r_gyros, 4, 'Make the salad: dice cucumber and halve cherry tomatoes; toss with crushed garlic, dill, remaining olive oil and lemon. Crumble over feta. Whisk Greek yogurt with a pinch of salt for the drizzle.'),
  (@r_gyros, 5, 'Plate rice, top with the sheet-pan chicken and chickpeas, side of cucumber-feta salad, finish with the yogurt drizzle.');
 
@@ -197,7 +198,7 @@ VALUES ('Mediterranean White Bean & Chicken Soup', 'One-pot soup with chicken br
 SET @rf_soup := LAST_INSERT_ID();
 
 INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_label, display_order)
-VALUES (@rf_soup, @r_soup, 1, 'Light', 1);
+VALUES (@rf_soup, @r_soup, 0, 'Light', 1);
 
 INSERT INTO recipe_meals (recipe_id, meal_id) VALUES (@r_soup, @meal_lunch);
 
@@ -238,7 +239,7 @@ VALUES ('Slow-Roasted Salmon with Citrus & Veg', 'Low-temp salmon with lemon, or
 SET @rf_salmon := LAST_INSERT_ID();
 
 INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_label, display_order)
-VALUES (@rf_salmon, @r_salmon, 1, 'Light', 1);
+VALUES (@rf_salmon, @r_salmon, 0, 'Light', 1);
 
 INSERT INTO recipe_meals (recipe_id, meal_id) VALUES (@r_salmon, @meal_dinner);
 
@@ -265,15 +266,16 @@ INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
 
 -- =============================================================================
 -- NEW RECIPE 5 — High-Protein Tuscan Chicken with Rice - Diet
---   Light: per srv ~587 kcal, 51.5 g protein, 57 g carb, 16.9 g fat
+--   Light: per srv ~550 kcal, 52.4 g protein, 57.1 g carb, 12.0 g fat
 --   Source concept: joytothefood.com high-protein "Marry Me" Tuscan chicken
+--   (No heavy cream — cottage cheese blended smooth carries the body)
 -- =============================================================================
 INSERT INTO recipes (name, default_servings, calories, is_cheat, is_live)
-VALUES ('High-Protein Tuscan Chicken with Rice - Diet', 2, 587, 0, 1);
+VALUES ('High-Protein Tuscan Chicken with Rice - Diet', 2, 550, 0, 1);
 SET @r_tuscan := LAST_INSERT_ID();
 
 INSERT INTO recipe_families (family_name, description)
-VALUES ('High-Protein Tuscan Chicken with Rice', 'Pan-seared chicken breast in a creamy sundried-tomato sauce thickened with cottage cheese, served over basmati and spinach. Diet (Light) variant.');
+VALUES ('High-Protein Tuscan Chicken with Rice', 'Pan-seared chicken breast in a creamy sundried-tomato sauce thickened with blended cottage cheese, served over jasmine rice and spinach. Diet (Light) variant.');
 SET @rf_tuscan := LAST_INSERT_ID();
 
 INSERT INTO recipe_family_members (family_id, recipe_id, is_default, variant_label, display_order)
@@ -283,26 +285,25 @@ INSERT INTO recipe_meals (recipe_id, meal_id) VALUES (@r_tuscan, @meal_dinner);
 
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, linked_recipe_id, quantity, unit_id, quantity_grams, sort_order) VALUES
  (@r_tuscan, @ing_chicken_breast,   NULL, 220, @u_g,  220, 1),
- (@r_tuscan, @ing_basmati,          NULL, 130, @u_g,  130, 2),
+ (@r_tuscan, @ing_jasmine_rice,          NULL, 130, @u_g,  130, 2),
  (@r_tuscan, @ing_sundried_tomatoes,NULL, 30,  @u_g,   30, 3),
- (@r_tuscan, @ing_heavy_cream,      NULL, 20,  @u_g,   20, 4),
- (@r_tuscan, @ing_cottage_cheese,   NULL, 80,  @u_g,   80, 5),
- (@r_tuscan, @ing_parmesan,         NULL, 20,  @u_g,   20, 6),
- (@r_tuscan, @ing_spinach,          NULL, 120, @u_g,  120, 7),
- (@r_tuscan, @ing_garlic,           NULL, 12,  @u_g,   12, 8),
- (@r_tuscan, @ing_olive_oil,        NULL, 4,   @u_g,    4, 9),
- (@r_tuscan, @ing_chicken_stock,    NULL, 240, @u_ml, 240, 10),
- (@r_tuscan, @ing_basil,            NULL, 6,   @u_g,    6, 11),
- (@r_tuscan, @ing_chilli,           NULL, 1,   @u_g,    1, 12),
- (@r_tuscan, @ing_oregano,          NULL, 1,   @u_g,    1, 13),
- (@r_tuscan, @ing_salt,             NULL, 3,   @u_g,    3, 14),
- (@r_tuscan, @ing_pepper,           NULL, 1,   @u_g,    1, 15);
+ (@r_tuscan, @ing_cottage_cheese,   NULL, 100, @u_g,  100, 4),
+ (@r_tuscan, @ing_parmesan,         NULL, 20,  @u_g,   20, 5),
+ (@r_tuscan, @ing_spinach,          NULL, 120, @u_g,  120, 6),
+ (@r_tuscan, @ing_garlic,           NULL, 12,  @u_g,   12, 7),
+ (@r_tuscan, @ing_olive_oil,        NULL, 4,   @u_g,    4, 8),
+ (@r_tuscan, @ing_chicken_stock,    NULL, 240, @u_ml, 240, 9),
+ (@r_tuscan, @ing_basil,            NULL, 6,   @u_g,    6, 10),
+ (@r_tuscan, @ing_chilli,           NULL, 1,   @u_g,    1, 11),
+ (@r_tuscan, @ing_oregano,          NULL, 1,   @u_g,    1, 12),
+ (@r_tuscan, @ing_salt,             NULL, 3,   @u_g,    3, 13),
+ (@r_tuscan, @ing_pepper,           NULL, 1,   @u_g,    1, 14);
 
 INSERT INTO recipe_steps (recipe_id, step_number, instruction) VALUES
- (@r_tuscan, 1, 'Cook the basmati rice per packet (about 12 min).'),
+ (@r_tuscan, 1, 'Cook the jasmine rice per packet (about 12 min).'),
  (@r_tuscan, 2, 'Slice chicken breast into 1″ medallions, season with salt, pepper, oregano and chilli flakes. Heat olive oil in a non-stick pan over medium-high; sear chicken 3 min each side until just cooked through. Remove and rest.'),
- (@r_tuscan, 3, 'Same pan: add minced garlic and chopped sundried tomatoes, cook 1 min. Pour in chicken stock and heavy cream, simmer to reduce slightly (3 min).'),
- (@r_tuscan, 4, 'Off heat, whisk in cottage cheese and grated parmesan until silky. Stir in baby spinach to wilt (1 min). Return chicken to coat in the sauce.'),
+ (@r_tuscan, 3, 'Same pan: add minced garlic and chopped sundried tomatoes, cook 1 min. Pour in chicken stock, simmer to reduce slightly (3 min).'),
+ (@r_tuscan, 4, 'Blend cottage cheese smooth in a small jug (immersion blender or whisk hard). Off heat, whisk it into the pan with the grated parmesan until silky. Stir in baby spinach to wilt (1 min). Return chicken to coat in the sauce.'),
  (@r_tuscan, 5, 'Plate rice, ladle over the Tuscan chicken and sauce, scatter torn basil to serve.');
 
 -- =============================================================================

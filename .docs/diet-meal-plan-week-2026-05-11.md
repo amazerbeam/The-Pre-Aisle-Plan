@@ -53,7 +53,7 @@ Average **121 g/day**, every day inside the 101–134 g target band.
 | Tamarind Tossed Noodles (existing) | 546 | 40 | ✅ |
 | Chicken Burrito Bowl Light (existing) | 578 | 38 | Just over Light cap (under 600 reject) |
 
-## New ingredients added to the database
+## New ingredients added to the database (6 — Jasmine rice id 26 reused; no basmati added)
 
 | Ingredient | Aisle | Why |
 |---|---|---|
@@ -63,7 +63,6 @@ Average **121 g/day**, every day inside the 101–134 g target band.
 | Baby spinach | Veg | Soup + Tuscan chicken |
 | Sundried tomatoes (in oil) | Tins & Jars | Tuscan chicken signature flavour |
 | Heavy cream | Dairy | Tuscan chicken sauce |
-| Basmati rice | Grains & Pasta | Gyros bowl + Tuscan chicken base |
 | Orange | Fruit | Slow-roasted salmon citrus glaze |
 
 ## New recipes — sourcing

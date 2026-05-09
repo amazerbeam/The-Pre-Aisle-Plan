@@ -6,6 +6,10 @@ import MealPlanDay from './MealPlanDay'
 import WeeklyMacroPopup from './WeeklyMacroPopup'
 import SwapDaysModal from './SwapDaysModal'
 import CopyWeekModal from './CopyWeekModal'
+import MealPlanMenu from './MealPlanMenu'
+import SaveTemplateModal from './SaveTemplateModal'
+import ApplyTemplateModal from './ApplyTemplateModal'
+import ManageTemplatesModal from './ManageTemplatesModal'
 import { formatDateRange } from '../../utils/dateUtils'
 import './MealPlanCalendar.css'
 
@@ -18,12 +22,34 @@ import './MealPlanCalendar.css'
  */
 function MealPlanCalendar() {
   const { isAuthenticated } = useAuth()
-  const { weekPlan, startDate, endDate, loading, error, swapDayMeals, copyWeek } = useMealPlan()
+  const {
+    weekPlan, startDate, endDate, loading, error,
+    swapDayMeals, copyWeek,
+    templates, loadTemplates,
+    saveTemplate, renameTemplate, updateTemplateSnapshot, deleteTemplate, applyTemplate
+  } = useMealPlan()
   const navigate = useNavigate()
   const [showWeeklyPopup, setShowWeeklyPopup] = useState(false)
   const [swapSourceDay, setSwapSourceDay] = useState(null)
   const [showCopyModal, setShowCopyModal] = useState(false)
+  const [showSaveModal, setShowSaveModal] = useState(false)
+  const [showApplyModal, setShowApplyModal] = useState(false)
+  const [showManageModal, setShowManageModal] = useState(false)
   const todayRef = useRef(null)
+
+  const currentWeekHasMeals = !!(weekPlan?.days?.some(d =>
+    Object.values(d.mealsByType || {}).some(entries => entries.length > 0)
+  ))
+
+  const openApply = async () => {
+    try { await loadTemplates({ force: true }) } catch {}
+    setShowApplyModal(true)
+  }
+
+  const openManage = async () => {
+    try { await loadTemplates({ force: true }) } catch {}
+    setShowManageModal(true)
+  }
 
   // Auto-scroll to today on mobile when weekPlan loads
   useEffect(() => {
@@ -76,14 +102,12 @@ function MealPlanCalendar() {
       <header className="calendar-header">
         {/* FR-038: Recipes button moved to Footer.jsx - DO NOT add navigation buttons here */}
         <h2>Meal Plan</h2>
-        <button
-          className="copy-week-button"
-          onClick={() => setShowCopyModal(true)}
-          title="Copy this week to another week"
-          aria-label="Copy week"
-        >
-          C
-        </button>
+        <MealPlanMenu
+          onCopyWeek={() => setShowCopyModal(true)}
+          onSaveAs={() => setShowSaveModal(true)}
+          onApply={openApply}
+          onManage={openManage}
+        />
         <span className="date-range">{formatDateRange(startDate, endDate)}</span>
         {/* FR-082: Make week total clickable */}
         {weekPlan && (
@@ -151,6 +175,41 @@ function MealPlanCalendar() {
           sourceEndDate={endDate}
           onCopy={handleCopyWeek}
           onClose={() => setShowCopyModal(false)}
+        />
+      )}
+
+      {/* Save Template Modal */}
+      {showSaveModal && (
+        <SaveTemplateModal
+          onSave={async (name) => {
+            await saveTemplate(name)
+            setShowSaveModal(false)
+          }}
+          onClose={() => setShowSaveModal(false)}
+        />
+      )}
+
+      {/* Apply Template Modal */}
+      {showApplyModal && (
+        <ApplyTemplateModal
+          templates={templates}
+          currentWeekHasMeals={currentWeekHasMeals}
+          onApply={async (templateId) => {
+            await applyTemplate(templateId)
+            setShowApplyModal(false)
+          }}
+          onClose={() => setShowApplyModal(false)}
+        />
+      )}
+
+      {/* Manage Templates Modal */}
+      {showManageModal && (
+        <ManageTemplatesModal
+          templates={templates}
+          onRename={renameTemplate}
+          onUpdateSnapshot={updateTemplateSnapshot}
+          onDelete={deleteTemplate}
+          onClose={() => setShowManageModal(false)}
         />
       )}
     </div>

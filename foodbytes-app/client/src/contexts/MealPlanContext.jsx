@@ -1,6 +1,7 @@
 import { createContext, useState, useEffect, useContext, useCallback, useRef } from 'react'
 import { useAuth } from './AuthContext'
 import mealPlanService from '../services/mealPlanService'
+import mealPlanTemplateService from '../services/mealPlanTemplateService'
 import { getTodayISO, addDays, formatDateISO, getWeekDays } from '../utils/dateUtils'
 
 const MealPlanContext = createContext()
@@ -80,6 +81,10 @@ export const MealPlanProvider = ({ children }) => {
 
   // FR-098: Assignment error state for optimistic UI rollback feedback
   const [assignmentError, setAssignmentError] = useState(null)
+
+  // Saved meal-plan templates
+  const [templates, setTemplates] = useState([])
+  const [templatesLoaded, setTemplatesLoaded] = useState(false)
 
   // Track pending operations to prevent duplicate requests
   const pendingOperations = useRef(new Set())
@@ -383,6 +388,86 @@ export const MealPlanProvider = ({ children }) => {
   }, [isAuthenticated, startDate, setStartDate])
 
   /**
+   * Saved meal-plan templates: load list (cached after first call).
+   */
+  const loadTemplates = useCallback(async ({ force = false } = {}) => {
+    if (!isAuthenticated) {
+      setTemplates([])
+      setTemplatesLoaded(false)
+      return []
+    }
+    if (templatesLoaded && !force) return templates
+    try {
+      const data = await mealPlanTemplateService.list()
+      setTemplates(data)
+      setTemplatesLoaded(true)
+      return data
+    } catch (err) {
+      console.error('Failed to load meal-plan templates:', err)
+      throw err
+    }
+  }, [isAuthenticated, templates, templatesLoaded])
+
+  // Reload templates list whenever auth changes
+  useEffect(() => {
+    if (isAuthenticated) {
+      loadTemplates({ force: true }).catch(() => {})
+    } else {
+      setTemplates([])
+      setTemplatesLoaded(false)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated])
+
+  const saveTemplate = useCallback(async (name) => {
+    if (!isAuthenticated) throw new Error('Authentication required')
+    const created = await mealPlanTemplateService.create(name, startDate)
+    await loadTemplates({ force: true })
+    return created
+  }, [isAuthenticated, startDate, loadTemplates])
+
+  const renameTemplate = useCallback(async (templateId, newName) => {
+    if (!isAuthenticated) throw new Error('Authentication required')
+    const updated = await mealPlanTemplateService.rename(templateId, newName)
+    await loadTemplates({ force: true })
+    return updated
+  }, [isAuthenticated, loadTemplates])
+
+  const updateTemplateSnapshot = useCallback(async (templateId) => {
+    if (!isAuthenticated) throw new Error('Authentication required')
+    const updated = await mealPlanTemplateService.updateSnapshot(templateId, startDate)
+    await loadTemplates({ force: true })
+    return updated
+  }, [isAuthenticated, startDate, loadTemplates])
+
+  const deleteTemplate = useCallback(async (templateId) => {
+    if (!isAuthenticated) throw new Error('Authentication required')
+    await mealPlanTemplateService.remove(templateId)
+    await loadTemplates({ force: true })
+  }, [isAuthenticated, loadTemplates])
+
+  /**
+   * Apply a saved template to the currently-displayed week.
+   * Replace-all: backend deletes every entry in the target week, then inserts
+   * template entries with planDate = startDate + dayOffset. Mirrors copyWeek's
+   * shopping-list cache invalidation since the live week is mutated.
+   */
+  const applyTemplate = useCallback(async (templateId) => {
+    if (!isAuthenticated) throw new Error('Authentication required')
+    try {
+      const result = await mealPlanTemplateService.apply(templateId, startDate)
+      invalidateShoppingListCache()
+      setWeekPlan(result)
+      return result
+    } catch (err) {
+      console.error('Failed to apply template:', err)
+      setAssignmentError('Failed to apply template. Please try again.')
+      setTimeout(() => setAssignmentError(null), 3000)
+      throw err
+    }
+  }, [isAuthenticated, startDate])
+
+  /**
    * Get all entries for a specific date
    * @param {string} planDate - ISO format
    * @returns {Object} Map of mealType to entries
@@ -428,6 +513,15 @@ export const MealPlanProvider = ({ children }) => {
     removeEntry,
     swapDayMeals,
     copyWeek,
+
+    // Saved templates
+    templates,
+    loadTemplates,
+    saveTemplate,
+    renameTemplate,
+    updateTemplateSnapshot,
+    deleteTemplate,
+    applyTemplate,
 
     // Helpers
     isRecipeAssigned,
