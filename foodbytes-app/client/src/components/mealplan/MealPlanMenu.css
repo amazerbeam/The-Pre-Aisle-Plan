@@ -4,23 +4,29 @@
 }
 
 .meal-plan-menu-trigger {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
   border: none;
-  background: rgba(255, 255, 255, 0.15);
+  background-color: var(--primary-color, #4a3f80);
   color: #fff;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 3px;
   cursor: pointer;
-  transition: background-color 0.15s ease;
+  flex-shrink: 0;
+  transition: background-color 0.2s ease, transform 0.1s ease;
 }
 
 .meal-plan-menu-trigger:hover,
 .meal-plan-menu-trigger[aria-expanded="true"] {
-  background: rgba(255, 255, 255, 0.3);
+  background-color: #3d3469;
+  transform: scale(1.05);
+}
+
+.meal-plan-menu-trigger:active {
+  transform: scale(0.95);
 }
 
 .meal-plan-menu-dot {

@@ -30,7 +30,7 @@ CREATE TABLE meal_plan_templates (
 CREATE TABLE meal_plan_template_entries (
     id           BIGINT   NOT NULL AUTO_INCREMENT,
     template_id  BIGINT   NOT NULL,
-    day_offset   TINYINT  NOT NULL,
+    day_offset   INT      NOT NULL,
     meal_id      BIGINT   NOT NULL,
     recipe_id    BIGINT   NOT NULL,
     servings     INT      NOT NULL DEFAULT 1,
