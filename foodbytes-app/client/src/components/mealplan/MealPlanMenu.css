@@ -4,9 +4,11 @@
 }
 
 .meal-plan-menu-trigger {
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
+  min-width: 44px;
+  min-height: 44px;
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
   border: none;
   background-color: var(--primary-color, #4a3f80);
   color: #fff;
@@ -17,16 +19,29 @@
   cursor: pointer;
   flex-shrink: 0;
   transition: background-color 0.2s ease, transform 0.1s ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
-.meal-plan-menu-trigger:hover,
 .meal-plan-menu-trigger[aria-expanded="true"] {
   background-color: #3d3469;
-  transform: scale(1.05);
+}
+
+@media (hover: hover) {
+  .meal-plan-menu-trigger:hover {
+    background-color: #3d3469;
+    transform: scale(1.05);
+  }
 }
 
 .meal-plan-menu-trigger:active {
+  background-color: #3d3469;
   transform: scale(0.95);
+}
+
+.meal-plan-menu-trigger:focus-visible {
+  outline: 2px solid var(--primary-color, #4a3f80);
+  outline-offset: 2px;
 }
 
 .meal-plan-menu-dot {

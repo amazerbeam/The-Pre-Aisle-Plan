@@ -203,13 +203,21 @@
   cursor: pointer;
   user-select: none;
   transition: background-color 0.2s ease;
-  padding: 4px 8px;
-  border-radius: 4px;
-  display: inline-block;
+  padding: 12px 14px;
+  min-height: 44px;
+  min-width: 44px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
-.day-calories-clickable:hover {
-  background-color: rgba(74, 63, 128, 0.1);
+@media (hover: hover) {
+  .day-calories-clickable:hover {
+    background-color: rgba(74, 63, 128, 0.1);
+  }
 }
 
 .day-calories-clickable:active {
@@ -217,7 +225,7 @@
 }
 
 /* Keyboard focus style */
-.day-calories-clickable:focus {
+.day-calories-clickable:focus-visible {
   outline: 2px solid var(--primary-color, #4a3f80);
   outline-offset: 2px;
 }

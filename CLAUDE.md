@@ -92,6 +92,14 @@ When adding or modifying a recipe, every variant must satisfy:
 
 Common levers: air-fry instead of pan-fry, sub egg whites for whole eggs, add a starch (toast/potato/rice) for carbs, scale lean protein. If a recipe fails, redesign — don't ship it with caveats. Verify macros for the **whole recipe including linked-recipe extras**, not just direct ingredients.
 
+**Provenance (verified 2026-05-12):**
+- **Protein ≥35 g/serving** — USDA 2025–2030 (1.2–1.6 g/kg/day → 32–43 g across 3 meals for an 80 kg adult) + Moore/Morton MPS literature (20–40 g/meal sweet spot).
+- **Fat 25–35 % of kcal** — Upper half of USDA AMDR (20–35 %).
+- **Carbs 40–50 % of kcal** — **Intentionally below USDA AMDR floor (45–65 %)** to favour protein on a deficit; not formal AMDR compliance.
+- **Per-serving kcal bands (450–550 / 550–650 / 700–800)** — Project-internal calibration; 3 × Moderate ≈ 1650–1950 kcal/day, consistent with NHLBI 500–1000 kcal/day deficit guidance.
+- **Reject thresholds (Light >600, Moderate >750, Balanced >900)** — Project-internal; meal-plan ceiling so a single recipe can't blow the daily budget when stacked with two others. No external source.
+- **Daily kcal floor (men <1500, women <1200)** — Verbatim from NIH/NHLBI obesity-treatment guidelines.
+
 ### User health/diet preferences (relevant to recipe work)
 - Prefers clean ingredients (e.g. pure tamarind block over jarred paste with stabilizers). Quality fats: butter, olive oil, ghee — not seed-oil blends.
 - Asia Market (asiamarket.ie) for Asian ingredients; Tesco Ireland for everyday.
