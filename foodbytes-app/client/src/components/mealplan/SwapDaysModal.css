@@ -1,0 +1,211 @@
+/* SwapDaysModal - Swap days popup styles */
+
+.swap-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: swapFadeIn 0.2s ease-out;
+}
+
+@keyframes swapFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.swap-modal {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  min-width: 320px;
+  max-width: 420px;
+  width: 90%;
+  max-height: 80vh;
+  overflow: auto;
+  animation: swapSlideIn 0.2s ease-out;
+}
+
+@keyframes swapSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.swap-modal-header {
+  background: #4a3f80;
+  color: #fff;
+  padding: 16px;
+  border-radius: 12px 12px 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.swap-modal-title {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.swap-modal-title h4 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.swap-modal-subtitle {
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+
+.swap-modal-close {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 2rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.swap-modal-close:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.swap-modal-content {
+  padding: 16px;
+}
+
+.swap-day-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.swap-day-button {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 14px 12px;
+  background: #f8f9fa;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.swap-day-button:hover {
+  border-color: #4a3f80;
+  background: rgba(74, 63, 128, 0.05);
+}
+
+.swap-day-button:focus {
+  outline: none;
+  border-color: #4a3f80;
+  box-shadow: 0 0 0 3px rgba(74, 63, 128, 0.2);
+}
+
+.swap-day-button:active {
+  transform: scale(0.98);
+}
+
+.swap-day-button.today {
+  border-color: #4a3f80;
+  background: rgba(74, 63, 128, 0.08);
+}
+
+.swap-day-name {
+  font-weight: 600;
+  color: #333;
+  font-size: 1rem;
+}
+
+.swap-day-date {
+  color: #666;
+  font-size: 0.85rem;
+  margin-top: 2px;
+}
+
+.swap-day-meals {
+  color: #999;
+  font-size: 0.75rem;
+  margin-top: 6px;
+}
+
+.swap-today-badge {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  padding: 2px 6px;
+  background-color: #4a3f80;
+  color: white;
+  border-radius: 10px;
+  font-size: 9px;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.swap-modal-hint {
+  text-align: center;
+  font-size: 0.75rem;
+  color: #999;
+  padding: 8px;
+  margin: 0;
+  border-top: 1px solid #eee;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 480px) {
+  .swap-modal {
+    max-width: 95%;
+    margin: 10px;
+  }
+
+  .swap-modal-header {
+    padding: 14px;
+  }
+
+  .swap-modal-title h4 {
+    font-size: 1rem;
+  }
+
+  .swap-day-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .swap-day-button {
+    padding: 10px 8px;
+  }
+
+  .swap-day-name {
+    font-size: 0.9rem;
+  }
+
+  .swap-day-date {
+    font-size: 0.75rem;
+  }
+}

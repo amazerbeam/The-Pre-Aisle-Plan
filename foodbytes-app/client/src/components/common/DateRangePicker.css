@@ -1,0 +1,80 @@
+/* DateRangePicker - FR-007: Date range selector in header */
+
+.date-range-picker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background-color: transparent;
+  border-radius: 20px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.date-range-picker:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.date-label {
+  color: rgba(255, 255, 255, 0.9);
+  white-space: nowrap;
+}
+
+.date-input {
+  padding: 4px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  background-color: rgba(255, 255, 255, 0.95);
+  color: #333;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.date-input:focus {
+  outline: none;
+  border-color: #fff;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+}
+
+.date-arrow {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 16px;
+}
+
+.date-end {
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* Dropdown chevron */
+.date-range-picker .dropdown-chevron {
+  width: 16px;
+  height: 16px;
+  opacity: 0.7;
+  margin-left: 4px;
+}
+
+/* Mobile responsive */
+@media (max-width: 600px) {
+  .date-range-picker {
+    padding: 6px 10px;
+    gap: 4px;
+    font-size: 12px;
+  }
+
+  .date-label {
+    display: none; /* Hide label emoji on mobile to save space */
+  }
+
+  .date-input {
+    padding: 3px 6px;
+    font-size: 12px;
+    max-width: 110px;
+  }
+
+  .date-arrow {
+    font-size: 12px;
+  }
+}

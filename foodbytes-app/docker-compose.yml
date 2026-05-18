@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: foodbytes-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: ${DB_NAME:-foodbytes}
+      MYSQL_USER: ${DB_USER:-foodbytes}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-foodbytes123}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./database/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD:-rootpassword}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - foodbytes-network
+
+  backend:
+    build:
+      context: ./foodbytes-api
+      dockerfile: Dockerfile
+    container_name: foodbytes-backend
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME:-foodbytes}
+      DB_USER: ${DB_USER:-foodbytes}
+      DB_PASSWORD: ${DB_PASSWORD:-foodbytes123}
+      JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-key-min-32-characters-long}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-your-google-client-id}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-your-google-client-secret}
+      OAUTH_REDIRECT_URI: http://localhost:8080/login/oauth2/code/google
+      SERVER_PORT: 8080
+      FRONTEND_URL: http://localhost:3000
+    ports:
+      - "8080:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    networks:
+      - foodbytes-network
+
+  frontend:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        NGINX_ENV: dev
+    container_name: foodbytes-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - foodbytes-network
+
+networks:
+  foodbytes-network:
+    driver: bridge
+
+volumes:
+  mysql_data:

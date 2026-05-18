@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recipe Card Mockup - FoodBytes</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ========== CSS VARIABLES (from FoodBytes) ========== */
+    :root {
+      /* Brand Colors */
+      --brand-primary: #4a3f80;
+      --brand-primary-dark: #3a3266;
+      --brand-primary-light: #6b5fa0;
+
+      /* Neutral Colors */
+      --text-primary: #2c3e50;
+      --text-secondary: #6c757d;
+      --bg-primary: #ffffff;
+      --bg-secondary: #f8f9fa;
+      --border-color: #e9ecef;
+
+      /* Spacing */
+      --spacing-xs: 0.25rem;
+      --spacing-sm: 0.5rem;
+      --spacing-md: 1rem;
+      --spacing-lg: 1.5rem;
+
+      /* Border Radius */
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+
+      /* Shadows */
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+      /* ========== NEW: Recipe Card Stripe Colors ========== */
+      /* Purple-based harmonious palette */
+      --stripe-purple: #4a3f80;      /* Primary brand purple */
+      --stripe-teal: #2aa198;        /* Complementary teal */
+      --stripe-coral: #e07a5f;       /* Warm coral accent */
+      --stripe-gold: #d4a574;        /* Muted gold */
+      --stripe-blue: #5c7cfa;        /* Soft blue */
+      --stripe-rose: #b5838d;        /* Dusty rose */
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: var(--text-primary);
+      background-color: var(--bg-secondary);
+      line-height: 1.5;
+      padding: 2rem;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 1rem;
+      color: var(--brand-primary);
+    }
+
+    .subtitle {
+      text-align: center;
+      color: var(--text-secondary);
+      margin-bottom: 2rem;
+    }
+
+    /* Color palette display */
+    .color-palette {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .color-swatch {
+      text-align: center;
+    }
+
+    .color-swatch .swatch {
+      width: 60px;
+      height: 40px;
+      border-radius: 6px;
+      margin-bottom: 4px;
+    }
+
+    .color-swatch .label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+
+    /* Cards container */
+    .cards-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* ========== NEW RECIPE CARD DESIGN ========== */
+    .recipe-card {
+      background: white;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border-color);
+      overflow: hidden;
+    }
+
+    /* NEW: Colored stripe at top */
+    .card-stripe {
+      height: 6px;
+      width: 100%;
+    }
+
+    .card-stripe.purple { background: var(--stripe-purple); }
+    .card-stripe.teal { background: var(--stripe-teal); }
+    .card-stripe.coral { background: var(--stripe-coral); }
+    .card-stripe.gold { background: var(--stripe-gold); }
+    .card-stripe.blue { background: var(--stripe-blue); }
+    .card-stripe.rose { background: var(--stripe-rose); }
+
+    /* NEW: Recipe title section (moved out of header) */
+    .card-title-section {
+      padding: 14px 16px 10px 16px;
+    }
+
+    .recipe-name {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1.3;
+      margin: 0;
+      /* 2-line max with ellipsis */
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* Card body */
+    .card-body {
+      padding: 0 16px;
+    }
+
+    /* Meta pill bar (calories, variant, servings) - UNCHANGED */
+    .meta-pill {
+      display: flex;
+      align-items: center;
+      background: var(--bg-secondary);
+      border-radius: 24px;
+      padding: 4px;
+      margin-bottom: 14px;
+      gap: 4px;
+    }
+
+    .cal-dropdown {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 8px 12px;
+      background: white;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      flex-shrink: 0;
+    }
+
+    .cal-dropdown svg {
+      width: 12px;
+      height: 12px;
+      opacity: 0.6;
+    }
+
+    .variant-badge {
+      flex: 1;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      padding: 8px;
+      white-space: nowrap;
+    }
+
+    .servings-pill {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      background: white;
+      border-radius: 20px;
+      padding: 4px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      flex-shrink: 0;
+    }
+
+    .servings-btn {
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-secondary);
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .servings-btn:hover {
+      background: var(--brand-primary);
+      color: white;
+    }
+
+    .servings-value {
+      width: 24px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    /* Day buttons grid - UNCHANGED */
+    .days-grid {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+
+    .day-btn {
+      flex: 1;
+      min-width: 42px;
+      padding: 8px 4px;
+      background: var(--bg-secondary);
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .day-btn:hover {
+      background: var(--border-color);
+    }
+
+    .day-btn.assigned {
+      background: var(--brand-primary);
+      color: white;
+    }
+
+    .day-btn .cal-total {
+      font-size: 0.7rem;
+      font-weight: 600;
+      display: block;
+    }
+
+    .day-btn .day-name {
+      font-size: 0.75rem;
+      display: block;
+      margin-top: 2px;
+    }
+
+    /* NEW: Card footer with View Recipe & Edit */
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px 16px 16px;
+      gap: 12px;
+    }
+
+    /* ========== BUTTON STYLE VARIATIONS ========== */
+
+    /* Style 1: Outlined pill + underline (based on Style 2) */
+    .btn-style-1 .view-btn {
+      flex: 1;
+      padding: 10px 16px;
+      background: white;
+      color: var(--stripe-purple);
+      border: 2px solid var(--stripe-purple);
+      border-radius: 20px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-style-1 .view-btn:hover { background: var(--stripe-purple); color: white; }
+    .btn-style-1 .edit-btn {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      cursor: pointer;
+      padding: 10px 12px;
+      text-decoration: underline;
+      transition: color 0.2s;
+    }
+    .btn-style-1 .edit-btn:hover { color: var(--stripe-purple); }
+
+    /* Style 2: Outlined matching stripe + Ghost */
+    .btn-style-2 .view-btn {
+      flex: 1;
+      padding: 10px 16px;
+      background: white;
+      color: var(--stripe-teal);
+      border: 2px solid var(--stripe-teal);
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-style-2 .view-btn:hover { background: var(--stripe-teal); color: white; }
+    .btn-style-2 .edit-btn {
+      background: var(--bg-secondary);
+      border: none;
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      padding: 10px 16px;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+    .btn-style-2 .edit-btn:hover { background: var(--border-color); }
+
+    /* Style 3: Soft colored background + Underline link */
+    .btn-style-3 .view-btn {
+      flex: 1;
+      padding: 10px 16px;
+      background: rgba(224, 122, 95, 0.15);
+      color: var(--stripe-coral);
+      border: none;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-style-3 .view-btn:hover { background: rgba(224, 122, 95, 0.25); }
+    .btn-style-3 .edit-btn {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      cursor: pointer;
+      padding: 10px 12px;
+      text-decoration: underline;
+      transition: color 0.2s;
+    }
+    .btn-style-3 .edit-btn:hover { color: var(--stripe-coral); }
+
+    /* Style 4: Soft bg pill shape + ghost (based on Style 3) */
+    .btn-style-4 .view-btn {
+      flex: 1;
+      padding: 10px 16px;
+      background: rgba(212, 165, 116, 0.2);
+      color: #b8860b;
+      border: none;
+      border-radius: 20px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-style-4 .view-btn:hover { background: rgba(212, 165, 116, 0.35); }
+    .btn-style-4 .edit-btn {
+      background: var(--bg-secondary);
+      border: none;
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      padding: 10px 16px;
+      border-radius: 20px;
+      transition: all 0.2s;
+    }
+    .btn-style-4 .edit-btn:hover { background: var(--border-color); }
+
+    /* Style 5: Thin outlined + text link */
+    .btn-style-5 .view-btn {
+      flex: 1;
+      padding: 10px 16px;
+      background: white;
+      color: var(--brand-primary);
+      border: 1px solid var(--brand-primary);
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-style-5 .view-btn:hover { background: var(--brand-primary); color: white; }
+    .btn-style-5 .edit-btn {
+      background: none;
+      border: none;
+      color: var(--brand-primary);
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      padding: 10px 12px;
+      transition: all 0.2s;
+    }
+    .btn-style-5 .edit-btn:hover { text-decoration: underline; }
+
+    /* Style 6: Soft bg + outlined edit (based on Style 3) */
+    .btn-style-6 .view-btn {
+      flex: 1;
+      padding: 10px 16px;
+      background: rgba(181, 131, 141, 0.15);
+      color: var(--stripe-rose);
+      border: none;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-style-6 .view-btn:hover { background: rgba(181, 131, 141, 0.25); }
+    .btn-style-6 .edit-btn {
+      padding: 10px 16px;
+      background: white;
+      color: var(--stripe-rose);
+      border: 1px solid var(--stripe-rose);
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-style-6 .edit-btn:hover { background: var(--stripe-rose); color: white; }
+
+    /* Style labels */
+    .style-label {
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+      text-align: center;
+      padding: 6px;
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border-color);
+      font-weight: 500;
+    }
+
+    /* Comparison section */
+    .comparison {
+      max-width: 800px;
+      margin: 3rem auto 0;
+      padding: 2rem;
+      background: white;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
+    }
+
+    .comparison h2 {
+      color: var(--brand-primary);
+      margin-bottom: 1rem;
+    }
+
+    .comparison ul {
+      margin-left: 1.5rem;
+    }
+
+    .comparison li {
+      margin-bottom: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>Recipe Card Redesign Mockup</h1>
+  <p class="subtitle">FoodBytes - Proposed card layout with colored stripes</p>
+
+  <!-- Color Palette Display -->
+  <div class="color-palette">
+    <div class="color-swatch">
+      <div class="swatch" style="background: var(--stripe-purple);"></div>
+      <div class="label">Purple</div>
+    </div>
+    <div class="color-swatch">
+      <div class="swatch" style="background: var(--stripe-teal);"></div>
+      <div class="label">Teal</div>
+    </div>
+    <div class="color-swatch">
+      <div class="swatch" style="background: var(--stripe-coral);"></div>
+      <div class="label">Coral</div>
+    </div>
+    <div class="color-swatch">
+      <div class="swatch" style="background: var(--stripe-gold);"></div>
+      <div class="label">Gold</div>
+    </div>
+    <div class="color-swatch">
+      <div class="swatch" style="background: var(--stripe-blue);"></div>
+      <div class="label">Blue</div>
+    </div>
+    <div class="color-swatch">
+      <div class="swatch" style="background: var(--stripe-rose);"></div>
+      <div class="label">Rose</div>
+    </div>
+  </div>
+
+  <!-- Recipe Cards -->
+  <div class="cards-container">
+    <!-- Card 1: Purple stripe -->
+    <div class="recipe-card btn-style-5">
+      <div class="card-stripe purple"></div>
+      <div class="card-title-section">
+        <h3 class="recipe-name">Porridge with Honey</h3>
+      </div>
+      <div class="card-body">
+        <div class="meta-pill">
+          <button class="cal-dropdown">
+            440 cal
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M6 9l6 6 6-6"/>
+            </svg>
+          </button>
+          <span class="variant-badge">Standard</span>
+          <div class="servings-pill">
+            <button class="servings-btn">-</button>
+            <span class="servings-value">2</span>
+            <button class="servings-btn">+</button>
+          </div>
+        </div>
+        <div class="days-grid">
+          <button class="day-btn"><span class="cal-total">2062</span><span class="day-name">Mon</span></button>
+          <button class="day-btn assigned"><span class="cal-total">1885</span><span class="day-name">Tue</span></button>
+          <button class="day-btn"><span class="cal-total">0</span><span class="day-name">Wed</span></button>
+          <button class="day-btn"><span class="cal-total">0</span><span class="day-name">Thu</span></button>
+          <button class="day-btn"><span class="cal-total">2636</span><span class="day-name">Fri</span></button>
+          <button class="day-btn"><span class="cal-total">2404</span><span class="day-name">Sat</span></button>
+          <button class="day-btn"><span class="cal-total">2366</span><span class="day-name">Sun</span></button>
+        </div>
+      </div>
+      <div class="card-footer">
+        <button class="view-btn">View Recipe</button>
+        <button class="edit-btn">Edit</button>
+      </div>
+    </div>
+
+    <!-- Card 2: Teal stripe -->
+    <div class="recipe-card btn-style-5">
+      <div class="card-stripe teal"></div>
+      <div class="card-title-section">
+        <h3 class="recipe-name">Avocado Toast with Poached Eggs</h3>
+      </div>
+      <div class="card-body">
+        <div class="meta-pill">
+          <button class="cal-dropdown">
+            453 cal
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M6 9l6 6 6-6"/>
+            </svg>
+          </button>
+          <span class="variant-badge">Standard</span>
+          <div class="servings-pill">
+            <button class="servings-btn">-</button>
+            <span class="servings-value">2</span>
+            <button class="servings-btn">+</button>
+          </div>
+        </div>
+        <div class="days-grid">
+          <button class="day-btn"><span class="cal-total">2062</span><span class="day-name">Mon</span></button>
+          <button class="day-btn"><span class="cal-total">1885</span><span class="day-name">Tue</span></button>
+          <button class="day-btn"><span class="cal-total">0</span><span class="day-name">Wed</span></button>
+          <button class="day-btn assigned"><span class="cal-total">453</span><span class="day-name">Thu</span></button>
+          <button class="day-btn assigned"><span class="cal-total">2636</span><span class="day-name">Fri</span></button>
+          <button class="day-btn"><span class="cal-total">2404</span><span class="day-name">Sat</span></button>
+          <button class="day-btn"><span class="cal-total">2366</span><span class="day-name">Sun</span></button>
+        </div>
+      </div>
+      <div class="card-footer">
+        <button class="view-btn">View Recipe</button>
+        <button class="edit-btn">Edit</button>
+      </div>
+    </div>
+
+    <!-- Card 3: Coral stripe -->
+    <div class="recipe-card btn-style-5">
+      <div class="card-stripe coral"></div>
+      <div class="card-title-section">
+        <h3 class="recipe-name">Greek Yogurt Parfait</h3>
+      </div>
+      <div class="card-body">
+        <div class="meta-pill">
+          <button class="cal-dropdown">
+            320 cal
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M6 9l6 6 6-6"/>
+            </svg>
+          </button>
+          <span class="variant-badge">Low Cal</span>
+          <div class="servings-pill">
+            <button class="servings-btn">-</button>
+            <span class="servings-value">1</span>
+            <button class="servings-btn">+</button>
+          </div>
+        </div>
+        <div class="days-grid">
+          <button class="day-btn"><span class="cal-total">2062</span><span class="day-name">Mon</span></button>
+          <button class="day-btn"><span class="cal-total">1885</span><span class="day-name">Tue</span></button>
+          <button class="day-btn"><span class="cal-total">0</span><span class="day-name">Wed</span></button>
+          <button class="day-btn"><span class="cal-total">0</span><span class="day-name">Thu</span></button>
+          <button class="day-btn"><span class="cal-total">2636</span><span class="day-name">Fri</span></button>
+          <button class="day-btn"><span class="cal-total">2404</span><span class="day-name">Sat</span></button>
+          <button class="day-btn"><span class="cal-total">2366</span><span class="day-name">Sun</span></button>
+        </div>
+      </div>
+      <div class="card-footer">
+        <button class="view-btn">View Recipe</button>
+        <button class="edit-btn">Edit</button>
+      </div>
+    </div>
+
+    <!-- Card 4: Gold stripe -->
+    <div class="recipe-card btn-style-5">
+      <div class="card-stripe gold"></div>
+      <div class="card-title-section">
+        <h3 class="recipe-name">Overnight Oats with Berries</h3>
+      </div>
+      <div class="card-body">
+        <div class="meta-pill">
+          <button class="cal-dropdown">
+            385 cal
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M6 9l6 6 6-6"/>
+            </svg>
+          </button>
+          <span class="variant-badge">Standard</span>
+          <div class="servings-pill">
+            <button class="servings-btn">-</button>
+            <span class="servings-value">2</span>
+            <button class="servings-btn">+</button>
+          </div>
+        </div>
+        <div class="days-grid">
+          <button class="day-btn assigned"><span class="cal-total">2062</span><span class="day-name">Mon</span></button>
+          <button class="day-btn"><span class="cal-total">1885</span><span class="day-name">Tue</span></button>
+          <button class="day-btn"><span class="cal-total">0</span><span class="day-name">Wed</span></button>
+          <button class="day-btn"><span class="cal-total">0</span><span class="day-name">Thu</span></button>
+          <button class="day-btn"><span class="cal-total">2636</span><span class="day-name">Fri</span></button>
+          <button class="day-btn"><span class="cal-total">2404</span><span class="day-name">Sat</span></button>
+          <button class="day-btn"><span class="cal-total">2366</span><span class="day-name">Sun</span></button>
+        </div>
+      </div>
+      <div class="card-footer">
+        <button class="view-btn">View Recipe</button>
+        <button class="edit-btn">Edit</button>
+      </div>
+    </div>
+
+    <!-- Card 5: Blue stripe -->
+    <div class="recipe-card btn-style-5">
+      <div class="card-stripe blue"></div>
+      <div class="card-title-section">
+        <h3 class="recipe-name">Smoothie Bowl</h3>
+      </div>
+      <div class="card-body">
+        <div class="meta-pill">
+          <button class="cal-dropdown">
+            290 cal
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M6 9l6 6 6-6"/>
+            </svg>
+          </button>
+          <span class="variant-badge">Standard</span>
+          <div class="servings-pill">
+            <button class="servings-btn">-</button>
+            <span class="servings-value">1</span>
+            <button class="servings-btn">+</button>
+          </div>
+        </div>
+        <div class="days-grid">
+          <button class="day-btn"><span class="cal-total">2062</span><span class="day-name">Mon</span></button>
+          <button class="day-btn"><span class="cal-total">1885</span><span class="day-name">Tue</span></button>
+          <button class="day-btn assigned"><span class="cal-total">290</span><span class="day-name">Wed</span></button>
+          <button class="day-btn"><span class="cal-total">0</span><span class="day-name">Thu</span></button>
+          <button class="day-btn"><span class="cal-total">2636</span><span class="day-name">Fri</span></button>
+          <button class="day-btn"><span class="cal-total">2404</span><span class="day-name">Sat</span></button>
+          <button class="day-btn"><span class="cal-total">2366</span><span class="day-name">Sun</span></button>
+        </div>
+      </div>
+      <div class="card-footer">
+        <button class="view-btn">View Recipe</button>
+        <button class="edit-btn">Edit</button>
+      </div>
+    </div>
+
+    <!-- Card 6: Rose stripe -->
+    <div class="recipe-card btn-style-5">
+      <div class="card-stripe rose"></div>
+      <div class="card-title-section">
+        <h3 class="recipe-name">Banana Pancakes with Maple Syrup</h3>
+      </div>
+      <div class="card-body">
+        <div class="meta-pill">
+          <button class="cal-dropdown">
+            520 cal
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M6 9l6 6 6-6"/>
+            </svg>
+          </button>
+          <span class="variant-badge">Standard</span>
+          <div class="servings-pill">
+            <button class="servings-btn">-</button>
+            <span class="servings-value">2</span>
+            <button class="servings-btn">+</button>
+          </div>
+        </div>
+        <div class="days-grid">
+          <button class="day-btn"><span class="cal-total">2062</span><span class="day-name">Mon</span></button>
+          <button class="day-btn"><span class="cal-total">1885</span><span class="day-name">Tue</span></button>
+          <button class="day-btn"><span class="cal-total">0</span><span class="day-name">Wed</span></button>
+          <button class="day-btn"><span class="cal-total">0</span><span class="day-name">Thu</span></button>
+          <button class="day-btn"><span class="cal-total">2636</span><span class="day-name">Fri</span></button>
+          <button class="day-btn"><span class="cal-total">2404</span><span class="day-name">Sat</span></button>
+          <button class="day-btn assigned"><span class="cal-total">2886</span><span class="day-name">Sun</span></button>
+        </div>
+      </div>
+      <div class="card-footer">
+        <button class="view-btn">View Recipe</button>
+        <button class="edit-btn">Edit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary of Changes -->
+  <div class="comparison">
+    <h2>Card Layout (All Cards)</h2>
+    <ul>
+      <li><strong>Colored stripe at top</strong> - 6px height, cycles through 6 harmonious colors</li>
+      <li><strong>Recipe title moved</strong> - Now below stripe, outside header (dark header removed)</li>
+      <li><strong>Calories & portions unchanged</strong> - Same pill bar design</li>
+      <li><strong>Day buttons unchanged</strong> - Same layout with calorie totals</li>
+    </ul>
+
+    <h2 style="margin-top: 1.5rem;">Current Button Style (Style 5)</h2>
+    <ul>
+      <li><strong>View Recipe:</strong> White background, 1px purple border, 8px radius</li>
+      <li><strong>Edit:</strong> Text link in purple, underlines on hover</li>
+      <li><strong>Hover:</strong> View Recipe fills with purple, text turns white</li>
+    </ul>
+
+    <h2 style="margin-top: 1.5rem;">Stripe Color Palette</h2>
+    <ul>
+      <li><strong>Purple (#4a3f80)</strong> - Primary brand color</li>
+      <li><strong>Teal (#2aa198)</strong> - Complementary cool tone</li>
+      <li><strong>Coral (#e07a5f)</strong> - Warm accent</li>
+      <li><strong>Gold (#d4a574)</strong> - Muted warm neutral</li>
+      <li><strong>Blue (#5c7cfa)</strong> - Soft cool accent</li>
+      <li><strong>Rose (#b5838d)</strong> - Dusty pink, analogous to purple</li>
+    </ul>
+  </div>
+</body>
+</html>

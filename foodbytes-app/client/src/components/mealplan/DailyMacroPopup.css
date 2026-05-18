@@ -1,0 +1,240 @@
+/* FR-081: Daily Macro Popup Styles */
+
+.macro-popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.macro-popup {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  min-width: 320px;
+  max-width: 500px;
+  width: 90%;
+  max-height: 80vh;
+  overflow: auto;
+  animation: slideIn 0.2s ease-out;
+}
+
+.macro-popup-wide {
+  max-width: 600px;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.macro-popup-header {
+  background: #4a3f80;
+  color: #fff;
+  padding: 16px;
+  border-radius: 12px 12px 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.macro-popup-title {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.macro-popup-title h4 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.macro-popup-date {
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.macro-popup-close {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 2rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.macro-popup-close:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.macro-popup-content {
+  padding: 20px;
+}
+
+.macro-total {
+  text-align: center;
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.macro-total-label {
+  display: block;
+  font-size: 0.85rem;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.macro-total-value {
+  display: block;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #4a3f80;
+}
+
+.macro-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.macro-item {
+  background: #fff;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 12px;
+  text-align: center;
+  transition: border-color 0.2s ease;
+}
+
+.macro-item:hover {
+  border-color: #4a3f80;
+}
+
+.macro-item-protein {
+  border-color: #e57373;
+}
+
+.macro-item-carbs {
+  border-color: #ffa726;
+}
+
+.macro-item-fat {
+  border-color: #66bb6a;
+}
+
+.macro-item-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+
+.macro-item-label {
+  font-size: 0.75rem;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.macro-item-values {
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.macro-item-grams {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #333;
+}
+
+.macro-item-percent {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #666;
+  background: #f0f0f0;
+  padding: 2px 6px;
+  border-radius: 12px;
+}
+
+.macro-item-calories {
+  font-size: 0.75rem;
+  color: #999;
+}
+
+.macro-popup-hint {
+  text-align: center;
+  font-size: 0.75rem;
+  color: #999;
+  padding: 8px;
+  margin: 0;
+  border-top: 1px solid #eee;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 480px) {
+  .macro-popup {
+    max-width: 95%;
+    margin: 10px;
+  }
+
+  .macro-popup-header {
+    padding: 14px;
+  }
+
+  .macro-popup-title h4 {
+    font-size: 1.1rem;
+  }
+
+  .macro-popup-content {
+    padding: 16px;
+  }
+
+  .macro-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .macro-item {
+    padding: 14px;
+  }
+}

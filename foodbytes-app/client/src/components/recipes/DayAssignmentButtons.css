@@ -1,0 +1,100 @@
+/* DayAssignmentButtons - Pill Bar Design
+ * 7-column grid with calories inside each day button
+ */
+
+/* Days grid - 7 columns */
+.days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+
+/* Day button - vertical layout with calories inside */
+.day-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 4px;
+  background: var(--bg-secondary, #f8f9fa);
+  border: 2px solid transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.day-btn:hover {
+  border-color: var(--brand-primary-light, #6b5fa0);
+  background: #f0eef5;
+}
+
+/* Calorie value inside button */
+.day-cal {
+  font-size: 0.65rem;
+  font-weight: 600;
+  margin-bottom: 2px;
+  opacity: 0.9;
+}
+
+/* Day name inside button */
+.day-name {
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* Selected state - THIS recipe is assigned (purple) */
+.day-btn.selected {
+  background: var(--brand-primary, #4a3f80);
+  color: white;
+}
+
+.day-btn.selected:hover {
+  background: var(--brand-primary-dark, #3a3266);
+  border-color: transparent;
+}
+
+.day-btn.selected .day-cal,
+.day-btn.selected .day-name {
+  color: white;
+}
+
+/* Unselected state - slot is available (gray) */
+.day-btn.unselected {
+  background: var(--bg-secondary, #f8f9fa);
+  color: var(--text-primary, #2c3e50);
+}
+
+/* Already-selected state - ANOTHER recipe is assigned (green) */
+.day-btn.already-selected {
+  background: #e8f5e9;
+  color: var(--text-primary, #2c3e50);
+}
+
+.day-btn.already-selected:hover {
+  background: #c8e6c9;
+}
+
+/* Disabled state */
+.day-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Mobile responsive */
+@media (max-width: 480px) {
+  .days-grid {
+    gap: 4px;
+  }
+
+  .day-btn {
+    padding: 6px 2px;
+  }
+
+  .day-cal {
+    font-size: 0.6rem;
+  }
+
+  .day-name {
+    font-size: 0.7rem;
+  }
+}

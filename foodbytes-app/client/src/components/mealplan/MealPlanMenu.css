@@ -1,0 +1,95 @@
+.meal-plan-menu {
+  position: relative;
+  display: inline-block;
+}
+
+.meal-plan-menu-trigger {
+  min-width: 44px;
+  min-height: 44px;
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  border: none;
+  background-color: var(--primary-color, #4a3f80);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.meal-plan-menu-trigger[aria-expanded="true"] {
+  background-color: #3d3469;
+}
+
+@media (hover: hover) {
+  .meal-plan-menu-trigger:hover {
+    background-color: #3d3469;
+    transform: scale(1.05);
+  }
+}
+
+.meal-plan-menu-trigger:active {
+  background-color: #3d3469;
+  transform: scale(0.95);
+}
+
+.meal-plan-menu-trigger:focus-visible {
+  outline: 2px solid var(--primary-color, #4a3f80);
+  outline-offset: 2px;
+}
+
+.meal-plan-menu-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.meal-plan-menu-list {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 50;
+  min-width: 200px;
+  margin: 0;
+  padding: 6px 0;
+  list-style: none;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
+}
+
+.meal-plan-menu-list li {
+  margin: 0;
+}
+
+.meal-plan-menu-list button {
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: none;
+  padding: 12px 16px;
+  font-size: 0.95rem;
+  color: #333;
+  cursor: pointer;
+  min-height: 44px;
+}
+
+.meal-plan-menu-list button:hover,
+.meal-plan-menu-list button:focus-visible {
+  background: #f3f0fa;
+  color: #4a3f80;
+  outline: none;
+}
+
+@media (max-width: 480px) {
+  .meal-plan-menu-list {
+    min-width: 220px;
+  }
+}

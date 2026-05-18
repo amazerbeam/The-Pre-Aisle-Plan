@@ -1,0 +1,92 @@
+/* MealPlanEntry - Single recipe in the meal plan */
+
+.meal-plan-entry {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  background-color: rgba(74, 63, 128, 0.05);
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  cursor: pointer; /* FR-014: Indicate clickable for fullscreen view */
+}
+
+.meal-plan-entry:hover {
+  background-color: rgba(74, 63, 128, 0.1);
+}
+
+.meal-plan-entry.removing {
+  opacity: 0.5;
+}
+
+.entry-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.recipe-name {
+  font-size: 12px;
+  font-weight: 500;
+  color: #333;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.recipe-calories {
+  font-size: 10px;
+  color: #666;
+}
+
+.remove-btn {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  color: #666;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.remove-btn:hover:not(:disabled) {
+  background-color: #fee;
+  border-color: #e74c3c;
+  color: #e74c3c;
+}
+
+.remove-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Mobile: Slightly larger touch targets */
+@media (max-width: 600px) {
+  .meal-plan-entry {
+    padding: 8px 10px;
+  }
+
+  .recipe-name {
+    font-size: 13px;
+  }
+
+  .recipe-calories {
+    font-size: 11px;
+  }
+
+  .remove-btn {
+    width: 24px;
+    height: 24px;
+    font-size: 16px;
+  }
+}

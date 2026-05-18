@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  # MySQL Database
+  db:
+    image: mysql:8.0
+    container_name: foodbytes-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: ${DB_NAME:-foodbytes}
+      MYSQL_USER: ${DB_USER:-foodbytes_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-foodbytes_pass}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./foodbytes-app/database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./foodbytes-app/database/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - foodbytes-network
+
+  # Spring Boot API
+  api:
+    build:
+      context: ./foodbytes-app/foodbytes-api
+      dockerfile: Dockerfile
+    container_name: foodbytes-api
+    restart: unless-stopped
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME:-foodbytes}
+      DB_USER: ${DB_USER:-foodbytes_user}
+      DB_PASSWORD: ${DB_PASSWORD:-foodbytes_pass}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      JWT_SECRET: ${JWT_SECRET:-change-this-to-a-secure-secret-key-in-production}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
+      OAUTH_REDIRECT_URI: http://localhost:8080/login/oauth2/code/google
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - foodbytes-network
+
+  # React Frontend (Production Build)
+  client:
+    build:
+      context: ./foodbytes-app/client
+      dockerfile: Dockerfile
+      args:
+        NGINX_ENV: dev
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:8080}
+    container_name: foodbytes-client
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      - api
+    networks:
+      - foodbytes-network
+
+volumes:
+  mysql_data:
+
+networks:
+  foodbytes-network:
+    driver: bridge

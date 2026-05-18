@@ -1,0 +1,1449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MyPantryPlan - UI Improvements Preview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* ============================================
+       CSS VARIABLES
+       ============================================ */
+    :root {
+      /* Brand Colors */
+      --brand-primary: #4a3f80;
+      --brand-primary-dark: #3a3266;
+      --brand-primary-light: #6b5fa0;
+      --brand-50: #f5f3ff;
+
+      /* Neutral Colors */
+      --text-primary: #2c3e50;
+      --text-secondary: #6c757d;
+      --bg-primary: #ffffff;
+      --bg-secondary: #f8f9fa;
+      --border-color: #e9ecef;
+
+      /* Semantic Colors */
+      --success: #22c55e;
+      --success-light: #dcfce7;
+      --warning: #ffc107;
+      --error: #dc3545;
+      --cheat-badge: #ff6b35;
+
+      /* Spacing */
+      --spacing-xs: 0.25rem;
+      --spacing-sm: 0.5rem;
+      --spacing-md: 1rem;
+      --spacing-lg: 1.5rem;
+      --spacing-xl: 2rem;
+
+      /* Border Radius */
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+
+      /* Shadows */
+      --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.04), 0 4px 8px rgba(0, 0, 0, 0.04);
+      --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.04), 0 8px 16px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.06), 0 16px 32px rgba(0, 0, 0, 0.08);
+      --shadow-brand: 0 4px 12px rgba(74, 63, 128, 0.15);
+
+      /* Aisle Colors */
+      --aisle-produce: #4caf50;
+      --aisle-dairy: #2196f3;
+      --aisle-meat: #f44336;
+      --aisle-bakery: #ff9800;
+      --aisle-grains: #795548;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #f0f2f5;
+      color: var(--text-primary);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ============================================
+       PREVIEW CONTAINER
+       ============================================ */
+    .preview-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .preview-section {
+      margin-bottom: 60px;
+    }
+
+    .preview-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--border-color);
+    }
+
+    .preview-row {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .preview-card {
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+      flex: 1;
+      min-width: 300px;
+    }
+
+    .preview-label {
+      font-size: 0.6875rem;
+      font-weight: 600;
+      color: var(--brand-primary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 12px;
+    }
+
+    /* ============================================
+       1. HEADER - IMPROVED
+       ============================================ */
+    .header-new {
+      background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-primary-dark) 100%);
+      padding: 16px 24px;
+      border-radius: var(--radius-lg);
+      box-shadow: 0 4px 20px rgba(74, 63, 128, 0.25);
+      color: white;
+    }
+
+    .header-content-new {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .logo-new h1 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    .logo-new:hover h1 {
+      transform: scale(1.02);
+    }
+
+    .date-picker-new {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.15);
+      padding: 8px 16px;
+      border-radius: 24px;
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .date-picker-new:hover {
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    .sign-in-btn-new {
+      background: white;
+      color: var(--brand-primary);
+      padding: 10px 24px;
+      border-radius: 24px;
+      font-weight: 600;
+      font-size: 0.875rem;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      transition: all 0.2s ease;
+    }
+
+    .sign-in-btn-new:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    .user-avatar-new {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.15);
+      padding: 6px 12px 6px 6px;
+      border-radius: 24px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .user-avatar-new:hover {
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    .avatar-circle {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 0.875rem;
+    }
+
+    .user-name-new {
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+
+    /* ============================================
+       2. RECIPE CARDS - IMPROVED
+       ============================================ */
+    .recipe-card-new {
+      background: white;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      transition: all 0.25s ease;
+      cursor: pointer;
+      width: 100%;
+      max-width: 340px;
+    }
+
+    .recipe-card-new:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg), var(--shadow-brand);
+    }
+
+    .recipe-hero {
+      height: 8px;
+      background: linear-gradient(90deg, var(--brand-primary-light) 0%, var(--brand-primary) 100%);
+    }
+
+    .recipe-card-new.is-cheat .recipe-hero {
+      background: linear-gradient(90deg, #ff8a65 0%, var(--cheat-badge) 100%);
+    }
+
+    .recipe-body {
+      padding: 16px 20px;
+    }
+
+    .recipe-header-new {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .recipe-name-new {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.3;
+    }
+
+    .cheat-badge-new {
+      display: inline-flex;
+      align-items: center;
+      background: linear-gradient(135deg, #ff8a65 0%, var(--cheat-badge) 100%);
+      color: white;
+      font-size: 0.625rem;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .recipe-meta-new {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .calorie-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 12px;
+      background: var(--bg-secondary);
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.875rem;
+      color: var(--brand-primary);
+    }
+
+    .servings-control-new {
+      display: inline-flex;
+      align-items: center;
+      background: var(--bg-secondary);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .servings-btn {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      font-size: 1.125rem;
+      color: var(--brand-primary);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .servings-btn:hover {
+      background: var(--brand-primary);
+      color: white;
+    }
+
+    .servings-value {
+      padding: 0 8px;
+      font-weight: 600;
+      font-size: 0.875rem;
+      min-width: 40px;
+      text-align: center;
+    }
+
+    .day-pills {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .day-pill {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      border: 2px solid var(--border-color);
+      background: white;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .day-pill:hover {
+      border-color: var(--brand-primary);
+      color: var(--brand-primary);
+      background: var(--brand-50);
+    }
+
+    .day-pill.selected {
+      background: var(--brand-primary);
+      border-color: var(--brand-primary);
+      color: white;
+    }
+
+    .recipe-actions-new {
+      display: flex;
+      gap: 8px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .action-btn-primary {
+      flex: 1;
+      padding: 12px 16px;
+      background: var(--brand-primary);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .action-btn-primary:hover {
+      background: var(--brand-primary-dark);
+      transform: translateY(-1px);
+    }
+
+    .action-btn-secondary {
+      padding: 12px 16px;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      border: none;
+      border-radius: 10px;
+      font-weight: 500;
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .action-btn-secondary:hover {
+      background: var(--border-color);
+    }
+
+    /* ============================================
+       3. BOTTOM NAVIGATION - IMPROVED
+       ============================================ */
+    .footer-new {
+      background: white;
+      border-radius: var(--radius-lg);
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+      padding: 8px 0;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    .footer-nav-new {
+      display: flex;
+      justify-content: space-around;
+      align-items: stretch;
+    }
+
+    .footer-btn-new {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 10px 8px 8px;
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      position: relative;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .footer-btn-new::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 3px;
+      background: var(--brand-primary);
+      border-radius: 0 0 2px 2px;
+      transition: width 0.25s ease;
+    }
+
+    .footer-btn-new.active::before {
+      width: 32px;
+    }
+
+    .footer-btn-new.active {
+      color: var(--brand-primary);
+    }
+
+    .footer-btn-new svg {
+      width: 24px;
+      height: 24px;
+      transition: transform 0.2s ease;
+    }
+
+    .footer-btn-new.active svg {
+      transform: scale(1.1);
+    }
+
+    .footer-btn-new span {
+      font-size: 0.6875rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    .footer-btn-new:hover:not(.active) {
+      color: var(--brand-primary-light);
+    }
+
+    /* ============================================
+       4. MEAL PLAN DAY CARD - IMPROVED
+       ============================================ */
+    .meal-day-card {
+      background: white;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border-color);
+      width: 100%;
+      max-width: 200px;
+      transition: all 0.2s ease;
+    }
+
+    .meal-day-card:hover {
+      box-shadow: var(--shadow-md);
+    }
+
+    .meal-day-card.is-today {
+      border: 2px solid var(--brand-primary);
+      box-shadow: var(--shadow-brand);
+    }
+
+    .day-header-new {
+      padding: 12px 14px;
+      background: linear-gradient(180deg, var(--bg-secondary) 0%, white 100%);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .day-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .day-name-new {
+      font-weight: 700;
+      font-size: 0.875rem;
+      color: var(--text-primary);
+    }
+
+    .day-date-new {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+
+    .today-badge-new {
+      background: linear-gradient(135deg, var(--brand-primary-light) 0%, var(--brand-primary) 100%);
+      color: white;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 0.5625rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .day-meals-new {
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .meal-section-new {
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .meal-label-new {
+      font-size: 0.625rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-secondary);
+      padding: 4px 8px;
+      background: var(--bg-secondary);
+    }
+
+    .meal-entry-new {
+      padding: 8px 10px;
+      background: white;
+      border-left: 3px solid var(--brand-primary);
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .add-meal-btn {
+      padding: 10px;
+      background: var(--bg-secondary);
+      border: 2px dashed var(--border-color);
+      border-radius: 6px;
+      color: var(--text-secondary);
+      font-size: 0.75rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .add-meal-btn:hover {
+      background: var(--brand-50);
+      border-color: var(--brand-primary);
+      color: var(--brand-primary);
+    }
+
+    .day-footer-new {
+      padding: 10px 14px;
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border-color);
+      text-align: right;
+    }
+
+    .day-calories-new {
+      font-weight: 700;
+      font-size: 0.8125rem;
+      color: var(--brand-primary);
+    }
+
+    /* ============================================
+       5. SHOPPING LIST - IMPROVED
+       ============================================ */
+    .shopping-list-new {
+      background: white;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .shopping-header-new {
+      padding: 20px 24px;
+      border-bottom: 3px solid var(--brand-primary);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .shopping-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--brand-primary);
+    }
+
+    .shopping-meta {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+
+    .item-count-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 14px;
+      background: var(--brand-primary);
+      color: white;
+      border-radius: 20px;
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
+
+    .aisle-section {
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .aisle-header-new {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 20px;
+      background: var(--bg-secondary);
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+
+    .aisle-header-new:hover {
+      background: var(--border-color);
+    }
+
+    .aisle-header-new.produce {
+      border-left: 5px solid var(--aisle-produce);
+    }
+
+    .aisle-header-new.dairy {
+      border-left: 5px solid var(--aisle-dairy);
+    }
+
+    .aisle-header-new.meat {
+      border-left: 5px solid var(--aisle-meat);
+    }
+
+    .aisle-name-new {
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .aisle-count {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 28px;
+      height: 28px;
+      background: white;
+      border-radius: 14px;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .aisle-items-new {
+      padding: 0;
+    }
+
+    .shopping-item-new {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border-color);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .shopping-item-new:last-child {
+      border-bottom: none;
+    }
+
+    .shopping-item-new:hover {
+      background: var(--bg-secondary);
+    }
+
+    .checkbox-new {
+      appearance: none;
+      width: 24px;
+      height: 24px;
+      border: 2px solid var(--border-color);
+      border-radius: 6px;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.15s ease;
+      flex-shrink: 0;
+    }
+
+    .checkbox-new:checked {
+      background: var(--success);
+      border-color: var(--success);
+    }
+
+    .checkbox-new:checked::after {
+      content: '';
+      position: absolute;
+      left: 7px;
+      top: 3px;
+      width: 6px;
+      height: 12px;
+      border: solid white;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+
+    .item-name-new {
+      flex: 1;
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      transition: all 0.2s ease;
+    }
+
+    .item-quantity-new {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      font-weight: 600;
+      padding: 4px 10px;
+      background: var(--bg-secondary);
+      border-radius: 6px;
+    }
+
+    .shopping-item-new.checked {
+      background: #f8fff8;
+    }
+
+    .shopping-item-new.checked .item-name-new {
+      text-decoration: line-through;
+      color: var(--text-secondary);
+      opacity: 0.6;
+    }
+
+    .shopping-item-new.checked .item-quantity-new {
+      opacity: 0.5;
+    }
+
+    /* ============================================
+       6. BUTTONS SHOWCASE
+       ============================================ */
+    .button-showcase {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .btn-new {
+      padding: 12px 24px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.875rem;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-new.primary {
+      background: var(--brand-primary);
+      color: white;
+    }
+
+    .btn-new.primary:hover {
+      background: var(--brand-primary-dark);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-brand);
+    }
+
+    .btn-new.secondary {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+    }
+
+    .btn-new.secondary:hover {
+      background: var(--border-color);
+    }
+
+    .btn-new.outline {
+      background: white;
+      color: var(--brand-primary);
+      border: 2px solid var(--brand-primary);
+    }
+
+    .btn-new.outline:hover {
+      background: var(--brand-50);
+    }
+
+    .btn-new.success {
+      background: var(--success);
+      color: white;
+    }
+
+    .btn-new.success:hover {
+      background: #16a34a;
+    }
+
+    /* ============================================
+       7. COMPARISON SECTION
+       ============================================ */
+    .comparison {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 768px) {
+      .comparison {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .comparison-item {
+      padding: 20px;
+      background: white;
+      border-radius: var(--radius-md);
+    }
+
+    .comparison-label {
+      font-size: 0.6875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 16px;
+      padding: 4px 10px;
+      border-radius: 4px;
+      display: inline-block;
+    }
+
+    .comparison-label.old {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+
+    .comparison-label.new {
+      background: var(--success-light);
+      color: var(--success);
+    }
+
+    /* Old styles for comparison */
+    .old-header {
+      background: var(--brand-primary);
+      padding: 16px;
+      color: white;
+      border-radius: 0;
+    }
+
+    .old-card {
+      background: white;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 16px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+
+    .old-btn {
+      padding: 8px 16px;
+      background: var(--bg-secondary);
+      border: none;
+      border-radius: 4px;
+      font-size: 0.875rem;
+      cursor: pointer;
+    }
+
+    /* Mobile Preview Frame */
+    .mobile-frame {
+      width: 375px;
+      max-width: 100%;
+      margin: 0 auto;
+      background: #f0f2f5;
+      border-radius: 24px;
+      padding: 12px;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .mobile-screen {
+      background: var(--bg-secondary);
+      border-radius: 16px;
+      overflow: hidden;
+      min-height: 600px;
+    }
+
+    .mobile-content {
+      padding: 16px;
+    }
+
+    /* Recipe Grid */
+    .recipe-grid-preview {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="preview-container">
+    <h1 style="text-align: center; margin-bottom: 40px; color: var(--brand-primary);">MyPantryPlan UI Improvements</h1>
+
+    <!-- 1. HEADER COMPARISON -->
+    <section class="preview-section">
+      <h2 class="preview-title">1. Header Design</h2>
+      <div class="comparison">
+        <div class="comparison-item">
+          <span class="comparison-label old">Current</span>
+          <div class="old-header">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 1.5rem; font-weight: 700;">MyPantryPlan</span>
+              <button class="old-btn" style="background: white; color: var(--brand-primary);">Sign In</button>
+            </div>
+          </div>
+        </div>
+        <div class="comparison-item">
+          <span class="comparison-label new">Improved</span>
+          <div class="header-new">
+            <div class="header-content-new">
+              <div class="logo-new">
+                <h1>MyPantryPlan</h1>
+              </div>
+              <div class="date-picker-new">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="4" width="18" height="18" rx="2"/>
+                  <line x1="16" y1="2" x2="16" y2="6"/>
+                  <line x1="8" y1="2" x2="8" y2="6"/>
+                  <line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>
+                Nov 25 - Dec 1
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="6 9 12 15 18 9"/>
+                </svg>
+              </div>
+              <div class="user-avatar-new">
+                <div class="avatar-circle">J</div>
+                <span class="user-name-new">John</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. RECIPE CARDS -->
+    <section class="preview-section">
+      <h2 class="preview-title">2. Recipe Cards</h2>
+      <div class="recipe-grid-preview">
+        <!-- Regular Recipe -->
+        <div class="recipe-card-new">
+          <div class="recipe-hero"></div>
+          <div class="recipe-body">
+            <div class="recipe-header-new">
+              <h3 class="recipe-name-new">Porridge with Honey</h3>
+            </div>
+            <div class="recipe-meta-new">
+              <span class="calorie-badge">440 cal</span>
+              <div class="servings-control-new">
+                <button class="servings-btn">-</button>
+                <span class="servings-value">2</span>
+                <button class="servings-btn">+</button>
+              </div>
+            </div>
+            <div class="day-pills">
+              <button class="day-pill">Mon</button>
+              <button class="day-pill selected">Tue</button>
+              <button class="day-pill">Wed</button>
+              <button class="day-pill">Thu</button>
+              <button class="day-pill">Fri</button>
+              <button class="day-pill">Sat</button>
+              <button class="day-pill">Sun</button>
+            </div>
+            <div class="recipe-actions-new">
+              <button class="action-btn-primary">View Recipe</button>
+              <button class="action-btn-secondary">Edit</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cheat Meal Recipe -->
+        <div class="recipe-card-new is-cheat">
+          <div class="recipe-hero"></div>
+          <div class="recipe-body">
+            <div class="recipe-header-new">
+              <h3 class="recipe-name-new">Double Cheeseburger</h3>
+              <span class="cheat-badge-new">Cheat</span>
+            </div>
+            <div class="recipe-meta-new">
+              <span class="calorie-badge">880 cal</span>
+              <div class="servings-control-new">
+                <button class="servings-btn">-</button>
+                <span class="servings-value">1</span>
+                <button class="servings-btn">+</button>
+              </div>
+            </div>
+            <div class="day-pills">
+              <button class="day-pill">Mon</button>
+              <button class="day-pill">Tue</button>
+              <button class="day-pill">Wed</button>
+              <button class="day-pill">Thu</button>
+              <button class="day-pill">Fri</button>
+              <button class="day-pill selected">Sat</button>
+              <button class="day-pill">Sun</button>
+            </div>
+            <div class="recipe-actions-new">
+              <button class="action-btn-primary">View Recipe</button>
+              <button class="action-btn-secondary">Edit</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. BOTTOM NAVIGATION -->
+    <section class="preview-section">
+      <h2 class="preview-title">3. Bottom Navigation</h2>
+      <div class="preview-row">
+        <div class="preview-card" style="max-width: 500px;">
+          <div class="preview-label">Improved Navigation with Active Indicator</div>
+          <div class="footer-new">
+            <nav class="footer-nav-new">
+              <button class="footer-btn-new">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                  <path d="M2 17l10 5 10-5"/>
+                  <path d="M2 12l10 5 10-5"/>
+                </svg>
+                <span>Recipes</span>
+              </button>
+              <button class="footer-btn-new active">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="4" width="18" height="18" rx="2"/>
+                  <line x1="16" y1="2" x2="16" y2="6"/>
+                  <line x1="8" y1="2" x2="8" y2="6"/>
+                  <line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>
+                <span>Plan</span>
+              </button>
+              <button class="footer-btn-new">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="11" cy="11" r="8"/>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+                <span>Search</span>
+              </button>
+              <button class="footer-btn-new">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="9" cy="21" r="1"/>
+                  <circle cx="20" cy="21" r="1"/>
+                  <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                </svg>
+                <span>Shopping</span>
+              </button>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. MEAL PLAN DAY CARDS -->
+    <section class="preview-section">
+      <h2 class="preview-title">4. Meal Plan Day Cards</h2>
+      <div class="preview-row" style="gap: 16px;">
+        <!-- Today Card -->
+        <div class="meal-day-card is-today">
+          <div class="day-header-new">
+            <div class="day-info">
+              <span class="day-name-new">Monday</span>
+              <span class="day-date-new">Nov 25</span>
+            </div>
+            <span class="today-badge-new">Today</span>
+          </div>
+          <div class="day-meals-new">
+            <div class="meal-section-new">
+              <div class="meal-label-new">Breakfast</div>
+              <div class="meal-entry-new">Porridge</div>
+            </div>
+            <div class="meal-section-new">
+              <div class="meal-label-new">Lunch</div>
+              <div class="meal-entry-new">Caesar Salad</div>
+            </div>
+            <div class="meal-section-new">
+              <div class="meal-label-new">Dinner</div>
+              <button class="add-meal-btn">+ Add</button>
+            </div>
+          </div>
+          <div class="day-footer-new">
+            <span class="day-calories-new">1,280 cal</span>
+          </div>
+        </div>
+
+        <!-- Regular Day Card -->
+        <div class="meal-day-card">
+          <div class="day-header-new">
+            <div class="day-info">
+              <span class="day-name-new">Tuesday</span>
+              <span class="day-date-new">Nov 26</span>
+            </div>
+          </div>
+          <div class="day-meals-new">
+            <div class="meal-section-new">
+              <div class="meal-label-new">Breakfast</div>
+              <div class="meal-entry-new">Eggs Benedict</div>
+            </div>
+            <div class="meal-section-new">
+              <div class="meal-label-new">Lunch</div>
+              <button class="add-meal-btn">+ Add</button>
+            </div>
+            <div class="meal-section-new">
+              <div class="meal-label-new">Dinner</div>
+              <div class="meal-entry-new">Stir Fry</div>
+            </div>
+          </div>
+          <div class="day-footer-new">
+            <span class="day-calories-new">1,620 cal</span>
+          </div>
+        </div>
+
+        <!-- Empty Day Card -->
+        <div class="meal-day-card">
+          <div class="day-header-new">
+            <div class="day-info">
+              <span class="day-name-new">Wednesday</span>
+              <span class="day-date-new">Nov 27</span>
+            </div>
+          </div>
+          <div class="day-meals-new">
+            <div class="meal-section-new">
+              <div class="meal-label-new">Breakfast</div>
+              <button class="add-meal-btn">+ Add</button>
+            </div>
+            <div class="meal-section-new">
+              <div class="meal-label-new">Lunch</div>
+              <button class="add-meal-btn">+ Add</button>
+            </div>
+            <div class="meal-section-new">
+              <div class="meal-label-new">Dinner</div>
+              <button class="add-meal-btn">+ Add</button>
+            </div>
+          </div>
+          <div class="day-footer-new">
+            <span class="day-calories-new" style="color: var(--text-secondary);">--</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. SHOPPING LIST -->
+    <section class="preview-section">
+      <h2 class="preview-title">5. Shopping List</h2>
+      <div class="preview-row">
+        <div style="flex: 1; max-width: 600px;">
+          <div class="shopping-list-new">
+            <div class="shopping-header-new">
+              <div>
+                <h2 class="shopping-title">Shopping List</h2>
+                <p class="shopping-meta">Nov 25 - Dec 1</p>
+              </div>
+              <span class="item-count-badge">12 items</span>
+            </div>
+
+            <!-- Produce Aisle -->
+            <div class="aisle-section">
+              <div class="aisle-header-new produce">
+                <span class="aisle-name-new">Produce</span>
+                <span class="aisle-count">5</span>
+              </div>
+              <div class="aisle-items-new">
+                <div class="shopping-item-new checked">
+                  <input type="checkbox" class="checkbox-new" checked>
+                  <span class="item-name-new">Bananas</span>
+                  <span class="item-quantity-new">2 pieces</span>
+                </div>
+                <div class="shopping-item-new">
+                  <input type="checkbox" class="checkbox-new">
+                  <span class="item-name-new">Spinach</span>
+                  <span class="item-quantity-new">200g</span>
+                </div>
+                <div class="shopping-item-new">
+                  <input type="checkbox" class="checkbox-new">
+                  <span class="item-name-new">Tomatoes</span>
+                  <span class="item-quantity-new">4 pieces</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Dairy Aisle -->
+            <div class="aisle-section">
+              <div class="aisle-header-new dairy">
+                <span class="aisle-name-new">Dairy & Eggs</span>
+                <span class="aisle-count">4</span>
+              </div>
+              <div class="aisle-items-new">
+                <div class="shopping-item-new">
+                  <input type="checkbox" class="checkbox-new">
+                  <span class="item-name-new">Milk</span>
+                  <span class="item-quantity-new">500ml</span>
+                </div>
+                <div class="shopping-item-new">
+                  <input type="checkbox" class="checkbox-new">
+                  <span class="item-name-new">Eggs</span>
+                  <span class="item-quantity-new">6 pieces</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Meat Aisle -->
+            <div class="aisle-section">
+              <div class="aisle-header-new meat">
+                <span class="aisle-name-new">Meat & Poultry</span>
+                <span class="aisle-count">3</span>
+              </div>
+              <div class="aisle-items-new">
+                <div class="shopping-item-new">
+                  <input type="checkbox" class="checkbox-new">
+                  <span class="item-name-new">Chicken Breast</span>
+                  <span class="item-quantity-new">500g</span>
+                </div>
+                <div class="shopping-item-new checked">
+                  <input type="checkbox" class="checkbox-new" checked>
+                  <span class="item-name-new">Ground Beef</span>
+                  <span class="item-quantity-new">400g</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. BUTTONS -->
+    <section class="preview-section">
+      <h2 class="preview-title">6. Button Styles</h2>
+      <div class="preview-card">
+        <div class="button-showcase">
+          <button class="btn-new primary">Primary Action</button>
+          <button class="btn-new secondary">Secondary</button>
+          <button class="btn-new outline">Outline</button>
+          <button class="btn-new success">Success</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. MOBILE PREVIEW -->
+    <section class="preview-section">
+      <h2 class="preview-title">7. Mobile Preview</h2>
+      <div style="display: flex; justify-content: center;">
+        <div class="mobile-frame">
+          <div class="mobile-screen">
+            <!-- Mobile Header -->
+            <div class="header-new" style="border-radius: 0;">
+              <div class="header-content-new">
+                <div class="logo-new">
+                  <h1 style="font-size: 1rem;">MyPantryPlan</h1>
+                </div>
+                <div class="user-avatar-new">
+                  <div class="avatar-circle" style="width: 28px; height: 28px; font-size: 0.75rem;">J</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Mobile Content -->
+            <div class="mobile-content">
+              <!-- Recipe Card -->
+              <div class="recipe-card-new" style="max-width: 100%; margin-bottom: 16px;">
+                <div class="recipe-hero"></div>
+                <div class="recipe-body">
+                  <div class="recipe-header-new">
+                    <h3 class="recipe-name-new" style="font-size: 1rem;">Porridge with Honey</h3>
+                  </div>
+                  <div class="recipe-meta-new">
+                    <span class="calorie-badge" style="font-size: 0.8125rem; padding: 4px 10px;">440 cal</span>
+                    <div class="servings-control-new">
+                      <button class="servings-btn" style="width: 28px; height: 28px;">-</button>
+                      <span class="servings-value" style="font-size: 0.8125rem;">2</span>
+                      <button class="servings-btn" style="width: 28px; height: 28px;">+</button>
+                    </div>
+                  </div>
+                  <div class="day-pills" style="gap: 4px;">
+                    <button class="day-pill" style="width: 32px; height: 32px; font-size: 0.625rem;">M</button>
+                    <button class="day-pill selected" style="width: 32px; height: 32px; font-size: 0.625rem;">T</button>
+                    <button class="day-pill" style="width: 32px; height: 32px; font-size: 0.625rem;">W</button>
+                    <button class="day-pill" style="width: 32px; height: 32px; font-size: 0.625rem;">T</button>
+                    <button class="day-pill" style="width: 32px; height: 32px; font-size: 0.625rem;">F</button>
+                    <button class="day-pill" style="width: 32px; height: 32px; font-size: 0.625rem;">S</button>
+                    <button class="day-pill" style="width: 32px; height: 32px; font-size: 0.625rem;">S</button>
+                  </div>
+                  <div class="recipe-actions-new">
+                    <button class="action-btn-primary" style="font-size: 0.8125rem; padding: 10px 12px;">View Recipe</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Another Card -->
+              <div class="recipe-card-new is-cheat" style="max-width: 100%;">
+                <div class="recipe-hero"></div>
+                <div class="recipe-body">
+                  <div class="recipe-header-new">
+                    <h3 class="recipe-name-new" style="font-size: 1rem;">Pizza Night</h3>
+                    <span class="cheat-badge-new">Cheat</span>
+                  </div>
+                  <div class="recipe-meta-new">
+                    <span class="calorie-badge" style="font-size: 0.8125rem; padding: 4px 10px;">750 cal</span>
+                    <div class="servings-control-new">
+                      <button class="servings-btn" style="width: 28px; height: 28px;">-</button>
+                      <span class="servings-value" style="font-size: 0.8125rem;">1</span>
+                      <button class="servings-btn" style="width: 28px; height: 28px;">+</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Mobile Footer Nav -->
+            <div style="position: absolute; bottom: 0; left: 0; right: 0;">
+              <div class="footer-new" style="border-radius: 0;">
+                <nav class="footer-nav-new">
+                  <button class="footer-btn-new active" style="padding: 8px 4px;">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                      <path d="M2 17l10 5 10-5"/>
+                      <path d="M2 12l10 5 10-5"/>
+                    </svg>
+                    <span style="font-size: 0.625rem;">Recipes</span>
+                  </button>
+                  <button class="footer-btn-new" style="padding: 8px 4px;">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="3" y="4" width="18" height="18" rx="2"/>
+                      <line x1="16" y1="2" x2="16" y2="6"/>
+                      <line x1="8" y1="2" x2="8" y2="6"/>
+                      <line x1="3" y1="10" x2="21" y2="10"/>
+                    </svg>
+                    <span style="font-size: 0.625rem;">Plan</span>
+                  </button>
+                  <button class="footer-btn-new" style="padding: 8px 4px;">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="11" cy="11" r="8"/>
+                      <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                    </svg>
+                    <span style="font-size: 0.625rem;">Search</span>
+                  </button>
+                  <button class="footer-btn-new" style="padding: 8px 4px;">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="9" cy="21" r="1"/>
+                      <circle cx="20" cy="21" r="1"/>
+                      <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                    </svg>
+                    <span style="font-size: 0.625rem;">Shop</span>
+                  </button>
+                </nav>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer style="text-align: center; padding: 40px 20px; color: var(--text-secondary); font-size: 0.875rem;">
+      <p>MyPantryPlan UI Improvements Preview</p>
+      <p style="margin-top: 8px;">Open this file in your browser to see the proposed designs</p>
+    </footer>
+  </div>
+
+  <script>
+    // Add interactivity to checkboxes
+    document.querySelectorAll('.checkbox-new').forEach(checkbox => {
+      checkbox.addEventListener('change', function() {
+        this.closest('.shopping-item-new').classList.toggle('checked', this.checked);
+      });
+    });
+
+    // Add interactivity to day pills
+    document.querySelectorAll('.day-pills').forEach(container => {
+      container.querySelectorAll('.day-pill').forEach(pill => {
+        pill.addEventListener('click', function() {
+          container.querySelectorAll('.day-pill').forEach(p => p.classList.remove('selected'));
+          this.classList.add('selected');
+        });
+      });
+    });
+
+    // Add interactivity to servings buttons
+    document.querySelectorAll('.servings-control-new').forEach(control => {
+      const value = control.querySelector('.servings-value');
+      const minusBtn = control.querySelectorAll('.servings-btn')[0];
+      const plusBtn = control.querySelectorAll('.servings-btn')[1];
+
+      minusBtn.addEventListener('click', () => {
+        let num = parseInt(value.textContent);
+        if (num > 1) value.textContent = num - 1;
+      });
+
+      plusBtn.addEventListener('click', () => {
+        let num = parseInt(value.textContent);
+        if (num < 20) value.textContent = num + 1;
+      });
+    });
+
+    // Add interactivity to nav buttons
+    document.querySelectorAll('.footer-nav-new').forEach(nav => {
+      nav.querySelectorAll('.footer-btn-new').forEach(btn => {
+        btn.addEventListener('click', function() {
+          nav.querySelectorAll('.footer-btn-new').forEach(b => b.classList.remove('active'));
+          this.classList.add('active');
+        });
+      });
+    });
+  </script>
+</body>
+</html>

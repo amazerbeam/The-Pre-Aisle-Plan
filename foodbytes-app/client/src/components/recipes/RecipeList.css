@@ -1,0 +1,94 @@
+.recipe-list-container {
+  padding: var(--spacing-md) 0;
+}
+
+.meal-tabs {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-lg);
+  overflow-x: auto;
+  padding-bottom: var(--spacing-sm);
+  -webkit-overflow-scrolling: touch;
+  /* Sticky meal tabs */
+  position: sticky;
+  top: 0;
+  background: var(--bg-secondary);
+  z-index: 90;
+  padding-top: var(--spacing-sm);
+  margin-top: calc(-1 * var(--spacing-md));
+  padding-left: var(--spacing-xs);
+  padding-right: var(--spacing-xs);
+}
+
+.meal-tab {
+  flex-shrink: 0;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.meal-tab:hover {
+  background: var(--bg-secondary);
+}
+
+.meal-tab.active {
+  background: var(--brand-primary);
+  border-color: var(--brand-primary);
+  color: white;
+}
+
+/* FR-047: Add Recipe Button for Admins */
+.add-recipe-button {
+  flex-shrink: 0;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  background: var(--success);
+  border: 1px solid var(--success);
+  border-radius: var(--radius-md);
+  color: white;
+  font-weight: 500;
+  white-space: nowrap;
+  margin-left: auto;
+  transition: all 0.2s ease;
+}
+
+.add-recipe-button:hover {
+  background: #1a7f37;
+  border-color: #1a7f37;
+}
+
+.recipe-grid {
+  display: grid;
+  gap: var(--spacing-md);
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 600px) {
+  .recipe-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 900px) {
+  .recipe-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.error-message {
+  background: #fee2e2;
+  color: #dc2626;
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  text-align: center;
+}
+
+.no-recipes {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: var(--text-secondary);
+  padding: var(--spacing-xl);
+}

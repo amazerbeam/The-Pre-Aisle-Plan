@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Copy Week - Mockup</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f5f5f5;
+    color: #333;
+    max-width: 420px;
+    margin: 0 auto;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Top bar */
+  .top-bar {
+    background: #4a3f80;
+    color: white;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 14px;
+  }
+  .top-bar .trash { opacity: 0.8; font-size: 18px; }
+  .top-bar .date-range { display: flex; align-items: center; gap: 6px; }
+  .top-bar .avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: #e0d5ff; display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+
+  /* Main content */
+  .content {
+    flex: 1;
+    padding: 16px;
+    background: white;
+    overflow-y: auto;
+  }
+
+  /* Calendar header */
+  .calendar-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #4a3f80;
+  }
+  .calendar-header h2 {
+    color: #4a3f80;
+    font-size: 1.4rem;
+    margin: 0;
+  }
+  .copy-week-button {
+    width: 34px;
+    height: 34px;
+    background: #4a3f80;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+  .copy-week-button:hover { background: #3d3469; transform: scale(1.05); }
+  .copy-week-button:active { transform: scale(0.95); }
+
+  .header-date-range {
+    color: #666;
+    font-size: 13px;
+    width: 100%;
+  }
+  .week-calories {
+    padding: 6px 14px;
+    background: #4a3f80;
+    color: white;
+    border-radius: 16px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+
+  /* Day section */
+  .day-section {
+    margin-bottom: 20px;
+  }
+  .day-header {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .day-header .day-name { font-size: 1.1rem; font-weight: 600; }
+  .day-header .day-date { color: #888; font-size: 0.9rem; }
+
+  .meal-group { margin-bottom: 12px; }
+  .meal-type {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #4a3f80;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .meal-type .emoji { font-size: 14px; }
+  .meal-entry {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+  }
+  .meal-entry .name { font-size: 0.95rem; }
+  .meal-entry .cals { color: #888; font-size: 0.85rem; }
+  .meal-entry .remove {
+    color: #ccc; font-size: 18px; cursor: pointer;
+    background: none; border: none; padding: 4px;
+  }
+  .daily-total {
+    text-align: right;
+    color: #e67e22;
+    font-weight: 500;
+    font-size: 0.9rem;
+    margin-top: 4px;
+  }
+
+  /* Bottom nav */
+  .bottom-nav {
+    display: flex;
+    background: white;
+    border-top: 1px solid #eee;
+    padding: 8px 0 12px;
+  }
+  .nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    font-size: 11px;
+    color: #999;
+    cursor: pointer;
+    background: none;
+    border: none;
+  }
+  .nav-item.active { color: #4a3f80; font-weight: 600; }
+  .nav-item .icon { font-size: 20px; }
+
+  /* ============================================ */
+  /* COPY WEEK MODAL */
+  /* ============================================ */
+  .modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.2s ease-out;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  .modal-overlay.visible {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .copy-modal {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.25);
+    width: 90%;
+    max-width: 380px;
+    animation: slideIn 0.2s ease-out;
+    overflow: hidden;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  .copy-modal-header {
+    background: #4a3f80;
+    color: white;
+    padding: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .copy-modal-title h4 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+  .copy-modal-subtitle {
+    font-size: 0.8rem;
+    opacity: 0.85;
+    margin-top: 3px;
+    display: block;
+  }
+  .copy-modal-close {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 1.8rem;
+    line-height: 1;
+    cursor: pointer;
+    width: 32px; height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+  }
+  .copy-modal-close:hover { background: rgba(255,255,255,0.2); }
+
+  .copy-modal-content { padding: 20px 16px 16px; }
+
+  .copy-date-label {
+    display: block;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+  }
+  .copy-date-input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+  }
+  .copy-date-input:focus {
+    outline: none;
+    border-color: #4a3f80;
+    box-shadow: 0 0 0 3px rgba(74,63,128,0.2);
+  }
+
+  .validation-msg {
+    font-size: 0.85rem;
+    margin-top: 8px;
+    display: none;
+  }
+  .validation-msg.error { color: #e53e3e; }
+  .validation-msg.info {
+    color: #4a3f80;
+    font-weight: 500;
+  }
+  .validation-msg.visible { display: block; }
+
+  .overwrite-warning {
+    color: #e67e22;
+    font-size: 0.85rem;
+    margin-top: 12px;
+    padding: 8px 12px;
+    background: #fef3e2;
+    border-radius: 6px;
+    border-left: 3px solid #e67e22;
+    display: none;
+  }
+  .overwrite-warning.visible { display: block; }
+
+  .copy-modal-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+  }
+  .btn-cancel, .btn-copy {
+    flex: 1;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-cancel {
+    border: 2px solid #e0e0e0;
+    background: white;
+    color: #666;
+  }
+  .btn-cancel:hover { border-color: #999; color: #333; }
+  .btn-copy {
+    border: none;
+    background: #4a3f80;
+    color: white;
+  }
+  .btn-copy:hover:not(:disabled) { background: #3d3469; }
+  .btn-copy:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .copy-modal-hint {
+    text-align: center;
+    font-size: 0.75rem;
+    color: #999;
+    padding: 8px;
+    margin: 0;
+    border-top: 1px solid #eee;
+  }
+
+  /* Tooltip arrow for the C button */
+  .tooltip {
+    position: absolute;
+    background: #333;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+    top: 100%;
+    margin-top: 4px;
+  }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <span class="trash">🗑</span>
+  <span class="date-range">16/02/2026 📅 → Feb 22</span>
+  <span class="avatar">👤</span>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="content">
+  <header class="calendar-header">
+    <h2>Meal Plan</h2>
+    <button class="copy-week-button" id="copyBtn" title="Copy this week to another week">C</button>
+    <span class="header-date-range">Feb 16 - Feb 22</span>
+    <span class="week-calories">Week Total: 8140 cal</span>
+  </header>
+
+  <!-- Mon -->
+  <div class="day-section">
+    <div class="day-header">
+      <span class="day-name">Mon</span>
+      <span class="day-date">Feb 16</span>
+    </div>
+    <div class="meal-group">
+      <div class="meal-type"><span class="emoji">🍳</span> BREAKFAST</div>
+      <div class="meal-entry">
+        <div>
+          <div class="name">Scrambled Eggs & Toast</div>
+          <div class="cals">459 cal</div>
+        </div>
+        <button class="remove">&times;</button>
+      </div>
+    </div>
+    <div class="meal-group">
+      <div class="meal-type"><span class="emoji">🍲</span> LUNCH</div>
+      <div class="meal-entry">
+        <div>
+          <div class="name">Lentil Stuffed Peppers</div>
+          <div class="cals">484 cal</div>
+        </div>
+        <button class="remove">&times;</button>
+      </div>
+    </div>
+    <div class="meal-group">
+      <div class="meal-type"><span class="emoji">🍽</span> DINNER</div>
+      <div class="meal-entry">
+        <div>
+          <div class="name">Drunken Noodles</div>
+          <div class="cals">654 cal</div>
+        </div>
+        <button class="remove">&times;</button>
+      </div>
+    </div>
+    <div class="daily-total">1597 cal</div>
+  </div>
+
+  <!-- Tue -->
+  <div class="day-section">
+    <div class="day-header">
+      <span class="day-name">Tue</span>
+      <span class="day-date">Feb 17</span>
+    </div>
+    <div class="meal-group">
+      <div class="meal-type"><span class="emoji">🍳</span> BREAKFAST</div>
+      <div class="meal-entry">
+        <div>
+          <div class="name">Hash Browns & Eggs</div>
+          <div class="cals">512 cal</div>
+        </div>
+        <button class="remove">&times;</button>
+      </div>
+    </div>
+    <div class="meal-group">
+      <div class="meal-type"><span class="emoji">🍲</span> LUNCH</div>
+      <div class="meal-entry">
+        <div>
+          <div class="name">Chicken Caesar Wrap</div>
+          <div class="cals">520 cal</div>
+        </div>
+        <button class="remove">&times;</button>
+      </div>
+    </div>
+    <div class="meal-group">
+      <div class="meal-type"><span class="emoji">🍽</span> DINNER</div>
+      <div class="meal-entry">
+        <div>
+          <div class="name">Teriyaki Salmon Bowl</div>
+          <div class="cals">680 cal</div>
+        </div>
+        <button class="remove">&times;</button>
+      </div>
+    </div>
+    <div class="daily-total">1712 cal</div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <button class="nav-item"><span class="icon">📋</span> Recipes</button>
+  <button class="nav-item active"><span class="icon">📅</span> Meal Plan</button>
+  <button class="nav-item"><span class="icon">🔍</span> Search</button>
+  <button class="nav-item"><span class="icon">🛒</span> Shopping</button>
+</div>
+
+<!-- COPY WEEK MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="copy-modal" id="copyModal">
+    <header class="copy-modal-header">
+      <div class="copy-modal-title">
+        <h4>Copy Week</h4>
+        <span class="copy-modal-subtitle">Copying from Feb 16 - Feb 22</span>
+      </div>
+      <button class="copy-modal-close" id="closeBtn">&times;</button>
+    </header>
+
+    <div class="copy-modal-content">
+      <label class="copy-date-label" for="targetDate">Copy to week starting:</label>
+      <input type="date" id="targetDate" class="copy-date-input">
+
+      <div class="validation-msg error" id="notMondayMsg">Please select a Monday</div>
+      <div class="validation-msg error" id="sameWeekMsg">Cannot copy to the same week</div>
+      <div class="validation-msg info" id="targetRangeMsg"></div>
+
+      <div class="overwrite-warning" id="overwriteWarning">
+        This will replace all meals in the target week.
+      </div>
+
+      <div class="copy-modal-actions">
+        <button class="btn-cancel" id="cancelBtn">Cancel</button>
+        <button class="btn-copy" id="confirmBtn" disabled>Copy</button>
+      </div>
+    </div>
+
+    <p class="copy-modal-hint">Press ESC or tap outside to cancel</p>
+  </div>
+</div>
+
+<script>
+  const copyBtn = document.getElementById('copyBtn')
+  const modalOverlay = document.getElementById('modalOverlay')
+  const copyModal = document.getElementById('copyModal')
+  const closeBtn = document.getElementById('closeBtn')
+  const cancelBtn = document.getElementById('cancelBtn')
+  const confirmBtn = document.getElementById('confirmBtn')
+  const targetDate = document.getElementById('targetDate')
+  const notMondayMsg = document.getElementById('notMondayMsg')
+  const sameWeekMsg = document.getElementById('sameWeekMsg')
+  const targetRangeMsg = document.getElementById('targetRangeMsg')
+  const overwriteWarning = document.getElementById('overwriteWarning')
+
+  const SOURCE_START = '2026-02-16' // The current week's Monday
+
+  function openModal() {
+    modalOverlay.classList.add('visible')
+    targetDate.value = ''
+    resetValidation()
+  }
+
+  function closeModal() {
+    modalOverlay.classList.remove('visible')
+  }
+
+  function resetValidation() {
+    notMondayMsg.classList.remove('visible')
+    sameWeekMsg.classList.remove('visible')
+    targetRangeMsg.classList.remove('visible')
+    overwriteWarning.classList.remove('visible')
+    confirmBtn.disabled = true
+  }
+
+  function isMonday(dateStr) {
+    if (!dateStr) return false
+    const [y, m, d] = dateStr.split('-').map(Number)
+    const date = new Date(y, m - 1, d)
+    return date.getDay() === 1
+  }
+
+  function formatShort(dateStr) {
+    const [y, m, d] = dateStr.split('-').map(Number)
+    const date = new Date(y, m - 1, d)
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+  }
+
+  function validate() {
+    resetValidation()
+    const val = targetDate.value
+    if (!val) return
+
+    if (!isMonday(val)) {
+      notMondayMsg.classList.add('visible')
+      return
+    }
+
+    if (val === SOURCE_START) {
+      sameWeekMsg.classList.add('visible')
+      return
+    }
+
+    // Valid Monday, different from source
+    const [y, m, d] = val.split('-').map(Number)
+    const end = new Date(y, m - 1, d)
+    end.setDate(end.getDate() + 6)
+    const endStr = end.toISOString().split('T')[0]
+    targetRangeMsg.textContent = `Target: ${formatShort(val)} - ${formatShort(endStr)}`
+    targetRangeMsg.classList.add('visible')
+    overwriteWarning.classList.add('visible')
+    confirmBtn.disabled = false
+  }
+
+  copyBtn.addEventListener('click', openModal)
+  closeBtn.addEventListener('click', closeModal)
+  cancelBtn.addEventListener('click', closeModal)
+  targetDate.addEventListener('input', validate)
+
+  confirmBtn.addEventListener('click', () => {
+    confirmBtn.textContent = 'Copying...'
+    confirmBtn.disabled = true
+    setTimeout(() => {
+      closeModal()
+      confirmBtn.textContent = 'Copy'
+      alert('Week copied to ' + targetDate.value + '! (In the real app, you would navigate to the target week.)')
+    }, 1000)
+  })
+
+  // Close on click outside
+  modalOverlay.addEventListener('click', (e) => {
+    if (e.target === modalOverlay) closeModal()
+  })
+
+  // Close on ESC
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeModal()
+  })
+</script>
+
+</body>
+</html>

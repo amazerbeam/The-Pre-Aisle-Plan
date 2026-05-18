@@ -1,0 +1,46 @@
+# TODO 
+
+
+
+##Issues##
+
+
+
+Linked meals: 
+	I want to be able to create different version of the same meal. Thses recipes would be linked. 
+	
+	For example : 
+		I could have a Curry sauce recie 
+		1 with Rice and chicken - Base Recipe 
+		1 with Rice and tofu and create - Vegatarian  
+		1 with Rice and tofu and cashew Create - Vegan
+		1 with chicken and veg (No Carbs) 
+	A dropdown across from the "Meal Name" will have all the different options if there are any. 
+	
+	we need a link table to link all the recipes and we need to mark one as the default. 
+
+Shared Meal Plans :
+	Be able to link with another user. So Karen and I can have the same "Meal plan" this way if she changes the plan mine will also update. She or I can set a meal plan and this will update for both of us. Basically we'll both share meal plan. 
+
+
+NF: 
+Guest, Vs Paid VS logged in only.
+ Also free Month trial of full access, give free month trials to users that share the app the other users
+A  way to get users to spread the app around.   
+
+NF: Extras
+
+	An "extras" section (or a better named) This section will be things that go with meals. For example, the "Bean burretio" uses a "Flat Bread". The "Flat Bread" would be in the Extras section. Things in the exta section do not get added to the meal plan, but will be added to shopping list. 
+
+
+	If a user clicks on a meal that is "Linked" to 1 or More "Extras" they'll be promoted with "Home made " + ExtraName + " or Store bought" with a button to select both, and a check box to say "Don't ask me again" 
+	Inside the. 
+
+	Inside the "Meal" say "Burretio" beside "Flat Bread" there will be a check box "Home Made" this is where the user can change this "If they've selected Don't ask me again", but this checkbox will always be there. 
+
+User Perfrences: 
+	Inside the user profile, they user will have "perference" or something. First setting will be "Default Servings" this will set all recipes to this default number, so if the user wants to always see 2 servings then this is where the set that. It'll be above "Sign out" onlt logged in users can see this. 
+
+Remove Snacks: 
+	Remove the snacks section
+	

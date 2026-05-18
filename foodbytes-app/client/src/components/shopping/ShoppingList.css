@@ -1,0 +1,412 @@
+/* Shopping List Styles */
+
+/* Page Container */
+.shopping-list-page {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* Header */
+.shopping-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-lg);
+  padding-bottom: var(--spacing-md);
+  border-bottom: 2px solid var(--brand-primary);
+  gap: var(--spacing-md);
+}
+
+.header-left {
+  flex: 1;
+}
+
+.shopping-list-header h1 {
+  font-size: 1.75rem;
+  color: var(--brand-primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.date-range {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  margin-bottom: var(--spacing-xs);
+}
+
+.item-count {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.generated-at {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  margin-top: var(--spacing-xs);
+}
+
+.header-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-shrink: 0;
+}
+
+.generate-list-btn {
+  white-space: nowrap;
+  padding: var(--spacing-sm) var(--spacing-md);
+}
+
+.uncheck-all-btn {
+  white-space: nowrap;
+  padding: var(--spacing-sm) var(--spacing-md);
+}
+
+/* Content Area */
+.shopping-list-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+/* Aisle Section */
+.shopping-aisle {
+  background: white;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+}
+
+.aisle-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md);
+  background: var(--bg-secondary);
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s ease;
+}
+
+.aisle-header:hover {
+  background: var(--border-color);
+}
+
+.aisle-header:focus {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: -2px;
+}
+
+.aisle-name {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--brand-primary);
+  margin: 0;
+}
+
+.expand-icon {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  transition: transform 0.2s ease;
+}
+
+/* Aisle Items */
+.aisle-items {
+  padding: var(--spacing-sm);
+}
+
+/* Shopping Item */
+.shopping-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-sm);
+  border-left: 4px solid var(--aisle-misc);
+  cursor: pointer;
+  transition: opacity 0.3s ease, transform 0.2s ease, background-color 0.15s ease;
+  user-select: none;
+}
+
+.shopping-item:hover {
+  background: var(--bg-secondary);
+  transform: translateX(4px);
+}
+
+.shopping-item:focus {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: -2px;
+}
+
+/* Checkbox */
+.shopping-item input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  flex-shrink: 0;
+  margin: 0;
+  accent-color: var(--brand-primary);
+}
+
+/* Item Text */
+.item-name {
+  flex: 1;
+  font-size: 1rem;
+  color: var(--text-primary);
+  transition: all 0.2s ease;
+}
+
+.item-quantity {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+/* Checked State */
+.shopping-item.checked {
+  transition: opacity 0.3s ease 0.1s;
+}
+
+/* FR-042: Long Press State */
+.shopping-item.long-pressing {
+  background: var(--bg-secondary);
+  animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.long-press-indicator {
+  font-size: 0.75rem;
+  color: var(--brand-primary);
+  font-weight: 500;
+  animation: fadeIn 0.2s ease-out;
+  background: rgba(74, 63, 128, 0.1);
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.shopping-item.checked .item-name,
+.shopping-item.checked .item-quantity {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+/* Loading State */
+.loading {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: var(--spacing-xl);
+  gap: var(--spacing-md);
+}
+
+.loading p {
+  color: var(--text-secondary);
+}
+
+/* FR-103: Generating State (shows with minimum 2s display) */
+.generating {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: var(--spacing-xl);
+  gap: var(--spacing-md);
+  min-height: 200px;
+}
+
+.generating p {
+  color: var(--brand-primary);
+  font-weight: 500;
+  font-size: 1.1rem;
+}
+
+/* Error State */
+.error {
+  padding: var(--spacing-lg);
+  background: #fee;
+  border: 1px solid var(--error);
+  border-radius: var(--radius-md);
+  color: var(--error);
+  text-align: center;
+}
+
+/* Empty State */
+.empty-state {
+  padding: var(--spacing-xl);
+  text-align: center;
+  background: white;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+}
+
+.empty-state p {
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.empty-state p:last-child {
+  margin-bottom: 0;
+}
+
+.empty-state.no-list {
+  padding: var(--spacing-xl) var(--spacing-lg);
+}
+
+.empty-state .generate-btn {
+  margin-top: var(--spacing-lg);
+  padding: var(--spacing-md) var(--spacing-xl);
+  font-size: 1rem;
+}
+
+.error .generate-btn {
+  margin-top: var(--spacing-md);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .shopping-list-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .header-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .generate-list-btn,
+  .uncheck-all-btn {
+    width: 100%;
+  }
+
+  .shopping-list-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .shopping-item {
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+
+  .item-name {
+    font-size: 0.9375rem;
+  }
+
+  .item-quantity {
+    font-size: 0.8125rem;
+  }
+}
+
+/* Tablet Responsive */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .shopping-list-page {
+    max-width: 700px;
+  }
+}
+
+/* Aisle-specific color coding via data-aisle attribute */
+.shopping-item[data-aisle="produce"] {
+  border-left-color: var(--aisle-produce);
+}
+
+.shopping-item[data-aisle="dairy & eggs"],
+.shopping-item[data-aisle="dairy"] {
+  border-left-color: var(--aisle-dairy);
+}
+
+.shopping-item[data-aisle="meat & poultry"],
+.shopping-item[data-aisle="meat"] {
+  border-left-color: var(--aisle-meat);
+}
+
+.shopping-item[data-aisle="seafood"] {
+  border-left-color: var(--aisle-seafood);
+}
+
+.shopping-item[data-aisle="bakery"] {
+  border-left-color: var(--aisle-bakery);
+}
+
+.shopping-item[data-aisle="grains & pasta"],
+.shopping-item[data-aisle="grains"] {
+  border-left-color: var(--aisle-grains);
+}
+
+.shopping-item[data-aisle="canned goods"],
+.shopping-item[data-aisle="canned"] {
+  border-left-color: var(--aisle-canned);
+}
+
+.shopping-item[data-aisle="condiments & sauces"],
+.shopping-item[data-aisle="condiments"] {
+  border-left-color: var(--aisle-condiments);
+}
+
+.shopping-item[data-aisle="snacks"] {
+  border-left-color: var(--aisle-snacks);
+}
+
+.shopping-item[data-aisle="beverages"] {
+  border-left-color: var(--aisle-beverages);
+}
+
+.shopping-item[data-aisle="frozen foods"],
+.shopping-item[data-aisle="frozen"] {
+  border-left-color: var(--aisle-frozen);
+}
+
+.shopping-item[data-aisle="spices & seasonings"],
+.shopping-item[data-aisle="spices"] {
+  border-left-color: var(--aisle-spices);
+}
+
+.shopping-item[data-aisle="oils & vinegars"],
+.shopping-item[data-aisle="oils"] {
+  border-left-color: var(--aisle-oils);
+}
+
+.shopping-item[data-aisle="baking supplies"],
+.shopping-item[data-aisle="baking"] {
+  border-left-color: var(--aisle-baking);
+}
+
+.shopping-item[data-aisle="miscellaneous"],
+.shopping-item[data-aisle="misc"] {
+  border-left-color: var(--aisle-misc);
+}
+
+/* Print styles for shopping list */
+@media print {
+  .shopping-list-header button {
+    display: none;
+  }
+
+  .shopping-aisle {
+    page-break-inside: avoid;
+  }
+
+  .shopping-item {
+    border-left-width: 2px;
+  }
+
+  .shopping-item input[type="checkbox"] {
+    -webkit-appearance: checkbox;
+    appearance: checkbox;
+  }
+}

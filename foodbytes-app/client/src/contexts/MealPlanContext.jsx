@@ -1,0 +1,547 @@
+import { createContext, useState, useEffect, useContext, useCallback, useRef } from 'react'
+import { useAuth } from './AuthContext'
+import mealPlanService from '../services/mealPlanService'
+import mealPlanTemplateService from '../services/mealPlanTemplateService'
+import { getTodayISO, addDays, formatDateISO, getWeekDays } from '../utils/dateUtils'
+
+const MealPlanContext = createContext()
+
+// Map meal type string to meal ID
+const MEAL_TYPE_MAP = {
+  breakfast: 1,
+  lunch: 2,
+  dinner: 3,
+  snacks: 4,
+  extras: 5
+}
+
+const MEAL_ID_TO_TYPE = {
+  1: 'breakfast',
+  2: 'lunch',
+  3: 'dinner',
+  4: 'snacks',
+  5: 'extras'
+}
+
+// localStorage key for persisting startDate
+const START_DATE_STORAGE_KEY = 'foodbytes_startDate'
+
+// FR-103: Shopping list cache key (shared with ShoppingListContext)
+const SHOPPING_LIST_INVALIDATED_KEY = 'shoppingListInvalidated'
+
+/**
+ * FR-103: Invalidate shopping list cache when meal plan changes
+ * Called directly to avoid circular dependency with ShoppingListContext
+ */
+const invalidateShoppingListCache = () => {
+  try {
+    localStorage.setItem(SHOPPING_LIST_INVALIDATED_KEY, 'true')
+  } catch (err) {
+    console.error('Failed to invalidate shopping list cache:', err)
+  }
+}
+
+/**
+ * Get initial start date from localStorage or default to today
+ */
+const getInitialStartDate = () => {
+  try {
+    const saved = localStorage.getItem(START_DATE_STORAGE_KEY)
+    if (saved) {
+      // Validate it's a valid date string
+      const date = new Date(saved)
+      if (!isNaN(date.getTime())) {
+        return saved
+      }
+    }
+  } catch (err) {
+    console.error('Failed to read startDate from localStorage:', err)
+  }
+  return getTodayISO()
+}
+
+/**
+ * MealPlanProvider - Manages global meal plan state
+ * Supports FR-007 (date range), FR-014 (assign), FR-015 (remove), FR-016 (calendar), FR-017 (calories)
+ * FR-098: Optimistic UI updates for instant feedback
+ */
+export const MealPlanProvider = ({ children }) => {
+  const { isAuthenticated } = useAuth()
+
+  // FR-007: Date range state - initialize from localStorage
+  const initialDate = getInitialStartDate()
+  const [startDate, setStartDateState] = useState(initialDate)
+  const [endDate, setEndDate] = useState(formatDateISO(addDays(initialDate, 6)))
+  const [weekDays, setWeekDays] = useState(getWeekDays(initialDate))
+
+  // Meal plan entries
+  const [weekPlan, setWeekPlan] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
+
+  // FR-098: Assignment error state for optimistic UI rollback feedback
+  const [assignmentError, setAssignmentError] = useState(null)
+
+  // Saved meal-plan templates
+  const [templates, setTemplates] = useState([])
+  const [templatesLoaded, setTemplatesLoaded] = useState(false)
+
+  // Track pending operations to prevent duplicate requests
+  const pendingOperations = useRef(new Set())
+
+  /**
+   * FR-007: Update start date and recalculate week
+   * Persists to localStorage for use across Recipes, Meal Plan, and Shopping List
+   */
+  const setStartDate = useCallback((newStartDate) => {
+    setStartDateState(newStartDate)
+    setEndDate(formatDateISO(addDays(newStartDate, 6)))
+    setWeekDays(getWeekDays(newStartDate))
+
+    // Persist to localStorage
+    try {
+      localStorage.setItem(START_DATE_STORAGE_KEY, newStartDate)
+    } catch (err) {
+      console.error('Failed to save startDate to localStorage:', err)
+    }
+  }, [])
+
+  /**
+   * Fetch the week plan from the server
+   */
+  const fetchWeekPlan = useCallback(async () => {
+    if (!isAuthenticated) {
+      setWeekPlan(null)
+      return
+    }
+
+    setLoading(true)
+    setError(null)
+
+    try {
+      const data = await mealPlanService.getWeekPlan(startDate)
+      setWeekPlan(data)
+    } catch (err) {
+      console.error('Failed to fetch meal plan:', err)
+      setError('Failed to load meal plan')
+      setWeekPlan(null)
+    } finally {
+      setLoading(false)
+    }
+  }, [isAuthenticated, startDate])
+
+  // Fetch week plan when startDate or auth changes
+  useEffect(() => {
+    fetchWeekPlan()
+  }, [fetchWeekPlan])
+
+  /**
+   * FR-098: Clear assignment error
+   */
+  const clearAssignmentError = useCallback(() => {
+    setAssignmentError(null)
+  }, [])
+
+  /**
+   * FR-098: Apply optimistic update to weekPlan
+   * Returns the previous state for potential rollback
+   */
+  const applyOptimisticUpdate = useCallback((recipeId, planDate, mealId, servings, recipeData, isRemoving) => {
+    const previousWeekPlan = weekPlan
+    const mealType = MEAL_ID_TO_TYPE[mealId]
+
+    setWeekPlan(currentPlan => {
+      if (!currentPlan || !currentPlan.days) return currentPlan
+
+      const newPlan = {
+        ...currentPlan,
+        days: currentPlan.days.map(day => {
+          if (day.date !== planDate) return day
+
+          const currentEntries = day.mealsByType?.[mealType] || []
+          let newEntries
+          let caloriesDelta = 0
+
+          if (isRemoving) {
+            // Remove the recipe
+            const entryToRemove = currentEntries.find(e => e.recipe?.id === recipeId)
+            if (entryToRemove) {
+              // Backend calculates per-serving calories: recipe.calories / recipe.defaultServings
+              const entryCalories = (entryToRemove.recipe?.calories || 0) / (entryToRemove.recipe?.defaultServings || 1)
+              caloriesDelta = -entryCalories
+            }
+            newEntries = currentEntries.filter(e => e.recipe?.id !== recipeId)
+          } else {
+            // Add or replace recipe
+            // First remove any existing entry for this meal slot (swap behavior)
+            const existingEntry = currentEntries[0]
+            if (existingEntry) {
+              // Backend calculates per-serving calories: recipe.calories / recipe.defaultServings
+              const existingCalories = (existingEntry.recipe?.calories || 0) / (existingEntry.recipe?.defaultServings || 1)
+              caloriesDelta -= existingCalories
+            }
+            // Add new entry - per-serving calories (matches backend calculation)
+            const recipeCalories = recipeData?.calories || 0
+            const defaultServings = recipeData?.defaultServings || 1
+            caloriesDelta += recipeCalories / defaultServings
+
+            newEntries = [{
+              id: Date.now(), // Temporary ID
+              recipe: recipeData,
+              servings: servings
+            }]
+          }
+
+          return {
+            ...day,
+            mealsByType: {
+              ...day.mealsByType,
+              [mealType]: newEntries
+            },
+            totalCalories: Math.round((day.totalCalories || 0) + caloriesDelta)
+          }
+        })
+      }
+
+      return newPlan
+    })
+
+    return previousWeekPlan
+  }, [weekPlan])
+
+  /**
+   * FR-014: Check if a recipe is assigned to a specific date and meal type
+   * @param {number} recipeId
+   * @param {string} planDate - ISO format
+   * @param {string} mealType - 'breakfast', 'lunch', 'dinner', 'snacks'
+   * @returns {boolean}
+   */
+  const isRecipeAssigned = useCallback((recipeId, planDate, mealType) => {
+    if (!weekPlan || !weekPlan.days) return false
+
+    const day = weekPlan.days.find(d => d.date === planDate)
+    if (!day || !day.mealsByType) return false
+
+    const entries = day.mealsByType[mealType] || []
+    return entries.some(entry => entry.recipe?.id === recipeId)
+  }, [weekPlan])
+
+  /**
+   * FR-014, FR-098: Assign recipe to a date with optimistic UI
+   * @param {number} recipeId
+   * @param {string} planDate - ISO format
+   * @param {number} mealId
+   * @param {number} servings
+   * @param {Object} recipeData - Recipe object with calories for optimistic update
+   * @returns {boolean} true if this will be an assignment, false if removal
+   */
+  const assignRecipe = useCallback((recipeId, planDate, mealId, servings = 1, recipeData = null) => {
+    if (!isAuthenticated) {
+      throw new Error('Authentication required')
+    }
+
+    // Prevent duplicate operations
+    const operationKey = `${recipeId}-${planDate}-${mealId}`
+    if (pendingOperations.current.has(operationKey)) {
+      return
+    }
+    pendingOperations.current.add(operationKey)
+
+    // Clear any previous error
+    setAssignmentError(null)
+
+    // Check if this is a removal (recipe already assigned)
+    const mealType = MEAL_ID_TO_TYPE[mealId]
+    const isCurrentlyAssigned = isRecipeAssigned(recipeId, planDate, mealType)
+
+    // FR-098: Apply optimistic update immediately
+    const previousState = applyOptimisticUpdate(recipeId, planDate, mealId, servings, recipeData, isCurrentlyAssigned)
+
+    // Fire API call in background (don't await)
+    mealPlanService.assignRecipe(planDate, mealId, recipeId, servings)
+      .then(() => {
+        // FR-103: Invalidate shopping list cache on successful meal plan change
+        invalidateShoppingListCache()
+        // Success - silently refresh to sync with server (gets real IDs, etc.)
+        return fetchWeekPlan()
+      })
+      .catch((err) => {
+        console.error('Failed to assign recipe:', err)
+        // Rollback to previous state
+        setWeekPlan(previousState)
+        // Show error to user
+        setAssignmentError('Failed to save. Please try again.')
+        // Auto-clear error after 3 seconds
+        setTimeout(() => setAssignmentError(null), 3000)
+      })
+      .finally(() => {
+        pendingOperations.current.delete(operationKey)
+      })
+
+    // Return immediately with expected result
+    return !isCurrentlyAssigned
+  }, [isAuthenticated, isRecipeAssigned, applyOptimisticUpdate, fetchWeekPlan])
+
+  /**
+   * FR-015: Remove a specific meal plan entry
+   * @param {number} entryId
+   */
+  const removeEntry = useCallback(async (entryId) => {
+    if (!isAuthenticated) {
+      throw new Error('Authentication required')
+    }
+
+    try {
+      await mealPlanService.removeEntry(entryId)
+      // FR-103: Invalidate shopping list cache on successful removal
+      invalidateShoppingListCache()
+      // Refresh the week plan
+      await fetchWeekPlan()
+    } catch (err) {
+      console.error('Failed to remove entry:', err)
+      throw err
+    }
+  }, [isAuthenticated, fetchWeekPlan])
+
+  /**
+   * Swap all meals between two dates
+   * @param {string} sourceDateISO - ISO format date string (YYYY-MM-DD)
+   * @param {string} targetDateISO - ISO format date string (YYYY-MM-DD)
+   */
+  const swapDayMeals = useCallback(async (sourceDateISO, targetDateISO) => {
+    if (!isAuthenticated) {
+      throw new Error('Authentication required')
+    }
+
+    // Apply optimistic UI update by swapping days in state
+    const previousWeekPlan = weekPlan
+    setWeekPlan(currentPlan => {
+      if (!currentPlan || !currentPlan.days) return currentPlan
+
+      const sourceIndex = currentPlan.days.findIndex(d => d.date === sourceDateISO)
+      const targetIndex = currentPlan.days.findIndex(d => d.date === targetDateISO)
+
+      if (sourceIndex === -1 || targetIndex === -1) return currentPlan
+
+      const newDays = [...currentPlan.days]
+      const sourceDay = { ...newDays[sourceIndex] }
+      const targetDay = { ...newDays[targetIndex] }
+
+      // Swap the meal data but keep the date metadata
+      newDays[sourceIndex] = {
+        ...sourceDay,
+        mealsByType: targetDay.mealsByType,
+        totalCalories: targetDay.totalCalories,
+        totalProtein: targetDay.totalProtein,
+        totalCarbs: targetDay.totalCarbs,
+        totalFat: targetDay.totalFat
+      }
+      newDays[targetIndex] = {
+        ...targetDay,
+        mealsByType: sourceDay.mealsByType,
+        totalCalories: sourceDay.totalCalories,
+        totalProtein: sourceDay.totalProtein,
+        totalCarbs: sourceDay.totalCarbs,
+        totalFat: sourceDay.totalFat
+      }
+
+      return { ...currentPlan, days: newDays }
+    })
+
+    try {
+      await mealPlanService.swapDays(sourceDateISO, targetDateISO)
+      // FR-103: Invalidate shopping list cache on successful swap
+      invalidateShoppingListCache()
+      // Refresh to sync with server
+      await fetchWeekPlan()
+    } catch (err) {
+      console.error('Failed to swap days:', err)
+      // Rollback on error
+      setWeekPlan(previousWeekPlan)
+      setAssignmentError('Failed to swap days. Please try again.')
+      setTimeout(() => setAssignmentError(null), 3000)
+      throw err
+    }
+  }, [isAuthenticated, weekPlan, fetchWeekPlan])
+
+  /**
+   * Copy all meals from the current week to a target week.
+   * On success, navigates to the target week.
+   * @param {string} targetStartDate - ISO format date string (YYYY-MM-DD) for target Monday
+   */
+  const copyWeek = useCallback(async (targetStartDate) => {
+    if (!isAuthenticated) {
+      throw new Error('Authentication required')
+    }
+
+    try {
+      const result = await mealPlanService.copyWeek(startDate, targetStartDate)
+      invalidateShoppingListCache()
+      setWeekPlan(result)
+      setStartDate(targetStartDate)
+    } catch (err) {
+      console.error('Failed to copy week:', err)
+      setAssignmentError('Failed to copy week. Please try again.')
+      setTimeout(() => setAssignmentError(null), 3000)
+      throw err
+    }
+  }, [isAuthenticated, startDate, setStartDate])
+
+  /**
+   * Saved meal-plan templates: load list (cached after first call).
+   */
+  const loadTemplates = useCallback(async ({ force = false } = {}) => {
+    if (!isAuthenticated) {
+      setTemplates([])
+      setTemplatesLoaded(false)
+      return []
+    }
+    if (templatesLoaded && !force) return templates
+    try {
+      const data = await mealPlanTemplateService.list()
+      setTemplates(data)
+      setTemplatesLoaded(true)
+      return data
+    } catch (err) {
+      console.error('Failed to load meal-plan templates:', err)
+      throw err
+    }
+  }, [isAuthenticated, templates, templatesLoaded])
+
+  // Reload templates list whenever auth changes
+  useEffect(() => {
+    if (isAuthenticated) {
+      loadTemplates({ force: true }).catch(() => {})
+    } else {
+      setTemplates([])
+      setTemplatesLoaded(false)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated])
+
+  const saveTemplate = useCallback(async (name) => {
+    if (!isAuthenticated) throw new Error('Authentication required')
+    const created = await mealPlanTemplateService.create(name, startDate)
+    await loadTemplates({ force: true })
+    return created
+  }, [isAuthenticated, startDate, loadTemplates])
+
+  const renameTemplate = useCallback(async (templateId, newName) => {
+    if (!isAuthenticated) throw new Error('Authentication required')
+    const updated = await mealPlanTemplateService.rename(templateId, newName)
+    await loadTemplates({ force: true })
+    return updated
+  }, [isAuthenticated, loadTemplates])
+
+  const updateTemplateSnapshot = useCallback(async (templateId) => {
+    if (!isAuthenticated) throw new Error('Authentication required')
+    const updated = await mealPlanTemplateService.updateSnapshot(templateId, startDate)
+    await loadTemplates({ force: true })
+    return updated
+  }, [isAuthenticated, startDate, loadTemplates])
+
+  const deleteTemplate = useCallback(async (templateId) => {
+    if (!isAuthenticated) throw new Error('Authentication required')
+    await mealPlanTemplateService.remove(templateId)
+    await loadTemplates({ force: true })
+  }, [isAuthenticated, loadTemplates])
+
+  /**
+   * Apply a saved template to the currently-displayed week.
+   * Replace-all: backend deletes every entry in the target week, then inserts
+   * template entries with planDate = startDate + dayOffset. Mirrors copyWeek's
+   * shopping-list cache invalidation since the live week is mutated.
+   */
+  const applyTemplate = useCallback(async (templateId) => {
+    if (!isAuthenticated) throw new Error('Authentication required')
+    try {
+      const result = await mealPlanTemplateService.apply(templateId, startDate)
+      invalidateShoppingListCache()
+      setWeekPlan(result)
+      return result
+    } catch (err) {
+      console.error('Failed to apply template:', err)
+      setAssignmentError('Failed to apply template. Please try again.')
+      setTimeout(() => setAssignmentError(null), 3000)
+      throw err
+    }
+  }, [isAuthenticated, startDate])
+
+  /**
+   * Get all entries for a specific date
+   * @param {string} planDate - ISO format
+   * @returns {Object} Map of mealType to entries
+   */
+  const getEntriesForDay = useCallback((planDate) => {
+    if (!weekPlan || !weekPlan.days) return {}
+
+    const day = weekPlan.days.find(d => d.date === planDate)
+    return day?.mealsByType || {}
+  }, [weekPlan])
+
+  /**
+   * FR-017: Get total calories for a specific date
+   * @param {string} planDate - ISO format
+   * @returns {number}
+   */
+  const getDailyCalories = useCallback((planDate) => {
+    if (!weekPlan || !weekPlan.days) return 0
+
+    const day = weekPlan.days.find(d => d.date === planDate)
+    return day?.totalCalories || 0
+  }, [weekPlan])
+
+  const value = {
+    // Date range (FR-007)
+    startDate,
+    endDate,
+    weekDays,
+    setStartDate,
+
+    // Meal plan data
+    weekPlan,
+    loading,
+    error,
+
+    // FR-098: Assignment error for optimistic UI feedback
+    assignmentError,
+    clearAssignmentError,
+
+    // Operations
+    fetchWeekPlan,
+    assignRecipe,
+    removeEntry,
+    swapDayMeals,
+    copyWeek,
+
+    // Saved templates
+    templates,
+    loadTemplates,
+    saveTemplate,
+    renameTemplate,
+    updateTemplateSnapshot,
+    deleteTemplate,
+    applyTemplate,
+
+    // Helpers
+    isRecipeAssigned,
+    getEntriesForDay,
+    getDailyCalories
+  }
+
+  return (
+    <MealPlanContext.Provider value={value}>
+      {children}
+    </MealPlanContext.Provider>
+  )
+}
+
+export const useMealPlan = () => {
+  const context = useContext(MealPlanContext)
+  if (!context) {
+    throw new Error('useMealPlan must be used within a MealPlanProvider')
+  }
+  return context
+}
+
+export default MealPlanContext

@@ -1,0 +1,1637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recipe Card Mockups - Pill Bar Style</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --brand-primary: #4a3f80;
+      --brand-primary-dark: #3a3266;
+      --brand-primary-light: #6b5fa0;
+      --text-primary: #2c3e50;
+      --text-secondary: #5a6c7d;
+      --bg-secondary: #f8f9fa;
+      --border-color: #e5e7eb;
+      --white: #ffffff;
+      --success: #22c55e;
+      --warning: #f59e0b;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #f0f0f5;
+      padding: 20px;
+    }
+
+    .mockup-container {
+      max-width: 400px;
+      margin: 0 auto 40px;
+      background: white;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+
+    .mockup-label {
+      background: #2c3e50;
+      color: white;
+      padding: 12px 16px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .mockup-label span {
+      opacity: 0.7;
+      font-weight: 400;
+      margin-left: 8px;
+    }
+
+    .mockup-label .admin-badge {
+      background: #f59e0b;
+      color: #000;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      margin-left: 8px;
+      font-weight: 600;
+    }
+
+    /* Section Titles */
+    h2.section-title {
+      max-width: 400px;
+      margin: 40px auto 16px;
+      font-size: 1.5rem;
+      color: var(--text-primary);
+    }
+
+    p.section-desc {
+      max-width: 400px;
+      margin: 0 auto 16px;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    /* Legend */
+    .legend {
+      max-width: 400px;
+      margin: 0 auto 40px;
+      background: white;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .legend h3 {
+      font-size: 0.9rem;
+      margin-bottom: 12px;
+      color: var(--text-primary);
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .legend-item:last-child {
+      border-bottom: none;
+    }
+
+    .legend-icon {
+      width: 32px;
+      height: 32px;
+      background: var(--bg-secondary);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 14px;
+    }
+
+    .legend-text strong {
+      display: block;
+      font-size: 0.85rem;
+      color: var(--text-primary);
+    }
+
+    .legend-text span {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+
+    /* ========== BASE RECIPE CARD STYLES ========== */
+    .recipe-card {
+      padding: 16px;
+    }
+
+    .recipe-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .recipe-name {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1.3;
+      flex: 1;
+      margin-right: 8px;
+    }
+
+    .recipe-actions {
+      display: flex;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+
+    .icon-btn {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-secondary);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      color: var(--text-secondary);
+      transition: all 0.2s;
+    }
+
+    .icon-btn:hover {
+      background: var(--brand-primary);
+      color: white;
+    }
+
+    .icon-btn svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* Meta Row - Calories & Variant */
+    .recipe-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .cal-dropdown {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 8px;
+      background: var(--bg-secondary);
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      cursor: pointer;
+      border: none;
+    }
+
+    .cal-dropdown:hover {
+      background: #e5e7eb;
+    }
+
+    .cal-dropdown svg {
+      width: 12px;
+      height: 12px;
+      opacity: 0.6;
+    }
+
+    .variant-badge {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      padding: 4px 8px;
+      background: var(--bg-secondary);
+      border-radius: 4px;
+    }
+
+    /* Servings */
+    .servings-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .servings-label {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    .servings-input {
+      width: 50px;
+      padding: 6px 8px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      font-size: 0.9rem;
+      text-align: center;
+    }
+
+    /* Day Buttons Grid */
+    .days-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+    }
+
+    .day-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 6px 4px;
+      background: var(--bg-secondary);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .day-btn:hover {
+      background: #e5e7eb;
+    }
+
+    .day-btn.selected {
+      background: var(--brand-primary);
+      color: white;
+    }
+
+    .day-btn.has-meal {
+      background: #e8f5e9;
+    }
+
+    .day-btn.has-meal.selected {
+      background: var(--brand-primary);
+    }
+
+    .day-cal {
+      font-size: 0.7rem;
+      font-weight: 500;
+      margin-bottom: 2px;
+    }
+
+    .day-btn.selected .day-cal {
+      color: rgba(255,255,255,0.9);
+    }
+
+    .day-name {
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    /* ========== DESIGN 1: Current Style (Baseline) ========== */
+    /* Uses base styles above */
+
+    /* ========== DESIGN 2: Pill Bar Layout ========== */
+    .design-2 .meta-pill {
+      display: flex;
+      align-items: center;
+      background: var(--bg-secondary);
+      border-radius: 20px;
+      padding: 4px;
+      margin-bottom: 12px;
+      gap: 4px;
+    }
+
+    .design-2 .cal-dropdown {
+      background: white;
+      border-radius: 16px;
+      padding: 6px 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .design-2 .variant-badge {
+      flex: 1;
+      text-align: center;
+      background: transparent;
+    }
+
+    .design-2 .servings-pill {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: white;
+      border-radius: 16px;
+      padding: 4px 8px 4px 4px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .design-2 .servings-btn {
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-secondary);
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 500;
+    }
+
+    .design-2 .servings-btn:hover {
+      background: var(--brand-primary);
+      color: white;
+    }
+
+    .design-2 .servings-value {
+      width: 28px;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    /* ========== DESIGN 3: Compact Card ========== */
+    .design-3 {
+      padding: 12px;
+    }
+
+    .design-3 .top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .design-3 .recipe-name {
+      font-size: 0.9rem;
+    }
+
+    .design-3 .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .design-3 .cal-badge {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--brand-primary);
+    }
+
+    .design-3 .days-row {
+      display: flex;
+      gap: 4px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .design-3 .day-chip {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 44px;
+      padding: 8px 6px;
+      background: var(--bg-secondary);
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+    }
+
+    .design-3 .day-chip.selected {
+      background: var(--brand-primary);
+      color: white;
+    }
+
+    .design-3 .day-chip .day-cal {
+      font-size: 0.65rem;
+      opacity: 0.8;
+    }
+
+    .design-3 .day-chip .day-name {
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+
+    /* ========== DESIGN 4: Header Strip ========== */
+    .design-4 .recipe-strip {
+      background: var(--brand-primary);
+      color: white;
+      padding: 10px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: -16px -16px 12px -16px;
+    }
+
+    .design-4 .recipe-strip .recipe-name {
+      color: white;
+      font-size: 0.9rem;
+    }
+
+    .design-4 .strip-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .design-4 .strip-btn {
+      background: rgba(255,255,255,0.2);
+      border: none;
+      border-radius: 6px;
+      padding: 6px 10px;
+      color: white;
+      font-size: 0.75rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .design-4 .strip-btn:hover {
+      background: rgba(255,255,255,0.3);
+    }
+
+    .design-4 .strip-btn svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .design-4 .meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    /* ========== DESIGN 5: Floating Actions ========== */
+    .design-5 {
+      position: relative;
+    }
+
+    .design-5 .floating-edit {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 36px;
+      height: 36px;
+      background: var(--brand-primary);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(74,63,128,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .design-5 .floating-edit:hover {
+      transform: scale(1.1);
+    }
+
+    .design-5 .floating-edit svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .design-5 .info-card {
+      background: var(--bg-secondary);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+
+    .design-5 .info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .design-5 .cal-large {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--brand-primary);
+    }
+
+    .design-5 .cal-unit {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    /* ========== DESIGN 6: Segmented Control ========== */
+    .design-6 .segment-row {
+      display: flex;
+      background: var(--bg-secondary);
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 12px;
+    }
+
+    .design-6 .segment {
+      flex: 1;
+      padding: 10px 8px;
+      text-align: center;
+      background: transparent;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .design-6 .segment.active {
+      background: white;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .design-6 .segment .seg-cal {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--brand-primary);
+    }
+
+    .design-6 .segment .seg-day {
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+    }
+
+    .design-6 .segment.active .seg-day {
+      color: var(--text-primary);
+    }
+
+    .design-6 .bottom-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* ========== DESIGN 7: Card with Tabs ========== */
+    .design-7 .tab-row {
+      display: flex;
+      border-bottom: 2px solid var(--bg-secondary);
+      margin-bottom: 12px;
+      margin: -16px -16px 12px -16px;
+      padding: 0 16px;
+    }
+
+    .design-7 .tab {
+      padding: 12px 16px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      border: none;
+      background: none;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+    }
+
+    .design-7 .tab.active {
+      color: var(--brand-primary);
+      border-bottom-color: var(--brand-primary);
+    }
+
+    .design-7 .week-scroll {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding: 4px 0;
+      margin-bottom: 12px;
+    }
+
+    .design-7 .day-card {
+      min-width: 52px;
+      padding: 10px 8px;
+      background: var(--bg-secondary);
+      border-radius: 10px;
+      text-align: center;
+      border: 2px solid transparent;
+      cursor: pointer;
+    }
+
+    .design-7 .day-card.selected {
+      border-color: var(--brand-primary);
+      background: white;
+    }
+
+    .design-7 .day-card .dc-cal {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--brand-primary);
+    }
+
+    .design-7 .day-card .dc-name {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+
+    .design-7 .day-card.selected .dc-name {
+      color: var(--text-primary);
+    }
+
+    /* ========== DESIGN 8: Inline Everything ========== */
+    .design-8 {
+      padding: 12px;
+    }
+
+    .design-8 .inline-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    .design-8 .recipe-name {
+      font-size: 0.9rem;
+    }
+
+    .design-8 .inline-meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-left: auto;
+    }
+
+    .design-8 .mini-pill {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 8px;
+      background: var(--bg-secondary);
+      border-radius: 12px;
+      font-size: 0.75rem;
+    }
+
+    .design-8 .days-inline {
+      display: flex;
+      gap: 3px;
+    }
+
+    .design-8 .day-mini {
+      width: calc((100% - 18px) / 7);
+      aspect-ratio: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-secondary);
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-size: 0.65rem;
+    }
+
+    .design-8 .day-mini.selected {
+      background: var(--brand-primary);
+      color: white;
+    }
+
+    .design-8 .day-mini .dm-cal {
+      font-weight: 600;
+      font-size: 0.6rem;
+    }
+
+    /* ========== DESIGN 9: Bottom Sheet Style ========== */
+    .design-9 {
+      border-radius: 20px 20px 16px 16px;
+    }
+
+    .design-9 .handle {
+      width: 40px;
+      height: 4px;
+      background: var(--border-color);
+      border-radius: 2px;
+      margin: 0 auto 12px;
+    }
+
+    .design-9 .sheet-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    }
+
+    .design-9 .recipe-name {
+      font-size: 1.1rem;
+    }
+
+    .design-9 .cal-big {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--brand-primary);
+    }
+
+    .design-9 .days-week {
+      display: flex;
+      justify-content: space-between;
+      background: var(--bg-secondary);
+      border-radius: 16px;
+      padding: 8px;
+    }
+
+    .design-9 .day-col {
+      flex: 1;
+      text-align: center;
+      padding: 8px 4px;
+      border-radius: 12px;
+      cursor: pointer;
+    }
+
+    .design-9 .day-col.selected {
+      background: var(--brand-primary);
+      color: white;
+    }
+
+    .design-9 .day-col .col-cal {
+      font-size: 0.65rem;
+      font-weight: 500;
+      margin-bottom: 2px;
+    }
+
+    .design-9 .day-col .col-name {
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+
+    /* ========== DESIGN 10: Dashboard Widget ========== */
+    .design-10 .widget-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 12px;
+    }
+
+    .design-10 .widget-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .design-10 .recipe-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-primary-light) 100%);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 18px;
+    }
+
+    .design-10 .recipe-name {
+      font-size: 0.9rem;
+    }
+
+    .design-10 .recipe-variant {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+
+    .design-10 .widget-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .design-10 .stat {
+      text-align: center;
+      padding: 8px;
+      background: var(--bg-secondary);
+      border-radius: 8px;
+    }
+
+    .design-10 .stat-value {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--brand-primary);
+    }
+
+    .design-10 .stat-label {
+      font-size: 0.65rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+    }
+
+    .design-10 .week-bar {
+      display: flex;
+      gap: 4px;
+    }
+
+    .design-10 .bar-day {
+      flex: 1;
+      height: 60px;
+      background: var(--bg-secondary);
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      padding-bottom: 6px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .design-10 .bar-day.selected {
+      background: var(--brand-primary);
+      color: white;
+    }
+
+    .design-10 .bar-fill {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(74,63,128,0.2);
+      transition: height 0.3s;
+    }
+
+    .design-10 .bar-day.selected .bar-fill {
+      background: rgba(255,255,255,0.3);
+    }
+
+    .design-10 .bar-day .bd-name {
+      font-size: 0.65rem;
+      font-weight: 600;
+      position: relative;
+      z-index: 1;
+    }
+
+    .design-10 .bar-day .bd-cal {
+      font-size: 0.6rem;
+      position: relative;
+      z-index: 1;
+      opacity: 0.8;
+    }
+  </style>
+</head>
+<body>
+
+  <h2 class="section-title">Recipe Card Mockups</h2>
+  <div class="legend">
+    <h3>Required Elements (Always Visible):</h3>
+    <div class="legend-item">
+      <div class="legend-icon">486</div>
+      <div class="legend-text">
+        <strong>Calorie Dropdown</strong>
+        <span>Clickable to show macro breakdown - must stay functional</span>
+      </div>
+    </div>
+    <div class="legend-item">
+      <div class="legend-icon">2</div>
+      <div class="legend-text">
+        <strong>Servings Control</strong>
+        <span>Input or +/- buttons to adjust servings</span>
+      </div>
+    </div>
+    <div class="legend-item">
+      <div class="legend-icon">W</div>
+      <div class="legend-text">
+        <strong>Days of Week + Daily Calories</strong>
+        <span>All 7 days visible with per-day calorie totals</span>
+      </div>
+    </div>
+    <div class="legend-item">
+      <div class="legend-icon" style="background: #f59e0b; color: white;">Ed</div>
+      <div class="legend-text">
+        <strong>Edit Button (Admin Only)</strong>
+        <span>Visible only for admin users in GOD mode</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- DESIGN 1: Current (Baseline) -->
+  <h2 class="section-title">1. Current Layout</h2>
+  <p class="section-desc">Baseline design for reference. Stacked layout with all elements visible.</p>
+  <div class="mockup-container">
+    <div class="mockup-label">Current Design <span>Baseline</span></div>
+    <div class="recipe-card">
+      <div class="recipe-header">
+        <div class="recipe-name">Porridge with Berries & Nuts</div>
+        <div class="recipe-actions">
+          <button class="icon-btn" title="Expand">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="recipe-meta">
+        <button class="cal-dropdown">
+          486 cal
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M19 9l-7 7-7-7"/>
+          </svg>
+        </button>
+        <span class="variant-badge">Standard</span>
+      </div>
+      <div class="servings-row">
+        <span class="servings-label">Servings:</span>
+        <input type="number" class="servings-input" value="2">
+      </div>
+      <div class="days-grid">
+        <button class="day-btn has-meal selected">
+          <span class="day-cal">486 cal</span>
+          <span class="day-name">Wed</span>
+        </button>
+        <button class="day-btn">
+          <span class="day-cal">0 cal</span>
+          <span class="day-name">Thu</span>
+        </button>
+        <button class="day-btn">
+          <span class="day-cal">0 cal</span>
+          <span class="day-name">Fri</span>
+        </button>
+        <button class="day-btn">
+          <span class="day-cal">0 cal</span>
+          <span class="day-name">Sat</span>
+        </button>
+        <button class="day-btn">
+          <span class="day-cal">0 cal</span>
+          <span class="day-name">Sun</span>
+        </button>
+        <button class="day-btn">
+          <span class="day-cal">0 cal</span>
+          <span class="day-name">Mon</span>
+        </button>
+        <button class="day-btn">
+          <span class="day-cal">0 cal</span>
+          <span class="day-name">Tue</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DESIGN 1B: Current with Admin -->
+  <div class="mockup-container">
+    <div class="mockup-label">Current Design <span class="admin-badge">ADMIN</span></div>
+    <div class="recipe-card">
+      <div class="recipe-header">
+        <div class="recipe-name">Peanut Butter Banana Smoothie (Full)</div>
+        <div class="recipe-actions">
+          <button class="icon-btn" title="Edit" style="background: #f59e0b; color: white;">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+          </button>
+          <button class="icon-btn" title="Expand">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="recipe-meta">
+        <button class="cal-dropdown">
+          702 cal
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M19 9l-7 7-7-7"/>
+          </svg>
+        </button>
+        <span class="variant-badge">Full</span>
+      </div>
+      <div class="servings-row">
+        <span class="servings-label">Servings:</span>
+        <input type="number" class="servings-input" value="2">
+      </div>
+      <div class="days-grid">
+        <button class="day-btn has-meal">
+          <span class="day-cal">1953</span>
+          <span class="day-name">Wed</span>
+        </button>
+        <button class="day-btn has-meal">
+          <span class="day-cal">1876</span>
+          <span class="day-name">Thu</span>
+        </button>
+        <button class="day-btn has-meal selected">
+          <span class="day-cal">1885</span>
+          <span class="day-name">Fri</span>
+        </button>
+        <button class="day-btn">
+          <span class="day-cal">0 cal</span>
+          <span class="day-name">Sat</span>
+        </button>
+        <button class="day-btn">
+          <span class="day-cal">0 cal</span>
+          <span class="day-name">Sun</span>
+        </button>
+        <button class="day-btn">
+          <span class="day-cal">0 cal</span>
+          <span class="day-name">Mon</span>
+        </button>
+        <button class="day-btn">
+          <span class="day-cal">0 cal</span>
+          <span class="day-name">Tue</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DESIGN 2: Pill Bar Layout -->
+  <h2 class="section-title">2. Pill Bar Layout</h2>
+  <p class="section-desc">Calories, variant, and servings in a unified pill bar. Matches header style.</p>
+  <div class="mockup-container">
+    <div class="mockup-label">Pill Bar <span>Unified controls</span></div>
+    <div class="recipe-card design-2">
+      <div class="recipe-header">
+        <div class="recipe-name">Porridge with Berries & Nuts</div>
+        <button class="icon-btn" title="Expand">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
+          </svg>
+        </button>
+      </div>
+      <div class="meta-pill">
+        <button class="cal-dropdown">
+          486 cal
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M19 9l-7 7-7-7"/>
+          </svg>
+        </button>
+        <span class="variant-badge">Standard</span>
+        <div class="servings-pill">
+          <button class="servings-btn">-</button>
+          <span class="servings-value">2</span>
+          <button class="servings-btn">+</button>
+        </div>
+      </div>
+      <div class="days-grid">
+        <button class="day-btn has-meal selected">
+          <span class="day-cal">486</span>
+          <span class="day-name">Wed</span>
+        </button>
+        <button class="day-btn">
+          <span class="day-cal">0</span>
+          <span class="day-name">Thu</span>
+        </button>
+        <button class="day-btn">
+          <span class="day-cal">0</span>
+          <span class="day-name">Fri</span>
+        </button>
+        <button class="day-btn">
+          <span class="day-cal">0</span>
+          <span class="day-name">Sat</span>
+        </button>
+        <button class="day-btn">
+          <span class="day-cal">0</span>
+          <span class="day-name">Sun</span>
+        </button>
+        <button class="day-btn">
+          <span class="day-cal">0</span>
+          <span class="day-name">Mon</span>
+        </button>
+        <button class="day-btn">
+          <span class="day-cal">0</span>
+          <span class="day-name">Tue</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DESIGN 2B: Pill Bar with Admin -->
+  <div class="mockup-container">
+    <div class="mockup-label">Pill Bar <span class="admin-badge">ADMIN</span></div>
+    <div class="recipe-card design-2">
+      <div class="recipe-header">
+        <div class="recipe-name">Peanut Butter Banana Smoothie (Full)</div>
+        <div class="recipe-actions">
+          <button class="icon-btn" title="Edit" style="background: #f59e0b; color: white;">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+          </button>
+          <button class="icon-btn" title="Expand">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="meta-pill">
+        <button class="cal-dropdown">
+          702 cal
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M19 9l-7 7-7-7"/>
+          </svg>
+        </button>
+        <span class="variant-badge">Full</span>
+        <div class="servings-pill">
+          <button class="servings-btn">-</button>
+          <span class="servings-value">2</span>
+          <button class="servings-btn">+</button>
+        </div>
+      </div>
+      <div class="days-grid">
+        <button class="day-btn has-meal">
+          <span class="day-cal">1953</span>
+          <span class="day-name">Wed</span>
+        </button>
+        <button class="day-btn has-meal">
+          <span class="day-cal">1876</span>
+          <span class="day-name">Thu</span>
+        </button>
+        <button class="day-btn has-meal selected">
+          <span class="day-cal">1885</span>
+          <span class="day-name">Fri</span>
+        </button>
+        <button class="day-btn">
+          <span class="day-cal">0</span>
+          <span class="day-name">Sat</span>
+        </button>
+        <button class="day-btn">
+          <span class="day-cal">0</span>
+          <span class="day-name">Sun</span>
+        </button>
+        <button class="day-btn">
+          <span class="day-cal">0</span>
+          <span class="day-name">Mon</span>
+        </button>
+        <button class="day-btn">
+          <span class="day-cal">0</span>
+          <span class="day-name">Tue</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DESIGN 3: Compact Card -->
+  <h2 class="section-title">3. Compact Card</h2>
+  <p class="section-desc">Minimal height. Everything on two rows. Days scroll horizontally if needed.</p>
+  <div class="mockup-container">
+    <div class="mockup-label">Compact <span>Space efficient</span></div>
+    <div class="recipe-card design-3">
+      <div class="top-row">
+        <div class="recipe-name">Porridge with Berries & Nuts</div>
+        <div class="top-actions">
+          <span class="cal-badge">486 cal</span>
+          <button class="icon-btn" style="width: 28px; height: 28px;">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width: 14px; height: 14px;">
+              <path d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="days-row">
+        <button class="day-chip selected">
+          <span class="day-cal">486</span>
+          <span class="day-name">Wed</span>
+        </button>
+        <button class="day-chip">
+          <span class="day-cal">0</span>
+          <span class="day-name">Thu</span>
+        </button>
+        <button class="day-chip">
+          <span class="day-cal">0</span>
+          <span class="day-name">Fri</span>
+        </button>
+        <button class="day-chip">
+          <span class="day-cal">0</span>
+          <span class="day-name">Sat</span>
+        </button>
+        <button class="day-chip">
+          <span class="day-cal">0</span>
+          <span class="day-name">Sun</span>
+        </button>
+        <button class="day-chip">
+          <span class="day-cal">0</span>
+          <span class="day-name">Mon</span>
+        </button>
+        <button class="day-chip">
+          <span class="day-cal">0</span>
+          <span class="day-name">Tue</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DESIGN 4: Header Strip -->
+  <h2 class="section-title">4. Header Strip</h2>
+  <p class="section-desc">Recipe name in branded header strip. Admin edit in strip. Clean separation.</p>
+  <div class="mockup-container">
+    <div class="mockup-label">Header Strip <span class="admin-badge">ADMIN</span></div>
+    <div class="recipe-card design-4">
+      <div class="recipe-strip">
+        <div class="recipe-name">Peanut Butter Banana Smoothie</div>
+        <div class="strip-actions">
+          <button class="strip-btn">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+            Edit
+          </button>
+        </div>
+      </div>
+      <div class="meta-row">
+        <div class="recipe-meta" style="margin: 0;">
+          <button class="cal-dropdown">
+            702 cal
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M19 9l-7 7-7-7"/>
+            </svg>
+          </button>
+          <span class="variant-badge">Full</span>
+        </div>
+        <div class="servings-row" style="margin: 0;">
+          <span class="servings-label">Servings:</span>
+          <input type="number" class="servings-input" value="2">
+        </div>
+      </div>
+      <div class="days-grid">
+        <button class="day-btn has-meal">
+          <span class="day-cal">1953</span>
+          <span class="day-name">Wed</span>
+        </button>
+        <button class="day-btn has-meal">
+          <span class="day-cal">1876</span>
+          <span class="day-name">Thu</span>
+        </button>
+        <button class="day-btn has-meal selected">
+          <span class="day-cal">1885</span>
+          <span class="day-name">Fri</span>
+        </button>
+        <button class="day-btn">
+          <span class="day-cal">0</span>
+          <span class="day-name">Sat</span>
+        </button>
+        <button class="day-btn">
+          <span class="day-cal">0</span>
+          <span class="day-name">Sun</span>
+        </button>
+        <button class="day-btn">
+          <span class="day-cal">0</span>
+          <span class="day-name">Mon</span>
+        </button>
+        <button class="day-btn">
+          <span class="day-cal">0</span>
+          <span class="day-name">Tue</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DESIGN 5: Floating Actions -->
+  <h2 class="section-title">5. Floating Actions</h2>
+  <p class="section-desc">Edit button floats in corner (admin only). Large calorie display.</p>
+  <div class="mockup-container">
+    <div class="mockup-label">Floating Actions <span class="admin-badge">ADMIN</span></div>
+    <div class="recipe-card design-5">
+      <button class="floating-edit" title="Edit Recipe">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+          <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+        </svg>
+      </button>
+      <div class="recipe-name" style="margin-bottom: 8px; padding-right: 40px;">Peanut Butter Banana Smoothie (Full)</div>
+      <div class="info-card">
+        <div class="info-row">
+          <div>
+            <span class="cal-large">702</span>
+            <span class="cal-unit">cal/serving</span>
+          </div>
+          <div class="servings-row" style="margin: 0;">
+            <span class="servings-label">Servings:</span>
+            <input type="number" class="servings-input" value="2">
+          </div>
+        </div>
+      </div>
+      <div class="days-grid">
+        <button class="day-btn has-meal">
+          <span class="day-cal">1953</span>
+          <span class="day-name">Wed</span>
+        </button>
+        <button class="day-btn has-meal">
+          <span class="day-cal">1876</span>
+          <span class="day-name">Thu</span>
+        </button>
+        <button class="day-btn has-meal selected">
+          <span class="day-cal">1885</span>
+          <span class="day-name">Fri</span>
+        </button>
+        <button class="day-btn">
+          <span class="day-cal">0</span>
+          <span class="day-name">Sat</span>
+        </button>
+        <button class="day-btn">
+          <span class="day-cal">0</span>
+          <span class="day-name">Sun</span>
+        </button>
+        <button class="day-btn">
+          <span class="day-cal">0</span>
+          <span class="day-name">Mon</span>
+        </button>
+        <button class="day-btn">
+          <span class="day-cal">0</span>
+          <span class="day-name">Tue</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DESIGN 6: Segmented Control -->
+  <h2 class="section-title">6. Segmented Control</h2>
+  <p class="section-desc">Days as iOS-style segmented control. Tap to assign/toggle.</p>
+  <div class="mockup-container">
+    <div class="mockup-label">Segmented Control <span>iOS style</span></div>
+    <div class="recipe-card design-6">
+      <div class="recipe-header">
+        <div class="recipe-name">Porridge with Berries & Nuts</div>
+        <button class="icon-btn" title="Expand">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
+          </svg>
+        </button>
+      </div>
+      <div class="segment-row">
+        <button class="segment active">
+          <div class="seg-cal">486</div>
+          <div class="seg-day">Wed</div>
+        </button>
+        <button class="segment">
+          <div class="seg-cal">0</div>
+          <div class="seg-day">Thu</div>
+        </button>
+        <button class="segment">
+          <div class="seg-cal">0</div>
+          <div class="seg-day">Fri</div>
+        </button>
+        <button class="segment">
+          <div class="seg-cal">0</div>
+          <div class="seg-day">Sat</div>
+        </button>
+        <button class="segment">
+          <div class="seg-cal">0</div>
+          <div class="seg-day">Sun</div>
+        </button>
+        <button class="segment">
+          <div class="seg-cal">0</div>
+          <div class="seg-day">Mon</div>
+        </button>
+        <button class="segment">
+          <div class="seg-cal">0</div>
+          <div class="seg-day">Tue</div>
+        </button>
+      </div>
+      <div class="bottom-row">
+        <div class="recipe-meta" style="margin: 0;">
+          <button class="cal-dropdown">
+            486 cal
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M19 9l-7 7-7-7"/>
+            </svg>
+          </button>
+          <span class="variant-badge">Standard</span>
+        </div>
+        <div class="servings-row" style="margin: 0;">
+          <span class="servings-label">Servings:</span>
+          <input type="number" class="servings-input" value="2" style="width: 45px;">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DESIGN 7: Card with Tabs -->
+  <h2 class="section-title">7. Card with Tabs</h2>
+  <p class="section-desc">Tabbed interface for switching between info and schedule views.</p>
+  <div class="mockup-container">
+    <div class="mockup-label">Tabbed Card <span>Multi-view</span></div>
+    <div class="recipe-card design-7">
+      <div class="tab-row">
+        <button class="tab active">Schedule</button>
+        <button class="tab">Nutrition</button>
+        <button class="tab">Steps</button>
+      </div>
+      <div class="recipe-header" style="margin-bottom: 8px;">
+        <div class="recipe-name">Porridge with Berries & Nuts</div>
+      </div>
+      <div class="week-scroll">
+        <button class="day-card selected">
+          <div class="dc-cal">486</div>
+          <div class="dc-name">Wed</div>
+        </button>
+        <button class="day-card">
+          <div class="dc-cal">0</div>
+          <div class="dc-name">Thu</div>
+        </button>
+        <button class="day-card">
+          <div class="dc-cal">0</div>
+          <div class="dc-name">Fri</div>
+        </button>
+        <button class="day-card">
+          <div class="dc-cal">0</div>
+          <div class="dc-name">Sat</div>
+        </button>
+        <button class="day-card">
+          <div class="dc-cal">0</div>
+          <div class="dc-name">Sun</div>
+        </button>
+        <button class="day-card">
+          <div class="dc-cal">0</div>
+          <div class="dc-name">Mon</div>
+        </button>
+        <button class="day-card">
+          <div class="dc-cal">0</div>
+          <div class="dc-name">Tue</div>
+        </button>
+      </div>
+      <div class="recipe-meta">
+        <button class="cal-dropdown">
+          486 cal
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M19 9l-7 7-7-7"/>
+          </svg>
+        </button>
+        <span class="variant-badge">Standard</span>
+        <div style="margin-left: auto;">
+          <span class="servings-label">Servings:</span>
+          <input type="number" class="servings-input" value="2" style="width: 45px;">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DESIGN 8: Inline Everything -->
+  <h2 class="section-title">8. Inline Everything</h2>
+  <p class="section-desc">Ultra compact. All meta inline with title. Square day buttons.</p>
+  <div class="mockup-container">
+    <div class="mockup-label">Inline <span>Ultra compact</span></div>
+    <div class="recipe-card design-8">
+      <div class="inline-header">
+        <div class="recipe-name">Porridge with Berries & Nuts</div>
+        <div class="inline-meta">
+          <span class="mini-pill">486 cal ▾</span>
+          <span class="mini-pill">2 srv</span>
+        </div>
+      </div>
+      <div class="days-inline">
+        <button class="day-mini selected">
+          <span class="dm-cal">486</span>
+          <span>W</span>
+        </button>
+        <button class="day-mini">
+          <span class="dm-cal">0</span>
+          <span>T</span>
+        </button>
+        <button class="day-mini">
+          <span class="dm-cal">0</span>
+          <span>F</span>
+        </button>
+        <button class="day-mini">
+          <span class="dm-cal">0</span>
+          <span>S</span>
+        </button>
+        <button class="day-mini">
+          <span class="dm-cal">0</span>
+          <span>S</span>
+        </button>
+        <button class="day-mini">
+          <span class="dm-cal">0</span>
+          <span>M</span>
+        </button>
+        <button class="day-mini">
+          <span class="dm-cal">0</span>
+          <span>T</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DESIGN 9: Bottom Sheet Style -->
+  <h2 class="section-title">9. Bottom Sheet Style</h2>
+  <p class="section-desc">Mobile bottom sheet aesthetic. Handle bar, large title, contained days.</p>
+  <div class="mockup-container">
+    <div class="mockup-label">Bottom Sheet <span>Mobile native</span></div>
+    <div class="recipe-card design-9">
+      <div class="handle"></div>
+      <div class="sheet-header">
+        <div>
+          <div class="recipe-name">Porridge with Berries & Nuts</div>
+          <span class="variant-badge" style="margin-top: 4px; display: inline-block;">Standard</span>
+        </div>
+        <div style="text-align: right;">
+          <div class="cal-big">486</div>
+          <div style="font-size: 0.75rem; color: var(--text-secondary);">cal · 2 srv</div>
+        </div>
+      </div>
+      <div class="days-week">
+        <div class="day-col selected">
+          <div class="col-cal">486</div>
+          <div class="col-name">Wed</div>
+        </div>
+        <div class="day-col">
+          <div class="col-cal">0</div>
+          <div class="col-name">Thu</div>
+        </div>
+        <div class="day-col">
+          <div class="col-cal">0</div>
+          <div class="col-name">Fri</div>
+        </div>
+        <div class="day-col">
+          <div class="col-cal">0</div>
+          <div class="col-name">Sat</div>
+        </div>
+        <div class="day-col">
+          <div class="col-cal">0</div>
+          <div class="col-name">Sun</div>
+        </div>
+        <div class="day-col">
+          <div class="col-cal">0</div>
+          <div class="col-name">Mon</div>
+        </div>
+        <div class="day-col">
+          <div class="col-cal">0</div>
+          <div class="col-name">Tue</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DESIGN 10: Dashboard Widget -->
+  <h2 class="section-title">10. Dashboard Widget</h2>
+  <p class="section-desc">Widget-style with icon, stats grid, and bar chart for days.</p>
+  <div class="mockup-container">
+    <div class="mockup-label">Dashboard Widget <span class="admin-badge">ADMIN</span></div>
+    <div class="recipe-card design-10">
+      <div class="widget-header">
+        <div class="widget-title">
+          <div class="recipe-icon">🥣</div>
+          <div>
+            <div class="recipe-name">Porridge with Berries</div>
+            <div class="recipe-variant">Standard · 2 servings</div>
+          </div>
+        </div>
+        <button class="icon-btn" title="Edit" style="background: #f59e0b; color: white;">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+            <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+          </svg>
+        </button>
+      </div>
+      <div class="widget-stats">
+        <div class="stat">
+          <div class="stat-value">486</div>
+          <div class="stat-label">Calories</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">42g</div>
+          <div class="stat-label">Protein</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">58g</div>
+          <div class="stat-label">Carbs</div>
+        </div>
+      </div>
+      <div class="week-bar">
+        <div class="bar-day selected">
+          <div class="bar-fill" style="height: 80%;"></div>
+          <span class="bd-cal">486</span>
+          <span class="bd-name">W</span>
+        </div>
+        <div class="bar-day">
+          <div class="bar-fill" style="height: 0%;"></div>
+          <span class="bd-cal">0</span>
+          <span class="bd-name">T</span>
+        </div>
+        <div class="bar-day">
+          <div class="bar-fill" style="height: 0%;"></div>
+          <span class="bd-cal">0</span>
+          <span class="bd-name">F</span>
+        </div>
+        <div class="bar-day">
+          <div class="bar-fill" style="height: 0%;"></div>
+          <span class="bd-cal">0</span>
+          <span class="bd-name">S</span>
+        </div>
+        <div class="bar-day">
+          <div class="bar-fill" style="height: 0%;"></div>
+          <span class="bd-cal">0</span>
+          <span class="bd-name">S</span>
+        </div>
+        <div class="bar-day">
+          <div class="bar-fill" style="height: 0%;"></div>
+          <span class="bd-cal">0</span>
+          <span class="bd-name">M</span>
+        </div>
+        <div class="bar-day">
+          <div class="bar-fill" style="height: 0%;"></div>
+          <span class="bd-cal">0</span>
+          <span class="bd-name">T</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
