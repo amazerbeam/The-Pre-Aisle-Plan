@@ -1,8 +1,14 @@
+import { useState } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import './LoginModal.css'
 
 function LoginModal({ onClose }) {
-  const { loginWithGoogle, continueAsGuest } = useAuth()
+  const { loginWithGoogle, continueAsGuest, passwordLogin } = useAuth()
+  const [showPasswordForm, setShowPasswordForm] = useState(false)
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState(null)
 
   const handleGoogleLogin = () => {
     loginWithGoogle()
@@ -11,6 +17,20 @@ function LoginModal({ onClose }) {
   const handleGuestContinue = () => {
     continueAsGuest()
     onClose()
+  }
+
+  const handlePasswordSubmit = async (e) => {
+    e.preventDefault()
+    setError(null)
+    setSubmitting(true)
+    try {
+      await passwordLogin(email, password)
+      onClose()
+    } catch (err) {
+      setError('Invalid email or password')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -36,6 +56,41 @@ function LoginModal({ onClose }) {
             />
             Sign in with Google
           </button>
+
+          {!showPasswordForm && (
+            <button className="email-toggle-btn" onClick={() => setShowPasswordForm(true)}>
+              Use email & password instead
+            </button>
+          )}
+
+          {showPasswordForm && (
+            <form className="password-form" onSubmit={handlePasswordSubmit}>
+              <label>
+                Email
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  autoComplete="username"
+                />
+              </label>
+              <label>
+                Password
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  autoComplete="current-password"
+                />
+              </label>
+              {error && <div className="password-error" role="alert">{error}</div>}
+              <button type="submit" className="password-submit-btn" disabled={submitting}>
+                {submitting ? 'Signing in…' : 'Sign in'}
+              </button>
+            </form>
+          )}
 
           <div className="benefits">
             <h3>Benefits of signing in:</h3>

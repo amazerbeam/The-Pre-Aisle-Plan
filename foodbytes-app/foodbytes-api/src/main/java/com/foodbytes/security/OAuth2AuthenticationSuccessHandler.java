@@ -2,7 +2,6 @@ package com.foodbytes.security;
 
 import com.foodbytes.model.User;
 import com.foodbytes.repository.UserRepository;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +15,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
-    private final JwtTokenProvider jwtTokenProvider;
+    private final JwtCookieService jwtCookieService;
     private final UserRepository userRepository;
 
     @Value("${app.frontend-url:http://localhost:3000}")
@@ -30,15 +29,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         User user = userRepository.findById(userPrincipal.getId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        String token = jwtTokenProvider.generateToken(user);
-
-        // Set JWT in httpOnly cookie
-        Cookie cookie = new Cookie("jwt", token);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true); // Required for HTTPS
-        cookie.setPath("/");
-        cookie.setMaxAge(7 * 24 * 60 * 60); // 7 days
-        response.addCookie(cookie);
+        jwtCookieService.writeJwtCookie(user, response);
 
         // Redirect to frontend
         getRedirectStrategy().sendRedirect(request, response, frontendUrl);
