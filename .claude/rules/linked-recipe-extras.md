@@ -58,6 +58,19 @@ Apply this rule whenever:
    - The parent's `quantity_grams` for that row must be **≤ linked_total_yield** and reflect the cooked/used portion.
 3. **Macros recompute correctly?** Run the parent through `MacroCalculationService.calculatePerServingMacros` — kcal/protein/carbs/fat must reflect the prorated linked contribution, not the linked recipe's full macros.
 4. **No double-counting:** if a linked row exists, the parent must NOT also list the linked recipe's raw ingredients separately.
+5. **A linked `recipe_ingredients` row MUST be paired with a `recipe_steps` row that carries the same `linked_recipe_id` plus an `alt_instruction`.** The cook needs a clickable prep step ("Prepare the X according to the linked recipe. Use Ng…") with a store-bought fallback in `alt_instruction`. Canonical examples: `Pink Sauce Pasta` (37/38/39), `Pizza` (13/14/15), `Salmon Sandwich` (28/29), `Stromboli` (44–46). A linked ingredient with no linked step is a bug — the homemade path becomes invisible in the UI. Verify:
+   ```sql
+   SELECT ri.recipe_id, r.name AS parent, lr.name AS linked
+   FROM recipe_ingredients ri
+   JOIN recipes r ON r.id = ri.recipe_id
+   JOIN recipes lr ON lr.id = ri.linked_recipe_id
+   WHERE ri.linked_recipe_id IS NOT NULL
+     AND NOT EXISTS (
+       SELECT 1 FROM recipe_steps rs
+       WHERE rs.recipe_id = ri.recipe_id AND rs.linked_recipe_id = ri.linked_recipe_id
+     );
+   ```
+   Any row returned = missing prep step. Add one with `linked_recipe_id` set and a populated `alt_instruction`.
 
 ## Edge cases
 
@@ -70,3 +83,4 @@ Apply this rule whenever:
 - Sub-component recipe exists but the parent inlines its raw ingredients instead of linking.
 - `linked_recipe_id` set but `quantity_grams` equals the linked recipe's total yield when only a portion is used (classic 300g-instead-of-50g bug).
 - Stored `recipes.calories` on the parent disagrees with the recomputed (raw + linked-prorated) total by >5%.
+- A `recipe_ingredients` row sets `linked_recipe_id` but the recipe has zero `recipe_steps` rows referencing that same `linked_recipe_id` (homemade prep step missing) or zero rows with a populated `alt_instruction` for the store-bought path.

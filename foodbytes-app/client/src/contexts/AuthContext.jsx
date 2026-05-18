@@ -28,6 +28,13 @@ export const AuthProvider = ({ children }) => {
     window.location.href = '/oauth2/authorization/google'
   }
 
+  const passwordLogin = async (email, password) => {
+    const response = await api.post('/auth/login', { email, password })
+    setUser(response.data)
+    setIsGuest(false)
+    return response.data
+  }
+
   const continueAsGuest = () => {
     setIsGuest(true)
     setUser(null)
@@ -49,6 +56,7 @@ export const AuthProvider = ({ children }) => {
     isAuthenticated: !!user,
     isAdmin: user?.isAdmin || false,
     loginWithGoogle,
+    passwordLogin,
     continueAsGuest,
     logout,
     checkAuthStatus
