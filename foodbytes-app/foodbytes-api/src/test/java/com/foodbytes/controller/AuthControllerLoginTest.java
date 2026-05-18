@@ -5,13 +5,10 @@ import com.foodbytes.model.User;
 import com.foodbytes.service.PasswordAuthService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Map;
@@ -32,7 +29,6 @@ class AuthControllerLoginTest {
     @MockBean private PasswordAuthService passwordAuthService;
 
     @Test
-    @WithAnonymousUser
     void loginSuccess_returns200_andSetsJwtCookieViaService() throws Exception {
         User user = new User();
         user.setId(42L);
@@ -61,7 +57,6 @@ class AuthControllerLoginTest {
     }
 
     @Test
-    @WithAnonymousUser
     void loginWrongPassword_returns401_andDoesNotSetCookie() throws Exception {
         when(passwordAuthService.authenticateAndIssueCookie(any(), any(), any()))
                 .thenThrow(new BadCredentialsException("Invalid email or password"));
@@ -77,7 +72,6 @@ class AuthControllerLoginTest {
     }
 
     @Test
-    @WithAnonymousUser
     void loginUnknownEmail_returns401_sameErrorShape() throws Exception {
         when(passwordAuthService.authenticateAndIssueCookie(any(), any(), any()))
                 .thenThrow(new BadCredentialsException("Invalid email or password"));
@@ -92,7 +86,6 @@ class AuthControllerLoginTest {
     }
 
     @Test
-    @WithAnonymousUser
     void loginMissingFields_returns400() throws Exception {
         mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
