@@ -70,6 +70,61 @@
   opacity: 0.5;
 }
 
+/* Hover tooltip showing recipe name, calories, and macros */
+.meal-entry-tooltip {
+  position: fixed;
+  transform: translate(-50%, calc(-100% - 8px));
+  background-color: #2a2440;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  z-index: 10000;
+  pointer-events: none;
+  min-width: 160px;
+  max-width: 240px;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.meal-entry-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: #2a2440;
+}
+
+.meal-entry-tooltip-name {
+  font-weight: 600;
+  font-size: 13px;
+  margin-bottom: 4px;
+  word-break: break-word;
+}
+
+.meal-entry-tooltip-cal {
+  color: #c7c0e8;
+  font-size: 11px;
+  margin-bottom: 6px;
+}
+
+.meal-entry-tooltip-macros {
+  display: flex;
+  gap: 10px;
+  font-size: 11px;
+}
+
+.meal-entry-tooltip-macros .macro-p { color: #ff9b9b; }
+.meal-entry-tooltip-macros .macro-c { color: #9bd7ff; }
+.meal-entry-tooltip-macros .macro-f { color: #ffd99b; }
+
+.meal-entry-tooltip-macros strong {
+  color: #fff;
+  font-weight: 600;
+}
+
 /* Mobile: Slightly larger touch targets */
 @media (max-width: 600px) {
   .meal-plan-entry {

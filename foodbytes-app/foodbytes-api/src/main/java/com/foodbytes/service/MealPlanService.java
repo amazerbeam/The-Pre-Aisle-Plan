@@ -356,6 +356,10 @@ public class MealPlanService {
         dto.setRecipe(recipeService.getRecipeSummaryById(entry.getRecipe().getId()));
         dto.setServings(entry.getServings());
         dto.setCaloriesPerServing(calculateCaloriesPerServing(entry.getRecipe()));
+        int[] macros = macroCalculationService.calculatePerServingMacros(entry.getRecipe());
+        dto.setProteinPerServing(macros[0]);
+        dto.setCarbsPerServing(macros[1]);
+        dto.setFatPerServing(macros[2]);
         return dto;
     }
 }
