@@ -21,4 +21,7 @@ public class MealPlanEntryDTO {
     private RecipeSummaryDTO recipe;  // FR-102: Summary only, fetch full on-demand
     private Integer servings;
     private Integer caloriesPerServing; // FR-017: Fixed per-serving calories
+    private Integer proteinPerServing;
+    private Integer carbsPerServing;
+    private Integer fatPerServing;
 }
