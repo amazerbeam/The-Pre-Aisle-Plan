@@ -5,7 +5,7 @@ import './RecipeInfoForm.css'
  * Form for editing recipe basic info (FR-033).
  * Fields: name, default servings, calories, meal types, cheat flag, extra flag, visibility.
  */
-function RecipeInfoForm({ recipe, isNew, onSave, onCancel, setHasUnsavedChanges }) {
+function RecipeInfoForm({ recipe, isNew, onSave, onCancel, setHasUnsavedChanges, onToggleMacrosAudit }) {
   const [name, setName] = useState('')
   const [defaultServings, setDefaultServings] = useState(2)
   const [calories, setCalories] = useState(0)
@@ -15,6 +15,13 @@ function RecipeInfoForm({ recipe, isNew, onSave, onCancel, setHasUnsavedChanges 
   const [isLive, setIsLive] = useState(false)
   const [errors, setErrors] = useState({})
   const [saving, setSaving] = useState(false)
+  // Audit state is read straight off the server-owned `recipe` prop, never mirrored
+  // into form state: the toggle applies immediately rather than on Save.
+  const [isDirty, setIsDirty] = useState(false)
+  const [auditSaving, setAuditSaving] = useState(false)
+
+  const macrosAudited = recipe?.macrosAudited || false
+  const macrosAuditedAt = recipe?.macrosAuditedAt || null
 
   const MEAL_TYPE_OPTIONS = [
     { key: 'breakfast', label: 'Breakfast' },
@@ -49,6 +56,7 @@ function RecipeInfoForm({ recipe, isNew, onSave, onCancel, setHasUnsavedChanges 
       isLive !== (recipe?.isLive || false)
 
     setHasUnsavedChanges(hasChanges)
+    setIsDirty(hasChanges)
   }, [name, defaultServings, calories, mealTypes, isCheat, isExtra, isLive, recipe, setHasUnsavedChanges])
 
   // Handle meal type toggle
@@ -101,6 +109,19 @@ function RecipeInfoForm({ recipe, isNew, onSave, onCancel, setHasUnsavedChanges 
       })
     } finally {
       setSaving(false)
+    }
+  }
+
+  // Instant-apply: signing off macros you haven't saved would be meaningless, so the
+  // control is disabled while the form is dirty.
+  const handleAuditToggle = async (audited) => {
+    if (audited === macrosAudited || isDirty || auditSaving) return
+
+    setAuditSaving(true)
+    try {
+      await onToggleMacrosAudit(audited)
+    } finally {
+      setAuditSaving(false)
     }
   }
 
@@ -221,6 +242,40 @@ function RecipeInfoForm({ recipe, isNew, onSave, onCancel, setHasUnsavedChanges 
             {isLive
               ? 'This recipe is visible to all users.'
               : 'This recipe is only visible to admins.'}
+          </p>
+        </div>
+      )}
+
+      {/* Macro audit sign-off - only for existing recipes, applies immediately */}
+      {!isNew && onToggleMacrosAudit && (
+        <div className="form-group">
+          <label>Macros Audited</label>
+          <div className="toggle-group">
+            <button
+              type="button"
+              className={`toggle-button ${!macrosAudited ? 'active' : ''}`}
+              onClick={() => handleAuditToggle(false)}
+              disabled={isDirty || auditSaving}
+              aria-pressed={!macrosAudited}
+            >
+              Not audited
+            </button>
+            <button
+              type="button"
+              className={`toggle-button ${macrosAudited ? 'active' : ''}`}
+              onClick={() => handleAuditToggle(true)}
+              disabled={isDirty || auditSaving}
+              aria-pressed={macrosAudited}
+            >
+              ✓ Audited
+            </button>
+          </div>
+          <p className="help-text">
+            {isDirty
+              ? 'Save your changes before marking the macros as audited.'
+              : macrosAudited
+                ? `Macros and calories signed off${macrosAuditedAt ? ` on ${new Date(macrosAuditedAt).toLocaleDateString()}` : ''}. Changes here apply immediately.`
+                : 'Mark this once the macros and calories have been checked. Applies immediately — no need to Save.'}
           </p>
         </div>
       )}

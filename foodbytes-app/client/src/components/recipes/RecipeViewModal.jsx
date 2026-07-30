@@ -1,11 +1,12 @@
 import { useEffect, useState, useRef, useMemo, useCallback } from 'react'
 import { recipeService } from '../../services/recipeService'
-import useRecipeNavigationStack from '../../hooks/useRecipeNavigationStack'
 import useServingsInput from '../../hooks/useServingsInput'
+import useRecipeStackServings from '../../hooks/useRecipeStackServings'
 import useWakeLock from '../../hooks/useWakeLock'
 import { useBodyScrollLock } from '../../hooks/useBodyScrollLock'
 import { useHomemadeSelections } from '../../contexts/HomemadeSelectionsContext'
 import LinkedRecipeNavigation from './LinkedRecipeNavigation'
+import MacroBadgeRow from './MacroBadgeRow'
 import WakeLockIcon from '../common/WakeLockIcon'
 import { MIN_SERVINGS, MAX_SERVINGS, SERVINGS_STEP } from '../../constants/servings'
 import './RecipeViewModal.css'
@@ -32,23 +33,14 @@ function RecipeViewModal({
   onClose,
   variants,           // Array of variant objects from recipe family
   onSelectVariant,    // Callback when variant is selected: (variantId, servings) => void
+                      // NOTE: never invoked today - if that changes to alter `recipeId` while
+                      // mounted, see the stable-recipeId invariant in useRecipeStackServings' JSDoc
   parentRecipeId = null  // FR-091: Parent recipe ID for homemade selection lookup
 }) {
   // FR-102: Full recipe data state (loaded on mount)
   const [fullRecipe, setFullRecipe] = useState(null)
   const [contentLoading, setContentLoading] = useState(true)
   const [contentError, setContentError] = useState(null)
-
-  // FR-092: Navigation stack for linked recipes
-  const {
-    currentRecipe: stackRecipe,
-    push: pushRecipe,
-    pop: popRecipe,
-    reset: resetStack,
-    canGoBack,
-    previousRecipeName,
-    breadcrumbs
-  } = useRecipeNavigationStack(fullRecipe)
 
   // FR-090: Get homemade selections to determine display for linked steps
   const { getSelections } = useHomemadeSelections()
@@ -75,6 +67,28 @@ function RecipeViewModal({
     resetServings
   } = useServingsInput(servings)
 
+  // FR-092, FR-095: Owns the linked-recipe navigation stack, keeps the
+  // displayed recipe and its servings in step as it changes, and provides
+  // the linked-step click handler. Full rationale (recipeId-seeding, the
+  // recipeId-stability invariant, and the live-ref staleness fix) documented
+  // on the hook itself.
+  const {
+    handleLinkedStepClick,
+    popRecipe,
+    resetStack,
+    canGoBack,
+    previousRecipeName,
+    breadcrumbs
+  } = useRecipeStackServings({
+    recipeId,
+    initialServings: servings,
+    fullRecipe,
+    currentServings,
+    resetServings,
+    setFullRecipe,
+    setCurrentRecipeName
+  })
+
   // FR-102: Fetch full recipe data on mount and when recipeId changes
   useEffect(() => {
     const fetchFullRecipe = async () => {
@@ -98,32 +112,6 @@ function RecipeViewModal({
 
     fetchFullRecipe()
   }, [recipeId, resetStack])
-
-  // FR-092, FR-095: Sync current recipe with stack when navigating
-  // Reset servings to the linked recipe's defaultServings when navigating
-  // Only trigger when stackRecipe changes (not when fullRecipe changes from variant selection)
-  const prevStackRecipeId = useRef(stackRecipe?.id)
-  useEffect(() => {
-    if (stackRecipe && stackRecipe.id !== prevStackRecipeId.current) {
-      setFullRecipe(stackRecipe)
-      setCurrentRecipeName(stackRecipe.name)
-      // FR-095: Reset servings to linked recipe's default (not parent's servings)
-      resetServings(stackRecipe.defaultServings || 1)
-      prevStackRecipeId.current = stackRecipe.id
-    }
-  }, [stackRecipe])
-
-  /**
-   * FR-092: Handle clicking a linked step to navigate to that recipe
-   */
-  const handleLinkedStepClick = useCallback(async (linkedRecipeId) => {
-    try {
-      const linkedRecipe = await recipeService.getRecipeById(linkedRecipeId)
-      pushRecipe(linkedRecipe)
-    } catch (err) {
-      console.error('Failed to fetch linked recipe:', err)
-    }
-  }, [pushRecipe])
 
   /**
    * FR-091: Check if a linked recipe is marked as homemade
@@ -179,12 +167,19 @@ function RecipeViewModal({
     return [...variants].sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0))
   }, [variants, hasVariants])
 
-  // Get current variant's calories
-  const getCurrentVariantCalories = () => {
-    if (!hasVariants) return currentCalories
-    const selectedVariant = sortedVariants.find(v => v.recipeId === selectedVariantId)
-    return selectedVariant ? selectedVariant.caloriesPerServing : currentCalories
-  }
+  // The variant on screen — resolved once for the calorie badge and the macro popup.
+  const selectedVariant = hasVariants
+    ? sortedVariants.find((v) => v.recipeId === selectedVariantId)
+    : null
+
+  // `?? currentCalories` keeps the old fallback for no-family and not-found paths.
+  const currentVariantCalories = selectedVariant?.caloriesPerServing ?? currentCalories
+
+  // FR-104: Popup subtitle context only; the bands are identical across variants.
+  // The displayed recipe is the only source — never selectedVariant, whose label still
+  // names the parent's variant after navigating into a family-less linked sub-recipe.
+  // null (not a literal) is correct: MacroTargetPopup then omits the ` · ` segment.
+  const currentVariantLabel = fullRecipe?.variantLabel ?? null
 
   // Handle variant selection - update in-place without closing popup
   // FR-013, FR-102: Fetch variant recipe data internally to keep modal open
@@ -192,11 +187,12 @@ function RecipeViewModal({
     setSelectedVariantId(variantId)
     setShowCalorieDropdown(false)
 
-    // Update calories and header immediately from variant data
-    const selectedVariant = sortedVariants.find(v => v.recipeId === variantId)
-    if (selectedVariant) {
-      setCurrentCalories(selectedVariant.caloriesPerServing)
-      setCurrentRecipeName(selectedVariant.recipeName)
+    // Update calories and header immediately from variant data. Own lookup, by the
+    // just-clicked id: selectedVariantId state has not settled yet.
+    const variant = sortedVariants.find(v => v.recipeId === variantId)
+    if (variant) {
+      setCurrentCalories(variant.caloriesPerServing)
+      setCurrentRecipeName(variant.recipeName)
     }
 
     // FR-102: Fetch full recipe data for the variant (ingredients, steps) internally
@@ -255,7 +251,7 @@ function RecipeViewModal({
                     aria-expanded={showCalorieDropdown}
                     aria-haspopup="listbox"
                   >
-                    <span className="calories-text">{getCurrentVariantCalories()} cal</span>
+                    <span className="calories-text">{currentVariantCalories} cal</span>
                     <span className="dropdown-chevron">▼</span>
                   </button>
                   {showCalorieDropdown && (
@@ -300,14 +296,12 @@ function RecipeViewModal({
               </div>
               {currentIsCheat && <span className="cheat-badge">Cheat</span>}
             </div>
-            {fullRecipe && (fullRecipe.protein != null || fullRecipe.carbs != null || fullRecipe.fat != null) && (
-              <div className="recipe-macros" aria-label="Macros per serving">
-                <span className="macro-badge"><strong>P</strong> {fullRecipe.protein ?? 0}g</span>
-                <span className="macro-badge"><strong>C</strong> {fullRecipe.carbs ?? 0}g</span>
-                <span className="macro-badge"><strong>F</strong> {fullRecipe.fat ?? 0}g</span>
-                <span className="macro-suffix">/ serving</span>
-              </div>
-            )}
+            {/* FR-104: Traffic-lit macro badges; tapping one opens its target popup */}
+            <MacroBadgeRow
+              recipe={fullRecipe}
+              variantLabel={currentVariantLabel}
+              displayedCaloriesPerServing={currentVariantCalories}
+            />
           </div>
           <button
             className="close-button"

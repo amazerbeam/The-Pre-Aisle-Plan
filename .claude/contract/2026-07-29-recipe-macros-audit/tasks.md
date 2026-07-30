@@ -2,8 +2,15 @@
 
 > **For agentic workers:** Use `/fb-apply` to walk this contract phase-by-phase. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-Status: PLANNED
+Status: BLOCKED
 Started: 2026-07-29
+Applied: 2026-07-30
+
+> **Why BLOCKED and not COMPLETE.** All 12 implementation tasks are done, and all three reviewers cleared this contract's own diff (Code-Evaluator APPROVED; QA ALL PASSED in contract scope; Defender's single remaining Warning is a confirmed pre-existing issue it explicitly scoped out, with "safe to merge this contract"). Two *verification* tasks could not complete, for reasons outside this contract:
+> - **Task 12 Step 1** — `mvn clean test` cannot reach BUILD SUCCESS because `AuthControllerLoginTest` is broken independently of this work (missing `@MockBean JwtCookieService`). Needs its own `/fb-issue`.
+> - **Task 13** — the live smoke test needs Docker (not installed) and a human browser login.
+>
+> Flip to COMPLETE once a developer runs Task 13 by hand. Do **not** treat the Task 12 Step 1 failure as this contract's defect.
 
 **Goal:** Add `macros_audited` / `macros_audited_at` / `macros_audited_by` to `recipes`, expose them through an admin-only `PATCH /api/recipes/admin/{id}/audit` endpoint, and surface an instant-apply audit toggle plus an admin-only "✓ Audited" badge in the client.
 
@@ -43,14 +50,14 @@ Started: 2026-07-29
 
 Adds the three columns to the live database. This is a safe stopping point because the change is purely additive: Hibernate `validate` only checks that *mapped* entity columns exist, so unmapped extra columns cannot break the currently-deployed backend. Nothing reads the columns yet.
 
-### Task 1: Migration file
+### Task 1: Migration file ✓
 
 - Skill: `java-backend` — owns the "schema change = date-prefixed migration file + entity change + manual Railway apply" rule.
 
 **Files:**
 - Create: `foodbytes-app/database/migrations/2026-07-29_recipe_macros_audit.sql`
 
-- [ ] **Step 1: Write the migration**
+- [x] **Step 1: Write the migration**
 
 ```sql
 -- 2026-07-29 — Chef sign-off that a recipe's macros/calories have been validated.
@@ -69,7 +76,7 @@ ALTER TABLE recipes
         FOREIGN KEY (macros_audited_by) REFERENCES users(id) ON DELETE SET NULL;
 ```
 
-- [ ] **Step 2: Confirm the file is the newest migration and no earlier file already added these columns**
+- [x] **Step 2: Confirm the file is the newest migration and no earlier file already added these columns**
 
 Run:
 ```bash
@@ -77,19 +84,21 @@ grep -rn "macros_audited" foodbytes-app/database/migrations/
 ```
 Expected: hits only in `2026-07-29_recipe_macros_audit.sql`.
 
-### Task 2: Apply the migration to Railway MySQL
+### Task 2: Apply the migration to Railway MySQL ✓
 
 - Skill: `java-backend` — the migration must be applied manually before any backend restart (`ddl-auto: validate`).
+
+> Executed by the **orchestrator**, not the Implementer: the `implementer` agent is granted no MCP tools and so cannot reach `mcp__mysql__mysql_query`. Applied 2026-07-30 with the developer's explicit authorization to write to production. Both `ALTER TABLE` statements returned "DDL operation successful on schema 'railway'". Verified: 3 columns with the expected types/nullability/defaults; `idx_recipes_macros_audited` present (non-unique); `fk_recipes_macros_audited_by` → `users(id)` with `DELETE_RULE = SET NULL`; 160 recipes, all `macros_audited = 0`, 0 nulls.
 
 **Files:**
 - (no source changes — applies Task 1's SQL to the live DB)
 
-- [ ] **Step 1: Execute both ALTER statements against the Railway database**
+- [x] **Step 1: Execute both ALTER statements against the Railway database**
 
 Run the two `ALTER TABLE` statements from `foodbytes-app/database/migrations/2026-07-29_recipe_macros_audit.sql` via the `mysql` MCP server (`mcp__mysql__mysql_query`), one statement per call.
 Expected: both succeed with no error.
 
-- [ ] **Step 2: Verify the columns, index, and FK landed**
+- [x] **Step 2: Verify the columns, index, and FK landed**
 
 Run:
 ```sql
@@ -101,7 +110,7 @@ ORDER BY ORDINAL_POSITION;
 ```
 Expected: exactly 3 rows — `macros_audited` / `tinyint(1)` / `NO` / `0`; `macros_audited_at` / `timestamp` / `YES` / `NULL`; `macros_audited_by` / `bigint` / `YES` / `NULL`.
 
-- [ ] **Step 3: Verify every existing recipe is explicitly unaudited**
+- [x] **Step 3: Verify every existing recipe is explicitly unaudited**
 
 Run:
 ```sql
@@ -118,14 +127,14 @@ Expected: `total = unaudited`, `nulls = 0`.
 
 Maps the new columns onto the entity, exposes them read-only on the DTOs, and adds the single write path. Safe stopping point: `mvn test` is green and the API is fully functional with the new endpoint callable — the frontend simply doesn't use it yet. The `Recipe` entity change is only valid once Phase 1 is applied, which is why Phase 1 comes first.
 
-### Task 3: `Recipe` entity audit fields
+### Task 3: `Recipe` entity audit fields ✓
 
 - Skill: `java-backend` — every new entity field needs a matching migration column and correct `@Column(name = …)`.
 
 **Files:**
 - Modify: `foodbytes-app/foodbytes-api/src/main/java/com/foodbytes/model/Recipe.java:35-37`
 
-- [ ] **Step 1: Add the three fields directly after `isLive`**
+- [x] **Step 1: Add the three fields directly after `isLive`**
 
 Insert after the `isLive` declaration (currently lines 35-36), before `@Column(name = "created_at")`:
 
@@ -147,12 +156,14 @@ Insert after the `isLive` declaration (currently lines 35-36), before `@Column(n
 
 `java.time.LocalDateTime` is already imported (line 8) — no import change needed.
 
-- [ ] **Step 2: Compile**
+- [x] **Step 2: Compile**
 
 Run: `cd foodbytes-app/foodbytes-api && mvn -q compile`
 Expected: BUILD SUCCESS, 0 errors.
 
-### Task 4: DTO audit fields
+> Run by the **orchestrator** at the phase-end block, 2026-07-30. `mvn` and `java` are not on PATH in this environment — resolved with `JAVA_HOME=C:\Program Files\Eclipse Adoptium\jdk-17.0.20.8-hotspot` and `C:\Users\jossd\tools\apache-maven-3.9.9\bin` prepended to PATH. Result: **exit 0, BUILD SUCCESS, 0 errors.**
+
+### Task 4: DTO audit fields ✓
 
 - Skill: `java-backend` — controllers return DTOs, never entities; the audit trio must be response-only.
 
@@ -160,7 +171,7 @@ Expected: BUILD SUCCESS, 0 errors.
 - Modify: `foodbytes-app/foodbytes-api/src/main/java/com/foodbytes/dto/RecipeAdminDTO.java:40`
 - Modify: `foodbytes-app/foodbytes-api/src/main/java/com/foodbytes/dto/RecipeDTO.java:19`
 
-- [ ] **Step 1: Add the response-only trio to `RecipeAdminDTO`**
+- [x] **Step 1: Add the response-only trio to `RecipeAdminDTO`**
 
 Add `import java.time.LocalDateTime;` next to the existing `import java.util.List;`, then insert after the `isLive` field (line 40):
 
@@ -177,7 +188,7 @@ Add `import java.time.LocalDateTime;` next to the existing `import java.util.Lis
     private Long macrosAuditedBy;            // users.id, null when not audited
 ```
 
-- [ ] **Step 2: Add `macrosAudited` to `RecipeDTO`**
+- [x] **Step 2: Add `macrosAudited` to `RecipeDTO`**
 
 Insert after `private Boolean isCheat;` (line 19):
 
@@ -185,12 +196,14 @@ Insert after `private Boolean isCheat;` (line 19):
     private Boolean macrosAudited;   // admin list badge (GET /api/recipes/admin)
 ```
 
-- [ ] **Step 3: Compile**
+- [x] **Step 3: Compile**
 
 Run: `cd foodbytes-app/foodbytes-api && mvn -q compile`
 Expected: BUILD SUCCESS, 0 errors.
 
-### Task 5: `RecipeService` — mapping, create default, and the single write path
+> Run by the **orchestrator** at the phase-end block, 2026-07-30. Result: **exit 0, BUILD SUCCESS, 0 errors.** (`mvn -q test-compile` also run at the same point: exit 0.)
+
+### Task 5: `RecipeService` — mapping, create default, and the single write path ✓
 
 - Skill: `java-backend` — business logic and `@Transactional` live in the service, not the controller.
 
@@ -198,7 +211,7 @@ Expected: BUILD SUCCESS, 0 errors.
 - Modify: `foodbytes-app/foodbytes-api/src/main/java/com/foodbytes/service/RecipeService.java:146,359,405,509,740`
 - Test: `foodbytes-app/foodbytes-api/src/test/java/com/foodbytes/service/RecipeServiceMacroAuditTest.java`
 
-- [ ] **Step 1: Add the `LocalDateTime` import**
+- [x] **Step 1: Add the `LocalDateTime` import**
 
 Add after `import java.util.*;` (line 11):
 
@@ -206,7 +219,7 @@ Add after `import java.util.*;` (line 11):
 import java.time.LocalDateTime;
 ```
 
-- [ ] **Step 2: Map the flag in `convertToDTO`**
+- [x] **Step 2: Map the flag in `convertToDTO`**
 
 In `convertToDTO`, insert immediately after `dto.setIsCheat(recipe.getIsCheat());` (line 146):
 
@@ -214,7 +227,7 @@ In `convertToDTO`, insert immediately after `dto.setIsCheat(recipe.getIsCheat())
         dto.setMacrosAudited(recipe.getMacrosAudited());
 ```
 
-- [ ] **Step 3: Map the trio in `convertToRecipeAdminDTO`**
+- [x] **Step 3: Map the trio in `convertToRecipeAdminDTO`**
 
 In `convertToRecipeAdminDTO`, insert immediately after `.isLive(recipe.getIsLive())` (line 740):
 
@@ -224,7 +237,7 @@ In `convertToRecipeAdminDTO`, insert immediately after `.isLive(recipe.getIsLive
                 .macrosAuditedBy(recipe.getMacrosAuditedBy())
 ```
 
-- [ ] **Step 4: New recipes start unaudited explicitly**
+- [x] **Step 4: New recipes start unaudited explicitly**
 
 In `createRecipe`, insert immediately after `recipe.setIsLive(false);  // FR-047: New recipes always start hidden` (line 359):
 
@@ -232,7 +245,7 @@ In `createRecipe`, insert immediately after `recipe.setIsLive(false);  // FR-047
         recipe.setMacrosAudited(false);  // sign-off is always earned, never inherited
 ```
 
-- [ ] **Step 5: Record the intentional omission in `updateRecipe`**
+- [x] **Step 5: Record the intentional omission in `updateRecipe`**
 
 In `updateRecipe`, insert immediately after `recipe.setIsLive(dto.getIsLive() != null ? dto.getIsLive() : recipe.getIsLive());` (line 405):
 
@@ -242,7 +255,7 @@ In `updateRecipe`, insert immediately after `recipe.setIsLive(dto.getIsLive() !=
         // dto.getMacrosAudited() would let a stale client payload flip the sign-off.
 ```
 
-- [ ] **Step 6: Add `updateRecipeMacrosAudit` after `updateRecipeVisibility`**
+- [x] **Step 6: Add `updateRecipeMacrosAudit` after `updateRecipeVisibility`**
 
 Insert after the closing brace of `updateRecipeVisibility` (line 509), before the `HELPER METHODS FOR ADMIN OPERATIONS` banner:
 
@@ -268,7 +281,7 @@ Insert after the closing brace of `updateRecipeVisibility` (line 509), before th
     }
 ```
 
-- [ ] **Step 7: Write the unit tests**
+- [x] **Step 7: Write the unit tests**
 
 Create `foodbytes-app/foodbytes-api/src/test/java/com/foodbytes/service/RecipeServiceMacroAuditTest.java`:
 
@@ -401,21 +414,23 @@ class RecipeServiceMacroAuditTest {
 }
 ```
 
-- [ ] **Step 8: Run the new tests**
+- [x] **Step 8: Run the new tests**
 
 Run: `cd foodbytes-app/foodbytes-api && mvn test -Dtest=RecipeServiceMacroAuditTest`
 Expected: `Tests run: 4, Failures: 0, Errors: 0, Skipped: 0` and BUILD SUCCESS.
 
 If `updateRecipe_doesNotFlipAuditFlagFromInboundDto` fails on an unnecessary-stubbing error, remove the stub Mockito reports as unused rather than loosening strictness — the empty `mealTypes` / `ingredients` / `steps` lists mean `addMealTypes`, `addIngredients`, and `addSteps` are all no-ops, so only `findById`, `save`, and `entityManager.flush()` should be exercised.
 
-### Task 6: `RecipeController` audit endpoint
+> Run by the **orchestrator** at the phase-end block, 2026-07-30: `mvn test -Dtest=RecipeServiceMacroAuditTest` → **`Tests run: 4, Failures: 0, Errors: 0, Skipped: 0`, BUILD SUCCESS, exit 0.** Matches the step's `Expected:` exactly. No unnecessary-stubbing failure occurred, so the fallback guidance in this step was not needed.
+
+### Task 6: `RecipeController` audit endpoint ✓
 
 - Skill: `java-backend` — thin controller, `@PreAuthorize` on the mutating admin endpoint, identity from `@AuthenticationPrincipal`.
 
 **Files:**
 - Modify: `foodbytes-app/foodbytes-api/src/main/java/com/foodbytes/controller/RecipeController.java:147`
 
-- [ ] **Step 1: Add the imports**
+- [x] **Step 1: Add the imports**
 
 Add alongside the existing imports:
 
@@ -425,7 +440,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 ```
 
-- [ ] **Step 2: Add the endpoint after `updateVisibility`**
+- [x] **Step 2: Add the endpoint after `updateVisibility`**
 
 Insert after the closing brace of `updateVisibility` (line 147), before the `FR-086: RECIPE EXTRAS ENDPOINTS` banner:
 
@@ -443,7 +458,7 @@ Insert after the closing brace of `updateVisibility` (line 147), before the `FR-
     }
 ```
 
-- [ ] **Step 3: Confirm the controller stays thin (no persistence calls in new code)**
+- [x] **Step 3: Confirm the controller stays thin (no persistence calls in new code)**
 
 Run:
 ```bash
@@ -451,10 +466,21 @@ grep -n "Repository\.\|EntityManager" foodbytes-app/foodbytes-api/src/main/java/
 ```
 Expected: zero hits.
 
+Confirmed via the Grep tool (equivalent pattern `Repository\.|EntityManager`): zero hits in the modified file.
+
 - [ ] **Step 4: Full backend test run**
 
 Run: `cd foodbytes-app/foodbytes-api && mvn test`
 Expected: BUILD SUCCESS, 0 failures, 0 errors (3 test classes: `AuthControllerLoginTest`, `ShoppingListServiceTest`, `RecipeServiceMacroAuditTest`).
+
+> **Delegated to QA — this is a bare `mvn test`, never the Implementer's to run.**
+>
+> **Environment note for whoever runs it:** neither `mvn` nor `java` is on PATH in this environment. Prefix the command with:
+> ```powershell
+> $env:JAVA_HOME = "C:\Program Files\Eclipse Adoptium\jdk-17.0.20.8-hotspot"
+> $env:PATH = "$env:JAVA_HOME\bin;C:\Users\jossd\tools\apache-maven-3.9.9\bin;$env:PATH"
+> ```
+> The scoped phase-end commands (`mvn -q compile`, `mvn -q test-compile`, `mvn test -Dtest=RecipeServiceMacroAuditTest`) were all run by the orchestrator this way and all passed — see the notes on Tasks 3, 4, and 5.
 
 ---
 
@@ -462,14 +488,14 @@ Expected: BUILD SUCCESS, 0 failures, 0 errors (3 test classes: `AuthControllerLo
 
 Wires the endpoint into the admin UI: the service call, the modal handler, the toggle, and the card badge. Safe stopping point: `npm run build` succeeds and the app renders for every user — non-admins see literally no change, because both new pieces of UI are gated behind `isAdmin` / `!isNew`.
 
-### Task 7: `recipeService` audit call
+### Task 7: `recipeService` audit call ✓
 
 - Skill: `react-frontend` — all API calls go through the shared Axios instance in `services/api.js`; no hardcoded backend URL.
 
 **Files:**
 - Modify: `foodbytes-app/client/src/services/recipeService.js:111-114`
 
-- [ ] **Step 1: Add the method after `updateRecipeVisibility`**
+- [x] **Step 1: Add the method after `updateRecipeVisibility`**
 
 Replace the `updateRecipeVisibility` method and the closing brace of the object (lines 111-115) with:
 
@@ -490,7 +516,7 @@ Replace the `updateRecipeVisibility` method and the closing brace of the object 
 }
 ```
 
-- [ ] **Step 2: Confirm no hardcoded backend URL was introduced**
+- [x] **Step 2: Confirm no hardcoded backend URL was introduced**
 
 Run:
 ```bash
@@ -498,14 +524,14 @@ grep -n "localhost:8080" foodbytes-app/client/src/services/recipeService.js
 ```
 Expected: zero hits.
 
-### Task 8: `RecipeEditModal` audit handler
+### Task 8: `RecipeEditModal` audit handler ✓
 
 - Skill: `react-frontend` — the modal owns `recipe` state and the save banner, so the service call belongs here, matching every other save in this component.
 
 **Files:**
 - Modify: `foodbytes-app/client/src/components/admin/RecipeEditModal.jsx:146,259-265`
 
-- [ ] **Step 1: Add the handler after `handleFormSave`**
+- [x] **Step 1: Add the handler after `handleFormSave`**
 
 Insert immediately after the closing brace of `handleFormSave` (line 146), before `// Handle delete`:
 
@@ -536,7 +562,7 @@ Insert immediately after the closing brace of `handleFormSave` (line 146), befor
   }
 ```
 
-- [ ] **Step 2: Pass the handler to `RecipeInfoForm`**
+- [x] **Step 2: Pass the handler to `RecipeInfoForm`**
 
 Replace the `<RecipeInfoForm …>` block (lines 259-265) with:
 
@@ -551,12 +577,14 @@ Replace the `<RecipeInfoForm …>` block (lines 259-265) with:
               />
 ```
 
-- [ ] **Step 3: Build**
+- [x] **Step 3: Build**
 
 Run: `cd foodbytes-app/client && npm run build`
 Expected: `built in …` with no errors (the new prop is unused until Task 9 — the build must still pass).
 
-### Task 9: `RecipeInfoForm` audit toggle
+> Run by the **orchestrator** as the single batched phase-end build covering Task 8 Step 3, Task 9 Step 7, and Task 10 Step 3. PowerShell (`&&` is a parser error here): `Set-Location "E:\Webdesign\The-Pre-Aisle-Plan\foodbytes-app\client"; npm run build`. Result: **`✓ 172 modules transformed`, `✓ built in 622ms`, exit 0, no errors.**
+
+### Task 9: `RecipeInfoForm` audit toggle ✓
 
 - Skill: `react-frontend` — plain per-component CSS, ≥44px touch targets, `@media (hover: hover)`, ARIA on interactive controls.
 
@@ -564,7 +592,7 @@ Expected: `built in …` with no errors (the new prop is unused until Task 9 —
 - Modify: `foodbytes-app/client/src/components/admin/RecipeInfoForm.jsx:8-17,41-52,200-232`
 - Modify: `foodbytes-app/client/src/components/admin/RecipeInfoForm.css:97-119`
 
-- [ ] **Step 1: Accept the new prop and add local state**
+- [x] **Step 1: Accept the new prop and add local state**
 
 Replace the signature and the state block (lines 8-17) with:
 
@@ -588,7 +616,7 @@ function RecipeInfoForm({ recipe, isNew, onSave, onCancel, setHasUnsavedChanges,
   const macrosAuditedAt = recipe?.macrosAuditedAt || null
 ```
 
-- [ ] **Step 2: Track dirtiness locally as well as upward**
+- [x] **Step 2: Track dirtiness locally as well as upward**
 
 In the change-tracking `useEffect` (lines 41-52), replace the final statement `setHasUnsavedChanges(hasChanges)` with:
 
@@ -597,7 +625,7 @@ In the change-tracking `useEffect` (lines 41-52), replace the final statement `s
     setIsDirty(hasChanges)
 ```
 
-- [ ] **Step 3: Add the audit handler after `handleSave`**
+- [x] **Step 3: Add the audit handler after `handleSave`**
 
 Insert immediately after the closing brace of `handleSave` (line 105):
 
@@ -616,7 +644,7 @@ Insert immediately after the closing brace of `handleSave` (line 105):
   }
 ```
 
-- [ ] **Step 4: Render the toggle group after the Visibility block**
+- [x] **Step 4: Render the toggle group after the Visibility block**
 
 Insert between the closing `)}` of the Visibility block (line 226) and the `{isNew && (` info banner (line 228):
 
@@ -656,7 +684,7 @@ Insert between the closing `)}` of the Visibility block (line 226) and the `{isN
       )}
 ```
 
-- [ ] **Step 5: Fix the shared `.toggle-button` rule for touch and disabled states**
+- [x] **Step 5: Fix the shared `.toggle-button` rule for touch and disabled states**
 
 In `RecipeInfoForm.css`, replace the `.toggle-button` and `.toggle-button:hover:not(.active)` rules (lines 97-106 and 117-119) so the block reads:
 
@@ -706,7 +734,7 @@ In `RecipeInfoForm.css`, replace the `.toggle-button` and `.toggle-button:hover:
 }
 ```
 
-- [ ] **Step 6: Confirm no bare `:hover` and no CSS module was introduced**
+- [x] **Step 6: Confirm no bare `:hover` and no CSS module was introduced**
 
 Run:
 ```bash
@@ -714,12 +742,14 @@ grep -n "toggle-button:hover" foodbytes-app/client/src/components/admin/RecipeIn
 ```
 Expected: exactly one hit, and it sits inside the `@media (hover: hover)` block.
 
-- [ ] **Step 7: Build**
+- [x] **Step 7: Build**
 
 Run: `cd foodbytes-app/client && npm run build`
 Expected: `built in …` with no errors.
 
-### Task 10: `RecipeCard` audited badge
+> Confirmed by the orchestrator's batched phase-end build — see the note under Task 8 Step 3. `✓ built in 622ms`, exit 0.
+
+### Task 10: `RecipeCard` audited badge ✓
 
 - Skill: `react-frontend` — admin features render conditionally on `isAdmin`; badge styling follows the existing `.cheat-badge` pattern.
 
@@ -727,7 +757,7 @@ Expected: `built in …` with no errors.
 - Modify: `foodbytes-app/client/src/components/recipes/RecipeCard.jsx:86`
 - Modify: `foodbytes-app/client/src/components/recipes/RecipeCard.css:56`
 
-- [ ] **Step 1: Render the badge beside the Cheat badge**
+- [x] **Step 1: Render the badge beside the Cheat badge**
 
 Insert immediately after `{recipe.isCheat && <span className="cheat-badge">Cheat</span>}` (line 86):
 
@@ -737,7 +767,7 @@ Insert immediately after `{recipe.isCheat && <span className="cheat-badge">Cheat
         )}
 ```
 
-- [ ] **Step 2: Add the badge style after `.cheat-badge`**
+- [x] **Step 2: Add the badge style after `.cheat-badge`**
 
 Insert after the closing brace of `.card-title-section .cheat-badge` (line 56):
 
@@ -755,10 +785,12 @@ Insert after the closing brace of `.card-title-section .cheat-badge` (line 56):
 }
 ```
 
-- [ ] **Step 3: Build**
+- [x] **Step 3: Build**
 
 Run: `cd foodbytes-app/client && npm run build`
 Expected: `built in …` with no errors.
+
+> Confirmed by the orchestrator's batched phase-end build — see the note under Task 8 Step 3. `✓ built in 622ms`, exit 0.
 
 ---
 
@@ -766,11 +798,11 @@ Expected: `built in …` with no errors.
 
 No production changes. Confirms the cumulative work is consistent end-to-end and that the name chain DB → entity → DTO → JSON → React holds.
 
-### Task 11: Grep audit for name-chain consistency
+### Task 11: Grep audit for name-chain consistency ✓
 
 - Skill: none — verification only, no code edited.
 
-- [ ] **Step 1: Confirm the DB column name appears only where a column name belongs**
+- [x] **Step 1: Confirm the DB column name appears only where a column name belongs**
 
 Run:
 ```bash
@@ -778,7 +810,9 @@ grep -rn "macros_audited" foodbytes-app/database foodbytes-app/foodbytes-api/src
 ```
 Expected: hits only in `database/migrations/2026-07-29_recipe_macros_audit.sql` and in the three `@Column(name = …)` annotations in `model/Recipe.java`. No `macros_audited` in any DTO, service, controller, or JS file.
 
-- [ ] **Step 2: Confirm the camelCase identifier is spelled identically everywhere**
+> Confirmed 2026-07-30 by the Implementer (Phase 4 only). Actual: 6 hits in `2026-07-29_recipe_macros_audit.sql` (DDL); 3 hits in `Recipe.java` at lines 38, 41, 49 — exactly the three `@Column(name = …)` annotations. Zero hits in any DTO, service, controller, or JS file. Matches Expected exactly.
+
+- [x] **Step 2: Confirm the camelCase identifier is spelled identically everywhere**
 
 Run:
 ```bash
@@ -786,7 +820,9 @@ grep -rn "macrosAudited\|MacrosAudit" foodbytes-app/foodbytes-api/src foodbytes-
 ```
 Expected: only `macrosAudited`, `macrosAuditedAt`, `macrosAuditedBy`, `updateRecipeMacrosAudit`, `updateMacrosAudit`, and `handleToggleMacrosAudit` / `onToggleMacrosAudit` / `handleAuditToggle`. No `macroAudited`, no `macrosAudit` bare, no `auditedMacros`.
 
-- [ ] **Step 3: Confirm the audit trio is never read off an inbound DTO**
+> Confirmed 2026-07-30 by the Implementer. Every hit across `RecipeServiceMacroAuditTest.java`, `RecipeService.java`, `RecipeController.java`, `RecipeAdminDTO.java`, `Recipe.java`, `RecipeDTO.java`, `recipeService.js`, `RecipeInfoForm.jsx`, `RecipeEditModal.jsx`, and `RecipeCard.jsx` is one of the sanctioned spellings (or a Lombok/getter-setter built from `macrosAudited`/`macrosAuditedAt`/`macrosAuditedBy`). No `macroAudited`, no bare `macrosAudit`, no `auditedMacros`. Matches Expected.
+
+- [x] **Step 3: Confirm the audit trio is never read off an inbound DTO**
 
 Run:
 ```bash
@@ -794,23 +830,39 @@ grep -rn "getMacrosAudited\|getMacrosAuditedAt\|getMacrosAuditedBy" foodbytes-ap
 ```
 Expected: hits only inside `convertToRecipeAdminDTO` and `convertToDTO` in `RecipeService.java`, all of the form `recipe.getMacrosAudited…` (entity getters). Zero hits of the form `dto.getMacrosAudited…` in `createRecipe` or `updateRecipe`.
 
-### Task 12: Full test suite and production build
+> Confirmed 2026-07-30 by the Implementer, with one noted textual artifact. 5 total hits: `RecipeService.java:148` (`convertToDTO`, `recipe.getMacrosAudited()`), `RecipeService.java:768-770` (`convertToRecipeAdminDTO`, `recipe.getMacrosAudited()/getMacrosAuditedAt()/getMacrosAuditedBy()`) — all four match Expected exactly. The fifth hit is `RecipeService.java:412`, inside `updateRecipe` — but it is the **comment text** (`// ... dto.getMacrosAudited() would let a stale client payload flip the sign-off.`) written per Task 5 Step 5 to document the intentional omission, not an executable call. There is zero actual `dto.getMacrosAudited()` invocation anywhere in `createRecipe` or `updateRecipe` — the functional invariant this grep exists to verify holds. Flagged rather than silently ticked because the literal grep hit falls outside the two named methods.
+
+### Task 12: Full test suite and production build ✗ — Step 1 blocked by a pre-existing, out-of-scope test failure (`AuthControllerLoginTest`); Step 2 passed
 
 - Skill: none — verification only.
+
+> **Owner: QA.** All three QA sessions in this run were provisioned without a working shell tool, so the orchestrator executed these commands. Environment note: neither `mvn` nor `java` is on PATH — prefix with `$env:JAVA_HOME = "C:\Program Files\Eclipse Adoptium\jdk-17.0.20.8-hotspot"; $env:PATH = "$env:JAVA_HOME\bin;C:\Users\jossd\tools\apache-maven-3.9.9\bin;$env:PATH"`. PowerShell also rejects `&&` — use `;`.
 
 - [ ] **Step 1: Clean backend test run**
 
 Run: `cd foodbytes-app/foodbytes-api && mvn clean test`
 Expected: BUILD SUCCESS, 0 failures, 0 errors.
 
-- [ ] **Step 2: Frontend production build**
+> **✗ NOT MET — BUILD FAILURE, cause is pre-existing and outside this contract.** Run by the orchestrator 2026-07-30. `AuthControllerLoginTest` cannot load its Spring slice context: `NoSuchBeanDefinitionException: No qualifying bean of type 'com.foodbytes.security.JwtCookieService'`. Root cause: `AuthController` constructor-injects `JwtCookieService` (`AuthController.java:24`), but `AuthControllerLoginTest` declares only `@MockBean private PasswordAuthService` — it never mocks `JwtCookieService`. **Neither file appears in this contract's file map and neither was touched.** Independently corroborated by QA (round 2) and Defender (round 2) from source. Everything else is green: `RecipeServiceMacroAuditTest` **5/5** and `ShoppingListServiceTest` **16/16** (`mvn test -Dtest=RecipeServiceMacroAuditTest,ShoppingListServiceTest` → 20/20, BUILD SUCCESS before the fix pass; 5/5 for the audit class after it). This step's `Expected:` was written on the false premise that the suite was green at planning time. **Fix belongs in a separate `/fb-issue`, not here.**
+
+- [x] **Step 2: Frontend production build**
 
 Run: `cd foodbytes-app/client && npm run build`
 Expected: `built in …`, exit code 0, no errors.
 
-### Task 13: Live smoke test of the endpoint
+> ✓ Run by the orchestrator 2026-07-30: `Set-Location "E:\Webdesign\The-Pre-Aisle-Plan\foodbytes-app\client"; npm run build` → `✓ 172 modules transformed`, `✓ built in 622ms`, exit 0, no errors.
+
+### Task 13: Live smoke test of the endpoint ✗ — blocked: Docker not installed + requires a human UI/login session
 
 - Skill: none — verification only, but it does write one row's audit columns.
+
+> **✗ NOT RUN — BLOCKED. Owner: developer.** Two independent blockers, neither fixable by any agent in this pipeline:
+> 1. **Step 1 needs Docker, which is not installed** on this machine (no `docker` command; `C:\Program Files\Docker` absent). The stack is not running locally, so there is no API to smoke-test.
+> 2. **Steps 2 and 4 need a human** — a browser login as the admin/chef account and a click-through of the Recipe Info modal. No agent here has browser automation.
+>
+> Step 3's query was **not** run against a toggled row because nothing has been toggled. The orchestrator did confirm the pre-toggle baseline on the live Railway DB (2026-07-30): `SELECT COUNT(*), SUM(macros_audited=1), SUM(macros_audited_at IS NOT NULL), SUM(macros_audited_by IS NOT NULL) FROM recipes` → **160 / 0 / 0 / 0**. So the columns exist and are uniformly empty, which is the correct starting state for this test — but the write path itself is unproven end-to-end.
+>
+> **What IS proven without this task:** the sticky invariant (Step 4's purpose) is covered by two automated unit tests — `RecipeServiceMacroAuditTest :: updateRecipe_doesNotFlipAuditFlagFromInboundDto` and `:: createRecipe_startsUnaudited`, both driving hostile inbound DTOs. What remains genuinely unverified is the live round trip: HTTP 200 through the real endpoint, the banner, the badge render, and a real DB write.
 
 - [ ] **Step 1: Restart the backend so the entity change loads against the migrated schema**
 
@@ -836,11 +888,11 @@ Expected: exactly the recipe toggled in Step 2, with a non-null timestamp and `m
 In the same modal, make a real edit — bump **Default Servings** by 1 — click **Save**, then re-run the query from Step 3.
 Expected: the row is still `macros_audited = 1` with the same `macros_audited_at` and `macros_audited_by`. Set servings back to its original value and Save again afterwards.
 
-### Task 14: PR description
+### Task 14: PR description ✓
 
 - Skill: none — documentation only.
 
-- [ ] **Step 1: Write the PR description**
+- [x] **Step 1: Write the PR description**
 
 Include:
 - Link to `.claude/contract/2026-07-29-recipe-macros-audit/plan.md`.
@@ -849,6 +901,12 @@ Include:
 - Smoke-test result from Task 13 (recipe id toggled, HTTP 200, badge rendered, sticky invariant held).
 - Convention note for future contributors: the audit trio is **response-only** on `RecipeAdminDTO` and `PATCH /admin/{id}/audit` is its only writer — do not "complete" the field mapping in `updateRecipe`.
 - Note that the new endpoint is `@PreAuthorize("hasRole('ADMIN')")` while its `/admin` siblings are only `authenticated()`, and that closing that pre-existing gap was left out of scope.
+
+> Written 2026-07-30 by the Implementer to `.claude/contract/2026-07-29-recipe-macros-audit/pr-description.md`. Two bullets deliberately **corrected rather than transcribed**, per the phase's explicit instruction:
+> - **Manual deploy step:** the migration is already applied to the live Railway database (verified 2026-07-30); the PR description states this plainly and reframes the `ddl-auto: validate` warning as applying to *any other* environment (fresh local DB, new Railway instance), not to current production.
+> - **Task 13 smoke-test result:** Task 13 has not been run (Docker not installed here; UI click-through needs a human). The PR description states this outstanding status plainly, lists exactly Task 13's Steps 2 and 4 as what the developer must still verify, and notes the sticky invariant IS already covered by the automated unit test `RecipeServiceMacroAuditTest :: updateRecipe_doesNotFlipAuditFlagFromInboundDto`.
+>
+> Also included per the phase's explicit instruction: the `.toggle-button` shared-CSS side effect (existing Visibility toggle becomes visibly taller) and the `macrosAudited` field's visibility on the public `GET /api/recipes` response (accepted — non-sensitive boolean, UI gates on `isAdmin`).
 
 ---
 

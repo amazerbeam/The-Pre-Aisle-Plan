@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -144,6 +145,7 @@ public class RecipeService {
         dto.setCarbs(macros[1]);
         dto.setFat(macros[2]);
         dto.setIsCheat(recipe.getIsCheat());
+        dto.setMacrosAudited(recipe.getMacrosAudited());
 
         dto.setMealTypes(recipe.getMeals().stream()
                 .map(m -> m.getMeal().getKey())
@@ -357,6 +359,7 @@ public class RecipeService {
         recipe.setCalories(dto.getCalories());
         recipe.setIsCheat(dto.getIsCheat() != null ? dto.getIsCheat() : false);
         recipe.setIsLive(false);  // FR-047: New recipes always start hidden
+        recipe.setMacrosAudited(false);  // sign-off is always earned, never inherited
 
         // Save recipe first to get ID
         recipe = recipeRepository.save(recipe);
@@ -403,6 +406,10 @@ public class RecipeService {
         recipe.setCalories(dto.getCalories());
         recipe.setIsCheat(dto.getIsCheat() != null ? dto.getIsCheat() : false);
         recipe.setIsLive(dto.getIsLive() != null ? dto.getIsLive() : recipe.getIsLive());
+
+        // Audit fields are deliberately NOT mapped from the DTO here. The flag is
+        // sticky and PATCH /api/recipes/admin/{id}/audit is its only writer — mapping
+        // dto.getMacrosAudited() would let a stale client payload flip the sign-off.
 
         // Clear existing collections
         recipe.getMeals().clear();
@@ -503,6 +510,26 @@ public class RecipeService {
         }
 
         recipe.setIsLive(isLive);
+        recipe = recipeRepository.save(recipe);
+
+        return convertToRecipeAdminDTO(recipe);
+    }
+
+    /**
+     * Set or clear the chef's macro/calorie audit sign-off on a recipe.
+     * Sticky: nothing else in the application clears this — only an explicit call here.
+     * Clearing resets the timestamp and auditor too, so the columns never describe a
+     * sign-off that is no longer in force.
+     */
+    @Transactional
+    public RecipeAdminDTO updateRecipeMacrosAudit(Long id, boolean audited, Long auditedByUserId) {
+        Recipe recipe = recipeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Recipe not found with id: " + id));
+
+        recipe.setMacrosAudited(audited);
+        recipe.setMacrosAuditedAt(audited ? LocalDateTime.now() : null);
+        recipe.setMacrosAuditedBy(audited ? auditedByUserId : null);
+
         recipe = recipeRepository.save(recipe);
 
         return convertToRecipeAdminDTO(recipe);
@@ -738,6 +765,9 @@ public class RecipeService {
                 .calories(recipe.getCalories())
                 .isCheat(recipe.getIsCheat())
                 .isLive(recipe.getIsLive())
+                .macrosAudited(recipe.getMacrosAudited())
+                .macrosAuditedAt(recipe.getMacrosAuditedAt())
+                .macrosAuditedBy(recipe.getMacrosAuditedBy())
                 .mealTypes(recipe.getMeals().stream()
                         .map(m -> m.getMeal().getKey())
                         .collect(Collectors.toList()))

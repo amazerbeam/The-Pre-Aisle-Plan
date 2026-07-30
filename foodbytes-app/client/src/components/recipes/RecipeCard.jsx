@@ -104,6 +104,9 @@ function RecipeCard({ recipe, currentMealType, onSelectVariant, onEdit }) {
       <div className="card-title-section">
         <h3 className="recipe-name">{recipe.name}</h3>
         {recipe.isCheat && <span className="cheat-badge">Cheat</span>}
+        {isAdmin && recipe.macrosAudited && (
+          <span className="audited-badge" title="Macros and calories signed off">✓ Audited</span>
+        )}
       </div>
 
       {/* Meta Pill Bar: Calories | Variant | Servings */}

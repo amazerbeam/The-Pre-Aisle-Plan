@@ -1,0 +1,406 @@
+/* FR-104: Macro target popup — explains one macro's traffic-light bands.
+ * Mirrors DailyMacroPopup.css. Keyframe names are prefixed because CSS keyframe
+ * names are global and the last definition wins.
+ */
+
+.macro-target-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  /* Above .recipe-view-overlay (1000) — this popup opens on top of it. */
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: macroTargetFadeIn 0.2s ease-out;
+}
+
+@keyframes macroTargetFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes macroTargetSlideIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.macro-target-popup {
+  background: #fff;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  max-width: 470px;
+  width: 100%;
+  max-height: 90vh;
+  max-height: 90dvh;
+  display: flex;
+  flex-direction: column;
+  animation: macroTargetSlideIn 0.2s ease-out;
+}
+
+.macro-target-header {
+  background: var(--brand-primary);
+  color: #fff;
+  padding: 16px;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.macro-target-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.macro-target-heading h4 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.macro-target-subtitle {
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+
+.macro-target-close {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 2rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  min-width: 44px;
+  min-height: 44px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  transition: background-color 0.2s ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (hover: hover) {
+  .macro-target-close:hover { background-color: rgba(255, 255, 255, 0.2); }
+}
+
+.macro-target-close:active { background-color: rgba(255, 255, 255, 0.3); }
+
+.macro-target-close:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+.macro-target-content {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding: 20px;
+}
+
+/* Current reading */
+.macro-target-current {
+  text-align: center;
+  padding: 16px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  margin-bottom: 18px;
+  border: 2px solid transparent;
+}
+
+.macro-target-current--under { border-color: var(--macro-under-target); }
+.macro-target-current--near { border-color: var(--macro-near-target); }
+.macro-target-current--on { border-color: var(--macro-on-target); }
+.macro-target-current--over { border-color: var(--macro-over-target); }
+
+.macro-target-value {
+  display: block;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--brand-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.macro-target-value-sub {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+.macro-target-status-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.macro-target-pill,
+.macro-target-reject {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+/* Fill and label from the status token group in global.css, so a hue retune moves
+   the pill with the border and the dot instead of leaving it on the old colour. */
+.macro-target-pill--under { background: var(--macro-under-target-pill-bg); color: var(--macro-under-target-pill-text); }
+.macro-target-pill--near { background: var(--macro-near-target-pill-bg); color: var(--macro-near-target-pill-text); }
+.macro-target-pill--on { background: var(--macro-on-target-pill-bg); color: var(--macro-on-target-pill-text); }
+.macro-target-pill--over { background: var(--macro-over-target-pill-bg); color: var(--macro-over-target-pill-text); }
+
+/* The must-fix signal, independent of the traffic light. */
+.macro-target-reject {
+  background: var(--text-primary);
+  color: #fff;
+}
+
+/* Perfect target callout */
+.macro-target-perfect {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  margin-bottom: 18px;
+  background: #efedf7;
+  border-left: 4px solid var(--brand-primary);
+}
+
+.macro-target-perfect-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 700;
+  color: var(--brand-primary);
+}
+
+.macro-target-perfect-value {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.macro-target-section {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  margin: 0 0 8px;
+}
+
+/* Band legend */
+.macro-target-legend {
+  list-style: none;
+  margin: 0 0 18px;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.macro-target-legend li {
+  display: grid;
+  grid-template-columns: 16px 22px 1fr auto;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  background: #fff;
+  border: 2px solid var(--border-color);
+  font-size: 0.85rem;
+}
+
+.macro-target-legend li.is-current {
+  border-color: var(--brand-primary);
+  background: #f7f6fc;
+}
+
+.macro-target-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+}
+
+.macro-target-dot--under { background: var(--macro-under-target); }
+.macro-target-dot--near { background: var(--macro-near-target); }
+.macro-target-dot--on { background: var(--macro-on-target); }
+.macro-target-dot--over { background: var(--macro-over-target); }
+
+.macro-target-legend-arrow {
+  font-size: 1rem;
+  font-weight: 700;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.macro-target-legend-range {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.macro-target-legend-reject {
+  display: inline-block;
+  font-size: 0.66rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  background: var(--text-primary);
+  color: #fff;
+  padding: 2px 6px;
+  border-radius: 8px;
+  margin-left: 6px;
+}
+
+.macro-target-legend-meaning {
+  display: block;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+}
+
+.macro-target-here {
+  font-size: 0.66rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--brand-primary);
+  background: #efedf7;
+  padding: 3px 8px;
+  border-radius: 10px;
+}
+
+/* Provenance */
+.macro-target-why {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  margin-bottom: 12px;
+}
+
+.macro-target-why p {
+  margin: 0 0 8px;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+.macro-target-why p:last-child { margin-bottom: 0; }
+
+/* Attribution — every claim paired with where it came from. */
+.macro-target-sources {
+  list-style: none;
+  margin: 0 0 12px;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.macro-target-sources li {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  background: #fff;
+}
+
+.macro-target-source-claim {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+.macro-target-source-origin {
+  font-size: 0.76rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+.macro-target-variant-note {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  border-top: 1px solid var(--border-color);
+  padding-top: 12px;
+  margin: 0;
+}
+
+.macro-target-hint {
+  text-align: center;
+  font-size: 0.75rem;
+  color: #999;
+  padding: 8px;
+  margin: 0;
+  border-top: 1px solid #eee;
+  flex-shrink: 0;
+}
+
+/* Mobile: bottom sheet, matching DailyMacroPopup */
+@media (max-width: 480px) {
+  .macro-target-overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .macro-target-popup {
+    max-width: 100%;
+    max-height: 95vh;
+    max-height: 95dvh;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  }
+
+  .macro-target-header {
+    padding: 14px;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  }
+
+  .macro-target-heading h4 { font-size: 1.1rem; }
+
+  .macro-target-content { padding: 16px; }
+
+  /* Label above value — side-by-side wraps badly once the target string is
+     "40 – 50 % of kcal" on a 320px screen. */
+  .macro-target-perfect {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  /* Drop the "You are here" column: at 320px the four-column grid squeezes the
+     range and meaning text to 2-3 words per line. The current band is still
+     identifiable by its highlighted border. */
+  .macro-target-legend li {
+    grid-template-columns: 16px 22px 1fr;
+  }
+
+  .macro-target-here { display: none; }
+
+  .macro-target-hint {
+    padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* Respect a reduced-motion preference: the fade and scale are decorative. */
+@media (prefers-reduced-motion: reduce) {
+  .macro-target-overlay,
+  .macro-target-popup {
+    animation: none;
+  }
+}

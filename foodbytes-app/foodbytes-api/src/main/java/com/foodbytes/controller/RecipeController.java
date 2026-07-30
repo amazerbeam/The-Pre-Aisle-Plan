@@ -6,6 +6,7 @@ import com.foodbytes.dto.RecipeExtrasHierarchyDTO;
 import com.foodbytes.dto.RecipeIngredientsUpdateDTO;
 import com.foodbytes.dto.RecipeStepsUpdateDTO;
 import com.foodbytes.dto.RecipeSummaryDTO;
+import com.foodbytes.security.UserPrincipal;
 import com.foodbytes.service.RecipeService;
 import com.foodbytes.service.RecipeExtrasService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,6 +15,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -144,6 +147,18 @@ public class RecipeController {
             @PathVariable Long id,
             @RequestParam boolean isLive) {
         return ResponseEntity.ok(recipeService.updateRecipeVisibility(id, isLive));
+    }
+
+    @PatchMapping("/admin/{id}/audit")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Set macro audit sign-off (admin)",
+            description = "Marks or unmarks a recipe as having had its macros and calories validated by the chef")
+    public ResponseEntity<RecipeAdminDTO> updateMacrosAudit(
+            @PathVariable Long id,
+            @RequestParam boolean audited,
+            @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        return ResponseEntity.ok(
+                recipeService.updateRecipeMacrosAudit(id, audited, userPrincipal.getId()));
     }
 
     // ========================================
