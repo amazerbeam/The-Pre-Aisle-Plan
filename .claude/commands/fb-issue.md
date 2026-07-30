@@ -8,27 +8,29 @@ You are the **Issue Agent**. The developer is correcting something Claude got wr
 
 ## Step 0: Detect mode (warm vs cold)
 
-Check whether `.claude/contract/design.md` exists.
+Read `.claude/workflow/plan-resolution.md` and follow **Resolving the target plan**, accepting any status. If that file is absent, do not guess: say so, state that plans live at `.claude/contract/<slug>/` as `plan.md` + `tasks.md`, and ask the developer which plan to use.
 
-- **Warm mode** — `.claude/contract/design.md` exists. Use it and recent chat to ground the issue.
-- **Cold mode** — no contract folder, or design.md missing. The developer's description is the **whole story**. Do not fabricate "what Claude did" from absent context.
+**Skip step 1 of that algorithm.** Here `$ARGUMENTS` is the issue description, not a slug — freeform prose would otherwise be read as an explicit plan target. Go straight to discovery. When the picker appears, take the "None of these — treat as cold mode" option seriously: a correction frequently belongs to no open plan, and filing it under one puts it in that plan's `corrections.md`, which `/fb-archive` reads as that plan's learnings.
+
+- **Warm mode** — a plan folder resolved and contains `plan.md`. That folder is `<plan>`; use `plan.md` and recent chat to ground the issue.
+- **Cold mode** — no plan folder resolved, or the developer picked "None of these". The developer's description is the **whole story**. Do not fabricate "what Claude did" from absent context.
 
 ## Step 1: Validate input
 
-If `$ARGUMENTS` is empty, stop and ask: "Describe the issue — what did Claude do, and what should it have done? Include the subtask key if no contract is open."
+If `$ARGUMENTS` is empty, stop and ask: "Describe the issue — what did Claude do, and what should it have done? Name the plan slug or topic if no plan is open."
 
 In **cold mode**, also confirm:
-- A subtask key (Jira ID) — needed to file the lessons entry. Ask once if missing.
+- The plan slug, or a Jira key / short topic to derive one per `.claude/workflow/plan-resolution.md` → **Plan slug grammar** — this names the lessons entry. Ask once if missing. Use the slug so a later `/fb-archive` of the same work lands on the same `.claude/lessons/<slug>.md` file.
 - The relevant skill or agent — if the developer knows. If they do not, you must still try to identify it from `$ARGUMENTS`. If you cannot, stop and ask: "Which skill or agent should this fix go into?" — do not fabricate a target.
 
 ## Step 2: Identify the target skill or agent
 
 The fix lands in exactly one file. Determine which:
 
-- **Warm mode** — read `.claude/contract/design.md`. The plan should name the skill or agent that owned this work (Pattern Reference, Approach, or the invoked specialised agent).
+- **Warm mode** — read `<plan>/plan.md`. Part 1 → Pattern Reference and Part 2 → Approach and Skills to invoke during execution name the skill or agent that owned this work.
 - **Cold mode** — use the developer's stated target, or infer from `$ARGUMENTS` if unambiguous.
 
-Resolve to a real file path under `${CLAUDE_PLUGIN_ROOT}/skills/...` or `${CLAUDE_PLUGIN_ROOT}/agents/...`. If the path does not exist, stop and tell the developer — do not silently create new files from `/issue`.
+Resolve to a real file path under `${CLAUDE_PLUGIN_ROOT}/skills/...` or `${CLAUDE_PLUGIN_ROOT}/agents/...`. If the path does not exist, stop and tell the developer — do not silently create new files from `/fb-issue`.
 
 ## Step 3: Read the target file
 
@@ -64,13 +66,15 @@ Do **not** edit the file before the developer answers.
 
 Append a block to the corrections file. Decide the path:
 
-- **Warm mode** → `.claude/contract/corrections.md`
-- **Cold mode** → `.claude/lessons/<subtask-key>.md`
+- **Warm mode** → `<plan>/corrections.md`
+- **Cold mode** → `.claude/lessons/<slug>.md`
+
+`<slug>` is the plan slug, the same key `/fb-archive` uses when it moves a plan's `corrections.md` to `.claude/lessons/<slug>.md`. The two commands must agree, or a later correction starts a second trail beside the first.
 
 Lazy-create the file with a header on first use:
 
 ```markdown
-# Corrections — <subtask-key>
+# Corrections — <slug>
 ```
 
 Append the block:
@@ -88,7 +92,7 @@ Append the block:
 \`\`\`
 ```
 
-The diff goes in the documentation **even if the fix was rejected** — future runs of `/eida:archive` and future `/issue` calls benefit from seeing what was tried.
+The diff goes in the documentation **even if the fix was rejected** — future runs of `/fb-archive` and future `/fb-issue` calls benefit from seeing what was tried.
 
 ## Step 7: Confirm
 
@@ -96,14 +100,14 @@ Tell the developer:
 
 - Target file path and whether it was edited
 - Corrections file path
-- That `/eida:archive` will read this when closing the contract, and `/issue` against the same subtask later (post-QA, next day) will continue the same lessons file
+- That `/fb-archive` will read this when closing the contract, and `/fb-issue` against the same slug later (post-QA, next day) will continue the same lessons file — both commands key on `<slug>`, so the trail stays in one place
 
 ## Guardrails
 
 - **Fixing the skill is the primary outcome.** Documentation alone is failure.
 - **Never edit without explicit "yes".** Same posture as the rest of the workflow.
 - **Read before you write.** Compose every edit against the actual current content of the target file, not from memory.
-- **One issue per invocation.** Multiple corrections require multiple `/issue` calls so each gets its own diff and approval.
-- **Do not modify the contract files** (`proposal.md`, `design.md`, `tasks.md`).
-- **Do not create new skill or agent files from `/issue`.** If the right place to put the fix does not exist, stop and tell the developer — that is a `skill-creator` job, not an `/issue` job.
+- **One issue per invocation.** Multiple corrections require multiple `/fb-issue` calls so each gets its own diff and approval.
+- **Do not modify the contract files** (`plan.md`, `tasks.md`).
+- **Do not create new skill or agent files from `/fb-issue`.** If the right place to put the fix does not exist, stop and tell the developer — that is a `skill-creator` job, not an `/fb-issue` job.
 - **Never invent context.** If you do not know what Claude did in cold mode, write "unknown — see developer description" rather than guessing.

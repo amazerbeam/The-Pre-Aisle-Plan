@@ -226,14 +226,20 @@ public class MealPlanController {
 
     /**
      * FR-042: Get breakdown of which meals use a specific ingredient.
-     * FR-102: Added sourceChain parameter for finding ingredients from extras.
+     * FR-102: The service finds ingredients inside extras by walking every planned meal's extras
+     * tree itself — the sourceChain parameter is NOT what makes that work (see @param below).
      * GET /api/meal-plan/shopping-list/ingredient-breakdown?ingredientId=123&unit=tbsp&startDate=2025-12-01&sourceChain=10,12,13
      *
      * @param userPrincipal Authenticated user (required)
      * @param ingredientId The ingredient ID to look up
      * @param unit The unit string (e.g., "tbsp", "g")
      * @param startDate Start date of the 7-day period
-     * @param sourceChain Optional comma-separated recipe IDs showing provenance
+     * @param sourceChain Optional comma-separated recipe IDs. Still parsed and forwarded, but
+     *                    <b>accepted and ignored</b> by the breakdown — it is kept only for API
+     *                    compatibility with clients that already send it. See
+     *                    {@code ShoppingListService.getIngredientBreakdown}'s javadoc for why
+     *                    filtering on it was wrong (an aggregated row keeps only the FIRST
+     *                    contributing recipe's chain).
      * @return IngredientBreakdownDTO with meal breakdown list
      */
     @GetMapping("/shopping-list/ingredient-breakdown")

@@ -45,7 +45,8 @@ const ShoppingListItem = ({ item, startDate }) => {
     longPressTimer.current = setTimeout(async () => {
       // Fetch breakdown from API
       try {
-        // FR-102: Pass sourceChain for finding ingredients from extras
+        // sourceChain is still sent for API compatibility, but the endpoint accepts and ignores
+        // it — the backend scans the whole week itself. See ShoppingListService's javadoc.
         const data = await shoppingService.getIngredientBreakdown(
           item.ingredientId,
           item.unit,

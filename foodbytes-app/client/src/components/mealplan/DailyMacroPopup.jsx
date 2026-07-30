@@ -1,6 +1,7 @@
 import { useEffect, useRef, useCallback } from 'react'
 import { formatDateShort } from '../../utils/dateUtils'
 import { usePullToDismiss } from '../../hooks/usePullToDismiss'
+import { useBodyScrollLock } from '../../hooks/useBodyScrollLock'
 import PullToDismissUI from '../common/PullToDismissUI'
 import './DailyMacroPopup.css'
 
@@ -12,6 +13,8 @@ import './DailyMacroPopup.css'
 function DailyMacroPopup({ day, onClose }) {
   const popupRef = useRef(null)
 
+  useBodyScrollLock(!!day)
+
   // Pull-to-dismiss hook
   const {
     isDragging,
@@ -20,16 +23,17 @@ function DailyMacroPopup({ day, onClose }) {
     dragDirection,
     handlers: dismissHandlers,
     setScrollableRef,
+    setGestureRef,
     targetPosition
   } = usePullToDismiss(onClose)
 
-  // Combine refs for the popup element
+  // Panel owns the gesture surface and the click-outside boundary
   const setPopupRef = useCallback((el) => {
     popupRef.current = el
-    setScrollableRef(el)
-  }, [setScrollableRef])
+    setGestureRef(el)
+  }, [setGestureRef])
 
-  // Close on click outside, ESC key, or scroll
+  // Close on click outside or ESC key
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (popupRef.current && !popupRef.current.contains(e.target)) {
@@ -43,20 +47,14 @@ function DailyMacroPopup({ day, onClose }) {
       }
     }
 
-    const handleScroll = () => {
-      onClose()
-    }
-
     document.addEventListener('mousedown', handleClickOutside)
     document.addEventListener('touchstart', handleClickOutside)
     document.addEventListener('keydown', handleEscKey)
-    document.addEventListener('scroll', handleScroll, true)
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside)
       document.removeEventListener('touchstart', handleClickOutside)
       document.removeEventListener('keydown', handleEscKey)
-      document.removeEventListener('scroll', handleScroll, true)
     }
   }, [onClose])
 
@@ -105,7 +103,8 @@ function DailyMacroPopup({ day, onClose }) {
           </button>
         </header>
 
-        <div className="macro-popup-content">
+        {/* Inner scroller: defines the at-top / at-bottom pull-to-dismiss boundaries */}
+        <div className="macro-popup-content" ref={setScrollableRef}>
           <div className="macro-total">
             <span className="macro-total-label">Total Calories</span>
             <span className="macro-total-value">{totalCalories}</span>
@@ -147,7 +146,7 @@ function DailyMacroPopup({ day, onClose }) {
           </div>
         </div>
 
-        <p className="macro-popup-hint">Press ESC or tap anywhere to close</p>
+        <p className="macro-popup-hint">Press ESC or tap outside to close</p>
       </div>
 
       {/* Pull-to-dismiss UI */}

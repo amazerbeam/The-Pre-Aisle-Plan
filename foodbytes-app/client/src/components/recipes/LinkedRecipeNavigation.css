@@ -1,4 +1,9 @@
-/* FR-092: LinkedRecipeNavigation - Back button and breadcrumb styles */
+/* FR-092: LinkedRecipeNavigation - Back button and breadcrumb styles
+ * All rules are scoped under .linked-recipe-navigation. `.back-button` is also
+ * used by the admin RecipeEditModal with a light-background style — unscoped
+ * rules there previously overrode these and rendered the back button in
+ * --brand-primary on the --brand-primary header (invisible).
+ */
 
 .linked-recipe-navigation {
   display: flex;
@@ -7,7 +12,7 @@
   margin-bottom: var(--spacing-sm);
 }
 
-.back-button {
+.linked-recipe-navigation .back-button {
   display: inline-flex;
   align-items: center;
   gap: var(--spacing-xs);
@@ -22,21 +27,21 @@
   align-self: flex-start;
 }
 
-.back-button:hover {
+.linked-recipe-navigation .back-button:hover {
   background: rgba(255, 255, 255, 0.25);
 }
 
-.back-arrow {
+.linked-recipe-navigation .back-arrow {
   font-size: 1rem;
   line-height: 1;
 }
 
-.back-text {
+.linked-recipe-navigation .back-text {
   font-weight: 500;
 }
 
 /* Breadcrumbs */
-.breadcrumbs {
+.linked-recipe-navigation .breadcrumbs {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -45,29 +50,29 @@
   color: rgba(255, 255, 255, 0.7);
 }
 
-.breadcrumb-item {
+.linked-recipe-navigation .breadcrumb-item {
   display: inline-flex;
   align-items: center;
   gap: var(--spacing-xs);
 }
 
-.breadcrumb-separator {
+.linked-recipe-navigation .breadcrumb-separator {
   color: rgba(255, 255, 255, 0.5);
 }
 
-.breadcrumb-item .current {
+.linked-recipe-navigation .breadcrumb-item .current {
   color: #ffffff;
   font-weight: 500;
 }
 
 /* Mobile responsive */
 @media (max-width: 480px) {
-  .back-button {
+  .linked-recipe-navigation .back-button {
     font-size: 0.8rem;
-    padding: var(--spacing-xs);
+    padding: var(--spacing-xs) var(--spacing-sm);
   }
 
-  .breadcrumbs {
+  .linked-recipe-navigation .breadcrumbs {
     display: none;
   }
 }

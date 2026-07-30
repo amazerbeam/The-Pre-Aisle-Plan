@@ -176,8 +176,13 @@
 }
 
 .servings-btn {
-  width: 28px;
-  height: 28px;
+  /* Expanded from a 28px visual to the 44px touch minimum. border-box keeps the
+     padding inside the 44px, so the button measures exactly 44x44 — with
+     content-box the min-width would stack on top of the padding and yield 60px. */
+  min-width: 44px;
+  min-height: 44px;
+  padding: 8px;
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -190,11 +195,26 @@
   color: var(--text-primary);
   transition: all 0.2s;
   font-family: inherit;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.servings-btn:hover:not(:disabled) {
+/* Hover only where hover exists — avoids sticky hover on touch */
+@media (hover: hover) {
+  .servings-btn:hover:not(:disabled) {
+    background: var(--brand-primary);
+    color: white;
+  }
+}
+
+.servings-btn:active:not(:disabled) {
   background: var(--brand-primary);
   color: white;
+}
+
+.servings-btn:focus-visible {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: 2px;
 }
 
 .servings-btn:disabled {
@@ -202,12 +222,29 @@
   cursor: not-allowed;
 }
 
-.servings-value {
-  width: 24px;
+.servings-input {
+  width: 40px;
   text-align: center;
   font-weight: 600;
   font-size: 0.9rem;
   color: var(--text-primary);
+  background: transparent;
+  border: none;
+  font-family: inherit;
+  -moz-appearance: textfield;
+  touch-action: manipulation;
+}
+
+.servings-input::-webkit-outer-spin-button,
+.servings-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.servings-input:focus-visible {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: 1px;
+  border-radius: 4px;
 }
 
 /* ========== CALORIE DROPDOWN MENU ========== */

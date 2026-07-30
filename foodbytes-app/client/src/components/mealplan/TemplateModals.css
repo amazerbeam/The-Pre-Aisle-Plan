@@ -8,6 +8,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 16px;
   animation: tplFadeIn 0.2s ease-out;
 }
 
@@ -20,9 +21,11 @@
   background: #fff;
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
-  min-width: 320px;
+  min-width: 0;
   max-width: 420px;
-  width: 90%;
+  width: 100%;
+  max-height: 90vh;
+  max-height: 90dvh;
   animation: tplSlideIn 0.2s ease-out;
   display: flex;
   flex-direction: column;
@@ -45,6 +48,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-shrink: 0;
 }
 
 .tpl-modal-title {
@@ -72,17 +76,31 @@
   line-height: 1;
   cursor: pointer;
   padding: 0;
-  width: 32px;
-  height: 32px;
+  min-width: 44px;
+  min-height: 44px;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 4px;
   transition: background-color 0.2s ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.tpl-modal-close:hover {
-  background-color: rgba(255, 255, 255, 0.2);
+@media (hover: hover) {
+  .tpl-modal-close:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+}
+
+.tpl-modal-close:active {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.tpl-modal-close:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
 }
 
 .tpl-modal-close:disabled {
@@ -91,6 +109,10 @@
 }
 
 .tpl-modal-content {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
   padding: 20px 16px 16px;
   display: flex;
   flex-direction: column;
@@ -163,11 +185,8 @@
   cursor: pointer;
   transition: all 0.2s ease;
   min-height: 44px;
-}
-
-.tpl-cancel-button:hover:not(:disabled) {
-  border-color: #999;
-  color: #333;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .tpl-cancel-button:disabled {
@@ -187,9 +206,27 @@
   cursor: pointer;
   transition: all 0.2s ease;
   min-height: 44px;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.tpl-confirm-button:hover:not(:disabled) {
+@media (hover: hover) {
+  .tpl-cancel-button:hover:not(:disabled) {
+    border-color: #999;
+    color: #333;
+  }
+
+  .tpl-confirm-button:hover:not(:disabled) {
+    background: #3d3469;
+  }
+}
+
+.tpl-cancel-button:active:not(:disabled) {
+  border-color: #999;
+  color: #333;
+}
+
+.tpl-confirm-button:active:not(:disabled) {
   background: #3d3469;
 }
 
@@ -205,9 +242,12 @@
   padding: 8px;
   margin: 0;
   border-top: 1px solid #eee;
+  flex-shrink: 0;
 }
 
 /* Manage list */
+/* No max-height / overflow-y here: .tpl-modal-content is the single
+   scroller. Two nested touch scrollers cause scroll-chaining on mobile. */
 .tpl-list {
   list-style: none;
   margin: 0;
@@ -215,8 +255,6 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  max-height: 50vh;
-  overflow-y: auto;
 }
 
 .tpl-list-item {
@@ -268,13 +306,10 @@
   font-size: 0.85rem;
   font-weight: 500;
   cursor: pointer;
-  min-height: 36px;
+  min-height: 44px;
   transition: all 0.15s ease;
-}
-
-.tpl-action-button:hover:not(:disabled) {
-  background: #f3f0fa;
-  border-color: #4a3f80;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .tpl-action-button:disabled {
@@ -287,24 +322,60 @@
   border-color: #e6b8b1;
 }
 
-.tpl-action-danger:hover:not(:disabled) {
+@media (hover: hover) {
+  .tpl-action-button:hover:not(:disabled) {
+    background: #f3f0fa;
+    border-color: #4a3f80;
+  }
+
+  .tpl-action-danger:hover:not(:disabled) {
+    background: #fdecea;
+    border-color: #c0392b;
+  }
+}
+
+.tpl-action-button:active:not(:disabled) {
+  background: #f3f0fa;
+  border-color: #4a3f80;
+}
+
+.tpl-action-danger:active:not(:disabled) {
   background: #fdecea;
   border-color: #c0392b;
 }
 
 .tpl-small {
   flex: 0 0 auto;
-  min-height: 36px;
+  min-height: 44px;
   padding: 6px 12px;
   font-size: 0.85rem;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 @media (max-width: 480px) {
-  .tpl-modal {
-    max-width: 95%;
-    margin: 10px;
+  .tpl-modal-overlay {
+    align-items: flex-end;
+    padding: 0;
   }
+
+  .tpl-modal {
+    max-width: 100%;
+    max-height: 95vh;
+    max-height: 95dvh;
+    border-radius: 12px 12px 0 0;
+  }
+
+  .tpl-modal-header {
+    padding: 14px;
+    border-radius: 12px 12px 0 0;
+  }
+
   .tpl-list-item {
     align-items: flex-start;
+  }
+
+  .tpl-modal-hint {
+    padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
   }
 }

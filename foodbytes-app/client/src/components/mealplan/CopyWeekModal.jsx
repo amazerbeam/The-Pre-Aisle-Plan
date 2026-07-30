@@ -22,13 +22,15 @@ function CopyWeekModal({ sourceStartDate, sourceEndDate, onCopy, onClose }) {
     dragDirection,
     handlers: dismissHandlers,
     setScrollableRef,
+    setGestureRef,
     targetPosition
   } = usePullToDismiss(onClose)
 
+  // Panel owns the gesture surface and the click-outside boundary
   const setPopupRef = useCallback((el) => {
     popupRef.current = el
-    setScrollableRef(el)
-  }, [setScrollableRef])
+    setGestureRef(el)
+  }, [setGestureRef])
 
   // Close on click outside or ESC
   useEffect(() => {
@@ -103,7 +105,8 @@ function CopyWeekModal({ sourceStartDate, sourceEndDate, onCopy, onClose }) {
           </button>
         </header>
 
-        <div className="copy-modal-content">
+        {/* Inner scroller: defines the at-top / at-bottom pull-to-dismiss boundaries */}
+        <div className="copy-modal-content" ref={setScrollableRef}>
           <label className="copy-date-label" htmlFor="copy-target-date">
             Copy to week starting:
           </label>

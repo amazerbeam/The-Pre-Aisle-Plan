@@ -6,6 +6,7 @@ import com.foodbytes.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -171,7 +172,7 @@ public class MealPlanTemplateService {
             entry.setPlanDate(targetStartDate.plusDays(src.getDayOffset()));
             entry.setMeal(src.getMeal());
             entry.setRecipe(recipe.get());
-            entry.setServings(src.getServings() != null ? src.getServings() : 1);
+            entry.setServings(src.getServings() != null ? src.getServings() : BigDecimal.ONE);
             newEntries.add(entry);
         }
 
@@ -201,7 +202,7 @@ public class MealPlanTemplateService {
             e.setDayOffset((int) offset);
             e.setMeal(src.getMeal());
             e.setRecipe(src.getRecipe());
-            e.setServings(src.getServings() != null ? src.getServings() : 1);
+            e.setServings(src.getServings() != null ? src.getServings() : BigDecimal.ONE);
             snapshots.add(e);
         }
 

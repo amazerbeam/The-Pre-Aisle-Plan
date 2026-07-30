@@ -41,6 +41,17 @@
   color: #666;
 }
 
+.entry-servings {
+  margin-left: 5px;
+  padding: 0 4px;
+  border-radius: 3px;
+  background-color: rgba(74, 63, 128, 0.15);
+  color: #4a3f80;
+  font-weight: 600;
+  font-size: 10px;
+  white-space: nowrap;
+}
+
 .remove-btn {
   width: 20px;
   height: 20px;

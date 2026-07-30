@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -36,8 +37,8 @@ public class MealPlanEntry {
     @JoinColumn(name = "recipe_id", nullable = false)
     private Recipe recipe;
 
-    @Column(nullable = false)
-    private Integer servings = 1;
+    @Column(nullable = false, precision = 4, scale = 2)
+    private BigDecimal servings = BigDecimal.ONE;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

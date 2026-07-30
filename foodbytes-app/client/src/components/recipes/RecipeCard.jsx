@@ -2,12 +2,16 @@ import { useState, useMemo, useEffect, useRef } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import DayAssignmentButtons from './DayAssignmentButtons'
 import RecipeViewModal from './RecipeViewModal'
+import { MIN_SERVINGS, MAX_SERVINGS, SERVINGS_STEP } from '../../constants/servings'
+import { parseServings, formatServings, stepServings } from '../../utils/servingsUtils'
 import './RecipeCard.css'
 
 function RecipeCard({ recipe, currentMealType, onSelectVariant, onEdit }) {
   const { isAdmin } = useAuth()
   const [showDetails, setShowDetails] = useState(false)
   const [servings, setServings] = useState(recipe.defaultServings || 1)
+  // Display buffer so a partially-typed value ("0." ) doesn't clobber the numeric state
+  const [servingsDisplay, setServingsDisplay] = useState(formatServings(recipe.defaultServings || 1))
   // FR-043: Track selected variant (default to current recipe)
   const [selectedVariantId, setSelectedVariantId] = useState(recipe.id)
   // FR-043: Track if calorie dropdown is open
@@ -33,6 +37,22 @@ function RecipeCard({ recipe, currentMealType, onSelectVariant, onEdit }) {
     const scaled = (originalQty / recipe.defaultServings) * servings
     // Round to 2 decimal places, but show as integer if whole number
     return Number.isInteger(scaled) ? scaled : scaled.toFixed(2)
+  }
+
+  const handleServingsChange = (e) => {
+    setServingsDisplay(e.target.value)
+    const parsed = parseServings(e.target.value)
+    if (parsed !== null) setServings(parsed)
+  }
+
+  const handleServingsBlur = () => {
+    setServingsDisplay(formatServings(servings))
+  }
+
+  const adjustServings = (delta) => {
+    const next = stepServings(servings, delta)
+    setServings(next)
+    setServingsDisplay(formatServings(next))
   }
 
   // FR-036: Fixed per-serving calories (does NOT scale with servings)
@@ -134,17 +154,28 @@ function RecipeCard({ recipe, currentMealType, onSelectVariant, onEdit }) {
         <div className="servings-pill">
           <button
             className="servings-btn"
-            onClick={() => setServings(Math.max(1, servings - 1))}
-            disabled={servings <= 1}
+            onClick={() => adjustServings(-SERVINGS_STEP)}
+            disabled={servings <= MIN_SERVINGS}
             aria-label="Decrease servings"
           >
             −
           </button>
-          <span className="servings-value">{servings}</span>
+          <input
+            type="number"
+            inputMode="decimal"
+            min={MIN_SERVINGS}
+            max={MAX_SERVINGS}
+            step={SERVINGS_STEP}
+            value={servingsDisplay}
+            onChange={handleServingsChange}
+            onBlur={handleServingsBlur}
+            className="servings-input"
+            aria-label="Number of servings"
+          />
           <button
             className="servings-btn"
-            onClick={() => setServings(Math.min(20, servings + 1))}
-            disabled={servings >= 20}
+            onClick={() => adjustServings(SERVINGS_STEP)}
+            disabled={servings >= MAX_SERVINGS}
             aria-label="Increase servings"
           >
             +
