@@ -2,22 +2,23 @@
 description: Execute the implementation contract — Implementer runs every phase end-to-end (writing and running tests as it goes), then [Code-Evaluator + Defender + QA] review in parallel once at the end, then a single combined fix pass + verification round (max 2 rounds)
 ---
 
-You are the **Orchestrator** for the EIDA implementation pipeline. Execute the contract in `.claude/contract/` using 4 specialized agents.
+You are the **Orchestrator** for the EIDA implementation pipeline. Execute the resolved contract under `.claude/contract/<slug>/` (see Step 1) using 4 specialized agents.
 
 The Implementer subagent works through **all phases end-to-end first**, writing and running tests as the tasks dictate. Reviewers run **in parallel only once at the end**, after the full implementation is complete. Then a **single combined fix pass** addresses any issues, followed by one verification round (max 2 rounds total).
 
 Reviewers **always run as parallel subagents** in a single Agent dispatch — never sequentially.
 
-## Step 1: Load Contract
+## Step 1: Resolve the plan and load the contract
 
-Read these files:
-- `.claude/contract/proposal.md` — acceptance criteria and scope
-- `.claude/contract/design.md` — technical approach and API design
-- `.claude/contract/tasks.md` — implementation checklist (grouped under `## Phase N — Name` headings; each task carries its own `**Files:**` block and ordered `- [ ] **Step:**` bullets)
+Read `.claude/workflow/plan-resolution.md` and follow **Resolving the target plan**, accepting statuses `PLANNED`, `IN PROGRESS`, and `BLOCKED`. `$ARGUMENTS` may name the slug directly. The resolved folder is `<plan>` for the rest of this document — state which plan you resolved before doing any work. If that file is absent, do not guess: say so, state that plans live at `.claude/contract/<slug>/` as `plan.md` + `tasks.md`, and ask the developer which plan to use.
 
-If any file is missing, **STOP** and tell the user to run `/eida:plan <feature>` first.
+Then read:
+- `<plan>/plan.md` — Part 1 is scope and acceptance criteria, Part 2 is the technical approach and API design
+- `<plan>/tasks.md` — implementation checklist (grouped under `## Phase N — Name` headings; each task carries its own `**Files:**` block and ordered `- [ ] **Step:**` bullets)
 
-Update the `Status:` line in `tasks.md` to `IN PROGRESS`.
+If either file is missing, **stop** and tell the user to run `/fb-plan <subtask>` first.
+
+Update the `Status:` line in `<plan>/tasks.md` to `IN PROGRESS`.
 
 ## Step 2: Load Agent Definitions
 
@@ -31,7 +32,7 @@ You will pass each file's content to the Agent tool when spawning its agent.
 
 ## Step 3: Reading tasks.md
 
-`tasks.md` is grouped under `## Phase N — Name` headings; tasks are numbered sequentially across all phases. Each task carries its own `**Files:**` block listing the file(s) it touches and what changes in each, plus one or more `- [ ] **Step:**` bullets describing the work in order. **File paths are owned by the task, not by `design.md`.** Example shape produced by `/eida:plan`:
+`<plan>/tasks.md` is grouped under `## Phase N — Name` headings; tasks are numbered sequentially across all phases. Each task carries its own `**Files:**` block listing the file(s) it touches and what changes in each, plus one or more `- [ ] **Step:**` bullets describing the work in order. **File paths are owned by the task, not by `plan.md`.** Example shape produced by `/fb-plan`:
 
 ```
 ## Phase 1 — Add request DTO and wire it through
@@ -142,10 +143,10 @@ For **each phase** that has unchecked tasks in `tasks.md`, spawn an **Agent** (s
 ## Your Assignment
 
 ### Contract Context
-[Paste the relevant sections from proposal.md and design.md for this phase]
+[Paste the relevant `###` sections of `<plan>/plan.md` for this phase — normally Part 1 → Restated goal + In scope + Explicitly out of scope, and Part 2 → Approach + Data shapes]
 
 ### Skills to invoke
-[Paste the "Skills to invoke during execution" list from design.md. The Implementer must invoke each via the Skill tool BEFORE writing code — these encode layer placement, naming, and patterns.]
+[Paste the "Skills to invoke during execution" list from `<plan>/plan.md` Part 2. The Implementer must invoke each via the Skill tool before writing code — these encode layer placement, naming, and patterns.]
 
 ### Rules to honour
 - ${CLAUDE_PLUGIN_ROOT}/rules/code-quality.md (read it)
@@ -159,7 +160,7 @@ For **each phase** that has unchecked tasks in `tasks.md`, spawn an **Agent** (s
 
 ### Important Constraints
 - **Walk every `- [ ] **Step:**` bullet of every task in the listed order.** The planner picked the step shape per task (TDD test-first, edit/verify, grep audit, etc.); your job is to execute exactly what's there. Do NOT collapse, reorder, or skip steps. For tasks whose `**Files:**` block lists a `Test:` path, the test file is required output of this phase — write the test, run it, and confirm the expected outcome before moving on. Tests are part of the contract, not a future PR.
-- Update `.claude/contract/tasks.md`, ticking each `- [ ] **Step:**` checkbox as you complete it and the task heading once all its steps are ticked.
+- Update `<plan>/tasks.md`, ticking each `- [ ] **Step:**` checkbox as you complete it and the task heading once all its steps are ticked.
 - Return your Implementer Report listing every file changed (production AND test files) in this phase.
 - **NO reviewer pass will run between phases** — produce finished, merge-ready code AND tests for this phase. Reviewers (Code-Evaluator + Defender + QA) WILL run once at the very end, after every phase has completed; QA validates that any tests introduced are present, runnable, passing, and meaningful (not tautological).
 - If the design references an asset that lives outside the contract (SVG icon markup pasted into a Jira subtask, Figma node, attached image, etc.), fetch it via the appropriate MCP (`getJiraIssue`, `figma__get_design_context`) and use it verbatim. Do NOT ship placeholder `<rect>`s, lorem-ipsum copy, or "TODO: replace later" stubs — the asset is reachable, fetch it.
@@ -223,7 +224,7 @@ Review every changed file and produce your Defender Report.
 ## Your Assignment
 
 ### Acceptance Criteria
-[Paste the full AC list from proposal.md]
+[Paste `<plan>/plan.md` Part 1 → Restated goal, In scope, and Explicitly out of scope]
 
 ### Tasks to Validate
 [Full tasks.md task list, grouped by phase, with ✓ marks — INCLUDING each task's full `**Files:**` block (Create / Modify / Delete / Test) and the full text of every `- [ ] **Step:**` bullet. The step bullets are the spec — you need them to judge whether the actual code and tests on disk match what the task asked for.]
@@ -299,7 +300,7 @@ Collect the result. Extract the updated list of changed files (union with the pr
 
 ## Step 7: Update Tasks & Final Report
 
-Update `.claude/contract/tasks.md`:
+Update `<plan>/tasks.md`:
 - Tasks that completed cleanly: tick the task heading and every step beneath it; append ` ✓` to the heading.
 - Tasks that could not be completed or failed after max retries: tick the heading, append ` ✗ — [failure reason]`.
 
@@ -337,8 +338,8 @@ Present:
 [Cumulative changed-files log, deduplicated]
 
 ### Next Steps
-[If all passed, no residuals]: "Implementation complete. Run `/eida:archive` to close this contract."
-[If some failed or residuals]: "Some tasks failed or have residual review issues. Review above. Run `/eida:apply` again to retry failed tasks only."
+[If all passed, no residuals]: "Implementation complete. Run `/fb-archive` to close this contract."
+[If some failed or residuals]: "Some tasks failed or have residual review issues. Review above. Run `/fb-apply` again to retry failed tasks only."
 ```
 
 ## Important Rules
@@ -348,8 +349,8 @@ Present:
 - **Combined feedback to the Implementer** — all 3 reviewer reports are merged into a single Implementer prompt for the fix pass, never sent one reviewer at a time.
 - **Agents have isolated context** — pass everything they need in the prompt; do not assume any agent remembers prior phases or prior dispatches.
 - **The orchestrator manages state** — track the cumulative changed-files log across phases, fix-round counters, and residual issues.
-- **Files come from tasks, not from `design.md`** — every phase dispatch uses each task's `**Files:**` block as the authoritative file list.
+- **Files come from tasks, not from `plan.md`** — every phase dispatch uses each task's `**Files:**` block as the authoritative file list.
 - **Maximum 2 fix-review rounds total.** After round 2, log residuals and continue.
-- **Failed tasks from a previous `/eida:apply` run** should be retried (they will still be unticked in `tasks.md`).
+- **Failed tasks from a previous `/fb-apply` run** should be retried (they will still be unticked in `tasks.md`).
 - **Do not implement code yourself** — all code changes go through the Implementer agent.
 - **If a phase blocks on a genuine failure** (the Implementer cannot complete a task), log the blocker, continue with remaining phases, and surface it in the final report — do not run reviewers as an early-exit hack, and do not auto-retry beyond the post-review fix-loop cap.

@@ -1,10 +1,13 @@
 import { useEffect, useState, useRef, useMemo, useCallback } from 'react'
 import { recipeService } from '../../services/recipeService'
 import useRecipeNavigationStack from '../../hooks/useRecipeNavigationStack'
+import useServingsInput from '../../hooks/useServingsInput'
 import useWakeLock from '../../hooks/useWakeLock'
+import { useBodyScrollLock } from '../../hooks/useBodyScrollLock'
 import { useHomemadeSelections } from '../../contexts/HomemadeSelectionsContext'
 import LinkedRecipeNavigation from './LinkedRecipeNavigation'
 import WakeLockIcon from '../common/WakeLockIcon'
+import { MIN_SERVINGS, MAX_SERVINGS, SERVINGS_STEP } from '../../constants/servings'
 import './RecipeViewModal.css'
 
 /**
@@ -62,10 +65,15 @@ function RecipeViewModal({
   const [currentIsCheat, setCurrentIsCheat] = useState(isCheat)
   const dropdownRef = useRef(null)
 
-  // FR-095: Independent servings state per recipe in navigation stack
-  const [currentServings, setCurrentServings] = useState(servings)
-  // Display value for input - allows empty while typing
-  const [servingsDisplay, setServingsDisplay] = useState(String(servings))
+  // FR-095: Independent servings state per recipe in navigation stack.
+  // Decimal-aware: parsing, clamping and the typing buffer live in the hook.
+  const {
+    servings: currentServings,
+    servingsDisplay,
+    handleServingsChange,
+    handleServingsBlur,
+    resetServings
+  } = useServingsInput(servings)
 
   // FR-102: Fetch full recipe data on mount and when recipeId changes
   useEffect(() => {
@@ -100,9 +108,7 @@ function RecipeViewModal({
       setFullRecipe(stackRecipe)
       setCurrentRecipeName(stackRecipe.name)
       // FR-095: Reset servings to linked recipe's default (not parent's servings)
-      const newServings = stackRecipe.defaultServings || 1
-      setCurrentServings(newServings)
-      setServingsDisplay(String(newServings))
+      resetServings(stackRecipe.defaultServings || 1)
       prevStackRecipeId.current = stackRecipe.id
     }
   }, [stackRecipe])
@@ -160,13 +166,9 @@ function RecipeViewModal({
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [onClose, showCalorieDropdown])
 
-  // Prevent body scroll when modal is open
-  useEffect(() => {
-    document.body.style.overflow = 'hidden'
-    return () => {
-      document.body.style.overflow = ''
-    }
-  }, [])
+  // Lock body scroll while open; guard mirrors the `!recipeId` early return below
+  // (locking while rendering null would pin the shared reference count).
+  useBodyScrollLock(!!recipeId)
 
   // Check if recipe has variants (2+ required for dropdown)
   const hasVariants = variants && variants.length >= 2
@@ -223,26 +225,6 @@ function RecipeViewModal({
     if (!fullRecipe?.defaultServings) return originalQty
     const scaled = (originalQty / fullRecipe.defaultServings) * currentServings
     return Number.isInteger(scaled) ? scaled : scaled.toFixed(2)
-  }
-
-  // FR-095: Handle servings input change
-  // Allow empty display while typing, but keep last valid value for calculations
-  const handleServingsChange = (e) => {
-    const inputValue = e.target.value
-    setServingsDisplay(inputValue)
-
-    // Only update actual servings if valid number >= 1
-    const parsed = parseInt(inputValue)
-    if (!isNaN(parsed) && parsed >= 1) {
-      setCurrentServings(parsed)
-    }
-  }
-
-  // Handle blur - restore display to actual value if empty
-  const handleServingsBlur = () => {
-    if (servingsDisplay === '' || isNaN(parseInt(servingsDisplay))) {
-      setServingsDisplay(String(currentServings))
-    }
   }
 
   return (
@@ -303,8 +285,10 @@ function RecipeViewModal({
               <div className="servings-input-container">
                 <input
                   type="number"
-                  min="1"
-                  max="20"
+                  inputMode="decimal"
+                  min={MIN_SERVINGS}
+                  max={MAX_SERVINGS}
+                  step={SERVINGS_STEP}
                   value={servingsDisplay}
                   onChange={handleServingsChange}
                   onBlur={handleServingsBlur}

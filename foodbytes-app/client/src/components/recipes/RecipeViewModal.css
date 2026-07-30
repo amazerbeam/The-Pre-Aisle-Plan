@@ -223,7 +223,8 @@
 }
 
 .recipe-view-modal .servings-input {
-  width: 40px;
+  /* Wider than the card's input so a 2dp value like 1.25 is not clipped */
+  width: 52px;
   background: rgba(255, 255, 255, 0.3);
   border: none;
   border-radius: 4px;
@@ -252,7 +253,8 @@
   color: #ffffff;
 }
 
-.close-button {
+/* Scoped to the modal — the admin RecipeEditModal also styles .close-button */
+.recipe-view-modal .close-button {
   background: rgba(255, 255, 255, 0.2);
   border: none;
   /* FR-013: Explicit white text */
@@ -270,7 +272,7 @@
   transition: background 0.2s ease;
 }
 
-.close-button:hover {
+.recipe-view-modal .close-button:hover {
   background: rgba(255, 255, 255, 0.3);
 }
 

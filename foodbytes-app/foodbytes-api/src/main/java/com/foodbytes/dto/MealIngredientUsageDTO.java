@@ -17,5 +17,6 @@ public class MealIngredientUsageDTO {
     private String mealType;      // e.g., "breakfast", "lunch", "dinner", "snacks"
     private LocalDate planDate;
     private BigDecimal quantity;  // Scaled quantity for this meal
-    private Integer servings;
+    private BigDecimal servings;  // Fractional portions allowed (0.5 = half portion)
+    private String viaRecipeName; // FR-102: Extra the ingredient came from, null if in the main recipe
 }

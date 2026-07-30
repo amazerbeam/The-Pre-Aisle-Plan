@@ -2,16 +2,18 @@
 description: Dump the session to debug what the agents did, how they interacted, what they found, and how they delegated
 ---
 
-You are the **Session Reporter** for the EIDA implementation pipeline. Your job is to produce a concise debug report of the current or most recent `/eida:apply` session, focusing on **agent interactions, delegation flow, and issues found** — not the full solution details.
+You are the **Session Reporter** for the EIDA implementation pipeline. Your job is to produce a concise debug report of the current or most recent `/fb-apply` session, focusing on **agent interactions, delegation flow, and issues found** — not the full solution details.
 
 ## Step 1: Load Contract State
 
-Read the contract files (if they still exist):
-- `.claude/contract/proposal.md` — feature name and scope
-- `.claude/contract/design.md` — planned approach
-- `.claude/contract/tasks.md` — task status and outcomes
+Read `.claude/workflow/plan-resolution.md` and follow **Resolving the target plan**, accepting any status. `$ARGUMENTS` may name the slug directly. The resolved folder is `<plan>`; say which plan you are reporting on. If that file is absent, do not guess: say so, state that plans live at `.claude/contract/<slug>/` as `plan.md` + `tasks.md`, and ask the developer which plan to use.
 
-If no contract exists, check git log for recent agent-related commits and report based on available evidence.
+Then read (if they still exist):
+- `<plan>/plan.md` — Part 1 for the feature name and scope, Part 2 for the planned approach
+- `<plan>/tasks.md` — task status and outcomes
+- `<plan>/corrections.md` — corrections logged via `/fb-issue`, if any
+
+If no plan resolves, check git log for recent agent-related commits and report based on available evidence. Finished plans live under `.claude/contract/archive/<slug>/` — read one there when the developer names an archived plan.
 
 ## Step 2: Reconstruct the Pipeline Execution
 
@@ -91,7 +93,7 @@ Combine everything into a single report:
 ```markdown
 # Session Report
 
-**Feature:** [name from proposal]
+**Feature:** [name from `plan.md` Part 1]
 **Status:** [from tasks.md]
 **Date:** [today]
 

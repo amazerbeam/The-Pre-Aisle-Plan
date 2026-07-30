@@ -4,15 +4,16 @@ description: Archive the completed contract — extract learnings, update rules,
 
 You are the **Archive Agent** for the EIDA implementation pipeline. Close out the current contract, capture learnings, and clean up.
 
-## Step 1: Read Contract Status
+## Step 1: Resolve the plan and read its status
 
-Read all contract files:
-- `.claude/contract/tasks.md` — check ✓ vs ✗ counts and overall status
-- `.claude/contract/proposal.md` — feature name and acceptance criteria
-- `.claude/contract/design.md` — technical approach taken
-- `.claude/contract/corrections.md` — **if present**, the developer's corrections logged via `/issue` during this contract. This is the **primary signal** for learnings (Step 3). If absent, the developer logged no corrections — fall back to `tasks.md` ✗ entries and session context.
+Read `.claude/workflow/plan-resolution.md` and follow **Resolving the target plan**, accepting statuses `COMPLETE` and `BLOCKED`. `$ARGUMENTS` may name the slug directly. The resolved folder is `<plan>`; the slug is `<slug>`. If that file is absent, do not guess: say so, state that plans live at `.claude/contract/<slug>/` as `plan.md` + `tasks.md`, and ask the developer which plan to use.
 
-If no contract files exist, inform the user: "No active contract found. Nothing to archive."
+Then read:
+- `<plan>/tasks.md` — check ✓ vs ✗ counts and overall status
+- `<plan>/plan.md` — Part 1 for the feature name and acceptance criteria, Part 2 for the technical approach taken
+- `<plan>/corrections.md` — **if present**, the developer's corrections logged via `/fb-issue` during this contract. This is the **primary signal** for learnings (Step 3). If absent, the developer logged no corrections — fall back to `tasks.md` ✗ entries and session context.
+
+If no plan resolves, inform the user: "No finished plan to archive."
 
 ## Step 2: Generate Session Summary
 
@@ -37,7 +38,7 @@ For each source, identify:
 - **What was surprising?** — Unexpected issues, missing context, or wrong assumptions in the plan
 - **Rule gaps** — Were there edge cases or quality patterns not covered by existing rules?
 
-If `corrections.md` is present and most issues were already applied to skills/agents during the session via `/issue`, Steps 4 and 5 may have little to add — that is fine. Skip them honestly rather than inventing rule updates.
+If `corrections.md` is present and most issues were already applied to skills/agents during the session via `/fb-issue`, Steps 4 and 5 may have little to add — that is fine. Skip them honestly rather than inventing rule updates.
 
 ## Step 4: Propose Rule Updates (if needed)
 
@@ -81,15 +82,18 @@ Only save what would be useful in a future conversation with no memory of this s
 
 ## Step 7: Clean Up
 
-After the user confirms they are satisfied with the summary and any proposed updates:
+After the user confirms they are satisfied with the summary and any proposed updates, **ask for confirmation before touching any file** — this is the one destructive step in the pipeline, so the prompt comes first, not after the moves:
 
-1. **If `.claude/contract/corrections.md` exists**, **move** it (do not delete) to `.claude/lessons/<subtask-key>.md`. Create the `.claude/lessons/` directory if needed. The subtask key comes from the contract (proposal.md or the `corrections.md` header). This preserves the correction trail for post-QA `/issue` invocations against the same subtask.
-2. Delete `.claude/contract/proposal.md`
-3. Delete `.claude/contract/design.md`
-4. Delete `.claude/contract/tasks.md`
-5. Remove the `.claude/contract/` directory
+> "Ready to move corrections to `.claude/lessons/<slug>.md` and archive the plan to `.claude/contract/archive/<slug>/`. Proceed?"
 
-**Ask for confirmation before the cleanup:** "Ready to archive corrections to `.claude/lessons/` and delete the contract files. Proceed?"
+Only once the developer agrees, work through the four steps below. Nothing is deleted — a finished plan becomes history, not a gap.
+
+1. **If `<plan>/corrections.md` exists**, move its content to `.claude/lessons/<slug>.md`, creating `.claude/lessons/` if needed. If that file already holds a trail, **append** to it rather than overwriting — a forced overwrite destroys prior lessons and an unforced move fails mid-cleanup, leaving the folder half-processed. Then remove the now-copied `<plan>/corrections.md`. `.claude/lessons/` stays the single place a post-archive `/fb-issue` appends to, which is why corrections leave the plan folder rather than travelling with it.
+2. Create `.claude/contract/archive/` if it does not exist.
+3. Check `.claude/contract/archive/<slug>/` **before** moving. If it already exists, stop and report it, or archive to `<slug>-2` (then `-3`, …) — on Windows, moving a folder onto an existing folder of the same name nests it as `archive/<slug>/<slug>/` instead of merging. Once the target is free, **move** the whole plan folder to `.claude/contract/archive/<slug>/` — `plan.md`, `tasks.md`, and `spec.md` if present. Move, never copy: a path that is live in two places drifts.
+4. Confirm `.claude/contract/<slug>/` no longer exists, that `.claude/contract/archive/<slug>/plan.md` is the file you just moved (same size and content as the plan you summarised — a pre-existing archived copy would satisfy a bare existence check), and that `.claude/contract/archive/<slug>/<slug>/` does **not** exist.
+
+Other plan folders are untouched — archiving one plan never affects another. Before writing the Step 8 output, enumerate them for the "Other plans still active" line: run the discovery step from `.claude/workflow/plan-resolution.md` over `.claude/contract/` and list each remaining plan's slug and status.
 
 ## Step 8: Final Output
 
@@ -113,11 +117,14 @@ After the user confirms they are satisfied with the summary and any proposed upd
 - [list of memories saved, or "None"]
 
 ### Contract
-- [DELETED | RETAINED — reason]
+- [MOVED to `.claude/contract/archive/<slug>/` | RETAINED in place — reason]
 
 ### Corrections
-- [`corrections.md` archived to `.claude/lessons/<subtask-key>.md` | "No corrections logged"]
+- [`corrections.md` moved to `.claude/lessons/<slug>.md` | "No corrections logged"]
+
+### Other plans still active
+- [slug — Status, one line each, or "None"]
 
 ---
-Ready for the next `/eida:plan`.
+Ready for the next `/fb-plan`.
 ```

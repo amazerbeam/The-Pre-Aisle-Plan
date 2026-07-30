@@ -188,7 +188,13 @@ export const MealPlanProvider = ({ children }) => {
             newEntries = [{
               id: Date.now(), // Temporary ID
               recipe: recipeData,
-              servings: servings
+              // Display-only fallback mirroring the backend's resolution, so the
+              // optimistic entry never renders `servings: undefined` (which would
+              // surface as the literal string "undefined" in the servings input
+              // until fetchWeekPlan() returns). The API call below deliberately
+              // receives the raw `servings` value so an omitted one stays omitted
+              // from the JSON body and the backend fallback still applies.
+              servings: servings ?? recipeData?.defaultServings ?? 1
             }]
           }
 
@@ -231,11 +237,13 @@ export const MealPlanProvider = ({ children }) => {
    * @param {number} recipeId
    * @param {string} planDate - ISO format
    * @param {number} mealId
-   * @param {number} servings
+   * @param {number} [servings] - Servings to cook; may be fractional
+   *   (0.5 = half portion). Omit to let the backend derive it from the
+   *   recipe's defaultServings; do not default it to 1 here.
    * @param {Object} recipeData - Recipe object with calories for optimistic update
    * @returns {boolean} true if this will be an assignment, false if removal
    */
-  const assignRecipe = useCallback((recipeId, planDate, mealId, servings = 1, recipeData = null) => {
+  const assignRecipe = useCallback((recipeId, planDate, mealId, servings, recipeData = null) => {
     if (!isAuthenticated) {
       throw new Error('Authentication required')
     }

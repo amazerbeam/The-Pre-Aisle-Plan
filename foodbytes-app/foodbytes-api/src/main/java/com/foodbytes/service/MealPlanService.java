@@ -4,8 +4,10 @@ import com.foodbytes.dto.*;
 import com.foodbytes.model.*;
 import com.foodbytes.repository.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.TextStyle;
 import java.time.temporal.ChronoUnit;
@@ -19,6 +21,7 @@ import java.util.stream.Collectors;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class MealPlanService {
 
     private final MealPlanEntryRepository mealPlanEntryRepository;
@@ -176,10 +179,39 @@ public class MealPlanService {
         entry.setPlanDate(request.getPlanDate());
         entry.setMeal(meal);
         entry.setRecipe(recipe);
-        entry.setServings(request.getServings() != null ? request.getServings() : 1);
+        entry.setServings(resolveServings(request.getServings(), recipe));
 
         entry = mealPlanEntryRepository.save(entry);
         return convertToDTO(entry);
+    }
+
+    /**
+     * Resolve how many servings a new entry represents.
+     * An omitted value means "the whole recipe as authored", i.e. the recipe's
+     * default_servings — not 1. Storing 1 against a 2-serving recipe halves every
+     * quantity ShoppingListService derives from the entry.
+     *
+     * @param requested Servings from the request, or null when omitted. May be
+     *                  fractional (0.5 = half portion, 0.25 = quarter).
+     * @param recipe    The recipe being assigned
+     * @return the requested value when it is positive, else the recipe's
+     *         default_servings when that is positive, else 1
+     */
+    private BigDecimal resolveServings(BigDecimal requested, Recipe recipe) {
+        if (requested != null && requested.signum() > 0) {
+            return requested;
+        }
+        if (requested != null) {
+            log.warn("Ignoring non-positive servings ({}) on a meal plan entry for recipe {}; deriving from the recipe instead",
+                     requested, recipe.getId());
+        }
+        Integer recipeDefault = recipe.getDefaultServings();
+        if (recipeDefault != null && recipeDefault > 0) {
+            return BigDecimal.valueOf(recipeDefault);
+        }
+        log.warn("Recipe {} has invalid default_servings ({}); storing servings = 1 for the new meal plan entry",
+                 recipe.getId(), recipeDefault);
+        return BigDecimal.ONE;
     }
 
     /**

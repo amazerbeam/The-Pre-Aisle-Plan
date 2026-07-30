@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import java.math.BigDecimal;
 
 /**
  * Individual recipe assignment within a saved meal-plan template.
@@ -36,6 +37,6 @@ public class MealPlanTemplateEntry {
     @JoinColumn(name = "recipe_id", nullable = false)
     private Recipe recipe;
 
-    @Column(nullable = false)
-    private Integer servings = 1;
+    @Column(nullable = false, precision = 4, scale = 2)
+    private BigDecimal servings = BigDecimal.ONE;
 }

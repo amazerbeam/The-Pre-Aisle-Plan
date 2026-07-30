@@ -3,6 +3,7 @@ package com.foodbytes.dto;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import java.math.BigDecimal;
 
 @Data
 @NoArgsConstructor
@@ -14,5 +15,5 @@ public class MealPlanTemplateEntryDTO {
     private String mealType;
     private Long recipeId;
     private String recipeName;
-    private Integer servings;
+    private BigDecimal servings;
 }

@@ -53,28 +53,48 @@ function MealPlanMenu({ onCopyWeek, onSaveAs, onApply, onManage }) {
       </button>
 
       {open && (
-        <ul className="meal-plan-menu-list" role="menu">
-          <li role="none">
-            <button role="menuitem" type="button" onClick={choose(onCopyWeek)}>
-              Copy week…
-            </button>
-          </li>
-          <li role="none">
-            <button role="menuitem" type="button" onClick={choose(onSaveAs)}>
-              Save as template…
-            </button>
-          </li>
-          <li role="none">
-            <button role="menuitem" type="button" onClick={choose(onApply)}>
-              Apply template…
-            </button>
-          </li>
-          <li role="none">
-            <button role="menuitem" type="button" onClick={choose(onManage)}>
-              Manage templates…
-            </button>
-          </li>
-        </ul>
+        <>
+          {/* Mobile bottom-sheet backdrop. A native <button>, not a <div>: iOS
+              Safari always synthesises a click on a native control, so the
+              onClick below is reliable with no document-level fallback needed.
+              The scrim renders inside wrapperRef, so the document handler's
+              contains() check reads a tap here as an *inside* tap and will not
+              close — hence the explicit onClick. Dismissal deliberately happens
+              on click, not touchstart: closing on touchstart would unmount the
+              scrim before touchend, and the synthesised click would land on the
+              calendar underneath (ghost click onto .remove-btn et al).
+              aria-hidden requires tabIndex={-1} — Escape and the menu items are
+              the accessible dismiss/activate paths. */}
+          <button
+            type="button"
+            className="meal-plan-menu-scrim"
+            onClick={() => setOpen(false)}
+            aria-hidden="true"
+            tabIndex={-1}
+          />
+          <ul className="meal-plan-menu-list" role="menu">
+            <li role="none">
+              <button role="menuitem" type="button" onClick={choose(onCopyWeek)}>
+                Copy week…
+              </button>
+            </li>
+            <li role="none">
+              <button role="menuitem" type="button" onClick={choose(onSaveAs)}>
+                Save as template…
+              </button>
+            </li>
+            <li role="none">
+              <button role="menuitem" type="button" onClick={choose(onApply)}>
+                Apply template…
+              </button>
+            </li>
+            <li role="none">
+              <button role="menuitem" type="button" onClick={choose(onManage)}>
+                Manage templates…
+              </button>
+            </li>
+          </ul>
+        </>
       )}
     </div>
   )

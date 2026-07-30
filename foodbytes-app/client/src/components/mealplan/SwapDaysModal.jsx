@@ -20,14 +20,18 @@ function SwapDaysModal({ sourceDay, allDays, onSwap, onClose }) {
     dragDirection,
     handlers: dismissHandlers,
     setScrollableRef,
+    setGestureRef,
     targetPosition
   } = usePullToDismiss(onClose)
 
-  // Combine refs for the popup element
+  // Combine refs for the popup element. The panel itself is the scroller here
+  // (.swap-modal is max-height + overflow: auto), so it is both the scroll
+  // boundary and the gesture surface.
   const setPopupRef = useCallback((el) => {
     popupRef.current = el
     setScrollableRef(el)
-  }, [setScrollableRef])
+    setGestureRef(el)
+  }, [setScrollableRef, setGestureRef])
 
   // Filter out the source day from available swap targets
   const targetDays = allDays.filter(d => d.date !== sourceDay.date)

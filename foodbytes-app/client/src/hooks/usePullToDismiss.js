@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 
 /**
  * Hook for pull-to-dismiss gesture on mobile popups.
@@ -9,7 +9,7 @@ import { useState, useRef, useCallback } from 'react'
  * @param {Function} onDismiss - Callback when popup should be dismissed
  * @param {Object} options - Configuration options
  * @param {number} options.targetRadius - Radius of the X target hit area (default: 40)
- * @returns {Object} - { isDragging, circlePosition, isOverTarget, targetPosition, handlers, setScrollableRef }
+ * @returns {Object} - { isDragging, circlePosition, isOverTarget, dragDirection, targetPosition, handlers, setScrollableRef, setGestureRef }
  */
 export function usePullToDismiss(onDismiss, options = {}) {
   const { targetRadius = 40 } = options
@@ -23,6 +23,14 @@ export function usePullToDismiss(onDismiss, options = {}) {
   const scrollableRef = useRef(null)
   const isTouchActive = useRef(false)
   const initialScrollTop = useRef(0)
+
+  // The element the touchmove listener is attached to. Held in state, not a
+  // ref, so the effect below re-runs once the element is mounted.
+  const [gestureEl, setGestureEl] = useState(null)
+
+  const setGestureRef = useCallback((element) => {
+    setGestureEl(element)
+  }, [])
 
   // Target position based on drag direction
   const getTargetPosition = useCallback(() => {
@@ -104,13 +112,32 @@ export function usePullToDismiss(onDismiss, options = {}) {
       setCirclePosition({ x: touch.clientX, y: touch.clientY })
       setIsOverTarget(checkOverTarget(touch.clientX, touch.clientY, direction))
 
-      // Prevent scroll while dragging to dismiss
-      e.preventDefault()
+      // Prevent scroll while dragging to dismiss. Guarded: the 10px activation
+      // threshold is above the browser's ~8px touch slop, so the UA has often
+      // already claimed the gesture and marked the stream non-cancelable by the
+      // time we get here — calling preventDefault() then is a no-op that logs
+      // "Ignored attempt to cancel a touchmove event with cancelable=false".
+      if (e.cancelable) e.preventDefault()
     } else if (!isDragging) {
       // Allow normal scrolling if not in dismiss mode
       setDragDirection(null)
     }
   }, [isAtTop, isAtBottom, checkOverTarget, isDragging])
+
+  // Attached natively rather than via React's onTouchMove: React 18 registers
+  // touchmove passively at the root, which makes the preventDefault() inside
+  // handleTouchMove a silent no-op — the popup would scroll and show the
+  // dismiss circle at the same time.
+  useEffect(() => {
+    if (!gestureEl) return
+
+    const handler = handleTouchMove
+    gestureEl.addEventListener('touchmove', handler, { passive: false })
+
+    return () => {
+      gestureEl.removeEventListener('touchmove', handler)
+    }
+  }, [gestureEl, handleTouchMove])
 
   const handleTouchEnd = useCallback(() => {
     if (isDragging && isOverTarget) {
@@ -128,11 +155,15 @@ export function usePullToDismiss(onDismiss, options = {}) {
     scrollableRef.current = element
   }, [])
 
-  // Touch handlers to spread onto the popup container
+  // Touch handlers to spread onto the popup container. onTouchMove is attached
+  // natively via setGestureRef — see the effect above. onTouchCancel matters:
+  // when the UA aborts a sequence (incoming call, notification shade, OS back
+  // gesture) it fires touchcancel instead of touchend, which would otherwise
+  // leave isDragging true and the dismiss circle frozen on screen.
   const handlers = {
     onTouchStart: handleTouchStart,
-    onTouchMove: handleTouchMove,
-    onTouchEnd: handleTouchEnd
+    onTouchEnd: handleTouchEnd,
+    onTouchCancel: handleTouchEnd
   }
 
   return {
@@ -142,6 +173,7 @@ export function usePullToDismiss(onDismiss, options = {}) {
     dragDirection,
     handlers,
     setScrollableRef,
+    setGestureRef,
     targetPosition: getTargetPosition()
   }
 }

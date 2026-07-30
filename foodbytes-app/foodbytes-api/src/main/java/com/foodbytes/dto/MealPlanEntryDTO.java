@@ -3,6 +3,7 @@ package com.foodbytes.dto;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 /**
@@ -19,7 +20,7 @@ public class MealPlanEntryDTO {
     private String mealType;          // "breakfast", "lunch", "dinner", "snacks"
     private Long mealId;
     private RecipeSummaryDTO recipe;  // FR-102: Summary only, fetch full on-demand
-    private Integer servings;
+    private BigDecimal servings;   // Fractional portions allowed (0.5 = half portion)
     private Integer caloriesPerServing; // FR-017: Fixed per-serving calories
     private Integer proteinPerServing;
     private Integer carbsPerServing;

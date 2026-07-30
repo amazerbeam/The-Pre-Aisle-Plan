@@ -3,6 +3,18 @@
   display: inline-block;
 }
 
+/* Mobile-only tap-to-close backdrop for the bottom sheet. It is a native
+   <button> in MealPlanMenu.jsx so iOS Safari reliably synthesises its click;
+   the resets below make it render exactly like the plain <div> it replaced.
+   It sits inside .meal-plan-menu, so the document handler's contains() check
+   reads a tap here as an inside tap and will not close — its own onClick is
+   the dismiss path, firing on click rather than touchstart so the scrim is
+   still mounted at touchend and no ghost click reaches the calendar beneath.
+   display: none here (base) means no hit target at all above 600px. */
+.meal-plan-menu-scrim {
+  display: none;
+}
+
 .meal-plan-menu-trigger {
   min-width: 44px;
   min-height: 44px;
@@ -55,7 +67,10 @@
   position: absolute;
   top: calc(100% + 6px);
   right: 0;
-  z-index: 50;
+  /* Must stay above Footer.css's `position: fixed; z-index: 100` — .meal-plan-menu
+     creates no stacking context, so this competes with the footer directly. Below
+     100 makes the lower menu items paint behind the footer on short viewports. */
+  z-index: 200;
   min-width: 200px;
   margin: 0;
   padding: 6px 0;
@@ -79,17 +94,77 @@
   color: #333;
   cursor: pointer;
   min-height: 44px;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.meal-plan-menu-list button:hover,
+@media (hover: hover) {
+  .meal-plan-menu-list button:hover {
+    background: #f3f0fa;
+    color: #4a3f80;
+  }
+}
+
 .meal-plan-menu-list button:focus-visible {
   background: #f3f0fa;
   color: #4a3f80;
-  outline: none;
+  outline: 2px solid var(--primary-color, #4a3f80);
+  outline-offset: -2px;
 }
 
-@media (max-width: 480px) {
-  .meal-plan-menu-list {
-    min-width: 220px;
+.meal-plan-menu-list button:active {
+  background: #e9e3f7;
+  color: #4a3f80;
+}
+
+/* 600px, not the house 480px: this is where MealPlanCalendar.css:197 flips
+   .calendar-header to a left-aligned column, which is what pushes the
+   right-anchored dropdown off the left edge of the viewport. */
+@media (max-width: 600px) {
+  .meal-plan-menu-scrim {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    background: rgba(0, 0, 0, 0.4);
+    /* Resets so the native <button> renders identically to the old <div>. */
+    border: none;
+    padding: 0;
+    margin: 0;
+    -webkit-appearance: none;
+    appearance: none;
+    font: inherit;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    animation: mealPlanMenuFadeIn 0.2s ease-out;
   }
+
+  .meal-plan-menu-list {
+    position: fixed;
+    top: auto;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1000;
+    min-width: 0;
+    padding: 6px 0 calc(6px + env(safe-area-inset-bottom, 0px));
+    border-radius: 12px 12px 0 0;
+    box-shadow: 0 -6px 24px rgba(0, 0, 0, 0.22);
+    animation: mealPlanMenuSlideUp 0.2s ease-out;
+  }
+
+  .meal-plan-menu-list button {
+    padding: 16px 20px;
+    font-size: 1rem;
+  }
+}
+
+@keyframes mealPlanMenuFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes mealPlanMenuSlideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
 }

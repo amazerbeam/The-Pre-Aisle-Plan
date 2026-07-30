@@ -21,10 +21,12 @@ export const mealPlanService = {
    * @param {string} planDate - ISO format date string (YYYY-MM-DD)
    * @param {number} mealId - Meal type ID (1=breakfast, 2=lunch, 3=dinner, 4=snacks)
    * @param {number} recipeId - Recipe ID
-   * @param {number} servings - Number of servings (default 1)
+   * @param {number} [servings] - Servings to cook; may be fractional
+   *   (0.5 = half portion), 0.25-20, max 2dp. Omit to let the backend derive it
+   *   from the recipe's defaultServings; do not default it to 1 here.
    * @returns {Promise<Object|null>} MealPlanEntryDTO if created, null if removed
    */
-  async assignRecipe(planDate, mealId, recipeId, servings = 1) {
+  async assignRecipe(planDate, mealId, recipeId, servings) {
     const response = await api.post('/meal-plan', {
       planDate,
       mealId,

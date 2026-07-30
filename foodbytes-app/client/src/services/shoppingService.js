@@ -101,11 +101,14 @@ export const shoppingService = {
 
   /**
    * FR-042: Get breakdown of which meals use a specific ingredient
-   * FR-102: Added sourceChain for finding ingredients from extras
+   * The backend scans every planned meal (and its extras) itself, so no provenance hint is needed.
    * @param {number} ingredientId - Ingredient ID
    * @param {string} unit - Unit string (e.g., "tbsp", "g")
    * @param {string} startDate - ISO format date string (YYYY-MM-DD)
-   * @param {number[]} sourceChain - Optional chain of recipe IDs for extras
+   * @param {number[]} sourceChain - Optional chain of recipe IDs. Still sent, but the endpoint
+   *   accepts and IGNORES it; retained for API compatibility. See
+   *   ShoppingListService.getIngredientBreakdown's javadoc — an aggregated shopping-list row keeps
+   *   only the first contributing recipe's chain, so filtering on it hid every other dish.
    * @returns {Promise<IngredientBreakdownDTO>}
    */
   getIngredientBreakdown: async (ingredientId, unit, startDate, sourceChain = null) => {

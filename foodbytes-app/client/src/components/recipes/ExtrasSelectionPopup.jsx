@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useHomemadeSelections } from '../../contexts/HomemadeSelectionsContext'
+import { useBodyScrollLock } from '../../hooks/useBodyScrollLock'
 import './ExtrasSelectionPopup.css'
 
 /**
@@ -183,13 +184,11 @@ function ExtrasSelectionPopup({
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [onCancel])
 
-  // Prevent body scroll when popup is open
-  useEffect(() => {
-    document.body.style.overflow = 'hidden'
-    return () => {
-      document.body.style.overflow = ''
-    }
-  }, [])
+  // Prevent body scroll when popup is open. Must stay above the early return
+  // below (hook ordering), so the argument — not the call — carries the guard:
+  // with no extras this component renders null, and locking while rendering
+  // nothing would pin the reference count with no UI able to release it.
+  useBodyScrollLock(!!recipe?.extras?.length)
 
   if (!recipe?.extras || recipe.extras.length === 0) {
     return null

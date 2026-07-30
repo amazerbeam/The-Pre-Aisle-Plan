@@ -10,6 +10,44 @@ metadata:
 
 Conventions for the FoodBytes web client (`foodbytes-app/client/`). Read this before writing or editing anything under `client/src/`.
 
+**Scope:** this file holds the hard contract plus FoodBytes-specific conventions (Contexts, PWA config, touch rules, recipe data quirks). General engineering standards — principles, component size budget, constants taxonomy, four async states, API resilience, performance order, Definition of Done — live in `references/engineering-standards.md`. Read that file when scaffolding something new, reviewing a large change, or when a rule below points at it.
+
+## Engineering principles
+
+Optimise for readability over cleverness, simplicity over abstraction, consistency over personal preference, maintainability over speed, reusability over duplication, predictability over complexity. Before declaring anything done: *will another developer understand this in six months, is it the simplest thing that works, does it match existing patterns here?* Code is read far more often than written.
+
+## Hard floor (MUST / NEVER)
+
+Everything below this section is rationale, detail, or template. These are the rules a change cannot ship without.
+
+### MUST
+
+- **Read the nearest existing equivalent before writing.** Match its file naming, prop shape, CSS approach, and error handling.
+- **Handle all four async states — loading, success, error, empty.** Empty is not loading; error is not empty. Detail: `references/engineering-standards.md` § Four async states.
+- **Measure every component file you create or grow** (`(Get-Content <file> | Measure-Object -Line).Lines`) before declaring the work done. <200 lines fine, 200–400 needs a second look, **>400 is blocking** — split it in the same change (logic → `use*` hook, render concerns → sibling components).
+- **Follow one file order:** imports → constants → component → helpers → export.
+- **Extract significant logic into a `use*` hook** — components render UI, hooks hold logic.
+- **Declare any repeated meaningful value once and import it** — meal types, variant labels, storage keys, route paths, endpoints. `UPPER_SNAKE_CASE` keys in `src/constants/`.
+- **Every request carries a timeout**, from one exported constant on the shared Axios instance — never a literal at the call site.
+- **Cancellable reads own an `AbortController`**, aborted in effect cleanup; cancellations are swallowed, never rendered as errors.
+- **Read an error response body before throwing** — surface the server's message; fall back to a status-based message only when there is no body.
+- **Justify any new dependency out loud** in the change summary: what platform API or existing code could do it, bundle cost, maintenance activity.
+- **State what you verified and what you did not.** There is no test runner — see NEVER below.
+
+### NEVER
+
+- **Never claim a test passed.** No test runner is wired into `client/package.json`. Say what you exercised manually, or say it's unverified.
+- **Never swallow an error into a success shape** (`catch { return [] }`) — that caches a timeout or 500 as "loaded, zero results": no error, no retry, a silently blank panel.
+- **Never call `axios` directly in a component.** HTTP lives in `services/`, surfaced through a Context or hook.
+- **Never auto-abort a write.** Cancelling a half-sent POST/PATCH/DELETE leaves ambiguous server state.
+- **Never leave `console.log` / `console.debug` in shipped code.**
+- **Never add `memo` / `useMemo` / `useCallback` without profiling evidence** — excessive memoisation is itself an anti-pattern.
+- **Never introduce a second state manager.** React Context is the only sanctioned store — no Zustand, no Redux, no `useReducer` for shared state. Feature-specific state never goes into a global Context.
+- **Never expose an imperative setter from a hook meant to be called during render** — infinite-loop trap with `useState`. Custom hooks take declarative props and return values.
+- **Never create dumping-ground folders** — `misc`, `helpers`, `temp`, `old`, `new`.
+- **Never use `dangerouslySetInnerHTML`** without an explicit, reviewed justification.
+- **Never knowingly introduce debt silently** — if a shortcut is right, say so in the summary so it's a decision, not a surprise.
+
 ## Use when
 
 - Adding or editing components, hooks, contexts, or services in `client/src/`.
@@ -24,8 +62,11 @@ Conventions for the FoodBytes web client (`foodbytes-app/client/`). Read this be
 
 ## Stack (authoritative — match what's in the repo)
 
-- React 18 + Vite + React Router v6, Axios, date-fns.
-- **PWA: `vite-plugin-pwa` with Workbox.** The app ships as an installable Progressive Web App — manifest, service worker, icons, and offline fallbacks are required. Treat any new frontend work as PWA-first: if a feature can't work offline, it must degrade gracefully (cached shell + clear offline UI), not white-screen.
+Verify before relying on any line here (`Read client/package.json`) — this section has drifted from reality before.
+
+- React 18 + Vite 5 + React Router v6 + Axios. **Four runtime dependencies, no more** — `react`, `react-dom`, `react-router-dom`, `axios`. There is **no `date-fns`**; date handling lives in `src/utils/dateUtils.js`. Adding a dependency requires a stated justification (see `references/engineering-standards.md` § Dependencies).
+- Plain JavaScript + JSX — no TypeScript. Don't introduce `.ts`/`.tsx` files.
+- **PWA target: `vite-plugin-pwa` with Workbox — not yet installed.** Treat any new frontend work as PWA-first: if a feature can't work offline, it must degrade gracefully (cached shell + clear offline UI), not white-screen. Bootstrap per § PWA setup below when a change first depends on it; don't claim the app is installable until it is.
 - **Styling: plain CSS in `src/styles/` and per-component CSS files.** The repo does **not** use CSS Modules despite older agent notes — follow the existing pattern in neighboring components, don't introduce `*.module.css`.
 - State: React Context + hooks. Existing contexts: `AuthContext`, `MealPlanContext`, `ShoppingListContext`, `HomemadeSelectionsContext`. Don't add a new global store — extend a context.
 - No test runner is wired into `client/package.json`; do not claim a test passed unless you actually ran something.
@@ -88,6 +129,18 @@ If `vite-plugin-pwa` isn't yet wired in (`Grep "vite-plugin-pwa" client/package.
 
 After bootstrap, the rule is simply: don't regress any of the above when adding features.
 
+## Known debt (don't grow it; fix opportunistically when you're already in the file)
+
+| Debt | Where |
+|---|---|
+| Files over the 400-line budget | `admin/RecipeIngredientsForm.jsx` (682), `contexts/MealPlanContext.jsx` (476) |
+| At the 400-line ceiling | `recipes/RecipeViewModal.jsx` (393) |
+| Meal-type string literals, ~31 across 8 files, no shared constant | `MealPlanContext`, `MealPlanDay`, `RecipeList`, `DayAssignmentButtons`, `RecipeInfoForm`, `IngredientBreakdownPopup`, `emojiUtils`, `mealPlanService` |
+| No `src/constants/` folder exists yet | create it with the first constant map |
+| No request timeout on the Axios instance | `services/api.js` — a hung request is an indefinite spinner |
+| `console.log` in shipped code (6) | `services/api.js`, `hooks/useWakeLock.js`, `mealplan/MealPlanEntry.jsx` |
+| No `useOnlineStatus` hook | needed for the PWA offline banner |
+
 ## Output
 
 When implementing a frontend change, deliver:
@@ -95,7 +148,7 @@ When implementing a frontend change, deliver:
 - The component/hook/service edit, matching neighboring file conventions.
 - Any context update if state is cross-cutting.
 - Plain CSS following the existing per-component pattern.
-- A note in your end-of-turn summary covering: what changed, what you verified manually (or that you couldn't verify because there's no test runner / no dev server running), and any responsive/a11y considerations skipped.
+- A note in your end-of-turn summary covering: what changed, **why this approach**, what you verified manually (or that you couldn't verify because there's no test runner / no dev server running), any responsive/a11y considerations skipped, and **any known risk or debt introduced**.
 
 ## Shared rules (read on demand)
 
@@ -108,9 +161,13 @@ Especially relevant when frontend work touches recipe display:
 ## Success criteria
 
 - Edit lives under `foodbytes-app/client/src/` and matches neighboring file structure (`Glob client/src/**/<area>/*.jsx`).
+- No file you created or grew exceeds 400 lines — measured, not estimated.
+- No new `console.log` / `console.debug` (`Grep "console\.(log|debug)" client/src` → count not above the 6 baseline).
+- No new repeated string literal that should be a constant; no new `.ts`/`.tsx` file; no new runtime dependency without a stated justification.
+- Every new async surface handles loading, success, error, **and** empty; no `catch` that returns a success-shaped fallback.
 - API calls go through `services/api.js`; no direct `axios.create` elsewhere, no hardcoded backend URL (`Grep -n "localhost:8080" client/src` → no new hits).
 - No new `*.module.css` files introduced (`Glob client/src/**/*.module.css` → list unchanged).
 - Cross-cutting state read from an existing context via its hook, not refetched.
 - Recipe kcal rendered as `calories / default_servings`, not raw `calories`.
 - Mobile-first CSS with ≥44px touch targets; semantic HTML and ARIA on interactive elements.
-- PWA stays green: `vite-plugin-pwa` is configured (`Grep "VitePWA" client/vite.config.js` → 1 hit), manifest lists 192 + 512 + maskable icons, OAuth paths are in `navigateFallbackDenylist`, user-mutable `/api/meal-plans` and `/api/shopping-list` are NOT cached as `CacheFirst`/`StaleWhileRevalidate`, and a Lighthouse PWA audit on the built app would still report installable.
+- PWA stays green **once bootstrapped** (today `Grep "VitePWA" client/vite.config.js` → 0 hits — the plugin is not installed yet; don't assert installability before wiring it): `vite-plugin-pwa` is configured, manifest lists 192 + 512 + maskable icons, OAuth paths are in `navigateFallbackDenylist`, user-mutable `/api/meal-plans` and `/api/shopping-list` are NOT cached as `CacheFirst`/`StaleWhileRevalidate`, and a Lighthouse PWA audit on the built app would still report installable.

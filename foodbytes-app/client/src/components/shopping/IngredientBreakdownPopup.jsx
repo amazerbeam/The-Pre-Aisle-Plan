@@ -1,6 +1,7 @@
 import { useRef, useCallback } from 'react'
 import { usePullToDismiss } from '../../hooks/usePullToDismiss'
 import PullToDismissUI from '../common/PullToDismissUI'
+import { parseISODate } from '../../utils/dateUtils'
 import './IngredientBreakdownPopup.css'
 
 /**
@@ -21,14 +22,18 @@ function IngredientBreakdownPopup({ breakdown, onClose }) {
     dragDirection,
     handlers: dismissHandlers,
     setScrollableRef,
+    setGestureRef,
     targetPosition
   } = usePullToDismiss(onClose)
 
-  // Combine refs for the popup element
+  // Combine refs for the popup element. The panel itself is the scroller here
+  // (.breakdown-popup is max-height + overflow: auto), so it is both the scroll
+  // boundary and the gesture surface.
   const setPopupRef = useCallback((el) => {
     popupRef.current = el
     setScrollableRef(el)
-  }, [setScrollableRef])
+    setGestureRef(el)
+  }, [setScrollableRef, setGestureRef])
 
   // Handle overlay click (grey area) - close popup
   const handleOverlayClick = (e) => {
@@ -52,6 +57,31 @@ function IngredientBreakdownPopup({ breakdown, onClose }) {
   const formatQuantity = (qty) => {
     const num = parseFloat(qty)
     return num % 1 === 0 ? num.toFixed(0) : num.toFixed(2).replace(/\.?0+$/, '')
+  }
+
+  // Format planDate ("2026-07-27") without timezone drift -> "Mon 27 Jul"
+  // parseISODate is the shared local-date parser (utils/dateUtils) — don't re-inline it here.
+  const formatPlanDate = (planDate) => {
+    if (!planDate) return ''
+    return parseISODate(planDate).toLocaleDateString('en-GB', {
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short'
+    })
+  }
+
+  // The same dish can be planned several times in a week — show when each one is,
+  // otherwise the rows look like duplicates. Derives the label from mealType rather
+  // than a new literal map, so this file's meal-type debt doesn't grow.
+  const formatMealContext = (meal) => {
+    const mealLabel = meal.mealType
+      ? meal.mealType.charAt(0).toUpperCase() + meal.mealType.slice(1)
+      : ''
+    const parts = [formatPlanDate(meal.planDate), mealLabel].filter(Boolean)
+    if (meal.viaRecipeName) {
+      parts.push(`via ${meal.viaRecipeName}`)
+    }
+    return parts.join(' · ')
   }
 
   return (
@@ -83,7 +113,10 @@ function IngredientBreakdownPopup({ breakdown, onClose }) {
               <span className="meal-emoji">
                 {mealEmojis[meal.mealType] || '\u{1F37D}'}
               </span>
-              <span className="meal-name">{meal.recipeName}</span>
+              <span className="meal-details">
+                <span className="meal-name">{meal.recipeName}</span>
+                <span className="meal-context">{formatMealContext(meal)}</span>
+              </span>
               <span className="meal-quantity">
                 {formatQuantity(meal.quantity)} {breakdown.unit}
               </span>

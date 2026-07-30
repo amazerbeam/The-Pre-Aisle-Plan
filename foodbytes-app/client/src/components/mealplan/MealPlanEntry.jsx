@@ -2,6 +2,7 @@ import { useState, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { useMealPlan } from '../../contexts/MealPlanContext'
 import RecipeViewModal from '../recipes/RecipeViewModal'
+import { formatServings } from '../../utils/servingsUtils'
 import './MealPlanEntry.css'
 
 /**
@@ -67,7 +68,12 @@ function MealPlanEntry({ entry }) {
       >
         <div className="entry-info">
           <span className="recipe-name">{entry.recipe?.name}</span>
-          <span className="recipe-calories">{entry.caloriesPerServing} cal</span>
+          <span className="recipe-calories">
+            {entry.caloriesPerServing} cal
+            {entry.servings != null && Number(entry.servings) !== 1 && (
+              <span className="entry-servings">× {formatServings(entry.servings)}</span>
+            )}
+          </span>
         </div>
         <button
           className="remove-btn"
@@ -109,10 +115,9 @@ function MealPlanEntry({ entry }) {
           onClose={() => setShowRecipeView(false)}
           variants={entry.recipe.variants}
           parentRecipeId={entry.recipe.id}
-          onSelectVariant={(variantId, servings) => {
+          onSelectVariant={() => {
             // FR-013: In meal plan view, variant selection updates display only
-            // (recipe swap would require updating the meal plan entry)
-            console.log('Variant selected in modal:', variantId, servings)
+            // (a recipe swap would require updating the meal plan entry)
           }}
         />
       )}

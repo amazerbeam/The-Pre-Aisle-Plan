@@ -103,7 +103,7 @@ public class ShoppingListService {
         for (MealPlanEntry entry : entries) {
             Recipe recipe = entry.getRecipe();
             Long recipeId = recipe.getId();
-            Integer entryServings = entry.getServings();
+            BigDecimal entryServings = entry.getServings();
             Integer recipeDefaultServings = recipe.getDefaultServings();
 
             // FR-102: Create source chain starting with the main recipe
@@ -200,14 +200,35 @@ public class ShoppingListService {
 
     /**
      * FR-042: Get breakdown of which meals use a specific ingredient.
-     * FR-102: Added sourceChain support for finding ingredients in extras.
-     * Shows each meal that uses the ingredient and how much it requires.
+     * FR-102: Extras are searched too, so ingredients that come from a sub-recipe are found.
+     * Shows every meal that uses the ingredient and how much it requires.
+     *
+     * <p>The breakdown must mirror {@link #getShoppingList}: a shopping list row is the sum of
+     * the ingredient across ALL planned meals (and their homemade extras), so this scans every
+     * meal plan entry rather than a single recipe. Selections aren't available on this endpoint,
+     * so extras are treated as homemade — the same default aggregation uses when no selections
+     * are supplied.
+     *
+     * <p><b>Known divergence when a component is toggled to store-bought (FR-103).</b> This is a
+     * GET with no {@link HomemadeSelectionsDTO} body, so it cannot see the user's homemade/
+     * store-bought toggles. The persisted row, by contrast, comes from
+     * {@code getShoppingList(…, homemadeSelections)}, and {@link #processExtras} SKIPS a
+     * store-bought extra's whole ingredient subtree, substituting a single raw store-bought
+     * ingredient instead. Consequently, for any row fed by a store-bought component this method
+     * does NOT merely list a few extra rows the shopping list omits — it also <b>over-states
+     * {@code totalQuantity} by that entire subtree's contribution</b>. The header the popup
+     * presents as the authoritative total for the row can therefore exceed the row itself. The
+     * discrepancy is NOT cosmetic. The honest fix is a POST carrying the selections; that needs a
+     * new request shape and is deliberately out of scope here.
      *
      * @param userId User ID
      * @param ingredientId Ingredient ID
      * @param unit Unit string (e.g., "tbsp", "g")
      * @param startDate Start date of the 7-day period
-     * @param sourceChain Optional chain of recipe IDs showing provenance (first = extra, last = main recipe)
+     * @param sourceChain Legacy provenance hint from the shopping list row. Ignored: the row is
+     *                    aggregated across recipes but IngredientAggregate only keeps the FIRST
+     *                    contributor's chain, so filtering on it hid every other dish using the
+     *                    ingredient. Kept on the signature for API compatibility.
      * @return IngredientBreakdownDTO with meal breakdown list
      */
     @Transactional(readOnly = true)
@@ -225,82 +246,54 @@ public class ShoppingListService {
         BigDecimal totalQuantity = BigDecimal.ZERO;
         String ingredientName = null;
 
-        // FR-102: Determine which recipe contains the ingredient
-        // sourceChain format: [extraRecipeId, ..., mainRecipeId]
-        // - If 1 element: it's the main recipe (ingredient is in the main recipe, not an extra)
-        // - If 2+ elements: first is the extra recipe containing the ingredient, last is the main recipe
-        Long extraRecipeId = null;
-        Long mainRecipeId = null;
-
-        if (sourceChain != null && !sourceChain.isEmpty()) {
-            if (sourceChain.size() == 1) {
-                // Single element = main recipe only (no extra involved)
-                mainRecipeId = sourceChain.get(0);
-                extraRecipeId = null;
-            } else {
-                // Multiple elements: first = extra recipe, last = main recipe
-                extraRecipeId = sourceChain.get(0);
-                mainRecipeId = sourceChain.get(sourceChain.size() - 1);
-            }
-        }
+        // Request-scoped memoisation: the same recipe usually appears on several days, so build
+        // each extras tree once and load each distinct extra recipe once per call.
+        Map<Long, List<RecipeExtraNodeDTO>> extrasTreeCache = new HashMap<>();
+        Map<Long, Recipe> extraRecipeCache = new HashMap<>();
 
         // Process each meal plan entry
         for (MealPlanEntry entry : entries) {
             Recipe recipe = entry.getRecipe();
-            Integer entryServings = entry.getServings();
+            BigDecimal entryServings = entry.getServings();
             Integer recipeDefaultServings = recipe.getDefaultServings();
 
-            // FR-102: If sourceChain provided, only process entries matching the main recipe
-            if (mainRecipeId != null && !recipe.getId().equals(mainRecipeId)) {
-                continue;
-            }
+            // Collect every use of the ingredient in this meal: the main recipe first,
+            // then its extras (recursively) — the same traversal getShoppingList aggregates over.
+            List<IngredientUsage> usages = new ArrayList<>();
+            collectIngredientUsages(recipe, ingredientId, unit, null, usages);
 
-            // FR-102: Determine which recipe to search for the ingredient
-            Recipe searchRecipe = recipe;
-            if (extraRecipeId != null) {
-                // Ingredient is in an extra recipe, load it
-                searchRecipe = recipeRepository.findById(extraRecipeId).orElse(recipe);
-            }
+            List<RecipeExtraNodeDTO> extras = extrasTreeCache.computeIfAbsent(
+                recipe.getId(),
+                id -> recipeExtrasService.hasExtras(id)
+                    ? recipeExtrasService.buildExtrasTree(id, new HashSet<>())
+                    : Collections.emptyList());
+            collectUsagesFromExtras(extras, ingredientId, unit, usages, extraRecipeCache);
 
-            // Find the specific ingredient in the search recipe
-            for (RecipeIngredient recipeIngredient : searchRecipe.getIngredients()) {
-                // FR-093: Skip linked recipe ingredients (they don't have an ingredient)
-                if (recipeIngredient.isLinkedRecipe()) {
-                    continue;
+            for (IngredientUsage usage : usages) {
+                // Capture ingredient name
+                if (ingredientName == null) {
+                    ingredientName = usage.ingredientName();
                 }
 
-                Ingredient ingredient = recipeIngredient.getIngredient();
+                // Scale quantity: scaledQty = quantity * entry.servings / recipe.defaultServings
+                // Extras scale off the MAIN recipe's default servings, matching processExtras.
+                BigDecimal scaledQuantity = usage.quantity()
+                    .multiply(entryServings)
+                    .divide(BigDecimal.valueOf(recipeDefaultServings), 2, RoundingMode.HALF_UP);
 
-                // Check if this is the ingredient we're looking for
-                if (ingredient != null && ingredient.getId().equals(ingredientId) &&
-                    recipeIngredient.getUnit().getValue().equalsIgnoreCase(unit)) {
+                // Add to total
+                totalQuantity = totalQuantity.add(scaledQuantity);
 
-                    // Capture ingredient name
-                    if (ingredientName == null) {
-                        ingredientName = ingredient.getName();
-                    }
-
-                    // Scale quantity: scaledQty = ingredient.quantity * entry.servings / recipe.defaultServings
-                    BigDecimal originalQuantity = recipeIngredient.getQuantity();
-                    BigDecimal scaledQuantity = originalQuantity
-                        .multiply(BigDecimal.valueOf(entryServings))
-                        .divide(BigDecimal.valueOf(recipeDefaultServings), 2, RoundingMode.HALF_UP);
-
-                    // Add to total
-                    totalQuantity = totalQuantity.add(scaledQuantity);
-
-                    // FR-102: Display the main recipe name (not the extra)
-                    String displayName = recipe.getName();
-
-                    // Add meal breakdown entry
-                    mealBreakdown.add(new MealIngredientUsageDTO(
-                        displayName,
-                        entry.getMeal().getKey(),
-                        entry.getPlanDate(),
-                        scaledQuantity,
-                        entryServings
-                    ));
-                }
+                // Add meal breakdown entry — named by the planned dish, with the extra (if any)
+                // carried separately so the row stays recognisable against the meal plan.
+                mealBreakdown.add(new MealIngredientUsageDTO(
+                    recipe.getName(),
+                    entry.getMeal().getKey(),
+                    entry.getPlanDate(),
+                    scaledQuantity,
+                    entryServings,
+                    usage.viaRecipeName()
+                ));
             }
         }
 
@@ -317,6 +310,79 @@ public class ShoppingListService {
             mealBreakdown
         );
     }
+
+    /**
+     * FR-042: Find each row of a recipe that uses the given ingredient in the given unit.
+     *
+     * @param viaRecipeName Name of the extra the ingredient came from, or null for the main recipe
+     */
+    private void collectIngredientUsages(Recipe recipe, Long ingredientId, String unit,
+                                         String viaRecipeName, List<IngredientUsage> usages) {
+        for (RecipeIngredient recipeIngredient : recipe.getIngredients()) {
+            // FR-093: Skip linked recipe ingredients (they don't have an ingredient)
+            if (recipeIngredient.isLinkedRecipe()) {
+                continue;
+            }
+
+            Ingredient ingredient = recipeIngredient.getIngredient();
+            if (ingredient != null && ingredient.getId().equals(ingredientId) &&
+                recipeIngredient.getUnit().getValue().equalsIgnoreCase(unit)) {
+                usages.add(new IngredientUsage(
+                    ingredient.getName(),
+                    recipeIngredient.getQuantity(),
+                    viaRecipeName
+                ));
+            }
+        }
+    }
+
+    /**
+     * FR-042: Walk an extras tree looking for the ingredient, labelling each hit with the extra
+     * it came from. Cycle detection is handled by RecipeExtrasService.buildExtrasTree.
+     *
+     * <p><b>Loads extras with {@code findById}, deliberately — do NOT "optimise" this to
+     * {@code findWithDetailsById}.</b> That finder's {@code @EntityGraph} LEFT JOIN FETCHes TWO
+     * collections, {@code ingredients} (a {@code List} with no {@code @OrderColumn}, i.e. a
+     * Hibernate bag) and {@code meals} (a {@code Set}). The SQL rows are the cartesian product of
+     * the two, and bag initialisation does not de-duplicate — so the {@code Set} collapses while
+     * every {@code RecipeIngredient} survives once per {@code recipe_meals} row. Because
+     * {@link #collectIngredientUsages} SUMS over {@code recipe.getIngredients()}, an extra tagged
+     * with 2 meals would report every quantity twice and inflate the popup's header total against
+     * a shopping-list row that reads correctly. {@link #processExtras} uses plain
+     * {@code findById} for exactly this reason; this method matches it and relies on the
+     * {@code @BatchSize(20)} on {@code Recipe.ingredients} the same way — repeated tree entries
+     * share one {@code Recipe} via session identity, so the batch loader keeps this to ~1-2
+     * queries per call rather than one per entry.
+     *
+     * @param extraRecipeCache Request-scoped cache so each distinct extra is loaded at most once
+     */
+    private void collectUsagesFromExtras(List<RecipeExtraNodeDTO> extras, Long ingredientId,
+                                         String unit, List<IngredientUsage> usages,
+                                         Map<Long, Recipe> extraRecipeCache) {
+        for (RecipeExtraNodeDTO extra : extras) {
+            // computeIfAbsent does not cache a null result, so a missing recipe is simply skipped.
+            // findById (not findWithDetailsById) — see the javadoc: the @EntityGraph finder
+            // duplicates the `ingredients` bag per recipe_meals row and would double-count here.
+            Recipe extraRecipe = extraRecipeCache.computeIfAbsent(
+                extra.getRecipeId(),
+                id -> recipeRepository.findById(id).orElse(null));
+
+            if (extraRecipe != null) {
+                collectIngredientUsages(extraRecipe, ingredientId, unit,
+                                        extra.getRecipeName(), usages);
+            }
+
+            if (extra.getChildren() != null && !extra.getChildren().isEmpty()) {
+                collectUsagesFromExtras(extra.getChildren(), ingredientId, unit,
+                                        usages, extraRecipeCache);
+            }
+        }
+    }
+
+    /**
+     * FR-042: One use of an ingredient inside a recipe (or one of its extras).
+     */
+    private record IngredientUsage(String ingredientName, BigDecimal quantity, String viaRecipeName) {}
 
     /**
      * Key class for aggregating ingredients by (ingredientId, unitId).
@@ -413,7 +479,7 @@ public class ShoppingListService {
      * FR-102: Added sourceChain parameter for tracking ingredient provenance.
      * @param sourceChain Chain of recipe IDs for provenance (null for main recipes)
      */
-    private void processRecipeIngredients(Recipe recipe, Integer entryServings, Integer defaultServings,
+    private void processRecipeIngredients(Recipe recipe, BigDecimal entryServings, Integer defaultServings,
                                           Map<IngredientUnitKey, IngredientAggregate> aggregatedIngredients,
                                           List<Long> sourceChain) {
         for (RecipeIngredient recipeIngredient : recipe.getIngredients()) {
@@ -425,7 +491,7 @@ public class ShoppingListService {
             // Scale quantity: scaledQty = ingredient.quantity * entry.servings / recipe.defaultServings
             BigDecimal originalQuantity = recipeIngredient.getQuantity();
             BigDecimal scaledQuantity = originalQuantity
-                .multiply(BigDecimal.valueOf(entryServings))
+                .multiply(entryServings)
                 .divide(BigDecimal.valueOf(defaultServings), 2, RoundingMode.HALF_UP);
 
             // Create key for aggregation (ingredientId, unitId)
@@ -465,7 +531,7 @@ public class ShoppingListService {
      *
      * @param extras List of extra nodes to process
      * @param selections Map of extraRecipeId -> isHomemade (null = all homemade)
-     * @param entryServings Servings for the meal plan entry
+     * @param entryServings Servings for the meal plan entry (may be fractional, e.g. 0.5)
      * @param defaultServings Default servings for the parent recipe
      * @param aggregatedIngredients Map to add ingredients to
      * @param storeBoughtItems List to add store-bought items to
@@ -473,7 +539,7 @@ public class ShoppingListService {
      */
     private void processExtras(List<RecipeExtraNodeDTO> extras,
                                Map<Long, Boolean> selections,
-                               Integer entryServings,
+                               BigDecimal entryServings,
                                Integer defaultServings,
                                Map<IngredientUnitKey, IngredientAggregate> aggregatedIngredients,
                                List<StoreBoughtItem> storeBoughtItems,
