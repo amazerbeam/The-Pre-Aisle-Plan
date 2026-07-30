@@ -59,6 +59,93 @@ public class MacroCalculationService {
     }
 
     /**
+     * Atwater factors. Mirrors client/src/constants/macroTargets.js -> KCAL_PER_GRAM
+     * so the backend figure and the frontend traffic-light denominator cannot diverge.
+     */
+    private static final BigDecimal KCAL_PER_G_PROTEIN = BigDecimal.valueOf(4);
+    private static final BigDecimal KCAL_PER_G_CARBS = BigDecimal.valueOf(4);
+    private static final BigDecimal KCAL_PER_G_FAT = BigDecimal.valueOf(9);
+
+    /**
+     * kcal from a macro triple: 4P + 4C + 9F.
+     *
+     * Deliberately applied to the UNROUNDED BigDecimal totals. Rounding the three
+     * macros to whole grams first injects up to ~7 kcal of error, and `ingredients`
+     * carries no calorie column, so Atwater factors are the only available basis.
+     *
+     * @param macros BigDecimal array [protein, carbs, fat]
+     * @return kcal, unrounded
+     */
+    public BigDecimal deriveKcal(BigDecimal[] macros) {
+        if (macros == null || macros.length != 3) {
+            return BigDecimal.ZERO;
+        }
+        BigDecimal protein = macros[0] == null ? BigDecimal.ZERO : macros[0];
+        BigDecimal carbs = macros[1] == null ? BigDecimal.ZERO : macros[1];
+        BigDecimal fat = macros[2] == null ? BigDecimal.ZERO : macros[2];
+
+        return protein.multiply(KCAL_PER_G_PROTEIN)
+            .add(carbs.multiply(KCAL_PER_G_CARBS))
+            .add(fat.multiply(KCAL_PER_G_FAT));
+    }
+
+    /**
+     * Whole-recipe kcal derived from raw ingredients plus prorated linked extras.
+     *
+     * This is the value RecipeDTO.calories and RecipeSummaryDTO.calories carry —
+     * whole-recipe, NOT per-serving, because the frontend divides by defaultServings.
+     * Replaces reads of the stored recipes.calories column, which on 20 of 48 recipes
+     * with extras was entered on the store-bought basis (see the plan folder's findings.md).
+     */
+    public int calculateRecipeTotalCalories(Recipe recipe) {
+        if (recipe == null) {
+            return 0;
+        }
+        warnIfIngredientsMissing(recipe);
+        BigDecimal[] totals = calculateRecipeTotalMacros(recipe, new HashSet<>());
+        return deriveKcal(totals).setScale(0, RoundingMode.HALF_UP).intValue();
+    }
+
+    /**
+     * Per-serving kcal = derived whole-recipe kcal / default_servings.
+     *
+     * Divides in BigDecimal, so 1025/2 is 513 rather than the 512 that
+     * Integer/Integer division produced at the previous call sites.
+     */
+    public int calculateCaloriesPerServing(Recipe recipe) {
+        if (recipe == null || recipe.getDefaultServings() == null || recipe.getDefaultServings() == 0) {
+            return 0;
+        }
+        warnIfIngredientsMissing(recipe);
+        BigDecimal[] totals = calculateRecipeTotalMacros(recipe, new HashSet<>());
+        return deriveKcal(totals)
+            .divide(BigDecimal.valueOf(recipe.getDefaultServings()), 4, RoundingMode.HALF_UP)
+            .setScale(0, RoundingMode.HALF_UP)
+            .intValue();
+    }
+
+    /**
+     * A recipe with a null or empty ingredient collection now silently derives to
+     * 0 kcal in place of whatever the stored recipes.calories column previously
+     * showed. Unlike "derived kcal == 0" (a legitimately zero-macro recipe is not
+     * a data bug and these methods run on every DTO assembly, so that condition
+     * would flood the logs), an empty/null ingredient collection is a genuine data
+     * signal worth one line. Checked directly on the collection, not on the
+     * derived total, so it stays narrow.
+     *
+     * Called from both calculateRecipeTotalCalories and calculateCaloriesPerServing;
+     * a request that calls both for the same recipe logs twice. Not deduplicated —
+     * doing so cheaply would need request-scoped state this stateless service
+     * doesn't have, and a duplicate warning is a smaller cost than that.
+     */
+    private void warnIfIngredientsMissing(Recipe recipe) {
+        if (recipe.getIngredients() == null || recipe.getIngredients().isEmpty()) {
+            log.warn("Recipe id {} ({}) has no ingredient rows; derived calories will be 0.",
+                recipe.getId(), recipe.getName());
+        }
+    }
+
+    /**
      * FR-094: Calculate total macros for a recipe (before dividing by servings).
      * Handles both raw ingredients and linked recipe ingredients recursively.
      *
@@ -75,36 +162,45 @@ public class MacroCalculationService {
             return new BigDecimal[]{totalProtein, totalCarbs, totalFat};
         }
 
-        // Prevent infinite recursion
-        if (visitedRecipeIds.contains(recipe.getId())) {
+        // FR-094: Guard genuine cycles only. The set tracks the CURRENT PATH, not
+        // every recipe ever visited — ids are removed on the way back out (below).
+        // A never-cleared set also zeroes legitimate repeats: one parent using the
+        // same sub-recipe on two rows, or two sub-recipes sharing a grandchild.
+        if (!visitedRecipeIds.add(recipe.getId())) {
             log.warn("Circular recipe reference detected for recipe ID: {}. Skipping to prevent infinite loop.", recipe.getId());
             return new BigDecimal[]{totalProtein, totalCarbs, totalFat};
         }
-        visitedRecipeIds.add(recipe.getId());
 
-        for (RecipeIngredient ri : recipe.getIngredients()) {
-            BigDecimal quantityGrams = ri.getQuantityGrams();
-            if (quantityGrams == null) quantityGrams = BigDecimal.ZERO;
+        try {
+            for (RecipeIngredient ri : recipe.getIngredients()) {
+                BigDecimal quantityGrams = ri.getQuantityGrams();
+                if (quantityGrams == null) quantityGrams = BigDecimal.ZERO;
 
-            // FR-094: Check if this is a linked recipe ingredient
-            if (ri.isLinkedRecipe()) {
-                Recipe linkedRecipe = ri.getLinkedRecipe();
-                if (linkedRecipe != null) {
-                    BigDecimal[] linkedMacros = calculateLinkedRecipeMacros(linkedRecipe, quantityGrams, visitedRecipeIds);
-                    totalProtein = totalProtein.add(linkedMacros[0]);
-                    totalCarbs = totalCarbs.add(linkedMacros[1]);
-                    totalFat = totalFat.add(linkedMacros[2]);
+                // FR-094: Check if this is a linked recipe ingredient.
+                // Tested BEFORE isRawIngredient() so an FR-103 dual-path row
+                // (both ids set) always uses the homemade linked recipe and never
+                // the store-bought ingredient — and never both.
+                if (ri.isLinkedRecipe()) {
+                    Recipe linkedRecipe = ri.getLinkedRecipe();
+                    if (linkedRecipe != null) {
+                        BigDecimal[] linkedMacros = calculateLinkedRecipeMacros(linkedRecipe, quantityGrams, visitedRecipeIds);
+                        totalProtein = totalProtein.add(linkedMacros[0]);
+                        totalCarbs = totalCarbs.add(linkedMacros[1]);
+                        totalFat = totalFat.add(linkedMacros[2]);
+                    }
+                } else if (ri.isRawIngredient()) {
+                    // FR-084: Calculate macros for raw ingredient
+                    BigDecimal[] ingredientMacros = calculateRawIngredientMacros(ri, quantityGrams);
+                    totalProtein = totalProtein.add(ingredientMacros[0]);
+                    totalCarbs = totalCarbs.add(ingredientMacros[1]);
+                    totalFat = totalFat.add(ingredientMacros[2]);
                 }
-            } else if (ri.isRawIngredient()) {
-                // FR-084: Calculate macros for raw ingredient
-                BigDecimal[] ingredientMacros = calculateRawIngredientMacros(ri, quantityGrams);
-                totalProtein = totalProtein.add(ingredientMacros[0]);
-                totalCarbs = totalCarbs.add(ingredientMacros[1]);
-                totalFat = totalFat.add(ingredientMacros[2]);
             }
-        }
 
-        return new BigDecimal[]{totalProtein, totalCarbs, totalFat};
+            return new BigDecimal[]{totalProtein, totalCarbs, totalFat};
+        } finally {
+            visitedRecipeIds.remove(recipe.getId());
+        }
     }
 
     /**
@@ -148,9 +244,9 @@ public class MacroCalculationService {
         BigDecimal portionCarbs = linkedTotalMacros[1].multiply(portionRatio).setScale(4, RoundingMode.HALF_UP);
         BigDecimal portionFat = linkedTotalMacros[2].multiply(portionRatio).setScale(4, RoundingMode.HALF_UP);
 
-        log.debug("Linked recipe {} ({}g of {}g = {:.2f}%): protein={}, carbs={}, fat={}",
+        log.debug("Linked recipe {} ({}g of {}g = {}%): protein={}, carbs={}, fat={}",
             linkedRecipe.getName(), usedGrams, totalYield,
-            portionRatio.multiply(BigDecimal.valueOf(100)),
+            portionRatio.multiply(BigDecimal.valueOf(100)).setScale(2, RoundingMode.HALF_UP),
             portionProtein, portionCarbs, portionFat);
 
         return new BigDecimal[]{portionProtein, portionCarbs, portionFat};
@@ -229,20 +325,31 @@ public class MacroCalculationService {
      * @return int array [protein, carbs, fat] totals (rounded to whole numbers)
      */
     public int[] calculateTotalMacros(List<Recipe> recipes) {
-        int totalProtein = 0;
-        int totalCarbs = 0;
-        int totalFat = 0;
+        BigDecimal totalProtein = BigDecimal.ZERO;
+        BigDecimal totalCarbs = BigDecimal.ZERO;
+        BigDecimal totalFat = BigDecimal.ZERO;
 
         if (recipes != null) {
             for (Recipe recipe : recipes) {
-                int[] recipeMacros = calculatePerServingMacros(recipe);
-                totalProtein += recipeMacros[0];
-                totalCarbs += recipeMacros[1];
-                totalFat += recipeMacros[2];
+                if (recipe == null || recipe.getDefaultServings() == null || recipe.getDefaultServings() == 0) {
+                    continue;
+                }
+                // Accumulate UNROUNDED per-serving values: rounding each recipe to whole
+                // grams first loses up to 0.5 g per macro per meal, which compounds
+                // across 21 meals in the weekly summary.
+                BigDecimal[] totals = calculateRecipeTotalMacros(recipe, new HashSet<>());
+                BigDecimal servings = BigDecimal.valueOf(recipe.getDefaultServings());
+                totalProtein = totalProtein.add(totals[0].divide(servings, 4, RoundingMode.HALF_UP));
+                totalCarbs = totalCarbs.add(totals[1].divide(servings, 4, RoundingMode.HALF_UP));
+                totalFat = totalFat.add(totals[2].divide(servings, 4, RoundingMode.HALF_UP));
             }
         }
 
-        return new int[]{totalProtein, totalCarbs, totalFat};
+        return new int[]{
+            totalProtein.setScale(0, RoundingMode.HALF_UP).intValue(),
+            totalCarbs.setScale(0, RoundingMode.HALF_UP).intValue(),
+            totalFat.setScale(0, RoundingMode.HALF_UP).intValue()
+        };
     }
 
     /**

@@ -52,6 +52,8 @@ Sketch ingredients, portions, technique. Aim straight at Moderate's targets:
 | **Moderate (default)** | 550–650 | ≥35 g | 25–35% | 40–50% |
 | Balanced | 700–800 | ≥35 g | 25–35% | 40–50% |
 
+> Calories are a **design target**, not an audit reject. A finished variant outside its kcal band still passes audit and can be marked `macros_audited`. See `.claude/rules/recipe-variants.md` → "Calories are a target, not a reject condition".
+
 Use ~150 g lean protein per serving as the starting point. Levers to differentiate variants: starch portion, whole vs white eggs, air-fry vs pan-fry, cheese/avocado garnish, oil/butter quantity. Each lever should move ~80–150 kcal between siblings.
 
 ### 3. Resolve ingredients against the live DB
@@ -278,6 +280,69 @@ This is the lens that catches "it passes macros but is not a good dish."
 
 Lead with a one-line verdict per variant on macro pass/fail. Then a single **Findings (ranked)** list — dish-breakers and technique failures **before** macro misses, because a watery sauce on a macro-passing recipe is a worse outcome than a 10% kcal overshoot on a delicious one. End with a numbered list of proposed fixes the user can approve in one go (do not apply automatically — explicit approval per the DO NOT list).
 
+### Recording the audit — `macros_audited`
+
+An audit isn't finished until it's recorded on the `recipes` row. Otherwise the next audit re-does work that was already signed off, and there's no way to query "which recipes still need review".
+
+**Columns** (all on `recipes`):
+
+| Column | Type | What to write |
+|---|---|---|
+| `macros_audited` | `tinyint(1)` NOT NULL, default 0 | `1` once the audit is complete and its macro findings are resolved or explicitly accepted |
+| `macros_audited_at` | `timestamp` NULL | `NOW()` in the same statement |
+| `macros_audited_by` | `bigint` NULL → FK `users.id` | **leave NULL** for an agent-run audit |
+
+`macros_audited_by` is a FK to `users.id`. An audit run by this skill has no user row behind it, so leave it NULL — do **not** invent an id or go looking through the `users` table for one. Only populate it if the user explicitly tells you which user id to attribute. Established convention: the Stromboli family (44/45/46) is marked with `macros_audited_by = NULL`.
+
+**Mark the whole family in one statement, never a single variant.** The audit covers Light + Moderate + Balanced together; a family where only Moderate is flagged audited is a worse state than one where none are, because it reads as "reviewed" on the card while its siblings were never checked.
+
+```sql
+UPDATE recipes
+SET macros_audited = 1,
+    macros_audited_at = NOW()
+WHERE id IN (23, 24, 25);   -- every member of the family, from recipe_family_members
+```
+
+This is idempotent — re-running it only refreshes the timestamp.
+
+**When you may set it to 1:**
+
+- All five audit lenses have been run (not just the macro recompute).
+- Every macro **reject** condition is cleared — per-serving protein, fat % and carbs % pass on all three variants, and `recipes.calories` agrees with the recomputed whole-recipe total within 5 %. Per-serving kcal is reported but does **not** gate the flag (see `.claude/rules/recipe-variants.md` → "Calories are a target, not a reject condition").
+- Remaining findings are either fixed or the user has explicitly said to leave them. Dish-quality findings the user has knowingly declined (no acid, soggy garnish) do **not** block the flag — `macros_audited` is a macro attestation, not a taste one. Say plainly in your summary which findings were left open.
+
+**When you must NOT set it to 1:**
+
+- Any variant still fails a per-variant target band, or the family still violates `.claude/rules/recipe-variants.md` structurally (wrong default, ≠3 members, broken kcal ordering).
+- You only recomputed macros and skipped lenses 2–5.
+- The user hasn't approved the fixes yet — mark it *after* the SQL is applied and verified, not alongside the proposal.
+
+**Invalidation.** Any later change to a recipe's `recipe_ingredients`, `default_servings`, or `calories` makes the attestation stale. When you edit an audited recipe and are not re-verifying it in the same pass, clear the flag:
+
+```sql
+UPDATE recipes
+SET macros_audited = 0, macros_audited_at = NULL
+WHERE id IN (...);
+```
+
+**Verify / find unaudited work:**
+
+```sql
+-- did the mark land on the whole family?
+SELECT rfm.variant_label, r.id, r.macros_audited, r.macros_audited_at
+FROM recipe_family_members rfm
+JOIN recipes r ON r.id = rfm.recipe_id
+WHERE rfm.family_id = <family_id>
+ORDER BY rfm.display_order;
+
+-- families with a partially-applied audit (the bad state)
+SELECT rfm.family_id, SUM(r.macros_audited) AS audited, COUNT(*) AS members
+FROM recipe_family_members rfm
+JOIN recipes r ON r.id = rfm.recipe_id
+GROUP BY rfm.family_id
+HAVING audited > 0 AND audited < members;
+```
+
 ## DO / DO NOT
 
 **DO**
@@ -291,6 +356,7 @@ Lead with a one-line verdict per variant on macro pass/fail. Then a single **Fin
 - Apply FR-103 dual-path consistently across all three variants in a family.
 - Use cook-friendly display units: **tsp/tbsp/pinch** for dry spices and herbs, **cloves** for garlic, **tsp/tbsp** for oil ≥5 g, **ml** for liquids, whole-item units for eggs/lemons/onions. The gram weight stays in `quantity_grams` for macros.
 - Write instructions a stranger can cook from: every step has a visual/temporal endpoint, aromatics go into a warm-not-cold pan, dairy is tempered, protein rests and its juices return to the sauce, taste-and-adjust is a step.
+- Close every audit by setting `macros_audited = 1` + `macros_audited_at = NOW()` on **all** members of the family once the macro findings are resolved — see "Recording the audit". Leave `macros_audited_by` NULL.
 
 **DO NOT**
 
@@ -300,6 +366,8 @@ Lead with a one-line verdict per variant on macro pass/fail. Then a single **Fin
 - Insert plural-form ingredient rows (`Bananas`) or duplicates differing only in casing.
 - Set `quantity_grams` to the linked recipe's total yield when only a portion is used (the 50g-vs-300g bug).
 - Apply Nutrition Agent / audit suggestions automatically — get explicit user approval for each change.
+- Set `macros_audited = 1` on one variant only, while a macro reject is still outstanding, or before the approved fixes have been applied and verified.
+- Write a made-up id into `macros_audited_by`, or query the `users` table looking for one.
 
 ## Output format (preview)
 
@@ -351,3 +419,4 @@ Full template + worked example in `references/output-format.md`.
 - Display units are cook-friendly (no `1 g oregano`, no `12 g garlic`, no `14 g olive oil`).
 - Instructions pass the chef lens in "Auditing an existing recipe" — no vague endpoints, no broken physics (watery sauces, split dairy, cold-pan aromatics), no discarded resting juices, no missing taste-and-adjust.
 - When auditing, dish-quality and technique findings are reported **before** macro findings — a watery sauce on a macro-passing recipe is the worse outcome.
+- Every completed audit is recorded: `macros_audited = 1` and `macros_audited_at` set on all three family members, `macros_audited_by` NULL. No family is left in the partially-audited state (some members flagged, others not).

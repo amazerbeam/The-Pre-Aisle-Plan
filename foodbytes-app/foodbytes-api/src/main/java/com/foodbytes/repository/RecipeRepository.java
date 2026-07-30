@@ -24,6 +24,19 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
     @Query("SELECT DISTINCT r FROM Recipe r LEFT JOIN FETCH r.meals rm LEFT JOIN FETCH rm.meal WHERE r.isLive = true")
     List<Recipe> findAllLiveRecipes();
 
+    /**
+     * Live recipes with the graph MacroCalculationService walks: meals, ingredient
+     * rows, and each row's raw ingredient. Linked recipes and their own ingredient
+     * rows are resolved by Hibernate batch fetching (default_batch_fetch_size) —
+     * fetching that second collection level here too would produce a
+     * recipe_ingredients x linked_ingredients cartesian product.
+     */
+    @Query("SELECT DISTINCT r FROM Recipe r " +
+           "LEFT JOIN FETCH r.meals rm LEFT JOIN FETCH rm.meal " +
+           "LEFT JOIN FETCH r.ingredients ri LEFT JOIN FETCH ri.ingredient " +
+           "WHERE r.isLive = true")
+    List<Recipe> findAllLiveRecipesWithMacroGraph();
+
     @Query("SELECT DISTINCT r FROM Recipe r JOIN FETCH r.meals rm JOIN FETCH rm.meal m WHERE r.isLive = true AND m.key = :mealKey")
     List<Recipe> findByMealKey(@Param("mealKey") String mealKey);
 

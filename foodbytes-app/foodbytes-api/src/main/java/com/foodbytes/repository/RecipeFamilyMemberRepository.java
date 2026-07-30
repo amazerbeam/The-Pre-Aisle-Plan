@@ -40,6 +40,28 @@ public interface RecipeFamilyMemberRepository extends JpaRepository<RecipeFamily
     List<RecipeFamilyMember> findVariantsForRecipe(@Param("recipeId") Long recipeId);
 
     /**
+     * FR-094: Same variants as {@link #findVariantsForRecipe}, with each member's
+     * {@code recipe.ingredients} (and each row's raw ingredient) fetched alongside
+     * the member. Every caller of this finder passes the result straight into
+     * {@code toVariantDTO}, which calls {@code MacroCalculationService.calculateCaloriesPerServing}
+     * on every sibling — without the join that lazily loads the ingredient graph
+     * once per sibling (RecipeService.addVariantInfoToSummary / addVariantInfo,
+     * RecipeFamilyService.getVariantsForRecipe). {@code hasVariants} only needs the
+     * member count, so it stays on the plain {@link #findVariantsForRecipe}.
+     * Linked recipes and their own ingredient rows are left to Hibernate batch
+     * fetching (default_batch_fetch_size) — joining that second collection level
+     * here too would produce a recipe_ingredients x linked_ingredients cartesian
+     * product, the same constraint that shaped
+     * {@code RecipeRepository.findAllLiveRecipesWithMacroGraph}.
+     */
+    @Query("SELECT DISTINCT m FROM RecipeFamilyMember m " +
+           "LEFT JOIN FETCH m.recipe r " +
+           "LEFT JOIN FETCH r.ingredients ri LEFT JOIN FETCH ri.ingredient " +
+           "WHERE m.family.id = (SELECT m2.family.id FROM RecipeFamilyMember m2 WHERE m2.recipe.id = :recipeId) " +
+           "ORDER BY m.displayOrder ASC")
+    List<RecipeFamilyMember> findVariantsForRecipeWithMacroGraph(@Param("recipeId") Long recipeId);
+
+    /**
      * Count members in a family (for validation).
      */
     long countByFamilyId(Long familyId);

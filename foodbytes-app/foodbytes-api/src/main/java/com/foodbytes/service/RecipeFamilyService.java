@@ -27,6 +27,7 @@ public class RecipeFamilyService {
     private final RecipeFamilyRepository recipeFamilyRepository;
     private final RecipeFamilyMemberRepository recipeFamilyMemberRepository;
     private final RecipeRepository recipeRepository;
+    private final MacroCalculationService macroCalculationService;
 
     // ========================================
     // PUBLIC API - GET VARIANTS FOR RECIPES
@@ -38,7 +39,11 @@ public class RecipeFamilyService {
      */
     @Transactional(readOnly = true)
     public List<RecipeVariantDTO> getVariantsForRecipe(Long recipeId) {
-        List<RecipeFamilyMember> members = recipeFamilyMemberRepository.findVariantsForRecipe(recipeId);
+        // toVariantDTO below walks each sibling's ingredient graph via
+        // MacroCalculationService.calculateCaloriesPerServing, so this call site
+        // needs the macro-graph finder — the plain one leaves that graph lazy,
+        // which is a fresh per-sibling N+1.
+        List<RecipeFamilyMember> members = recipeFamilyMemberRepository.findVariantsForRecipeWithMacroGraph(recipeId);
 
         // Only show dropdown if 2+ members
         if (members.size() < 2) {
@@ -52,6 +57,8 @@ public class RecipeFamilyService {
 
     /**
      * Check if a recipe has variants (for conditional dropdown display).
+     * Only the member count is needed here, not the ingredient graph — stays on
+     * the plain finder per findVariantsForRecipeWithMacroGraph's own javadoc.
      */
     @Transactional(readOnly = true)
     public boolean hasVariants(Long recipeId) {
@@ -294,10 +301,9 @@ public class RecipeFamilyService {
 
     private RecipeVariantDTO toVariantDTO(RecipeFamilyMember member) {
         Recipe recipe = member.getRecipe();
-        // FR-043: Calculate per-serving calories for dropdown display
-        Integer caloriesPerServing = recipe.getDefaultServings() > 0
-            ? recipe.getCalories() / recipe.getDefaultServings()
-            : recipe.getCalories();
+        // FR-043: Derived per-serving kcal for dropdown display — homemade basis,
+        // matching RecipeService.addVariantInfo.
+        Integer caloriesPerServing = macroCalculationService.calculateCaloriesPerServing(recipe);
         return new RecipeVariantDTO(
             recipe.getId(),
             recipe.getName(),

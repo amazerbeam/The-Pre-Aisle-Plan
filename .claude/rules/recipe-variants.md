@@ -126,3 +126,44 @@ Any row returned = a family where the store-bought option exists in some variant
 - A sub-recipe exists for a component, the parent variant uses it, but only `linked_recipe_id` is set with no store-bought ingredient counterpart **and** the user expects a store-bought option to be available. (Acceptable if the component has no realistic store-bought equivalent — e.g. a custom spice blend.)
 - One variant in a family has the FR-103 dual-path row for a component; its siblings do not.
 - Store-bought path's per-serving kcal diverges from the homemade path by >10% on the same row (data bug — usually wrong `quantity_grams` or wrong per-100g macros on the raw ingredient).
+
+## Calories are a target, not a reject condition (audit policy, 2026-07-30)
+
+For **audit purposes**, per-serving kcal does not fail a recipe. The bands
+(Light 450–550, Moderate 550–650, Balanced 700–800) remain design targets and
+should guide new recipes, but a variant outside its band is **not** a reject and
+must not block `macros_audited`.
+
+### What still rejects
+
+| Check | Reject when |
+|---|---|
+| Protein | < 35 g per serving |
+| Fat | > 35 % of kcal |
+| Carbs | < 38 % of kcal |
+| Family size | ≠ 3 members |
+| Variant labels | not exactly Light / Moderate / Balanced |
+| Default | `is_default` not on Moderate, or zero/multiple defaults |
+| kcal ordering | not `Light < Moderate < Balanced` |
+
+Carbs **above** 50 % is over-target but not a reject. The ≥80 kcal gap between
+siblings is advisory.
+
+### Why
+
+The variant family *is* the calorie-matching mechanism: a user picks Light,
+Moderate or Balanced to fit their own budget. A family whose Balanced runs to
+850 kcal is serving that purpose, not failing — so long as the picker is honest,
+which is why family size, labels, default and kcal ordering stay hard rejects.
+
+This also aligns the audit with what the app already shows. The P/C/F traffic
+light in `client/src/constants/macroTargets.js` deliberately excludes kcal
+("those variants differ on kcal only, which is deliberately not traffic-lit",
+line 19). Before this policy the audit failed 12 of 20 families that the UI
+rendered all-green — the standard and the display disagreed, and the display was
+right.
+
+### Verify
+
+Score per-serving protein grams, carb % and fat % from `recipe_ingredients`
+plus prorated linked recipes. Report kcal for information; do not fail on it.

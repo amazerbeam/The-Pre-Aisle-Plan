@@ -335,13 +335,14 @@ public class MealPlanService {
     }
 
     /**
-     * FR-017: Calculate per-serving calories for a recipe.
+     * FR-017: Per-serving calories for a recipe, derived from ingredients plus
+     * prorated linked extras rather than the stored recipes.calories column.
+     *
+     * Delegating keeps day totals (buildDayDTO) and entry values (convertToDTO)
+     * on one basis, and the service handles the null/zero-servings guards.
      */
     private Integer calculateCaloriesPerServing(Recipe recipe) {
-        if (recipe.getCalories() == null || recipe.getDefaultServings() == null || recipe.getDefaultServings() == 0) {
-            return 0;
-        }
-        return recipe.getCalories() / recipe.getDefaultServings();
+        return macroCalculationService.calculateCaloriesPerServing(recipe);
     }
 
     /**

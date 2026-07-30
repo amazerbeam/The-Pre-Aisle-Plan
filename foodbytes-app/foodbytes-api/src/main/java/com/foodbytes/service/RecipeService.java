@@ -47,7 +47,7 @@ public class RecipeService {
     public List<RecipeDTO> getAllRecipes() {
         // FR-043: Filter out non-default family members (only show defaults in list)
         Set<Long> hiddenRecipeIds = new HashSet<>(recipeFamilyMemberRepository.findNonDefaultRecipeIds());
-        return recipeRepository.findAllLiveRecipes().stream()
+        return recipeRepository.findAllLiveRecipesWithMacroGraph().stream()
                 .filter(recipe -> !hiddenRecipeIds.contains(recipe.getId()))
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
@@ -84,7 +84,7 @@ public class RecipeService {
     @Transactional(readOnly = true)
     public List<RecipeSummaryDTO> getAllRecipeSummaries() {
         Set<Long> hiddenRecipeIds = new HashSet<>(recipeFamilyMemberRepository.findNonDefaultRecipeIds());
-        return recipeRepository.findAllLiveRecipes().stream()
+        return recipeRepository.findAllLiveRecipesWithMacroGraph().stream()
                 .filter(recipe -> !hiddenRecipeIds.contains(recipe.getId()))
                 .map(this::convertToSummaryDTO)
                 .collect(Collectors.toList());
@@ -139,7 +139,10 @@ public class RecipeService {
         dto.setId(recipe.getId());
         dto.setName(recipe.getName());
         dto.setDefaultServings(recipe.getDefaultServings());
-        dto.setCalories(recipe.getCalories());
+        // Derived, not the stored column: recipes.calories was entered on the
+        // store-bought basis for 20 of 48 recipes with extras. Whole-recipe kcal —
+        // the frontend divides by defaultServings.
+        dto.setCalories(macroCalculationService.calculateRecipeTotalCalories(recipe));
         int[] macros = macroCalculationService.calculatePerServingMacros(recipe);
         dto.setProtein(macros[0]);
         dto.setCarbs(macros[1]);
@@ -183,7 +186,7 @@ public class RecipeService {
                 .id(recipe.getId())
                 .name(recipe.getName())
                 .defaultServings(recipe.getDefaultServings())
-                .calories(recipe.getCalories())
+                .calories(macroCalculationService.calculateRecipeTotalCalories(recipe))
                 .isCheat(recipe.getIsCheat())
                 .mealTypes(recipe.getMeals().stream()
                         .map(m -> m.getMeal().getKey())
@@ -211,18 +214,22 @@ public class RecipeService {
             dto.setVariantLabel(member.getVariantLabel());
             dto.setIsDefault(member.getIsDefault());
 
-            // Get all variants in the family
+            // Get all variants in the family. Each sibling's caloriesPerServing below
+            // walks its ingredient graph via MacroCalculationService, so the finder
+            // must fetch that graph too — otherwise this is a fresh N+1 per sibling.
             List<RecipeFamilyMember> allMembers = recipeFamilyMemberRepository
-                .findVariantsForRecipe(recipeId);
+                .findVariantsForRecipeWithMacroGraph(recipeId);
 
             // Only include variants if 2+ members
             if (allMembers.size() >= 2) {
                 dto.setVariants(allMembers.stream()
                     .map(m -> {
                         Recipe variantRecipe = m.getRecipe();
-                        Integer caloriesPerServing = variantRecipe.getDefaultServings() > 0
-                            ? variantRecipe.getCalories() / variantRecipe.getDefaultServings()
-                            : variantRecipe.getCalories();
+                        // FR-043: Derived per-serving kcal for dropdown display.
+                        // BigDecimal division inside the service — the Integer/Integer
+                        // form this replaces truncated (1025/2 gave 512, not 513).
+                        Integer caloriesPerServing =
+                            macroCalculationService.calculateCaloriesPerServing(variantRecipe);
                         return new RecipeVariantDTO(
                             variantRecipe.getId(),
                             variantRecipe.getName(),
@@ -268,19 +275,22 @@ public class RecipeService {
             RecipeFamilyMember member = membership.get();
             dto.setVariantLabel(member.getVariantLabel());
 
-            // Get all variants in the family
+            // Get all variants in the family. Each sibling's caloriesPerServing below
+            // walks its ingredient graph via MacroCalculationService, so the finder
+            // must fetch that graph too — otherwise this is a fresh N+1 per sibling.
             List<RecipeFamilyMember> allMembers = recipeFamilyMemberRepository
-                .findVariantsForRecipe(recipeId);
+                .findVariantsForRecipeWithMacroGraph(recipeId);
 
             // Only include variants if 2+ members
             if (allMembers.size() >= 2) {
                 dto.setVariants(allMembers.stream()
                     .map(m -> {
                         Recipe variantRecipe = m.getRecipe();
-                        // FR-043: Calculate per-serving calories for dropdown display
-                        Integer caloriesPerServing = variantRecipe.getDefaultServings() > 0
-                            ? variantRecipe.getCalories() / variantRecipe.getDefaultServings()
-                            : variantRecipe.getCalories();
+                        // FR-043: Derived per-serving kcal for dropdown display.
+                        // BigDecimal division inside the service — the Integer/Integer
+                        // form this replaces truncated (1025/2 gave 512, not 513).
+                        Integer caloriesPerServing =
+                            macroCalculationService.calculateCaloriesPerServing(variantRecipe);
                         return new RecipeVariantDTO(
                             variantRecipe.getId(),
                             variantRecipe.getName(),
