@@ -11,7 +11,7 @@ Completed: 2026-07-29
 **Goal:** Fix the three mobile-broken surfaces on `/mealplan` — the day/week macro popups that dismiss themselves the moment you scroll them, the Options kebab menu whose dropdown renders off the left edge of the viewport at ≤600px, and the four Options modals whose confirm buttons become unreachable when the on-screen keyboard opens — plus the ≥44px touch-target, `@media (hover: hover)`, and `dvh` ergonomics sweep across the five stylesheets involved.
 
 **Spec:** `plan.md` in this folder.
- 
+  
 ---
 
 ## File map
