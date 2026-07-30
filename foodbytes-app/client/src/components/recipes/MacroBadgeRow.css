@@ -1,0 +1,154 @@
+/* FR-104: Per-serving macro badges with the four-state traffic light.
+ * Relocated from RecipeViewModal.css and extended. Rendered on the
+ * brand-purple modal header, so all text is explicitly white.
+ */
+
+.recipe-macros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  align-items: center;
+  margin-top: var(--spacing-sm);
+}
+
+.recipe-macros .macro-badge {
+  /* Was a <span>; now a real button, so reset the UA styles. */
+  font: inherit;
+  appearance: none;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1.5px solid transparent;
+  border-radius: 20px;
+  color: #ffffff;
+  font-size: 0.78rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  /* Compact visual, 44px-tall hit area (react-frontend touch rule). */
+  min-height: 44px;
+  padding: 4px 12px;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.recipe-macros .macro-badge strong {
+  font-weight: 700;
+  opacity: 0.85;
+}
+
+/* Component recipes (Extras-only) — grams with no verdict. A <span>, not a
+   button, so it must not look or behave interactively. */
+.recipe-macros .macro-badge--plain {
+  cursor: default;
+  min-height: 0;
+  padding: 3px 9px;
+  background: rgba(255, 255, 255, 0.15);
+  border-color: transparent;
+}
+
+.recipe-macros .macro-value {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Interactive states are scoped to button.macro-badge: the Extras-only variant is
+   a <span> and must not pick up hover, active, or a focus ring. */
+@media (hover: hover) {
+  .recipe-macros button.macro-badge:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+  }
+}
+
+.recipe-macros button.macro-badge:active {
+  background-color: rgba(255, 255, 255, 0.36);
+}
+
+.recipe-macros button.macro-badge:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
+}
+
+/* The light itself. */
+.recipe-macros .macro-light {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 1.5px rgba(0, 0, 0, 0.18);
+}
+
+/* Direction signal — so the state never depends on colour alone. */
+.recipe-macros .macro-arrow {
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* Must-fix signal, independent of the traffic light: a documented reject can be
+   blue (protein/carbs, under target) or red (fat, over target). */
+.recipe-macros .macro-reject {
+  font-size: 0.78rem;
+  line-height: 1;
+}
+
+/* Border, fill and dot all come from the same status token group in global.css —
+   never inline channels, or a hue retune only lands on some of the three. */
+.recipe-macros .macro-badge--under {
+  border-color: var(--macro-under-target);
+  background-color: var(--macro-under-target-tint);
+}
+
+.recipe-macros .macro-badge--under .macro-light {
+  background-color: var(--macro-under-target);
+}
+
+.recipe-macros .macro-badge--near {
+  border-color: var(--macro-near-target);
+  background-color: var(--macro-near-target-tint);
+}
+
+.recipe-macros .macro-badge--near .macro-light {
+  background-color: var(--macro-near-target);
+}
+
+.recipe-macros .macro-badge--on {
+  border-color: var(--macro-on-target);
+  background-color: var(--macro-on-target-tint);
+}
+
+.recipe-macros .macro-badge--on .macro-light {
+  background-color: var(--macro-on-target);
+}
+
+.recipe-macros .macro-badge--over {
+  border-color: var(--macro-over-target);
+  background-color: var(--macro-over-target-tint);
+}
+
+.recipe-macros .macro-badge--over .macro-light {
+  background-color: var(--macro-over-target);
+}
+
+.recipe-macros .macro-suffix {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* Narrow screens: three badges plus the "/ serving" suffix must wrap cleanly
+   rather than overflow. A rejecting badge carries five children (dot, letter,
+   grams, arrow, warning), so trim the horizontal padding and gap to buy room. */
+@media (max-width: 400px) {
+  .recipe-macros {
+    gap: 6px;
+  }
+
+  .recipe-macros .macro-badge {
+    padding: 4px 9px;
+    gap: 5px;
+  }
+
+  /* Drop to its own line so the three badges can share the row above it. */
+  .recipe-macros .macro-suffix {
+    flex-basis: 100%;
+  }
+}

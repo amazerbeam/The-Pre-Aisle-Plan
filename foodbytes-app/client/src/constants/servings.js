@@ -8,3 +8,7 @@
 export const MIN_SERVINGS = 0.25
 export const MAX_SERVINGS = 20
 export const SERVINGS_STEP = 0.5
+
+// Fallback when a servings value is absent or unparseable. Replaces the `|| 1`
+// literal that was duplicated across useServingsInput and RecipeViewModal.
+export const DEFAULT_SERVINGS = 1

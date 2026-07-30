@@ -17,6 +17,7 @@ public class RecipeDTO {
     private Integer carbs;     // grams per serving
     private Integer fat;       // grams per serving
     private Boolean isCheat;
+    private Boolean macrosAudited;   // admin list badge (GET /api/recipes/admin)
     private List<String> mealTypes;
     private List<IngredientDTO> ingredients;
 

@@ -111,6 +111,15 @@ export const recipeService = {
   async updateRecipeVisibility(id, isLive) {
     const response = await api.patch(`/recipes/admin/${id}/visibility?isLive=${isLive}`)
     return response.data
+  },
+
+  /**
+   * Set/clear the chef's macro + calorie audit sign-off (admin only).
+   * Applies immediately — this is not part of the Recipe Info save payload.
+   */
+  async updateRecipeMacrosAudit(id, audited) {
+    const response = await api.patch(`/recipes/admin/${id}/audit?audited=${audited}`)
+    return response.data
   }
 }
 

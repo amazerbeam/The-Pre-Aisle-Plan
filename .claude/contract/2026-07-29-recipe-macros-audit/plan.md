@@ -206,8 +206,11 @@ PATCH /api/recipes/admin/{id}/audit?audited=true
                          macrosAuditedAt: "2026-07-29T14:03:11",
                          macrosAuditedBy: 1 }
   403 → non-admin caller
-  500 → unknown recipe id ("Recipe not found with id: …", matching the
-        existing RuntimeException behaviour of every sibling admin method)
+  500 → unknown recipe id — the same RuntimeException every sibling admin
+        method throws ("Recipe not found with id: …"), but that message is
+        only logged server-side; Spring Boot's default error handling (no
+        custom @ControllerAdvice exists, and server.error.include-message is
+        not set) returns a generic body with no message field
 ```
 
 #### Frontend service
@@ -225,7 +228,7 @@ async updateRecipeMacrosAudit(id, audited) {
 - **Resource cleanup:** No new files, sockets, streams, or timers. The single DB write runs inside the `@Transactional` boundary on `updateRecipeMacrosAudit`, so the connection and transaction are managed by Spring exactly as in `updateRecipeVisibility`. No `setTimeout` is added on the frontend — the existing `saveMessage` timeout in `RecipeEditModal` is reused unchanged, so no new timer to clear on unmount.
 - **Concurrency / thread-safety:** No shared mutable state is introduced; `RecipeService` stays stateless and the new fields live on per-request entity instances. Two admins toggling the same recipe concurrently is a last-write-wins on three independent columns — acceptable and self-consistent (the flag, timestamp, and auditor are always written together in one statement). No optimistic-locking `@Version` is added: with a single chef, a `409` on a sign-off click would be worse UX than last-write-wins. Nothing here allocates enough to influence GC pauses.
 - **Allocation behaviour:** Three scalar fields per `Recipe` (`Boolean`, `LocalDateTime`, `Long`) — no collections, no eager association. `convertToDTO` runs once per recipe on the admin list; the added line is one boolean copy with no extra query, which is precisely why `macrosAuditedBy` is a `Long` column rather than a `@ManyToOne User` (which would issue one lazy `SELECT users` per card, or force a join). The index on `macros_audited` costs one small secondary index on a ~200-row table. No leak surface: no cache, no static registry, no listener registration.
-- **Error paths:** Unknown recipe id → the same `RuntimeException("Recipe not found with id: …")` every sibling admin method throws, handled by the existing `GlobalExceptionHandler` (no new exception type, no behavioural divergence). Non-admin caller → Spring Security returns `403` before the service is reached. On the frontend the call is wrapped in the modal's existing try/catch, which already unpacks `err.response.data.errors` / `.message` and renders the red `saveMessage` banner; on failure the modal's `recipe` state is left untouched so the toggle visibly stays where it was rather than lying about success. Nothing is swallowed silently; `console.error` is emitted on the catch path exactly as the neighbouring handlers do.
+- **Error paths:** Unknown recipe id → the same `RuntimeException("Recipe not found with id: …")` every sibling admin method throws (no new exception type, no behavioural divergence). No custom `@ControllerAdvice`/`GlobalExceptionHandler` exists in this codebase, so the exception falls through to Spring Boot's default error handling (`BasicErrorController`), which returns a generic 500 body with no `message` field (`server.error.include-message` is not set in `application.yml`) — consistent with every sibling method, just not routed through any bespoke handler. Non-admin caller → Spring Security returns `403` before the service is reached. On the frontend the call is wrapped in the modal's existing try/catch, which already unpacks `err.response.data.errors` / `.message` and renders the red `saveMessage` banner; on failure the modal's `recipe` state is left untouched so the toggle visibly stays where it was rather than lying about success. Nothing is swallowed silently; `console.error` is emitted on the catch path exactly as the neighbouring handlers do.
 
 ### Risks and judgement calls
 

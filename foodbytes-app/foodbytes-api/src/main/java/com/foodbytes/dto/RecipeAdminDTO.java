@@ -10,6 +10,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -38,6 +39,17 @@ public class RecipeAdminDTO {
     private Boolean isCheat = false;
 
     private Boolean isLive = false;  // New recipes default to hidden (FR-047)
+
+    // Macro/calorie audit sign-off — RESPONSE ONLY.
+    // RecipeService never reads these off an inbound DTO; the only writer is
+    // PATCH /api/recipes/admin/{id}/audit. RecipeInfoForm saves a spread of the
+    // whole loaded DTO, so reading them here would let a stale client payload
+    // flip the flag as a side effect of an unrelated edit.
+    private Boolean macrosAudited = false;
+
+    private LocalDateTime macrosAuditedAt;   // null when not audited
+
+    private Long macrosAuditedBy;            // users.id, null when not audited
 
     @NotEmpty(message = "At least one meal type is required")
     private List<String> mealTypes;  // List of meal keys: "breakfast", "lunch", "dinner", "snacks"

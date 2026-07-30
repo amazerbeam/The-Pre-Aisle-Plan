@@ -5,9 +5,42 @@
 Status: BLOCKED
 Started: 2026-07-29
 
-**BLOCKED on two developer actions, not on unfinished work.** All code, tests, and the data-repair SQL are written and reviewed (Code-Evaluator + Defender + QA, one combined fix pass applied). Outstanding:
+**BLOCKED on one developer action, not on unfinished work.** All code, tests, and the data-repair SQL are written and reviewed (Code-Evaluator + Defender + QA, one combined fix pass applied). Outstanding:
 1. **Backend never compiled or tested** — this machine has no JDK/Maven/Docker. 9 tests across 2 files are written-but-unexecuted. Run `cd foodbytes-app/foodbytes-api; mvn clean test`.
-2. **The 23 production rows are still wrong** — apply `foodbytes-app/database/migrations/2026-07-29_fix_meal_plan_entries_servings.sql` by hand (rollback block is at the bottom, commented out).
+2. ~~**The 23 production rows are still wrong**~~ — **RESOLVED 2026-07-30. The repair has been applied to the live Railway MySQL.** See "Data repair applied" below.
+
+### Data repair applied — 2026-07-30
+
+`foodbytes-app/database/migrations/2026-07-29_fix_meal_plan_entries_servings.sql` was run against the
+production Railway MySQL, all five steps in order.
+
+**Authorisation.** The note at the bottom of this section ("the developer withdrew authorisation for an
+agent-run `UPDATE`… no agent executes any write against the live Railway MySQL") was **explicitly
+superseded on 2026-07-30**: the developer instructed "run the sql", was shown the scope, the personal-data
+warning, and the fact that the commented rollback block is the only reversal path, and confirmed
+"Yes — proceed, I accept the risk". That standing constraint therefore no longer applies to this file, and
+the write was authorised rather than assumed. It remains in force for anything not covered by that
+confirmation.
+
+**Results — every step matched the file's stated expectation exactly:**
+
+| Step | Expected | Actual |
+|---|---|---|
+| 1 — pre-flight, 23 enumerated ids | 23 rows, all `servings = 1`, `default_servings = 2`, `user_id = 1`, recipes in (23, 37, 104, 139, 142) | ✅ 23 rows, all matched. Dates 2026-05-12 → 2026-07-31 |
+| 2 — repo-wide audit (before) | 24 rows: the 23 targets + `id 306` (`user_id = 6`) | ✅ exactly 24 |
+| 3 — the `UPDATE` | 23 rows affected | ✅ **23 affected, 23 changed** |
+| 4 — repo-wide audit (after) | exactly 1 row, `id = 306`, `user_id = 6` | ✅ exactly 1 — `id 306`, *Porridge with Berries & Nuts*, untouched |
+| 5 — symptom check, entry 1493 / `ri.id` 1584 | `Sirloin steak`, `recipe_qty 240.00`, `servings 2`, `shopping_list_qty` **240.00** | ✅ 240.00 (captured **120.00** immediately before the write, confirming the reported symptom and its fix) |
+
+**Collateral check:** `meal_plan_entries` still holds **565** rows — `1.00`×1 (that is `id 306`), `2.00`×562,
+`3.00`×1, `4.00`×1. No row count change and no unintended value moved. `id 306` was never a target: it
+appears only in the audit queries, where its survival is the expected result. It is still wrong, still
+belongs to user 6, and per the file header must be raised with that user rather than swept in.
+
+**Note:** `2026-07-29_decimal_servings.sql` (the sibling DDL widening `servings` to `DECIMAL(4,2)`) was
+found **already applied** — both `meal_plan_entries.servings` and `meal_plan_template_entries.servings`
+are already `decimal(4,2) NOT NULL DEFAULT 1.00`. No redundant `ALTER` was issued. The `servings = 1`
+guard in the repair still matched correctly against the decimal column (`1.00 = 1` in MySQL).
 
 **Concurrent-change note:** mid-run, the sibling contract `2026-07-29-decimal-serving-size` converted `servings` from `Integer` to `BigDecimal` across entities, DTOs, and services. This contract's fix was adapted to match (`resolveServings` now returns `BigDecimal`; `@Min(1)` became `@DecimalMin("0.25")` on the DTO). A type-consistency sweep confirms every `servings` site is `BigDecimal` — no mismatch. The core fix is intact: the DTO carries **no field initialiser**, so an omitted `servings` still reaches the recipe-derived fallback.
 
@@ -486,7 +519,7 @@ WHERE mpe.id IN (956,961,964,1078,1081,1084,1192,1200,1203,1223,1231,1234,
 
 Expected: 23 rows affected. The `AND mpe.servings = 1` guard makes the statement idempotent — a re-run affects 0 rows rather than re-applying. The id list is enumerated rather than predicate-driven so a legitimate single-serving entry created since planning cannot be caught.
 
-- [ ] **Step 2: Verify only the intended rows moved** — **NOT RUN. SUPERSEDED, not complete.** Delivered as **STEP 4** of the SQL file, with the expected result (exactly 1 row, `id = 306`, `user_id = 6`) stated in a comment. Cannot be a verification until the developer runs it after STEP 3.
+- [x] **Step 2: Verify only the intended rows moved** — **RUN 2026-07-30 against production. PASS.** Delivered as **STEP 4** of the SQL file. Returned **exactly 1 row** — `id = 306`, `user_id = 6`, *Porridge with Berries & Nuts*, `2026-01-26` — so every `user_id = 1` row left the result set and user 6's row was not touched. Matches the expected result stated in the file's comment.
 
 Run (via `mcp__mysql__mysql_query`):
 
@@ -501,7 +534,7 @@ ORDER BY mpe.id;
 
 Expected: exactly 1 row — `id = 306`, `user_id = 6`. Every `user_id = 1` row is gone from the result set.
 
-- [ ] **Step 3: Confirm the reported symptom is arithmetically resolved** — **NOT RUN. SUPERSEDED, not complete.** Delivered as **STEP 5** of the SQL file, with the expected row (`Sirloin steak`, `recipe_qty = 240.00`, `servings = 2`, `default_servings = 2`, `shopping_list_qty = 240.00`) stated in a comment. The bug-report figure is **unconfirmed** until the developer runs it.
+- [x] **Step 3: Confirm the reported symptom is arithmetically resolved** — **RUN 2026-07-30 against production. PASS.** Delivered as **STEP 5** of the SQL file. Returned exactly the expected row: `Sirloin steak`, `recipe_qty = 240.00`, `servings = 2.00`, `default_servings = 2`, `shopping_list_qty = **240.00**`. The same query run immediately **before** the `UPDATE` returned `shopping_list_qty = 120.00`, so the bug-report figure is now **confirmed both ways** — symptom reproduced, then resolved.
 
 Run (via `mcp__mysql__mysql_query`):
 

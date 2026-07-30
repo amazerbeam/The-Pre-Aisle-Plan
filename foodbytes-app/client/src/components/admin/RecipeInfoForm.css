@@ -96,6 +96,7 @@
 
 .toggle-button {
   padding: var(--spacing-sm) var(--spacing-lg);
+  min-height: 44px;
   background: var(--bg-secondary);
   border: none;
   cursor: pointer;
@@ -103,6 +104,8 @@
   font-weight: 500;
   color: var(--text-secondary);
   transition: all 0.2s ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .toggle-button:first-child {
@@ -114,7 +117,24 @@
   color: white;
 }
 
-.toggle-button:hover:not(.active) {
+.toggle-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.toggle-button:focus-visible {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: -2px;
+}
+
+/* Hover only on devices that actually hover - no sticky hover on touch */
+@media (hover: hover) {
+  .toggle-button:hover:not(.active):not(:disabled) {
+    background: var(--border-color);
+  }
+}
+
+.toggle-button:active:not(.active):not(:disabled) {
   background: var(--border-color);
 }
 

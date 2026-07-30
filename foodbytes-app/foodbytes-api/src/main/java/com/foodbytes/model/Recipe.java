@@ -35,6 +35,20 @@ public class Recipe {
     @Column(name = "is_live")
     private Boolean isLive = true;
 
+    @Column(name = "macros_audited", nullable = false)
+    private Boolean macrosAudited = false;
+
+    @Column(name = "macros_audited_at")
+    private LocalDateTime macrosAuditedAt;
+
+    /**
+     * users.id of the admin who signed off the macros. Deliberately a plain FK column
+     * rather than a @ManyToOne User: Recipe is mapped in list views and an extra lazy
+     * association would risk an N+1 for a field the UI never renders.
+     */
+    @Column(name = "macros_audited_by")
+    private Long macrosAuditedBy;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 

@@ -145,6 +145,31 @@ function RecipeEditModal({ recipeId, isNew, onClose, onSave }) {
     }
   }
 
+  // Instant-apply macro audit sign-off (not part of the Recipe Info save payload).
+  const handleToggleMacrosAudit = async (audited) => {
+    try {
+      const savedRecipe = await recipeService.updateRecipeMacrosAudit(recipeId, audited)
+      setRecipe(savedRecipe)
+      setSaveMessage({
+        type: 'success',
+        text: audited ? 'Marked as audited.' : 'Audit mark removed.'
+      })
+      // Clear the banner but keep the form open — unlike handleFormSave, this does
+      // not navigate back to the menu.
+      setTimeout(() => setSaveMessage(null), 2000)
+
+      if (onSave) {
+        onSave(savedRecipe)
+      }
+    } catch (err) {
+      setSaveMessage({
+        type: 'error',
+        text: err.response?.data?.message || 'Failed to update audit status.'
+      })
+      console.error('Error updating audit status:', err)
+    }
+  }
+
   // Handle delete
   const handleDelete = async () => {
     try {
@@ -262,6 +287,7 @@ function RecipeEditModal({ recipeId, isNew, onClose, onSave }) {
                 onSave={(data) => handleFormSave(data, 'Recipe info')}
                 onCancel={handleBackToMenu}
                 setHasUnsavedChanges={setHasUnsavedChanges}
+                onToggleMacrosAudit={handleToggleMacrosAudit}
               />
             ) : activeForm === 'ingredients' ? (
               <RecipeIngredientsForm
