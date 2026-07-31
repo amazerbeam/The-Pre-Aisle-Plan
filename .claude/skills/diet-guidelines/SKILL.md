@@ -39,7 +39,9 @@ Evidence-based reference for weight-loss diet decisions in the FoodBytes app. So
 | Moderate | 550–650 | ≥35 g | 25–35 % | 40–50 % |
 | Balanced | 700–800 | ≥35 g | 25–35 % | 40–50 % |
 
-Reject if Light >600, Moderate >750, Balanced >900, protein <35 g, fat >35 % kcal, or carbs <38 % kcal. Compute on **whole recipe including linked-recipe extras**, not direct ingredients only — stored kcal totals are unreliable.
+Reject if protein <35 g, fat >35 % kcal, or carbs <38 % kcal. Compute on **whole recipe including linked-recipe extras**, not direct ingredients only — stored kcal totals are unreliable.
+
+> **Calories are a target, not a reject condition.** The kcal/serving column above is a design target: a variant outside its band does not fail an audit and does not block `macros_audited`. See `.claude/rules/recipe-variants.md` → "Calories are a target, not a reject condition (audit policy, 2026-07-30)".
 
 ### Storing kcal in `recipes.calories` — convention (do not get this wrong)
 
@@ -77,8 +79,9 @@ GLP-1 medication is **adjunct to** diet/activity/behavioural support, not a subs
 ## Health constraints (project-specific)
 From `CLAUDE.md` — apply automatically:
 - **Gout history**: avoid organ meats, anchovies, fish sauce, sardines; moderate red meat, shellfish, oyster sauce, yeast extract. Prefer chicken/turkey over beef. Sub fish sauce → soy sauce.
-- **Quality fats only**: butter, olive oil, ghee — not seed-oil blends.
 - **Clean ingredients**: pure tamarind block over jarred paste with stabilizers.
+
+This skill's own nutritional recommendation (not a `CLAUDE.md` rule — the developer removed the seed-oil clause from `CLAUDE.md` on 2026-07-30): prefer butter, olive oil, or ghee over seed-oil blends where a recipe calls for a generic cooking fat.
 
 ## Approach when invoked
 1. Identify the decision: recipe creation, plan review, pattern recommendation, or macro audit.

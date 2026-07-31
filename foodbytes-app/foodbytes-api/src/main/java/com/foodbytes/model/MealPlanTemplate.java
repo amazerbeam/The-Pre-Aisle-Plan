@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import lombok.ToString;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +30,7 @@ public class MealPlanTemplate {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
+    @ToString.Exclude
     private User user;
 
     @Column(nullable = false, length = 60)
@@ -41,6 +43,7 @@ public class MealPlanTemplate {
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "template", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @ToString.Exclude
     private List<MealPlanTemplateEntry> entries = new ArrayList<>();
 
     @PrePersist
@@ -52,5 +55,19 @@ public class MealPlanTemplate {
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
+    }
+
+    // Identity is the primary key — see Recipe#equals. `entries` hold a `template`
+    // back-reference, closing the cycle.
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof MealPlanTemplate other)) return false;
+        return id != null && id.equals(other.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return MealPlanTemplate.class.hashCode();
     }
 }

@@ -17,10 +17,27 @@
 
 -- Group 1 — failed the first audit on per-serving kcal ONLY. Clean under the
 -- 2026-07-30 policy; structurally repaired in part 1. Not redesigned.
+-- WITHHELD AT APPLY TIME, 2026-07-30 — family 23 (Spaghetti Bolognese,
+-- recipes 81/82/83). Its per-serving protein, fat % and carbs % all PASS. What
+-- fails is the `chef` skill's marking precondition that `recipes.calories` agree
+-- with the recomputed whole-recipe total within 5 %: stored 1378/1545/1874
+-- against computed 1254/1407/1701, i.e. +9.9 % / +9.8 % / +10.1 %.
+--
+-- That column is explicitly the in-flight plan's scope, not this one's
+-- (.claude/contract/2026-07-30-linked-extras-macro-kcal-audit/, and this
+-- contract's tasks.md Task 9 Step 2 says so verbatim). Rather than attest to a
+-- family whose stored calories are 10 % wrong, the three ids are commented out
+-- below. Mark the whole family or none of it — 0 of 3 is a clean state; 3 of 3
+-- would be a false attestation.
+--
+-- TO FINISH: apply the linked-extras migration (its calories UPDATE is
+-- self-computing, so it will derive the correct values from the current rows),
+-- re-run verify-macros.sql to confirm stored_cal_check = 'ok' on 81/82/83, then
+-- uncomment the line below and re-run this file.
 UPDATE recipes SET macros_audited = 1, macros_audited_at = NOW()
 WHERE id IN (
    20,  21,  22,   -- family  6  Black Bean Chicken Wrap
-   81,  82,  83,   -- family 23  Spaghetti Bolognese
+-- 81,  82,  83,   -- family 23  Spaghetti Bolognese — WITHHELD, see note above
    87,  88,  89,   -- family 25  Paella de pollo
   104, 105, 106,   -- family 31  Beef & Mushroom Black Bean Stir Fry
   130, 131, 132,   -- family 39  Peanut Butter Banana Overnight Oats

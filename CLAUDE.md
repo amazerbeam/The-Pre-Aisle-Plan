@@ -104,7 +104,7 @@ Common levers: air-fry instead of pan-fry, sub egg whites for whole eggs, add a 
 - **Daily kcal floor (men <1500, women <1200)** — Verbatim from NIH/NHLBI obesity-treatment guidelines.
 
 ### User health/diet preferences (relevant to recipe work)
-- Prefers clean ingredients (e.g. pure tamarind block over jarred paste with stabilizers). Quality fats: butter, olive oil, ghee — not seed-oil blends.
+- Prefers clean ingredients (e.g. pure tamarind block over jarred paste with stabilizers).
 - Asia Market (asiamarket.ie) for Asian ingredients; Tesco Ireland for everyday.
 
 

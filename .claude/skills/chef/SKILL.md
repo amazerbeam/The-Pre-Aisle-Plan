@@ -313,7 +313,7 @@ This is idempotent — re-running it only refreshes the timestamp.
 
 **When you must NOT set it to 1:**
 
-- Any variant still fails a per-variant target band, or the family still violates `.claude/rules/recipe-variants.md` structurally (wrong default, ≠3 members, broken kcal ordering).
+- Any variant fails a per-serving reject condition — protein < 35 g, fat % > 35, or carbs % < 38 — or the family violates `.claude/rules/recipe-variants.md` structurally (wrong default, ≠3 members, labels not exactly Light/Moderate/Balanced, or broken kcal ordering). See `.claude/rules/recipe-variants.md` → "Calories are a target, not a reject condition" → "What still rejects" table — per-serving kcal band alone is **not** on that table and must never be the reason a family is withheld.
 - You only recomputed macros and skipped lenses 2–5.
 - The user hasn't approved the fixes yet — mark it *after* the SQL is applied and verified, not alongside the proposal.
 

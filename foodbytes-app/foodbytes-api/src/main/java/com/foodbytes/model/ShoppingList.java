@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import lombok.ToString;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ public class ShoppingList {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
+    @ToString.Exclude
     private User user;
 
     @Column(name = "start_date", nullable = false)
@@ -37,6 +39,7 @@ public class ShoppingList {
     private LocalDateTime generatedAt;
 
     @OneToMany(mappedBy = "shoppingList", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @ToString.Exclude
     private List<ShoppingListItem> items = new ArrayList<>();
 
     @PrePersist
@@ -57,5 +60,19 @@ public class ShoppingList {
      */
     public void clearItems() {
         items.clear();
+    }
+
+    // Identity is the primary key — see Recipe#equals. `items` hold a
+    // `shoppingList` back-reference, closing the cycle.
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ShoppingList other)) return false;
+        return id != null && id.equals(other.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return ShoppingList.class.hashCode();
     }
 }

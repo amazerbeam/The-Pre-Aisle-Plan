@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import lombok.ToString;
 import java.math.BigDecimal;
 
 /**
@@ -24,6 +25,7 @@ public class MealPlanTemplateEntry {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "template_id", nullable = false)
+    @ToString.Exclude
     private MealPlanTemplate template;
 
     @Column(name = "day_offset", nullable = false)
@@ -35,8 +37,22 @@ public class MealPlanTemplateEntry {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recipe_id", nullable = false)
+    @ToString.Exclude
     private Recipe recipe;
 
     @Column(nullable = false, precision = 4, scale = 2)
     private BigDecimal servings = BigDecimal.ONE;
+
+    // Identity is the primary key — see Recipe#equals.
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof MealPlanTemplateEntry other)) return false;
+        return id != null && id.equals(other.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return MealPlanTemplateEntry.class.hashCode();
+    }
 }

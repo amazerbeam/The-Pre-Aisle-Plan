@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import lombok.ToString;
 import org.hibernate.annotations.BatchSize;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -56,22 +57,55 @@ public class Recipe {
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @ToString.Exclude
     private Set<RecipeMeal> meals = new HashSet<>();
 
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @OrderBy("sortOrder ASC")
     @BatchSize(size = 20)
+    @ToString.Exclude
     private List<RecipeIngredient> ingredients = new ArrayList<>();
 
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @OrderBy("stepNumber ASC")
     @BatchSize(size = 20)
+    @ToString.Exclude
     private List<RecipeStep> steps = new ArrayList<>();
 
     // FR-086: Recipes that are "extras" (sub-recipes) for this recipe
     @OneToMany(mappedBy = "parentRecipe", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @OrderBy("displayOrder ASC")
+    @ToString.Exclude
     private List<RecipeExtra> extras = new ArrayList<>();
+
+    /**
+     * Identity is the primary key, never the fields.
+     *
+     * Lombok's {@code @Data} would otherwise derive equals/hashCode from every
+     * field, including the association collections above. Each of those elements
+     * holds a back-reference to this Recipe, so a field-based hashCode recurses
+     * Recipe -> meals -> RecipeMeal -> recipe -> Recipe until the stack overflows.
+     * Hibernate 6 hashes entities whenever it de-duplicates a {@code SELECT DISTINCT}
+     * result (see RecipeRepository#findByMealKey), so this is reachable from an
+     * ordinary read, not just from application code.
+     *
+     * hashCode is a class-level constant so it stays stable across the
+     * transient -> persistent transition, and equals treats two id-less
+     * instances as distinct — RecipeService adds unsaved RecipeMeals to the
+     * {@code meals} HashSet before flush, and id-only equality would silently
+     * collapse them into one.
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Recipe other)) return false;
+        return id != null && id.equals(other.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Recipe.class.hashCode();
+    }
 
     @PrePersist
     protected void onCreate() {

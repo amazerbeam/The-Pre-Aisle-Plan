@@ -21,11 +21,13 @@
 -- earlier draft of this work trimmed noodles and oil on 111 and added 180 g of
 -- butterbeans to 190 purely to hold kcal inside a band. All dropped.
 --
--- kcal ordering after the fixes (Light < Moderate < Balanced) still holds:
---   Black Pepper Beef 528 / 632 / 744
---   Chop Suey         582 / 630 / 787
---   Salmon            534 / 672 / 781
---   Reina Arepa       473 / 583 / 751
+-- kcal ordering after the fixes (Light < Moderate < Balanced) still holds.
+-- Figures below are measured against the live database after applying (not
+-- the plan's pre-apply projections); ordering holds on all four:
+--   family 24 Black Pepper Beef  528 / 632 / 744
+--   family 33 Chop Suey          583 / 630 / 787
+--   family 38 Reina Arepa        473 / 586 / 755
+--   family 89 Salmon             534 / 642 / 757
 --
 -- GOUT NOTE: raising sirloin cuts against .claude/skills/diet-guidelines
 -- ("moderate red meat, prefer chicken/turkey"). Accepted deliberately — the

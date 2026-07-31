@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import lombok.ToString;
 import java.math.BigDecimal;
 
 /**
@@ -26,6 +27,7 @@ public class RecipeIngredient {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recipe_id", nullable = false)
+    @ToString.Exclude
     private Recipe recipe;
 
     // FR-093: Made nullable - either ingredient OR linkedRecipe must be set
@@ -37,6 +39,7 @@ public class RecipeIngredient {
     // When set, ingredient must be NULL. Macros calculated from linked recipe.
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "linked_recipe_id", nullable = true)
+    @ToString.Exclude
     private Recipe linkedRecipe;
 
     @Column(nullable = false, precision = 10, scale = 2)
@@ -67,5 +70,20 @@ public class RecipeIngredient {
      */
     public boolean isRawIngredient() {
         return ingredient != null;
+    }
+
+    // Identity is the primary key — see Recipe#equals. Both `recipe` and
+    // `linkedRecipe` point back at a Recipe, so a field-based equals/hashCode
+    // recurses without terminating.
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof RecipeIngredient other)) return false;
+        return id != null && id.equals(other.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return RecipeIngredient.class.hashCode();
     }
 }

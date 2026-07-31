@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import lombok.ToString;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -24,6 +25,7 @@ public class MealPlanEntry {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
+    @ToString.Exclude
     private User user;
 
     @Column(name = "plan_date", nullable = false)
@@ -35,6 +37,7 @@ public class MealPlanEntry {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "recipe_id", nullable = false)
+    @ToString.Exclude
     private Recipe recipe;
 
     @Column(nullable = false, precision = 4, scale = 2)
@@ -66,5 +69,19 @@ public class MealPlanEntry {
             return 0;
         }
         return recipe.getCalories() / recipe.getDefaultServings();
+    }
+
+    // Identity is the primary key — see Recipe#equals. `recipe` is EAGER, so a
+    // field-based hashCode reaches Recipe's cyclic association graph immediately.
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof MealPlanEntry other)) return false;
+        return id != null && id.equals(other.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return MealPlanEntry.class.hashCode();
     }
 }

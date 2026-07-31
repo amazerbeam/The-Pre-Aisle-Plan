@@ -2,14 +2,22 @@
 --
 -- Macro-neutral. No gram weight changes. Three groups of change:
 --
--- 1. SEED OIL. `Sunflower Oil` (ingredient 84) is a seed oil, prohibited
---    outright by CLAUDE.md ("No seed oils, margarine, or vegetable oil of
---    unknown composition"). It appears on 6 recipes: Black Pepper Beef Stir Fry
---    (84/85/86) and Chicken & Beef Chop Suey (111/112/113). Replaced with Ghee,
---    a new ingredient row — CLAUDE.md names ghee as a preferred fat and it is
---    the only approved option with a stir-fry-appropriate smoke point (butter
---    burns; olive oil is wrong for the cuisine). At 99.80 % fat vs sunflower's
---    100 %, whole-recipe kcal moves by <3 kcal on every affected recipe.
+-- 1. SEED OIL. `Sunflower Oil` (ingredient 84) is a seed oil. At the time this
+--    migration was written (2026-07-30), CLAUDE.md prohibited seed oils outright
+--    ("No seed oils, margarine, or vegetable oil of unknown composition") and
+--    named butter/olive oil/ghee as the approved fats. Under that guidance the
+--    oil was swapped for Ghee on the 6 recipes it appeared on: Black Pepper Beef
+--    Stir Fry (84/85/86) and Chicken & Beef Chop Suey (111/112/113) — the only
+--    approved option with a stir-fry-appropriate smoke point (butter burns;
+--    olive oil is wrong for the cuisine). At 99.80 % fat vs sunflower's 100 %,
+--    whole-recipe kcal moves by <3 kcal on every affected recipe.
+--
+--    Later in this same session the developer removed the seed-oil clause from
+--    CLAUDE.md ("I don't care about seed oils anymore, it's been removed from
+--    claude.md"), so this swap is no longer required by any active rule. It
+--    stands as applied — reverting it isn't warranted on its own — but the 13
+--    remaining `Sunflower Oil` rows elsewhere in the database are deliberately
+--    left alone; this migration never claimed to sweep all of them.
 --
 -- 2. VARIANT PICKER. Nine families had `is_default` on Balanced; the rule in
 --    .claude/rules/recipe-variants.md requires Moderate. Five of those also had

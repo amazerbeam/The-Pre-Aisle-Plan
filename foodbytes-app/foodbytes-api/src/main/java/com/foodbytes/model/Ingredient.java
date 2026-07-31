@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import lombok.ToString;
 import java.math.BigDecimal;
 
 @Entity
@@ -24,6 +25,7 @@ public class Ingredient {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "aisle_id", nullable = false)
+    @ToString.Exclude
     private Aisle aisle;
 
     // FR-080: Macronutrient data per 100g
@@ -39,4 +41,18 @@ public class Ingredient {
     // FR-083: Verification flag - recipes cannot go live with unverified ingredients
     @Column(name = "macros_verified", nullable = false)
     private Boolean macrosVerified = false;
+
+    // Identity is the primary key — see Recipe#equals. No cycle here, but a
+    // field-based equals/hashCode would force-initialise the lazy `aisle` proxy.
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Ingredient other)) return false;
+        return id != null && id.equals(other.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Ingredient.class.hashCode();
+    }
 }

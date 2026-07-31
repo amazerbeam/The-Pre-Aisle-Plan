@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import lombok.ToString;
 import java.math.BigDecimal;
 
 /**
@@ -22,6 +23,7 @@ public class ShoppingListItem {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "shopping_list_id", nullable = false)
+    @ToString.Exclude
     private ShoppingList shoppingList;
 
     @Column(name = "ingredient_id", nullable = false)
@@ -50,4 +52,17 @@ public class ShoppingListItem {
 
     @Column(name = "is_checked")
     private Boolean isChecked = false;
+
+    // Identity is the primary key — see Recipe#equals.
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ShoppingListItem other)) return false;
+        return id != null && id.equals(other.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return ShoppingListItem.class.hashCode();
+    }
 }

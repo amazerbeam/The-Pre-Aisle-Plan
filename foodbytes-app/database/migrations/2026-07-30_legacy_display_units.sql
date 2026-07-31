@@ -83,3 +83,44 @@ WHERE unit_id = 1 AND ingredient_id = 80;
 -- Egg (59) -> piece, 50 g per egg. Whole eggs only, so round to integers.
 UPDATE recipe_ingredients SET unit_id = 5, quantity = GREATEST(ROUND(quantity_grams / 50.0), 1)
 WHERE unit_id = 1 AND ingredient_id = 59;
+
+-- ---------------------------------------------------------------------------
+-- ADDED AT APPLY TIME, 2026-07-30. The Sugar -> tsp conversion above produced
+-- two readings that fail the plan's own "no quantity over 12" sanity check
+-- (tasks.md Task 15 Step 3): Brioche Buns (60) at 50 g = 12.5 tsp and Eggnog
+-- (61) at 70 g = 17.5 tsp. Nobody counts out 17 teaspoons of sugar. Promoted to
+-- tbsp at 12.5 g -- exactly 3x the 4 g/tsp basis used above, so the two
+-- statements stay internally consistent. Guarded on `unit_id = 3 AND
+-- quantity > 12`, so it only ever catches rows the tsp statement over-converted
+-- and is a no-op on re-run. quantity_grams still never appears in a SET clause.
+-- ---------------------------------------------------------------------------
+UPDATE recipe_ingredients SET unit_id = 4, quantity = GREATEST(ROUND(quantity_grams / 12.5 * 4) / 4, 0.25)
+WHERE unit_id = 3 AND ingredient_id = 36 AND quantity > 12;
+
+-- ---------------------------------------------------------------------------
+-- ADDED AT APPLY TIME (QA follow-up), 2026-07-30. plan.md's Phase 5 design
+-- table (line 330) also listed Cinnamon, Cumin, Paprika, Oregano and Italian
+-- herbs as gram -> tsp conversions at 2 g/tsp, but the SQL above never
+-- included them — an unfinished-scope gap against the approved plan, found
+-- and closed here. A live-DB check found only THREE of the five still have
+-- any rows in grams:
+--   Cinnamon (19)        3 rows @ 1.00 g -> 0.5 tsp
+--   Dried oregano (35)   3 rows @ 2.00 g -> 1 tsp
+--   Paprika (65)         3 rows @ 2.00 g -> 1 tsp
+-- Cumin and Italian herbs are in the plan's table but have ZERO rows at
+-- unit_id = 1 in the live database — nothing to convert, so no statement is
+-- written for either. Same 2 g/tsp basis, same shape as the rest of this
+-- file. quantity_grams is not touched; macros cannot move.
+-- ---------------------------------------------------------------------------
+
+-- Cinnamon (19) -> tsp, 2 g per tsp. 3 rows.
+UPDATE recipe_ingredients SET unit_id = 3, quantity = GREATEST(ROUND(quantity_grams / 2.0 * 4) / 4, 0.25)
+WHERE unit_id = 1 AND ingredient_id = 19;
+
+-- Dried oregano (35) -> tsp, 2 g per tsp. 3 rows.
+UPDATE recipe_ingredients SET unit_id = 3, quantity = GREATEST(ROUND(quantity_grams / 2.0 * 4) / 4, 0.25)
+WHERE unit_id = 1 AND ingredient_id = 35;
+
+-- Paprika (65) -> tsp, 2 g per tsp. 3 rows.
+UPDATE recipe_ingredients SET unit_id = 3, quantity = GREATEST(ROUND(quantity_grams / 2.0 * 4) / 4, 0.25)
+WHERE unit_id = 1 AND ingredient_id = 65;
