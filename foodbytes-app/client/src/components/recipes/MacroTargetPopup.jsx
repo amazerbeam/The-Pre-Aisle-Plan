@@ -31,12 +31,15 @@ function MacroTargetPopup({
   macros,
   variantLabel,
   displayedCaloriesPerServing,
+  targets = MACRO_TARGETS,
+  periodLabel,
+  footerNote = MACRO_COPY.VARIANT_NOTE,
   onClose
 }) {
   const closeButtonRef = useRef(null)
 
-  const target = MACRO_TARGETS[macroKey]
-  const result = evaluateMacro(macros, macroKey)
+  const target = targets[macroKey]
+  const result = evaluateMacro(macros, macroKey, targets)
 
   // Mobile pull-to-dismiss — the app's standard popup gesture (below 768px only).
   const {
@@ -116,7 +119,7 @@ function MacroTargetPopup({
           <div className="macro-target-heading">
             <h4 id="macro-target-title">{target.label}</h4>
             <span className="macro-target-subtitle">
-              per serving{variantLabel ? ` · ${variantLabel}` : ''}
+              {periodLabel ?? `per serving${variantLabel ? ` · ${variantLabel}` : ''}`}
             </span>
           </div>
           <button
@@ -201,7 +204,7 @@ function MacroTargetPopup({
             ))}
           </ul>
 
-          <p className="macro-target-variant-note">{MACRO_COPY.VARIANT_NOTE}</p>
+          <p className="macro-target-variant-note">{footerNote}</p>
         </div>
 
         <p className="macro-target-hint">Press ESC or tap outside to close</p>

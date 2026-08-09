@@ -163,17 +163,38 @@
   padding: 12px;
   text-align: center;
   transition: border-color 0.2s ease;
+  /* MPP-2: .macro-item is now a <button>, not a presentational <div> — reset
+     button chrome and add the standard touch/focus affordances. */
+  width: 100%;
+  min-height: 44px;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
-/* Deliberate exception to the hover/active pairing rule: .macro-item is a
-   presentational <div> (DailyMacroPopup.jsx), not an interactive control, so
-   :active and touch-action/-webkit-tap-highlight-color are meaningless on it.
-   The @media (hover: hover) wrap is still needed to stop touch devices
-   inheriting a sticky border colour. */
 @media (hover: hover) {
   .macro-item:hover {
     border-color: #4a3f80;
   }
+}
+
+.macro-item:active {
+  border-color: #4a3f80;
+  background: #faf9fd;
+}
+
+.macro-item:focus-visible {
+  outline: 2px solid #4a3f80;
+  outline-offset: 2px;
+}
+
+/* MPP-2 fix pass: all-zero macros (no planned meals) disable the tile instead
+   of opening a confident "0 g / rejected" popup — see hasUsableMacros. */
+.macro-item:disabled {
+  cursor: default;
+  opacity: 0.6;
 }
 
 .macro-item-protein {

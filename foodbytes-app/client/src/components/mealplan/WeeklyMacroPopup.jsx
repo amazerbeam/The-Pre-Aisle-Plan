@@ -1,8 +1,11 @@
-import { useEffect, useRef, useCallback } from 'react'
+import { useEffect, useRef, useCallback, useState } from 'react'
 import { formatDateRange } from '../../utils/dateUtils'
 import { usePullToDismiss } from '../../hooks/usePullToDismiss'
 import { useBodyScrollLock } from '../../hooks/useBodyScrollLock'
 import PullToDismissUI from '../common/PullToDismissUI'
+import MacroTargetPopup from '../recipes/MacroTargetPopup'
+import { DAILY_MACRO_TARGETS, MACRO_COPY, WEEKLY_MACRO_TARGETS } from '../../constants/macroTargets'
+import { hasUsableMacros } from '../../utils/macroStatus'
 import './WeeklyMacroPopup.css'
 
 /**
@@ -12,6 +15,7 @@ import './WeeklyMacroPopup.css'
  */
 function WeeklyMacroPopup({ weekData, onClose }) {
   const popupRef = useRef(null)
+  const [openMacro, setOpenMacro] = useState(null) // { key: 'protein'|'carbs'|'fat', scope: 'day'|'week' } | null
 
   useBodyScrollLock(!!weekData)
 
@@ -36,6 +40,11 @@ function WeeklyMacroPopup({ weekData, onClose }) {
   // Close on click outside or ESC key
   useEffect(() => {
     const handleClickOutside = (e) => {
+      // MacroTargetPopup renders via createPortal(document.body), so its DOM
+      // nodes are real siblings of popupRef.current, not descendants —
+      // .contains() below would return false for a click inside it and
+      // incorrectly close this popup out from under the nested one (MPP-2).
+      if (e.target.closest?.('.macro-target-overlay')) return
       if (popupRef.current && !popupRef.current.contains(e.target)) {
         onClose()
       }
@@ -93,6 +102,20 @@ function WeeklyMacroPopup({ weekData, onClose }) {
     ? Math.round((avgFatCalories / avgCalories) * 100)
     : 0
 
+  // All-zero macros (no planned meals for the week, or no days with meals) is a
+  // data-completeness gap, not a nutrition verdict — see macroStatus.hasUsableMacros.
+  // Skip opening the popup for whichever section has nothing to show.
+  const weekHasUsableMacros = hasUsableMacros({
+    protein: weekTotalProtein,
+    carbs: weekTotalCarbs,
+    fat: weekTotalFat
+  })
+  const avgHasUsableMacros = hasUsableMacros({
+    protein: avgProtein,
+    carbs: avgCarbs,
+    fat: avgFat
+  })
+
   return (
     <div className="macro-popup-overlay">
       <div
@@ -126,21 +149,42 @@ function WeeklyMacroPopup({ weekData, onClose }) {
               <span className="macro-total-value">{weekTotalCalories.toLocaleString()}</span>
             </div>
             <div className="macro-summary-grid">
-              <div className="macro-summary-item">
+              <button
+                type="button"
+                className="macro-summary-item"
+                onClick={weekHasUsableMacros ? () => setOpenMacro({ key: 'protein', scope: 'week' }) : undefined}
+                disabled={!weekHasUsableMacros}
+                aria-haspopup={weekHasUsableMacros ? 'dialog' : undefined}
+                aria-expanded={weekHasUsableMacros ? (openMacro?.key === 'protein' && openMacro?.scope === 'week') : undefined}
+              >
                 <span className="macro-summary-label">Protein</span>
                 <span className="macro-summary-value">{weekTotalProtein}g</span>
                 <span className="macro-summary-calories">{weekProteinCalories.toLocaleString()} cal</span>
-              </div>
-              <div className="macro-summary-item">
+              </button>
+              <button
+                type="button"
+                className="macro-summary-item"
+                onClick={weekHasUsableMacros ? () => setOpenMacro({ key: 'carbs', scope: 'week' }) : undefined}
+                disabled={!weekHasUsableMacros}
+                aria-haspopup={weekHasUsableMacros ? 'dialog' : undefined}
+                aria-expanded={weekHasUsableMacros ? (openMacro?.key === 'carbs' && openMacro?.scope === 'week') : undefined}
+              >
                 <span className="macro-summary-label">Carbs</span>
                 <span className="macro-summary-value">{weekTotalCarbs}g</span>
                 <span className="macro-summary-calories">{weekCarbsCalories.toLocaleString()} cal</span>
-              </div>
-              <div className="macro-summary-item">
+              </button>
+              <button
+                type="button"
+                className="macro-summary-item"
+                onClick={weekHasUsableMacros ? () => setOpenMacro({ key: 'fat', scope: 'week' }) : undefined}
+                disabled={!weekHasUsableMacros}
+                aria-haspopup={weekHasUsableMacros ? 'dialog' : undefined}
+                aria-expanded={weekHasUsableMacros ? (openMacro?.key === 'fat' && openMacro?.scope === 'week') : undefined}
+              >
                 <span className="macro-summary-label">Fat</span>
                 <span className="macro-summary-value">{weekTotalFat}g</span>
                 <span className="macro-summary-calories">{weekFatCalories.toLocaleString()} cal</span>
-              </div>
+              </button>
             </div>
           </section>
 
@@ -154,7 +198,14 @@ function WeeklyMacroPopup({ weekData, onClose }) {
               <span className="macro-total-value">{avgCalories.toLocaleString()}</span>
             </div>
             <div className="macro-grid">
-              <div className="macro-item macro-item-protein">
+              <button
+                type="button"
+                className="macro-item macro-item-protein"
+                onClick={avgHasUsableMacros ? () => setOpenMacro({ key: 'protein', scope: 'day' }) : undefined}
+                disabled={!avgHasUsableMacros}
+                aria-haspopup={avgHasUsableMacros ? 'dialog' : undefined}
+                aria-expanded={avgHasUsableMacros ? (openMacro?.key === 'protein' && openMacro?.scope === 'day') : undefined}
+              >
                 <div className="macro-item-header">
                   <span className="macro-item-label">Protein</span>
                 </div>
@@ -163,9 +214,16 @@ function WeeklyMacroPopup({ weekData, onClose }) {
                   <span className="macro-item-percent">{avgProteinPercent}%</span>
                 </div>
                 <div className="macro-item-calories">{avgProteinCalories} cal</div>
-              </div>
+              </button>
 
-              <div className="macro-item macro-item-carbs">
+              <button
+                type="button"
+                className="macro-item macro-item-carbs"
+                onClick={avgHasUsableMacros ? () => setOpenMacro({ key: 'carbs', scope: 'day' }) : undefined}
+                disabled={!avgHasUsableMacros}
+                aria-haspopup={avgHasUsableMacros ? 'dialog' : undefined}
+                aria-expanded={avgHasUsableMacros ? (openMacro?.key === 'carbs' && openMacro?.scope === 'day') : undefined}
+              >
                 <div className="macro-item-header">
                   <span className="macro-item-label">Carbs</span>
                 </div>
@@ -174,9 +232,16 @@ function WeeklyMacroPopup({ weekData, onClose }) {
                   <span className="macro-item-percent">{avgCarbsPercent}%</span>
                 </div>
                 <div className="macro-item-calories">{avgCarbsCalories} cal</div>
-              </div>
+              </button>
 
-              <div className="macro-item macro-item-fat">
+              <button
+                type="button"
+                className="macro-item macro-item-fat"
+                onClick={avgHasUsableMacros ? () => setOpenMacro({ key: 'fat', scope: 'day' }) : undefined}
+                disabled={!avgHasUsableMacros}
+                aria-haspopup={avgHasUsableMacros ? 'dialog' : undefined}
+                aria-expanded={avgHasUsableMacros ? (openMacro?.key === 'fat' && openMacro?.scope === 'day') : undefined}
+              >
                 <div className="macro-item-header">
                   <span className="macro-item-label">Fat</span>
                 </div>
@@ -185,13 +250,29 @@ function WeeklyMacroPopup({ weekData, onClose }) {
                   <span className="macro-item-percent">{avgFatPercent}%</span>
                 </div>
                 <div className="macro-item-calories">{avgFatCalories} cal</div>
-              </div>
+              </button>
             </div>
           </section>
         </div>
 
         <p className="macro-popup-hint">Press ESC or tap outside to close</p>
       </div>
+
+      {openMacro && (
+        <MacroTargetPopup
+          macroKey={openMacro.key}
+          macros={
+            openMacro.scope === 'week'
+              ? { protein: weekTotalProtein, carbs: weekTotalCarbs, fat: weekTotalFat }
+              : { protein: avgProtein, carbs: avgCarbs, fat: avgFat }
+          }
+          displayedCaloriesPerServing={openMacro.scope === 'week' ? weekTotalCalories : avgCalories}
+          targets={openMacro.scope === 'week' ? WEEKLY_MACRO_TARGETS : DAILY_MACRO_TARGETS}
+          periodLabel={openMacro.scope === 'week' ? 'per week (7-day total)' : 'per day (average)'}
+          footerNote={MACRO_COPY.DAILY_NOTE}
+          onClose={() => setOpenMacro(null)}
+        />
+      )}
 
       {/* Pull-to-dismiss UI */}
       <PullToDismissUI

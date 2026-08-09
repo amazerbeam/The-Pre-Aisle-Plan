@@ -93,17 +93,22 @@ export function hasMealMacroTargets(recipe) {
  *
  * @param {'protein'|'carbs'|'fat'} key
  * @param {number} subject grams for mode 'grams', integer percent for 'percent'
+ * @param {object} [targets] target table to evaluate against — MACRO_TARGETS
+ *   (per-serving), DAILY_MACRO_TARGETS, or WEEKLY_MACRO_TARGETS. Defaults to
+ *   MACRO_TARGETS so every existing per-serving call site is unaffected.
  */
-export function bandFor(key, subject) {
-  const target = MACRO_TARGETS[key]
+export function bandFor(key, subject, targets = MACRO_TARGETS) {
+  const target = targets[key]
   if (!target) throw new Error(`Unknown macro key: ${key}`)
 
   return target.bands.find((band) => band.test(subject))
 }
 
 /**
- * @param {{protein?: number, carbs?: number, fat?: number} | null} macros per-serving grams
+ * @param {{protein?: number, carbs?: number, fat?: number} | null} macros grams
+ *   at whatever scale `targets` expects (per serving, per day, or per week)
  * @param {'protein'|'carbs'|'fat'} key
+ * @param {object} [targets] see bandFor. Defaults to MACRO_TARGETS.
  * @returns {{
  *   status: 'under'|'near'|'on'|'over',
  *   band: { status: string, range: string, meaning: string, reject?: boolean },
@@ -112,8 +117,8 @@ export function bandFor(key, subject) {
  *   derivedKcal: number
  * }}
  */
-export function evaluateMacro(macros, key) {
-  const target = MACRO_TARGETS[key]
+export function evaluateMacro(macros, key, targets = MACRO_TARGETS) {
+  const target = targets[key]
   if (!target) throw new Error(`Unknown macro key: ${key}`)
 
   const grams = macros?.[key] ?? 0
@@ -125,7 +130,7 @@ export function evaluateMacro(macros, key) {
     : 0
 
   const subject = target.mode === MACRO_MODE.GRAMS ? grams : percent
-  const band = bandFor(key, subject)
+  const band = bandFor(key, subject, targets)
 
   return { status: band.status, band, grams, percent, derivedKcal }
 }

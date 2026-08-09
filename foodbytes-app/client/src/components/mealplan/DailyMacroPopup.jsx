@@ -1,8 +1,11 @@
-import { useEffect, useRef, useCallback } from 'react'
+import { useEffect, useRef, useCallback, useState } from 'react'
 import { formatDateShort } from '../../utils/dateUtils'
 import { usePullToDismiss } from '../../hooks/usePullToDismiss'
 import { useBodyScrollLock } from '../../hooks/useBodyScrollLock'
 import PullToDismissUI from '../common/PullToDismissUI'
+import MacroTargetPopup from '../recipes/MacroTargetPopup'
+import { DAILY_MACRO_TARGETS, MACRO_COPY } from '../../constants/macroTargets'
+import { hasUsableMacros } from '../../utils/macroStatus'
 import './DailyMacroPopup.css'
 
 /**
@@ -12,6 +15,7 @@ import './DailyMacroPopup.css'
  */
 function DailyMacroPopup({ day, onClose }) {
   const popupRef = useRef(null)
+  const [openMacroKey, setOpenMacroKey] = useState(null)
 
   useBodyScrollLock(!!day)
 
@@ -36,6 +40,11 @@ function DailyMacroPopup({ day, onClose }) {
   // Close on click outside or ESC key
   useEffect(() => {
     const handleClickOutside = (e) => {
+      // MacroTargetPopup renders via createPortal(document.body), so its DOM
+      // nodes are real siblings of popupRef.current, not descendants —
+      // .contains() below would return false for a click inside it and
+      // incorrectly close this popup out from under the nested one (MPP-2).
+      if (e.target.closest?.('.macro-target-overlay')) return
       if (popupRef.current && !popupRef.current.contains(e.target)) {
         onClose()
       }
@@ -82,6 +91,15 @@ function DailyMacroPopup({ day, onClose }) {
     ? Math.round((fatCalories / totalCalories) * 100)
     : 0
 
+  // All-zero macros (a day with no planned meals) is a data-completeness gap,
+  // not a nutrition verdict — see macroStatus.hasUsableMacros. Skip opening the
+  // popup so an empty day doesn't render a confident "0 g / rejected" badge.
+  const dayHasUsableMacros = hasUsableMacros({
+    protein: totalProtein,
+    carbs: totalCarbs,
+    fat: totalFat
+  })
+
   return (
     <div className="macro-popup-overlay">
       <div
@@ -111,7 +129,14 @@ function DailyMacroPopup({ day, onClose }) {
           </div>
 
           <div className="macro-grid">
-            <div className="macro-item macro-item-protein">
+            <button
+              type="button"
+              className="macro-item macro-item-protein"
+              onClick={dayHasUsableMacros ? () => setOpenMacroKey('protein') : undefined}
+              disabled={!dayHasUsableMacros}
+              aria-haspopup={dayHasUsableMacros ? 'dialog' : undefined}
+              aria-expanded={dayHasUsableMacros ? openMacroKey === 'protein' : undefined}
+            >
               <div className="macro-item-header">
                 <span className="macro-item-label">Protein</span>
               </div>
@@ -120,9 +145,16 @@ function DailyMacroPopup({ day, onClose }) {
                 <span className="macro-item-percent">{proteinPercent}%</span>
               </div>
               <div className="macro-item-calories">{proteinCalories} cal</div>
-            </div>
+            </button>
 
-            <div className="macro-item macro-item-carbs">
+            <button
+              type="button"
+              className="macro-item macro-item-carbs"
+              onClick={dayHasUsableMacros ? () => setOpenMacroKey('carbs') : undefined}
+              disabled={!dayHasUsableMacros}
+              aria-haspopup={dayHasUsableMacros ? 'dialog' : undefined}
+              aria-expanded={dayHasUsableMacros ? openMacroKey === 'carbs' : undefined}
+            >
               <div className="macro-item-header">
                 <span className="macro-item-label">Carbs</span>
               </div>
@@ -131,9 +163,16 @@ function DailyMacroPopup({ day, onClose }) {
                 <span className="macro-item-percent">{carbsPercent}%</span>
               </div>
               <div className="macro-item-calories">{carbsCalories} cal</div>
-            </div>
+            </button>
 
-            <div className="macro-item macro-item-fat">
+            <button
+              type="button"
+              className="macro-item macro-item-fat"
+              onClick={dayHasUsableMacros ? () => setOpenMacroKey('fat') : undefined}
+              disabled={!dayHasUsableMacros}
+              aria-haspopup={dayHasUsableMacros ? 'dialog' : undefined}
+              aria-expanded={dayHasUsableMacros ? openMacroKey === 'fat' : undefined}
+            >
               <div className="macro-item-header">
                 <span className="macro-item-label">Fat</span>
               </div>
@@ -142,12 +181,24 @@ function DailyMacroPopup({ day, onClose }) {
                 <span className="macro-item-percent">{fatPercent}%</span>
               </div>
               <div className="macro-item-calories">{fatCalories} cal</div>
-            </div>
+            </button>
           </div>
         </div>
 
         <p className="macro-popup-hint">Press ESC or tap outside to close</p>
       </div>
+
+      {openMacroKey && (
+        <MacroTargetPopup
+          macroKey={openMacroKey}
+          macros={{ protein: totalProtein, carbs: totalCarbs, fat: totalFat }}
+          displayedCaloriesPerServing={totalCalories}
+          targets={DAILY_MACRO_TARGETS}
+          periodLabel="per day"
+          footerNote={MACRO_COPY.DAILY_NOTE}
+          onClose={() => setOpenMacroKey(null)}
+        />
+      )}
 
       {/* Pull-to-dismiss UI */}
       <PullToDismissUI

@@ -21,6 +21,10 @@ import {
   STATUS_WORD
 } from '../constants/macroTargets.js'
 import {
+  DAILY_MACRO_TARGETS,
+  WEEKLY_MACRO_TARGETS
+} from '../constants/macroTargets.js'
+import {
   bandFor,
   deriveKcal,
   evaluateMacro,
@@ -31,8 +35,8 @@ import {
 let passed = 0
 
 /** Assert the band selected for a raw subject value (grams or percent). */
-function expectBand(key, subject, expectedStatus, expectedReject = false) {
-  const band = bandFor(key, subject)
+function expectBand(key, subject, expectedStatus, expectedReject = false, targets = MACRO_TARGETS) {
+  const band = bandFor(key, subject, targets)
   assert.ok(band, `${key} @ ${subject}: no band matched — gap in the band table`)
   assert.equal(band.status, expectedStatus,
     `${key} @ ${subject}: expected ${expectedStatus}, got ${band.status}`)
@@ -48,6 +52,34 @@ expectBand('protein', 33, 'near')
 expectBand('protein', 34, 'near')
 expectBand('protein', 35, 'on')
 expectBand('protein', 120, 'on')
+
+/* ---- daily protein: 100g floor, MPP-2 ---- */
+expectBand('protein', 0, 'under', true, DAILY_MACRO_TARGETS)
+expectBand('protein', 97, 'under', true, DAILY_MACRO_TARGETS)
+expectBand('protein', 98, 'near', false, DAILY_MACRO_TARGETS)
+expectBand('protein', 99, 'near', false, DAILY_MACRO_TARGETS)
+expectBand('protein', 100, 'on', false, DAILY_MACRO_TARGETS)
+expectBand('protein', 250, 'on', false, DAILY_MACRO_TARGETS)
+
+/* ---- weekly protein: 700g floor (7x daily), MPP-2 ---- */
+expectBand('protein', 0, 'under', true, WEEKLY_MACRO_TARGETS)
+expectBand('protein', 685, 'under', true, WEEKLY_MACRO_TARGETS)
+expectBand('protein', 686, 'near', false, WEEKLY_MACRO_TARGETS)
+expectBand('protein', 699, 'near', false, WEEKLY_MACRO_TARGETS)
+expectBand('protein', 700, 'on', false, WEEKLY_MACRO_TARGETS)
+expectBand('protein', 1750, 'on', false, WEEKLY_MACRO_TARGETS)
+
+/* ---- carbs/fat reused directly: same band table object, MPP-2 ---- */
+assert.equal(DAILY_MACRO_TARGETS.carbs, MACRO_TARGETS.carbs,
+  'DAILY_MACRO_TARGETS.carbs must be the same object as MACRO_TARGETS.carbs, not a copy')
+assert.equal(DAILY_MACRO_TARGETS.fat, MACRO_TARGETS.fat,
+  'DAILY_MACRO_TARGETS.fat must be the same object as MACRO_TARGETS.fat, not a copy')
+assert.equal(WEEKLY_MACRO_TARGETS.carbs, MACRO_TARGETS.carbs,
+  'WEEKLY_MACRO_TARGETS.carbs must be the same object as MACRO_TARGETS.carbs, not a copy')
+assert.equal(WEEKLY_MACRO_TARGETS.fat, MACRO_TARGETS.fat,
+  'WEEKLY_MACRO_TARGETS.fat must be the same object as MACRO_TARGETS.fat, not a copy')
+
+console.log('✓ daily/weekly protein band-boundary and carbs/fat reuse assertions passed')
 
 /* ---- carbs: % of kcal, slack below, no upper reject ---- */
 expectBand('carbs', 0, 'under', true)
@@ -173,41 +205,44 @@ console.log('✓ status-map completeness assertions passed')
  */
 const BANNED_IN_COPY = ['CLAUDE.md', '.claude', 'SKILL.md', 'chef skill', 'FR-104', 'recipe_ingredients']
 
-for (const key of ['protein', 'carbs', 'fat']) {
-  const target = MACRO_TARGETS[key]
+const TARGET_TABLES_TO_CHECK = [
+  { name: 'MACRO_TARGETS', table: MACRO_TARGETS, keys: ['protein', 'carbs', 'fat'] },
+  { name: 'DAILY_MACRO_TARGETS', table: DAILY_MACRO_TARGETS, keys: ['protein'] },
+  { name: 'WEEKLY_MACRO_TARGETS', table: WEEKLY_MACRO_TARGETS, keys: ['protein'] }
+]
 
-  const userVisible = [
-    target.label,
-    target.perfect,
-    ...target.bands.flatMap((band) => [band.range, band.meaning]),
-    ...target.why,
-    ...target.sources.flatMap((entry) => [entry.claim, entry.source]),
-    // Macro-independent, so re-checked on each pass. Cheap, and it keeps every
-    // rendered string inside one assertion rather than two parallel ones.
-    ...Object.values(MACRO_COPY)
-  ]
+for (const { name, table, keys } of TARGET_TABLES_TO_CHECK) {
+  for (const key of keys) {
+    const target = table[key]
 
-  for (const text of userVisible) {
-    assert.equal(typeof text, 'string', `${key}: every user-visible entry must be a string`)
-    for (const banned of BANNED_IN_COPY) {
-      assert.ok(!text.includes(banned),
-        `${key}: user-visible copy must not mention "${banned}" — found in: ${text}`)
+    const userVisible = [
+      target.label,
+      target.perfect,
+      ...target.bands.flatMap((band) => [band.range, band.meaning]),
+      ...target.why,
+      ...target.sources.flatMap((entry) => [entry.claim, entry.source]),
+      ...Object.values(MACRO_COPY)
+    ]
+
+    for (const text of userVisible) {
+      assert.equal(typeof text, 'string', `${name}.${key}: every user-visible entry must be a string`)
+      for (const banned of BANNED_IN_COPY) {
+        assert.ok(!text.includes(banned),
+          `${name}.${key}: user-visible copy must not mention "${banned}" — found in: ${text}`)
+      }
     }
-  }
 
-  // Nothing may be asserted to the user without saying where it came from.
-  assert.ok(target.sources.length > 0, `${key}: must declare at least one source`)
-  for (const entry of target.sources) {
-    assert.ok(entry.claim?.trim(), `${key}: a source entry is missing its claim`)
-    assert.ok(entry.source?.trim(), `${key}: claim "${entry.claim}" is missing its origin`)
-  }
+    assert.ok(target.sources.length > 0, `${name}.${key}: must declare at least one source`)
+    for (const entry of target.sources) {
+      assert.ok(entry.claim?.trim(), `${name}.${key}: a source entry is missing its claim`)
+      assert.ok(entry.source?.trim(), `${name}.${key}: claim "${entry.claim}" is missing its origin`)
+    }
 
-  // An internal calibration must say so rather than sit unlabelled next to a
-  // published guideline and borrow its authority.
-  const origins = target.sources.map((entry) => entry.source).join(' ')
-  assert.ok(/FoodBytes/.test(origins),
-    `${key}: at least one source must identify the FoodBytes-internal portion of the rule`)
+    const origins = target.sources.map((entry) => entry.source).join(' ')
+    assert.ok(/FoodBytes/.test(origins),
+      `${name}.${key}: at least one source must identify the FoodBytes-internal portion of the rule`)
+  }
 }
-console.log('✓ copy-hygiene and attribution assertions passed')
+console.log('✓ copy-hygiene and attribution assertions passed (MACRO_TARGETS, DAILY_MACRO_TARGETS, WEEKLY_MACRO_TARGETS)')
 
 console.log('\nAll macro traffic-light checks passed.')
