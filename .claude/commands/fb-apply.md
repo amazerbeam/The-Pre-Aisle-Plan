@@ -12,7 +12,9 @@ Reviewers **always run as parallel subagents** in a single Agent dispatch — ne
 
 Read `.claude/workflow/plan-resolution.md` and follow **Resolving the target plan**, accepting statuses `PLANNED`, `IN PROGRESS`, and `BLOCKED`. `$ARGUMENTS` may name the slug directly. The resolved folder is `<plan>` for the rest of this document — state which plan you resolved before doing any work. If that file is absent, do not guess: say so, state that plans live at `.claude/contract/<slug>/` as `plan.md` + `tasks.md`, and ask the developer which plan to use.
 
-Then read:
+**Then move the ticket to `Coding` — before anything else.** The slug is the only prerequisite (it carries the key), so this is the first action `/fb-apply` takes: the board must show work in flight from the moment the command starts, not after the contract has been read. If the slug carries an `MPP-<n>` key, invoke the `management-jira` skill and transition that issue to `Coding` — automatically, no confirmation prompt. Read *The MPP status model* in that skill for the rules: resolve the transition id live, report the move in one line, skip silently when the slug has no key, and never fail this command over a Jira error. Transitions are any → any, so a ticket still sitting in `To Do` moves straight to `Coding`. Do not defer this to a later step, and do not batch it with the `Status:` write below.
+
+With the board updated, read:
 - `<plan>/plan.md` — Part 1 is scope and acceptance criteria, Part 2 is the technical approach and data shapes
 - `<plan>/tasks.md` — implementation checklist (grouped under `## Phase N — Name` headings; each task carries its own `**Files:**` block and ordered `- [ ] **Step:**` bullets)
 
@@ -98,6 +100,8 @@ Work through every phase in `tasks.md` in order. **Do NOT invoke reviewers betwe
 - Error or blocker encountered → report and wait for guidance
 - A task requires the developer to act on the live database or Railway (see Step 3)
 - User interrupts
+
+**On pause, flag the ticket — do not transition it.** If the slug carries an `MPP-<n>` key, invoke `management-jira` and add a flag to that card, leaving its status at `Coding`. Blocked is orthogonal to progress, so there is no `Blocked` status to move to — see *The MPP status model*. Clear the flag when work resumes.
 
 ### Output During Implementation
 
@@ -309,6 +313,8 @@ Update `<plan>/tasks.md`:
 
 Set the `Status:` line to `COMPLETE` (or `BLOCKED` if any task failed after max retries).
 
+**Move the ticket to `Ready for Test`** — but only when the status you just wrote is `COMPLETE`. The gates are green and the one remaining question is how it feels in the hand, which is the developer's to answer. If you wrote `BLOCKED` instead, flag the card and leave it at `Coding`. Automatic either way, no confirmation prompt; the rules are in *The MPP status model* in `management-jira`.
+
 Present:
 
 ```markdown
@@ -337,6 +343,9 @@ Present:
 ### Residual Review Issues (if round 2 still had issues)
 - [unresolved issue summary, file:line]
 
+### Jira
+- [The transition performed, e.g. `MPP-12 Coding → Ready for Test` — or the flag added, or plainly that it was skipped or failed]
+
 ### Developer Actions Outstanding
 - [Migrations to apply to the Railway MySQL, backend redeploys, and every MANUAL VERIFICATION NEEDED item from the QA report — route, viewport, expected outcome]
 
@@ -350,6 +359,7 @@ Present:
 
 ## Important Rules
 
+- **The Jira move to `Coding` is the first action, not a formality.** It happens in Step 1 the moment the slug resolves — before the contract files are read, before any dispatch. A run that reaches the Implementer with the card still in `Planned` is a defect in this command's ordering.
 - **Implementer runs through every phase first** — do NOT invoke Code-Evaluator, Defender, or QA between phases. The Implementer carries quality through every phase (writing AND running tests as tasks dictate); reviewers see the full result.
 - **Reviewers run once, at the very end, in a single Agent dispatch** — always spawn all 3 in a single message so they execute concurrently. Never per-phase, never sequentially.
 - **Combined feedback to the Implementer** — all 3 reviewer reports are merged into a single Implementer prompt for the fix pass, never sent one reviewer at a time.

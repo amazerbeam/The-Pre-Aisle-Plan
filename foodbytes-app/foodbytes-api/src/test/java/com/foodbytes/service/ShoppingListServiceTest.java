@@ -53,6 +53,7 @@ class ShoppingListServiceTest {
     @Mock private RecipeExtrasService recipeExtrasService;
     @Mock private IngredientRepository ingredientRepository;
     @Mock private UserRepository userRepository;
+    @Mock private MacroCalculationService macroCalculationService;
 
     @InjectMocks private ShoppingListService shoppingListService;
 
@@ -331,6 +332,85 @@ class ShoppingListServiceTest {
         assertThat(items.get(2).getIngredientName()).isEqualTo("Zucchini");
     }
 
+    @Test
+    void extraWithPartialPortionUsed_ProratesRawIngredientsByGramsNotServings() {
+        // Regression test for MPP-1. Mirrors the real bug: recipe 65 (Pastichio) links to recipe
+        // 64 (Honey Ham) via a recipe_ingredients row using less than Honey Ham's own total yield.
+        // Numbers are simplified from the real 2916g/2500g Honey Ham recipe to round figures so
+        // the expected value is hand-verifiable: here Honey Ham yields 2000g (Ham Fillet 1600g +
+        // Onion 400g) and Pastichio's 8-serving batch uses 200g of it.
+        Unit grams = unit(3L, "g");
+        Ingredient hamFillet = ingredient(97L, "Ham Fillet");
+        Ingredient onion = ingredient(12L, "Onion");
+
+        Recipe honeyHam = recipe(64L, "Honey Ham", 8,
+            recipeIngredient(hamFillet, "1600.00", grams, "1600.00"),
+            recipeIngredient(onion, "400.00", grams, "400.00"));
+        // Honey Ham's total yield = 1600 + 400 = 2000g
+
+        Recipe pastichio = recipe(65L, "Pastichio (Lasagna)", 8);
+        pastichio.setIngredients(List.of(linkedRecipeIngredient(honeyHam, "200.00"))); // 200g per 8-serving batch
+
+        givenUserOwnsTheirOwnPlan(userId);
+        givenEntries(entry(startDate, "dinner", pastichio, 16));
+        when(recipeExtrasService.hasExtras(65L)).thenReturn(true);
+        when(recipeExtrasService.buildExtrasTree(eq(65L), any()))
+            .thenReturn(List.of(RecipeExtraNodeDTO.builder()
+                .recipeId(64L)
+                .recipeName("Honey Ham")
+                .children(new ArrayList<>())
+                .build()));
+        when(recipeRepository.findById(64L)).thenReturn(Optional.of(honeyHam));
+        // Mocked, not the real MacroCalculationService — stub the same sum it would compute:
+        // Honey Ham's own total yield = 1600 (Ham Fillet) + 400 (Onion) = 2000g.
+        when(macroCalculationService.calculateRecipeTotalYield(honeyHam)).thenReturn(new BigDecimal("2000.00"));
+
+        AggregatedShoppingListDTO result = shoppingListService.getShoppingList(userId, startDate, null);
+
+        ShoppingItemDTO hamFilletItem = result.getAisles().stream()
+            .flatMap(a -> a.getItems().stream())
+            .filter(i -> "Ham Fillet".equals(i.getIngredientName()))
+            .findFirst()
+            .orElseThrow(() -> new AssertionError("no shopping list row for Ham Fillet"));
+
+        // usedGrams = 200 * (16/8) = 400; portionRatio = 400/2000 = 0.2
+        // hamFillet = 1600 * 0.2 = 320.00 — NOT 1600 * 16/8 = 3200.00 (the bug: prorating by the
+        // parent's servings ratio instead of the extra's own grams-used-vs-yield ratio)
+        assertThat(hamFilletItem.getTotalQuantity()).isEqualByComparingTo(new BigDecimal("320.00"));
+    }
+
+    @Test
+    void extraWithNoMatchingLinkedIngredientRow_SkipsProrationDefensively() {
+        // Data-integrity guard: if the extras tree names a recipe with no corresponding
+        // recipe_ingredients.linked_recipe_id row on the parent, there is no quantity_grams to
+        // prorate by. The row must be skipped, not silently treated as "use the whole batch"
+        // (which is exactly the MPP-1 bug this ticket fixes).
+        Unit grams = unit(3L, "g");
+        Ingredient hamFillet = ingredient(97L, "Ham Fillet");
+
+        Recipe honeyHam = recipe(64L, "Honey Ham", 8,
+            recipeIngredient(hamFillet, "1600.00", grams, "1600.00"));
+        Recipe pastichio = recipe(65L, "Pastichio (Lasagna)", 8); // no linked_recipe_id row at all
+
+        givenUserOwnsTheirOwnPlan(userId);
+        givenEntries(entry(startDate, "dinner", pastichio, 16));
+        when(recipeExtrasService.hasExtras(65L)).thenReturn(true);
+        when(recipeExtrasService.buildExtrasTree(eq(65L), any()))
+            .thenReturn(List.of(RecipeExtraNodeDTO.builder()
+                .recipeId(64L)
+                .recipeName("Honey Ham")
+                .children(new ArrayList<>())
+                .build()));
+        when(recipeRepository.findById(64L)).thenReturn(Optional.of(honeyHam));
+
+        AggregatedShoppingListDTO result = shoppingListService.getShoppingList(userId, startDate, null);
+
+        boolean hasHamFillet = result.getAisles().stream()
+            .flatMap(a -> a.getItems().stream())
+            .anyMatch(i -> "Ham Fillet".equals(i.getIngredientName()));
+        assertThat(hasHamFillet).isFalse();
+    }
+
     // ------------------------------------------------------------------
     // getIngredientBreakdown — FR-042 / FR-102
     // ------------------------------------------------------------------
@@ -400,8 +480,11 @@ class ShoppingListServiceTest {
         Ingredient flour = ingredient(31L, "Bread flour");
 
         Recipe dough = recipe(13L, "Pizza Dough", 2,
-            recipeIngredient(flour, "300.00", grams));
+            recipeIngredient(flour, "300.00", grams, "300.00"));
+        // Dough's own total yield = 300g (its only ingredient).
         Recipe pizza = recipe(12L, "Pizza", 2); // flour lives only in the extra
+        pizza.setIngredients(List.of(linkedRecipeIngredient(dough, "150.00")));
+        // Pizza uses 150g of a 300g Dough batch — half.
 
         givenUserOwnsTheirOwnPlan(1L);
         givenEntries(entry(MONDAY, "dinner", pizza, 2));
@@ -415,6 +498,7 @@ class ShoppingListServiceTest {
         // findById, not findWithDetailsById: the @EntityGraph finder duplicates the `ingredients`
         // bag per recipe_meals row, which would double-count in the summing breakdown walk.
         when(recipeRepository.findById(13L)).thenReturn(Optional.of(dough));
+        when(macroCalculationService.calculateRecipeTotalYield(dough)).thenReturn(new BigDecimal("300.00"));
 
         IngredientBreakdownDTO result = shoppingListService
             .getIngredientBreakdown(1L, 31L, "g", MONDAY, List.of(12L));
@@ -423,24 +507,34 @@ class ShoppingListServiceTest {
         MealIngredientUsageDTO row = result.getMealBreakdown().get(0);
         assertThat(row.getRecipeName()).isEqualTo("Pizza");
         assertThat(row.getViaRecipeName()).isEqualTo("Pizza Dough");
-        assertThat(row.getQuantity()).isEqualByComparingTo("300.00");
+        // Pizza@2 servings of its own 2-serving default = ratio 1; dough portionRatio = 150/300
+        // = 0.5; flour = 300 * 0.5 = 150.00 (MPP-1: prorated by grams used, not pizza's servings).
+        assertThat(row.getQuantity()).isEqualByComparingTo("150.00");
     }
 
     @Test
-    void breakdownWalksNestedExtrasAndScalesOffTheMainRecipeServings() {
+    void breakdownWalksNestedExtrasAndProratesEachLinkedHop() {
         Unit grams = unit(3L, "g");
         Ingredient basil = ingredient(45L, "Basil");
 
         // Pizza(12) -> Pizza Sauce(14) -> Pesto(10); the basil lives only in the GRANDCHILD,
         // so this is the only fixture that enters the recursive branch of collectUsagesFromExtras.
-        // Sibling default servings are deliberately different from Pizza's to prove which one wins.
+        // MPP-1: each hop is prorated by its own linked_recipe_id row's quantity_grams against
+        // the child's own total yield — not by Pizza's servings alone.
         Recipe pesto = recipe(10L, "Pesto", 6,
-            recipeIngredient(basil, "30.00", grams));
+            recipeIngredient(basil, "30.00", grams, "30.00"));
+        // Pesto's own total yield = 30g (its only ingredient).
+
         Recipe pizzaSauce = recipe(14L, "Pizza Sauce", 4);
+        pizzaSauce.setIngredients(List.of(linkedRecipeIngredient(pesto, "20.00")));
+        // Pizza Sauce's own total yield = 20g (its only ingredient is 20g of Pesto).
+
         Recipe pizza = recipe(12L, "Pizza", 2);
+        pizza.setIngredients(List.of(linkedRecipeIngredient(pizzaSauce, "9.00")));
+        // Pizza uses 9g of Pizza Sauce per its own 2-serving batch.
 
         givenUserOwnsTheirOwnPlan(1L);
-        givenEntries(entry(MONDAY, "dinner", pizza, 4));
+        givenEntries(entry(MONDAY, "dinner", pizza, 4)); // double Pizza's own default batch
         when(recipeExtrasService.hasExtras(12L)).thenReturn(true);
         when(recipeExtrasService.buildExtrasTree(eq(12L), any()))
             .thenReturn(List.of(RecipeExtraNodeDTO.builder()
@@ -454,6 +548,8 @@ class ShoppingListServiceTest {
                 .build()));
         when(recipeRepository.findById(14L)).thenReturn(Optional.of(pizzaSauce));
         when(recipeRepository.findById(10L)).thenReturn(Optional.of(pesto));
+        when(macroCalculationService.calculateRecipeTotalYield(pizzaSauce)).thenReturn(new BigDecimal("20.00"));
+        when(macroCalculationService.calculateRecipeTotalYield(pesto)).thenReturn(new BigDecimal("30.00"));
 
         IngredientBreakdownDTO result = shoppingListService
             .getIngredientBreakdown(1L, 45L, "g", MONDAY, null);
@@ -463,10 +559,14 @@ class ShoppingListServiceTest {
         assertThat(row.getRecipeName()).isEqualTo("Pizza");
         // Attributed to the nested extra that actually holds the ingredient, not its parent
         assertThat(row.getViaRecipeName()).isEqualTo("Pesto");
-        // Scales off the MAIN recipe's defaultServings (Pizza = 2), matching processExtras —
-        // NOT Pesto's 6 and not Pizza Sauce's 4: 30.00 * 4 / 2 = 60.00
-        assertThat(row.getQuantity()).isEqualByComparingTo("60.00");
-        assertThat(result.getTotalQuantity()).isEqualByComparingTo("60.00");
+        // Pizza@4 servings of its own 2-serving default = ratio 2.
+        // usedGrams(sauce) = 9 * 2 = 18; sauce portionRatio = 18/20 = 0.9.
+        // usedGrams(pesto, per one full sauce batch) = 20 (sauce's own link row) * 0.9 = 18;
+        // pesto portionRatio = 18/30 = 0.6.
+        // basil = 30 * 0.6 = 18.00 — NOT 30 * 4/2 = 60.00 (the bug: scaling every nested hop off
+        // only the MAIN recipe's servings, ignoring each link's own quantity_grams/yield).
+        assertThat(row.getQuantity()).isEqualByComparingTo("18.00");
+        assertThat(result.getTotalQuantity()).isEqualByComparingTo("18.00");
     }
 
     /**
@@ -485,10 +585,13 @@ class ShoppingListServiceTest {
         // Two dishes on different days feed one row: one direct hit, one via an extra, so both
         // halves of both traversals are exercised by the same fixture.
         Recipe curry = recipe(70L, "Irish Chicken Curry", 2,
-            recipeIngredient(oliveOil, "1.00", tbsp));
+            recipeIngredient(oliveOil, "1.00", tbsp, "14.00")); // 1 tbsp olive oil ~= 14g
         Recipe dough = recipe(13L, "Pizza Dough", 2,
-            recipeIngredient(oliveOil, "0.50", tbsp));
+            recipeIngredient(oliveOil, "0.50", tbsp, "7.00")); // 0.5 tbsp ~= 7g
+        // Dough's own total yield = 7g (its only ingredient).
         Recipe pizza = recipe(12L, "Pizza", 2); // oil reaches this dish only through the extra
+        pizza.setIngredients(List.of(linkedRecipeIngredient(dough, "3.50")));
+        // Pizza uses 3.5g of a 7g Dough batch — half.
 
         givenUserOwnsTheirOwnPlan(1L);
         givenEntries(
@@ -504,6 +607,7 @@ class ShoppingListServiceTest {
                 .build()));
         // One stub serves both methods now that the breakdown also uses findById (see F1)
         when(recipeRepository.findById(13L)).thenReturn(Optional.of(dough));
+        when(macroCalculationService.calculateRecipeTotalYield(dough)).thenReturn(new BigDecimal("7.00"));
 
         // The persisted row, all-homemade (no selections) — same default the breakdown assumes
         AggregatedShoppingListDTO shoppingList = shoppingListService
@@ -519,7 +623,8 @@ class ShoppingListServiceTest {
         IngredientBreakdownDTO breakdown = shoppingListService
             .getIngredientBreakdown(1L, OLIVE_OIL_ID, "tbsp", MONDAY, oilRow.getSourceChain());
 
-        // Both dishes contribute: curry 1.00*2/2 = 1.00, pizza's dough 0.50*2/2 = 0.50
+        // Both dishes contribute: curry 1.00*1 = 1.00, pizza's dough 0.50 * (3.50/7.00) = 0.25,
+        // total 1.25
         assertThat(breakdown.getMealBreakdown())
             .extracting(MealIngredientUsageDTO::getRecipeName)
             .containsExactly("Irish Chicken Curry", "Pizza");
@@ -609,6 +714,19 @@ class ShoppingListServiceTest {
         recipeIngredient.setIngredient(ingredient);
         recipeIngredient.setQuantity(new BigDecimal(quantity));
         recipeIngredient.setUnit(unit);
+        return recipeIngredient;
+    }
+
+    private RecipeIngredient recipeIngredient(Ingredient ingredient, String quantity, Unit unit, String quantityGrams) {
+        RecipeIngredient recipeIngredient = recipeIngredient(ingredient, quantity, unit);
+        recipeIngredient.setQuantityGrams(new BigDecimal(quantityGrams));
+        return recipeIngredient;
+    }
+
+    private RecipeIngredient linkedRecipeIngredient(Recipe linkedRecipe, String quantityGrams) {
+        RecipeIngredient recipeIngredient = new RecipeIngredient();
+        recipeIngredient.setLinkedRecipe(linkedRecipe);
+        recipeIngredient.setQuantityGrams(new BigDecimal(quantityGrams));
         return recipeIngredient;
     }
 

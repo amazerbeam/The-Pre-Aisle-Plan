@@ -14,6 +14,7 @@ import com.foodbytes.repository.MealPlanEntryRepository;
 import com.foodbytes.repository.RecipeRepository;
 import com.foodbytes.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +30,7 @@ import java.util.stream.Collectors;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ShoppingListService {
 
     private final MealPlanEntryRepository mealPlanEntryRepository;
@@ -36,6 +38,7 @@ public class ShoppingListService {
     private final RecipeExtrasService recipeExtrasService;
     private final IngredientRepository ingredientRepository;
     private final UserRepository userRepository;
+    private final MacroCalculationService macroCalculationService; // MPP-1: reuse calculateRecipeTotalYield
 
     // Special aisle for store-bought items
     private static final Long STORE_BOUGHT_AISLE_ID = -999L;
@@ -94,6 +97,11 @@ public class ShoppingListService {
         // FR-089: List to store store-bought items (extras marked as store-bought)
         List<StoreBoughtItem> storeBoughtItems = new ArrayList<>();
 
+        // MPP-1: Request-scoped memoisation, mirroring getIngredientBreakdown's extraRecipeCache —
+        // the same extra recipe (e.g. a sauce/dough reused across the week) is looked up at most
+        // once per shopping-list generation instead of once per meal-plan entry that uses it.
+        Map<Long, Recipe> extraRecipeCache = new HashMap<>();
+
         // Extract selections map (null-safe)
         Map<Long, Map<Long, Boolean>> selectionsMap = homemadeSelections != null
             ? homemadeSelections.getSelections()
@@ -105,13 +113,16 @@ public class ShoppingListService {
             Long recipeId = recipe.getId();
             BigDecimal entryServings = entry.getServings();
             Integer recipeDefaultServings = recipe.getDefaultServings();
+            // MPP-1: pre-resolve once — the fraction of the MAIN recipe's own batch needed.
+            // Extras derive their own ratio from this one via resolveExtraPortionRatio, not from
+            // entryServings/defaultServings directly.
+            BigDecimal mainRatio = entryServings.divide(BigDecimal.valueOf(recipeDefaultServings), 10, RoundingMode.HALF_UP);
 
             // FR-102: Create source chain starting with the main recipe
             List<Long> mainRecipeChain = Collections.singletonList(recipeId);
 
             // Process main recipe ingredients
-            processRecipeIngredients(recipe, entryServings, recipeDefaultServings,
-                                    aggregatedIngredients, mainRecipeChain);
+            processRecipeIngredients(recipe, mainRatio, aggregatedIngredients, mainRecipeChain);
 
             // FR-089: Process extras based on homemade selections
             if (recipeExtrasService.hasExtras(recipeId)) {
@@ -120,8 +131,8 @@ public class ShoppingListService {
                     ? selectionsMap.get(recipeId)
                     : null;
 
-                processExtras(extras, recipeSelections, entryServings, recipeDefaultServings,
-                             aggregatedIngredients, storeBoughtItems, mainRecipeChain);
+                processExtras(extras, recipeSelections, recipe, mainRatio,
+                             aggregatedIngredients, storeBoughtItems, mainRecipeChain, extraRecipeCache);
             }
         }
 
@@ -256,18 +267,21 @@ public class ShoppingListService {
             Recipe recipe = entry.getRecipe();
             BigDecimal entryServings = entry.getServings();
             Integer recipeDefaultServings = recipe.getDefaultServings();
+            // MPP-1: same pre-resolved ratio as getShoppingList's mainRatio — the two entry
+            // points are kept symmetric on purpose so they can never disagree.
+            BigDecimal mainRatio = entryServings.divide(BigDecimal.valueOf(recipeDefaultServings), 10, RoundingMode.HALF_UP);
 
             // Collect every use of the ingredient in this meal: the main recipe first,
             // then its extras (recursively) — the same traversal getShoppingList aggregates over.
             List<IngredientUsage> usages = new ArrayList<>();
-            collectIngredientUsages(recipe, ingredientId, unit, null, usages);
+            collectIngredientUsages(recipe, ingredientId, unit, null, mainRatio, usages);
 
             List<RecipeExtraNodeDTO> extras = extrasTreeCache.computeIfAbsent(
                 recipe.getId(),
                 id -> recipeExtrasService.hasExtras(id)
                     ? recipeExtrasService.buildExtrasTree(id, new HashSet<>())
                     : Collections.emptyList());
-            collectUsagesFromExtras(extras, ingredientId, unit, usages, extraRecipeCache);
+            collectUsagesFromExtras(extras, ingredientId, unit, usages, extraRecipeCache, recipe, mainRatio);
 
             for (IngredientUsage usage : usages) {
                 // Capture ingredient name
@@ -275,11 +289,12 @@ public class ShoppingListService {
                     ingredientName = usage.ingredientName();
                 }
 
-                // Scale quantity: scaledQty = quantity * entry.servings / recipe.defaultServings
-                // Extras scale off the MAIN recipe's default servings, matching processExtras.
+                // MPP-1: ratio is already fully resolved per-usage at collection time (see
+                // collectIngredientUsages / collectUsagesFromExtras) — no separate
+                // entryServings/defaultServings multiply here anymore.
                 BigDecimal scaledQuantity = usage.quantity()
-                    .multiply(entryServings)
-                    .divide(BigDecimal.valueOf(recipeDefaultServings), 2, RoundingMode.HALF_UP);
+                    .multiply(usage.ratio())
+                    .setScale(2, RoundingMode.HALF_UP);
 
                 // Add to total
                 totalQuantity = totalQuantity.add(scaledQuantity);
@@ -315,9 +330,12 @@ public class ShoppingListService {
      * FR-042: Find each row of a recipe that uses the given ingredient in the given unit.
      *
      * @param viaRecipeName Name of the extra the ingredient came from, or null for the main recipe
+     * @param ratio MPP-1: fully-resolved scale factor for this recipe's own ingredients — mainRatio
+     *              for the main recipe, or the portionRatio resolved by resolveExtraPortionRatio
+     *              for an extra
      */
     private void collectIngredientUsages(Recipe recipe, Long ingredientId, String unit,
-                                         String viaRecipeName, List<IngredientUsage> usages) {
+                                         String viaRecipeName, BigDecimal ratio, List<IngredientUsage> usages) {
         for (RecipeIngredient recipeIngredient : recipe.getIngredients()) {
             // FR-093: Skip linked recipe ingredients (they don't have an ingredient)
             if (recipeIngredient.isLinkedRecipe()) {
@@ -330,7 +348,8 @@ public class ShoppingListService {
                 usages.add(new IngredientUsage(
                     ingredient.getName(),
                     recipeIngredient.getQuantity(),
-                    viaRecipeName
+                    viaRecipeName,
+                    ratio
                 ));
             }
         }
@@ -355,10 +374,13 @@ public class ShoppingListService {
      * queries per call rather than one per entry.
      *
      * @param extraRecipeCache Request-scoped cache so each distinct extra is loaded at most once
+     * @param parentRecipe The recipe that OWNS these extras (has the linked_recipe_id rows)
+     * @param parentRatio Fraction of parentRecipe's own batch actually needed
      */
     private void collectUsagesFromExtras(List<RecipeExtraNodeDTO> extras, Long ingredientId,
                                          String unit, List<IngredientUsage> usages,
-                                         Map<Long, Recipe> extraRecipeCache) {
+                                         Map<Long, Recipe> extraRecipeCache,
+                                         Recipe parentRecipe, BigDecimal parentRatio) {
         for (RecipeExtraNodeDTO extra : extras) {
             // computeIfAbsent does not cache a null result, so a missing recipe is simply skipped.
             // findById (not findWithDetailsById) — see the javadoc: the @EntityGraph finder
@@ -368,21 +390,28 @@ public class ShoppingListService {
                 id -> recipeRepository.findById(id).orElse(null));
 
             if (extraRecipe != null) {
-                collectIngredientUsages(extraRecipe, ingredientId, unit,
-                                        extra.getRecipeName(), usages);
-            }
+                // MPP-1: prorate by how much of THIS extra's own batch the parent actually uses
+                BigDecimal portionRatio = resolveExtraPortionRatio(parentRecipe, extra.getRecipeId(), parentRatio, extraRecipe);
+                if (portionRatio.compareTo(BigDecimal.ZERO) > 0) {
+                    collectIngredientUsages(extraRecipe, ingredientId, unit,
+                                            extra.getRecipeName(), portionRatio, usages);
 
-            if (extra.getChildren() != null && !extra.getChildren().isEmpty()) {
-                collectUsagesFromExtras(extra.getChildren(), ingredientId, unit,
-                                        usages, extraRecipeCache);
+                    if (extra.getChildren() != null && !extra.getChildren().isEmpty()) {
+                        collectUsagesFromExtras(extra.getChildren(), ingredientId, unit,
+                                                usages, extraRecipeCache, extraRecipe, portionRatio);
+                    }
+                }
             }
         }
     }
 
     /**
      * FR-042: One use of an ingredient inside a recipe (or one of its extras).
+     * MPP-1: ratio is the fully-resolved scale factor for THIS occurrence, computed at
+     * collection time (mainRatio for the main recipe, or resolveExtraPortionRatio's result
+     * for anything found inside an extra).
      */
-    private record IngredientUsage(String ingredientName, BigDecimal quantity, String viaRecipeName) {}
+    private record IngredientUsage(String ingredientName, BigDecimal quantity, String viaRecipeName, BigDecimal ratio) {}
 
     /**
      * Key class for aggregating ingredients by (ingredientId, unitId).
@@ -477,9 +506,13 @@ public class ShoppingListService {
      * FR-089: Process ingredients for a single recipe, adding to aggregated map.
      * FR-093: Skip linked recipe ingredients (handled by extras system).
      * FR-102: Added sourceChain parameter for tracking ingredient provenance.
+     * MPP-1: ratio replaces the old (entryServings, defaultServings) pair — for the MAIN recipe
+     * it is entryServings/defaultServings (unchanged); for a linked extra's own ingredients it is
+     * the portionRatio resolved by resolveExtraPortionRatio.
+     * @param ratio Fraction of THIS recipe's own batch actually needed
      * @param sourceChain Chain of recipe IDs for provenance (null for main recipes)
      */
-    private void processRecipeIngredients(Recipe recipe, BigDecimal entryServings, Integer defaultServings,
+    private void processRecipeIngredients(Recipe recipe, BigDecimal ratio,
                                           Map<IngredientUnitKey, IngredientAggregate> aggregatedIngredients,
                                           List<Long> sourceChain) {
         for (RecipeIngredient recipeIngredient : recipe.getIngredients()) {
@@ -488,11 +521,8 @@ public class ShoppingListService {
                 continue;
             }
 
-            // Scale quantity: scaledQty = ingredient.quantity * entry.servings / recipe.defaultServings
             BigDecimal originalQuantity = recipeIngredient.getQuantity();
-            BigDecimal scaledQuantity = originalQuantity
-                .multiply(entryServings)
-                .divide(BigDecimal.valueOf(defaultServings), 2, RoundingMode.HALF_UP);
+            BigDecimal scaledQuantity = originalQuantity.multiply(ratio).setScale(2, RoundingMode.HALF_UP);
 
             // Create key for aggregation (ingredientId, unitId)
             Long ingredientId = recipeIngredient.getIngredient().getId();
@@ -528,22 +558,28 @@ public class ShoppingListService {
     /**
      * FR-089: Process extras recursively, adding ingredients or store-bought items.
      * FR-102: Added sourceChain parameter for tracking ingredient provenance.
+     * MPP-1: parentRecipe/parentRatio replace the old (entryServings, defaultServings) pair.
+     * Each extra's own ratio is resolved from parentRecipe's linked_recipe_id row via
+     * resolveExtraPortionRatio, not inherited directly from the top-level meal's servings.
      *
      * @param extras List of extra nodes to process
      * @param selections Map of extraRecipeId -> isHomemade (null = all homemade)
-     * @param entryServings Servings for the meal plan entry (may be fractional, e.g. 0.5)
-     * @param defaultServings Default servings for the parent recipe
+     * @param parentRecipe The recipe that OWNS these extras (has the linked_recipe_id rows)
+     * @param parentRatio Fraction of parentRecipe's own batch actually needed
      * @param aggregatedIngredients Map to add ingredients to
      * @param storeBoughtItems List to add store-bought items to
      * @param parentSourceChain Source chain from parent (to build upon)
+     * @param extraRecipeCache Request-scoped cache so each distinct extra is loaded at most once
+     *                         (mirrors {@link #collectUsagesFromExtras}'s cache of the same name)
      */
     private void processExtras(List<RecipeExtraNodeDTO> extras,
                                Map<Long, Boolean> selections,
-                               BigDecimal entryServings,
-                               Integer defaultServings,
+                               Recipe parentRecipe,
+                               BigDecimal parentRatio,
                                Map<IngredientUnitKey, IngredientAggregate> aggregatedIngredients,
                                List<StoreBoughtItem> storeBoughtItems,
-                               List<Long> parentSourceChain) {
+                               List<Long> parentSourceChain,
+                               Map<Long, Recipe> extraRecipeCache) {
         if (extras == null || extras.isEmpty()) {
             return;
         }
@@ -563,17 +599,24 @@ public class ShoppingListService {
             boolean isHomemade = selections == null || selectionValue == null || selectionValue;
 
             if (isHomemade) {
-                // Add extra's ingredients to shopping list
-                Recipe extraRecipe = recipeRepository.findById(extraRecipeId).orElse(null);
+                // MPP-1: prorate by how much of THIS extra's own batch the parent actually uses.
+                // computeIfAbsent does not cache a null result, so a missing recipe is simply
+                // skipped — same contract as collectUsagesFromExtras's extraRecipeCache.
+                Recipe extraRecipe = extraRecipeCache.computeIfAbsent(
+                    extraRecipeId,
+                    id -> recipeRepository.findById(id).orElse(null));
                 if (extraRecipe != null) {
-                    processRecipeIngredients(extraRecipe, entryServings, defaultServings,
-                                           aggregatedIngredients, currentSourceChain);
-                }
+                    BigDecimal portionRatio = resolveExtraPortionRatio(parentRecipe, extraRecipeId, parentRatio, extraRecipe);
+                    if (portionRatio.compareTo(BigDecimal.ZERO) > 0) {
+                        processRecipeIngredients(extraRecipe, portionRatio, aggregatedIngredients, currentSourceChain);
 
-                // Process children recursively
-                if (extra.getChildren() != null && !extra.getChildren().isEmpty()) {
-                    processExtras(extra.getChildren(), selections, entryServings, defaultServings,
-                                 aggregatedIngredients, storeBoughtItems, currentSourceChain);
+                        // Process children recursively, carrying THIS extra's resolved ratio forward
+                        if (extra.getChildren() != null && !extra.getChildren().isEmpty()) {
+                            processExtras(extra.getChildren(), selections, extraRecipe, portionRatio,
+                                         aggregatedIngredients, storeBoughtItems, currentSourceChain,
+                                         extraRecipeCache);
+                        }
+                    }
                 }
             } else {
                 // FR-103: Store-bought selected - use the actual ingredient if available
@@ -588,6 +631,61 @@ public class ShoppingListService {
                 // Don't process children - they're covered by the store-bought parent
             }
         }
+    }
+
+    /**
+     * MPP-1: How much of a linked-recipe extra is needed at the current scale, expressed as a
+     * fraction of the CHILD recipe's own total yield. Mirrors
+     * {@link MacroCalculationService#calculateLinkedRecipeMacros} so the shopping list and the
+     * macro traffic light agree on what "using 400g of an 8-serving batch" means.
+     *
+     * <p>usedGrams = parentRecipe's own recipe_ingredients.quantity_grams for this link, scaled
+     * by however much of the PARENT's own batch is needed (parentRatio). portionRatio =
+     * usedGrams / childRecipe's total yield.
+     *
+     * @return the ratio to apply to childRecipe's own ingredient quantities, or ZERO if
+     *         parentRecipe has no matching linked_recipe_id row for childRecipeId, or
+     *         childRecipe's total yield is zero — both are data-integrity states (see
+     *         linked-recipe-extras.md), not recoverable runtime states.
+     */
+    private BigDecimal resolveExtraPortionRatio(Recipe parentRecipe, Long childRecipeId,
+                                                BigDecimal parentRatio, Recipe childRecipe) {
+        BigDecimal linkQuantityGrams = findLinkedQuantityGrams(parentRecipe, childRecipeId);
+        if (linkQuantityGrams == null) {
+            // Null-safe: linkQuantityGrams can be null either because no matching linked_recipe_id
+            // row was found on a non-null parentRecipe, or because parentRecipe itself was null —
+            // don't let the diagnostic log NPE on the very case it's meant to surface.
+            log.warn("No recipe_ingredients row on recipe {} links to extra recipe {}; " +
+                     "cannot prorate its raw ingredients for the shopping list.",
+                     parentRecipe != null ? parentRecipe.getId() : "?", childRecipeId);
+            return BigDecimal.ZERO;
+        }
+
+        BigDecimal usedGrams = linkQuantityGrams.multiply(parentRatio);
+        BigDecimal totalYield = macroCalculationService.calculateRecipeTotalYield(childRecipe);
+        if (totalYield.compareTo(BigDecimal.ZERO) <= 0) {
+            log.warn("Extra recipe {} has 0 total yield; cannot prorate its raw ingredients.", childRecipeId);
+            return BigDecimal.ZERO;
+        }
+
+        return usedGrams.divide(totalYield, 10, RoundingMode.HALF_UP);
+    }
+
+    /**
+     * MPP-1: Find parentRecipe's own recipe_ingredients row with linked_recipe_id = childRecipeId
+     * and return its quantity_grams — the "how much of the child is used" figure needed to
+     * prorate the child's own raw ingredients. Returns null if no such row exists.
+     */
+    private BigDecimal findLinkedQuantityGrams(Recipe parentRecipe, Long childRecipeId) {
+        if (parentRecipe == null || parentRecipe.getIngredients() == null) {
+            return null;
+        }
+        for (RecipeIngredient ri : parentRecipe.getIngredients()) {
+            if (ri.isLinkedRecipe() && ri.getLinkedRecipe().getId().equals(childRecipeId)) {
+                return ri.getQuantityGrams();
+            }
+        }
+        return null;
     }
 
     /**

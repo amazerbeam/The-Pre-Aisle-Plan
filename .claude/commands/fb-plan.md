@@ -6,7 +6,7 @@ You are the **Planning Agent**. Produce an implementation plan for the primed ta
 
 **Task brief:** $ARGUMENTS
 
-The brief is the source of truth. Scope, technical pointers, pattern references, and constraints all come from it — whether it arrived as prose the developer typed, a `/brainstorming` spec under `.claude/contract/specs/`, or a file the developer pointed at. Do not infer intent the brief doesn't state. Do not sweep the codebase for context — the developer has already primed what you need.
+The brief is the source of truth. Scope, technical pointers, pattern references, and constraints all come from it — whether it arrived as prose the developer typed, a Jira ticket they named, a `/brainstorming` spec under `.claude/contract/specs/`, or a file the developer pointed at. Do not infer intent the brief doesn't state. Do not sweep the codebase for context — the developer has already primed what you need.
 
 ## Step 0: Preconditions — only refuse when there is literally no context
 
@@ -15,8 +15,8 @@ The gate is narrow. Only refuse to plan if one of these two unrecoverable condit
 1. **No brief** — `$ARGUMENTS` is empty and there is no pasted task description, spec, or file reference in the session.
    - Response: "Describe the task (or run `/brainstorming` first) before invoking `/fb-plan`."
 
-2. **Brief unreadable** — the developer named a spec file, contract folder, or source file and it cannot be read (missing path, permission error).
-   - Response: surface the actual error verbatim and list what you did find (e.g. the specs that exist under `.claude/contract/specs/`). Ask the developer to paste the brief inline or fix the path. Do not guess.
+2. **Brief unreadable** — the developer named a spec file, contract folder, source file, or Jira issue and it cannot be read (missing path, permission error, unknown issue key).
+   - Response: surface the actual error verbatim and list what you did find (e.g. the specs that exist under `.claude/contract/specs/`). Ask the developer to paste the brief inline or fix the reference. Do not guess.
 
 **Vagueness is NOT a refusal condition.** If the brief is missing pattern references, ambiguous on scope, light on technical pointers, or otherwise sparse — proceed. Do not bounce it back to the developer. Instead, in Step 2:
 
@@ -25,6 +25,16 @@ The gate is narrow. Only refuse to plan if one of these two unrecoverable condit
 - Frame the plan so the developer can red-line specific assumptions during Part 1 review rather than rewriting the brief.
 
 The alignment check happens in `plan.md` Part 1, not at the gate. A best-effort plan with explicit assumptions is more useful to the developer than a refusal.
+
+## Step 0.5: Move the ticket to `Planning` — before anything else
+
+**This is the first action `/fb-plan` takes.** The board must show the work in flight from the moment planning starts, not once the plan folder exists — a developer looking at the board mid-planning should never see the card still in `To Do`.
+
+Nothing here depends on the slug. Scan `$ARGUMENTS` and the primed brief for an `MPP-<n>` key: the developer named a ticket, pasted one, or referenced a spec that cites one. If you find one, invoke the `management-jira` skill and transition that issue to `Planning` — automatically, no confirmation prompt. Read *The MPP status model* in that skill for the rules: resolve the transition id live, report the move in one line, and never fail this command over a Jira error. Transitions are any → any, so a card in `To Do` moves straight to `Planning`.
+
+Skip silently when the brief carries no key — that work will get a date-branch slug in Step 1.7 and has no card to move. Do not create a ticket to have something to transition; `/fb-plan` plans, it does not open work.
+
+Run this **after** Step 0's refusal gate, not before it. Step 0 only refuses when there is no brief at all or the named brief is unreadable, and moving a card for a run that is about to refuse would leave the board lying. Everything else — classification, the skill confirmation, the config audit, creating the folder — comes after this transition.
 
 ## Step 1: Defer to the skills and the shared rules
 
@@ -95,14 +105,16 @@ Capture findings in `plan.md` Part 1 under **"Cross-code alignment audit (FE ↔
 
 Plans are folders, not loose files — several plans coexist under `.claude/contract/`, and a new plan must never overwrite an existing one.
 
-Read `.claude/workflow/plan-resolution.md` and follow **Plan slug grammar**. This project has no issue tracker, so always use the date branch: today's date (`YYYY-MM-DD`) plus a kebab-case title, lowercase, 60 characters max — e.g. `2026-07-29-decimal-serving-size`.
+Read `.claude/workflow/plan-resolution.md` and follow **Plan slug grammar**. This project has a Jira project (`MPP`), so **prefer the Jira key** when the work has one — `MPP-8-scaffold-vite-app`. Fall back to today's date plus a kebab-case title when it does not — `YYYY-MM-DD` plus a kebab-case title, lowercase, 60 characters max, e.g. `2026-07-29-decimal-serving-size`.
 
 Then:
 
 1. Check whether `.claude/contract/<slug>/` already exists. If it does, append `-2` (then `-3`, …) until the path is free. Never write into an existing plan folder.
 2. Create `.claude/contract/<slug>/`. For the rest of this document, `<plan>` means that path.
-3. If the session was primed with a `/brainstorming` spec from `.claude/contract/specs/`, **move** it to `<plan>/spec.md` so the plan folder carries its own upstream input, and cite it in Part 1 → Task reference.
+3. If the session was primed with a `/brainstorming` spec from `.claude/contract/specs/`, **move** it to `<plan>/spec.md` so the plan folder carries its own upstream input, and cite it in Part 1 → Task reference. If the brief came from a Jira ticket, cite the issue key and paste its acceptance criteria into Part 1 → Task reference — the plan folder must stand alone after `/clear`.
 4. State the chosen slug in chat when you hand off in Step 3 — it is the developer's cue to rename the folder now, while it is cheap. A rename must also update the `Plan folder:` line the Step 2 template writes into `plan.md`, or that line names a path that no longer exists; and `specs` and `archive` are reserved names a plan folder may not take, since resolution skips both and the plan would become permanently undiscoverable.
+
+The ticket is already in `Planning` — Step 0.5 moved it before this folder existed. If the slug you just derived carries an `MPP-<n>` key that Step 0.5 did not find in the brief, transition it now and say that the move was late.
 
 ## Step 2: Produce the plan — write plan.md
 
@@ -127,7 +139,7 @@ Execution status: see `tasks.md` in this folder.
 *(The shared understanding of what this task is doing. Restate it in your own words — this is how the developer confirms you read the brief correctly before any design happens. Mismatch here = stop and fix.)*
 
 ### Task reference
-[The verbatim prose the developer primed, or a citation of `spec.md` when a /brainstorming spec was moved into this folder. Include any follow-up decisions confirmed interactively, dated.]
+[The verbatim prose the developer primed, the Jira issue key plus its acceptance criteria, or a citation of `spec.md` when a /brainstorming spec was moved into this folder. Include any follow-up decisions confirmed interactively, dated.]
 
 ### Restated goal
 [One paragraph in plain prose: what this task delivers, in your own words.]
@@ -472,12 +484,15 @@ Fix issues inline. No need to re-review after fixing — just fix and continue t
 
 ## Step 5: Final hand off
 
-After writing `tasks.md`, present in chat:
+`tasks.md` now exists at `Status: PLANNED`, so **move the ticket `Planning → Planned`** — automatically, no confirmation prompt. Same rules as Step 0.5: invoke `management-jira`, resolve the transition id live per *The MPP status model*, skip silently when the slug carries no `MPP-<n>` key, and never fail this command over a Jira error.
+
+Then present in chat:
 
 1. **Counts**: total phases and total tasks (each task is a vertical slice with its own `**Files:**` block and ordered checkbox steps)
 2. **Phase summary**: one line per phase naming the phase and what it delivers
 3. Reminder of the approved skills to invoke during execution (from `plan.md` Part 2)
 4. **Any task the developer owns personally** — applying a migration to the Railway MySQL, redeploying the backend, checking something visually on a phone
+5. **Jira**: the transition performed, e.g. `MPP-12 → Planned`. Say so plainly if it was skipped or failed
 
 Then tell the developer:
 
