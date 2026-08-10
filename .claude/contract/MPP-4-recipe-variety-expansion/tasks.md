@@ -4,7 +4,7 @@
 >
 > **Process note before you start:** every dish task below has a hard "present the design and pause for developer approval" step before SQL generation, per `.claude/skills/chef/SKILL.md` step 6. This is a live human judgement call (taste, technique, whether the macro-target-driven ingredient list reads as a dish worth eating), not a build-verifiable gate. See `plan.md` → Risks and judgement calls. If you are an unattended `/fb-apply` run, you cannot obtain that approval mid-task — the recommended execution mode for this specific contract is the developer driving each dish task as a live `/chef` conversation turn, approving the design before the task's SQL step runs. Proceeding unattended means designing and inserting without that live check, deferring human review entirely to Phase 6 and the end-of-run reviewers.
 
-Status: IN PROGRESS
+Status: COMPLETE
 Started: 2026-08-09
 
 **Goal:** Design 15 new Light/Moderate/Balanced recipe families, 1 new Extras recipe (granola/muesli), and redesign 1 existing family (Scrambled Eggs & Toast) in place, all inserted into the live Railway MySQL via guarded, idempotent SQL, with every variant independently passing the CLAUDE.md macro targets and no reject condition from `.claude/rules/recipe-variants.md`, `linked-recipe-extras.md`, or `homemade-first-and-ingredient-dedup.md` tripped.
@@ -363,28 +363,28 @@ Same shape as Task 7 Step 4, `meal_id = 1`. Write to `sql/egg-fried.sql`.
 
 Same verification shape as Task 7 Step 5.
 
-### Task 10: Design and insert the Omelette family
+### Task 10: Design and insert the Omelette family ✓
 
 - Skill: chef
 
 **Files:**
 - Create: `.claude/contract/MPP-4-recipe-variety-expansion/sql/egg-omelette.sql`
 
-- [ ] **Step 1: Resolve ingredients**
+- [x] **Step 1: Resolve ingredients**
 
 Working direction: *Cheese & Ham Omelette with Toast* — eggs, cheese, ham (dedup-check — `Honey Ham` exists as an Extras recipe per CLAUDE.md's Extras examples; confirm whether to link it or use a raw deli-ham ingredient), toast linked per the bread rule. If ham is itself a linkable sub-component recipe, apply the same linked-step pairing as Tasks 6-9.
 
-- [ ] **Step 2: Design Moderate first, then derive Light/Balanced**
+- [x] **Step 2: Design Moderate first, then derive Light/Balanced**
 
 Same procedure as prior egg tasks. Technique note: whisk eggs off-heat, don't overcook (French-style soft curd vs a fully-set diner-style omelette — confirm which style with the developer at presentation since it changes doneness wording in `recipe_steps`, not macros).
 
-- [ ] **Step 3: Present the 3-variant design and pause for approval**
+- [x] **Step 3: Present the 3-variant design and pause for approval**
 
-- [ ] **Step 4: Generate and run guarded INSERT SQL**
+- [x] **Step 4: Generate and run guarded INSERT SQL**
 
 Same shape as prior egg tasks, `meal_id = 1`. Write to `sql/egg-omelette.sql`.
 
-- [ ] **Step 5: Verify**
+- [x] **Step 5: Verify**
 
 Same verification shape as prior egg tasks (linked-step coverage applies only if the ham or bread component ended up linked rather than raw).
 
@@ -394,81 +394,81 @@ Same verification shape as prior egg tasks (linked-step coverage applies only if
 
 Independent of each other and of Phase 2, dependent only on Task 1's `Cod`/`Mackerel` ingredient rows. Safe stopping point once each task's verification passes.
 
-### Task 11: Design and insert the Cod family
+### Task 11: Design and insert the Cod family ✓
 
 - Skill: chef
 
 **Files:**
 - Create: `.claude/contract/MPP-4-recipe-variety-expansion/sql/fish-cod.sql`
 
-- [ ] **Step 1: Confirm the `Cod` ingredient id from Task 1 and resolve the rest**
+- [x] **Step 1: Confirm the `Cod` ingredient id from Task 1 and resolve the rest**
 
 ```sql
 SELECT id, protein_per_100g, carbs_per_100g, fat_per_100g FROM ingredients WHERE name = 'Cod';
 ```
 Working direction: *Baked Cod with Lemon, Herbs & New Potatoes* — cod, potatoes, lemon, herbs, olive oil. Dedup-check `New potatoes`/`Potato` before assuming which existing row to use — `.claude/rules/homemade-first-and-ingredient-dedup.md` flags `Potato`/`Potatoes` as a known historical dupe pair, confirm which is canonical before inserting.
 
-- [ ] **Step 2: Design Moderate first, then derive Light/Balanced**
+- [x] **Step 2: Design Moderate first, then derive Light/Balanced**
 
 Full macro table + self-review. Hard constraint: zero prawns/shellfish anywhere in this recipe or its sides.
 
-- [ ] **Step 3: Present the 3-variant design and pause for approval**
+- [x] **Step 3: Present the 3-variant design and pause for approval**
 
-- [ ] **Step 4: Generate and run guarded INSERT SQL**
+- [x] **Step 4: Generate and run guarded INSERT SQL**
 
 `meal_id = 3` (Dinner). Standard insert shape (recipes ×3, recipe_meals, recipe_ingredients, recipe_steps, recipe_families, recipe_family_members). Write to `sql/fish-cod.sql`.
 
-- [ ] **Step 5: Verify**
+- [x] **Step 5: Verify**
 
 Family-structure + recomputed-macro check, plus an explicit grep-style confirmation that no ingredient row in this recipe matches `Prawns (raw, peeled)` (id 143) or any other shellfish name.
 
-### Task 12: Design and insert the Mackerel family
+### Task 12: Design and insert the Mackerel family ✓
 
 - Skill: chef
 
 **Files:**
 - Create: `.claude/contract/MPP-4-recipe-variety-expansion/sql/fish-mackerel.sql`
 
-- [ ] **Step 1: Confirm the `Mackerel` ingredient id from Task 1 and resolve the rest**
+- [x] **Step 1: Confirm the `Mackerel` ingredient id from Task 1 and resolve the rest**
 
 Working direction: *Pan-Seared Mackerel with Greens & Quinoa* — mackerel, quinoa, leafy greens, lemon. Dedup-check `Quinoa` and any greens before assuming a new row is needed.
 
-- [ ] **Step 2: Design Moderate first, then derive Light/Balanced**
+- [x] **Step 2: Design Moderate first, then derive Light/Balanced**
 
 Full macro table + self-review. Same no-shellfish constraint as Task 11. Technique note: mackerel is an oily fish — skin-on pan-sear needs a dry-patted fillet and a hot pan for crisp skin, reflect in `recipe_steps`.
 
-- [ ] **Step 3: Present the 3-variant design and pause for approval**
+- [x] **Step 3: Present the 3-variant design and pause for approval**
 
-- [ ] **Step 4: Generate and run guarded INSERT SQL**
+- [x] **Step 4: Generate and run guarded INSERT SQL**
 
 `meal_id = 3`. Same insert shape as Task 11. Write to `sql/fish-mackerel.sql`.
 
-- [ ] **Step 5: Verify**
+- [x] **Step 5: Verify**
 
 Same verification shape as Task 11 Step 5.
 
-### Task 13: Design and insert the Chicken Breast (roasted) family
+### Task 13: Design and insert the Chicken Breast (roasted) family ✓
 
 - Skill: chef
 
 **Files:**
 - Create: `.claude/contract/MPP-4-recipe-variety-expansion/sql/chicken-breast-roasted.sql`
 
-- [ ] **Step 1: Resolve ingredients**
+- [x] **Step 1: Resolve ingredients**
 
 Working direction: *Herb-Roasted Chicken Breast with Sweet Potato & Greens* — `Chicken breast` (id 11, confirmed live), sweet potato, greens, olive oil, herbs. Hard constraint: roasted or fried technique only — no breading, no curry sauce, no composed bowl beyond a simple side (those preparations already exist elsewhere in the DB per the planning audit).
 
-- [ ] **Step 2: Design Moderate first, then derive Light/Balanced**
+- [x] **Step 2: Design Moderate first, then derive Light/Balanced**
 
 Full macro table + self-review. Technique note for `recipe_steps`: rest the chicken after roasting and return any resting juices to the plate/sauce, per the `/chef` audit lens on missing chef craft.
 
-- [ ] **Step 3: Present the 3-variant design and pause for approval**
+- [x] **Step 3: Present the 3-variant design and pause for approval**
 
-- [ ] **Step 4: Generate and run guarded INSERT SQL**
+- [x] **Step 4: Generate and run guarded INSERT SQL**
 
 `meal_id = 3`. Standard insert shape. Write to `sql/chicken-breast-roasted.sql`.
 
-- [ ] **Step 5: Verify**
+- [x] **Step 5: Verify**
 
 Family-structure + recomputed-macro check, plus explicit confirmation that `recipe_steps.instruction` text contains only roasting (or frying) language, no breading/frying-in-batter/curry-sauce steps.
 
@@ -476,56 +476,56 @@ Family-structure + recomputed-macro check, plus explicit confirmation that `reci
 
 ## Phase 4 — Beef
 
-### Task 14: Design and insert the Beef Meatballs family
+### Task 14: Design and insert the Beef Meatballs family ✓
 
 - Skill: chef
 
 **Files:**
 - Create: `.claude/contract/MPP-4-recipe-variety-expansion/sql/beef-meatballs.sql`
 
-- [ ] **Step 1: Resolve ingredients**
+- [x] **Step 1: Resolve ingredients**
 
 Working direction: *Beef Meatballs in Tomato Sauce with Spaghetti* — `Beef Mince (3% fat)` (confirmed live, already used in the existing Bolognese and Burger Patties recipes), breadcrumbs, egg, tomato base, spaghetti. Confirm this reads as genuinely distinct from the existing `Spaghetti Bolognese` family (rolled/shaped meatballs vs loose ragù — a real technique difference, not a relabeling).
 
-- [ ] **Step 2: Design Moderate first, then derive Light/Balanced**
+- [x] **Step 2: Design Moderate first, then derive Light/Balanced**
 
 Full macro table + self-review.
 
-- [ ] **Step 3: Present the 3-variant design and pause for approval**
+- [x] **Step 3: Present the 3-variant design and pause for approval**
 
-- [ ] **Step 4: Generate and run guarded INSERT SQL**
+- [x] **Step 4: Generate and run guarded INSERT SQL**
 
 `meal_id = 3`. Standard insert shape. Write to `sql/beef-meatballs.sql`.
 
-- [ ] **Step 5: Verify**
+- [x] **Step 5: Verify**
 
 Family-structure + recomputed-macro check.
 
-### Task 15: Design and insert the Beef Burger family (store-bought patty)
+### Task 15: Design and insert the Beef Burger family (store-bought patty) ✓
 
 - Skill: chef
 
 **Files:**
 - Create: `.claude/contract/MPP-4-recipe-variety-expansion/sql/beef-burger.sql`
 
-- [ ] **Step 1: Confirm the store-bought patty ingredient and resolve the rest**
+- [x] **Step 1: Confirm the store-bought patty ingredient and resolve the rest**
 
 ```sql
 SELECT id, protein_per_100g, carbs_per_100g, fat_per_100g FROM ingredients WHERE id = 95;
 ```
 Expected: `Beef Burger Patties`, protein 17/carbs 0/fat 20 per 100g (confirmed during planning). Per the developer's explicit decision, this recipe uses `ingredient_id = 95` directly on every variant — **do not** link `Burger Patties` (id 43) and **do not** design a fresh homemade patty. Resolve the remaining ingredients: burger bun (dedup-check before assuming a new bread-adjacent ingredient is needed — `Milk Bread`/`Flatbread`/`Pita Bread` are all linkable sub-recipes but a burger bun is a distinct product; check for an existing "bun" or "bread roll" ingredient first), lettuce, tomato, cheese.
 
-- [ ] **Step 2: Design Moderate first, then derive Light/Balanced**
+- [x] **Step 2: Design Moderate first, then derive Light/Balanced**
 
 Full macro table + self-review — this is a straightforward ingredient × per-100g calc since the patty has no linked-recipe proration to worry about (store-bought, `linked_recipe_id` stays NULL on this row).
 
-- [ ] **Step 3: Present the 3-variant design and pause for approval**
+- [x] **Step 3: Present the 3-variant design and pause for approval**
 
-- [ ] **Step 4: Generate and run guarded INSERT SQL**
+- [x] **Step 4: Generate and run guarded INSERT SQL**
 
 `meal_id = 3`. `recipe_ingredients` patty row: `ingredient_id = 95, linked_recipe_id = NULL`. Standard insert shape otherwise. Write to `sql/beef-burger.sql`.
 
-- [ ] **Step 5: Verify**
+- [x] **Step 5: Verify**
 
 Family-structure + recomputed-macro check, plus explicit confirmation the patty row has `linked_recipe_id IS NULL` and `ingredient_id = 95` on all three variants (guards against accidentally reaching for id 43 mid-design).
 
@@ -535,78 +535,78 @@ Family-structure + recomputed-macro check, plus explicit confirmation the patty 
 
 Depends on Task 1's `Turkey mince (2% fat)` ingredient row. All three tasks are independent of each other once that dependency is satisfied.
 
-### Task 16: Design and insert the Turkey Burger family
+### Task 16: Design and insert the Turkey Burger family ✓
 
 - Skill: chef
 
 **Files:**
 - Create: `.claude/contract/MPP-4-recipe-variety-expansion/sql/turkey-burger.sql`
 
-- [ ] **Step 1: Confirm the `Turkey mince (2% fat)` ingredient id from Task 1 and resolve the rest**
+- [x] **Step 1: Confirm the `Turkey mince (2% fat)` ingredient id from Task 1 and resolve the rest**
 
 Working direction: *Turkey Burger with Bun & Slaw* — turkey mince patty inlined as raw ingredients (turkey mince, breadcrumbs, egg, seasoning) directly on this recipe per the plan's Assumption (not a linked Extras sub-recipe, since no existing turkey-patty component exists to link and only this one dish uses it). Resolve bun/slaw ingredients (dedup-check, reuse from Task 15 where the burger bun item was already resolved).
 
-- [ ] **Step 2: Design Moderate first, then derive Light/Balanced**
+- [x] **Step 2: Design Moderate first, then derive Light/Balanced**
 
 Full macro table + self-review, including the from-scratch patty's own macro contribution (turkey mince + breadcrumbs + egg, summed per variant — not a linked-recipe proration since it's inlined).
 
-- [ ] **Step 3: Present the 3-variant design and pause for approval**
+- [x] **Step 3: Present the 3-variant design and pause for approval**
 
-- [ ] **Step 4: Generate and run guarded INSERT SQL**
+- [x] **Step 4: Generate and run guarded INSERT SQL**
 
 `meal_id = 3`. Standard insert shape — patty ingredients are separate `recipe_ingredients` rows (turkey mince, breadcrumbs, egg, seasoning), not a single linked row. Write to `sql/turkey-burger.sql`.
 
-- [ ] **Step 5: Verify**
+- [x] **Step 5: Verify**
 
 Family-structure + recomputed-macro check.
 
-### Task 17: Design and insert the Turkey Meatballs family
+### Task 17: Design and insert the Turkey Meatballs family ✓
 
 - Skill: chef
 
 **Files:**
 - Create: `.claude/contract/MPP-4-recipe-variety-expansion/sql/turkey-meatballs.sql`
 
-- [ ] **Step 1: Confirm the `Turkey mince (2% fat)` ingredient id and resolve the rest**
+- [x] **Step 1: Confirm the `Turkey mince (2% fat)` ingredient id and resolve the rest**
 
 Working direction: *Turkey Meatballs in Tomato Sauce* — mirrors Task 14's beef meatballs structure with turkey mince swapped in; confirm the fat-percentage difference (2% turkey vs 3% beef) is reflected correctly in the macro recompute, not copy-pasted from Task 14's numbers.
 
-- [ ] **Step 2: Design Moderate first, then derive Light/Balanced**
+- [x] **Step 2: Design Moderate first, then derive Light/Balanced**
 
 Full macro table + self-review.
 
-- [ ] **Step 3: Present the 3-variant design and pause for approval**
+- [x] **Step 3: Present the 3-variant design and pause for approval**
 
-- [ ] **Step 4: Generate and run guarded INSERT SQL**
+- [x] **Step 4: Generate and run guarded INSERT SQL**
 
 `meal_id = 3`. Standard insert shape. Write to `sql/turkey-meatballs.sql`.
 
-- [ ] **Step 5: Verify**
+- [x] **Step 5: Verify**
 
 Family-structure + recomputed-macro check.
 
-### Task 18: Design and insert the Turkey Bolognese family
+### Task 18: Design and insert the Turkey Bolognese family ✓
 
 - Skill: chef
 
 **Files:**
 - Create: `.claude/contract/MPP-4-recipe-variety-expansion/sql/turkey-bolognese.sql`
 
-- [ ] **Step 1: Confirm the `Turkey mince (2% fat)` ingredient id and resolve the rest**
+- [x] **Step 1: Confirm the `Turkey mince (2% fat)` ingredient id and resolve the rest**
 
 Working direction: *Turkey Bolognese with Spaghetti* — mirrors the existing beef `Spaghetti Bolognese` (family 23, recipes 81/82/83) aromatics/tomato-base structure (onion, carrot, celery, garlic, tinned tomatoes, tomato paste, beef stock → swap for a stock appropriate to turkey or keep a neutral vegetable/chicken stock, confirm at design time) with turkey mince replacing beef mince and its own macro profile — this is a genuinely different family (different protein), not a duplicate of family 23.
 
-- [ ] **Step 2: Design Moderate first, then derive Light/Balanced**
+- [x] **Step 2: Design Moderate first, then derive Light/Balanced**
 
 Full macro table + self-review.
 
-- [ ] **Step 3: Present the 3-variant design and pause for approval**
+- [x] **Step 3: Present the 3-variant design and pause for approval**
 
-- [ ] **Step 4: Generate and run guarded INSERT SQL**
+- [x] **Step 4: Generate and run guarded INSERT SQL**
 
 `meal_id = 3`. Standard insert shape. Write to `sql/turkey-bolognese.sql`.
 
-- [ ] **Step 5: Verify**
+- [x] **Step 5: Verify**
 
 Family-structure + recomputed-macro check, plus a duplicate-family sanity check confirming this is not flagged as a same-dish duplicate of family 23 (different `family_name`, different protein/macro profile).
 
@@ -616,11 +616,11 @@ Family-structure + recomputed-macro check, plus a duplicate-family sanity check 
 
 No production changes — only sanity-checks that the cumulative epic is internally consistent across all 17 dishes inserted in Phases 1-5.
 
-### Task 19: Family-structure and macro-target sweep across every new family
+### Task 19: Family-structure and macro-target sweep across every new family ✓
 
 - Skill: chef
 
-- [ ] **Step 1: Run the family-structure check from `.claude/rules/recipe-variants.md` scoped to every family created in this epic**
+- [x] **Step 1: Run the family-structure check from `.claude/rules/recipe-variants.md` scoped to every family created in this epic**
 
 Run:
 ```sql
@@ -635,16 +635,16 @@ HAVING member_count <> 3 OR labels <> 'Light,Moderate,Balanced' OR default_count
 ```
 Expected: zero rows. Any row returned is a structural defect in one of Tasks 4-18 — fix before proceeding.
 
-- [ ] **Step 2: Recompute per-serving macros for every new/redesigned recipe and confirm targets**
+- [x] **Step 2: Recompute per-serving macros for every new/redesigned recipe and confirm targets**
 
 For each recipe id inserted in Tasks 2-18 (plus 50/51/52 from Task 3), recompute per-serving P/C/F/kcal from `recipe_ingredients` (+ prorated `linked_recipe_id` contributions). Confirm protein ≥35g, fat 25-35% of kcal, carbs ≥38% of kcal on every meal-slot family member (the Granola Extras recipe from Task 2 is exempt — it's a component, not a meal). Confirm `Light.kcal < Moderate.kcal < Balanced.kcal` on every family.
 Expected: zero reject-condition violations. Report any recipe that fails and route it back to its originating task for a fix before Step 3.
 
-### Task 20: Dedup and linked-step coverage sweep
+### Task 20: Dedup and linked-step coverage sweep ✓
 
 - Skill: chef
 
-- [ ] **Step 1: Confirm no duplicate ingredients were introduced**
+- [x] **Step 1: Confirm no duplicate ingredients were introduced**
 
 Run:
 ```sql
@@ -657,7 +657,7 @@ HAVING COUNT(*) > 1;
 ```
 Expected: zero rows (only 4 new ingredients from Task 1, all distinct roots — `turkey mince`, `cod`, `mackerel`, `coconut oil`).
 
-- [ ] **Step 2: Confirm every `linked_recipe_id` row has a paired `recipe_steps` row**
+- [x] **Step 2: Confirm every `linked_recipe_id` row has a paired `recipe_steps` row**
 
 Run the verify query from `.claude/rules/linked-recipe-extras.md`:
 ```sql
@@ -674,7 +674,7 @@ WHERE ri.linked_recipe_id IS NOT NULL
 ```
 Expected: zero rows. This covers the Yogurt Bowl → Granola link (Task 6) and any bread links in the egg families (Tasks 7-10).
 
-- [ ] **Step 3: Confirm no raw ingredient inlines a sub-component that exists as its own recipe**
+- [x] **Step 3: Confirm no raw ingredient inlines a sub-component that exists as its own recipe**
 
 Run the verify query from `.claude/rules/homemade-first-and-ingredient-dedup.md` scoped to new recipes:
 ```sql
@@ -688,15 +688,15 @@ WHERE ri.linked_recipe_id IS NULL
 ```
 Expected: zero rows.
 
-### Task 21: Idempotency re-run check
+### Task 21: Idempotency re-run check ✓
 
 - Skill: chef
 
-- [ ] **Step 1: Re-run every guarded INSERT script from Tasks 1-18 a second time**
+- [x] **Step 1: Re-run every guarded INSERT script from Tasks 1-18 a second time**
 
 For each `sql/*.sql` file in this plan folder, re-execute its `INSERT ... WHERE NOT EXISTS` and `recipe_steps` wipe-and-re-insert statements against the live DB.
 
-- [ ] **Step 2: Confirm row counts are unchanged**
+- [x] **Step 2: Confirm row counts are unchanged**
 
 Run:
 ```sql
@@ -706,14 +706,14 @@ SELECT COUNT(*) FROM recipe_families WHERE id > 93;
 ```
 Expected: identical counts to the first run — proves every generated script in this epic is safely re-runnable, per `/chef` step 7a.
 
-### Task 22: Write the PR / handoff description
+### Task 22: Write the PR / handoff description ✓
 
 - Skill: none — documentation summary, no code or schema governs this
 
 **Files:**
 - Create: `.claude/contract/MPP-4-recipe-variety-expansion/pr-description.md`
 
-- [ ] **Step 1: Write the handoff summary**
+- [x] **Step 1: Write the handoff summary**
 
 Include: link to `plan.md`; the full list of 17 dishes inserted (1 Extras + 15 new families + 1 redesigned family) with their final approved names; confirmation that Phase 6's three verification tasks passed with zero violations; a note that this epic has no migration to apply (pure data, not schema) and no backend redeploy is required; and a one-line note that the `Turkey mince (2% fat)` naming convention (fat-% in parentheses) should be followed for any future turkey ingredient variants.
 

@@ -53,7 +53,15 @@
 }
 
 .default-portions-input {
-  flex: 1;
+  /* width: 0 neutralises the input's intrinsic size="20" width (~180px). Without
+     it, .user-dropdown — position: absolute with no explicit width — resolves by
+     shrink-to-fit against max-content, so the input inflated the whole panel well
+     past its 220px min-width and it sprawled left over the meal plan. min-width: 0
+     alone is not enough: that permits shrinking after the panel width is decided,
+     it does not keep the input out of the max-content calculation. flex-grow then
+     fills whatever the panel actually is. */
+  flex: 1 1 0;
+  width: 0;
   min-width: 0;
   min-height: 44px;
   padding: 0 0.5rem;

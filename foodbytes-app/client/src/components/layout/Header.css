@@ -2,7 +2,18 @@
   background-color: var(--brand-primary);
   color: white;
   padding: 8px 12px;
-  z-index: 50;
+  /* position is load-bearing, not decoration: `z-index` is ignored on a static
+     box, so the old `z-index: 50` here was inert and the header formed no
+     stacking context. That left .user-dropdown's z-index: 100 competing in the
+     root context against RecipeList.css's `.meal-tabs` (position: sticky;
+     z-index: 90), whose --bg-secondary background painted a grey band straight
+     across the open account menu.
+     100 clears .meal-tabs (90) and stays well under the 1000+ band every modal
+     and popup uses, so dialogs still cover the header. Raising the dropdown's
+     own z-index does NOT fix this — verified in-browser; the header has to be
+     the stacking context, otherwise any future sticky content re-opens the bug. */
+  position: relative;
+  z-index: 100;
   box-shadow: var(--shadow-md);
 }
 
