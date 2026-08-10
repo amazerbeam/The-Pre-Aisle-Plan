@@ -6,6 +6,7 @@ import com.foodbytes.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Service
@@ -41,7 +42,21 @@ public class UserService {
                 user.getEmail(),
                 user.getName(),
                 user.getAvatarUrl(),
-                user.getIsAdmin()
+                user.getIsAdmin(),
+                user.getDefaultServings()
         );
+    }
+
+    /**
+     * MPP-3: save the user's preferred starting portion count.
+     * A null value clears the preference, restoring the recipe-default
+     * behaviour. Validation of the range happens on the request DTO.
+     */
+    @Transactional
+    public UserDTO updateDefaultServings(Long userId, BigDecimal defaultServings) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
+        user.setDefaultServings(defaultServings);
+        return convertToDTO(userRepository.save(user));
     }
 }

@@ -1,0 +1,81 @@
+.default-portions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.default-portions-label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #555;
+}
+
+.default-portions-stepper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.default-portions-btn {
+  min-width: 44px;
+  min-height: 44px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 1.125rem;
+  line-height: 1;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.default-portions-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+@media (hover: hover) {
+  .default-portions-btn:not(:disabled):hover {
+    background: #f3f3f3;
+  }
+}
+
+.default-portions-btn:not(:disabled):active {
+  background: #e8e8e8;
+}
+
+.default-portions-btn:focus-visible,
+.default-portions-input:focus-visible {
+  outline: 2px solid #4a7c59;
+  outline-offset: 2px;
+}
+
+.default-portions-input {
+  flex: 1;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  text-align: center;
+  touch-action: manipulation;
+}
+
+.default-portions-input:disabled {
+  opacity: 0.6;
+}
+
+/* AC 9: "never set" — the displayed number is a placeholder, not a saved
+   choice. Subdued styling only; no new UI is introduced. */
+.default-portions-input--unset {
+  color: #999;
+  font-style: italic;
+}
+
+.default-portions-error {
+  font-size: 0.75rem;
+  color: #c0392b;
+}

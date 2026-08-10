@@ -3,15 +3,21 @@ import { useAuth } from '../../contexts/AuthContext'
 import DayAssignmentButtons from './DayAssignmentButtons'
 import RecipeViewModal from './RecipeViewModal'
 import { MIN_SERVINGS, MAX_SERVINGS, SERVINGS_STEP } from '../../constants/servings'
-import { parseServings, formatServings, stepServings } from '../../utils/servingsUtils'
+import { parseServings, formatServings, stepServings, resolveStartingServings } from '../../utils/servingsUtils'
 import './RecipeCard.css'
 
 function RecipeCard({ recipe, currentMealType, onSelectVariant, onEdit }) {
-  const { isAdmin } = useAuth()
+  const { isAdmin, defaultServings: userDefaultServings } = useAuth()
   const [showDetails, setShowDetails] = useState(false)
-  const [servings, setServings] = useState(recipe.defaultServings || 1)
+  // MPP-3: the user's preference moves the STARTING value only. scaleQuantity
+  // and perServingCalories below still divide by recipe.defaultServings — the
+  // scaling basis is the recipe's, not the user's (AC 7).
+  // Computed once (not inside two separate lazy-initializer closures) so both
+  // states seed from the identical value.
+  const startingServings = resolveStartingServings(recipe, userDefaultServings)
+  const [servings, setServings] = useState(() => startingServings)
   // Display buffer so a partially-typed value ("0." ) doesn't clobber the numeric state
-  const [servingsDisplay, setServingsDisplay] = useState(formatServings(recipe.defaultServings || 1))
+  const [servingsDisplay, setServingsDisplay] = useState(() => formatServings(startingServings))
   // FR-043: Track selected variant (default to current recipe)
   const [selectedVariantId, setSelectedVariantId] = useState(recipe.id)
   // FR-043: Track if calorie dropdown is open

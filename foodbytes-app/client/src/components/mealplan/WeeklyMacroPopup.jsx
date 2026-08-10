@@ -5,7 +5,7 @@ import { useBodyScrollLock } from '../../hooks/useBodyScrollLock'
 import PullToDismissUI from '../common/PullToDismissUI'
 import MacroTargetPopup from '../recipes/MacroTargetPopup'
 import { DAILY_MACRO_TARGETS, MACRO_COPY, WEEKLY_MACRO_TARGETS } from '../../constants/macroTargets'
-import { hasUsableMacros } from '../../utils/macroStatus'
+import { evaluateMacro, hasUsableMacros } from '../../utils/macroStatus'
 import './WeeklyMacroPopup.css'
 
 /**
@@ -102,19 +102,37 @@ function WeeklyMacroPopup({ weekData, onClose }) {
     ? Math.round((avgFatCalories / avgCalories) * 100)
     : 0
 
+  const weekMacros = { protein: weekTotalProtein, carbs: weekTotalCarbs, fat: weekTotalFat }
+  const avgMacros = { protein: avgProtein, carbs: avgCarbs, fat: avgFat }
+
   // All-zero macros (no planned meals for the week, or no days with meals) is a
   // data-completeness gap, not a nutrition verdict — see macroStatus.hasUsableMacros.
   // Skip opening the popup for whichever section has nothing to show.
-  const weekHasUsableMacros = hasUsableMacros({
-    protein: weekTotalProtein,
-    carbs: weekTotalCarbs,
-    fat: weekTotalFat
-  })
-  const avgHasUsableMacros = hasUsableMacros({
-    protein: avgProtein,
-    carbs: avgCarbs,
-    fat: avgFat
-  })
+  const weekHasUsableMacros = hasUsableMacros(weekMacros)
+  const avgHasUsableMacros = hasUsableMacros(avgMacros)
+
+  // Border/background colour reflects whether the target is met — under (blue) /
+  // near (amber) / on (green) / over (red) — not a fixed colour per macro. See
+  // macroTargets.js MACRO_STATUS and the equivalent comment in DailyMacroPopup.
+  const weekProteinStatus = weekHasUsableMacros
+    ? evaluateMacro(weekMacros, 'protein', WEEKLY_MACRO_TARGETS).status
+    : 'plain'
+  const weekCarbsStatus = weekHasUsableMacros
+    ? evaluateMacro(weekMacros, 'carbs', WEEKLY_MACRO_TARGETS).status
+    : 'plain'
+  const weekFatStatus = weekHasUsableMacros
+    ? evaluateMacro(weekMacros, 'fat', WEEKLY_MACRO_TARGETS).status
+    : 'plain'
+
+  const avgProteinStatus = avgHasUsableMacros
+    ? evaluateMacro(avgMacros, 'protein', DAILY_MACRO_TARGETS).status
+    : 'plain'
+  const avgCarbsStatus = avgHasUsableMacros
+    ? evaluateMacro(avgMacros, 'carbs', DAILY_MACRO_TARGETS).status
+    : 'plain'
+  const avgFatStatus = avgHasUsableMacros
+    ? evaluateMacro(avgMacros, 'fat', DAILY_MACRO_TARGETS).status
+    : 'plain'
 
   return (
     <div className="macro-popup-overlay">
@@ -151,7 +169,7 @@ function WeeklyMacroPopup({ weekData, onClose }) {
             <div className="macro-summary-grid">
               <button
                 type="button"
-                className="macro-summary-item"
+                className={`macro-summary-item macro-summary-item--${weekProteinStatus}`}
                 onClick={weekHasUsableMacros ? () => setOpenMacro({ key: 'protein', scope: 'week' }) : undefined}
                 disabled={!weekHasUsableMacros}
                 aria-haspopup={weekHasUsableMacros ? 'dialog' : undefined}
@@ -163,7 +181,7 @@ function WeeklyMacroPopup({ weekData, onClose }) {
               </button>
               <button
                 type="button"
-                className="macro-summary-item"
+                className={`macro-summary-item macro-summary-item--${weekCarbsStatus}`}
                 onClick={weekHasUsableMacros ? () => setOpenMacro({ key: 'carbs', scope: 'week' }) : undefined}
                 disabled={!weekHasUsableMacros}
                 aria-haspopup={weekHasUsableMacros ? 'dialog' : undefined}
@@ -175,7 +193,7 @@ function WeeklyMacroPopup({ weekData, onClose }) {
               </button>
               <button
                 type="button"
-                className="macro-summary-item"
+                className={`macro-summary-item macro-summary-item--${weekFatStatus}`}
                 onClick={weekHasUsableMacros ? () => setOpenMacro({ key: 'fat', scope: 'week' }) : undefined}
                 disabled={!weekHasUsableMacros}
                 aria-haspopup={weekHasUsableMacros ? 'dialog' : undefined}
@@ -200,7 +218,7 @@ function WeeklyMacroPopup({ weekData, onClose }) {
             <div className="macro-grid">
               <button
                 type="button"
-                className="macro-item macro-item-protein"
+                className={`macro-item macro-item--${avgProteinStatus}`}
                 onClick={avgHasUsableMacros ? () => setOpenMacro({ key: 'protein', scope: 'day' }) : undefined}
                 disabled={!avgHasUsableMacros}
                 aria-haspopup={avgHasUsableMacros ? 'dialog' : undefined}
@@ -218,7 +236,7 @@ function WeeklyMacroPopup({ weekData, onClose }) {
 
               <button
                 type="button"
-                className="macro-item macro-item-carbs"
+                className={`macro-item macro-item--${avgCarbsStatus}`}
                 onClick={avgHasUsableMacros ? () => setOpenMacro({ key: 'carbs', scope: 'day' }) : undefined}
                 disabled={!avgHasUsableMacros}
                 aria-haspopup={avgHasUsableMacros ? 'dialog' : undefined}
@@ -236,7 +254,7 @@ function WeeklyMacroPopup({ weekData, onClose }) {
 
               <button
                 type="button"
-                className="macro-item macro-item-fat"
+                className={`macro-item macro-item--${avgFatStatus}`}
                 onClick={avgHasUsableMacros ? () => setOpenMacro({ key: 'fat', scope: 'day' }) : undefined}
                 disabled={!avgHasUsableMacros}
                 aria-haspopup={avgHasUsableMacros ? 'dialog' : undefined}
@@ -261,11 +279,7 @@ function WeeklyMacroPopup({ weekData, onClose }) {
       {openMacro && (
         <MacroTargetPopup
           macroKey={openMacro.key}
-          macros={
-            openMacro.scope === 'week'
-              ? { protein: weekTotalProtein, carbs: weekTotalCarbs, fat: weekTotalFat }
-              : { protein: avgProtein, carbs: avgCarbs, fat: avgFat }
-          }
+          macros={openMacro.scope === 'week' ? weekMacros : avgMacros}
           displayedCaloriesPerServing={openMacro.scope === 'week' ? weekTotalCalories : avgCalories}
           targets={openMacro.scope === 'week' ? WEEKLY_MACRO_TARGETS : DAILY_MACRO_TARGETS}
           periodLabel={openMacro.scope === 'week' ? 'per week (7-day total)' : 'per day (average)'}

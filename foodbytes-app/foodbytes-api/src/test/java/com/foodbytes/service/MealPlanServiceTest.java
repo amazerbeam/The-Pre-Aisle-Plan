@@ -164,4 +164,49 @@ class MealPlanServiceTest {
         verify(mealPlanEntryRepository).save(entryCaptor.capture());
         assertThat(entryCaptor.getValue().getServings()).isEqualByComparingTo("1");
     }
+
+    /**
+     * MPP-3 AC 5: an omitted servings value resolves to the user's preference
+     * rather than the recipe's default_servings.
+     */
+    @Test
+    void assignRecipe_whenServingsOmittedAndUserHasPreference_usesThePreference() {
+        user.setDefaultServings(new BigDecimal("1.00"));
+        stubHappyPath();
+
+        mealPlanService.assignRecipe(USER_ID, requestWithServings(null));
+
+        verify(mealPlanEntryRepository).save(entryCaptor.capture());
+        assertThat(entryCaptor.getValue().getServings()).isEqualByComparingTo("1.00");
+    }
+
+    /**
+     * MPP-3 AC 10: the preference is a starting point, not a lock. An explicit
+     * request value still wins over it.
+     */
+    @Test
+    void assignRecipe_whenServingsProvided_beatsTheUserPreference() {
+        user.setDefaultServings(new BigDecimal("1.00"));
+        stubHappyPath();
+
+        mealPlanService.assignRecipe(USER_ID, requestWithServings(new BigDecimal("4")));
+
+        verify(mealPlanEntryRepository).save(entryCaptor.capture());
+        assertThat(entryCaptor.getValue().getServings()).isEqualByComparingTo("4");
+    }
+
+    /**
+     * MPP-3 AC 9: a user who never set the preference behaves exactly as before —
+     * the recipe's default_servings (2) still wins.
+     */
+    @Test
+    void assignRecipe_whenUserHasNoPreference_stillUsesRecipeDefault() {
+        user.setDefaultServings(null);
+        stubHappyPath();
+
+        mealPlanService.assignRecipe(USER_ID, requestWithServings(null));
+
+        verify(mealPlanEntryRepository).save(entryCaptor.capture());
+        assertThat(entryCaptor.getValue().getServings()).isEqualByComparingTo("2");
+    }
 }

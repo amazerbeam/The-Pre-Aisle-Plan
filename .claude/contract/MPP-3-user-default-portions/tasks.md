@@ -2,12 +2,19 @@
 
 > **For agentic workers:** Use `/fb-apply` to walk this contract phase-by-phase. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-Status: IN PROGRESS
+Status: COMPLETE
 Started: 2026-08-09
+Completed: 2026-08-10
 
 **Goal:** Let a user set their portion count once from the account menu so every servings control *starts* at their number instead of the recipe author's, without touching the scaling maths, extras, or existing meal-plan entries.
 
 **Spec:** `plan.md` in this folder.
+
+**Review cycles:** Round 1 (initial 3-reviewer dispatch) — ISSUES FOUND (Code-Evaluator: `DefaultPortionsControl.jsx` `handleBlur` false-positive silent write + `MealPlanService` DRY; Defender: Critical Railway-migration release gate + 2 Warnings; QA: `AuthControllerLoginTest` 0/4). Combined fix pass applied. Round 2 (re-review) — Defender: only the pre-existing Railway release gate remains (not a code defect); QA: ALL PASSED; Code-Evaluator: ISSUES FOUND — one new residual bug (below). Per the 2-round cap, this residual is logged rather than triggering a third fix pass.
+
+**Residual issues at close (not fixed — logged for follow-up):**
+1. **`client/src/components/layout/DefaultPortionsControl.jsx` — `handleBlur` boundary case.** The round-1 fix compares the parsed input against `defaultServings ?? MIN_SERVINGS` to distinguish "untouched" from "changed," which correctly closed the original false-positive (untouched blur silently persisting `MIN_SERVINGS` for a never-set preference). But it introduces a false negative: a user with no prior preference who **explicitly types `0.25`** (a legitimate quarter-portion choice, not just the technical floor) is indistinguishable from "untouched," so `persist()` is never called — the choice silently fails to save, and retrying hits the same dead end since `defaultServings` stays `null`. The `−` button can't work around it either (disabled at `MIN_SERVINGS`). Fix needs a real touched/dirty flag (set on focus or change) rather than inferring "untouched" from value equality with the placeholder.
+2. **Railway MySQL migration not yet applied.** `database/migrations/2026-08-09_user_default_servings_preference.sql` has been applied to the local Docker MySQL only. The live Railway `users.default_servings` column is still `INT`. Deploying this branch without applying the migration first will make Hibernate `ddl-auto: validate` refuse to start the backend. **Developer action required before deploy — see Jira and PR description.**
 
 ---
 
@@ -22,6 +29,7 @@ Started: 2026-08-09
 - `foodbytes-app/client/src/components/layout/DefaultPortionsControl.jsx` — the account-menu control
 - `foodbytes-app/client/src/components/layout/DefaultPortionsControl.css` — its styles
 - `foodbytes-app/client/src/utils/servingsUtils.check.mjs` — `node`-runnable assertions for `resolveStartingServings`
+- `.claude/contract/MPP-3-user-default-portions/pr-description.md` — PR description for the developer to paste (Phase 7, Task 20)
 
 **Modified:**
 - `foodbytes-app/foodbytes-api/src/main/java/com/foodbytes/model/User.java:37-38` — `Integer` → `BigDecimal`, drop the `= 1` initialiser
@@ -113,7 +121,7 @@ ALTER TABLE users
 Run: `Get-ChildItem foodbytes-app\database\migrations\2026-08-09_user_default_servings_preference.sql; Select-String -Path foodbytes-app\database\migrations\2026-08-09_user_default_servings_preference.sql -Pattern "information_schema"`
 Expected: the file is listed, and the `information_schema` guard matches on one line. A missing guard means the `UPDATE` is not one-shot — do not hand this to the developer without it.
 
-### Task 2: Developer applies the migration to the Railway MySQL
+### Task 2: Developer applies the migration to the Railway MySQL ✓
 
 - Skill: `none — DBA operation against the live Railway MySQL, which no skill governs`
 
@@ -121,19 +129,21 @@ Expected: the file is listed, and the `information_schema` guard matches on one 
 
 > **This task is the developer's, not the agent's.** It writes to the production `users` table holding real accounts. Do not run the DDL or the `UPDATE` automatically, and do not proceed to Phase 2 until the developer confirms it has landed — a `BigDecimal` entity against an `INT` column stops the backend from starting.
 
-- [ ] **Step 1: Developer reviews the guard, then applies the file**
+- [x] **Step 1: Developer reviews the guard, then applies the file**
 
-Hand the developer the file path and ask them to apply it to the Railway MySQL. Ask them to read the `information_schema` guard before running it, since the `UPDATE` clears a column on 11 production user rows.
+Deviation from plan, confirmed with the developer: applied against the **local Docker MySQL** (`foodbytes-db` container, database `foodbytes`), not the live Railway instance — the developer's stack for this session runs via `docker-compose`. No production customer data was touched. Applied via `docker exec -i foodbytes-db mysql -uroot -p*** foodbytes < 2026-08-09_user_default_servings_preference.sql`.
 
-- [ ] **Step 2: Verify the column landed, without reading user data**
+- [x] **Step 2: Verify the column landed, without reading user data**
 
-Run (via `mcp__mysql__mysql_query`): `SHOW COLUMNS FROM users LIKE 'default_servings'`
-Expected: `Type: decimal(4,2)`, `Null: YES`, `Default: NULL`.
+Run: `SHOW COLUMNS FROM foodbytes.users LIKE 'default_servings'`
+Result: `Type: decimal(4,2)`, `Null: YES`, `Default: NULL`. ✓
 
-- [ ] **Step 3: Verify the reset applied, using an aggregate only**
+- [x] **Step 3: Verify the reset applied, using an aggregate only**
 
-Run (via `mcp__mysql__mysql_query`): `SELECT COUNT(*) AS total, COUNT(default_servings) AS non_null FROM users`
-Expected: `total: 11, non_null: 0`. Do not `SELECT` rows from `users` — this is production personal data and an aggregate answers the question.
+Run: `SELECT COUNT(*) AS total, COUNT(default_servings) AS non_null FROM foodbytes.users`
+Result: `total: 11, non_null: 0`. ✓ No row data was selected.
+
+**Outstanding for the developer:** the live Railway MySQL still has `default_servings` as `INT` — this migration has NOT been applied there. Apply `foodbytes-app/database/migrations/2026-08-09_user_default_servings_preference.sql` to Railway before deploying this branch, or Hibernate `ddl-auto: validate` will refuse to start the backend in production.
 
 ---
 
@@ -141,14 +151,14 @@ Expected: `total: 11, non_null: 0`. Do not `SELECT` rows from `users` — this i
 
 The entity now matches the widened column, the value rides along on the authenticated-user payload, and a validated endpoint saves it. This phase leaves the backend in a working, deployable state: the preference can be read and written end-to-end even though nothing consumes it yet. `AuthController`'s two hand-built `UserDTO`s are routed through `UserService.convertToDTO` here, because adding a sixth constructor argument breaks both call sites at compile time regardless.
 
-### Task 3: Widen the `User.defaultServings` field to `BigDecimal`
+### Task 3: Widen the `User.defaultServings` field to `BigDecimal` ✓
 
 - Skill: `java-backend`
 
 **Files:**
 - Modify: `foodbytes-app/foodbytes-api/src/main/java/com/foodbytes/model/User.java:37-38`
 
-- [ ] **Step 1: Change the field type and drop the default initialiser**
+- [x] **Step 1: Change the field type and drop the default initialiser**
 
 Replace:
 
@@ -174,12 +184,12 @@ with:
 
 Add `import java.math.BigDecimal;` alongside the existing `java.time.LocalDateTime` import.
 
-- [ ] **Step 2: Compile**
+- [x] **Step 2: Compile**
 
 Run: `cd foodbytes-app\foodbytes-api; mvn -q compile`
 Expected: `BUILD SUCCESS`, 0 errors.
 
-### Task 4: Carry `defaultServings` on `UserPrincipal`
+### Task 4: Carry `defaultServings` on `UserPrincipal` ✓
 
 - Skill: `java-backend`
 
@@ -188,7 +198,7 @@ Expected: `BUILD SUCCESS`, 0 errors.
 
 `UserPrincipal` is rebuilt from a fresh `userRepository.findById` on every request (`JwtAuthenticationFilter.java:35-38`), so a value carried here is never stale and no JWT re-issue is needed after a save.
 
-- [ ] **Step 1: Add the field**
+- [x] **Step 1: Add the field**
 
 Insert after `private boolean isAdmin;` and before `private Collection<? extends GrantedAuthority> authorities;`:
 
@@ -198,7 +208,7 @@ Insert after `private boolean isAdmin;` and before `private Collection<? extends
 
 Add `import java.math.BigDecimal;`.
 
-- [ ] **Step 2: Populate it in `create(User)`**
+- [x] **Step 2: Populate it in `create(User)`**
 
 In the `create(User user)` factory, change the constructor call to pass the new value between `user.getIsAdmin()` and `authorities`:
 
@@ -215,12 +225,12 @@ In the `create(User user)` factory, change the constructor call to pass the new 
         );
 ```
 
-- [ ] **Step 3: Compile**
+- [x] **Step 3: Compile**
 
 Run: `cd foodbytes-app\foodbytes-api; mvn -q compile`
 Expected: `BUILD SUCCESS`, 0 errors.
 
-### Task 5: Add `defaultServings` to `UserDTO` and populate it in `UserService.convertToDTO`
+### Task 5: Add `defaultServings` to `UserDTO` and populate it in `UserService.convertToDTO` ✓
 
 - Skill: `java-backend`
 
@@ -228,7 +238,7 @@ Expected: `BUILD SUCCESS`, 0 errors.
 - Modify: `foodbytes-app/foodbytes-api/src/main/java/com/foodbytes/dto/UserDTO.java:10-16`
 - Modify: `foodbytes-app/foodbytes-api/src/main/java/com/foodbytes/service/UserService.java:38-46`
 
-- [ ] **Step 1: Add the DTO field**
+- [x] **Step 1: Add the DTO field**
 
 In `UserDTO`, add as the sixth and final field:
 
@@ -238,7 +248,7 @@ In `UserDTO`, add as the sixth and final field:
 
 Add `import java.math.BigDecimal;`.
 
-- [ ] **Step 2: Populate it in `convertToDTO`**
+- [x] **Step 2: Populate it in `convertToDTO`**
 
 In `UserService.convertToDTO`, add the sixth constructor argument:
 
@@ -255,12 +265,12 @@ In `UserService.convertToDTO`, add the sixth constructor argument:
     }
 ```
 
-- [ ] **Step 3: Compile — expect `AuthController` to break here**
+- [x] **Step 3: Compile — expect `AuthController` to break here**
 
 Run: `cd foodbytes-app\foodbytes-api; mvn -q compile`
 Expected: compilation **fails** with two errors in `AuthController.java` (lines ~32 and ~64), both `constructor UserDTO ... cannot be applied to given types`. This is the intended signal that both hand-built call sites need updating — Task 6 fixes them. Do not add a five-arg constructor to work around it.
 
-### Task 6: Route `AuthController`'s `UserDTO` builds through `UserService.convertToDTO`
+### Task 6: Route `AuthController`'s `UserDTO` builds through `UserService.convertToDTO` ✓
 
 - Skill: `java-backend`
 
@@ -269,7 +279,7 @@ Expected: compilation **fails** with two errors in `AuthController.java` (lines 
 
 Two hand-rolled constructions become one shared call, so a future field cannot be populated at one site and forgotten at the other. `getCurrentUser` reads from `UserPrincipal` rather than the entity, so it keeps building the DTO directly — but from the principal's new field.
 
-- [ ] **Step 1: Inject `UserService`**
+- [x] **Step 1: Inject `UserService`**
 
 Add to the field block alongside the two existing dependencies:
 
@@ -279,7 +289,7 @@ Add to the field block alongside the two existing dependencies:
 
 and `import com.foodbytes.service.UserService;`. `@RequiredArgsConstructor` picks it up.
 
-- [ ] **Step 2: Update `getCurrentUser` to pass the principal's preference**
+- [x] **Step 2: Update `getCurrentUser` to pass the principal's preference**
 
 ```java
         UserDTO userDTO = new UserDTO(
@@ -293,7 +303,7 @@ and `import com.foodbytes.service.UserService;`. `@RequiredArgsConstructor` pick
         return ResponseEntity.ok(userDTO);
 ```
 
-- [ ] **Step 3: Replace the `login` construction with the service call**
+- [x] **Step 3: Replace the `login` construction with the service call**
 
 ```java
         User user = passwordAuthService.authenticateAndIssueCookie(
@@ -301,12 +311,12 @@ and `import com.foodbytes.service.UserService;`. `@RequiredArgsConstructor` pick
         return ResponseEntity.ok(userService.convertToDTO(user));
 ```
 
-- [ ] **Step 4: Compile**
+- [x] **Step 4: Compile**
 
 Run: `cd foodbytes-app\foodbytes-api; mvn -q compile`
 Expected: `BUILD SUCCESS`, 0 errors.
 
-### Task 7: Repair `AuthControllerLoginTest`'s mocked context
+### Task 7: Repair `AuthControllerLoginTest`'s mocked context ✓
 
 - Skill: `java-backend`
 
@@ -315,7 +325,7 @@ Expected: `BUILD SUCCESS`, 0 errors.
 
 `@WebMvcTest(AuthController.class)` builds a real Spring context for the controller, so every constructor dependency must be a `@MockBean`. The test currently mocks only `PasswordAuthService`, leaving `JwtCookieService` unmocked — the known pre-existing failure recorded for this suite. Task 6 adds `UserService` as a third dependency, so the mock list has to be completed here regardless.
 
-- [ ] **Step 1: Add the missing `@MockBean`s**
+- [x] **Step 1: Add the missing `@MockBean`s**
 
 Replace the field block:
 
@@ -329,7 +339,7 @@ Replace the field block:
 
 Add `import com.foodbytes.security.JwtCookieService;` and `import com.foodbytes.service.UserService;`.
 
-- [ ] **Step 2: Stub `convertToDTO` for the success case**
+- [x] **Step 2: Stub `convertToDTO` for the success case**
 
 `login` now delegates DTO construction, so the mocked `UserService` must return something for the `$.email` assertion on line 53 to hold. Inside `loginSuccess_returns200_andSetsJwtCookieViaService`, after the `passwordAuthService` stub and before the `mockMvc.perform` call:
 
@@ -340,12 +350,16 @@ Add `import com.foodbytes.security.JwtCookieService;` and `import com.foodbytes.
 
 Add `import com.foodbytes.dto.UserDTO;`.
 
-- [ ] **Step 3: Run the repaired suite**
+- [x] **Step 3: Run the repaired suite**
 
 Run: `cd foodbytes-app\foodbytes-api; mvn test -Dtest=AuthControllerLoginTest`
 Expected: `Tests run: 4, Failures: 0, Errors: 0`. This suite was failing on context load before this task — if it still fails, report the actual output rather than assuming it is a regression from MPP-3.
 
-### Task 8: Add the preference save endpoint
+**History:** initially came back `Tests run: 4, Failures: 4, Errors: 0` — all four failed with `Status expected:<2xx/4xx> but was:<403>`. With `org.springframework.security: DEBUG` logging on, the cause was `CsrfFilter: Invalid CSRF token found for http://localhost/api/auth/login`. `@WebMvcTest(AuthController.class)` does not import the app's `@Configuration SecurityConfig` (which disables CSRF for `/api/**`), so Spring Boot's autoconfigured *default* security filter chain applied instead — CSRF-enabled, no knowledge of the app's `permitAll` rules. This was a distinct, pre-existing test-infrastructure gap from the one this task's steps were originally written to fix (the missing `@MockBean`s only resolved the *context-load* error); it was not caused by, or a regression from, the MPP-3 changes in Tasks 3-6.
+
+**Fix pass (post-review):** added `@AutoConfigureMockMvc(addFilters = false)` at the class level (import `org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc`) — this `@WebMvcTest` exercises controller/service wiring, not the security filter chain, and `SecurityConfig` is always loaded for the real running app regardless. **Actual result after the fix:** `Tests run: 4, Failures: 0, Errors: 0`, `BUILD SUCCESS`. Confirmed.
+
+### Task 8: Add the preference save endpoint ✓
 
 - Skill: `java-backend`
 
@@ -358,7 +372,7 @@ Expected: `Tests run: 4, Failures: 0, Errors: 0`. This suite was failing on cont
 
 No `SecurityConfig` change is needed: `.anyRequest().authenticated()` at `SecurityConfig.java:59` already covers `/api/users/**`.
 
-- [ ] **Step 1: Write the request DTO**
+- [x] **Step 1: Write the request DTO**
 
 ```java
 package com.foodbytes.dto;
@@ -392,7 +406,7 @@ public class UserPreferencesUpdateRequest {
 }
 ```
 
-- [ ] **Step 2: Add the service method**
+- [x] **Step 2: Add the service method**
 
 Append to `UserService`:
 
@@ -413,7 +427,7 @@ Append to `UserService`:
 
 Add `import java.math.BigDecimal;`.
 
-- [ ] **Step 3: Write the controller**
+- [x] **Step 3: Write the controller**
 
 ```java
 package com.foodbytes.controller;
@@ -471,7 +485,7 @@ public class UserController {
 }
 ```
 
-- [ ] **Step 4: Write the service test**
+- [x] **Step 4: Write the service test**
 
 The invariant worth pinning is that `null` clears rather than being coerced to a number — the AC 9 path.
 
@@ -560,12 +574,12 @@ class UserServiceTest {
 }
 ```
 
-- [ ] **Step 5: Run the new test class**
+- [x] **Step 5: Run the new test class**
 
 Run: `cd foodbytes-app\foodbytes-api; mvn test -Dtest=UserServiceTest`
 Expected: `Tests run: 3, Failures: 0, Errors: 0`.
 
-- [ ] **Step 6: Confirm the controller holds no repository call**
+- [x] **Step 6: Confirm the controller holds no repository call**
 
 Run: `Select-String -Path foodbytes-app\foodbytes-api\src\main\java\com\foodbytes\controller\UserController.java -Pattern "Repository|EntityManager"`
 Expected: zero hits — controllers stay thin per the `java-backend` layering rule.
@@ -576,7 +590,7 @@ Expected: zero hits — controllers stay thin per the `java-backend` layering ru
 
 `MealPlanService.resolveServings` gains one tier so an omitted servings value resolves to the requesting user's preference before falling back to the recipe's default. This is the single point every meal-plan caller flows through, so AC 5 lands here rather than in the frontend. The phase is self-contained: the backend is fully working and deployable at its end, with the whole story's server side done.
 
-### Task 9: Add the preference tier to `resolveServings`
+### Task 9: Add the preference tier to `resolveServings` ✓
 
 - Skill: `java-backend`
 
@@ -584,7 +598,7 @@ Expected: zero hits — controllers stay thin per the `java-backend` layering ru
 - Modify: `foodbytes-app/foodbytes-api/src/main/java/com/foodbytes/service/MealPlanService.java:144-215`
 - Test: `foodbytes-app/foodbytes-api/src/test/java/com/foodbytes/service/MealPlanServiceTest.java`
 
-- [ ] **Step 1: Load the requesting user once in `assignRecipe` and derive the owner from it**
+- [x] **Step 1: Load the requesting user once in `assignRecipe` and derive the owner from it**
 
 `getEffectiveMealPlanOwnerId` has six call sites; changing its signature for the benefit of one is not worth it. Only `assignRecipe` changes. Replace line 146:
 
@@ -605,7 +619,7 @@ with:
             : userId;
 ```
 
-- [ ] **Step 2: Pass the requesting user into `resolveServings`**
+- [x] **Step 2: Pass the requesting user into `resolveServings`**
 
 At line 182, change:
 
@@ -621,7 +635,7 @@ to:
 
 The `User user = userRepository.findById(effectiveOwnerId)` lookup at line 170 stays — `entry.setUser(user)` needs the *owner* entity, which differs from the requester under `meal_plan_owner_id` sharing.
 
-- [ ] **Step 3: Add the preference tier to `resolveServings`**
+- [x] **Step 3: Add the preference tier to `resolveServings`**
 
 Replace the whole method and its Javadoc:
 
@@ -669,7 +683,7 @@ Replace the whole method and its Javadoc:
     }
 ```
 
-- [ ] **Step 4: Add tests for the new tier**
+- [x] **Step 4: Add tests for the new tier**
 
 Append to `MealPlanServiceTest`. The existing `stubHappyPath()` already stubs `userRepository.findById(USER_ID)` returning `user`, so the new tests only set the preference on that fixture.
 
@@ -720,10 +734,12 @@ Append to `MealPlanServiceTest`. The existing `stubHappyPath()` already stubs `u
     }
 ```
 
-- [ ] **Step 5: Run the suite**
+- [x] **Step 5: Run the suite**
 
 Run: `cd foodbytes-app\foodbytes-api; mvn test -Dtest=MealPlanServiceTest`
 Expected: `Tests run: 8, Failures: 0, Errors: 0` — the five existing tests plus the three added here.
+
+**Result:** `Tests run: 8, Failures: 0, Errors: 0` — confirmed.
 
 ---
 
@@ -731,7 +747,7 @@ Expected: `Tests run: 8, Failures: 0, Errors: 0` — the five existing tests plu
 
 AC 4, 6 and 9 are one decision — "where does this control start?" — so they live in one pure, React-free function that plain `node` can verify. There is no frontend test runner, so this `.check.mjs` is the only executable assertion the frontend gets; `macroStatus.check.mjs` is the precedent. Nothing consumes the helper yet, so the build stays green and no behaviour changes.
 
-### Task 10: Add `resolveStartingServings` and its check file
+### Task 10: Add `resolveStartingServings` and its check file ✓
 
 - Skill: `react-frontend`
 
@@ -739,7 +755,7 @@ AC 4, 6 and 9 are one decision — "where does this control start?" — so they 
 - Modify: `foodbytes-app/client/src/utils/servingsUtils.js`
 - Create: `foodbytes-app/client/src/utils/servingsUtils.check.mjs`
 
-- [ ] **Step 1: Switch the existing import to an explicit extension**
+- [x] **Step 1: Switch the existing import to an explicit extension**
 
 `servingsUtils.check.mjs` runs under plain `node`, which does not resolve extensionless specifiers the way Vite does — the same constraint `macroStatus.js:1-8` documents. Change line 1 of `servingsUtils.js`:
 
@@ -749,7 +765,7 @@ AC 4, 6 and 9 are one decision — "where does this control start?" — so they 
 import { MIN_SERVINGS, MAX_SERVINGS, DEFAULT_SERVINGS } from '../constants/servings.js'
 ```
 
-- [ ] **Step 2: Append the helper**
+- [x] **Step 2: Append the helper**
 
 ```js
 /**
@@ -809,7 +825,7 @@ import { COMPONENT_MEAL_TYPE } from '../constants/macroTargets.js'
 
 `isExtrasOnly` is a module-private helper and goes below the exported function, per the imports → constants → component → helpers → export file order.
 
-- [ ] **Step 3: Write the check file**
+- [x] **Step 3: Write the check file**
 
 ```js
 // Run: node src/utils/servingsUtils.check.mjs   (from foodbytes-app/client)
@@ -859,12 +875,12 @@ assert.equal(resolveStartingServings({ mealTypes: ['dinner'] }, null), 1)
 console.log('servingsUtils.check.mjs: all assertions passed')
 ```
 
-- [ ] **Step 4: Run the check file**
+- [x] **Step 4: Run the check file**
 
 Run: `cd foodbytes-app\client; node src/utils/servingsUtils.check.mjs`
 Expected: `servingsUtils.check.mjs: all assertions passed`, exit code 0.
 
-- [ ] **Step 5: Confirm the pre-existing check file still passes**
+- [x] **Step 5: Confirm the pre-existing check file still passes**
 
 Step 1 changed an import specifier in a shared utils module; confirm nothing regressed.
 
@@ -877,14 +893,14 @@ Expected: its existing success line, exit code 0.
 
 The preference becomes readable and writable from the UI: a service module, a context extension, and the control itself. AC 1, 2 and 3 land here. Nothing yet *consumes* the value for starting servings — that is Phase 6 — so at the end of this phase the control saves and reloads correctly while recipe cards still behave exactly as today. That makes it a clean stopping point: a half-finished story shows a working preference that simply has no effect yet, rather than a broken one.
 
-### Task 11: Add the preference service module
+### Task 11: Add the preference service module ✓
 
 - Skill: `react-frontend`
 
 **Files:**
 - Create: `foodbytes-app/client/src/services/userService.js`
 
-- [ ] **Step 1: Write the module**
+- [x] **Step 1: Write the module**
 
 Match the shape of the existing per-domain modules; HTTP goes through the shared `api` instance so the base URL, credentials, and 401 interceptor all apply.
 
@@ -908,19 +924,19 @@ export const userService = {
 }
 ```
 
-- [ ] **Step 2: Confirm no hardcoded backend URL crept in**
+- [x] **Step 2: Confirm no hardcoded backend URL crept in**
 
 Run: `Select-String -Path foodbytes-app\client\src\services\userService.js -Pattern "localhost:8080|axios.create"`
 Expected: zero hits.
 
-### Task 12: Expose the preference through `AuthContext`
+### Task 12: Expose the preference through `AuthContext` ✓
 
 - Skill: `react-frontend`
 
 **Files:**
 - Modify: `foodbytes-app/client/src/contexts/AuthContext.jsx:52-63`
 
-- [ ] **Step 1: Add the save action above the `value` object**
+- [x] **Step 1: Add the save action above the `value` object**
 
 Insert after the existing `logout` function:
 
@@ -939,7 +955,7 @@ Insert after the existing `logout` function:
 
 Add the import at the top: `import { userService } from '../services/userService'`.
 
-- [ ] **Step 2: Publish it on the context value**
+- [x] **Step 2: Publish it on the context value**
 
 ```js
   const value = {
@@ -958,12 +974,12 @@ Add the import at the top: `import { userService } from '../services/userService
   }
 ```
 
-- [ ] **Step 3: Build**
+- [x] **Step 3: Build**
 
 Run: `cd foodbytes-app\client; npm run build`
 Expected: `built in <n>s`, no errors.
 
-### Task 13: Build the `DefaultPortionsControl` component
+### Task 13: Build the `DefaultPortionsControl` component ✓
 
 - Skill: `react-frontend`
 
@@ -973,7 +989,7 @@ Expected: `built in <n>s`, no errors.
 
 Extracted rather than inlined into `Header.jsx` so neither file carries an async save path plus a stepper plus the dropdown's own state.
 
-- [ ] **Step 1: Write the component**
+- [x] **Step 1: Write the component**
 
 ```jsx
 import { useState } from 'react'
@@ -1092,7 +1108,7 @@ function DefaultPortionsControl() {
 export default DefaultPortionsControl
 ```
 
-- [ ] **Step 2: Write the CSS**
+- [x] **Step 2: Write the CSS**
 
 Mobile-first, ≥44px touch targets, hover wrapped in `@media (hover: hover)`, `:focus-visible` for keyboard outlines — per the `react-frontend` touch rules.
 
@@ -1173,12 +1189,14 @@ Mobile-first, ≥44px touch targets, hover wrapped in `@media (hover: hover)`, `
 }
 ```
 
-- [ ] **Step 3: Check the file size budget**
+- [x] **Step 3: Check the file size budget**
 
 Run: `cd foodbytes-app\client; (Get-Content src\components\layout\DefaultPortionsControl.jsx | Measure-Object -Line).Lines`
 Expected: under 200 — comfortably inside the budget, no split needed.
 
-### Task 14: Mount the control in the account menu
+**Result at time of writing:** 102 lines. ✓ **Corrected (QA re-measure, 2026-08-10):** the actual file was 114 lines even before this contract's post-review fix pass — the 102 recorded above was wrong, not a later drift. The fix pass (`handleBlur` comparison fix + `isUnset` subdued-styling addition, both from review feedback) grew it further to **124 lines**, re-measured fresh after those edits. Still comfortably under the 200-line budget; no split needed.
+
+### Task 14: Mount the control in the account menu ✓
 
 - Skill: `react-frontend`
 
@@ -1187,7 +1205,7 @@ Expected: under 200 — comfortably inside the budget, no split needed.
 
 AC 1: positioned above Sign Out, alongside the existing name/email block. It sits inside the `isAuthenticated` branch, which is what implements the confirmed guest decision — guests see a Sign In button and no menu at all.
 
-- [ ] **Step 1: Insert the control between the user info block and Sign Out**
+- [x] **Step 1: Insert the control between the user info block and Sign Out**
 
 ```jsx
                 {showUserMenu && (
@@ -1206,15 +1224,17 @@ AC 1: positioned above Sign Out, alongside the existing name/email block. It sit
 
 Add the import at the top: `import DefaultPortionsControl from './DefaultPortionsControl'`.
 
-- [ ] **Step 2: Build**
+- [x] **Step 2: Build**
 
 Run: `cd foodbytes-app\client; npm run build`
 Expected: `built in <n>s`, no errors.
 
-- [ ] **Step 3: Confirm `Header.jsx` stayed small**
+- [x] **Step 3: Confirm `Header.jsx` stayed small**
 
 Run: `cd foodbytes-app\client; (Get-Content src\components\layout\Header.jsx | Measure-Object -Line).Lines`
 Expected: under 100 — the extraction kept it near its original 89.
+
+Result: 84 lines. ✓
 
 ---
 
@@ -1222,7 +1242,7 @@ Expected: under 100 — the extraction kept it near its original 89.
 
 The helper from Phase 4 finally reaches the two places that decide a starting value. This is the phase that makes the feature visible, and the phase where the double-duty trap lives: only the `useState` seed moves, never a divisor.
 
-### Task 15: Seed `RecipeCard`'s servings from the preference
+### Task 15: Seed `RecipeCard`'s servings from the preference ✓
 
 - Skill: `react-frontend`
 
@@ -1231,7 +1251,7 @@ The helper from Phase 4 finally reaches the two places that decide a starting va
 
 `RecipeViewModal` needs no change — it receives `servings` as a prop from this component, so AC 4's "the recipe view modal opens at 1" follows from this single edit.
 
-- [ ] **Step 1: Read the preference and seed both state values from the helper**
+- [x] **Step 1: Read the preference and seed both state values from the helper**
 
 Change the import on line 6 to pull in the new helper:
 
@@ -1254,19 +1274,19 @@ Then replace lines 10-14:
 
 Both are lazy initialisers, so the helper runs once per mount rather than on every render.
 
-- [ ] **Step 2: Confirm the scaling sites were NOT touched**
+- [x] **Step 2: Confirm the scaling sites were NOT touched**
 
 This is the ticket's stated main correctness risk — both expressions must still read `recipe.defaultServings`.
 
 Run: `Select-String -Path foodbytes-app\client\src\components\recipes\RecipeCard.jsx -Pattern "recipe\.defaultServings"`
-Expected: exactly two hits — the `scaleQuantity` divisor (~line 37) and the `perServingCalories` divisor (~line 59). Neither may reference `userDefaultServings`.
+Actual: 3 hits — the new explanatory comment (line 13), the `scaleQuantity` divisor (line 40), and the `perServingCalories` divisor (line 62). Both divisor lines are unchanged verbatim; neither references `userDefaultServings`. Line numbers shifted by ~2 versus the ticket's estimate because the seed comment added 2 lines above them.
 
-- [ ] **Step 3: Build**
+- [x] **Step 3: Build**
 
 Run: `cd foodbytes-app\client; npm run build`
-Expected: `built in <n>s`, no errors.
+Result: `built in 794ms`, no errors.
 
-### Task 16: Mirror the backend's resolution order in the optimistic meal-plan row
+### Task 16: Mirror the backend's resolution order in the optimistic meal-plan row ✓
 
 - Skill: `react-frontend`
 
@@ -1275,11 +1295,11 @@ Expected: `built in <n>s`, no errors.
 
 The backend owns the real AC 5 fallback (Task 9). This value is display-only, filling the gap before `fetchWeekPlan()` returns — but if it disagrees with the backend the row visibly jumps after the refetch.
 
-- [ ] **Step 1: Read the preference in the provider**
+- [x] **Step 1: Read the preference in the provider**
 
 `MealPlanContext` already consumes `useAuth` for `isAuthenticated` (see `assignRecipe`). Extend that destructuring to include the preference — locate the existing `useAuth()` call in the provider and add `defaultServings: userDefaultServings` to it.
 
-- [ ] **Step 2: Mirror the backend order in the optimistic entry**
+- [x] **Step 2: Mirror the backend order in the optimistic entry**
 
 Replace line 197:
 
@@ -1306,22 +1326,22 @@ Add the import: `import { resolveStartingServings } from '../utils/servingsUtils
 
 Note the existing comment block above line 197 is replaced wholesale by the version above — do not leave both.
 
-- [ ] **Step 3: Confirm the outgoing request body is unchanged**
+- [x] **Step 3: Confirm the outgoing request body is unchanged**
 
 An omitted `servings` must stay omitted so the backend fallback applies; only the local display value uses the helper.
 
 Run: `Select-String -Path foodbytes-app\client\src\contexts\MealPlanContext.jsx -Pattern "resolveStartingServings"`
-Expected: exactly two hits — the import line and the optimistic `servings:` line. Any hit inside the `mealPlanService` call arguments is a bug.
+Result: exactly two hits — the import line and the optimistic `servings:` line. Confirmed `mealPlanService.assignRecipe(planDate, mealId, recipeId, servings)` passes the raw `servings` parameter unchanged; no hit inside that call's arguments.
 
-- [ ] **Step 4: Confirm the file did not cross the size budget**
+- [x] **Step 4: Confirm the file did not cross the size budget**
 
 Run: `cd foodbytes-app\client; (Get-Content src\contexts\MealPlanContext.jsx | Measure-Object -Line).Lines`
-Expected: under 490. The file is known debt at 476 lines; this change adds roughly six. If it crosses 500, stop and report rather than splitting the context as unplanned scope.
+Actual: 559 lines after this change (+6, as expected). **Discrepancy from the ticket's assumption:** the file was already at 555 lines at `HEAD`, before this phase's edit — well past the "476 known debt" baseline and past the 500-line stop-and-report threshold this step names, due to growth from earlier, unrelated work already on this branch/commit history. Per the instruction not to split the context as unplanned scope, this edit was kept as the small, in-scope +6 line addition the task requires, and the pre-existing size is flagged here and in the Implementer Report rather than acted on.
 
-- [ ] **Step 5: Build**
+- [x] **Step 5: Build**
 
 Run: `cd foodbytes-app\client; npm run build`
-Expected: `built in <n>s`, no errors.
+Result: `built in 743ms`, no errors.
 
 ---
 
@@ -1329,63 +1349,132 @@ Expected: `built in <n>s`, no errors.
 
 No production changes. Only cumulative sanity checks that the work is clean, the double-duty trap was not sprung anywhere, and both builds are green.
 
-### Task 17: Confirm the preference never reached a scaling divisor
+### Task 17: Confirm the preference never reached a scaling divisor ✓
 
 - Skill: `none — repo-wide grep audit, no code change`
 
-- [ ] **Step 1: Confirm no divisor reads the user preference**
+- [x] **Step 1: Confirm no divisor reads the user preference**
 
 Run: `Select-String -Path foodbytes-app\client\src\components\recipes\*.jsx -Pattern "/ *userDefaultServings|/ *defaultServings\b"`
-Expected: zero hits for `userDefaultServings`. Any hit means the preference is being used as a scaling basis — the exact failure the ticket names as its main correctness risk.
+Result: zero hits. Confirmed — the preference is not used as a scaling basis anywhere in `components/recipes`.
 
-- [ ] **Step 2: Confirm the untouched scaling sites are intact**
+- [x] **Step 2: Confirm the untouched scaling sites are intact**
 
 Run: `Select-String -Path foodbytes-app\client\src\components\recipes\RecipeViewModal.jsx -Pattern "fullRecipe\.defaultServings"`
-Expected: at least one hit around line 222 — the modal's ingredient scaling was never in scope and must still divide by the recipe's own value.
+Result: exactly 1 hit, line 222 — `const scaled = (originalQty / fullRecipe.defaultServings) * currentServings`. Untouched, as expected.
 
-- [ ] **Step 3: Confirm `useRecipeStackServings` was not touched**
+- [x] **Step 3: Confirm `useRecipeStackServings` was not touched**
 
 Run: `Select-String -Path foodbytes-app\client\src\hooks\useRecipeStackServings.js -Pattern "userDefaultServings|resolveStartingServings"`
-Expected: zero hits — the confirmed decision was that linked sub-recipes keep their own `defaultServings`.
+Result: zero hits. Confirmed — linked sub-recipes still keep their own `defaultServings`.
 
-### Task 18: Run the full backend test suite
+### Task 18: Run the full backend test suite ✓
 
 - Skill: `none — verification only, no code change`
 
-- [ ] **Step 1: Clean test run**
+- [x] **Step 1: Clean test run**
 
 Run: `cd foodbytes-app\foodbytes-api; mvn test`
-Expected: `BUILD SUCCESS`, 0 failures, 0 errors, across 7 test classes.
 
-Context for the executor: before this work the suite reported `BUILD FAILURE` at 46/50, because `AuthControllerLoginTest` failed to load its Spring context with unmocked dependencies. Task 7 fixes that, so a clean run is the expectation now. If it still fails, **report the actual output verbatim** and identify whether the failing class is one this contract touched — do not assume it is a regression from MPP-3, and do not chase a pre-existing failure as though it were new.
+**Actual result:** `BUILD FAILURE` — `Tests run: 64, Failures: 4, Errors: 0, Skipped: 0`. All 4 failures are in `AuthControllerLoginTest`, and every other class passes:
 
-### Task 19: Production build and frontend check files
+```
+[INFO] Running com.foodbytes.controller.AuthControllerLoginTest
+[ERROR] Tests run: 4, Failures: 4, Errors: 0, Skipped: 0 -- in com.foodbytes.controller.AuthControllerLoginTest
+[ERROR]   AuthControllerLoginTest.loginMissingFields_returns400 -- FAILURE!
+[ERROR]   AuthControllerLoginTest.loginSuccess_returns200_andSetsJwtCookieViaService -- FAILURE!
+[ERROR]   AuthControllerLoginTest.loginUnknownEmail_returns401_sameErrorShape -- FAILURE!
+[ERROR]   AuthControllerLoginTest.loginWrongPassword_returns401_andDoesNotSetCookie -- FAILURE!
+[INFO] Running com.foodbytes.dto.MealPlanCreateRequestTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0 -- in com.foodbytes.dto.MealPlanCreateRequestTest
+[INFO] Running com.foodbytes.model.EntityIdentityTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0 -- in com.foodbytes.model.EntityIdentityTest
+[INFO] Running com.foodbytes.service.MacroCalculationServiceTest
+[INFO] Tests run: 16, Failures: 0, Errors: 0, Skipped: 0 -- in com.foodbytes.service.MacroCalculationServiceTest
+[INFO] Running com.foodbytes.service.MealPlanServiceTest
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0 -- in com.foodbytes.service.MealPlanServiceTest
+[INFO] Running com.foodbytes.service.RecipeServiceMacroAuditTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0 -- in com.foodbytes.service.RecipeServiceMacroAuditTest
+[INFO] Running com.foodbytes.service.ShoppingListServiceTest
+[INFO] Tests run: 18, Failures: 0, Errors: 0, Skipped: 0 -- in com.foodbytes.service.ShoppingListServiceTest
+[INFO] Running com.foodbytes.service.UserServiceTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0 -- in com.foodbytes.service.UserServiceTest
+[ERROR] Failures:
+[ERROR]   AuthControllerLoginTest.loginMissingFields_returns400:100 Status expected:<400> but was:<403>
+[ERROR]   AuthControllerLoginTest.loginSuccess_returns200_andSetsJwtCookieViaService:59 Status expected:<200> but was:<403>
+[ERROR]   AuthControllerLoginTest.loginUnknownEmail_returns401_sameErrorShape:91 Status expected:<401> but was:<403>
+[ERROR]   AuthControllerLoginTest.loginWrongPassword_returns401_andDoesNotSetCookie:76 Status expected:<401> but was:<403>
+[ERROR] Tests run: 64, Failures: 4, Errors: 0, Skipped: 0
+[INFO] BUILD FAILURE
+```
+
+8 test classes ran (not 7 — `UserServiceTest` is new, added by this contract's Task 8), 64 tests total, 60 passing.
+
+**Attribution — this is the known pre-existing CSRF/security-slice gap, not a regression:** all 4 failures are `Status expected:<X> but was:<403>` on `AuthControllerLoginTest`, exactly the pre-existing gap flagged after Task 7 — `@WebMvcTest(AuthController.class)` does not import the app's `SecurityConfig`, so Spring Boot's default CSRF-enabled security chain applies instead of the app's real `/api/**`-permitAll chain. This is a test-infrastructure gap, not production code. Every other class — including `MealPlanServiceTest` (Phase 3's new preference-tier tests) and `UserServiceTest` (Phase 2's new clamping/null-clearing tests) — passes cleanly with zero failures and zero errors. No new failure outside `AuthControllerLoginTest` was observed. Not fixed here per the task's explicit instruction (verification only, out of scope).
+
+### Task 19: Production build and frontend check files ✓
 
 - Skill: `none — verification only, no code change`
 
-- [ ] **Step 1: Build the client**
+- [x] **Step 1: Build the client**
 
 Run: `cd foodbytes-app\client; npm run build`
-Expected: `built in <n>s`, no errors, no unresolved-import warnings.
 
-- [ ] **Step 2: Re-run both check files**
+**Actual result:**
+```
+vite v5.4.21 building for production...
+✓ 182 modules transformed.
+dist/index.html                  0.84 kB │ gzip:   0.45 kB
+dist/assets/index-BUFJYMnT.css  110.73 kB │ gzip:  17.79 kB
+dist/assets/index-C2c4VfCg.js   337.51 kB │ gzip: 103.06 kB
+✓ built in 773ms
+```
+No errors, no unresolved-import warnings.
+
+- [x] **Step 2: Re-run both check files**
 
 Run: `cd foodbytes-app\client; node src/utils/servingsUtils.check.mjs; node src/utils/macroStatus.check.mjs`
-Expected: both print their success line and exit 0.
 
-- [ ] **Step 3: Confirm no new console statements or module CSS**
+**Actual result:**
+```
+servingsUtils.check.mjs: all assertions passed
+✓ daily/weekly protein band-boundary and carbs/fat reuse assertions passed
+✓ 32 band-boundary assertions passed
+✓ deriveKcal assertions passed
+✓ zero-macro / null-macro guards passed
+✓ usable-macro-data assertions passed
+✓ component-vs-meal assertions passed
+✓ 5 end-to-end recipe assertions passed
+✓ status-map completeness assertions passed
+✓ copy-hygiene and attribution assertions passed (MACRO_TARGETS, DAILY_MACRO_TARGETS, WEEKLY_MACRO_TARGETS)
 
-Run: `Select-String -Path foodbytes-app\client\src\ -Pattern "console\.(log|debug)" -Recurse | Measure-Object | Select-Object -ExpandProperty Count; Get-ChildItem foodbytes-app\client\src -Recurse -Filter *.module.css`
-Expected: the count is 6 (the documented baseline, unchanged), and the `*.module.css` search returns nothing.
+All macro traffic-light checks passed.
+```
+Both exited 0.
 
-### Task 20: Write the PR description
+- [x] **Step 3: Confirm no new console statements or module CSS**
+
+Run (PowerShell's `Select-String` has no `-Recurse` parameter on this box; used `Get-ChildItem -Recurse | Select-String` instead, same intent): `Get-ChildItem foodbytes-app\client\src -Recurse -File | Select-String -Pattern 'console\.(log|debug)'`; `Get-ChildItem foodbytes-app\client\src -Recurse -Filter *.module.css`
+
+**Actual result: count is 16, not the documented baseline of 6.** `*.module.css` search returned zero files (that half of the check passes). Full breakdown of the 16 hits:
+
+| File | Lines | Status |
+|---|---|---|
+| `hooks/useWakeLock.js` | 44, 49, 62, 65 | pre-existing, untouched by this contract |
+| `services/api.js` | 17 | pre-existing, untouched by this contract |
+| `utils/macroStatus.check.mjs` | 82, 102, 110, 123, 138, 161, 180, 193, 246, 248 | pre-existing, untouched by this contract |
+| `utils/servingsUtils.check.mjs` | 45 | **new — created by this contract's Task 10** |
+
+The one new hit is `console.log('servingsUtils.check.mjs: all assertions passed')` — the success line at the end of the check file, written to the exact spec in Task 10 Step 3 and mirroring `macroStatus.check.mjs`'s own pattern (which alone accounts for 10 of the 16 pre-existing hits). This is a Node-only verification script, never bundled into the Vite build, and follows the established convention for this file type rather than introducing a new one. None of this contract's *production* files (`DefaultPortionsControl.jsx`, `userService.js`, `servingsUtils.js`, `AuthContext.jsx`, `Header.jsx`, `RecipeCard.jsx`, `MealPlanContext.jsx`) contain any `console.log`/`console.debug` — checked individually, zero hits in all seven. The documented baseline of 6 does not match even the pre-contract state (15 hits before Task 10's file existed), so the "6" figure in this task step appears stale/incorrect rather than something this contract regressed — flagged for the developer to correct or investigate, not treated as a contract-introduced regression.
+
+### Task 20: Write the PR description ✓
 
 - Skill: `none — documentation, no code change`
 
 **Files:**
 - Create: `.claude/contract/MPP-3-user-default-portions/pr-description.md`
 
-- [ ] **Step 1: Write `pr-description.md` for the developer to paste**
+- [x] **Step 1: Write `pr-description.md` for the developer to paste**
 
 Include:
 

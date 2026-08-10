@@ -197,16 +197,35 @@
   opacity: 0.6;
 }
 
-.macro-item-protein {
-  border-color: #e57373;
+/* MPP-2 fix: border colour reflects whether the target is MET, not a fixed
+ * colour per macro. A day/average that clears every floor must read as green
+ * across all three tiles, not permanently red/orange/green regardless of the
+ * numbers. Direction-coded via the same status tokens MacroBadgeRow uses
+ * (macroTargets.js MACRO_STATUS) — under (blue) / near (amber) / on (green) /
+ * over (red). `--plain` is the no-usable-data case (disabled tile), kept
+ * neutral like the pre-fix default. */
+.macro-item--plain {
+  border-color: #e0e0e0;
 }
 
-.macro-item-carbs {
-  border-color: #ffa726;
+.macro-item--under {
+  border-color: var(--macro-under-target);
+  background-color: var(--macro-under-target-tint);
 }
 
-.macro-item-fat {
-  border-color: #66bb6a;
+.macro-item--near {
+  border-color: var(--macro-near-target);
+  background-color: var(--macro-near-target-tint);
+}
+
+.macro-item--on {
+  border-color: var(--macro-on-target);
+  background-color: var(--macro-on-target-tint);
+}
+
+.macro-item--over {
+  border-color: var(--macro-over-target);
+  background-color: var(--macro-over-target-tint);
 }
 
 .macro-item-header {

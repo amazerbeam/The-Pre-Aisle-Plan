@@ -1,11 +1,15 @@
 package com.foodbytes.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.foodbytes.dto.UserDTO;
 import com.foodbytes.model.User;
+import com.foodbytes.security.JwtCookieService;
 import com.foodbytes.service.PasswordAuthService;
+import com.foodbytes.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -22,11 +26,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(AuthController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class AuthControllerLoginTest {
 
     @Autowired private MockMvc mockMvc;
     @Autowired private ObjectMapper objectMapper;
     @MockBean private PasswordAuthService passwordAuthService;
+    @MockBean private JwtCookieService jwtCookieService;
+    @MockBean private UserService userService;
 
     @Test
     void loginSuccess_returns200_andSetsJwtCookieViaService() throws Exception {
@@ -43,6 +50,8 @@ class AuthControllerLoginTest {
                     res.addCookie(c);
                     return user;
                 });
+        when(userService.convertToDTO(user))
+                .thenReturn(new UserDTO(42L, "friend@example.com", "Friend", null, false, null));
 
         mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)

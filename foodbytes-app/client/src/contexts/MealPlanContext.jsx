@@ -3,6 +3,7 @@ import { useAuth } from './AuthContext'
 import mealPlanService from '../services/mealPlanService'
 import mealPlanTemplateService from '../services/mealPlanTemplateService'
 import { getTodayISO, addDays, formatDateISO, getWeekDays } from '../utils/dateUtils'
+import { resolveStartingServings } from '../utils/servingsUtils'
 
 const MealPlanContext = createContext()
 
@@ -66,7 +67,7 @@ const getInitialStartDate = () => {
  * FR-098: Optimistic UI updates for instant feedback
  */
 export const MealPlanProvider = ({ children }) => {
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, defaultServings: userDefaultServings } = useAuth()
 
   // FR-007: Date range state - initialize from localStorage
   const initialDate = getInitialStartDate()
@@ -194,7 +195,10 @@ export const MealPlanProvider = ({ children }) => {
               // until fetchWeekPlan() returns). The API call below deliberately
               // receives the raw `servings` value so an omitted one stays omitted
               // from the JSON body and the backend fallback still applies.
-              servings: servings ?? recipeData?.defaultServings ?? 1
+              // MPP-3: the tier order here must match MealPlanService.resolveServings
+              // — requested, then the user's preference, then the recipe default.
+              // A mismatch makes the row visibly jump when fetchWeekPlan() lands.
+              servings: servings ?? resolveStartingServings(recipeData, userDefaultServings)
             }]
           }
 
@@ -213,7 +217,7 @@ export const MealPlanProvider = ({ children }) => {
     })
 
     return previousWeekPlan
-  }, [weekPlan])
+  }, [weekPlan, userDefaultServings])
 
   /**
    * FR-014: Check if a recipe is assigned to a specific date and meal type

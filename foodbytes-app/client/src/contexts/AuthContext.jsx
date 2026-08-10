@@ -1,5 +1,6 @@
 import { createContext, useState, useEffect, useContext } from 'react'
 import api from '../services/api'
+import { userService } from '../services/userService'
 
 const AuthContext = createContext()
 
@@ -49,16 +50,29 @@ export const AuthProvider = ({ children }) => {
     }
   }
 
+  /**
+   * MPP-3: save the default portion count. Pass null to clear it.
+   * Throws on failure so the calling control can surface the server's message
+   * and revert — deliberately NOT caught into a success shape here.
+   */
+  const saveDefaultServings = async (defaultServings) => {
+    const updated = await userService.updatePreferences(defaultServings)
+    setUser(updated)
+    return updated
+  }
+
   const value = {
     user,
     loading,
     isGuest,
     isAuthenticated: !!user,
     isAdmin: user?.isAdmin || false,
+    defaultServings: user?.defaultServings ?? null,
     loginWithGoogle,
     passwordLogin,
     continueAsGuest,
     logout,
+    saveDefaultServings,
     checkAuthStatus
   }
 

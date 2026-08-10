@@ -7,6 +7,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -21,6 +22,7 @@ public class UserPrincipal implements UserDetails, OAuth2User {
     private String name;
     private String avatarUrl;
     private boolean isAdmin;
+    private BigDecimal defaultServings;
     private Collection<? extends GrantedAuthority> authorities;
     private Map<String, Object> attributes;
 
@@ -35,6 +37,7 @@ public class UserPrincipal implements UserDetails, OAuth2User {
                 user.getName(),
                 user.getAvatarUrl(),
                 user.getIsAdmin(),
+                user.getDefaultServings(),
                 authorities,
                 Collections.emptyMap()
         );

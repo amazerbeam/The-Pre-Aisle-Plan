@@ -70,6 +70,33 @@
   opacity: 0.6;
 }
 
+/* MPP-2 fix: border colour reflects whether the WEEKLY target is met, matching
+ * the daily-average tiles below (DailyMacroPopup.css). Same status tokens,
+ * same `--plain` no-data fallback. */
+.macro-summary-item--plain {
+  border-color: transparent;
+}
+
+.macro-summary-item--under {
+  border-color: var(--macro-under-target);
+  background-color: var(--macro-under-target-tint);
+}
+
+.macro-summary-item--near {
+  border-color: var(--macro-near-target);
+  background-color: var(--macro-near-target-tint);
+}
+
+.macro-summary-item--on {
+  border-color: var(--macro-on-target);
+  background-color: var(--macro-on-target-tint);
+}
+
+.macro-summary-item--over {
+  border-color: var(--macro-over-target);
+  background-color: var(--macro-over-target-tint);
+}
+
 .macro-summary-label {
   font-size: 0.75rem;
   color: #666;

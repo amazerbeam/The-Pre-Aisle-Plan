@@ -41,8 +41,19 @@ public class MealPlanService {
      */
     private Long getEffectiveMealPlanOwnerId(Long userId) {
         return userRepository.findById(userId)
-            .map(user -> user.getMealPlanOwnerId() != null ? user.getMealPlanOwnerId() : userId)
+            .map(this::effectiveOwnerId)
             .orElse(userId);
+    }
+
+    /**
+     * The single definition of "effective meal plan owner" for an already-loaded
+     * user: their own id, unless meal_plan_owner_id redirects them to share
+     * another user's meal plan. Shared by {@link #getEffectiveMealPlanOwnerId}
+     * (which loads the user itself) and {@link #assignRecipe} (which already has
+     * the loaded {@link User}), so the rule lives in exactly one place.
+     */
+    private Long effectiveOwnerId(User user) {
+        return user.getMealPlanOwnerId() != null ? user.getMealPlanOwnerId() : user.getId();
     }
 
     /**
@@ -143,7 +154,12 @@ public class MealPlanService {
      */
     @Transactional
     public MealPlanEntryDTO assignRecipe(Long userId, MealPlanCreateRequest request) {
-        Long effectiveOwnerId = getEffectiveMealPlanOwnerId(userId);
+        // MPP-3: the requesting user is loaded here (not just their owner id) so
+        // resolveServings can read their portion preference without a third
+        // findById on this path. Query count is unchanged: two before, two after.
+        User requestingUser = userRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+        Long effectiveOwnerId = effectiveOwnerId(requestingUser);
 
         // FR-037: Check if THIS recipe is already assigned (toggle off case)
         Optional<MealPlanEntry> sameRecipeEntry = mealPlanEntryRepository
@@ -179,7 +195,7 @@ public class MealPlanService {
         entry.setPlanDate(request.getPlanDate());
         entry.setMeal(meal);
         entry.setRecipe(recipe);
-        entry.setServings(resolveServings(request.getServings(), recipe));
+        entry.setServings(resolveServings(request.getServings(), recipe, requestingUser));
 
         entry = mealPlanEntryRepository.save(entry);
         return convertToDTO(entry);
@@ -191,19 +207,32 @@ public class MealPlanService {
      * default_servings — not 1. Storing 1 against a 2-serving recipe halves every
      * quantity ShoppingListService derives from the entry.
      *
+     * <p>MPP-3 adds a tier between the two: when the requesting user has set a
+     * default portion count, an omitted value resolves to that instead of the
+     * recipe's default (AC 5). The preference belongs to the person clicking,
+     * not to the meal plan owner — under meal_plan_owner_id sharing they can
+     * differ, and the clicker is the one who set it and the one who will cook.
+     *
      * @param requested Servings from the request, or null when omitted. May be
      *                  fractional (0.5 = half portion, 0.25 = quarter).
      * @param recipe    The recipe being assigned
-     * @return the requested value when it is positive, else the recipe's
-     *         default_servings when that is positive, else 1
+     * @param requestingUser The authenticated user making the request; may carry
+     *                  a default_servings preference, or null when never set
+     * @return the requested value when it is positive, else the user's preference
+     *         when positive, else the recipe's default_servings when that is
+     *         positive, else 1
      */
-    private BigDecimal resolveServings(BigDecimal requested, Recipe recipe) {
+    private BigDecimal resolveServings(BigDecimal requested, Recipe recipe, User requestingUser) {
         if (requested != null && requested.signum() > 0) {
             return requested;
         }
         if (requested != null) {
             log.warn("Ignoring non-positive servings ({}) on a meal plan entry for recipe {}; deriving from the recipe instead",
                      requested, recipe.getId());
+        }
+        BigDecimal userDefault = requestingUser != null ? requestingUser.getDefaultServings() : null;
+        if (userDefault != null && userDefault.signum() > 0) {
+            return userDefault;
         }
         Integer recipeDefault = recipe.getDefaultServings();
         if (recipeDefault != null && recipeDefault > 0) {

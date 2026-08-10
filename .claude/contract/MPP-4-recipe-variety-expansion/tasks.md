@@ -4,7 +4,7 @@
 >
 > **Process note before you start:** every dish task below has a hard "present the design and pause for developer approval" step before SQL generation, per `.claude/skills/chef/SKILL.md` step 6. This is a live human judgement call (taste, technique, whether the macro-target-driven ingredient list reads as a dish worth eating), not a build-verifiable gate. See `plan.md` → Risks and judgement calls. If you are an unattended `/fb-apply` run, you cannot obtain that approval mid-task — the recommended execution mode for this specific contract is the developer driving each dish task as a live `/chef` conversation turn, approving the design before the task's SQL step runs. Proceeding unattended means designing and inserting without that live check, deferring human review entirely to Phase 6 and the end-of-run reviewers.
 
-Status: PLANNED
+Status: IN PROGRESS
 Started: 2026-08-09
 
 **Goal:** Design 15 new Light/Moderate/Balanced recipe families, 1 new Extras recipe (granola/muesli), and redesign 1 existing family (Scrambled Eggs & Toast) in place, all inserted into the live Railway MySQL via guarded, idempotent SQL, with every variant independently passing the CLAUDE.md macro targets and no reject condition from `.claude/rules/recipe-variants.md`, `linked-recipe-extras.md`, or `homemade-first-and-ingredient-dedup.md` tripped.
@@ -46,14 +46,14 @@ Started: 2026-08-09
 
 Both tasks in this phase are hard prerequisites for later phases: Task 1's `Turkey mince` ingredient is consumed by three Phase 5 dishes and `Cod`/`Mackerel` by Phase 3; Task 2's Granola recipe is the FK target of Phase 2's Yogurt Bowl. Nothing downstream can safely start until this phase is green.
 
-### Task 1: Create shared new ingredients (dedup-guarded)
+### Task 1: Create shared new ingredients (dedup-guarded) ✓
 
 - Skill: chef
 
 **Files:**
 - Create: `.claude/contract/MPP-4-recipe-variety-expansion/sql/00-shared-ingredients.sql`
 
-- [ ] **Step 1: Re-confirm no existing row for each of the four proposed ingredients**
+- [x] **Step 1: Re-confirm no existing row for each of the four proposed ingredients**
 
 Run (values already checked during planning — re-run live immediately before insert since time has passed):
 ```sql
@@ -65,7 +65,7 @@ WHERE LOWER(name) LIKE '%turkey%'
 ```
 Expected: same result as the planning audit — `Coconut milk` (id 38) is the only hit, and it is a different item. Zero rows for `Turkey mince`, `Cod`, `Mackerel`, `Coconut oil`.
 
-- [ ] **Step 2: Insert the four ingredients with guarded, idempotent SQL**
+- [x] **Step 2: Insert the four ingredients with guarded, idempotent SQL**
 
 Values sourced from USDA FoodData Central typical raw/product values, matching the precision already used on existing rows (e.g. `Chicken breast` 31/0/3.6, `Greek yogurt` 10/3.6/0.7):
 
@@ -91,7 +91,7 @@ Naming note: `Turkey mince (2% fat)` mirrors the existing `Beef Mince (3% fat)` 
 
 Run via `mcp__mysql__mysql_query`, one statement per call.
 
-- [ ] **Step 3: Verify exactly one row per name and capture the new ids**
+- [x] **Step 3: Verify exactly one row per name and capture the new ids**
 
 Run:
 ```sql
@@ -101,19 +101,19 @@ WHERE name IN ('Turkey mince (2% fat)', 'Cod', 'Mackerel', 'Coconut oil');
 ```
 Expected: exactly 4 rows returned. Record the 4 new ids in `sql/00-shared-ingredients.sql` as a trailing comment block — every later task's SQL references them by id.
 
-- [ ] **Step 4: Re-run Step 2's inserts once more and confirm zero new rows**
+- [x] **Step 4: Re-run Step 2's inserts once more and confirm zero new rows**
 
 Run the same four `INSERT ... WHERE NOT EXISTS` statements again, then re-run Step 3's `SELECT`.
 Expected: still exactly 4 rows — proves the guard is idempotent before any downstream task depends on it.
 
-### Task 2: Design and insert the Granola/Muesli Extras recipe
+### Task 2: Design and insert the Granola/Muesli Extras recipe ✓
 
 - Skill: chef
 
 **Files:**
 - Create: `.claude/contract/MPP-4-recipe-variety-expansion/sql/granola-muesli.sql`
 
-- [ ] **Step 1: Resolve every ingredient against the live DB**
+- [x] **Step 1: Resolve every ingredient against the live DB**
 
 The user's reference recipe: rolled oats, mixed nuts/seeds, coconut oil, maple syrup or honey, cinnamon. Run the dedup query for each proposed item:
 ```sql
@@ -122,15 +122,15 @@ WHERE name IN ('Rolled oats', 'Walnuts', 'Almonds', 'Chia seeds', 'Sesame seeds'
 ```
 Expected: all 9 rows found (the first 8 already confirmed live during planning; `Coconut oil` was just created in Task 1). No new ingredient inserts needed in this task.
 
-- [ ] **Step 2: Design the recipe as a single dish (no variant family), tagged Extras**
+- [x] **Step 2: Design the recipe as a single dish (no variant family), tagged Extras**
 
 Lay out grams per ingredient for a batch yield (e.g. `default_servings` = number of ~50g portions the batch produces — pick a realistic bake batch, e.g. 8 servings of 50g = 400g total yield). Build the per-ingredient table (whole-batch columns), sum to whole-recipe P/C/F/kcal, divide by `default_servings` for per-100g-equivalent reporting (Extras recipes don't need to hit the L/M/B per-serving bands — they're a linkable component, not a meal). Run the same self-review arithmetic checks as any `/chef` design (row-level spot check, column sums, `4P+4C+9F ≈ kcal` cross-check).
 
-- [ ] **Step 3: Present the granola design to the developer and pause**
+- [x] **Step 3: Present the granola design to the developer and pause**
 
 Show the full ingredient list with gram weights, the per-batch and per-100g macro table, and the proposed `recipes.name` (e.g. "Goodness Granola"). **Do not proceed to Step 4 until the developer approves in chat.**
 
-- [ ] **Step 4: Generate and run the guarded INSERT SQL**
+- [x] **Step 4: Generate and run the guarded INSERT SQL**
 
 Fetch live max ids first:
 ```sql
@@ -139,7 +139,7 @@ UNION ALL SELECT 'max_recipe_steps_id', MAX(id) FROM recipe_steps;
 ```
 Then insert `recipes` (one row, `meal_id` reference via `recipe_meals` = 5/Extras, `calories` = whole-batch kcal from Step 2, `default_servings` = the batch-portion count chosen in Step 2), `recipe_meals` (guarded), `recipe_ingredients` (guarded, one row per approved ingredient), and `recipe_steps` (wipe-and-re-insert pattern: bake/toast method for the oats+nuts+coconut oil+syrup mixture, cooling, storage). Write the full statements to `sql/granola-muesli.sql`.
 
-- [ ] **Step 5: Verify**
+- [x] **Step 5: Verify**
 
 Run:
 ```sql
@@ -155,14 +155,14 @@ Expected: one row, `meal_id = 5`. Confirm no `recipe_family_members` row exists 
 
 Every task in this phase is independent of the others except Task 6, which has a hard FK dependency on Task 2's granola recipe id. The phase is a safe stopping point once every task's own verification step passes — no shared state carries into Phase 3.
 
-### Task 3: Audit and redesign Scrambled Eggs & Toast in place (family 15, recipes 50/51/52)
+### Task 3: Audit and redesign Scrambled Eggs & Toast in place (family 15, recipes 50/51/52) ✓
 
 - Skill: chef
 
 **Files:**
 - Create: `.claude/contract/MPP-4-recipe-variety-expansion/sql/scrambled-eggs-toast-redesign.sql`
 
-- [ ] **Step 1: Run the full 5-lens `/chef` audit on the live recipe**
+- [x] **Step 1: Run the full 5-lens `/chef` audit on the live recipe**
 
 Pull the current state:
 ```sql
@@ -177,15 +177,15 @@ FROM recipe_steps WHERE recipe_id IN (50, 51, 52) ORDER BY recipe_id, step_numbe
 ```
 Apply Lens 1 (recompute macros from `recipe_ingredients`, confirm `Light<Moderate<Balanced`, protein≥35g/fat 25-35%/carbs≥38% on each of 50/51/52), Lens 2 (unit realism — flag grams-stored spices/garlic/oil), Lens 3 (technique — check for a "toast the bread"/rest/taste-adjust step and whether toast is a raw "Bread" ingredient that should be a `linked_recipe_id` to `Milk Bread` id 26 instead), Lens 4 (dish quality), Lens 5 (naming/metadata, linked-step coverage).
 
-- [ ] **Step 2: Report findings ranked by severity**
+- [x] **Step 2: Report findings ranked by severity**
 
 Findings likely include (confirm against live data, don't assume): toast modeled as a raw "Bread" ingredient rather than linked to `Milk Bread` (id 26) — a `.claude/rules/homemade-first-and-ingredient-dedup.md` violation if confirmed; any unit-realism misses (butter/oil in grams, herbs in grams). Present the ranked findings and the proposed fix for each to the developer and **pause for approval** before making any change.
 
-- [ ] **Step 3: Apply approved fixes with guarded/idempotent SQL**
+- [x] **Step 3: Apply approved fixes with guarded/idempotent SQL**
 
 Likely shape: `UPDATE recipe_ingredients SET ingredient_id = NULL, linked_recipe_id = 26, quantity_grams = <portion used> WHERE recipe_id IN (50,51,52) AND ingredient_id = <old bread ingredient id>` (converting the raw-bread rows to a link), plus a wipe-and-re-insert on `recipe_steps` adding a `linked_recipe_id = 26` prep step with a populated `alt_instruction` (store-bought toast fallback) if Step 2 confirmed that finding, and any unit fixes (`quantity`/`unit_id` only — `quantity_grams` must not move per the unit-realism rule). Write the exact statements to `sql/scrambled-eggs-toast-redesign.sql`.
 
-- [ ] **Step 4: Recompute and verify macros are unchanged (or intentionally changed) and record the audit**
+- [x] **Step 4: Recompute and verify macros are unchanged (or intentionally changed) and record the audit**
 
 Recompute per-serving P/C/F/kcal for 50/51/52 post-fix. Confirm all three still independently pass protein≥35g/fat 25-35%/carbs≥38%, and `Light<Moderate<Balanced` still holds. Then:
 ```sql
@@ -195,87 +195,87 @@ WHERE id IN (50, 51, 52);
 ```
 Verify: `SELECT id, macros_audited, macros_audited_at FROM recipes WHERE id IN (50,51,52);` → all three show `macros_audited = 1`.
 
-### Task 4: Design and insert the new Porridge family
+### Task 4: Design and insert the new Porridge family ✓
 
 - Skill: chef
 
 **Files:**
 - Create: `.claude/contract/MPP-4-recipe-variety-expansion/sql/porridge-apple-cinnamon-walnut.sql`
 
-- [ ] **Step 1: Resolve ingredients**
+- [x] **Step 1: Resolve ingredients**
 
 Working direction: *Apple, Cinnamon & Walnut Porridge* — rolled oats base, fresh apple, cinnamon, walnuts, a protein source (Greek yogurt swirl or added protein powder — confirm which the live `ingredients` table supports; `Greek yogurt` id 49 confirmed live) to clear the 35g/serving floor, since oats+fruit+nuts alone under-deliver protein (same failure mode the existing `Porridge with Berries & Nuts` family would have without its own protein lever — confirm by inspecting recipe 1-3's ingredient list before finalizing the lever). Run the dedup query for `Apple` and any other new item before assuming reuse.
 
-- [ ] **Step 2: Design Moderate first, then derive Light/Balanced**
+- [x] **Step 2: Design Moderate first, then derive Light/Balanced**
 
 Follow `/chef` step 2 targets (Moderate 550-650kcal) and step 5's mandatory whole-recipe/per-serving table for all three variants. Run the Step 5b self-review checklist (row spot-check, column sums, `4P+4C+9F≈kcal`, ordering & gaps) before presenting.
 
-- [ ] **Step 3: Present the 3-variant design and pause for approval**
+- [x] **Step 3: Present the 3-variant design and pause for approval**
 
 Show ingredients, gram weights, macro table (whole + per-serving), and confirm this reads as genuinely distinct from the two existing porridge families (different flavour profile, not just a portion resize).
 
-- [ ] **Step 4: Generate and run guarded INSERT SQL**
+- [x] **Step 4: Generate and run guarded INSERT SQL**
 
 Fetch live max ids, then insert 3× `recipes` (same `name`, `calories` = per-serving kcal × `default_servings`), `recipe_meals` (`meal_id = 1`, guarded), `recipe_ingredients` ×3 (guarded), `recipe_steps` ×3 (wipe-and-re-insert), `recipe_families` (1 row), `recipe_family_members` (3 rows, Moderate `is_default=1`). Write to `sql/porridge-apple-cinnamon-walnut.sql`.
 
-- [ ] **Step 5: Verify**
+- [x] **Step 5: Verify**
 
 Run the family-structure query from `.claude/rules/recipe-variants.md` §1-3 scoped to the new `family_id`, and recompute macros from `recipe_ingredients` to confirm within 5% of stored `calories`.
 
-### Task 5: Design and insert the new Smoothie family
+### Task 5: Design and insert the new Smoothie family ✓
 
 - Skill: chef
 
 **Files:**
 - Create: `.claude/contract/MPP-4-recipe-variety-expansion/sql/smoothie-mixed-berry-yogurt.sql`
 
-- [ ] **Step 1: Resolve ingredients**
+- [x] **Step 1: Resolve ingredients**
 
 Working direction: *Mixed Berry & Greek Yogurt Smoothie* — mixed berries, `Greek yogurt` (id 49, confirmed live) as the primary protein source, a liquid base (milk or kefir — dedup-check `Kefir` before assuming it doesn't exist; not found in the planning sweep, so likely a new ingredient if used). Confirm distinct from the existing `Peanut Butter Banana Smoothie` (different fruit, different protein source — yogurt vs peanut butter).
 
-- [ ] **Step 2: Design Moderate first, then derive Light/Balanced**
+- [x] **Step 2: Design Moderate first, then derive Light/Balanced**
 
 Same procedure as Task 4 Step 2 — Moderate target 550-650kcal/serving, full self-review before presenting.
 
-- [ ] **Step 3: Present the 3-variant design and pause for approval**
+- [x] **Step 3: Present the 3-variant design and pause for approval**
 
-- [ ] **Step 4: Generate and run guarded INSERT SQL**
+- [x] **Step 4: Generate and run guarded INSERT SQL**
 
 Same shape as Task 4 Step 4. `meal_id = 1` (Breakfast) — also consider a second `recipe_meals` row for `meal_id = 4` (Snacks), matching the existing smoothie family's dual-meal-slot precedent (recipes 4/5/6 are tagged both Breakfast and Snacks), confirmed with the developer at presentation time. Write to `sql/smoothie-mixed-berry-yogurt.sql`.
 
-- [ ] **Step 5: Verify**
+- [x] **Step 5: Verify**
 
 Family-structure + recomputed-macro verification, same shape as Task 4 Step 5.
 
-### Task 6: Design and insert the Greek Yogurt & Granola Bowl family (links Task 2)
+### Task 6: Design and insert the Greek Yogurt & Granola Bowl family (links Task 2) ✓
 
 - Skill: chef
 
 **Files:**
 - Create: `.claude/contract/MPP-4-recipe-variety-expansion/sql/yogurt-granola-bowl.sql`
 
-- [ ] **Step 1: Confirm the granola recipe id from Task 2**
+- [x] **Step 1: Confirm the granola recipe id from Task 2**
 
 ```sql
 SELECT id, name, calories, default_servings FROM recipes WHERE name = 'Goodness Granola';
 ```
 Compute `linked_total_yield = calories`-derived batch weight ÷ per-100g density, or more directly re-derive `linked_total_yield_g` from Task 2's ingredient gram sum. Record this value — it's the denominator for the proration in Step 3.
 
-- [ ] **Step 2: Resolve remaining ingredients**
+- [x] **Step 2: Resolve remaining ingredients**
 
 `Greek yogurt` (id 49) as the base, fresh berries, and the granola link. Dedup-check anything else proposed (e.g. honey drizzle — `Honey` id 4 confirmed live).
 
-- [ ] **Step 3: Design all three variants with the granola link prorated correctly**
+- [x] **Step 3: Design all three variants with the granola link prorated correctly**
 
 Per `.claude/rules/linked-recipe-extras.md`, the `recipe_ingredients` row for granola must set `quantity_grams` = grams of granola actually served in the bowl (e.g. 40g Light / 50g Moderate / 65g Balanced), **never** the granola recipe's total batch yield. Macro contribution = `granola_total_macros × (bowl_quantity_grams / linked_total_yield_g)`. Run the full self-review (Step 5b) including this proration term in the column sums.
 
-- [ ] **Step 4: Present the 3-variant design and pause for approval**
+- [x] **Step 4: Present the 3-variant design and pause for approval**
 
-- [ ] **Step 5: Generate and run guarded INSERT SQL, including the mandatory linked step**
+- [x] **Step 5: Generate and run guarded INSERT SQL, including the mandatory linked step**
 
 Insert `recipes` ×3, `recipe_meals` (`meal_id = 1`, guarded), `recipe_ingredients` ×3 with the granola row (`ingredient_id = NULL, linked_recipe_id = <granola_id>, quantity_grams = <prorated portion>`), and `recipe_steps` ×3 where **one step per variant carries `linked_recipe_id = <granola_id>` and a populated `alt_instruction`** (e.g. instruction: "Serve <Ng> of the linked Goodness Granola over the yogurt." / alt_instruction: "Use <Ng> of store-bought granola instead."). This is the reject condition from `.claude/rules/linked-recipe-extras.md` — a linked ingredient row with no matching linked step fails verification. Then `recipe_families` + `recipe_family_members` (Moderate default). Write to `sql/yogurt-granola-bowl.sql`.
 
-- [ ] **Step 6: Verify — including the linked-step coverage query**
+- [x] **Step 6: Verify — including the linked-step coverage query**
 
 ```sql
 SELECT ri.recipe_id, r.name AS parent, lr.name AS linked,
@@ -288,78 +288,78 @@ WHERE ri.linked_recipe_id = <granola_id>;
 ```
 Expected: `linked_step_count >= 1` on all three variant rows. Plus family-structure + recomputed-macro verification as in prior tasks.
 
-### Task 7: Design and insert the Poached Egg family
+### Task 7: Design and insert the Poached Egg family ✓
 
 - Skill: chef
 
 **Files:**
 - Create: `.claude/contract/MPP-4-recipe-variety-expansion/sql/egg-poached.sql`
 
-- [ ] **Step 1: Resolve ingredients**
+- [x] **Step 1: Resolve ingredients**
 
 Working direction: *Poached Eggs, Smoked Salmon & Avocado on Toast* — eggs, smoked salmon (dedup-check — likely new or reuse an existing salmon ingredient row, confirm before assuming), avocado, and toast linked to `Milk Bread` (id 26) per the homemade-first rule (never inline raw bread flour on this recipe).
 
-- [ ] **Step 2: Design Moderate first, then derive Light/Balanced, with the linked-bread step**
+- [x] **Step 2: Design Moderate first, then derive Light/Balanced, with the linked-bread step**
 
 Full macro table + self-review per Task 4 Step 2. Because toast links `Milk Bread`, this recipe needs the same linked-step pairing as Task 6: a step with `linked_recipe_id = 26` and a store-bought-bread `alt_instruction`.
 
-- [ ] **Step 3: Present the 3-variant design and pause for approval**
+- [x] **Step 3: Present the 3-variant design and pause for approval**
 
-- [ ] **Step 4: Generate and run guarded INSERT SQL**
+- [x] **Step 4: Generate and run guarded INSERT SQL**
 
 `meal_id = 1`. Insert `recipes` ×3, `recipe_meals`, `recipe_ingredients` (bread row: `linked_recipe_id = 26`, `quantity_grams` = grams of bread/toast actually used, not `Milk Bread`'s total batch yield), `recipe_steps` (one step per variant with `linked_recipe_id = 26` + `alt_instruction`), `recipe_families`, `recipe_family_members`. Write to `sql/egg-poached.sql`.
 
-- [ ] **Step 5: Verify**
+- [x] **Step 5: Verify**
 
 Linked-step coverage query (same shape as Task 6 Step 6, scoped to `linked_recipe_id = 26`), family-structure query, recomputed-macro check.
 
-### Task 8: Design and insert the Boiled Egg family
+### Task 8: Design and insert the Boiled Egg family ✓
 
 - Skill: chef
 
 **Files:**
 - Create: `.claude/contract/MPP-4-recipe-variety-expansion/sql/egg-boiled.sql`
 
-- [ ] **Step 1: Resolve ingredients**
+- [x] **Step 1: Resolve ingredients**
 
 Working direction: *Soft-Boiled Eggs, Cottage Cheese & Toast* — eggs, `Cottage cheese` (id 169, confirmed live) as the protein top-up, toast linked to `Milk Bread` (id 26) or `Pita Bread` (id 117) — pick whichever reads better as a dish, confirm at presentation.
 
-- [ ] **Step 2: Design Moderate first, then derive Light/Balanced, with the linked-bread step**
+- [x] **Step 2: Design Moderate first, then derive Light/Balanced, with the linked-bread step**
 
 Same procedure and linked-step requirement as Task 7 Step 2.
 
-- [ ] **Step 3: Present the 3-variant design and pause for approval**
+- [x] **Step 3: Present the 3-variant design and pause for approval**
 
-- [ ] **Step 4: Generate and run guarded INSERT SQL**
+- [x] **Step 4: Generate and run guarded INSERT SQL**
 
 Same shape as Task 7 Step 4, `meal_id = 1`. Write to `sql/egg-boiled.sql`.
 
-- [ ] **Step 5: Verify**
+- [x] **Step 5: Verify**
 
 Same verification shape as Task 7 Step 5.
 
-### Task 9: Design and insert the Fried Egg family
+### Task 9: Design and insert the Fried Egg family ✓
 
 - Skill: chef
 
 **Files:**
 - Create: `.claude/contract/MPP-4-recipe-variety-expansion/sql/egg-fried.sql`
 
-- [ ] **Step 1: Resolve ingredients**
+- [x] **Step 1: Resolve ingredients**
 
 Working direction: *Fried Eggs with Halloumi & Toast* — eggs, a high-protein cheese for the top-up (dedup-check `Halloumi` — not confirmed live during planning, search before assuming; fall back to another confirmed high-protein item if it doesn't exist), toast linked per the same bread rule as Tasks 7-8.
 
-- [ ] **Step 2: Design Moderate first, then derive Light/Balanced, with the linked-bread step**
+- [x] **Step 2: Design Moderate first, then derive Light/Balanced, with the linked-bread step**
 
 Same procedure as Task 7 Step 2. Technique note for the `/chef` audit lens: frying eggs needs a preheated pan and enough fat to crisp the white edge without over-browning — reflect that in the `recipe_steps` instruction, not just "fry the eggs."
 
-- [ ] **Step 3: Present the 3-variant design and pause for approval**
+- [x] **Step 3: Present the 3-variant design and pause for approval**
 
-- [ ] **Step 4: Generate and run guarded INSERT SQL**
+- [x] **Step 4: Generate and run guarded INSERT SQL**
 
 Same shape as Task 7 Step 4, `meal_id = 1`. Write to `sql/egg-fried.sql`.
 
-- [ ] **Step 5: Verify**
+- [x] **Step 5: Verify**
 
 Same verification shape as Task 7 Step 5.
 

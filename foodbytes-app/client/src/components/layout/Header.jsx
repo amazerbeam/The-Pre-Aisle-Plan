@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import LoginModal from '../auth/LoginModal'
 import DateRangePicker from '../common/DateRangePicker'
+import DefaultPortionsControl from './DefaultPortionsControl'
 import './Header.css'
 
 function Header() {
@@ -61,6 +62,7 @@ function Header() {
                       <span className="user-name-full">{user.name}</span>
                       <span className="user-email">{user.email}</span>
                     </div>
+                    <DefaultPortionsControl />
                     <button className="logout-btn" onClick={logout}>
                       Sign Out
                     </button>

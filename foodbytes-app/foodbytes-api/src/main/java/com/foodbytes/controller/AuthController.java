@@ -6,6 +6,7 @@ import com.foodbytes.model.User;
 import com.foodbytes.security.JwtCookieService;
 import com.foodbytes.security.UserPrincipal;
 import com.foodbytes.service.PasswordAuthService;
+import com.foodbytes.service.UserService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ public class AuthController {
 
     private final PasswordAuthService passwordAuthService;
     private final JwtCookieService jwtCookieService;
+    private final UserService userService;
 
     @GetMapping("/me")
     public ResponseEntity<?> getCurrentUser(@AuthenticationPrincipal UserPrincipal userPrincipal) {
@@ -34,7 +36,8 @@ public class AuthController {
                 userPrincipal.getEmail(),
                 userPrincipal.getName(),
                 userPrincipal.getAvatarUrl(),
-                userPrincipal.isAdmin()
+                userPrincipal.isAdmin(),
+                userPrincipal.getDefaultServings()
         );
         return ResponseEntity.ok(userDTO);
     }
@@ -61,14 +64,7 @@ public class AuthController {
                                    HttpServletResponse response) {
         User user = passwordAuthService.authenticateAndIssueCookie(
                 request.email(), request.password(), response);
-        UserDTO userDTO = new UserDTO(
-                user.getId(),
-                user.getEmail(),
-                user.getName(),
-                user.getAvatarUrl(),
-                Boolean.TRUE.equals(user.getIsAdmin())
-        );
-        return ResponseEntity.ok(userDTO);
+        return ResponseEntity.ok(userService.convertToDTO(user));
     }
 
     @ExceptionHandler(BadCredentialsException.class)

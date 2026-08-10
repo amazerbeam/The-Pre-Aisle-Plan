@@ -5,7 +5,7 @@ import { useBodyScrollLock } from '../../hooks/useBodyScrollLock'
 import PullToDismissUI from '../common/PullToDismissUI'
 import MacroTargetPopup from '../recipes/MacroTargetPopup'
 import { DAILY_MACRO_TARGETS, MACRO_COPY } from '../../constants/macroTargets'
-import { hasUsableMacros } from '../../utils/macroStatus'
+import { evaluateMacro, hasUsableMacros } from '../../utils/macroStatus'
 import './DailyMacroPopup.css'
 
 /**
@@ -91,14 +91,27 @@ function DailyMacroPopup({ day, onClose }) {
     ? Math.round((fatCalories / totalCalories) * 100)
     : 0
 
+  const macros = { protein: totalProtein, carbs: totalCarbs, fat: totalFat }
+
   // All-zero macros (a day with no planned meals) is a data-completeness gap,
   // not a nutrition verdict — see macroStatus.hasUsableMacros. Skip opening the
   // popup so an empty day doesn't render a confident "0 g / rejected" badge.
-  const dayHasUsableMacros = hasUsableMacros({
-    protein: totalProtein,
-    carbs: totalCarbs,
-    fat: totalFat
-  })
+  const dayHasUsableMacros = hasUsableMacros(macros)
+
+  // Border/background colour reflects whether the DAILY target is met — under
+  // (blue) / near (amber) / on (green) / over (red) — not a fixed colour per
+  // macro. A day that clears every floor must read as green, not "protein is
+  // always red". See macroTargets.js MACRO_STATUS. Days with no usable data get
+  // no verdict (plain/neutral), matching the disabled tile below.
+  const proteinStatus = dayHasUsableMacros
+    ? evaluateMacro(macros, 'protein', DAILY_MACRO_TARGETS).status
+    : 'plain'
+  const carbsStatus = dayHasUsableMacros
+    ? evaluateMacro(macros, 'carbs', DAILY_MACRO_TARGETS).status
+    : 'plain'
+  const fatStatus = dayHasUsableMacros
+    ? evaluateMacro(macros, 'fat', DAILY_MACRO_TARGETS).status
+    : 'plain'
 
   return (
     <div className="macro-popup-overlay">
@@ -131,7 +144,7 @@ function DailyMacroPopup({ day, onClose }) {
           <div className="macro-grid">
             <button
               type="button"
-              className="macro-item macro-item-protein"
+              className={`macro-item macro-item--${proteinStatus}`}
               onClick={dayHasUsableMacros ? () => setOpenMacroKey('protein') : undefined}
               disabled={!dayHasUsableMacros}
               aria-haspopup={dayHasUsableMacros ? 'dialog' : undefined}
@@ -149,7 +162,7 @@ function DailyMacroPopup({ day, onClose }) {
 
             <button
               type="button"
-              className="macro-item macro-item-carbs"
+              className={`macro-item macro-item--${carbsStatus}`}
               onClick={dayHasUsableMacros ? () => setOpenMacroKey('carbs') : undefined}
               disabled={!dayHasUsableMacros}
               aria-haspopup={dayHasUsableMacros ? 'dialog' : undefined}
@@ -167,7 +180,7 @@ function DailyMacroPopup({ day, onClose }) {
 
             <button
               type="button"
-              className="macro-item macro-item-fat"
+              className={`macro-item macro-item--${fatStatus}`}
               onClick={dayHasUsableMacros ? () => setOpenMacroKey('fat') : undefined}
               disabled={!dayHasUsableMacros}
               aria-haspopup={dayHasUsableMacros ? 'dialog' : undefined}
@@ -191,7 +204,7 @@ function DailyMacroPopup({ day, onClose }) {
       {openMacroKey && (
         <MacroTargetPopup
           macroKey={openMacroKey}
-          macros={{ protein: totalProtein, carbs: totalCarbs, fat: totalFat }}
+          macros={macros}
           displayedCaloriesPerServing={totalCalories}
           targets={DAILY_MACRO_TARGETS}
           periodLabel="per day"
