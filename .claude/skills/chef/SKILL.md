@@ -18,6 +18,8 @@ Designs FoodBytes recipes end-to-end: real-ingredient recipe drafts, Light/Moder
 - Generating recipe `INSERT` SQL ready to run against the live Railway MySQL
 - Auditing a recipe end-to-end: macros **and** units, technique/instructions, dish quality, naming. See **"Auditing an existing recipe"** below — the audit is not just a macro check.
 
+**Adding a recipe to the database always goes through this skill.** Any "add this recipe to the DB" / "insert this into the database" request — whether the recipe was designed in this conversation or handed over fully-formed — routes through the full workflow below, ending in step 9 (Auto-audit and fix). A recipe never lands in `recipes` without having passed all five audit lenses in the same pass that inserted it. If asked to "just insert" a recipe without the audit, still run the audit — silently skipping it is not an option this skill supports.
+
 ## Shared rules (read on demand)
 
 Project-wide rules live at `.claude/rules/`. Before designing or inserting any recipe, scan `.claude/rules/` (Glob `.claude/rules/*.md`) and Read any file whose topic matches the decision — including rules added after this skill was written. See `.claude/rules/README.md` for the index. Topics directly relevant here:
@@ -55,6 +57,8 @@ Sketch ingredients, portions, technique. Aim straight at Moderate's targets:
 > Calories are a **design target**, not an audit reject. A finished variant outside its kcal band still passes audit and can be marked `macros_audited`. See `.claude/rules/recipe-variants.md` → "Calories are a target, not a reject condition".
 
 Use ~150 g lean protein per serving as the starting point. Levers to differentiate variants: starch portion, whole vs white eggs, air-fry vs pan-fry, cheese/avocado garnish, oil/butter quantity. Each lever should move ~80–150 kcal between siblings.
+
+**Design for the green band, not the reject floor.** The client (`client/src/constants/macroTargets.js`) renders four colour bands per macro, not a pass/fail toggle: for carbs, <38% is a red REJECT, 38–39% is an amber "NEAR — under target, inside the documented slack", and only 40–50% is the green ON band the user actually sees as passing. The 38% floor exists so an *audit* of an existing recipe doesn't fail something merely close to target — it is not a license to design a new recipe to land at 38–39% on purpose. A brand-new recipe that clears the reject threshold but sits in amber is not "done" — it reads as failing on the recipe card even though the audit would technically wave it through. Same logic applies to fat: 25–35% is green, but designing to land at 25.0–25.5% leaves no margin and one rounding pass can tip it under. When computing portions in step 5, aim for the middle of the green band (call it carbs ~43–47%, fat ~28–32%) rather than the nearest edge — it costs nothing extra and means the recipe card is green the first time, not after a follow-up fix.
 
 ### 3. Resolve ingredients against the live DB
 
@@ -126,6 +130,7 @@ Do not show the design to the user until you have audited your own numbers. The 
 - **kcal cross-check:** `4×P + 4×C + 9×F` should land within ~3% of the kcal you reported. If it doesn't, one of the macros or the kcal is wrong.
 - **Per-serving derivation:** `whole ÷ default_servings`. Re-do the division — don't reuse a number you computed earlier.
 - **Per-variant target band:** Light 450–550, Moderate 550–650, Balanced 700–800. Protein ≥35 g. Fat 25–35% of kcal. Carbs 40–50% of kcal. Each variant independently.
+- **Green band, not just clear of reject:** carbs ≥40% and fat between 25–35% with some margin from either edge — not 38–39% carbs or 25.0–25.9% fat. Landing in the amber "documented slack" zone (38–39% carbs) is a self-review failure for a *new* recipe even though it wouldn't fail an audit of an existing one — see the note in step 2. If a variant lands in amber, adjust portions now (a few grams of the carb- or fat-heavy ingredient is usually enough) rather than shipping it and fixing it after the fact.
 - **Ordering & gaps:** `Light < Moderate < Balanced` with ≥80 kcal between siblings.
 - **Sanity:** if whole-recipe kcal lands in a per-serving band, you almost certainly wrote portions for one serving on a 2-serving recipe — go back to step 5.
 
@@ -196,6 +201,23 @@ After the user runs the SQL, run verification queries via `mcp__foodbytes-mysql_
 - No `recipe_ingredients` row inlines a sub-component that already exists as a recipe (Pita/Bread/Dough/Pesto/Pizza Sauce).
 - No duplicate ingredient rows by case-insensitive name or singular/plural collapse.
 - Every generated `INSERT INTO recipe_ingredients` (and `recipe_meals` / `recipe_extras` / `recipe_family_members`) is guarded with `WHERE NOT EXISTS` so a retry after a mid-transaction error cannot produce duplicate rows. Re-running the entire script must be a no-op on already-applied changes.
+
+### 9. Auto-audit and fix — mandatory before the task is done
+
+**A newly-inserted recipe must never be left in an unaudited or failing state.** As soon as step 8's verify queries confirm the rows landed, immediately run the full five-lens audit from "Auditing an existing recipe" below against the recipe you just inserted — Lens 1 through Lens 5, not just the macro recompute.
+
+This is the one case where fixes apply **without** waiting for a separate round of user approval: the recipe was designed and inserted in this same pass, so there is no "someone else's work" to be cautious about — you are finishing your own job, not overriding another author's decisions. Concretely:
+
+1. Run all five lenses against the just-inserted family.
+2. For every finding — macro, unit, technique, dish-quality, or naming — apply the fix directly (UPDATE/INSERT/DELETE as needed) rather than presenting it as a pending proposal. Recompute macros after any ingredient-quantity change and re-verify the per-variant targets and kcal ordering still hold.
+   - **Include the client's colour bands in Lens 1, not just the reject thresholds.** Passing the audit's reject conditions is not the bar for a freshly-inserted recipe — landing in `client/src/constants/macroTargets.js`'s green ON band is. A variant sitting at 38–39% carbs or hugging either edge of 25–35% fat clears the audit but shows amber on the recipe card; treat that as a finding to fix in this same pass (nudge the carb- or fat-heavy ingredient a few grams), not something to leave for the user to notice and ask about later.
+3. Write (or append to) a migration file recording what the audit changed, same as any other DB change.
+4. Set `macros_audited = 1` + `macros_audited_at = NOW()` on all three family members once every lens has been run and every reject condition clears — per "Recording the audit" below.
+5. Tell the user what the audit found and fixed in the same reply that confirms the recipe is live — don't leave it for them to ask "did you audit it?".
+
+The DO NOT rule about not auto-applying audit suggestions (see below) governs audits run **on request against a pre-existing recipe** whose provenance you don't control — a separate, later ask like "audit recipe 42." It does not apply to this step: a recipe this skill just designed and inserted is not done until it has been audited and fixed in the same breath.
+
+If a finding is a genuine judgment call with more than one reasonable fix (e.g. a stylistic technique choice, not a correctness bug), you may still apply your best judgment and note the alternative you considered — but do not leave the recipe sitting with a known, fixable issue just because it's arguable. The bar is: a recipe this skill hands off as "added to the database" should already be one you'd sign off on if someone else showed it to you for audit.
 
 ## Auditing an existing recipe
 
@@ -365,8 +387,9 @@ HAVING audited > 0 AND audited < members;
 - Suffix variant names (`Pizza (Light)` etc.) on `recipes.name`.
 - Insert plural-form ingredient rows (`Bananas`) or duplicates differing only in casing.
 - Set `quantity_grams` to the linked recipe's total yield when only a portion is used (the 50g-vs-300g bug).
-- Apply Nutrition Agent / audit suggestions automatically — get explicit user approval for each change.
+- Apply Nutrition Agent / audit suggestions automatically when auditing a **pre-existing** recipe on request — get explicit user approval for each change there. (Exception: step 9's auto-audit-and-fix on a recipe this same skill just inserted — that one applies fixes immediately, see step 9.)
 - Set `macros_audited = 1` on one variant only, while a macro reject is still outstanding, or before the approved fixes have been applied and verified.
+- Consider a "add this recipe to the database" task finished right after the INSERTs land. It isn't finished until step 9's audit has run and any findings are fixed.
 - Write a made-up id into `macros_audited_by`, or query the `users` table looking for one.
 
 ## Output format (preview)
@@ -420,3 +443,4 @@ Full template + worked example in `references/output-format.md`.
 - Instructions pass the chef lens in "Auditing an existing recipe" — no vague endpoints, no broken physics (watery sauces, split dairy, cold-pan aromatics), no discarded resting juices, no missing taste-and-adjust.
 - When auditing, dish-quality and technique findings are reported **before** macro findings — a watery sauce on a macro-passing recipe is the worse outcome.
 - Every completed audit is recorded: `macros_audited = 1` and `macros_audited_at` set on all three family members, `macros_audited_by` NULL. No family is left in the partially-audited state (some members flagged, others not).
+- **Every recipe this skill adds to the database goes through step 9 before the task is reported done.** A newly-inserted family is never left `macros_audited = 0` with known, fixable findings sitting open — those get fixed in the same pass, not proposed and parked.

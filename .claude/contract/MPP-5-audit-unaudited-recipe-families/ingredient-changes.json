@@ -1,0 +1,736 @@
+{
+  "families": [
+    {
+      "family_id": 1,
+      "dish": "Porridge with Berries & Nuts",
+      "renamed_to": null,
+      "is_cheat": false,
+      "variants": [
+        {
+          "variant": "Light",
+          "recipe_id": 1,
+          "changed": [
+            {"ingredient": "Greek yogurt", "before_g": null, "after_g": 530, "change": "added"},
+            {"ingredient": "Rolled oats", "before_g": 60, "after_g": 70, "change": "increased"},
+            {"ingredient": "Low fat milk", "before_g": 258, "after_g": 139, "change": "reduced"},
+            {"ingredient": "Peanut butter", "before_g": 18, "after_g": 9, "change": "reduced"}
+          ],
+          "unchanged": ["Water", "Mixed berries", "Honey", "Salt", "Almonds", "Walnuts"]
+        },
+        {
+          "variant": "Moderate",
+          "recipe_id": 2,
+          "changed": [
+            {"ingredient": "Greek yogurt", "before_g": null, "after_g": 570, "change": "added"},
+            {"ingredient": "Rolled oats", "before_g": 80, "after_g": 90, "change": "increased"},
+            {"ingredient": "Low fat milk", "before_g": 340, "after_g": 201, "change": "reduced"},
+            {"ingredient": "Peanut butter", "before_g": 27, "after_g": 14, "change": "reduced"}
+          ],
+          "unchanged": ["Water", "Mixed berries", "Honey", "Salt", "Almonds", "Walnuts"]
+        },
+        {
+          "variant": "Balanced",
+          "recipe_id": 3,
+          "changed": [
+            {"ingredient": "Greek yogurt", "before_g": null, "after_g": 620, "change": "added"},
+            {"ingredient": "Rolled oats", "before_g": 100, "after_g": 110, "change": "increased"},
+            {"ingredient": "Low fat milk", "before_g": 427, "after_g": 258, "change": "reduced"},
+            {"ingredient": "Peanut butter", "before_g": 36, "after_g": 18, "change": "reduced"}
+          ],
+          "unchanged": ["Water", "Mixed berries", "Honey", "Salt", "Almonds", "Walnuts"]
+        }
+      ],
+      "steps_rewritten": [1, 2, 3, 4, 5, 6, 7],
+      "steps_summary": "All the steps were rewritten so the newly added Greek yogurt is actually used, and it is folded in off the heat because yogurt stirred into boiling oats splits and goes grainy. The old 'set heat to 7/9' dial reading is replaced with a description of the simmer to look for, the nuts are now toasted before they go on, the peanut butter is stirred through instead of dropped on top, and there is a taste-and-adjust before the bowls are topped."
+    },
+    {
+      "family_id": 4,
+      "dish": "Pizza",
+      "renamed_to": null,
+      "is_cheat": false,
+      "variants": [
+        {
+          "variant": "Light",
+          "recipe_id": 13,
+          "changed": [
+            {"ingredient": "Pizza Dough (linked recipe)", "before_g": 200, "after_g": 240, "change": "increased"},
+            {"ingredient": "Chicken breast", "before_g": 220, "after_g": 180, "change": "reduced"}
+          ],
+          "unchanged": ["Pizza Sauce", "Mozzarella", "Mushrooms"]
+        },
+        {
+          "variant": "Moderate",
+          "recipe_id": 14,
+          "changed": [
+            {"ingredient": "Pizza Dough (linked recipe)", "before_g": 260, "after_g": 290, "change": "increased"}
+          ],
+          "unchanged": ["Pizza Sauce", "Mozzarella", "Chicken breast", "Mushrooms"]
+        },
+        {
+          "variant": "Balanced",
+          "recipe_id": 15,
+          "changed": [
+            {"ingredient": "Pizza Dough (linked recipe)", "before_g": 340, "after_g": 370, "change": "increased"}
+          ],
+          "unchanged": ["Pizza Sauce", "Mozzarella", "Chicken breast", "Mushrooms"]
+        }
+      ],
+      "steps_rewritten": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+      "steps_summary": "The dough weight and the per-pizza topping amounts are now generated from the actual ingredient rows for each variant, fixing steps that had drifted so far they read 25 g of mozzarella against 110 g of chicken. The chicken is also now seared in a film of oil taken from the pizza's own share, instead of in a hot dry pan where it stuck and tore."
+    },
+    {
+      "family_id": 5,
+      "dish": "Chicken Satay",
+      "renamed_to": null,
+      "is_cheat": false,
+      "variants": [
+        {
+          "variant": "Light",
+          "recipe_id": 16,
+          "changed": [
+            {"ingredient": "Chicken thigh (boneless)", "before_g": 220, "after_g": null, "change": "removed"},
+            {"ingredient": "Chicken breast", "before_g": null, "after_g": 220, "change": "added"},
+            {"ingredient": "Jasmine rice", "before_g": 56, "after_g": 110, "change": "increased"},
+            {"ingredient": "Coconut milk", "before_g": 100, "after_g": 50, "change": "reduced"}
+          ],
+          "unchanged": ["Garlic", "Ginger", "Soy sauce", "Honey", "Olive oil", "Onion", "Red bell pepper", "Peanut butter", "Worcestershire sauce", "Cumin", "Lime juice", "Cornflour", "Salt"],
+          "note": "The thigh-to-breast swap is one existing row changed in place, not a delete plus an insert: the same 220 g of meat, a leaner cut."
+        },
+        {
+          "variant": "Moderate",
+          "recipe_id": 17,
+          "changed": [
+            {"ingredient": "Chicken thigh (boneless)", "before_g": 280, "after_g": null, "change": "removed"},
+            {"ingredient": "Chicken breast", "before_g": null, "after_g": 280, "change": "added"},
+            {"ingredient": "Jasmine rice", "before_g": 74, "after_g": 130, "change": "increased"},
+            {"ingredient": "Coconut milk", "before_g": 100, "after_g": 50, "change": "reduced"}
+          ],
+          "unchanged": ["Garlic", "Ginger", "Soy sauce", "Honey", "Olive oil", "Onion", "Red bell pepper", "Peanut butter", "Worcestershire sauce", "Cumin", "Lime juice", "Cornflour", "Salt"],
+          "note": "The thigh-to-breast swap is one existing row changed in place, not a delete plus an insert: the same 280 g of meat, a leaner cut."
+        },
+        {
+          "variant": "Balanced",
+          "recipe_id": 18,
+          "changed": [
+            {"ingredient": "Chicken thigh (boneless)", "before_g": 360, "after_g": null, "change": "removed"},
+            {"ingredient": "Chicken breast", "before_g": null, "after_g": 360, "change": "added"},
+            {"ingredient": "Jasmine rice", "before_g": 92, "after_g": 180, "change": "increased"},
+            {"ingredient": "Coconut milk", "before_g": 130, "after_g": 70, "change": "reduced"}
+          ],
+          "unchanged": ["Garlic", "Ginger", "Soy sauce", "Honey", "Olive oil", "Onion", "Red bell pepper", "Peanut butter", "Worcestershire sauce", "Cumin", "Lime juice", "Cornflour", "Salt"],
+          "note": "The thigh-to-breast swap is one existing row changed in place, not a delete plus an insert: the same 360 g of meat, a leaner cut."
+        }
+      ],
+      "steps_rewritten": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+      "steps_summary": "The marinating and cooking steps called for chicken thigh by name and gave a thigh's timing, which leaves breast dry and stringy, so both now describe breast and add a short brine to keep it juicy. The sauce and rice steps follow the halved coconut milk and the larger rice portion."
+    },
+    {
+      "family_id": 8,
+      "dish": "Salmon Sandwich",
+      "renamed_to": null,
+      "is_cheat": false,
+      "variants": [
+        {
+          "variant": "Light",
+          "recipe_id": 269,
+          "changed": [
+            {"ingredient": "Milk Bread (linked recipe)", "before_g": null, "after_g": 200, "change": "added"},
+            {"ingredient": "Tinned salmon", "before_g": null, "after_g": 220, "change": "added"},
+            {"ingredient": "Cottage cheese", "before_g": null, "after_g": 90, "change": "added"},
+            {"ingredient": "Lettuce", "before_g": null, "after_g": 40, "change": "added"},
+            {"ingredient": "Lemon", "before_g": null, "after_g": 20, "change": "added"},
+            {"ingredient": "Black pepper", "before_g": null, "after_g": 0.5, "change": "added"}
+          ],
+          "unchanged": [],
+          "note": "Recipe 269 does not exist yet — the migration creates it as the family's missing Light variant, so every row on it is new. It deliberately carries no butter at all; cottage cheese is the binder."
+        },
+        {
+          "variant": "Moderate",
+          "recipe_id": 28,
+          "changed": [
+            {"ingredient": "Cottage cheese", "before_g": null, "after_g": 60, "change": "added"},
+            {"ingredient": "Lemon", "before_g": null, "after_g": 20, "change": "added"},
+            {"ingredient": "Black pepper", "before_g": null, "after_g": 0.5, "change": "added"},
+            {"ingredient": "Milk Bread (linked recipe)", "before_g": 200, "after_g": 240, "change": "increased"},
+            {"ingredient": "Tinned salmon", "before_g": 213, "after_g": 240, "change": "increased"},
+            {"ingredient": "Salted butter", "before_g": 24, "after_g": 8, "change": "reduced"}
+          ],
+          "unchanged": ["Lettuce"]
+        },
+        {
+          "variant": "Balanced",
+          "recipe_id": 29,
+          "changed": [
+            {"ingredient": "Lemon", "before_g": null, "after_g": 30, "change": "added"},
+            {"ingredient": "Black pepper", "before_g": null, "after_g": 1, "change": "added"},
+            {"ingredient": "Milk Bread (linked recipe)", "before_g": 400, "after_g": 460, "change": "increased"},
+            {"ingredient": "Salted butter", "before_g": 30, "after_g": 10, "change": "reduced"}
+          ],
+          "unchanged": ["Tinned salmon", "Lettuce"]
+        }
+      ],
+      "steps_rewritten": [1, 2, 3, 4, 5, 6, 7],
+      "steps_summary": "The old steps never mentioned the cottage cheese, lemon or pepper, so the cook was buying them and never told to use them; there is now a step that folds the cottage cheese through as the binder and one that squeezes in the lemon and grinds over the pepper with a taste-and-adjust. The buttering step no longer quotes the old 15 g and 30 g figures, and the bread slicing and the filling-per-sandwich weight are restated per variant instead of both saying '~106 g'."
+    },
+    {
+      "family_id": 9,
+      "dish": "Lentil Stew",
+      "renamed_to": null,
+      "is_cheat": false,
+      "variants": [
+        {
+          "variant": "Light",
+          "recipe_id": 30,
+          "changed": [
+            {"ingredient": "Chicken breast", "before_g": null, "after_g": 100, "change": "added"},
+            {"ingredient": "Olive oil", "before_g": 21, "after_g": 24, "change": "increased"}
+          ],
+          "unchanged": ["Brown lentils (tinned)", "Onion", "Garlic", "Carrot", "Tinned tomatoes", "Smoked paprika", "Cumin", "Vegetable stock", "Pak choi", "Salt"]
+        },
+        {
+          "variant": "Moderate",
+          "recipe_id": 31,
+          "changed": [
+            {"ingredient": "Chicken breast", "before_g": null, "after_g": 105, "change": "added"}
+          ],
+          "unchanged": ["Chorizo", "Brown lentils (tinned)", "Onion", "Garlic", "Carrot", "Tinned tomatoes", "Smoked paprika", "Cumin", "Vegetable stock", "Pak choi", "Salt", "Olive oil"]
+        },
+        {
+          "variant": "Balanced",
+          "recipe_id": 32,
+          "changed": [
+            {"ingredient": "Chicken breast", "before_g": null, "after_g": 110, "change": "added"}
+          ],
+          "unchanged": ["Chorizo", "Brown lentils (tinned)", "Onion", "Garlic", "Carrot", "Tinned tomatoes", "Smoked paprika", "Cumin", "Vegetable stock", "Pak choi", "Salt", "Olive oil"]
+        }
+      ],
+      "steps_rewritten": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+      "steps_summary": "The new chicken now has steps of its own — diced and patted dry in the prep, browned in the pan before the liquid goes in so it picks up colour rather than poaching grey, and finished in the stew. The last step used to be 'season with salt to taste, serve in bowls'; it now asks for a proper taste-and-adjust, with the acid and herb suggestions in the tip."
+    },
+    {
+      "family_id": 10,
+      "dish": "Lentil Stuffed Peppers",
+      "renamed_to": null,
+      "is_cheat": false,
+      "variants": [
+        {
+          "variant": "Light",
+          "recipe_id": 33,
+          "changed": [
+            {"ingredient": "Cottage cheese", "before_g": null, "after_g": 200, "change": "added"},
+            {"ingredient": "Mozzarella", "before_g": null, "after_g": 70, "change": "added"}
+          ],
+          "unchanged": ["Red bell pepper", "Brown lentils (tinned)", "Tinned tomatoes", "Tomato paste", "Onion", "Garlic", "Olive oil", "Sugar", "Dried oregano", "Salt", "Black pepper"]
+        },
+        {
+          "variant": "Moderate",
+          "recipe_id": 34,
+          "changed": [
+            {"ingredient": "Cottage cheese", "before_g": null, "after_g": 240, "change": "added"},
+            {"ingredient": "Mozzarella", "before_g": null, "after_g": 80, "change": "added"}
+          ],
+          "unchanged": ["Red bell pepper", "Brown lentils (tinned)", "Tinned tomatoes", "Tomato paste", "Onion", "Garlic", "Olive oil", "Sugar", "Dried oregano", "Salt", "Black pepper"]
+        },
+        {
+          "variant": "Balanced",
+          "recipe_id": 35,
+          "changed": [
+            {"ingredient": "Cottage cheese", "before_g": null, "after_g": 280, "change": "added"},
+            {"ingredient": "Mozzarella", "before_g": null, "after_g": 100, "change": "added"}
+          ],
+          "unchanged": ["Red bell pepper", "Brown lentils (tinned)", "Tinned tomatoes", "Tomato paste", "Onion", "Garlic", "Olive oil", "Sugar", "Dried oregano", "Salt", "Black pepper"]
+        }
+      ],
+      "steps_rewritten": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+      "steps_summary": "The stored steps ended 'serve hot' and never mentioned the cottage cheese or the mozzarella, so both now have real steps: the cottage cheese is folded through off the heat so it does not split, and the mozzarella goes on for the last stretch so it browns into a cap. The bake is split into 18-20 minutes then 10-12 rather than made longer, so total oven time is unchanged."
+    },
+    {
+      "family_id": 22,
+      "dish": "Classic Irish Beef Stew",
+      "renamed_to": null,
+      "is_cheat": false,
+      "variants": [
+        {
+          "variant": "Light",
+          "recipe_id": 78,
+          "changed": [
+            {"ingredient": "Beef Chuck", "before_g": 240, "after_g": 280, "change": "increased"},
+            {"ingredient": "Potato", "before_g": 240, "after_g": 350, "change": "increased"},
+            {"ingredient": "Butter", "before_g": 14, "after_g": 7, "change": "reduced"}
+          ],
+          "unchanged": ["Carrot", "Parsnip", "Onion", "Celery", "Garlic", "Beef Stock", "Tomato paste", "Worcestershire sauce", "Bay leaf", "Fresh Thyme", "Salt", "Black pepper", "Fresh Parsley"]
+        },
+        {
+          "variant": "Moderate",
+          "recipe_id": 79,
+          "changed": [
+            {"ingredient": "Potato", "before_g": 300, "after_g": 390, "change": "increased"},
+            {"ingredient": "Butter", "before_g": 14, "after_g": 7, "change": "reduced"}
+          ],
+          "unchanged": ["Beef Chuck", "Carrot", "Parsnip", "Onion", "Celery", "Garlic", "Beef Stock", "Tomato paste", "Worcestershire sauce", "Bay leaf", "Fresh Thyme", "Salt", "Black pepper", "Fresh Parsley"]
+        },
+        {
+          "variant": "Balanced",
+          "recipe_id": 80,
+          "changed": [
+            {"ingredient": "Potato", "before_g": 400, "after_g": 530, "change": "increased"},
+            {"ingredient": "Butter", "before_g": 14, "after_g": 7, "change": "reduced"}
+          ],
+          "unchanged": ["Beef Chuck", "Carrot", "Parsnip", "Onion", "Celery", "Garlic", "Beef Stock", "Tomato paste", "Worcestershire sauce", "Bay leaf", "Fresh Thyme", "Salt", "Black pepper", "Fresh Parsley"]
+        }
+      ],
+      "steps_rewritten": [1, 10],
+      "steps_summary": "The cooking steps were left exactly as they are — none of them quotes a gram figure, so nothing went stale, and the technique was judged the strongest in the audit. A stray 'step 0' chef's note about the chuck roast and the overnight dry brine was folded into step 1's tip where the instruction it explains actually lives, and step 10 gained a tip about finishing with a splash of vinegar or stout, because the stew's acid reads thin."
+    },
+    {
+      "family_id": 23,
+      "dish": "Spaghetti Bolognese",
+      "renamed_to": null,
+      "is_cheat": false,
+      "variants": [
+        {
+          "variant": "Light",
+          "recipe_id": 81,
+          "changed": [],
+          "unchanged": ["Beef Mince (3% fat)", "Fresh Pasta (linked recipe)", "Onion", "Carrot", "Celery", "Garlic", "Tinned tomatoes", "Tomato paste", "Beef Stock", "Olive oil", "Sugar", "Dried oregano", "Bay leaf", "Parmesan cheese", "Fresh basil"]
+        },
+        {
+          "variant": "Moderate",
+          "recipe_id": 82,
+          "changed": [],
+          "unchanged": ["Beef Mince (3% fat)", "Fresh Pasta (linked recipe)", "Onion", "Carrot", "Celery", "Garlic", "Tinned tomatoes", "Tomato paste", "Beef Stock", "Olive oil", "Sugar", "Dried oregano", "Bay leaf", "Parmesan cheese", "Fresh basil"]
+        },
+        {
+          "variant": "Balanced",
+          "recipe_id": 83,
+          "changed": [],
+          "unchanged": ["Beef Mince (3% fat)", "Fresh Pasta (linked recipe)", "Onion", "Carrot", "Celery", "Garlic", "Tinned tomatoes", "Tomato paste", "Beef Stock", "Olive oil", "Sugar", "Dried oregano", "Bay leaf", "Parmesan cheese", "Fresh basil"]
+        }
+      ],
+      "steps_rewritten": [1, 2, 3, 4, 5, 6, 7],
+      "steps_summary": "Nothing in the ingredients changes here at all — only the stored calorie figure moves. The steps were rewritten for two reasons: the pasta step never said how much dough to make, and now states it per variant (180 g, 200 g, 250 g), and no pasta water was ever reserved, so the sauce had nothing to loosen and emulsify it; it is now reserved when the pasta is drained and used when the two are tossed together."
+    },
+    {
+      "family_id": 35,
+      "dish": "Greek Chicken Gyros",
+      "renamed_to": null,
+      "is_cheat": false,
+      "variants": [
+        {
+          "variant": "Light",
+          "recipe_id": 118,
+          "changed": [
+            {"ingredient": "Chicken thigh (boneless)", "before_g": 200, "after_g": null, "change": "removed"},
+            {"ingredient": "Chicken breast", "before_g": null, "after_g": 200, "change": "added"},
+            {"ingredient": "Pita Bread (linked recipe)", "before_g": 120, "after_g": 140, "change": "increased"},
+            {"ingredient": "Olive oil", "before_g": 12, "after_g": 8, "change": "reduced"},
+            {"ingredient": "Feta Cheese", "before_g": 30, "after_g": 20, "change": "reduced"}
+          ],
+          "unchanged": ["Lemon", "Garlic", "Dried oregano", "Paprika", "Cumin", "Greek yogurt", "Cucumber", "Fresh Dill", "Tomato", "Red Onion", "Lettuce"],
+          "note": "The thigh-to-breast swap is one existing row changed in place at the same 200 g."
+        },
+        {
+          "variant": "Moderate",
+          "recipe_id": 119,
+          "changed": [
+            {"ingredient": "Chicken thigh (boneless)", "before_g": 250, "after_g": null, "change": "removed"},
+            {"ingredient": "Chicken breast", "before_g": null, "after_g": 250, "change": "added"},
+            {"ingredient": "Pita Bread (linked recipe)", "before_g": 160, "after_g": 180, "change": "increased"},
+            {"ingredient": "Olive oil", "before_g": 16, "after_g": 10, "change": "reduced"},
+            {"ingredient": "Feta Cheese", "before_g": 40, "after_g": 28, "change": "reduced"}
+          ],
+          "unchanged": ["Lemon", "Garlic", "Dried oregano", "Paprika", "Cumin", "Greek yogurt", "Cucumber", "Fresh Dill", "Tomato", "Red Onion", "Lettuce"],
+          "note": "The thigh-to-breast swap is one existing row changed in place at the same 250 g."
+        },
+        {
+          "variant": "Balanced",
+          "recipe_id": 120,
+          "changed": [
+            {"ingredient": "Chicken thigh (boneless)", "before_g": 320, "after_g": null, "change": "removed"},
+            {"ingredient": "Chicken breast", "before_g": null, "after_g": 320, "change": "added"},
+            {"ingredient": "Pita Bread (linked recipe)", "before_g": 200, "after_g": 220, "change": "increased"},
+            {"ingredient": "Olive oil", "before_g": 20, "after_g": 12, "change": "reduced"},
+            {"ingredient": "Feta Cheese", "before_g": 60, "after_g": 40, "change": "reduced"}
+          ],
+          "unchanged": ["Lemon", "Garlic", "Dried oregano", "Paprika", "Cumin", "Greek yogurt", "Cucumber", "Fresh Dill", "Tomato", "Red Onion", "Lettuce"],
+          "note": "The thigh-to-breast swap is one existing row changed in place at the same 320 g."
+        }
+      ],
+      "steps_rewritten": [1, 2, 3, 4, 5, 6],
+      "steps_summary": "The marinade and cook steps named thighs and gave a thigh's timing of 5-6 minutes a side, which dries out breast, so both were rewritten and the pita weight is now stated. Warming the pita is now a step of its own just before assembly — only the store-bought note had ever mentioned it, and cold pita cracks when you fold it — and the tzatziki finally gets a taste-and-adjust, since once it is inside a folded pita there is no fixing the salt."
+    },
+    {
+      "family_id": 42,
+      "dish": "Salmon with Air-Fried Potatoes & Green Beans",
+      "renamed_to": null,
+      "is_cheat": false,
+      "variants": [
+        {
+          "variant": "Light",
+          "recipe_id": 139,
+          "changed": [
+            {"ingredient": "Potato", "before_g": 400, "after_g": 570, "change": "increased"},
+            {"ingredient": "Salmon Fillet", "before_g": 260, "after_g": 300, "change": "increased"},
+            {"ingredient": "Olive oil", "before_g": 12, "after_g": 6, "change": "reduced"}
+          ],
+          "unchanged": ["Green beans", "Lemon", "Garlic", "Fresh Dill", "Salt", "Black pepper"]
+        },
+        {
+          "variant": "Moderate",
+          "recipe_id": 140,
+          "changed": [
+            {"ingredient": "Potato", "before_g": 480, "after_g": 670, "change": "increased"},
+            {"ingredient": "Olive oil", "before_g": 16, "after_g": 8, "change": "reduced"}
+          ],
+          "unchanged": ["Salmon Fillet", "Green beans", "Lemon", "Garlic", "Fresh Dill", "Salt", "Black pepper"]
+        },
+        {
+          "variant": "Balanced",
+          "recipe_id": 141,
+          "changed": [
+            {"ingredient": "Potato", "before_g": 600, "after_g": 830, "change": "increased"},
+            {"ingredient": "Olive oil", "before_g": 20, "after_g": 10, "change": "reduced"}
+          ],
+          "unchanged": ["Salmon Fillet", "Green beans", "Lemon", "Garlic", "Fresh Dill", "Salt", "Black pepper"]
+        }
+      ],
+      "steps_rewritten": [1, 2, 3, 4, 5, 6],
+      "steps_summary": "Nothing used to coordinate the three components, so read in order the potatoes came out and sat going cold while the salmon cooked; the salmon now starts against the potato clock and the air-fry times are restated for the much larger potato load, with a warning not to crowd the basket. The raw crushed garlic that was tossed through the warm beans, which is acrid and takes over the plate, now goes into the steam for the last thirty seconds instead."
+    },
+    {
+      "family_id": 43,
+      "dish": "Mediterranean Salmon with Sweet Potato & Broccoli",
+      "renamed_to": null,
+      "is_cheat": false,
+      "variants": [
+        {
+          "variant": "Light",
+          "recipe_id": 142,
+          "changed": [
+            {"ingredient": "Cherry Tomatoes", "before_g": null, "after_g": 120, "change": "added"},
+            {"ingredient": "Black Olives", "before_g": null, "after_g": 20, "change": "added"},
+            {"ingredient": "Dried oregano", "before_g": null, "after_g": 1, "change": "added"},
+            {"ingredient": "Sweet potato", "before_g": 340, "after_g": 520, "change": "increased"},
+            {"ingredient": "Salmon Fillet", "before_g": 260, "after_g": 300, "change": "increased"},
+            {"ingredient": "Olive oil", "before_g": 12, "after_g": 6, "change": "reduced"}
+          ],
+          "unchanged": ["Broccoli", "Lemon", "Garlic", "Fresh Dill", "Salt", "Black pepper"]
+        },
+        {
+          "variant": "Moderate",
+          "recipe_id": 143,
+          "changed": [
+            {"ingredient": "Cherry Tomatoes", "before_g": null, "after_g": 150, "change": "added"},
+            {"ingredient": "Black Olives", "before_g": null, "after_g": 30, "change": "added"},
+            {"ingredient": "Dried oregano", "before_g": null, "after_g": 1, "change": "added"},
+            {"ingredient": "Sweet potato", "before_g": 440, "after_g": 610, "change": "increased"},
+            {"ingredient": "Olive oil", "before_g": 16, "after_g": 8, "change": "reduced"}
+          ],
+          "unchanged": ["Salmon Fillet", "Broccoli", "Lemon", "Garlic", "Fresh Dill", "Salt", "Black pepper"]
+        },
+        {
+          "variant": "Balanced",
+          "recipe_id": 144,
+          "changed": [
+            {"ingredient": "Cherry Tomatoes", "before_g": null, "after_g": 180, "change": "added"},
+            {"ingredient": "Black Olives", "before_g": null, "after_g": 40, "change": "added"},
+            {"ingredient": "Dried oregano", "before_g": null, "after_g": 1.5, "change": "added"},
+            {"ingredient": "Sweet potato", "before_g": 560, "after_g": 770, "change": "increased"},
+            {"ingredient": "Olive oil", "before_g": 20, "after_g": 10, "change": "reduced"}
+          ],
+          "unchanged": ["Salmon Fillet", "Broccoli", "Lemon", "Garlic", "Fresh Dill", "Salt", "Black pepper"]
+        }
+      ],
+      "steps_rewritten": [1, 2, 3, 4, 5, 6, 7],
+      "steps_summary": "The three new Mediterranean ingredients get real placement rather than a mention: the oregano goes onto the sweet potato wedges at the start so it roasts into them, and the cherry tomatoes and olives join the tray for the last stretch — long enough for the tomatoes to collapse and catch, not so long that the olives go leathery. As on the sister salmon family, the components are now timed to finish together and the raw garlic goes into the steam rather than onto the hot broccoli."
+    },
+    {
+      "family_id": 95,
+      "dish": "Mixed Berry & Greek Yogurt Smoothie",
+      "renamed_to": null,
+      "is_cheat": false,
+      "variants": [
+        {
+          "variant": "Light",
+          "recipe_id": 217,
+          "changed": [
+            {"ingredient": "Greek yogurt", "before_g": 470, "after_g": 450, "change": "reduced"}
+          ],
+          "unchanged": ["Mixed berries", "Low fat milk", "Honey", "Chia seeds", "Walnuts", "Salt"]
+        },
+        {
+          "variant": "Moderate",
+          "recipe_id": 218,
+          "changed": [
+            {"ingredient": "Greek yogurt", "before_g": 500, "after_g": 460, "change": "reduced"}
+          ],
+          "unchanged": ["Mixed berries", "Low fat milk", "Honey", "Chia seeds", "Walnuts", "Salt"]
+        },
+        {
+          "variant": "Balanced",
+          "recipe_id": 219,
+          "changed": [
+            {"ingredient": "Greek yogurt", "before_g": 600, "after_g": 490, "change": "reduced"}
+          ],
+          "unchanged": ["Mixed berries", "Low fat milk", "Honey", "Chia seeds", "Walnuts", "Salt"]
+        }
+      ],
+      "steps_rewritten": [],
+      "steps_summary": null
+    },
+    {
+      "family_id": 96,
+      "dish": "Greek Yogurt & Granola Bowl",
+      "renamed_to": null,
+      "is_cheat": false,
+      "variants": [
+        {
+          "variant": "Light",
+          "recipe_id": 220,
+          "changed": [
+            {"ingredient": "Greek yogurt", "before_g": 600, "after_g": 580, "change": "reduced"},
+            {"ingredient": "Goodness Granola (linked recipe)", "before_g": 90, "after_g": 100, "change": "increased"}
+          ],
+          "unchanged": ["Mixed berries", "Honey"]
+        },
+        {
+          "variant": "Moderate",
+          "recipe_id": 221,
+          "changed": [
+            {"ingredient": "Greek yogurt", "before_g": 700, "after_g": 600, "change": "reduced"},
+            {"ingredient": "Goodness Granola (linked recipe)", "before_g": 120, "after_g": 135, "change": "increased"}
+          ],
+          "unchanged": ["Mixed berries", "Honey"]
+        },
+        {
+          "variant": "Balanced",
+          "recipe_id": 222,
+          "changed": [
+            {"ingredient": "Greek yogurt", "before_g": 900, "after_g": 640, "change": "reduced"},
+            {"ingredient": "Goodness Granola (linked recipe)", "before_g": 150, "after_g": 170, "change": "increased"}
+          ],
+          "unchanged": ["Mixed berries", "Honey"]
+        }
+      ],
+      "steps_rewritten": [1, 2, 3, 4],
+      "steps_summary": "The steps spell out the amounts per bowl, so they were regenerated against the new yogurt and granola weights — 290 g, 300 g and 320 g of yogurt per bowl rather than the old 300 g, 350 g and 450 g. Nothing about the method changes."
+    },
+    {
+      "family_id": 105,
+      "dish": "Beef Burger with Bun, Lettuce, Tomato & Ham",
+      "renamed_to": "Beef Burger in Pita with Lettuce & Tomato",
+      "is_cheat": false,
+      "variants": [
+        {
+          "variant": "Light",
+          "recipe_id": 247,
+          "changed": [
+            {"ingredient": "Burger Patties (linked recipe)", "before_g": 25, "after_g": 300, "change": "relinked"},
+            {"ingredient": "Pita Bread (linked recipe)", "before_g": null, "after_g": 140, "change": "added"},
+            {"ingredient": "Sliced Ham", "before_g": 280, "after_g": null, "change": "removed"},
+            {"ingredient": "Brioche Burger Buns", "before_g": 210, "after_g": null, "change": "removed"},
+            {"ingredient": "Lettuce", "before_g": 18, "after_g": 40, "change": "increased"},
+            {"ingredient": "Tomato", "before_g": 25, "after_g": 60, "change": "increased"},
+            {"ingredient": "Dijon Mustard", "before_g": 4, "after_g": 5, "change": "increased"}
+          ],
+          "unchanged": ["Black pepper", "Salt"],
+          "note": "The patty row is converted in place, so the store-bought 'Beef Burger Patties' fallback is dropped and the patty becomes homemade-only; the new pita row keeps both a homemade link and a store-bought option."
+        },
+        {
+          "variant": "Moderate",
+          "recipe_id": 248,
+          "changed": [
+            {"ingredient": "Burger Patties (linked recipe)", "before_g": 30, "after_g": 350, "change": "relinked"},
+            {"ingredient": "Pita Bread (linked recipe)", "before_g": null, "after_g": 175, "change": "added"},
+            {"ingredient": "Sliced Ham", "before_g": 350, "after_g": null, "change": "removed"},
+            {"ingredient": "Brioche Burger Buns", "before_g": 260, "after_g": null, "change": "removed"},
+            {"ingredient": "Lettuce", "before_g": 20, "after_g": 50, "change": "increased"},
+            {"ingredient": "Tomato", "before_g": 30, "after_g": 80, "change": "increased"},
+            {"ingredient": "Dijon Mustard", "before_g": 5, "after_g": 6, "change": "increased"}
+          ],
+          "unchanged": ["Black pepper", "Salt"],
+          "note": "The patty row is converted in place, so the store-bought 'Beef Burger Patties' fallback is dropped and the patty becomes homemade-only; the new pita row keeps both a homemade link and a store-bought option."
+        },
+        {
+          "variant": "Balanced",
+          "recipe_id": 249,
+          "changed": [
+            {"ingredient": "Burger Patties (linked recipe)", "before_g": 40, "after_g": 400, "change": "relinked"},
+            {"ingredient": "Pita Bread (linked recipe)", "before_g": null, "after_g": 210, "change": "added"},
+            {"ingredient": "Sliced Ham", "before_g": 430, "after_g": null, "change": "removed"},
+            {"ingredient": "Brioche Burger Buns", "before_g": 320, "after_g": null, "change": "removed"},
+            {"ingredient": "Lettuce", "before_g": 25, "after_g": 60, "change": "increased"},
+            {"ingredient": "Tomato", "before_g": 35, "after_g": 100, "change": "increased"},
+            {"ingredient": "Dijon Mustard", "before_g": 6, "after_g": 8, "change": "increased"}
+          ],
+          "unchanged": ["Black pepper", "Salt"],
+          "note": "The patty row is converted in place, so the store-bought 'Beef Burger Patties' fallback is dropped and the patty becomes homemade-only; the new pita row keeps both a homemade link and a store-bought option."
+        }
+      ],
+      "steps_rewritten": [1, 2, 3, 4, 5, 6],
+      "steps_summary": "The steps are written from scratch because the dish has changed: the old step 1 said to cook the patties 'according to package directions', with no internal temperature, no rest and no warning against pressing them. There are now proper prep steps for the homemade patties and the pita, each with a store-bought alternative, a dimple pressed into each patty so it stays flat, and a stated cook-and-rest."
+    },
+    {
+      "family_id": 106,
+      "dish": "Turkey Burger with Bun & Slaw",
+      "renamed_to": null,
+      "is_cheat": false,
+      "variants": [
+        {
+          "variant": "Light",
+          "recipe_id": 250,
+          "changed": [
+            {"ingredient": "White Wine Vinegar", "before_g": null, "after_g": 5, "change": "added"},
+            {"ingredient": "Mayonnaise (linked recipe)", "before_g": 10, "after_g": 10, "change": "relinked"}
+          ],
+          "unchanged": ["Turkey mince (2% fat)", "Breadcrumbs", "Egg", "Brioche Burger Buns", "White Cabbage", "Carrot", "Black pepper", "Salt"],
+          "note": "The mayonnaise weight does not change — the row gains a link to the homemade Mayonnaise recipe while keeping the shop-bought jar as a fallback."
+        },
+        {
+          "variant": "Moderate",
+          "recipe_id": 251,
+          "changed": [
+            {"ingredient": "White Wine Vinegar", "before_g": null, "after_g": 5, "change": "added"},
+            {"ingredient": "Mayonnaise (linked recipe)", "before_g": 12, "after_g": 12, "change": "relinked"}
+          ],
+          "unchanged": ["Turkey mince (2% fat)", "Breadcrumbs", "Egg", "Brioche Burger Buns", "White Cabbage", "Carrot", "Black pepper", "Salt"],
+          "note": "The mayonnaise weight does not change — the row gains a link to the homemade Mayonnaise recipe while keeping the shop-bought jar as a fallback."
+        },
+        {
+          "variant": "Balanced",
+          "recipe_id": 252,
+          "changed": [
+            {"ingredient": "White Wine Vinegar", "before_g": null, "after_g": 7, "change": "added"},
+            {"ingredient": "Mayonnaise (linked recipe)", "before_g": 18, "after_g": 18, "change": "relinked"}
+          ],
+          "unchanged": ["Turkey mince (2% fat)", "Breadcrumbs", "Egg", "Brioche Burger Buns", "White Cabbage", "Carrot", "Black pepper", "Salt"],
+          "note": "The mayonnaise weight does not change — the row gains a link to the homemade Mayonnaise recipe while keeping the shop-bought jar as a fallback."
+        }
+      ],
+      "steps_rewritten": [1, 2, 3, 4, 5, 6],
+      "steps_summary": "A new step 3 tells the cook to make the mayonnaise from the linked recipe, with buying a jar as the alternative, and the slaw step now includes the vinegar it never had — it was the only sharp thing missing from the component whose job is to cut a lean turkey patty. The patty now rests for thirty seconds before assembly, and the existing craft is kept as it was, including the 74°C poultry endpoint."
+    },
+    {
+      "family_id": 27,
+      "dish": "Pad Thai",
+      "renamed_to": null,
+      "is_cheat": false,
+      "variants": [
+        {
+          "variant": "Light",
+          "recipe_id": 91,
+          "changed": [
+            {"ingredient": "Prawns (raw, peeled)", "before_g": 90, "after_g": null, "change": "removed"},
+            {"ingredient": "Fish Sauce", "before_g": 18, "after_g": null, "change": "removed"},
+            {"ingredient": "Worcestershire sauce", "before_g": null, "after_g": 18, "change": "added"},
+            {"ingredient": "MSG", "before_g": null, "after_g": 1, "change": "added"},
+            {"ingredient": "Chicken breast", "before_g": 130, "after_g": 170, "change": "increased"}
+          ],
+          "unchanged": ["Flat Rice Noodles", "Egg", "Bean Sprouts", "Garlic", "Shallot", "Spring onions", "Roasted Peanuts", "Lime juice", "Tamarind Pulp", "Sugar", "Sunflower Oil", "Soy sauce", "Chilli Flakes"]
+        },
+        {
+          "variant": "Moderate",
+          "recipe_id": 92,
+          "changed": [
+            {"ingredient": "Prawns (raw, peeled)", "before_g": 110, "after_g": null, "change": "removed"},
+            {"ingredient": "Fish Sauce", "before_g": 18, "after_g": null, "change": "removed"},
+            {"ingredient": "Worcestershire sauce", "before_g": null, "after_g": 18, "change": "added"},
+            {"ingredient": "MSG", "before_g": null, "after_g": 1, "change": "added"},
+            {"ingredient": "Chicken breast", "before_g": 150, "after_g": 165, "change": "increased"}
+          ],
+          "unchanged": ["Flat Rice Noodles", "Egg", "Bean Sprouts", "Garlic", "Shallot", "Spring onions", "Roasted Peanuts", "Lime juice", "Tamarind Pulp", "Sugar", "Sunflower Oil", "Soy sauce", "Chilli Flakes"]
+        },
+        {
+          "variant": "Balanced",
+          "recipe_id": 93,
+          "changed": [
+            {"ingredient": "Prawns (raw, peeled)", "before_g": 130, "after_g": null, "change": "removed"},
+            {"ingredient": "Fish Sauce", "before_g": 18, "after_g": null, "change": "removed"},
+            {"ingredient": "Worcestershire sauce", "before_g": null, "after_g": 18, "change": "added"},
+            {"ingredient": "MSG", "before_g": null, "after_g": 1, "change": "added"}
+          ],
+          "unchanged": ["Chicken breast", "Flat Rice Noodles", "Egg", "Bean Sprouts", "Garlic", "Shallot", "Spring onions", "Roasted Peanuts", "Lime juice", "Tamarind Pulp", "Sugar", "Sunflower Oil", "Soy sauce", "Chilli Flakes"]
+        }
+      ],
+      "steps_rewritten": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+      "steps_summary": "The prawns were named in three steps and the fish sauce in two, so leaving them would have the cook following instructions for things no longer on the list; the prawn stir-fry stage is dropped entirely and the sequence closes up from eleven steps to ten, with Worcestershire and MSG taking the fish sauce's place in the sauce. All the technique is kept — the room-temperature noodle soak, the tamarind soaked, mashed and strained, and the wok taken properly hot."
+    },
+    {
+      "family_id": 17,
+      "dish": "Chicken Burrito Bowl",
+      "renamed_to": null,
+      "is_cheat": false,
+      "variants": [
+        {
+          "variant": "Light",
+          "recipe_id": 57,
+          "changed": [
+            {"ingredient": "Jalapeno", "before_g": null, "after_g": 20, "change": "added"}
+          ],
+          "unchanged": ["Chicken thigh (boneless)", "Jasmine rice", "Black beans (tinned)", "Greek yogurt", "Avocado", "Tomato", "Onion", "Lime juice", "Olive oil", "Garlic", "Fresh coriander", "Cumin", "Smoked paprika", "Salt", "Black pepper"]
+        },
+        {
+          "variant": "Moderate",
+          "recipe_id": 58,
+          "changed": [
+            {"ingredient": "Jalapeno", "before_g": null, "after_g": 30, "change": "added"}
+          ],
+          "unchanged": ["Chicken thigh (boneless)", "Jasmine rice", "Black beans (tinned)", "Greek yogurt", "Avocado", "Tomato", "Onion", "Lime juice", "Olive oil", "Garlic", "Fresh coriander", "Cumin", "Smoked paprika", "Salt", "Black pepper"]
+        },
+        {
+          "variant": "Balanced",
+          "recipe_id": 59,
+          "changed": [
+            {"ingredient": "Jalapeno", "before_g": null, "after_g": 40, "change": "added"}
+          ],
+          "unchanged": ["Chicken thigh (boneless)", "Jasmine rice", "Black beans (tinned)", "Greek yogurt", "Avocado", "Tomato", "Onion", "Lime juice", "Olive oil", "Garlic", "Fresh coriander", "Cumin", "Smoked paprika", "Salt", "Black pepper", "Cheddar Cheese"]
+        }
+      ],
+      "steps_rewritten": [1, 2, 3, 4, 5, 6, 7],
+      "steps_summary": "Only one thing genuinely changes: the jalapeno goes in raw with the pico rather than cooked into the chicken, so the heat stays bright instead of flattening out. Everything else is carried through as it was, including patting the chicken completely dry, searing it undisturbed, bringing it to 74°C and resting it five minutes before slicing against the grain."
+    },
+    {
+      "family_id": 93,
+      "dish": "Chicken Carbonara",
+      "renamed_to": null,
+      "is_cheat": true,
+      "variants": [
+        {
+          "variant": "Light",
+          "recipe_id": 210,
+          "changed": [
+            {"ingredient": "Pancetta", "before_g": 20, "after_g": 40, "change": "increased"},
+            {"ingredient": "Egg", "before_g": 50, "after_g": 100, "change": "increased"},
+            {"ingredient": "Parmesan cheese", "before_g": 15, "after_g": 30, "change": "increased"}
+          ],
+          "unchanged": ["Fresh Pasta (linked recipe)", "Chicken breast", "Black pepper"]
+        },
+        {
+          "variant": "Moderate",
+          "recipe_id": 211,
+          "changed": [
+            {"ingredient": "Pancetta", "before_g": 30, "after_g": 60, "change": "increased"},
+            {"ingredient": "Egg", "before_g": 50, "after_g": 100, "change": "increased"},
+            {"ingredient": "Egg yolk", "before_g": 18, "after_g": 36, "change": "increased"},
+            {"ingredient": "Parmesan cheese", "before_g": 25, "after_g": 50, "change": "increased"}
+          ],
+          "unchanged": ["Fresh Pasta (linked recipe)", "Chicken breast", "Black pepper"]
+        },
+        {
+          "variant": "Balanced",
+          "recipe_id": 212,
+          "changed": [
+            {"ingredient": "Pancetta", "before_g": 40, "after_g": 80, "change": "increased"},
+            {"ingredient": "Egg", "before_g": 50, "after_g": 100, "change": "increased"},
+            {"ingredient": "Egg yolk", "before_g": 18, "after_g": 36, "change": "increased"},
+            {"ingredient": "Parmesan cheese", "before_g": 35, "after_g": 70, "change": "increased"},
+            {"ingredient": "Fresh Pasta (linked recipe)", "before_g": 300, "after_g": 280, "change": "reduced"}
+          ],
+          "unchanged": ["Chicken breast", "Black pepper"]
+        }
+      ],
+      "steps_rewritten": [1, 2, 3, 4, 5, 6, 7],
+      "steps_summary": "The sauce step quoted the old egg count on all three variants and is restated for the doubled egg and Parmesan, and the pancetta step gains a note about crisping the larger amount in a single layer. On the Balanced variant the pasta step had lost the boil-and-reserve half of its instruction, which the whole sauce depends on, and that is put back alongside the corrected 280 g."
+    }
+  ]
+}

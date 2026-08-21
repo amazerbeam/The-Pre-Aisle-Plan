@@ -1,7 +1,11 @@
 # Plan: Delete 6 unused recipe families + build Catherine Duffy a 1400kcal Monday meal plan
 
 Plan folder: `.claude/contract/2026-08-10-recipe-cleanup-and-catherine-meal-plan/`
-Execution status: see `tasks.md` in this folder.
+
+**Status: COMPLETE** — executed live against Railway MySQL on 2026-08-10.
+- All 6 families / 14 recipes deleted, confirmed 0 remaining.
+- Catherine's 2026-08-17 meal plan inserted (`meal_plan_entries` ids 1611-1613).
+- Template "1400 Cal High Protein Day" created (id 4), Monday entries inserted (`meal_plan_template_entries` ids 135-137).
 
 ---
 
