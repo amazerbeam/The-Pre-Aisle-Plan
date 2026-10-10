@@ -288,15 +288,22 @@ public class ShoppingListService {
             // Collect every use of the ingredient in this meal: the main recipe first,
             // then its extras (recursively) — the same traversal getShoppingList aggregates over.
             List<IngredientUsage> usages = new ArrayList<>();
-            collectIngredientUsages(recipe, ingredientId, unit, null, mainRatio, usages);
-
             List<RecipeExtraNodeDTO> extras = extrasTreeCache.computeIfAbsent(
                 recipe.getId(),
                 id -> recipeExtrasService.hasExtras(id)
                     ? recipeExtrasService.buildExtrasTree(id, new HashSet<>())
                     : Collections.emptyList());
-            collectUsagesFromExtras(extras, ingredientId, unit, usages, extraRecipeCache, recipe, mainRatio,
-                                    choicesByEntry.get(entry.getId()), ingredientNames);
+
+            if (ingredientId < 0) {
+                // MPP-10: a generic "Store Bought X" row — its id is -X's recipe id. List the meals
+                // where X is store-bought with no product, i.e. exactly the meals the row sums.
+                collectGenericStoreBoughtUsages(extras, -ingredientId, usages, extraRecipeCache,
+                                                recipe, mainRatio, choicesByEntry.get(entry.getId()));
+            } else {
+                collectIngredientUsages(recipe, ingredientId, unit, null, mainRatio, usages);
+                collectUsagesFromExtras(extras, ingredientId, unit, usages, extraRecipeCache, recipe, mainRatio,
+                                        choicesByEntry.get(entry.getId()), ingredientNames);
+            }
 
             for (IngredientUsage usage : usages) {
                 // Capture ingredient name
@@ -435,6 +442,42 @@ public class ShoppingListService {
                                                 usages, extraRecipeCache, extraRecipe, portionRatio,
                                                 selections, ingredientNames);
                     }
+                }
+            }
+        }
+    }
+
+    /**
+     * MPP-10: breakdown for a generic "Store Bought X" row. Walks the extras tree the same way
+     * {@link #processExtras} does — through homemade extras only — and records each place where
+     * extraRecipeId is store-bought without a product, with the grams that meal uses (or 1 when
+     * the parent has no link row, matching the row's meal-count fallback).
+     */
+    private void collectGenericStoreBoughtUsages(List<RecipeExtraNodeDTO> extras, Long extraRecipeId,
+                                                 List<IngredientUsage> usages,
+                                                 Map<Long, Recipe> extraRecipeCache,
+                                                 Recipe parentRecipe, BigDecimal parentRatio,
+                                                 Map<Long, Boolean> selections) {
+        for (RecipeExtraNodeDTO extra : extras) {
+            Boolean choice = selections != null ? selections.get(extra.getRecipeId()) : null;
+            if (Boolean.FALSE.equals(choice)) {
+                BigDecimal usedGrams = extraPortionResolver.usedGrams(parentRecipe, extra.getRecipeId(), parentRatio);
+                boolean listedAsProduct = extra.getStoreBoughtIngredientId() != null && usedGrams != null;
+                if (extra.getRecipeId().equals(extraRecipeId) && !listedAsProduct) {
+                    usages.add(new IngredientUsage("Store Bought " + extra.getRecipeName(),
+                        usedGrams != null ? usedGrams : BigDecimal.ONE, null, BigDecimal.ONE));
+                }
+                continue; // a store-bought extra's children are not cooked
+            }
+
+            Recipe extraRecipe = extraRecipeCache.computeIfAbsent(
+                extra.getRecipeId(),
+                id -> recipeRepository.findById(id).orElse(null)); // findById — see collectUsagesFromExtras
+            if (extraRecipe != null && extra.getChildren() != null && !extra.getChildren().isEmpty()) {
+                BigDecimal portionRatio = extraPortionResolver.resolveExtraPortionRatio(parentRecipe, extra.getRecipeId(), parentRatio, extraRecipe);
+                if (portionRatio.compareTo(BigDecimal.ZERO) > 0) {
+                    collectGenericStoreBoughtUsages(extra.getChildren(), extraRecipeId, usages,
+                                                    extraRecipeCache, extraRecipe, portionRatio, selections);
                 }
             }
         }
@@ -734,9 +777,11 @@ public class ShoppingListService {
             });
         }
 
-        // Add to aggregated ingredients as special items (negative IDs to avoid conflicts)
-        long storeBoughtIndex = -1000L;
+        // Add to aggregated ingredients as special items. MPP-10: the id is the negated extra
+        // recipe id — negative so it never collides with a real ingredient, and decodable so the
+        // breakdown popup can list the meals behind the row (see getIngredientBreakdown).
         for (StoreBoughtItem item : aggregated.values()) {
+            long storeBoughtIndex = -item.recipeId;
             String itemName = "Store Bought " + item.recipeName;
             boolean inGrams = item.grams != null;
             if (!inGrams && item.count > 1) {
@@ -754,7 +799,6 @@ public class ShoppingListService {
                 STORE_BOUGHT_AISLE_ORDER,
                 null  // FR-102: No source chain for fallback store-bought items
             ));
-            storeBoughtIndex--;
         }
     }
 }

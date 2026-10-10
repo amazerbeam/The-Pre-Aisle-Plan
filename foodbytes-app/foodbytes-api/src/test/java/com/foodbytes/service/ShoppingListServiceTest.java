@@ -682,6 +682,31 @@ class ShoppingListServiceTest {
         assertThat(flour.getTotalQuantity()).isEqualByComparingTo("150.00");
     }
 
+    @Test
+    void breakdown_genericStoreBoughtRow_listsTheMealsBehindIt() {
+        // The generic row's id is -extraRecipeId; holding it lists the store-bought meals with their
+        // grams, and the total matches the row (200 + 400 = 600). Thursday's homemade meal is absent.
+        Recipe bolognese = bolognese();
+        MealPlanEntry mon = entry(startDate, "dinner", bolognese, 2);
+        MealPlanEntry wed = entry(startDate.plusDays(2), "dinner", bolognese, 4);
+        MealPlanEntry thu = entry(startDate.plusDays(3), "dinner", bolognese, 2);
+        givenBologneseWeek(bolognese, false, mon, wed, thu);
+        givenChoices(Map.of(mon.getId(), Map.of(36L, false), wed.getId(), Map.of(36L, false)));
+
+        AggregatedShoppingListDTO list = shoppingListService.getShoppingList(userId, startDate);
+        ShoppingItemDTO row = itemNamed(list, "Store Bought Fresh Pasta");
+        assertThat(row.getIngredientId()).isEqualTo(-36L);
+
+        IngredientBreakdownDTO breakdown = shoppingListService
+            .getIngredientBreakdown(userId, row.getIngredientId(), row.getUnit(), startDate, null);
+
+        assertThat(breakdown.getIngredientName()).isEqualTo("Store Bought Fresh Pasta");
+        assertThat(breakdown.getTotalQuantity()).isEqualByComparingTo(row.getTotalQuantity());
+        assertThat(breakdown.getMealBreakdown())
+            .extracting(MealIngredientUsageDTO::getPlanDate)
+            .containsExactly(startDate, startDate.plusDays(2));
+    }
+
     // ------------------------------------------------------------------
     // getIngredientBreakdown — FR-042 / FR-102
     // ------------------------------------------------------------------
