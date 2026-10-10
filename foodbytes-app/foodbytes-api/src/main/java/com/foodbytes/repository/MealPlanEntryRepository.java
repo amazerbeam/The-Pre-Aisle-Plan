@@ -41,6 +41,13 @@ public interface MealPlanEntryRepository extends JpaRepository<MealPlanEntry, Lo
     );
 
     /**
+     * MPP-10: every entry of an owner dated on or after fromDate — used by the one-time
+     * localStorage import to fill the current and future weeks.
+     */
+    @Query("SELECT mpe FROM MealPlanEntry mpe WHERE mpe.user.id = :userId AND mpe.planDate >= :fromDate")
+    List<MealPlanEntry> findByUserIdFromDate(@Param("userId") Long userId, @Param("fromDate") LocalDate fromDate);
+
+    /**
      * FR-014: Check if a specific recipe is already assigned to a date/meal for a user.
      * Used for toggle behavior - if exists, we remove it; if not, we create it.
      *

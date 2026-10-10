@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useMealPlan } from '../../contexts/MealPlanContext'
 import { useAuth } from '../../contexts/AuthContext'
-import { useHomemadeSelections } from '../../contexts/HomemadeSelectionsContext'
 import { recipeService } from '../../services/recipeService'
 import ExtrasSelectionPopup from './ExtrasSelectionPopup'
 // FR-041: Emojis are only shown in Meal Plan view, NOT on day assignment buttons
@@ -28,13 +27,13 @@ function DayAssignmentButtons({ recipe, servings, currentMealType, selectedRecip
   const recipeIdToAssign = selectedRecipeId || recipe.id
   const { isAuthenticated } = useAuth()
   const { weekDays, weekPlan, assignRecipe, isRecipeAssigned, getDailyCalories } = useMealPlan()
-  const { saveSelections } = useHomemadeSelections()
   // FR-098: Removed loading state - using optimistic UI instead
 
   // FR-087: State for extras popup
   const [showExtrasPopup, setShowExtrasPopup] = useState(false)
   const [pendingDate, setPendingDate] = useState(null) // Date waiting for popup confirmation
   const [extrasData, setExtrasData] = useState(null) // Fetched extras hierarchy
+  const [pendingInitialSelections, setPendingInitialSelections] = useState(undefined) // MPP-10
 
   // Hidden for guest users
   if (!isAuthenticated) {
@@ -84,11 +83,20 @@ function DayAssignmentButtons({ recipe, servings, currentMealType, selectedRecip
   /**
    * FR-087, FR-098: Perform the actual recipe assignment with optimistic UI
    */
-  const performAssignment = (dateStr) => {
+  const performAssignment = (dateStr, extraChoices = null) => {
     const mealId = getMealId(currentMealType)
     // FR-043: Use recipeIdToAssign to assign selected variant
     // FR-098: Pass recipe data for optimistic calorie calculation
-    assignRecipe(recipeIdToAssign, dateStr, mealId, servings, recipe)
+    // MPP-10: extraChoices from the popup are stored server-side with the assign
+    assignRecipe(recipeIdToAssign, dateStr, mealId, servings, recipe, extraChoices)
+  }
+
+  /** MPP-10: when the slot holds a sibling variant, pre-fill the popup with that meal's own choices. */
+  const getSiblingSlotChoices = (dateStr) => {
+    const day = weekPlan?.days?.find((d) => d.date === dateStr)
+    const existing = day?.mealsByType?.[currentMealType?.toLowerCase()]?.[0]
+    const isSibling = existing && recipe.variants?.some((v) => v.recipeId === existing.recipe?.id)
+    return isSibling ? existing.extraChoices : undefined
   }
 
   /**
@@ -125,6 +133,7 @@ function DayAssignmentButtons({ recipe, servings, currentMealType, selectedRecip
       }
 
       // Show popup
+      setPendingInitialSelections(getSiblingSlotChoices(dateStr))
       setPendingDate(dateStr)
       setShowExtrasPopup(true)
       return
@@ -141,10 +150,11 @@ function DayAssignmentButtons({ recipe, servings, currentMealType, selectedRecip
     setShowExtrasPopup(false)
 
     if (pendingDate) {
-      // Selections are automatically saved to localStorage by the popup
-      await performAssignment(pendingDate)
+      // MPP-10: the popup refreshes the local default cache; the server stores the choices with the assign
+      await performAssignment(pendingDate, selections)
       setPendingDate(null)
     }
+    setPendingInitialSelections(undefined)
   }
 
   /**
@@ -153,6 +163,7 @@ function DayAssignmentButtons({ recipe, servings, currentMealType, selectedRecip
   const handleExtrasCancel = () => {
     setShowExtrasPopup(false)
     setPendingDate(null)
+    setPendingInitialSelections(undefined)
   }
 
   /**
@@ -203,6 +214,7 @@ function DayAssignmentButtons({ recipe, servings, currentMealType, selectedRecip
         <ExtrasSelectionPopup
           recipe={recipeWithExtras}
           servings={servings}
+          initialSelections={pendingInitialSelections}
           onConfirm={handleExtrasConfirm}
           onCancel={handleExtrasCancel}
         />

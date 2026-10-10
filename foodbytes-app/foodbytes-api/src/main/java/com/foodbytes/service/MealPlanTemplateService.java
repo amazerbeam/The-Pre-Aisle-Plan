@@ -39,6 +39,8 @@ public class MealPlanTemplateService {
     private final RecipeRepository recipeRepository;
     private final UserRepository userRepository;
     private final MealPlanService mealPlanService;
+    private final ExtraChoiceService extraChoiceService;     // MPP-10: carries homemade/store-bought choices
+    private final ManageExtrasService manageExtrasService;   // MPP-10: Extras counts in Manage templates
 
     private Long getEffectiveMealPlanOwnerId(Long userId) {
         return userRepository.findById(userId)
@@ -49,8 +51,10 @@ public class MealPlanTemplateService {
     @Transactional(readOnly = true)
     public List<MealPlanTemplateDTO> listTemplates(Long userId) {
         Long ownerId = getEffectiveMealPlanOwnerId(userId);
-        return templateRepository.findByUserId(ownerId).stream()
-            .map(this::toSummaryDTO)
+        List<MealPlanTemplate> templates = templateRepository.findByUserId(ownerId);
+        Map<Long, int[]> counts = manageExtrasService.templateExtrasCounts(templates);
+        return templates.stream()
+            .map(t -> toSummaryDTO(t, counts.get(t.getId())))
             .collect(Collectors.toList());
     }
 
@@ -91,6 +95,8 @@ public class MealPlanTemplateService {
 
     /**
      * Replace the snapshot of an existing template with the user's current week.
+     * MPP-10: deleteByTemplateId cascades the old template choices in MySQL, and
+     * snapshotIntoTemplate writes the new ones, so Update re-snapshots the choices too.
      */
     @Transactional
     public MealPlanTemplateDTO updateSnapshot(Long userId, Long templateId, LocalDate sourceStartDate) {
@@ -125,7 +131,7 @@ public class MealPlanTemplateService {
         }
         template.setName(trimmed);
         template = templateRepository.save(template);
-        return toSummaryDTO(template);
+        return toSummaryDTO(template, manageExtrasService.templateExtrasCounts(List.of(template)).get(template.getId()));
     }
 
     @Transactional
@@ -161,6 +167,7 @@ public class MealPlanTemplateService {
 
         List<MealPlanTemplateEntry> sourceEntries = templateEntryRepository.findByTemplateId(templateId);
         List<MealPlanEntry> newEntries = new ArrayList<>();
+        List<Long> templateEntryIds = new ArrayList<>();
 
         for (MealPlanTemplateEntry src : sourceEntries) {
             // Skip silently if the recipe was deleted after the template was saved.
@@ -174,10 +181,18 @@ public class MealPlanTemplateService {
             entry.setRecipe(recipe.get());
             entry.setServings(src.getServings() != null ? src.getServings() : BigDecimal.ONE);
             newEntries.add(entry);
+            templateEntryIds.add(src.getId());
         }
 
         if (!newEntries.isEmpty()) {
-            mealPlanEntryRepository.saveAll(newEntries);
+            List<MealPlanEntry> saved = mealPlanEntryRepository.saveAll(newEntries);
+
+            // MPP-10: restore each template meal's homemade/store-bought choices (AC 7).
+            Map<Long, Long> templateEntryToEntry = new HashMap<>();
+            for (int i = 0; i < templateEntryIds.size(); i++) {
+                templateEntryToEntry.put(templateEntryIds.get(i), saved.get(i).getId());
+            }
+            extraChoiceService.copyTemplateChoicesToEntries(templateEntryToEntry);
         }
 
         return mealPlanService.getWeekPlan(userId, targetStartDate);
@@ -193,6 +208,7 @@ public class MealPlanTemplateService {
             .findByUserIdAndDateRange(ownerId, sourceStartDate, sourceEndExclusive);
 
         List<MealPlanTemplateEntry> snapshots = new ArrayList<>();
+        List<Long> sourceIds = new ArrayList<>();
         for (MealPlanEntry src : sourceEntries) {
             long offset = ChronoUnit.DAYS.between(sourceStartDate, src.getPlanDate());
             if (offset < 0 || offset > 6) continue;
@@ -204,28 +220,39 @@ public class MealPlanTemplateService {
             e.setRecipe(src.getRecipe());
             e.setServings(src.getServings() != null ? src.getServings() : BigDecimal.ONE);
             snapshots.add(e);
+            sourceIds.add(src.getId());
         }
 
         if (!snapshots.isEmpty()) {
             templateEntryRepository.saveAll(snapshots);
+
+            // MPP-10: snapshot each meal's homemade/store-bought choices with it (AC 7).
+            Map<Long, Long> entryToTemplateEntry = new HashMap<>();
+            for (int i = 0; i < snapshots.size(); i++) {
+                entryToTemplateEntry.put(sourceIds.get(i), snapshots.get(i).getId());
+            }
+            extraChoiceService.copyEntryChoicesToTemplate(entryToTemplateEntry);
         }
         template.getEntries().clear();
         template.getEntries().addAll(snapshots);
     }
 
-    private MealPlanTemplateDTO toSummaryDTO(MealPlanTemplate template) {
+    private MealPlanTemplateDTO toSummaryDTO(MealPlanTemplate template, int[] extrasCounts) {
         MealPlanTemplateDTO dto = new MealPlanTemplateDTO();
         dto.setId(template.getId());
         dto.setName(template.getName());
         dto.setEntryCount(template.getEntries() != null ? template.getEntries().size() : 0);
         dto.setCreatedAt(template.getCreatedAt());
         dto.setUpdatedAt(template.getUpdatedAt());
+        dto.setExtrasMealCount(extrasCounts == null ? 0 : extrasCounts[0]);
+        dto.setStoreBoughtCount(extrasCounts == null ? 0 : extrasCounts[1]);
         dto.setEntries(null);
         return dto;
     }
 
     private MealPlanTemplateDTO toDetailDTO(MealPlanTemplate template) {
-        MealPlanTemplateDTO dto = toSummaryDTO(template);
+        MealPlanTemplateDTO dto = toSummaryDTO(template,
+            manageExtrasService.templateExtrasCounts(List.of(template)).get(template.getId()));
         List<MealPlanTemplateEntry> entries = templateEntryRepository.findByTemplateId(template.getId());
         dto.setEntries(entries.stream().map(this::toEntryDTO).collect(Collectors.toList()));
         dto.setEntryCount(entries.size());

@@ -16,6 +16,7 @@ import './ExtrasSelectionPopup.css'
 function ExtrasSelectionPopup({
   recipe,           // Parent recipe with hasExtras and extras array
   servings,         // Servings being assigned
+  initialSelections, // MPP-10: a same-family slot's own choices; overrides the dish default
   onConfirm,        // (selections) => void - called with {extraRecipeId: isHomemade}
   onCancel          // () => void - close without assigning
 }) {
@@ -49,10 +50,10 @@ function ExtrasSelectionPopup({
   // Initialize selections from saved preferences on mount
   useEffect(() => {
     if (recipe?.extras) {
-      const saved = getSelections(recipe.id)
+      const saved = initialSelections ?? getSelections(recipe.id)
       setSelections(initializeSelections(recipe.extras, saved))
     }
-  }, [recipe, getSelections, initializeSelections])
+  }, [recipe, initialSelections, getSelections, initializeSelections])
 
   /**
    * FR-088: Get all descendant recipe IDs for cascade unchecking
@@ -132,7 +133,7 @@ function ExtrasSelectionPopup({
    * Handle confirm - save selections and call callback
    */
   const handleConfirm = () => {
-    // FR-090: Save to localStorage for future pre-population
+    // MPP-10: refresh the local default cache; the server stores these with the assign call.
     saveSelections(recipe.id, selections)
     onConfirm(selections)
   }

@@ -30,6 +30,8 @@ public class MealPlanService {
     private final UserRepository userRepository;
     private final RecipeService recipeService;
     private final MacroCalculationService macroCalculationService;
+    private final ExtraChoiceService extraChoiceService;                     // MPP-10: stored extra choices
+    private final RecipeFamilyMemberRepository recipeFamilyMemberRepository;   // MPP-10: same-family test for variant swaps
 
     /**
      * Get the effective meal plan owner ID for a user.
@@ -74,6 +76,10 @@ public class MealPlanService {
         List<MealPlanEntry> entries = mealPlanEntryRepository
             .findByUserIdAndDateRange(effectiveOwnerId, startDate, endDate);
 
+        // MPP-10: one query for the week's stored extra choices (cart icon on the calendar)
+        Map<Long, Map<Long, Boolean>> choicesByEntry = extraChoiceService.getEntryChoices(
+            entries.stream().map(MealPlanEntry::getId).toList());
+
         // Group entries by date
         Map<LocalDate, List<MealPlanEntry>> byDate = entries.stream()
             .collect(Collectors.groupingBy(MealPlanEntry::getPlanDate));
@@ -86,7 +92,7 @@ public class MealPlanService {
         for (int i = 0; i < 7; i++) {
             LocalDate date = startDate.plusDays(i);
             List<MealPlanEntry> dayEntries = byDate.getOrDefault(date, List.of());
-            MealPlanDayDTO dayDTO = buildDayDTO(date, dayEntries, today);
+            MealPlanDayDTO dayDTO = buildDayDTO(date, dayEntries, today, choicesByEntry);
 
             // FR-081: Calculate daily macros
             if (!dayEntries.isEmpty()) {
@@ -177,9 +183,17 @@ public class MealPlanService {
         Optional<MealPlanEntry> existingSlotEntry = mealPlanEntryRepository
             .findByUserIdAndPlanDateAndMealId(effectiveOwnerId, request.getPlanDate(), request.getMealId());
 
+        // MPP-10: a same-family replacement is a variant switch - keep the meal's choices.
+        // Read them BEFORE the delete: MySQL cascades choice rows away with their entry.
+        Map<Long, Boolean> carriedChoices = Map.of();
         if (existingSlotEntry.isPresent()) {
+            MealPlanEntry replaced = existingSlotEntry.get();
+            if (isSameFamily(replaced.getRecipe().getId(), request.getRecipeId())) {
+                carriedChoices = extraChoiceService.getEntryChoices(List.of(replaced.getId()))
+                    .getOrDefault(replaced.getId(), Map.of());
+            }
             // Swap - remove the existing recipe before adding the new one
-            mealPlanEntryRepository.delete(existingSlotEntry.get());
+            mealPlanEntryRepository.delete(replaced);
         }
 
         // Create new entry - assign to the effective owner (sync mode)
@@ -198,7 +212,28 @@ public class MealPlanService {
         entry.setServings(resolveServings(request.getServings(), recipe, requestingUser));
 
         entry = mealPlanEntryRepository.save(entry);
-        return convertToDTO(entry);
+
+        Map<Long, Boolean> storedChoices = Map.of();
+        Map<Long, Boolean> requested = extraChoiceService.retainTreeExtras(recipe.getId(), request.getExtraChoices());
+        if (!requested.isEmpty()) {
+            // Add-to-day popup: the choices win and become the dish's default (AC 4).
+            extraChoiceService.setEntryChoices(entry.getId(), requested);
+            extraChoiceService.updateDefaults(effectiveOwnerId, recipe.getId(), requested);
+            storedChoices = requested;
+        } else if (!carriedChoices.isEmpty()) {
+            extraChoiceService.setEntryChoices(entry.getId(), carriedChoices);
+            storedChoices = carriedChoices;
+        }
+        return convertToDTO(entry, storedChoices);
+    }
+
+    /** MPP-10: true when both recipes belong to the same recipe family (Light/Moderate/Balanced). */
+    private boolean isSameFamily(Long recipeIdA, Long recipeIdB) {
+        if (recipeIdA.equals(recipeIdB)) return true;
+        Optional<RecipeFamilyMember> a = recipeFamilyMemberRepository.findByRecipeId(recipeIdA);
+        Optional<RecipeFamilyMember> b = recipeFamilyMemberRepository.findByRecipeId(recipeIdB);
+        return a.isPresent() && b.isPresent()
+            && a.get().getFamily().getId().equals(b.get().getFamily().getId());
     }
 
     /**
@@ -265,6 +300,7 @@ public class MealPlanService {
     /**
      * Swap all meal plan entries between two dates.
      * All meals from sourceDate move to targetDate and vice versa.
+     * MPP-10: entries keep their ids, so their extra choices move with them.
      *
      * @param userId User ID
      * @param sourceDate First date
@@ -323,6 +359,7 @@ public class MealPlanService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
             List<MealPlanEntry> newEntries = new ArrayList<>();
+            List<Long> sourceIds = new ArrayList<>();
             for (MealPlanEntry source : sourceEntries) {
                 long dayOffset = ChronoUnit.DAYS.between(sourceStartDate, source.getPlanDate());
                 LocalDate targetDate = targetStartDate.plusDays(dayOffset);
@@ -334,9 +371,17 @@ public class MealPlanService {
                 copy.setRecipe(source.getRecipe());
                 copy.setServings(source.getServings());
                 newEntries.add(copy);
+                sourceIds.add(source.getId());
             }
 
-            mealPlanEntryRepository.saveAll(newEntries);
+            List<MealPlanEntry> savedEntries = mealPlanEntryRepository.saveAll(newEntries);
+
+            // MPP-10: each copy keeps its source meal's homemade/store-bought choices (AC 6).
+            Map<Long, Long> sourceToCopy = new HashMap<>();
+            for (int i = 0; i < sourceIds.size(); i++) {
+                sourceToCopy.put(sourceIds.get(i), savedEntries.get(i).getId());
+            }
+            extraChoiceService.copyEntryChoices(sourceToCopy);
         }
 
         // 4. Return the target week plan
@@ -377,7 +422,8 @@ public class MealPlanService {
     /**
      * Build a MealPlanDayDTO from entries for a specific date.
      */
-    private MealPlanDayDTO buildDayDTO(LocalDate date, List<MealPlanEntry> entries, LocalDate today) {
+    private MealPlanDayDTO buildDayDTO(LocalDate date, List<MealPlanEntry> entries, LocalDate today,
+                                       Map<Long, Map<Long, Boolean>> choicesByEntry) {
         MealPlanDayDTO day = new MealPlanDayDTO();
         day.setDate(date);
         day.setDayOfWeek(date.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.ENGLISH));
@@ -385,7 +431,7 @@ public class MealPlanService {
 
         // Group by meal type
         Map<String, List<MealPlanEntryDTO>> byMeal = entries.stream()
-            .map(this::convertToDTO)
+            .map(e -> convertToDTO(e, choicesByEntry.getOrDefault(e.getId(), Map.of())))
             .collect(Collectors.groupingBy(MealPlanEntryDTO::getMealType));
 
         // Ensure all meal types exist (even if empty)
@@ -410,6 +456,10 @@ public class MealPlanService {
      * FR-102: Uses RecipeSummaryDTO for lightweight response (no ingredients/steps).
      */
     private MealPlanEntryDTO convertToDTO(MealPlanEntry entry) {
+        return convertToDTO(entry, Map.of());
+    }
+
+    private MealPlanEntryDTO convertToDTO(MealPlanEntry entry, Map<Long, Boolean> extraChoices) {
         MealPlanEntryDTO dto = new MealPlanEntryDTO();
         dto.setId(entry.getId());
         dto.setPlanDate(entry.getPlanDate());
@@ -422,6 +472,7 @@ public class MealPlanService {
         dto.setProteinPerServing(macros[0]);
         dto.setCarbsPerServing(macros[1]);
         dto.setFatPerServing(macros[2]);
+        dto.setExtraChoices(new HashMap<>(extraChoices));
         return dto;
     }
 }

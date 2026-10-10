@@ -6,10 +6,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.util.Map;
 
 /**
  * Request DTO for generating a new shopping list.
+ * MPP-10: homemade/store-bought choices are read from the database; a `selections` property
+ * sent by an older client is ignored.
  */
 @Data
 @Builder
@@ -18,8 +19,4 @@ import java.util.Map;
 public class GenerateShoppingListRequest {
     private LocalDate startDate;
     private LocalDate endDate;
-
-    // Optional: homemade/store-bought selections for extras
-    // Format: { parentRecipeId: { extraRecipeId: isHomemade } }
-    private Map<Long, Map<Long, Boolean>> selections;
 }

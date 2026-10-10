@@ -10,6 +10,9 @@ import MealPlanMenu from './MealPlanMenu'
 import SaveTemplateModal from './SaveTemplateModal'
 import ApplyTemplateModal from './ApplyTemplateModal'
 import ManageTemplatesModal from './ManageTemplatesModal'
+import WeekExtrasModal from './WeekExtrasModal'
+import TemplateExtrasModal from './TemplateExtrasModal'
+import { useHomemadeSelections } from '../../contexts/HomemadeSelectionsContext'
 import { formatDateRange } from '../../utils/dateUtils'
 import './MealPlanCalendar.css'
 
@@ -23,7 +26,7 @@ import './MealPlanCalendar.css'
 function MealPlanCalendar() {
   const { isAuthenticated } = useAuth()
   const {
-    weekPlan, startDate, endDate, loading, error,
+    weekPlan, startDate, endDate, loading, error, fetchWeekPlan,
     swapDayMeals, copyWeek,
     templates, loadTemplates,
     saveTemplate, renameTemplate, updateTemplateSnapshot, deleteTemplate, applyTemplate
@@ -35,6 +38,9 @@ function MealPlanCalendar() {
   const [showSaveModal, setShowSaveModal] = useState(false)
   const [showApplyModal, setShowApplyModal] = useState(false)
   const [showManageModal, setShowManageModal] = useState(false)
+  const [showWeekExtras, setShowWeekExtras] = useState(false)     // MPP-10
+  const [extrasTemplate, setExtrasTemplate] = useState(null)      // MPP-10: template whose extras are open
+  const { reloadSelections } = useHomemadeSelections()
   const todayRef = useRef(null)
 
   const currentWeekHasMeals = !!(weekPlan?.days?.some(d =>
@@ -49,6 +55,26 @@ function MealPlanCalendar() {
   const openManage = async () => {
     try { await loadTemplates({ force: true }) } catch {}
     setShowManageModal(true)
+  }
+
+  const closeWeekExtras = (changed) => {
+    setShowWeekExtras(false)
+    if (changed) {
+      fetchWeekPlan()        // cart icons (AC 12)
+      reloadSelections()     // week edits updated dish defaults (AC 4)
+    }
+  }
+
+  const openTemplateExtras = (template) => {
+    setShowManageModal(false)  // replace, don't stack
+    setExtrasTemplate(template)
+  }
+
+  const closeTemplateExtras = async (backToManage) => {
+    setExtrasTemplate(null)
+    // Refresh failure is non-fatal: the template list simply keeps its previous extras counts.
+    try { await loadTemplates({ force: true }) } catch {}
+    if (backToManage) setShowManageModal(true)
   }
 
   // Auto-scroll to today on mobile when weekPlan loads
@@ -104,6 +130,7 @@ function MealPlanCalendar() {
         <h2>Meal Plan</h2>
         <MealPlanMenu
           onCopyWeek={() => setShowCopyModal(true)}
+          onManageExtras={() => setShowWeekExtras(true)}
           onSaveAs={() => setShowSaveModal(true)}
           onApply={openApply}
           onManage={openManage}
@@ -209,7 +236,22 @@ function MealPlanCalendar() {
           onRename={renameTemplate}
           onUpdateSnapshot={updateTemplateSnapshot}
           onDelete={deleteTemplate}
+          onOpenExtras={openTemplateExtras}
           onClose={() => setShowManageModal(false)}
+        />
+      )}
+
+      {/* MPP-10: Manage extras for the week on screen */}
+      {showWeekExtras && (
+        <WeekExtrasModal startDate={startDate} endDate={endDate} onClose={closeWeekExtras} />
+      )}
+
+      {/* MPP-10: Manage extras for one template (replaces Manage templates, with a back arrow) */}
+      {extrasTemplate && (
+        <TemplateExtrasModal
+          template={extrasTemplate}
+          onBack={() => closeTemplateExtras(true)}
+          onClose={() => closeTemplateExtras(false)}
         />
       )}
     </div>

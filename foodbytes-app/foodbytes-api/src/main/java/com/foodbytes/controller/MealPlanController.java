@@ -7,6 +7,7 @@ import com.foodbytes.service.ShoppingListService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -71,7 +72,13 @@ public class MealPlanController {
                 .body(Map.of("error", "Authentication required to save meal plan"));
         }
 
-        MealPlanEntryDTO result = mealPlanService.assignRecipe(userPrincipal.getId(), request);
+        MealPlanEntryDTO result;
+        try {
+            result = mealPlanService.assignRecipe(userPrincipal.getId(), request);
+        } catch (DataIntegrityViolationException e) {
+            return ResponseEntity.status(409).body(Map.of("error",
+                "That choice was changed at the same time on another device. Try again."));
+        }
 
         if (result == null) {
             // Recipe was toggled off (removed)
@@ -192,34 +199,30 @@ public class MealPlanController {
 
         AggregatedShoppingListDTO shoppingList = shoppingListService.getShoppingList(
             userPrincipal.getId(),
-            startDate,
-            null  // No homemade selections
+            startDate
         );
         return ResponseEntity.ok(shoppingList);
     }
 
     /**
-     * FR-089: Get aggregated shopping list with homemade/store-bought selections.
+     * FR-089 / MPP-10: POST kept for compatibility; choices come from the database.
      * POST /api/meal-plan/shopping-list?startDate=2025-12-01
      *
-     * Store-bought extras are shown as single "Store Bought [Recipe Name]" items.
-     * Homemade extras have their ingredients added to the list.
+     * Store-bought extras with a product are listed in grams; without one they are a single
+     * "Store Bought [Recipe Name]" item. Homemade extras have their ingredients added to the list.
      *
      * @param userPrincipal Authenticated user (required)
      * @param startDate Start date of the 7-day period
-     * @param selections Homemade selections from localStorage
      * @return AggregatedShoppingListDTO with items grouped by aisle
      */
     @PostMapping("/shopping-list")
     public ResponseEntity<AggregatedShoppingListDTO> getShoppingListWithSelections(
             @AuthenticationPrincipal UserPrincipal userPrincipal,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestBody(required = false) HomemadeSelectionsDTO selections) {
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate) {
 
         AggregatedShoppingListDTO shoppingList = shoppingListService.getShoppingList(
             userPrincipal.getId(),
-            startDate,
-            selections
+            startDate
         );
         return ResponseEntity.ok(shoppingList);
     }

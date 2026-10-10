@@ -81,12 +81,10 @@ public class PersistedShoppingListService {
      * @param userId User ID
      * @param startDate Start date for the shopping list period
      * @param endDate End date for the shopping list period
-     * @param homemadeSelections Optional homemade/store-bought selections
      * @return The newly generated PersistedShoppingListDTO
      */
     @Transactional
-    public PersistedShoppingListDTO generateShoppingList(Long userId, LocalDate startDate, LocalDate endDate,
-                                                          HomemadeSelectionsDTO homemadeSelections) {
+    public PersistedShoppingListDTO generateShoppingList(Long userId, LocalDate startDate, LocalDate endDate) {
         Long effectiveOwnerId = getEffectiveMealPlanOwnerId(userId);
         User user = userRepository.findById(effectiveOwnerId)
             .orElseThrow(() -> new RuntimeException("User not found"));
@@ -98,7 +96,7 @@ public class PersistedShoppingListService {
         // Generate aggregated shopping list using existing service
         // Note: We pass endDate + 1 day because the existing service uses exclusive end date
         AggregatedShoppingListDTO aggregated = shoppingListService
-            .getShoppingList(effectiveOwnerId, startDate, homemadeSelections);
+            .getShoppingList(effectiveOwnerId, startDate);
 
         // Create new shopping list
         ShoppingList shoppingList = new ShoppingList();

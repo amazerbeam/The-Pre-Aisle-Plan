@@ -30,14 +30,12 @@ export const shoppingService = {
    * Generate a new shopping list (replaces existing)
    * @param {string} startDate - ISO format date string (YYYY-MM-DD)
    * @param {string} endDate - ISO format date string (YYYY-MM-DD)
-   * @param {Object} selections - Optional homemade/store-bought selections
    * @returns {Promise<PersistedShoppingListDTO>}
    */
-  generateShoppingList: async (startDate, endDate, selections = null) => {
+  generateShoppingList: async (startDate, endDate) => {
     const response = await api.post('/shopping-list/generate', {
       startDate,
-      endDate,
-      selections
+      endDate
     })
     return response.data
   },
@@ -78,22 +76,6 @@ export const shoppingService = {
    */
   getShoppingList: async (startDate) => {
     const response = await api.get('/meal-plan/shopping-list', {
-      params: { startDate }
-    })
-    return response.data
-  },
-
-  /**
-   * FR-089: Get shopping list with homemade/store-bought selections
-   * Store-bought extras appear as single "Store Bought [Recipe Name]" items
-   * @param {string} startDate - ISO format date string (YYYY-MM-DD)
-   * @param {Object} selections - Map of parentRecipeId -> { extraRecipeId: isHomemade }
-   * @returns {Promise<AggregatedShoppingListDTO>}
-   */
-  getShoppingListWithSelections: async (startDate, selections) => {
-    const response = await api.post('/meal-plan/shopping-list', {
-      selections
-    }, {
       params: { startDate }
     })
     return response.data

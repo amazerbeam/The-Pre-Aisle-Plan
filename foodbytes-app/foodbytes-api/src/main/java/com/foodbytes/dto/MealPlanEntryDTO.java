@@ -5,6 +5,8 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * DTO for a single meal plan entry.
@@ -25,4 +27,5 @@ public class MealPlanEntryDTO {
     private Integer proteinPerServing;
     private Integer carbsPerServing;
     private Integer fatPerServing;
+    private Map<Long, Boolean> extraChoices = new HashMap<>(); // MPP-10: stored choices for this meal; empty = all homemade
 }

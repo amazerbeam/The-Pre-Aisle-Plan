@@ -84,6 +84,14 @@
   margin: 0;
 }
 
+/* MPP-10: separates the week actions from the three template actions. */
+.meal-plan-menu-list .meal-plan-menu-divider {
+  height: 1px;
+  margin: 4px 0;
+  background: #eee;
+  list-style: none;
+}
+
 .meal-plan-menu-list button {
   width: 100%;
   text-align: left;

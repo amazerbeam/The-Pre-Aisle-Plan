@@ -110,16 +110,15 @@ export const ShoppingListProvider = ({ children }) => {
    * Generate a new shopping list
    * @param {string} startDate - ISO format date string
    * @param {string} endDate - ISO format date string
-   * @param {Object} selections - Optional homemade/store-bought selections
    */
-  const generateShoppingList = useCallback(async (startDate, endDate, selections = null) => {
+  const generateShoppingList = useCallback(async (startDate, endDate) => {
     if (!isAuthenticated) return
 
     setIsGenerating(true)
     setError(null)
 
     try {
-      const data = await shoppingService.generateShoppingList(startDate, endDate, selections)
+      const data = await shoppingService.generateShoppingList(startDate, endDate)
       setShoppingList(data)
       setListExists(true)
     } catch (err) {

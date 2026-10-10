@@ -17,6 +17,8 @@ public class MealPlanTemplateDTO {
     private Long id;
     private String name;
     private Integer entryCount;
+    private Integer extrasMealCount;   // MPP-10: meals in the template that have extras
+    private Integer storeBoughtCount;  // MPP-10: extras set to store-bought across those meals
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private List<MealPlanTemplateEntryDTO> entries;

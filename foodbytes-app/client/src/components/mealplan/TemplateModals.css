@@ -379,3 +379,61 @@
     padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
   }
 }
+
+/* MPP-10: template extras entry point. Appended after the 480px block so the phone
+   layout below wins over its `align-items: flex-start`. */
+.tpl-meta-sb {
+  color: #b15a09;
+  font-weight: 600;
+}
+
+.tpl-action-extras {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.tpl-extras-count {
+  background: #fef3e2;
+  color: #b15a09;
+  font-size: 0.72rem;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 2px 7px;
+}
+
+/* Phone: info above, one row of equal-width action columns. */
+.tpl-list-item {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.tpl-list-actions {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  width: 100%;
+  gap: 6px;
+}
+
+.tpl-list-actions .tpl-action-button {
+  padding: 8px 4px;
+}
+
+@media (min-width: 768px) {
+  .tpl-list-item {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .tpl-list-actions {
+    display: flex;
+    flex-wrap: wrap;
+    width: auto;
+  }
+
+  .tpl-list-actions .tpl-action-button {
+    padding: 8px 12px;
+  }
+}

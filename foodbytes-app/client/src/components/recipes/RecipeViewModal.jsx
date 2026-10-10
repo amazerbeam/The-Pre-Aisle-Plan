@@ -4,7 +4,7 @@ import useServingsInput from '../../hooks/useServingsInput'
 import useRecipeStackServings from '../../hooks/useRecipeStackServings'
 import useWakeLock from '../../hooks/useWakeLock'
 import { useBodyScrollLock } from '../../hooks/useBodyScrollLock'
-import { useHomemadeSelections } from '../../contexts/HomemadeSelectionsContext'
+import { useLinkedStepSelections } from '../../hooks/useLinkedStepSelections'
 import LinkedRecipeNavigation from './LinkedRecipeNavigation'
 import MacroBadgeRow from './MacroBadgeRow'
 import WakeLockIcon from '../common/WakeLockIcon'
@@ -35,16 +35,15 @@ function RecipeViewModal({
   onSelectVariant,    // Callback when variant is selected: (variantId, servings) => void
                       // NOTE: never invoked today - if that changes to alter `recipeId` while
                       // mounted, see the stable-recipeId invariant in useRecipeStackServings' JSDoc
-  parentRecipeId = null  // FR-091: Parent recipe ID for homemade selection lookup
+  parentRecipeId = null, // FR-091: Parent recipe ID for homemade selection lookup
+  extraChoices = null    // MPP-10: a planned meal's own choices
 }) {
   // FR-102: Full recipe data state (loaded on mount)
   const [fullRecipe, setFullRecipe] = useState(null)
   const [contentLoading, setContentLoading] = useState(true)
   const [contentError, setContentError] = useState(null)
 
-  // FR-090: Get homemade selections to determine display for linked steps
-  const { getSelections } = useHomemadeSelections()
-  const homemadeSelections = parentRecipeId ? getSelections(parentRecipeId) : {}
+  const homemadeSelections = useLinkedStepSelections(parentRecipeId, extraChoices) // FR-090 / MPP-10
 
   // FR-029: Screen wake lock with clickable icon next to Ingredients
   const { isLocked, isSupported, isAnimating, toggle: toggleWakeLock } = useWakeLock(true)

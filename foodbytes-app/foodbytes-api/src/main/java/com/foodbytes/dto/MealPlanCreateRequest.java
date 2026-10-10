@@ -4,11 +4,13 @@ import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Map;
 
 /**
  * Request DTO for creating/toggling a meal plan entry (FR-014).
@@ -40,4 +42,11 @@ public class MealPlanCreateRequest {
     @DecimalMax(value = "20.00", message = "Servings must be at most 20")
     @Digits(integer = 2, fraction = 2, message = "Servings allows at most 2 decimal places")
     private BigDecimal servings;
+
+    /**
+     * MPP-10: optional homemade/store-bought choices from the add-to-day popup,
+     * extraRecipeId -> isHomemade. Null when the recipe has no extras or no popup was shown.
+     */
+    @Size(max = 50, message = "extraChoices may hold at most 50 entries")
+    private Map<Long, Boolean> extraChoices;
 }

@@ -1,0 +1,433 @@
+/* MPP-10: Manage extras popup. Ported from the approved mockup (mpp-10-manage-extras-mockup.html).
+   Mobile-first: base = phone bottom sheet; >= 768px = centred modal. Green = homemade, orange = store-bought. */
+
+/* ---------- Shell ---------- */
+.tpl-modal-overlay.mx-overlay {
+  align-items: flex-end;
+  padding: 0;
+}
+
+.mx-overlay .mx-modal {
+  max-width: 100%;
+  max-height: 90vh;
+  max-height: 90dvh;
+  border-radius: 12px 12px 0 0;
+}
+
+.mx-modal .tpl-modal-content > * {
+  flex-shrink: 0;
+}
+
+.mx-title-block {
+  flex: 1;
+  min-width: 0;
+}
+
+.mx-back {
+  font-size: 2rem;
+}
+
+.mx-loading {
+  color: #666;
+  text-align: center;
+  margin: 12px 0;
+}
+
+/* ---------- Toolbar + scope note ---------- */
+.mx-toolbar {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+  padding: 10px 12px;
+  background: #f3f0fa;
+  border-radius: 8px;
+  margin-bottom: 4px;
+}
+
+.mx-summary {
+  font-size: 0.85rem;
+  color: #6c757d;
+}
+
+.mx-summary strong {
+  color: #2c3e50;
+}
+
+.mx-summary-sb {
+  color: #b15a09;
+  font-weight: 600;
+}
+
+.mx-bulk {
+  display: flex;
+  gap: 6px;
+}
+
+.mx-bulk button {
+  flex: 1;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 500;
+  padding: 6px 10px;
+  min-height: 44px;
+  border-radius: 6px;
+  border: 1px solid #d0cbe6;
+  background: #fff;
+  color: #4a3f80;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mx-scope {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  font-size: 0.8rem;
+  color: #5b5180;
+  background: #fff;
+  border: 1px solid #e4def6;
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+
+.mx-scope svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* ---------- Day heading + meal card ---------- */
+.mx-day {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #6c757d;
+  margin: 10px 2px 6px;
+}
+
+.mx-day-date {
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  margin-left: 6px;
+}
+
+.mx-meal {
+  border: 1px solid #eee;
+  border-radius: 10px;
+  background: #fafafa;
+  overflow: hidden;
+}
+
+.mx-meal-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid #eee;
+  background: #fff;
+}
+
+.mx-slot {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: #555;
+  background: #efeff3;
+  padding: 3px 8px;
+  border-radius: 6px;
+  text-transform: uppercase;
+}
+
+.mx-recipe {
+  font-weight: 600;
+  color: #333;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mx-serv {
+  font-size: 0.7rem;
+  color: #4a3f80;
+  background: #e3e1ec;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.mx-variant {
+  font-size: 0.72rem;
+  color: #4a3f80;
+  background: #f3f0fa;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+/* ---------- Extra row ---------- */
+.mx-extra {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  padding: 10px 12px;
+}
+
+.mx-extra + .mx-extra {
+  border-top: 1px dashed #e6e6ec;
+}
+
+.mx-extra-info {
+  min-width: 0;
+}
+
+.mx-extra-name {
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.mx-extra-detail {
+  font-size: 0.8rem;
+  color: #6c757d;
+  margin-top: 2px;
+}
+
+.mx-extra-detail b {
+  font-weight: 600;
+}
+
+.mx-extra-detail.sb b {
+  color: #b15a09;
+}
+
+.mx-extra-detail.hm b {
+  color: #2f7d4a;
+}
+
+.mx-note {
+  font-size: 0.75rem;
+  color: #8a6d3b;
+  margin-top: 3px;
+}
+
+/* ---------- Homemade | Store-bought switch ---------- */
+.mx-seg {
+  display: flex;
+  width: 100%;
+  border: 1px solid #d0d0d0;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+  flex-shrink: 0;
+}
+
+.mx-seg button {
+  flex: 1;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 500;
+  border: none;
+  background: transparent;
+  color: #666;
+  padding: 8px 12px;
+  min-height: 44px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mx-seg button + button {
+  border-left: 1px solid #d0d0d0;
+}
+
+.mx-seg button svg {
+  width: 15px;
+  height: 15px;
+}
+
+.mx-seg button.on.mx-seg-hm {
+  background: #e8f5ec;
+  color: #2f7d4a;
+  font-weight: 600;
+}
+
+.mx-seg button.on.mx-seg-sb {
+  background: #fef3e2;
+  color: #b15a09;
+  font-weight: 600;
+}
+
+.mx-seg button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ---------- Save status ---------- */
+.mx-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  color: #6c757d;
+  min-height: 18px;
+  text-align: center;
+}
+
+.mx-status.saved {
+  color: #2f7d4a;
+}
+
+.mx-status.error {
+  color: #c0392b;
+}
+
+/* ---------- Stale shopping-list bar ---------- */
+.mx-stale {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  background: #fef3e2;
+  border-left: 3px solid #e67e22;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 0.82rem;
+  color: #7a4a10;
+}
+
+.mx-stale-button {
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: #fff;
+  color: #b15a09;
+  border: 1px solid #f0c28a;
+  border-radius: 6px;
+  padding: 6px 10px;
+  cursor: pointer;
+  min-height: 44px;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mx-stale-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.mx-stale-error {
+  width: 100%;
+  color: #c0392b;
+}
+
+/* ---------- Empty state ---------- */
+.mx-empty {
+  text-align: center;
+  color: #666;
+  padding: 28px 12px;
+}
+
+.mx-empty strong {
+  display: block;
+  color: #333;
+  margin-bottom: 6px;
+  font-size: 1rem;
+}
+
+.mx-empty p {
+  margin: 0;
+}
+
+/* ---------- Hover / active / focus ---------- */
+@media (hover: hover) {
+  .mx-bulk button:hover {
+    border-color: #4a3f80;
+  }
+
+  .mx-seg button:not(.on):not(:disabled):hover {
+    background: #f6f6f8;
+  }
+
+  .mx-stale-button:hover:not(:disabled) {
+    border-color: #b15a09;
+  }
+}
+
+.mx-bulk button:active {
+  border-color: #4a3f80;
+  background: #f3f0fa;
+}
+
+.mx-seg button:not(.on):not(:disabled):active {
+  background: #f0f0f4;
+}
+
+.mx-stale-button:active:not(:disabled) {
+  background: #fdebd0;
+}
+
+.mx-bulk button:focus-visible,
+.mx-seg button:focus-visible,
+.mx-stale-button:focus-visible {
+  outline: 2px solid #4a3f80;
+  outline-offset: 2px;
+}
+
+/* ---------- Desktop / tablet: centred modal, inline rows ---------- */
+@media (min-width: 768px) {
+  .tpl-modal-overlay.mx-overlay {
+    align-items: center;
+    padding: 16px;
+  }
+
+  .mx-overlay .mx-modal {
+    max-width: 520px;
+    max-height: 90vh;
+    border-radius: 12px;
+  }
+
+  .mx-toolbar {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+
+  .mx-bulk button {
+    flex: none;
+  }
+
+  .mx-extra {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .mx-extra-info {
+    flex: 1 1 180px;
+  }
+
+  .mx-seg {
+    display: inline-flex;
+    width: auto;
+  }
+
+  .mx-seg button {
+    flex: none;
+  }
+}

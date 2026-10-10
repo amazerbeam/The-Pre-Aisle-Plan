@@ -1,7 +1,6 @@
 package com.foodbytes.service;
 
 import com.foodbytes.dto.AggregatedShoppingListDTO;
-import com.foodbytes.dto.HomemadeSelectionsDTO;
 import com.foodbytes.dto.IngredientBreakdownDTO;
 import com.foodbytes.dto.MealIngredientUsageDTO;
 import com.foodbytes.dto.RecipeExtraNodeDTO;
@@ -11,11 +10,11 @@ import com.foodbytes.model.*;
 import com.foodbytes.repository.IngredientRepository;
 import com.foodbytes.repository.MealPlanEntryRepository;
 import com.foodbytes.repository.RecipeRepository;
+import com.foodbytes.repository.UnitRepository;
 import com.foodbytes.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -29,11 +28,15 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -57,8 +60,10 @@ class ShoppingListServiceTest {
     @Mock private IngredientRepository ingredientRepository;
     @Mock private UserRepository userRepository;
     @Mock private MacroCalculationService macroCalculationService;
+    @Mock private ExtraChoiceService extraChoiceService;
+    @Mock private UnitRepository unitRepository;
 
-    @InjectMocks private ShoppingListService shoppingListService;
+    private ShoppingListService shoppingListService;
 
     private Long userId;
     private LocalDate startDate;
@@ -69,9 +74,21 @@ class ShoppingListServiceTest {
     private Aisle dairyAisle;
     private Unit cupsUnit;
     private Unit ouncesUnit;
+    private Unit gramUnit;
+    private long nextEntryId = 100L;
 
     @BeforeEach
     void setUp() {
+        // ExtraPortionResolver is a real object over the mocked MacroCalculationService, so the
+        // calculateRecipeTotalYield stubs keep driving the proration maths.
+        shoppingListService = new ShoppingListService(
+            mealPlanEntryRepository, recipeRepository, recipeExtrasService,
+            ingredientRepository, userRepository, new ExtraPortionResolver(macroCalculationService),
+            extraChoiceService, unitRepository);
+        // MPP-10: the gram unit store-bought rows aggregate under (live: units.id = 1, key = 'g')
+        gramUnit = new Unit(1L, "g", "g");
+        lenient().when(unitRepository.findByKey("g")).thenReturn(Optional.of(gramUnit));
+
         userId = 1L;
         startDate = LocalDate.of(2025, 12, 1);
         endDate = startDate.plusDays(7);
@@ -101,7 +118,7 @@ class ShoppingListServiceTest {
             .thenReturn(new ArrayList<>());
 
         // Act
-        AggregatedShoppingListDTO result = shoppingListService.getShoppingList(userId, startDate, null);
+        AggregatedShoppingListDTO result = shoppingListService.getShoppingList(userId, startDate);
 
         // Assert
         assertThat(result).isNotNull();
@@ -125,7 +142,7 @@ class ShoppingListServiceTest {
             .thenReturn(List.of(entry));
 
         // Act
-        AggregatedShoppingListDTO result = shoppingListService.getShoppingList(userId, startDate, null);
+        AggregatedShoppingListDTO result = shoppingListService.getShoppingList(userId, startDate);
 
         // Assert
         assertThat(result).isNotNull();
@@ -163,7 +180,7 @@ class ShoppingListServiceTest {
             .thenReturn(List.of(entry1, entry2));
 
         // Act
-        AggregatedShoppingListDTO result = shoppingListService.getShoppingList(userId, startDate, null);
+        AggregatedShoppingListDTO result = shoppingListService.getShoppingList(userId, startDate);
 
         // Assert
         assertThat(result.getTotalItems()).isEqualTo(1);
@@ -189,7 +206,7 @@ class ShoppingListServiceTest {
             .thenReturn(List.of(entry));
 
         // Act
-        AggregatedShoppingListDTO result = shoppingListService.getShoppingList(userId, startDate, null);
+        AggregatedShoppingListDTO result = shoppingListService.getShoppingList(userId, startDate);
 
         // Assert
         ShoppingItemDTO item = result.getAisles().get(0).getItems().get(0);
@@ -213,7 +230,7 @@ class ShoppingListServiceTest {
             .thenReturn(List.of(entry));
 
         // Act
-        AggregatedShoppingListDTO result = shoppingListService.getShoppingList(userId, startDate, null);
+        AggregatedShoppingListDTO result = shoppingListService.getShoppingList(userId, startDate);
 
         // Assert
         ShoppingItemDTO item = result.getAisles().get(0).getItems().get(0);
@@ -236,7 +253,7 @@ class ShoppingListServiceTest {
             .thenReturn(List.of(entry));
 
         // Act
-        AggregatedShoppingListDTO result = shoppingListService.getShoppingList(userId, startDate, null);
+        AggregatedShoppingListDTO result = shoppingListService.getShoppingList(userId, startDate);
 
         // Assert
         ShoppingItemDTO item = result.getAisles().get(0).getItems().get(0);
@@ -261,7 +278,7 @@ class ShoppingListServiceTest {
             .thenReturn(List.of(entry));
 
         // Act
-        AggregatedShoppingListDTO result = shoppingListService.getShoppingList(userId, startDate, null);
+        AggregatedShoppingListDTO result = shoppingListService.getShoppingList(userId, startDate);
 
         // Assert
         assertThat(result.getTotalItems()).isEqualTo(2); // Two separate items
@@ -294,7 +311,7 @@ class ShoppingListServiceTest {
             .thenReturn(List.of(entry));
 
         // Act
-        AggregatedShoppingListDTO result = shoppingListService.getShoppingList(userId, startDate, null);
+        AggregatedShoppingListDTO result = shoppingListService.getShoppingList(userId, startDate);
 
         // Assert
         assertThat(result.getAisles()).hasSize(2);
@@ -324,7 +341,7 @@ class ShoppingListServiceTest {
             .thenReturn(List.of(entry));
 
         // Act
-        AggregatedShoppingListDTO result = shoppingListService.getShoppingList(userId, startDate, null);
+        AggregatedShoppingListDTO result = shoppingListService.getShoppingList(userId, startDate);
 
         // Assert
         List<ShoppingItemDTO> items = result.getAisles().get(0).getItems();
@@ -368,7 +385,7 @@ class ShoppingListServiceTest {
         // Honey Ham's own total yield = 1600 (Ham Fillet) + 400 (Onion) = 2000g.
         when(macroCalculationService.calculateRecipeTotalYield(honeyHam)).thenReturn(new BigDecimal("2000.00"));
 
-        AggregatedShoppingListDTO result = shoppingListService.getShoppingList(userId, startDate, null);
+        AggregatedShoppingListDTO result = shoppingListService.getShoppingList(userId, startDate);
 
         ShoppingItemDTO hamFilletItem = result.getAisles().stream()
             .flatMap(a -> a.getItems().stream())
@@ -406,7 +423,7 @@ class ShoppingListServiceTest {
                 .build()));
         when(recipeRepository.findById(64L)).thenReturn(Optional.of(honeyHam));
 
-        AggregatedShoppingListDTO result = shoppingListService.getShoppingList(userId, startDate, null);
+        AggregatedShoppingListDTO result = shoppingListService.getShoppingList(userId, startDate);
 
         boolean hasHamFillet = result.getAisles().stream()
             .flatMap(a -> a.getItems().stream())
@@ -414,77 +431,130 @@ class ShoppingListServiceTest {
         assertThat(hasHamFillet).isFalse();
     }
     // ------------------------------------------------------------------
-    // MPP-8 — homemade / store-bought selections
+    // MPP-10 - stored homemade / store-bought choices, store-bought products in grams
     // ------------------------------------------------------------------
 
     @Test
-    void storeBoughtExtraWithIngredient_ListsStoreBoughtItemAndSkipsWholeHomemadeSubtree() {
-        // Mirrors the live repro: Spaghetti Bolognese (82) → dual-path row → Fresh Pasta (36),
-        // store-bought counterpart Spaghetti (dried) (126). A nested child extra (90) under
-        // Fresh Pasta must also be skipped — AC1 "including nested child extras".
-        Unit grams = unit(3L, "g");
-        Ingredient mince = ingredient(41L, "Beef mince");
-        Ingredient spaghetti = ingredient(126L, "Spaghetti (dried)");
+    void storeBought_withProduct_listsLinkGramsAtDefaultServings() {
+        // Example 1 / AC 13: Bolognese (82) + Fresh Pasta (36) store-bought -> Spaghetti (dried) 200 g
+        Recipe bolognese = bolognese();
+        MealPlanEntry monday = entry(startDate, "dinner", bolognese, 2);
+        givenBologneseWeek(bolognese, true, monday);
+        givenChoices(Map.of(monday.getId(), Map.of(36L, false)));
 
-        Recipe freshPasta = recipe(36L, "Fresh Pasta", 4,
-            recipeIngredient(ingredient(40L, "Plain flour"), "300.00", grams, "300.00"));
-        RecipeIngredient dualPath = linkedRecipeIngredient(freshPasta, "200.00");
-        dualPath.setIngredient(spaghetti); // FR-103: both ids set
-        Recipe bolognese = recipe(82L, "Spaghetti Bolognese", 2,
-            recipeIngredient(mince, "500.00", grams, "500.00"), dualPath);
+        AggregatedShoppingListDTO result = shoppingListService.getShoppingList(userId, startDate);
 
-        givenUserOwnsTheirOwnPlan(userId);
-        givenEntries(entry(startDate, "dinner", bolognese, 2));
-        when(recipeExtrasService.hasExtras(82L)).thenReturn(true);
-        when(recipeExtrasService.buildExtrasTree(eq(82L), any()))
-            .thenReturn(List.of(RecipeExtraNodeDTO.builder()
-                .recipeId(36L)
-                .recipeName("Fresh Pasta")
-                .storeBoughtIngredientId(126L)
-                .children(new ArrayList<>(List.of(RecipeExtraNodeDTO.builder()
-                    .recipeId(90L)
-                    .recipeName("Pasta Dusting Mix")
-                    .children(new ArrayList<>())
-                    .build())))
-                .build()));
-        when(ingredientRepository.findById(126L)).thenReturn(Optional.of(spaghetti));
-
-        HomemadeSelectionsDTO selections = new HomemadeSelectionsDTO(Map.of(82L, Map.of(36L, false)));
-        AggregatedShoppingListDTO result = shoppingListService.getShoppingList(userId, startDate, selections);
-
-        List<String> names = result.getAisles().stream()
-            .flatMap(a -> a.getItems().stream())
-            .map(ShoppingItemDTO::getIngredientName)
-            .toList();
-        assertThat(names).contains("Spaghetti (dried)", "Beef mince");
-        assertThat(names).doesNotContain("Plain flour");
+        ShoppingItemDTO spaghetti = itemNamed(result, "Spaghetti (dried)");
+        assertThat(spaghetti.getTotalQuantity()).isEqualByComparingTo("200.00");
+        assertThat(spaghetti.getUnit()).isEqualTo("g");
+        assertThat(allItemNames(result)).contains("Beef mince").doesNotContain("Plain flour", "Egg");
         verify(recipeRepository, never()).findById(36L);
-        verify(recipeRepository, never()).findById(90L);
     }
 
     @Test
-    void storeBoughtExtraWithoutIngredient_FallsBackToStoreBoughtItemsAisle() {
-        // AC2: a link-only extra (no store-bought counterpart) set to store-bought keeps the
-        // pre-existing "Store Bought <name>" row in the special aisle.
+    void storeBought_twoMeals_sumsGrams() {
+        // Example 2: Mon + Thu both store-bought -> 400 g in one row
+        Recipe bolognese = bolognese();
+        MealPlanEntry mon = entry(startDate, "dinner", bolognese, 2);
+        MealPlanEntry thu = entry(startDate.plusDays(3), "dinner", bolognese, 2);
+        givenBologneseWeek(bolognese, true, mon, thu);
+        givenChoices(Map.of(mon.getId(), Map.of(36L, false), thu.getId(), Map.of(36L, false)));
+
+        AggregatedShoppingListDTO result = shoppingListService.getShoppingList(userId, startDate);
+
+        assertThat(allItems(result).stream().filter(i -> "Spaghetti (dried)".equals(i.getIngredientName())))
+            .hasSize(1)
+            .allSatisfy(i -> assertThat(i.getTotalQuantity()).isEqualByComparingTo("400.00"));
+    }
+
+    @Test
+    void storeBought_scalesWithServings() {
+        // Example 3: 4 servings of a 2-serving recipe -> 400 g
+        Recipe bolognese = bolognese();
+        MealPlanEntry big = entry(startDate, "dinner", bolognese, 4);
+        givenBologneseWeek(bolognese, true, big);
+        givenChoices(Map.of(big.getId(), Map.of(36L, false)));
+
+        AggregatedShoppingListDTO result = shoppingListService.getShoppingList(userId, startDate);
+
+        assertThat(itemNamed(result, "Spaghetti (dried)").getTotalQuantity()).isEqualByComparingTo("400.00");
+    }
+
+    @Test
+    void perEntryDivergence_sameDish() {
+        // Example 4 / AC 3: Mon store-bought, Thu homemade -> 200 g spaghetti + Thursday's flour/egg only
+        Recipe bolognese = bolognese();
+        MealPlanEntry mon = entry(startDate, "dinner", bolognese, 2);
+        MealPlanEntry thu = entry(startDate.plusDays(3), "dinner", bolognese, 2);
+        givenBologneseWeek(bolognese, true, mon, thu);
+        givenChoices(Map.of(mon.getId(), Map.of(36L, false))); // Thursday has no stored choice
+
+        AggregatedShoppingListDTO result = shoppingListService.getShoppingList(userId, startDate);
+
+        assertThat(itemNamed(result, "Spaghetti (dried)").getTotalQuantity()).isEqualByComparingTo("200.00");
+        // Thursday only: link 200 g of a 400 g batch = 0.5 -> flour 300*0.5, egg 100*0.5
+        assertThat(itemNamed(result, "Plain flour").getTotalQuantity()).isEqualByComparingTo("150.00");
+        assertThat(itemNamed(result, "Egg").getTotalQuantity()).isEqualByComparingTo("50.00");
+    }
+
+    @Test
+    void storeBought_mergesWithSameIngredientUsedRawInGrams() {
+        // AC 13: another recipe uses Spaghetti (dried) 100 g raw -> one merged row of 300 g
+        Recipe bolognese = bolognese();
+        Recipe salad = recipe(90L, "Pasta Salad", 1,
+            recipeIngredient(spaghetti(), "100.00", gramUnit, "100.00"));
+        MealPlanEntry bolo = entry(startDate, "dinner", bolognese, 2);
+        MealPlanEntry sal = entry(startDate.plusDays(1), "lunch", salad, 1);
+        givenBologneseWeek(bolognese, true, bolo, sal);
+        when(recipeExtrasService.hasExtras(90L)).thenReturn(false);
+        givenChoices(Map.of(bolo.getId(), Map.of(36L, false)));
+
+        AggregatedShoppingListDTO result = shoppingListService.getShoppingList(userId, startDate);
+
+        assertThat(allItems(result).stream().filter(i -> "Spaghetti (dried)".equals(i.getIngredientName())))
+            .hasSize(1)
+            .allSatisfy(i -> {
+                assertThat(i.getTotalQuantity()).isEqualByComparingTo("300.00");
+                assertThat(i.getUnit()).isEqualTo("g");
+            });
+    }
+
+    @Test
+    void storeBought_pizzaSauce_listsPassata() {
+        // Example 6: Pink Sauce Pasta (38) + Pizza Sauce (12) store-bought -> Tomato passata 180 g
         Unit grams = unit(3L, "g");
-        Recipe freshPasta = recipe(36L, "Fresh Pasta", 4,
-            recipeIngredient(ingredient(40L, "Plain flour"), "300.00", grams, "300.00"));
-        Recipe bolognese = recipe(82L, "Spaghetti Bolognese", 2,
-            recipeIngredient(ingredient(41L, "Beef mince"), "500.00", grams, "500.00"),
-            linkedRecipeIngredient(freshPasta, "200.00"));
+        Recipe pizzaSauce = recipe(12L, "Pizza Sauce", 4,
+            recipeIngredient(ingredient(70L, "Tomato"), "400.00", grams, "400.00"));
+        Recipe pink = recipe(38L, "Pink Sauce Pasta", 2);
+        pink.setIngredients(new ArrayList<>(List.of(linkedRecipeIngredient(pizzaSauce, "180.00"))));
+        Ingredient passata = ingredient(136L, "Tomato passata");
+        MealPlanEntry entry = entry(startDate, "dinner", pink, 2);
 
         givenUserOwnsTheirOwnPlan(userId);
-        givenEntries(entry(startDate, "dinner", bolognese, 2));
-        when(recipeExtrasService.hasExtras(82L)).thenReturn(true);
-        when(recipeExtrasService.buildExtrasTree(eq(82L), any()))
-            .thenReturn(List.of(RecipeExtraNodeDTO.builder()
-                .recipeId(36L)
-                .recipeName("Fresh Pasta")
-                .children(new ArrayList<>())
-                .build()));
+        givenEntries(entry);
+        when(recipeExtrasService.hasExtras(38L)).thenReturn(true);
+        when(recipeExtrasService.buildExtrasTree(eq(38L), any()))
+            .thenReturn(List.of(RecipeExtraNodeDTO.builder().recipeId(12L).recipeName("Pizza Sauce")
+                .storeBoughtIngredientId(136L).children(new ArrayList<>()).build()));
+        when(ingredientRepository.findById(136L)).thenReturn(Optional.of(passata));
+        givenChoices(Map.of(entry.getId(), Map.of(12L, false)));
 
-        HomemadeSelectionsDTO selections = new HomemadeSelectionsDTO(Map.of(82L, Map.of(36L, false)));
-        AggregatedShoppingListDTO result = shoppingListService.getShoppingList(userId, startDate, selections);
+        AggregatedShoppingListDTO result = shoppingListService.getShoppingList(userId, startDate);
+
+        ShoppingItemDTO item = itemNamed(result, "Tomato passata");
+        assertThat(item.getTotalQuantity()).isEqualByComparingTo("180.00");
+        assertThat(item.getUnit()).isEqualTo("g");
+    }
+
+    @Test
+    void storeBought_withoutProduct_keepsGenericRow() {
+        // AC 14: no store-bought ingredient on the extra -> "Store Bought Fresh Pasta" in its own aisle
+        Recipe bolognese = bolognese();
+        MealPlanEntry entry = entry(startDate, "dinner", bolognese, 2);
+        givenBologneseWeek(bolognese, false, entry);
+        givenChoices(Map.of(entry.getId(), Map.of(36L, false)));
+
+        AggregatedShoppingListDTO result = shoppingListService.getShoppingList(userId, startDate);
 
         ShoppingListByAisleDTO storeBoughtAisle = result.getAisles().stream()
             .filter(a -> "Store Bought Items".equals(a.getAisle().getName()))
@@ -493,52 +563,103 @@ class ShoppingListServiceTest {
         assertThat(storeBoughtAisle.getItems())
             .extracting(ShoppingItemDTO::getIngredientName)
             .containsExactly("Store Bought Fresh Pasta");
-        boolean hasFlour = result.getAisles().stream()
-            .flatMap(a -> a.getItems().stream())
-            .anyMatch(i -> "Plain flour".equals(i.getIngredientName()));
-        assertThat(hasFlour).isFalse();
+        assertThat(allItemNames(result)).doesNotContain("Plain flour", "Egg", "Spaghetti (dried)");
         verify(ingredientRepository, never()).findById(anyLong());
+        verifyNoInteractions(unitRepository);
     }
 
     @Test
-    void explicitHomemadeSelection_MatchesNoSelectionBehaviour() {
-        // AC3: {82:{36:true}} must produce exactly what null selections produce today.
-        Unit grams = unit(3L, "g");
-        Recipe freshPasta = recipe(36L, "Fresh Pasta", 4,
-            recipeIngredient(ingredient(40L, "Plain flour"), "300.00", grams, "300.00"));
-        Recipe bolognese = recipe(82L, "Spaghetti Bolognese", 2,
-            recipeIngredient(ingredient(41L, "Beef mince"), "500.00", grams, "500.00"),
-            linkedRecipeIngredient(freshPasta, "200.00"));
+    void noStoredChoice_equalsHomemadeOutput() {
+        // AC 15: no stored choice -> today's homemade behaviour (prorated flour/egg, no product row)
+        Recipe bolognese = bolognese();
+        MealPlanEntry entry = entry(startDate, "dinner", bolognese, 2);
+        givenBologneseWeek(bolognese, true, entry);
+        // extraChoiceService.getEntryChoices is not stubbed: the mock returns an empty map
 
-        givenUserOwnsTheirOwnPlan(userId);
-        givenEntries(entry(startDate, "dinner", bolognese, 2));
-        when(recipeExtrasService.hasExtras(82L)).thenReturn(true);
-        when(recipeExtrasService.buildExtrasTree(eq(82L), any()))
-            .thenReturn(List.of(RecipeExtraNodeDTO.builder()
-                .recipeId(36L)
-                .recipeName("Fresh Pasta")
-                .storeBoughtIngredientId(126L)
-                .children(new ArrayList<>())
-                .build()));
-        when(recipeRepository.findById(36L)).thenReturn(Optional.of(freshPasta));
-        when(macroCalculationService.calculateRecipeTotalYield(freshPasta)).thenReturn(new BigDecimal("300.00"));
+        AggregatedShoppingListDTO result = shoppingListService.getShoppingList(userId, startDate);
 
-        AggregatedShoppingListDTO homemade = shoppingListService.getShoppingList(
-            userId, startDate, new HomemadeSelectionsDTO(Map.of(82L, Map.of(36L, true))));
-        AggregatedShoppingListDTO noSelection = shoppingListService.getShoppingList(userId, startDate, null);
+        assertThat(itemNamed(result, "Plain flour").getTotalQuantity()).isEqualByComparingTo("150.00");
+        assertThat(itemNamed(result, "Egg").getTotalQuantity()).isEqualByComparingTo("50.00");
+        assertThat(allItemNames(result)).doesNotContain("Spaghetti (dried)");
+        verifyNoInteractions(unitRepository);
+    }
 
-        for (AggregatedShoppingListDTO result : List.of(homemade, noSelection)) {
-            ShoppingItemDTO flour = result.getAisles().stream()
-                .flatMap(a -> a.getItems().stream())
-                .filter(i -> "Plain flour".equals(i.getIngredientName()))
-                .findFirst()
-                .orElseThrow(() -> new AssertionError("no shopping list row for Plain flour"));
-            // usedGrams = 200 * (2/2) = 200; portionRatio = 200/300; flour = 300 * 200/300 = 200.00
-            assertThat(flour.getTotalQuantity()).isEqualByComparingTo(new BigDecimal("200.00"));
-            assertThat(result.getAisles().stream().flatMap(a -> a.getItems().stream()))
-                .noneMatch(i -> "Spaghetti (dried)".equals(i.getIngredientName()));
-        }
-        verify(ingredientRepository, never()).findById(anyLong());
+    @Test
+    void storeBought_linkedUser_readsOwnersEntriesAndChoices() {
+        // AC 2: user 2 shares owner 1's plan; the owner's stored {36:false} drives the list
+        Recipe bolognese = bolognese();
+        MealPlanEntry ownersEntry = entry(startDate, "dinner", bolognese, 2);
+        User linked = new User();
+        linked.setId(2L);
+        linked.setMealPlanOwnerId(1L);
+        when(userRepository.findById(2L)).thenReturn(Optional.of(linked));
+        givenEntries(ownersEntry);
+        stubBologneseExtras(bolognese, true);
+        givenChoices(Map.of(ownersEntry.getId(), Map.of(36L, false)));
+
+        AggregatedShoppingListDTO result = shoppingListService.getShoppingList(2L, startDate);
+
+        ShoppingItemDTO spaghetti = itemNamed(result, "Spaghetti (dried)");
+        assertThat(spaghetti.getTotalQuantity()).isEqualByComparingTo("200.00");
+        assertThat(spaghetti.getUnit()).isEqualTo("g");
+        verify(mealPlanEntryRepository).findByUserIdAndDateRange(eq(1L), any(), any());
+        verify(extraChoiceService).getEntryChoices(argThat(ids -> ids.contains(ownersEntry.getId())));
+    }
+
+    @Test
+    void storeBought_gramUnitMissing_fallsBackToGenericRow() {
+        // W4: a missing 'g' unit must not 500 the whole list
+        when(unitRepository.findByKey("g")).thenReturn(Optional.empty());
+        Recipe bolognese = bolognese();
+        MealPlanEntry entry = entry(startDate, "dinner", bolognese, 2);
+        givenBologneseWeek(bolognese, true, entry);
+        givenChoices(Map.of(entry.getId(), Map.of(36L, false)));
+
+        AggregatedShoppingListDTO result = shoppingListService.getShoppingList(userId, startDate);
+
+        assertThat(allItemNames(result)).contains("Store Bought Fresh Pasta", "Beef mince")
+            .doesNotContain("Spaghetti (dried)", "Plain flour", "Egg");
+    }
+
+    @Test
+    void choicesAreLoadedOncePerGeneration() {
+        // AC 1 / 19: one bulk query for all entries, not one per entry
+        Recipe bolognese = bolognese();
+        MealPlanEntry a = entry(startDate, "dinner", bolognese, 2);
+        MealPlanEntry b = entry(startDate.plusDays(1), "dinner", bolognese, 2);
+        MealPlanEntry c = entry(startDate.plusDays(2), "dinner", bolognese, 2);
+        givenBologneseWeek(bolognese, true, a, b, c);
+
+        shoppingListService.getShoppingList(userId, startDate);
+
+        verify(extraChoiceService, times(1)).getEntryChoices(anyCollection());
+    }
+
+    @Test
+    void breakdown_storeBoughtExtra_reportsGramsAndSkipsSubtree() {
+        // AC 18: Mon store-bought, Thu homemade. The product breakdown reports Monday's 200 g via the
+        // store-bought label; the flour breakdown contains Thursday only.
+        Recipe bolognese = bolognese();
+        MealPlanEntry mon = entry(startDate, "dinner", bolognese, 2);
+        MealPlanEntry thu = entry(startDate.plusDays(3), "dinner", bolognese, 2);
+        givenBologneseWeek(bolognese, true, mon, thu);
+        givenChoices(Map.of(mon.getId(), Map.of(36L, false)));
+
+        IngredientBreakdownDTO product = shoppingListService
+            .getIngredientBreakdown(userId, 126L, "g", startDate, null);
+        assertThat(product.getTotalQuantity()).isEqualByComparingTo("200.00");
+        assertThat(product.getIngredientName()).isEqualTo("Spaghetti (dried)");
+        assertThat(product.getMealBreakdown()).singleElement().satisfies(row -> {
+            assertThat(row.getPlanDate()).isEqualTo(startDate);
+            assertThat(row.getViaRecipeName()).isEqualTo("Fresh Pasta (store-bought)");
+            assertThat(row.getQuantity()).isEqualByComparingTo("200.00");
+        });
+
+        IngredientBreakdownDTO flour = shoppingListService
+            .getIngredientBreakdown(userId, 40L, "g", startDate, null);
+        assertThat(flour.getMealBreakdown()).singleElement()
+            .satisfies(row -> assertThat(row.getPlanDate()).isEqualTo(startDate.plusDays(3)));
+        assertThat(flour.getTotalQuantity()).isEqualByComparingTo("150.00");
     }
 
     // ------------------------------------------------------------------
@@ -739,9 +860,9 @@ class ShoppingListServiceTest {
         when(recipeRepository.findById(13L)).thenReturn(Optional.of(dough));
         when(macroCalculationService.calculateRecipeTotalYield(dough)).thenReturn(new BigDecimal("7.00"));
 
-        // The persisted row, all-homemade (no selections) — same default the breakdown assumes
+        // The persisted row, all-homemade (no stored choices) — same default the breakdown assumes
         AggregatedShoppingListDTO shoppingList = shoppingListService
-            .getShoppingList(1L, MONDAY, null);
+            .getShoppingList(1L, MONDAY);
         ShoppingItemDTO oilRow = shoppingList.getAisles().stream()
             .flatMap(aisle -> aisle.getItems().stream())
             .filter(item -> OLIVE_OIL_ID.equals(item.getIngredientId())
@@ -810,6 +931,64 @@ class ShoppingListServiceTest {
 
     // --- fixtures ---
 
+    private Ingredient spaghetti() {
+        return ingredient(126L, "Spaghetti (dried)");
+    }
+
+    /** Spaghetti Bolognese (82, 2 servings) with a dual-path link: 200 g of Fresh Pasta (36). */
+    private Recipe bolognese() {
+        Unit grams = unit(3L, "g");
+        Recipe freshPasta = recipe(36L, "Fresh Pasta", 4,
+            recipeIngredient(ingredient(40L, "Plain flour"), "300.00", grams, "300.00"),
+            recipeIngredient(ingredient(42L, "Egg"), "100.00", grams, "100.00"));
+        RecipeIngredient dualPath = linkedRecipeIngredient(freshPasta, "200.00");
+        dualPath.setIngredient(spaghetti()); // FR-103: both ids set
+        return recipe(82L, "Spaghetti Bolognese", 2,
+            recipeIngredient(ingredient(41L, "Beef mince"), "500.00", grams, "500.00"), dualPath);
+    }
+
+    private void givenBologneseWeek(Recipe bolognese, boolean withProduct, MealPlanEntry... entries) {
+        givenUserOwnsTheirOwnPlan(userId);
+        givenEntries(entries);
+        stubBologneseExtras(bolognese, withProduct);
+    }
+
+    private void stubBologneseExtras(Recipe bolognese, boolean withProduct) {
+        Recipe freshPasta = bolognese.getIngredients().stream()
+            .filter(RecipeIngredient::isLinkedRecipe).findFirst().orElseThrow().getLinkedRecipe();
+        when(recipeExtrasService.hasExtras(82L)).thenReturn(true);
+        when(recipeExtrasService.buildExtrasTree(eq(82L), any()))
+            .thenReturn(List.of(RecipeExtraNodeDTO.builder()
+                .recipeId(36L)
+                .recipeName("Fresh Pasta")
+                .storeBoughtIngredientId(withProduct ? 126L : null)
+                .children(new ArrayList<>())
+                .build()));
+        lenient().when(recipeRepository.findById(36L)).thenReturn(Optional.of(freshPasta));
+        // Fresh Pasta yields 300 g flour + 100 g egg = 400 g
+        lenient().when(macroCalculationService.calculateRecipeTotalYield(freshPasta)).thenReturn(new BigDecimal("400.00"));
+        lenient().when(ingredientRepository.findById(126L)).thenReturn(Optional.of(spaghetti()));
+    }
+
+    private void givenChoices(Map<Long, Map<Long, Boolean>> choicesByEntry) {
+        when(extraChoiceService.getEntryChoices(anyCollection())).thenReturn(choicesByEntry);
+    }
+
+    private List<ShoppingItemDTO> allItems(AggregatedShoppingListDTO result) {
+        return result.getAisles().stream().flatMap(a -> a.getItems().stream()).toList();
+    }
+
+    private List<String> allItemNames(AggregatedShoppingListDTO result) {
+        return allItems(result).stream().map(ShoppingItemDTO::getIngredientName).toList();
+    }
+
+    private ShoppingItemDTO itemNamed(AggregatedShoppingListDTO result, String name) {
+        return allItems(result).stream()
+            .filter(i -> name.equals(i.getIngredientName()))
+            .findFirst()
+            .orElseThrow(() -> new AssertionError("no shopping list row for " + name));
+    }
+
     private void givenUserOwnsTheirOwnPlan(Long userId) {
         User user = new User();
         user.setId(userId);
@@ -875,6 +1054,7 @@ class ShoppingListServiceTest {
         Meal meal = new Meal();
         meal.setKey(mealKey);
         MealPlanEntry entry = new MealPlanEntry();
+        entry.setId(nextEntryId++);
         entry.setPlanDate(date);
         entry.setMeal(meal);
         entry.setRecipe(recipe);

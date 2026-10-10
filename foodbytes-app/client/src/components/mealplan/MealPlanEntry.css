@@ -15,6 +15,13 @@
   background-color: rgba(74, 63, 128, 0.1);
 }
 
+/* MPP-10: store-bought cart flag (orange from the approved mockup's --storebought) */
+.entry-store-bought {
+  display: inline-flex;
+  flex-shrink: 0;
+  color: #b15a09;
+}
+
 .meal-plan-entry.removing {
   opacity: 0.5;
 }

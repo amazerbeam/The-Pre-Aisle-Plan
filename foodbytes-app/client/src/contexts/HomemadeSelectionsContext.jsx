@@ -1,5 +1,7 @@
 import { createContext, useState, useContext, useCallback, useEffect } from 'react'
 import { useAuth } from './AuthContext'
+import extraChoicesService from '../services/extraChoicesService'
+import { LEGACY_SELECTIONS_KEY_PREFIX } from '../constants/extraChoices'
 
 // FR-103: Shopping list cache key (shared with ShoppingListContext and MealPlanContext)
 const SHOPPING_LIST_INVALIDATED_KEY = 'shoppingListInvalidated'
@@ -16,39 +18,71 @@ const invalidateShoppingListCache = () => {
   }
 }
 
+const readLocal = (key) => {
+  try {
+    const stored = localStorage.getItem(key)
+    return stored ? JSON.parse(stored) : {}
+  } catch (err) {
+    console.error('Error reading homemade selections:', err)
+    return {}
+  }
+}
+
+const isCancelled = (err) => err?.code === 'ERR_CANCELED'
+
 /**
- * FR-090: Context for managing homemade/store-bought selections for recipe extras.
- * Persists choices to localStorage and pre-populates popup with saved preferences.
+ * MPP-10: load the owner's per-dish defaults. The first time the server has none, upload this
+ * browser's legacy localStorage selections once, then drop the local copy.
+ */
+const loadServerDefaults = async (legacyKey, signal) => {
+  const defaults = await extraChoicesService.getDefaults({ signal })
+  if (Object.keys(defaults).length > 0) return defaults
+  const legacy = readLocal(legacyKey)
+  if (Object.keys(legacy).length === 0) return defaults
+  await extraChoicesService.importLegacy(legacy)
+  try { localStorage.removeItem(legacyKey) } catch { /* storage unavailable — import is idempotent server-side */ }
+  return extraChoicesService.getDefaults({ signal })
+}
+
+/**
+ * FR-090 / MPP-10: homemade/store-bought defaults that pre-fill the add-to-day popup.
+ * Signed-in users: the server's per-dish defaults (shared with linked accounts). The popup's
+ * choices are saved server-side with the assign call, so saveSelections only refreshes the cache.
+ * Guests: localStorage, unchanged.
  * FR-103: Invalidates shopping list cache when selections change.
  */
 const HomemadeSelectionsContext = createContext()
 
 export const HomemadeSelectionsProvider = ({ children }) => {
-  const { user } = useAuth()
+  const { user, isAuthenticated } = useAuth()
   const [selections, setSelections] = useState({})
   const [selectionsLoaded, setSelectionsLoaded] = useState(false)
+  const [selectionsError, setSelectionsError] = useState(null)
+  const [reloadKey, setReloadKey] = useState(0)
+  const storageKey = `${LEGACY_SELECTIONS_KEY_PREFIX}${user?.id || 'guest'}`
 
-  // Storage key based on user ID (or 'guest' for guests)
-  const getStorageKey = useCallback(() => {
-    return `homemadeSelections_${user?.id || 'guest'}`
-  }, [user?.id])
-
-  // Load from localStorage on mount and when user changes
   useEffect(() => {
     setSelectionsLoaded(false)
-    try {
-      const stored = localStorage.getItem(getStorageKey())
-      if (stored) {
-        setSelections(JSON.parse(stored))
-      } else {
-        setSelections({})
-      }
-    } catch (err) {
-      console.error('Error loading homemade selections:', err)
-      setSelections({})
+    setSelectionsError(null)
+    if (!isAuthenticated) {
+      setSelections(readLocal(storageKey))
+      setSelectionsLoaded(true)
+      return undefined
     }
-    setSelectionsLoaded(true)
-  }, [getStorageKey])
+    const controller = new AbortController()
+    loadServerDefaults(storageKey, controller.signal)
+      .then((defaults) => setSelections(defaults))
+      .catch((err) => {
+        if (isCancelled(err)) return
+        console.error('Error loading homemade selections:', err)
+        setSelectionsError('Could not load your homemade/store-bought choices.')
+        setSelections({})
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setSelectionsLoaded(true)
+      })
+    return () => controller.abort()
+  }, [isAuthenticated, storageKey, reloadKey])
 
   /**
    * Save selections for a specific recipe.
@@ -57,18 +91,19 @@ export const HomemadeSelectionsProvider = ({ children }) => {
    * @param newSelections - Map of extraRecipeId -> isHomemade (boolean)
    */
   const saveSelections = useCallback((recipeId, newSelections) => {
-    setSelections(prev => {
+    setSelections((prev) => {
       const updated = { ...prev, [recipeId]: newSelections }
-      try {
-        localStorage.setItem(getStorageKey(), JSON.stringify(updated))
-        // FR-103: Invalidate shopping list cache when selections change
-        invalidateShoppingListCache()
-      } catch (err) {
-        console.error('Error saving homemade selections:', err)
+      if (!isAuthenticated) {
+        try {
+          localStorage.setItem(storageKey, JSON.stringify(updated))
+        } catch (err) {
+          console.error('Error saving homemade selections:', err)
+        }
       }
+      invalidateShoppingListCache()
       return updated
     })
-  }, [getStorageKey])
+  }, [isAuthenticated, storageKey])
 
   /**
    * Get saved selections for a recipe (for pre-populating popup).
@@ -79,23 +114,28 @@ export const HomemadeSelectionsProvider = ({ children }) => {
     return selections[recipeId] || {}
   }, [selections])
 
+  /** MPP-10: re-read server defaults after a Manage extras week edit changed them. */
+  const reloadSelections = useCallback(() => setReloadKey((k) => k + 1), [])
+
   /**
    * Clear all selections (e.g., on logout).
    */
   const clearSelections = useCallback(() => {
     setSelections({})
     try {
-      localStorage.removeItem(getStorageKey())
+      localStorage.removeItem(storageKey)
     } catch (err) {
       console.error('Error clearing homemade selections:', err)
     }
-  }, [getStorageKey])
+  }, [storageKey])
 
   const value = {
     selections,
     selectionsLoaded,
+    selectionsError,
     saveSelections,
     getSelections,
+    reloadSelections,
     clearSelections
   }
 

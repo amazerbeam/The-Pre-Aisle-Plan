@@ -87,18 +87,10 @@ public class ShoppingListController {
                 .body(Map.of("error", "endDate must be after startDate"));
         }
 
-        // Convert selections to HomemadeSelectionsDTO if provided
-        HomemadeSelectionsDTO homemadeSelections = null;
-        if (request.getSelections() != null && !request.getSelections().isEmpty()) {
-            homemadeSelections = new HomemadeSelectionsDTO();
-            homemadeSelections.setSelections(request.getSelections());
-        }
-
         PersistedShoppingListDTO list = persistedShoppingListService.generateShoppingList(
             userPrincipal.getId(),
             request.getStartDate(),
-            request.getEndDate(),
-            homemadeSelections
+            request.getEndDate()
         );
 
         return ResponseEntity.ok(list);

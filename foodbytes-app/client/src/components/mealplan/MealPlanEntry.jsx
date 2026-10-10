@@ -2,6 +2,7 @@ import { useState, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { useMealPlan } from '../../contexts/MealPlanContext'
 import RecipeViewModal from '../recipes/RecipeViewModal'
+import { CartIcon } from '../common/ExtrasIcons'
 import { formatServings } from '../../utils/servingsUtils'
 import './MealPlanEntry.css'
 
@@ -47,6 +48,9 @@ function MealPlanEntry({ entry }) {
     }
   }
 
+  // MPP-10 / AC 12: orange cart when any extra of this meal is store-bought
+  const hasStoreBought = Object.values(entry.extraChoices || {}).includes(false)
+
   // FR-014: Handle click on entry to open recipe view
   const handleEntryClick = () => {
     if (!removing && entry.recipe) {
@@ -75,6 +79,11 @@ function MealPlanEntry({ entry }) {
             )}
           </span>
         </div>
+        {hasStoreBought && (
+          <span className="entry-store-bought" role="img" aria-label="Has store-bought extras" title="Has store-bought extras">
+            <CartIcon />
+          </span>
+        )}
         <button
           className="remove-btn"
           onClick={handleRemove}
@@ -115,6 +124,7 @@ function MealPlanEntry({ entry }) {
           onClose={() => setShowRecipeView(false)}
           variants={entry.recipe.variants}
           parentRecipeId={entry.recipe.id}
+          extraChoices={entry.extraChoices}
           onSelectVariant={() => {
             // FR-013: In meal plan view, variant selection updates display only
             // (a recipe swap would require updating the meal plan entry)

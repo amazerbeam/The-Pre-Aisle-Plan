@@ -24,14 +24,16 @@ export const mealPlanService = {
    * @param {number} [servings] - Servings to cook; may be fractional
    *   (0.5 = half portion), 0.25-20, max 2dp. Omit to let the backend derive it
    *   from the recipe's defaultServings; do not default it to 1 here.
+   * @param {Object} [extraChoices] - MPP-10: extraRecipeId -> isHomemade from the add-to-day popup
    * @returns {Promise<Object|null>} MealPlanEntryDTO if created, null if removed
    */
-  async assignRecipe(planDate, mealId, recipeId, servings) {
+  async assignRecipe(planDate, mealId, recipeId, servings, extraChoices) {
     const response = await api.post('/meal-plan', {
       planDate,
       mealId,
       recipeId,
-      servings
+      servings,
+      extraChoices
     })
     // 204 No Content means recipe was toggled off
     if (response.status === 204) {

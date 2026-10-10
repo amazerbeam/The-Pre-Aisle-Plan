@@ -247,7 +247,7 @@ export const MealPlanProvider = ({ children }) => {
    * @param {Object} recipeData - Recipe object with calories for optimistic update
    * @returns {boolean} true if this will be an assignment, false if removal
    */
-  const assignRecipe = useCallback((recipeId, planDate, mealId, servings, recipeData = null) => {
+  const assignRecipe = useCallback((recipeId, planDate, mealId, servings, recipeData = null, extraChoices = null) => {
     if (!isAuthenticated) {
       throw new Error('Authentication required')
     }
@@ -270,7 +270,7 @@ export const MealPlanProvider = ({ children }) => {
     const previousState = applyOptimisticUpdate(recipeId, planDate, mealId, servings, recipeData, isCurrentlyAssigned)
 
     // Fire API call in background (don't await)
-    mealPlanService.assignRecipe(planDate, mealId, recipeId, servings)
+    mealPlanService.assignRecipe(planDate, mealId, recipeId, servings, extraChoices)
       .then(() => {
         // FR-103: Invalidate shopping list cache on successful meal plan change
         invalidateShoppingListCache()

@@ -6,13 +6,14 @@ import './TemplateModals.css'
  * See requirement-meal-plan-templates-2026-05-09.md.
  *
  * Props:
- *  - templates: array of { id, name, entryCount, updatedAt }
+ *  - templates: array of { id, name, entryCount, extrasMealCount, storeBoughtCount, updatedAt }
  *  - onRename(id, newName): Promise
  *  - onUpdateSnapshot(id): Promise — re-snapshots from currently-displayed week
  *  - onDelete(id): Promise
+ *  - onOpenExtras(template): opens the Manage extras popup for that template (MPP-10)
  *  - onClose()
  */
-function ManageTemplatesModal({ templates, onRename, onUpdateSnapshot, onDelete, onClose }) {
+function ManageTemplatesModal({ templates, onRename, onUpdateSnapshot, onDelete, onOpenExtras, onClose }) {
   const [editingId, setEditingId] = useState(null)
   const [editName, setEditName] = useState('')
   const [busyId, setBusyId] = useState(null)
@@ -98,7 +99,7 @@ function ManageTemplatesModal({ templates, onRename, onUpdateSnapshot, onDelete,
         <header className="tpl-modal-header">
           <div className="tpl-modal-title">
             <h4>Manage templates</h4>
-            <span className="tpl-modal-subtitle">Rename, refresh, or delete saved plans</span>
+            <span className="tpl-modal-subtitle">Rename, refresh, set extras, or delete saved plans</span>
           </div>
           <button
             type="button"
@@ -155,7 +156,10 @@ function ManageTemplatesModal({ templates, onRename, onUpdateSnapshot, onDelete,
                       <>
                         <div className="tpl-list-info">
                           <div className="tpl-list-name">{t.name}</div>
-                          <div className="tpl-list-meta">{t.entryCount ?? 0} meals</div>
+                          <div className="tpl-list-meta">
+                            {t.entryCount ?? 0} meals
+                            {t.storeBoughtCount > 0 && <span className="tpl-meta-sb"> · {t.storeBoughtCount} store-bought</span>}
+                          </div>
                         </div>
                         <div className="tpl-list-actions">
                           <button
@@ -176,6 +180,22 @@ function ManageTemplatesModal({ templates, onRename, onUpdateSnapshot, onDelete,
                           >
                             Update
                           </button>
+                          {t.extrasMealCount > 0 && (
+                            <button
+                              type="button"
+                              className="tpl-action-button tpl-action-extras"
+                              onClick={() => onOpenExtras(t)}
+                              disabled={isBusy}
+                              title="Choose homemade or store-bought for this template's extras"
+                            >
+                              Extras
+                              {t.storeBoughtCount > 0 && (
+                                <span className="tpl-extras-count" aria-label={`${t.storeBoughtCount} store-bought`}>
+                                  {t.storeBoughtCount}
+                                </span>
+                              )}
+                            </button>
+                          )}
                           <button
                             type="button"
                             className="tpl-action-button tpl-action-danger"
