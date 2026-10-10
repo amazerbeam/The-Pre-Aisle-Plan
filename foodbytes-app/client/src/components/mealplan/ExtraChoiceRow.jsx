@@ -14,7 +14,7 @@ function ExtraChoiceRow({ extra, onChange }) {
   } else if (storeBoughtIngredientName) {
     detail = <><b>Buy</b> {storeBoughtIngredientName}{grams}</>
   } else {
-    detail = <><b>Buy</b> ready-made · listed as "Store Bought {extraName}" (no product linked)</>
+    detail = <><b>Buy</b> ready-made{grams} · listed as "Store Bought {extraName}" (no product linked)</>
   }
 
   return (

@@ -563,9 +563,29 @@ class ShoppingListServiceTest {
         assertThat(storeBoughtAisle.getItems())
             .extracting(ShoppingItemDTO::getIngredientName)
             .containsExactly("Store Bought Fresh Pasta");
+        // The generic row says how much: the link's 200 g at default servings, not a bare "1"
+        ShoppingItemDTO row = storeBoughtAisle.getItems().get(0);
+        assertThat(row.getTotalQuantity()).isEqualByComparingTo("200.00");
+        assertThat(row.getUnit()).isEqualTo("g");
         assertThat(allItemNames(result)).doesNotContain("Plain flour", "Egg", "Spaghetti (dried)");
         verify(ingredientRepository, never()).findById(anyLong());
         verifyNoInteractions(unitRepository);
+    }
+
+    @Test
+    void storeBought_withoutProduct_twoMeals_sumsGramsInOneRow() {
+        // Generic rows sum grams across meals (200 g + 400 g at 4 servings) with no "(x2)" suffix
+        Recipe bolognese = bolognese();
+        MealPlanEntry mon = entry(startDate, "dinner", bolognese, 2);
+        MealPlanEntry thu = entry(startDate.plusDays(3), "dinner", bolognese, 4);
+        givenBologneseWeek(bolognese, false, mon, thu);
+        givenChoices(Map.of(mon.getId(), Map.of(36L, false), thu.getId(), Map.of(36L, false)));
+
+        AggregatedShoppingListDTO result = shoppingListService.getShoppingList(userId, startDate);
+
+        ShoppingItemDTO row = itemNamed(result, "Store Bought Fresh Pasta");
+        assertThat(row.getTotalQuantity()).isEqualByComparingTo("600.00");
+        assertThat(row.getUnit()).isEqualTo("g");
     }
 
     @Test

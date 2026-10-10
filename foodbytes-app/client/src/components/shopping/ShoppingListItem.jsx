@@ -36,8 +36,9 @@ const ShoppingListItem = ({ item, startDate }) => {
 
   // FR-042: Start long press timer
   const startLongPress = useCallback(() => {
-    // Don't show breakdown for checked items
-    if (checked) return
+    // Don't show breakdown for checked items, or for generic "Store Bought X" rows: they carry
+    // a synthetic negative id with no ingredient behind it, so the breakdown would be "Unknown Ingredient"
+    if (checked || item.ingredientId < 0) return
 
     touchMoved.current = false
     setIsLongPressing(true)

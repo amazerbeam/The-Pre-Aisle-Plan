@@ -148,7 +148,7 @@ public class ShoppingListService {
                 log.warn("Unit '{}' is missing; listing {} store-bought extras generically.",
                          GRAM_UNIT_KEY, storeBoughtGrams.size());
                 for (StoreBoughtGrams sb : storeBoughtGrams) {
-                    storeBoughtItems.add(new StoreBoughtItem(sb.extraRecipeId(), sb.extraRecipeName()));
+                    storeBoughtItems.add(new StoreBoughtItem(sb.extraRecipeId(), sb.extraRecipeName(), sb.grams()));
                 }
             } else {
                 for (StoreBoughtGrams sb : storeBoughtGrams) {
@@ -524,16 +524,20 @@ public class ShoppingListService {
 
     /**
      * FR-089: Helper class for store-bought items.
+     * MPP-10: carries the grams of the extra the meal uses, so the generic row can say how much
+     * to buy instead of a bare meal count. Null when the parent has no link row for the extra.
      */
     private static class StoreBoughtItem {
         private final Long recipeId;
         private final String recipeName;
         private int count;
+        private BigDecimal grams;
 
-        public StoreBoughtItem(Long recipeId, String recipeName) {
+        public StoreBoughtItem(Long recipeId, String recipeName, BigDecimal grams) {
             this.recipeId = recipeId;
             this.recipeName = recipeName;
             this.count = 1;
+            this.grams = grams;
         }
     }
 
@@ -658,15 +662,13 @@ public class ShoppingListService {
             } else {
                 // FR-103 / MPP-10: store-bought - list the product in grams actually used
                 Long storeBoughtIngredientId = extra.getStoreBoughtIngredientId();
-                BigDecimal usedGrams = storeBoughtIngredientId != null
-                    ? extraPortionResolver.usedGrams(parentRecipe, extraRecipeId, parentRatio)
-                    : null;
-                if (usedGrams != null) {
+                BigDecimal usedGrams = extraPortionResolver.usedGrams(parentRecipe, extraRecipeId, parentRatio);
+                if (storeBoughtIngredientId != null && usedGrams != null) {
                     storeBoughtGrams.add(new StoreBoughtGrams(storeBoughtIngredientId, usedGrams,
                         currentSourceChain, extraRecipeId, extra.getRecipeName()));
                 } else {
-                    // No linked product (or no link row): generic special-aisle row
-                    storeBoughtItems.add(new StoreBoughtItem(extraRecipeId, extra.getRecipeName()));
+                    // No linked product (or no link row): generic special-aisle row, in grams when known
+                    storeBoughtItems.add(new StoreBoughtItem(extraRecipeId, extra.getRecipeName(), usedGrams));
                 }
                 // Don't process children - they're covered by the store-bought parent
             }
@@ -690,7 +692,7 @@ public class ShoppingListService {
         if (ingredient == null) {
             log.warn("Store-bought ingredient {} for extra {} not found; listing it generically.",
                      sb.ingredientId(), sb.extraRecipeId());
-            storeBoughtItems.add(new StoreBoughtItem(sb.extraRecipeId(), sb.extraRecipeName()));
+            storeBoughtItems.add(new StoreBoughtItem(sb.extraRecipeId(), sb.extraRecipeName(), sb.grams()));
             return;
         }
         BigDecimal grams = sb.grams().setScale(2, RoundingMode.HALF_UP);
@@ -711,6 +713,8 @@ public class ShoppingListService {
 
     /**
      * FR-089: Add store-bought items to the shopping list.
+     * MPP-10: when every meal's grams are known the row is the summed grams in "g"
+     * ("Store Bought Fresh Pasta 440 g"); otherwise it falls back to the meal count.
      */
     private void addStoreBoughtItems(List<StoreBoughtItem> storeBoughtItems,
                                      Map<IngredientUnitKey, IngredientAggregate> aggregatedIngredients) {
@@ -722,6 +726,9 @@ public class ShoppingListService {
                     return item;
                 } else {
                     existing.count++;
+                    existing.grams = (existing.grams != null && item.grams != null)
+                        ? existing.grams.add(item.grams)
+                        : null;
                     return existing;
                 }
             });
@@ -731,7 +738,8 @@ public class ShoppingListService {
         long storeBoughtIndex = -1000L;
         for (StoreBoughtItem item : aggregated.values()) {
             String itemName = "Store Bought " + item.recipeName;
-            if (item.count > 1) {
+            boolean inGrams = item.grams != null;
+            if (!inGrams && item.count > 1) {
                 itemName += " (x" + item.count + ")";
             }
 
@@ -739,8 +747,8 @@ public class ShoppingListService {
             aggregatedIngredients.put(key, new IngredientAggregate(
                 storeBoughtIndex,
                 itemName,
-                BigDecimal.ONE,
-                "",  // No unit for store-bought items
+                inGrams ? item.grams.setScale(2, RoundingMode.HALF_UP) : BigDecimal.ONE,
+                inGrams ? GRAM_UNIT_KEY : "",  // No unit when only the meal count is known
                 STORE_BOUGHT_AISLE_ID,
                 STORE_BOUGHT_AISLE_NAME,
                 STORE_BOUGHT_AISLE_ORDER,
