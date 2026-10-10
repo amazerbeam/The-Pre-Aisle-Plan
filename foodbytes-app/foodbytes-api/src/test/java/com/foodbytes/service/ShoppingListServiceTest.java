@@ -1,6 +1,7 @@
 package com.foodbytes.service;
 
 import com.foodbytes.dto.AggregatedShoppingListDTO;
+import com.foodbytes.dto.HomemadeSelectionsDTO;
 import com.foodbytes.dto.IngredientBreakdownDTO;
 import com.foodbytes.dto.MealIngredientUsageDTO;
 import com.foodbytes.dto.RecipeExtraNodeDTO;
@@ -23,12 +24,14 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -409,6 +412,133 @@ class ShoppingListServiceTest {
             .flatMap(a -> a.getItems().stream())
             .anyMatch(i -> "Ham Fillet".equals(i.getIngredientName()));
         assertThat(hasHamFillet).isFalse();
+    }
+    // ------------------------------------------------------------------
+    // MPP-8 — homemade / store-bought selections
+    // ------------------------------------------------------------------
+
+    @Test
+    void storeBoughtExtraWithIngredient_ListsStoreBoughtItemAndSkipsWholeHomemadeSubtree() {
+        // Mirrors the live repro: Spaghetti Bolognese (82) → dual-path row → Fresh Pasta (36),
+        // store-bought counterpart Spaghetti (dried) (126). A nested child extra (90) under
+        // Fresh Pasta must also be skipped — AC1 "including nested child extras".
+        Unit grams = unit(3L, "g");
+        Ingredient mince = ingredient(41L, "Beef mince");
+        Ingredient spaghetti = ingredient(126L, "Spaghetti (dried)");
+
+        Recipe freshPasta = recipe(36L, "Fresh Pasta", 4,
+            recipeIngredient(ingredient(40L, "Plain flour"), "300.00", grams, "300.00"));
+        RecipeIngredient dualPath = linkedRecipeIngredient(freshPasta, "200.00");
+        dualPath.setIngredient(spaghetti); // FR-103: both ids set
+        Recipe bolognese = recipe(82L, "Spaghetti Bolognese", 2,
+            recipeIngredient(mince, "500.00", grams, "500.00"), dualPath);
+
+        givenUserOwnsTheirOwnPlan(userId);
+        givenEntries(entry(startDate, "dinner", bolognese, 2));
+        when(recipeExtrasService.hasExtras(82L)).thenReturn(true);
+        when(recipeExtrasService.buildExtrasTree(eq(82L), any()))
+            .thenReturn(List.of(RecipeExtraNodeDTO.builder()
+                .recipeId(36L)
+                .recipeName("Fresh Pasta")
+                .storeBoughtIngredientId(126L)
+                .children(new ArrayList<>(List.of(RecipeExtraNodeDTO.builder()
+                    .recipeId(90L)
+                    .recipeName("Pasta Dusting Mix")
+                    .children(new ArrayList<>())
+                    .build())))
+                .build()));
+        when(ingredientRepository.findById(126L)).thenReturn(Optional.of(spaghetti));
+
+        HomemadeSelectionsDTO selections = new HomemadeSelectionsDTO(Map.of(82L, Map.of(36L, false)));
+        AggregatedShoppingListDTO result = shoppingListService.getShoppingList(userId, startDate, selections);
+
+        List<String> names = result.getAisles().stream()
+            .flatMap(a -> a.getItems().stream())
+            .map(ShoppingItemDTO::getIngredientName)
+            .toList();
+        assertThat(names).contains("Spaghetti (dried)", "Beef mince");
+        assertThat(names).doesNotContain("Plain flour");
+        verify(recipeRepository, never()).findById(36L);
+        verify(recipeRepository, never()).findById(90L);
+    }
+
+    @Test
+    void storeBoughtExtraWithoutIngredient_FallsBackToStoreBoughtItemsAisle() {
+        // AC2: a link-only extra (no store-bought counterpart) set to store-bought keeps the
+        // pre-existing "Store Bought <name>" row in the special aisle.
+        Unit grams = unit(3L, "g");
+        Recipe freshPasta = recipe(36L, "Fresh Pasta", 4,
+            recipeIngredient(ingredient(40L, "Plain flour"), "300.00", grams, "300.00"));
+        Recipe bolognese = recipe(82L, "Spaghetti Bolognese", 2,
+            recipeIngredient(ingredient(41L, "Beef mince"), "500.00", grams, "500.00"),
+            linkedRecipeIngredient(freshPasta, "200.00"));
+
+        givenUserOwnsTheirOwnPlan(userId);
+        givenEntries(entry(startDate, "dinner", bolognese, 2));
+        when(recipeExtrasService.hasExtras(82L)).thenReturn(true);
+        when(recipeExtrasService.buildExtrasTree(eq(82L), any()))
+            .thenReturn(List.of(RecipeExtraNodeDTO.builder()
+                .recipeId(36L)
+                .recipeName("Fresh Pasta")
+                .children(new ArrayList<>())
+                .build()));
+
+        HomemadeSelectionsDTO selections = new HomemadeSelectionsDTO(Map.of(82L, Map.of(36L, false)));
+        AggregatedShoppingListDTO result = shoppingListService.getShoppingList(userId, startDate, selections);
+
+        ShoppingListByAisleDTO storeBoughtAisle = result.getAisles().stream()
+            .filter(a -> "Store Bought Items".equals(a.getAisle().getName()))
+            .findFirst()
+            .orElseThrow(() -> new AssertionError("no Store Bought Items aisle"));
+        assertThat(storeBoughtAisle.getItems())
+            .extracting(ShoppingItemDTO::getIngredientName)
+            .containsExactly("Store Bought Fresh Pasta");
+        boolean hasFlour = result.getAisles().stream()
+            .flatMap(a -> a.getItems().stream())
+            .anyMatch(i -> "Plain flour".equals(i.getIngredientName()));
+        assertThat(hasFlour).isFalse();
+        verify(ingredientRepository, never()).findById(anyLong());
+    }
+
+    @Test
+    void explicitHomemadeSelection_MatchesNoSelectionBehaviour() {
+        // AC3: {82:{36:true}} must produce exactly what null selections produce today.
+        Unit grams = unit(3L, "g");
+        Recipe freshPasta = recipe(36L, "Fresh Pasta", 4,
+            recipeIngredient(ingredient(40L, "Plain flour"), "300.00", grams, "300.00"));
+        Recipe bolognese = recipe(82L, "Spaghetti Bolognese", 2,
+            recipeIngredient(ingredient(41L, "Beef mince"), "500.00", grams, "500.00"),
+            linkedRecipeIngredient(freshPasta, "200.00"));
+
+        givenUserOwnsTheirOwnPlan(userId);
+        givenEntries(entry(startDate, "dinner", bolognese, 2));
+        when(recipeExtrasService.hasExtras(82L)).thenReturn(true);
+        when(recipeExtrasService.buildExtrasTree(eq(82L), any()))
+            .thenReturn(List.of(RecipeExtraNodeDTO.builder()
+                .recipeId(36L)
+                .recipeName("Fresh Pasta")
+                .storeBoughtIngredientId(126L)
+                .children(new ArrayList<>())
+                .build()));
+        when(recipeRepository.findById(36L)).thenReturn(Optional.of(freshPasta));
+        when(macroCalculationService.calculateRecipeTotalYield(freshPasta)).thenReturn(new BigDecimal("300.00"));
+
+        AggregatedShoppingListDTO homemade = shoppingListService.getShoppingList(
+            userId, startDate, new HomemadeSelectionsDTO(Map.of(82L, Map.of(36L, true))));
+        AggregatedShoppingListDTO noSelection = shoppingListService.getShoppingList(userId, startDate, null);
+
+        for (AggregatedShoppingListDTO result : List.of(homemade, noSelection)) {
+            ShoppingItemDTO flour = result.getAisles().stream()
+                .flatMap(a -> a.getItems().stream())
+                .filter(i -> "Plain flour".equals(i.getIngredientName()))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("no shopping list row for Plain flour"));
+            // usedGrams = 200 * (2/2) = 200; portionRatio = 200/300; flour = 300 * 200/300 = 200.00
+            assertThat(flour.getTotalQuantity()).isEqualByComparingTo(new BigDecimal("200.00"));
+            assertThat(result.getAisles().stream().flatMap(a -> a.getItems().stream()))
+                .noneMatch(i -> "Spaghetti (dried)".equals(i.getIngredientName()));
+        }
+        verify(ingredientRepository, never()).findById(anyLong());
     }
 
     // ------------------------------------------------------------------

@@ -1,0 +1,73 @@
+CHARACTER HEIGHT SCALE (v2 — updated for the stadium-riser full-canvas layout)
+Anchor: Arthur Morgan (Red Dead Redemption 2) = 185cm real -> 6cm on poster
+  (was 12cm in v1 — halved to fit far more characters via the riser-row
+  technique, growing the poster edge to edge instead of one corner)
+Scale factor: 6 / 185 = 0.0324 cm-poster per cm-real  (~1:30.8)
+Print target: 45 x 30cm @ 300dpi (5315 x 3543 px)
+
+LAYOUT: stadium-riser crowd, not a single corner huddle. Front row stands at
+canvas-bottom, full height. Each row behind rises up the canvas so it's never
+covered past its own chest by the row in front — using the anthropometric
+rule that chest height sits ~72% up a standing body, each row must rise by
+at least height x (1 - 0.72) = height x 0.28 above the row in front.
+At the 6cm anchor height this is a ~1.68cm rise per row.
+  6cm (row 1) + (rows-1) x 1.68cm <= 30cm  ->  15 rows fit total.
+Per-row width: a standing silhouette (with prop/arm spread) runs roughly
+0.35x its height -> ~2.1cm wide at 6cm tall. Packed shoulder-to-shoulder
+with natural crowd overlap: ~21-25 characters per row across 45cm.
+THEORETICAL CAPACITY: 15 rows x ~21-25/row =~ 315-375 characters.
+GOAL (per owner, 2026-08-21): fill the grey space — aim big, not a small
+curated cap. Roster building is actively expanding toward this capacity.
+
+RULE (unchanged): "Largest HUMAN character = 6cm" is satisfied by Arthur as
+the tallest ORDINARY human. Non-human (Mewtwo), demigod (Kratos), or
+powered-armor (Master Chief) characters may exceed 6cm on their own
+real/lore height.
+
+"official" = stated in-game/dev/wiki-documented canon figure
+"estimate" = no official source found; reasoned from model proportions / genre convention
+
+Character                                Real(cm)  Poster(cm)  Poster(px@300dpi)  Source
+--------------------------------------------------------------------------------------------
+Smough (Dark Souls, duo boss w/ Ornstein)    260        8.43            996        estimate - no official source, reasoned from in-game relative scale (boss-tier, exceeds ordinary-human cap like Kratos)
+Ornstein (Dark Souls, duo boss w/ Smough)    220        7.14            843        estimate - no official source, reasoned from in-game relative scale (boss-tier, exceeds ordinary-human cap like Kratos)
+Master Chief, armored (Halo)                 213        6.91            816        official
+Kratos (God of War)                          203        6.58            778        official
+Mewtwo (Pokemon)                             200        6.49            766        official (Pokedex)
+Minecraft Steve                              190        6.16            728        estimate - fan consensus
+Zarya (Overwatch)                            188        6.10            720        official
+McCree / Cassidy (Overwatch)                 188        6.10            720        official
+Arthur Morgan (Red Dead Redemption 2)        185        6.00            709        official - BASELINE
+Guile (Street Fighter)                       185        6.00            709        official
+Agent 47 (Hitman)                            185        6.00            709        official
+Kazuya Mishima (Tekken)                      183        5.94            701        official
+Isaac Clarke (Dead Space)                    183        5.94            701        estimate
+Solaire of Astora (Dark Souls)               183        5.94            701        estimate
+Gordon Freeman (Half-Life)                   180        5.84            690        estimate
+Walking Dead character (Telltale)            180        5.84            690        estimate
+Plants vs. Zombies (Zombie)                  180        5.84            690        estimate
+Leon S. Kennedy (Resident Evil)              179        5.81            686        estimate
+Spider-Man / Peter Parker (Marvel)           178        5.77            682        official (comics)
+Link, adult (Legend of Zelda)                177        5.74            678        official (BOTW)
+Abe (Oddworld)                               175        5.68            670        estimate
+Castle Crashers Knight                       175        5.68            670        estimate
+Shinobi (headband ninja, GG Landscape)       175        5.68            670        estimate
+Claire Redfield (Resident Evil)              170        5.51            651        official - Capcom character profile (170cm/54kg)
+Aloy (Horizon Zero Dawn)                     168        5.45            644        official
+Sheik / Zelda (disguised, adult)             163        5.29            624        estimate
+Mario                                        155        5.03            594        official (Nintendo Power Q&A)
+Limbo (the boy)                              110        3.57            421        estimate - child ~7-9yo
+Deku Link (Majora's Mask form)               100        3.24            383        estimate
+Sonic the Hedgehog                           100        3.24            383        official (Sega)
+Cuphead                                       95        3.08            364        estimate
+Crash Bandicoot                               90        2.92            345        estimate
+Ratchet (Ratchet & Clank)                     90        2.92            345        estimate
+Diddy Kong                                    87        2.82            333        estimate
+Tails                                         80        2.59            306        estimate
+Companion Cube (Portal)                       61        1.98            234        official (Valve, 2ft cube)
+Clank                                         60        1.95            230        estimate
+Super Meat Boy                                40        1.30            153        estimate
+Pikachu                                       40        1.30            153        official (Pokedex)
+
+NEXT: apply this same real-height lookup + v2 scale factor (6/185) to every
+new character as the roster grows toward the ~300+ stadium-riser capacity.

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useShoppingList } from '../../contexts/ShoppingListContext'
+import { useHomemadeSelections } from '../../contexts/HomemadeSelectionsContext'
 import { getTodayISO, addDays, formatDateISO } from '../../utils/dateUtils'
 import './GenerateShoppingListModal.css'
 
@@ -8,6 +9,8 @@ import './GenerateShoppingListModal.css'
  */
 const GenerateShoppingListModal = ({ onClose, showWarning = false }) => {
   const { generateShoppingList, isGenerating } = useShoppingList()
+  // MPP-8: send saved homemade/store-bought choices so store-bought extras list the bought product
+  const { selections } = useHomemadeSelections()
 
   // Default to today and 7 days from now
   const today = getTodayISO()
@@ -30,7 +33,7 @@ const GenerateShoppingListModal = ({ onClose, showWarning = false }) => {
     }
 
     setError(null)
-    await generateShoppingList(startDate, endDate)
+    await generateShoppingList(startDate, endDate, selections)
     onClose()
   }
 
