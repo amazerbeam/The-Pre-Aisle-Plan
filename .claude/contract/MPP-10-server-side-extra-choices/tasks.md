@@ -2,7 +2,7 @@
 
 > **For agentic workers:** Use `/fb-apply` to walk this contract phase-by-phase. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-Status: IN PROGRESS
+Status: COMPLETE
 Started: 2026-10-10
 
 **Goal:** Store homemade/store-bought extra choices in MySQL per planned meal, per template entry and as a per-dish (per-family) default under the effective meal-plan owner; have shopping-list generation and the ingredient breakdown read them and list store-bought products in grams; carry choices through assign / variant swap / copy week / swap days / templates; add the Manage extras popup (week + template), cart icon and Regenerate bar; migrate localStorage choices once; add the 32 missing `recipe_extras` rows.
@@ -223,18 +223,18 @@ WHERE NOT EXISTS (
 Run: `(Select-String -Path foodbytes-app\database\migrations\2026-10-10-mpp10-recipe-extras-missing-links.sql -Pattern "SELECT +\d+ *(AS p)?, +\d+").Count`
 Expected: `32`.
 
-### Task 3: Developer applies both migrations to the Railway MySQL
+### Task 3: Developer applies both migrations to the Railway MySQL ✓ (applied by the developer; verified 2026-10-10: 3 tables, 103 recipe_extras rows, 0 missing links)
 
 - Skill: none — DBA operation against the live Railway MySQL (developer-owned; never applied by an agent)
 
 **Files:**
 - (none — runs the two files from Tasks 1–2 against Railway)
 
-- [ ] **Step 1: Ask the developer to apply the schema migration, then the data migration, and wait for confirmation**
+- [x] **Step 1: Ask the developer to apply the schema migration, then the data migration, and wait for confirmation**
 
 The developer runs `2026-10-10-mpp10-extra-choices-schema.sql` then `2026-10-10-mpp10-recipe-extras-missing-links.sql` against Railway. Do not proceed to Phase 2 until they confirm.
 
-- [ ] **Step 2: Verify the tables exist**
+- [x] **Step 2: Verify the tables exist**
 
 Run (mcp__mysql__mysql_query, read-only):
 ```sql
@@ -244,7 +244,7 @@ WHERE TABLE_SCHEMA = DATABASE()
 ```
 Expected: 3 rows.
 
-- [ ] **Step 3: Verify AC 16**
+- [x] **Step 3: Verify AC 16**
 
 Run (mcp__mysql__mysql_query, read-only):
 ```sql
@@ -2178,25 +2178,25 @@ Expected: ≤ 559, ≤ 406, ≤ 16 (HEAD baseline measured at `/fb-apply` 2026-1
 Run: `Get-ChildItem foodbytes-app\client\src -Recurse -Filter *.module.css; Select-String -Path foodbytes-app\client\src\**\*.js* -Pattern "localhost:8080"`
 Expected: no output from either.
 
-### Task 25: Full backend suite
+### Task 25: Full backend suite ✓ (QA round 2: 118 tests, 0 failures)
 
 - Skill: none — verification
 
-- [ ] **Step 1: Clean test run**
+- [x] **Step 1: Clean test run**
 
 Run: `cd foodbytes-app\foodbytes-api; mvn test`
 Expected: `BUILD SUCCESS`, 0 failures, 0 errors.
 
-### Task 26: Production build
+### Task 26: Production build ✓ (QA round 2: built in 897ms; re-built after the ASI fix: 742ms)
 
 - Skill: none — verification
 
-- [ ] **Step 1: Build the client**
+- [x] **Step 1: Build the client**
 
 Run: `cd foodbytes-app\client; npm run build`
 Expected: `built in <n>s`, no errors.
 
-### Task 27: Manual checks for the developer (after migrations applied + backend deployed)
+### Task 27: Manual checks for the developer (after migrations applied + backend deployed) — developer-owned, pending
 
 - Skill: none — manual play-test owned by the developer
 

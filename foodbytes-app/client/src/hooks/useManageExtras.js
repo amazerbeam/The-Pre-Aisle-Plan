@@ -52,7 +52,8 @@ export function useManageExtras({ scope, startDate, templateId }) {
   const applyChoices = (items) => {
     if (!items.length) return
     const previous = new Map()
-    (viewRef.current?.meals ?? []).forEach((meal) => meal.extras.forEach((x) => previous.set(choiceKey(meal.targetId, x.extraRecipeId), x.homemade)))
+    const meals = viewRef.current?.meals ?? []
+    meals.forEach((meal) => meal.extras.forEach((x) => previous.set(choiceKey(meal.targetId, x.extraRecipeId), x.homemade)))
     const requestId = ++requestSeq.current
     items.forEach((i) => latestRequest.current.set(choiceKey(i.targetId, i.extraRecipeId), requestId))
     commitView((v) => patchView(v, items))
