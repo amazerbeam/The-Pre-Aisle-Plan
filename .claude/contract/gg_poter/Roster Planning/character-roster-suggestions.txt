@@ -1,0 +1,384 @@
+CHARACTER ROSTER — CONSOLIDATED LIST (reformatted 2026-08-21)
+Built from: E:\Games\Install\Steam, D:\SteamLibrary, E:\Emulators, real Steam
+playtime (localconfig.vdf), plus your explicit adds (LOTR GameCube, WWE, CS2).
+Delete anything you don't want. Whatever's left = the list.
+
+Target: full-canvas stadium-riser poster, 45x30cm, ~15 rows, theoretical
+capacity ~315-375 characters. 36 already locked in the poster. Everything
+below is a candidate for the remaining slots — keep going until it feels full.
+
+Confirmed retro consoles (from E:\Emulators, has real ROM files): GameCube,
+GBA, N64, DS, PS1, PS2, Xbox, Xbox 360.
+Set up but empty (can't confirm played): Sega, Super Nintendo.
+
+=====================================================
+ALREADY IN THE POSTER (for reference — don't re-add)
+=====================================================
+Spider-Man
+Dark Souls — Solaire
+Street Fighter — Guile
+Tekken — Kazuya
+God of War — Kratos
+Red Dead Redemption 2 — Arthur Morgan
+Overwatch — Zarya
+Overwatch — McCree
+Hitman — Agent 47
+Resident Evil — Leon
+Resident Evil — Claire Redfield
+Halo — Master Chief
+Dead Space — Isaac Clarke
+Half-Life — Gordon Freeman
+Horizon Zero Dawn — Aloy
+Crash Bandicoot
+Ratchet & Clank
+Sonic the Hedgehog & Tails
+Super Mario — Mario
+Legend of Zelda — Sheik, Link, Deku Link
+Minecraft — Steve
+Pokémon — Pikachu, Mewtwo
+Plants vs. Zombies
+Donkey Kong — Diddy Kong
+Oddworld — Abe (+ Portal Companion Cube)
+Super Meat Boy
+Limbo
+Castle Crashers
+The Walking Dead (Telltale)
+Cuphead
+Shinobi (headband character, GG Landscape only)
+
+=====================================================
+CANDIDATES — BY GAME (consolidated, all rounds merged)
+=====================================================
+
+--- Absolum ---
+Galandra (elf swordswoman, cursed right arm)
+Karl (dwarf, blunderbuss)
+Cider (rogue, mechanical prosthetics + grappling hook)
+Brome (frog wizard, staff)
+
+--- Apex Legends ---
+Octane
+Wraith
+Bloodhound
+Pathfinder
+
+
+
+--- Baldur's Gate 3 ---
+Astarion
+Shadowheart
+Karlach
+Gale
+Lae'zel
+
+--- Batman: Arkham (Asylum/City/Knight) ---
+Batman
+Joker
+Harley Quinn
+Nightwing
+Catwoman
+Bane
+Scarecrow
+Two-Face
+
+--- BioShock / BioShock Remastered ---
+Big Daddy
+Little Sister
+
+--- Black Myth: Wukong ---
+Sun Wukong (Destined One)
+
+--- Blasphemous ---
+The Penitent One
+
+--- Bugs Bunny: Lost in Time (PS1) ---
+Bugs Bunny
+
+--- Castlevania: Symphony of the Night ---
+Alucard
+Dracula
+
+--- Celeste ---
+Madeline
+
+
+--- Cult of the Lamb ---
+The Lamb
+
+--- Dark Souls Remastered (36.5h — on top of existing Solaire) ---
+[DRAFTED — row 13] Ornstein & Smough (duo boss — golden spear knight + hammer knight)
+Artorias the Abysswalker
+Gwyn, Lord of Cinder
+Havel the Rock
+Siegmeyer of Catarina
+Priscilla, the Crossbreed
+Gwyndolin
+The Fire Keeper
+
+--- Dead Cells ---
+The Prisoner
+
+--- DOOM Eternal ---
+Doom Slayer
+
+--- Duke Nukem: Time to Kill (PS1) ---
+Duke Nukem
+
+--- Elden Ring (188h, your #1 most-played) ---
+Malenia
+Melina
+Radahn
+Godrick the Grafted
+Rennala
+Ranni the Witch
+
+--- Gears of War ---
+Marcus Fenix
+General RAAM (final boss of Gears of War 1)
+Dom (Dominic Santiago)
+Cole Train
+Baird
+
+--- Geometry Dash ---
+The Cube (default icon)
+
+--- Getting Over It with Bennett Foddy ---
+Diogenes (the man in the pot, with the hammer)
+
+--- GoldenEye 007 (N64) ---
+James Bond
+
+--- Grand Theft Auto: San Andreas (PS2) ---
+CJ (Carl Johnson)
+Big Smoke
+
+--- Half-Life 2 / Alyx ---
+Alyx Vance
+Headcrab Zombie
+Barney Calhoun (undercover in the Combine Civil Protection outfit)
+G-Man
+Combine Soldier
+Dr. Breen 
+
+--- Halo (Infinite / Wars / 3) ---
+Arbiter
+Cortana
+Sergeant Johnson
+Grunt
+
+--- Harry Potter and the Philosopher's Stone (PS1) ---
+Harry Potter
+Hagrid
+
+--- Hollow Knight --- Might need to scale up sicne they are tiny. 
+The Knight
+Hornet (Hollow Knight: Silksong)
+Cornifer
+Quirrel
+Iselda
+Sly
+Troupe Master Grimm
+Myla
+
+
+--- The Last of Us ---
+Joel
+Ellie
+
+--- Legend of Zelda (Ocarina of Time / Twilight Princess / Four Swords) ---
+Young Link (OoT-era, alt to current Link)
+Twilight Princess Link (alt)
+Zelda
+Ganondorf
+Midna
+Impa
+Tingle
+
+--- Little Nightmares / II ---
+Six
+Mono
+
+--- Lord of the Rings — GameCube trilogy (Fellowship / Two Towers / Return of the King) ---
+Aragorn
+Legolas
+Gimli
+Gollum
+
+--- Mario Kart / Power Tennis / Smash Football (GameCube) ---
+Luigi — with his backpack and a Boo
+Toad — in his N64 kart
+Bowser — N64
+Diddy Kong — Power Tennis outfit
+
+--- Marvel (Rivals / Super Heroes PS1 arcade) ---
+Psylocke
+Wolverine
+Captain America
+Deadpool
+Hulk
+Doctor Strange
+Magneto
+
+--- Oddworld: Munch's Oddysee ---
+Munch
+
+--- Ori and the Will of the Wisps ---
+Ori
+
+--- Overwatch ---
+Tracer
+Reinhardt
+Ashe
+Ana
+Juno
+D.Va
+Kiriko
+Soldier: 76
+Widowmaker
+Winston
+Roadhog
+Junkrat
+Sombra
+Baptiste
+Moira
+
+--- Peggle / Peggle Nights ---
+Bjorn (the unicorn)
+
+
+
+--- Pokémon (FireRed / HeartGold / Black 2) ---
+Charizard
+Chandelure
+Houndoom
+Blastoise
+Alakazam
+Haunter
+Gyarados
+Snorlax
+Eevee
+Dragonite
+Tyranitar
+Gengar
+Machamp
+
+--- Portal ---
+GLaDOS
+Chell
+
+--- Rayman (PS1) ---
+Rayman
+
+--- Resident Evil (2/4/7/Village/Requiem/Biohazard) ---
+Jill Valentine
+Ada Wong
+Grace Ashcroft
+RE4 Merchant
+Ethan Winters
+Lady Dimitrescu
+Mr. X
+Nemesis
+Albert Wesker
+William Birkin (G-form)
+
+--- Sekiro: Shadows Die Twice ---
+Wolf (Sekiro)
+
+--- Stray ---
+The Cat
+
+--- Super Monkey Ball 2 (GameCube) ---
+AiAi
+
+--- Tekken (8 / Tag Tournament / 1–3) ---
+Heihachi Mishima
+Paul Phoenix
+Yoshimitsu
+King
+Devil Jin
+Xiaoyu
+Lili
+Bryan Fury
+Lei Wulong
+Anna Williams
+Kuma
+Law
+
+--- The Simpsons: Road Rage (PS2) ---
+Homer Simpson
+Bart Simpson
+Marge Simpson
+
+--- The Witcher 3 ---
+Geralt of Rivia
+Yennefer
+Ciri
+Triss Merigold
+Vesemir
+
+--- TUNIC ---
+Fox (the unnamed protagonist)
+
+--- WWE SmackDown! Here Comes the Pain (PS2) / Wrestling Empire ---
+The Rock
+Stone Cold Steve Austin
+The Undertaker
+Eddie Guerrero
+
+
+=====================================================
+ICONIC OBJECTS (props, standing in the crowd like the Companion Cube)
+=====================================================
+Same idea as the Companion Cube already in the poster — a recognizable
+prop/item instead of a character, for visual variety in the crowd.
+
+Half-Life — the Crowbar (Gordon Freeman's signature weapon)
+Legend of Zelda — the Master Sword (on its pedestal), a Heart Container
+Super Mario — a Question Block, a Warp Pipe
+Sonic the Hedgehog — a Chaos Emerald
+Pokemon — a Poke Ball
+Dark Souls — a Bonfire (the checkpoint/campfire)
+Elden Ring — a Site of Grace (the glowing golden marker)
+Halo — an Energy Sword
+God of War — the Leviathan Axe
+Hollow Knight — bench, actaull put the knigt ona becnh with someone else
+The Witcher 3 — with everythign to scale tis would be too smalls
+Baldur's Gate 3 — a D20 die
+Harry Potter — the Sorting Hat, the Golden Snitch
+Lord of the Rings — The One Ring - with everythign to scale tis would be too smalls
+Batman — a Batarang 
+Resident Evil — a Green Herb and red one, but not beside wach
+
+
+=====================================================
+EXPLICITLY CUT (do not re-suggest)
+=====================================================
+Cyberpunk 2077, Days Gone, Disco Elysium, Prince of Persia, Splinter Cell,
+Spyro, Sly Cooper, The Binding of Isaac, TimeSplitters 2, Tomb Raider,
+Croc, Pepsiman.
+
+Taste-based guesses confirmed NOT played (2026-08-21) — the only hit from
+that batch was The Last of Us, now moved into the candidates list above.
+Everything else in that round is cut, do not re-suggest: Bloodborne, Nioh,
+Ghost of Tsushima, Uncharted, Death Stranding, Persona 5, NieR: Automata,
+Devil May Cry, Monster Hunter, Diablo, Assassin's Creed, Bayonetta,
+Titanfall, Metal Gear Solid.
+
+=====================================================
+NOTES
+=====================================================
+- Franchises already in the poster (Overwatch, Resident Evil, Tekken,
+  Zelda, Halo, Portal, etc.) get MORE characters added alongside the
+  existing one, not a replacement — many-per-franchise is the house rule.
+- A few library entries were skipped as poor fits for this style: games
+  without a strong single recognizable protagonist silhouette (Factorio,
+  Frostpunk, Satisfactory, Balatro, Terraria-likes, sports/racing titles,
+  RimWorld, Dwarf Fortress, etc).
+- Movie tie-in PS1 games (Die Hard, Batman Forever arcade, Casper,
+  X-Files) skipped — not really "games you played for the character."
+- Still room to grow: 36 in poster + this file's candidates is real
+  progress but short of the ~315–375 theoretical capacity. Keep adding —
+  untouched corners of the library include Overcooked 2, Beat Saber,
+  Anno 1800, Bloons TD6 extras, Risk of Rain 2, more PS1/PS2 arcade
+  rosters (Marvel Super Heroes has more than Wolverine/Cap/Magneto/
+  Thanos-adjacent, Tekken has more still, WWE roster is much bigger).

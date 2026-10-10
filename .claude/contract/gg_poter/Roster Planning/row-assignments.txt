@@ -1,0 +1,24 @@
+ROW ASSIGNMENTS — living document, updated during Phase 2 execution
+15 rows, front (1) at canvas bottom to back (15) near the top.
+This is a rough starting skeleton, not a lock-in — every character's
+actual row gets confirmed/adjusted during its own Phase 2 reassessment
+step against whoever is already placed nearby.
+
+General strategy:
+- Rows 1-4 (front): small/cute characters, high-detail characters that
+  need to be seen up close, objects
+- Rows 5-10 (middle): most standard human-sized characters, mixed
+  franchises deliberately interleaved (no-bunching rule)
+- Rows 11-15 (back): tall/major figures whose height carries over the
+  crowd in front; interacting pairs/groups (visible enough to read as
+  a pair even partly behind others)
+
+Placed so far:
+(row) — (character) — (franchise) — (notes)
+
+Row 13 — Ornstein — Dark Souls — 7.14cm, spear+shield, z: front of the pair
+Row 13 — Smough — Dark Souls — 8.43cm, hammer+red plume, z: behind/right of
+  Ornstein (matches their official duo-boss art). Adjacent per the
+  interacting-pair exception to the no-bunching rule — this pair stays
+  together; other Dark Souls characters (Artorias, Gwyn, Havel, etc.)
+  go in DIFFERENT rows when their turn comes, not row 13.

@@ -1,0 +1,122 @@
+POSTER PRODUCTION PLAN — 45x30cm Stadium-Riser Character Lineup
+(2026-08-21 — supersedes the earlier "/fb-plan" reference in Jira MPP-7,
+which was a mismatch: /fb-plan is the FoodBytes app's code-planning
+pipeline, not suited to this creative asset project. This document is
+the real plan.)
+
+=====================================================
+OBJECTIVE
+=====================================================
+Produce a print-ready 45x30cm @ 300dpi poster (5315x3543px) — a
+stadium-riser crowd of flat-silhouette game characters filling the full
+canvas, built from Gaming_Poster.psd / GG_Landscape.psd's existing 36
+characters plus the ~174 candidates (+ objects) in
+character-roster-suggestions.txt.
+
+=====================================================
+RULES TO FOLLOW (authoritative — from .claude\skills\svg-character-poster\)
+=====================================================
+Full detail lives in `references/poster-conventions.md`. Summary:
+
+1. SCALE — poster_cm = real_cm x (6 / 185). Anchor: Arthur Morgan
+   (185cm real -> 6cm poster). Human-cap: ordinary humans capped at
+   Arthur's 6cm; non-human/demigod/powered-armor characters may exceed
+   it on their own real/lore height (Mewtwo, Kratos, Master Chief
+   precedent).
+
+2. LAYOUT — stadium risers, not a corner huddle. Front row at canvas
+   bottom, full height. Each row behind rises >= row_height x 0.28
+   above the row in front (chest-height rule, ~1.68cm/row at the 6cm
+   anchor). 15 rows fit in 30cm. ~21-25 characters per row across 45cm.
+   Fills the FULL canvas, all 15 rows, edge to edge.
+
+3. STYLE — flat solid color-block shapes only. No outline strokes, no
+   gradients/shading. One or two identifying details max (a scar, a
+   weapon shape, a color) — nothing finer survives at ~2-2.3cm print
+   width.
+
+4. NO FRANCHISE BUNCHING — spread a game's characters across different
+   rows/positions rather than clustering them in one patch. Exception:
+   deliberately interacting pairs/groups (Ornstein & Smough, the LOTR
+   Fellowship, a duo boss) stay adjacent on purpose — it's the *rest*
+   of a franchise's roster that scatters.
+
+5. VERIFY EVERY CHARACTER — width at/above the ~2-2.3cm recognizable
+   floor, silhouette distinctiveness vs. its row neighbors, z-order
+   sanity (nothing important clipped by a same-size neighbor).
+
+6. RECORD EVERYTHING — every character's real height, poster height,
+   and source confidence (official/estimate) goes in
+   `character-heights.txt`. Every drafted SVG goes in
+   `Roster Planning\svg-drafts\{character-name}.svg`. Mark it placed
+   in `character-roster-suggestions.txt` once done, don't just draft
+   and lose track.
+
+=====================================================
+PHASED TASK LIST
+=====================================================
+
+PHASE 0 — Roster close-out (nearly done)
+[ ] Resolve remaining ambiguous entries in character-roster-suggestions.txt:
+    - Absolum: confirm which protagonist
+    - Portal: decide if a second object (Turret) joins the Companion Cube
+[ ] Final read-through / any last trims
+
+PHASE 1 — Row skeleton (lightweight, adaptive — not a locked grid)
+[ ] Rough starting map of which characters lean toward which rows
+    (size/prominence, no-franchise-bunching, interacting groups stay
+    adjacent) — saved as `Roster Planning\row-assignments.txt`
+[ ] Treat this as a first draft, not a lock-in — Phase 3's per-character
+    reassessment is expected to move things around as the crowd fills in
+
+PHASE 2 — ONE CHARACTER AT A TIME (no batching — every character goes
+through this full loop by itself before the next one starts)
+
+For each character, in order:
+  a. Source real/canon height, flag official vs. estimate
+  b. Compute poster_cm and poster_px via the 6/185 scale factor
+     (apply the human-cap exception where relevant)
+  c. Append to character-heights.txt
+  d. Confirm/assign its row + horizontal slot + z-order — check this
+     against row-assignments.txt AND against every character already
+     placed nearby, not just the plan on paper
+  e. Find a real reference image (official art/render, clean single-
+     character shot) and actually look at it before drawing anything —
+     trace flat color-block shapes over what the reference shows, don't
+     freehand a generic template from memory
+  f. Save the SVG to `Roster Planning\svg-drafts\{character-name}.svg`
+     and the reference image alongside it as
+     `{character-name}-reference.{ext}`
+  g. REASSESS before moving to the next character:
+     - width at/above the ~2-2.3cm recognizable floor?
+     - silhouette distinctiveness vs. its actual row neighbors (not
+       just theoretical ones)?
+     - z-order sanity — does it clip or get clipped wrong?
+     - does its placement still respect the no-franchise-bunching rule
+       given everyone placed so far?
+     - if anything's off, fix it now — row-assignments.txt is allowed
+       to change here — before starting the next character
+  h. Mark it placed in character-roster-suggestions.txt
+
+Do not start character N+1 until character N has cleared step (g).
+This is deliberately slow — the point is each addition gets checked
+against the real, growing crowd instead of a plan made in the abstract.
+
+PHASE 3 — Assembly & final export (once the roster is fully worked
+through Phase 2)
+[ ] Composite all placed SVGs into the working file, matching the
+    row/z-order state as it stood after the last reassessment
+[ ] Full-crowd read: does it hold together as one mixed poster, not a
+    set of franchise clusters?
+[ ] Composite final 45x30cm @ 300dpi artwork
+[ ] Review with the owner before calling it final
+
+=====================================================
+DEFINITION OF DONE
+=====================================================
+1. All 15 rows filled per the row-assignment plan
+2. Every character/object has a sourced height + computed poster size in
+   character-heights.txt
+3. Every character exists as a flat-color SVG in Roster Planning\svg-drafts\
+4. No franchise visibly clumped; deliberate interacting groups intact
+5. Final 45x30cm @ 300dpi composite produced and reviewed

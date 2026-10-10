@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 239 581">
+  <!-- Leon S. Kennedy — v5, fresh trace from Leon_Example.jpg. Coordinates
+       read directly off a reference pre-scaled to this exact 239x581
+       viewBox with a 10-unit grid (no orig-pixel/local transform step,
+       which is what broke v2/v3's arm+gun alignment). Verified against a
+       transparent SVG-over-reference composite, not a side-by-side render.
+       Section-by-section / lower-to-upper / one-color-per-material
+       (SKILL.md step 5b-5f). Not derived from leon-extracted.svg. -->
+  <g>
+    <path d="M100,312 L155,308 L150,400 L140,500 L112,500 L102,400 Z" fill="#232B36"/>  <!-- pants_left -->
+    <path d="M160,306 L215,310 L208,400 L198,500 L168,500 L158,400 Z" fill="#232B36"/>  <!-- pants_right -->
+    <path d="M95,292 L215,288 L218,312 L92,316 Z" fill="#17191B"/>  <!-- belt -->
+    <path d="M88,335 L122,330 L128,375 L115,390 L82,384 Z" fill="#17191B"/>  <!-- holster_body -->
+    <path d="M78,355 L132,352 L132,368 L78,371 Z" fill="#17191B"/>  <!-- holster_strap1 -->
+    <path d="M76,372 L134,370 L134,386 L76,389 Z" fill="#17191B"/>  <!-- holster_strap2 -->
+    <path d="M105,495 L148,495 L158,530 L138,555 L95,548 Z" fill="#17191B"/>  <!-- boot_left -->
+    <path d="M168,495 L212,495 L222,530 L200,555 L158,548 Z" fill="#17191B"/>  <!-- boot_right -->
+    <path d="M108,182 L178,172 L200,180 L195,290 L180,305 L115,305 L95,285 L100,195 Z" fill="#3E4A5C"/>  <!-- jacket_torso -->
+    <path d="M118,188 L172,178 L182,195 L175,275 L163,298 L132,308 L112,290 L108,200 Z" fill="#262B28"/>  <!-- vest -->
+    <path d="M108,185 L150,182 L178,240 L152,245 Z" fill="#3E4A5C"/>  <!-- left_upper_arm -->
+    <path d="M85,145 L115,150 L180,235 L155,245 Z" fill="#A9B4B8"/>  <!-- left_forearm_guard -->
+    <path d="M198,178 L222,180 L228,222 L205,215 Z" fill="#3E4A5C"/>  <!-- right_upper_arm -->
+    <path d="M115,120 L140,130 L228,215 L205,225 Z" fill="#A9B4B8"/>  <!-- right_forearm_guard -->
+    <path d="M195,195 L205,240 L228,245 L232,225 L215,185 L200,175 Z" fill="#262B28"/>  <!-- shoulder_plate -->
+    <path d="M178,235 L190,240 L210,176 L195,172 Z" fill="#6B5C46"/>  <!-- shoulder_strap -->
+    <path d="M40,88 L108,85 L118,115 L105,150 L60,158 L35,130 Z" fill="#5A4C3C"/>  <!-- glove_hands -->
+    <path d="M35,38 L85,45 L100,80 L75,95 L50,70 Z" fill="#9CA0A3"/>  <!-- gun_slide -->
+    <path d="M70,100 L108,92 L118,140 L75,150 Z" fill="#17191B"/>  <!-- gun_grip -->
+    <ellipse cx="165" cy="112" rx="40" ry="60" fill="#E3B888"/>  <!-- face -->
+    <path d="M112,52 L122,15 L175,10 L215,28 L220,55 L210,90 L195,118 L175,95 L150,68 L135,58 Z" fill="#4A3D2C"/>  <!-- hair -->
+  </g>
+</svg>
