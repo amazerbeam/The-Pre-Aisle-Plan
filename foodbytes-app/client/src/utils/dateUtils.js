@@ -116,3 +116,17 @@ export const formatDateShort = (date) => {
 export const formatDateRange = (startDate, endDate) => {
   return `${formatDateShort(startDate)} - ${formatDateShort(endDate)}`
 }
+
+/**
+ * MPP-9: format a build timestamp for the version line (e.g., "10 Oct 14:02").
+ * Viewer local time zone, 24-hour (en-GB uses h23, so midnight is "00:05", never "24:05").
+ * @param {string} iso - ISO-8601 timestamp, or unknown
+ * @returns {string|null} null when the value is missing or unparseable
+ */
+export const formatBuildTime = (iso) => {
+  const d = new Date(iso)
+  if (!iso || Number.isNaN(d.getTime())) return null
+  const day = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
+  const time = d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
+  return `${day} ${time}`
+}

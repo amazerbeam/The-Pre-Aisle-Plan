@@ -247,6 +247,7 @@ Apply your full defensive checklist — including §11 Shared-Surface Contract /
 
 ### Delegated Final-Verification Commands
 [Paste verbatim the `Run:` / `Expected:` pairs from the contract's closing `Final verification` phase that the Implementer left unticked — typically bare `mvn test` and `npm run build`. If none, say "none delegated".]
+Always also run, whether or not the Implementer did: `cd foodbytes-app\client; npm run check:version` → Expected: `Version OK: <x.y.z>`, and confirm the top line of `CHANGELOG.md` names this contract's ticket key (or slug). A missing or failing bump FAILS Task M.1 (see `CLAUDE.md` → Versioning & deploy verification).
 
 Run all seven validation steps (build, lint position, **test validation** for tasks that list a `Test:` path, frontend verification, log review, AC traceability, delegated final-verification) against the FULL implementation (not per phase) and produce your QA Report. Remember: you NEVER write code — including tests. If a required test is missing, broken, or tautological, FAIL the task and let the Implementer fix it in the combined fix pass. You have no browser tools — emit visual/interaction criteria as MANUAL VERIFICATION NEEDED with the exact route, viewport, and expected outcome. Do not mutate the Railway database.
 ```
@@ -345,6 +346,9 @@ Present:
 
 ### Jira
 - [The transition performed, e.g. `MPP-12 Coding → Ready for Test` — or the flag added, or plainly that it was skipped or failed]
+
+### Version
+- [`<old> → <new>` and the CHANGELOG line added — or plainly that the bump is missing or `check:version` failed]
 
 ### Developer Actions Outstanding
 - [Migrations to apply to the Railway MySQL, backend redeploys, and every MANUAL VERIFICATION NEEDED item from the QA report — route, viewport, expected outcome]

@@ -336,39 +336,62 @@ Expected: `BUILD SUCCESS` with 0 errors.
 
 ## Phase M — Final verification
 
-The closing phase. No production changes — only sanity-checks that the cumulative work is clean.
+The closing phase. No production changes beyond the version bump — only sanity-checks that the cumulative work is clean.
 
-### Task M.1: Grep for stale references
+### Task M.1: Bump version + CHANGELOG
+
+- Skill: none — release bookkeeping per `CLAUDE.md` → Versioning & deploy verification
+
+**Files:**
+- Modify: `foodbytes-app/client/package.json` (`version`)
+- Modify: `foodbytes-app/foodbytes-api/pom.xml` (project `<version>`)
+- Modify: `CHANGELOG.md` (prepend one line)
+
+- [ ] **Step 1: Bump both manifests**
+
+Read the current version from `foodbytes-app/client/package.json`. This ticket is a [Jira issue type] → bump [PATCH | MINOR and reset PATCH]. Write the same new version into `package.json` → `version` and `pom.xml` → the `<version>` directly under `<artifactId>foodbytes-api</artifactId>`. (Planner: write the issue type and the rule; never the target number — it is computed at apply time, so two parallel contracts cannot collide on a stale value.)
+
+- [ ] **Step 2: Prepend the CHANGELOG line**
+
+Directly above the current top entry in `CHANGELOG.md`: `<new version> — <MPP-n, or the plan slug>: <one-line summary>`
+
+- [ ] **Step 3: Verify agreement**
+
+Run: `cd foodbytes-app\client; npm run check:version`
+Expected: `Version OK: <new version>`
+
+### Task M.2: Grep for stale references
 
 - [ ] **Step 1: Confirm no [stale-pattern] remains**
 
-Run: `Select-String -Path foodbytes-app\client\src\**\*.jsx -Pattern "<pattern>"`
+Run: `Get-ChildItem -Path foodbytes-app\client\src -Recurse -Include *.js,*.jsx | Select-String -Pattern "<pattern>"`
 Expected: zero hits.
 
-### Task M.2: Run the full backend test suite
+### Task M.3: Run the full backend test suite
 
 - [ ] **Step 1: Clean test run**
 
 Run: `cd foodbytes-app\foodbytes-api; mvn test`
 Expected: `BUILD SUCCESS`, 0 failures, 0 errors.
 
-### Task M.3: Production build
+### Task M.4: Production build
 
 - [ ] **Step 1: Build the client**
 
 Run: `cd foodbytes-app\client; npm run build`
 Expected: `built in <n>s`, no errors.
 
-### Task M.4: Update the PR description
+### Task M.5: Update the PR description
 
 - [ ] **Step 1: Write / update `pr-description.md` in this plan folder for the developer to paste**
 
 Include:
 - Link to `plan.md` in this folder.
-- Summary of the change.
+- Summary of the change, and the new version from Task M.1.
 - Any migration that must be applied to the Railway MySQL, and the required ordering.
 - Verification results from the prior phases.
 - A one-line note for future contributors on any new convention introduced.
+- A suggested commit subject in the form `MPP-n: <summary>`.
 
 ---
 
@@ -399,7 +422,7 @@ Include:
   - `grep → confirm zero hits` (verification phases)
   Each step must be a real action (a concrete code change, or a runnable command with `Run:` / `Expected:`), never a description.
 - The Skill bullet must name a skill from `plan.md` Part 2 "Skills to invoke during execution". If no skill applies, write `Skill: none — <one-line reason>` (e.g. a DBA operation against the live database, which no skill governs).
-- The closing phase is named `## Phase N — Final verification` and contains only no-production-change sanity checks (grep audits, full backend suite, production build, PR description).
+- The closing phase is named `## Phase N — Final verification`. It opens with the mandatory **Task M.1: Bump version + CHANGELOG** (bump type from the Jira issue type — see `CLAUDE.md` → Versioning & deploy verification), then contains only no-production-change sanity checks (grep audits, full backend suite, production build, PR description). A contract whose own feature work already performs the bump may replace M.1 with a one-line note naming the task that did it.
 
 **Verification commands — use the project's real runners.** Commands run in **PowerShell on Windows**; chain with `;`, not `&&`, and use backslash paths.
 

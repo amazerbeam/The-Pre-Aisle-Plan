@@ -14,7 +14,7 @@
 
     <groupId>com.foodbytes</groupId>
     <artifactId>foodbytes-api</artifactId>
-    <version>1.0.0-MVP</version>
+    <version>1.1.0</version>
     <name>FoodBytes API</name>
     <description>FoodBytes Recipe Viewer MVP Backend</description>
 
@@ -110,6 +110,15 @@
                         </exclude>
                     </excludes>
                 </configuration>
+                <!-- MPP-9: writes META-INF/build-info.properties (version from this pom, build
+                     time) so /api/health reports the running build instead of a literal. -->
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>build-info</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

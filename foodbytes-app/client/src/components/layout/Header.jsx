@@ -4,6 +4,7 @@ import { useAuth } from '../../contexts/AuthContext'
 import LoginModal from '../auth/LoginModal'
 import DateRangePicker from '../common/DateRangePicker'
 import DefaultPortionsControl from './DefaultPortionsControl'
+import VersionInfo from './VersionInfo'
 import './Header.css'
 
 function Header() {
@@ -66,6 +67,8 @@ function Header() {
                     <button className="logout-btn" onClick={logout}>
                       Sign Out
                     </button>
+                    {/* MPP-9: mounts only while the menu is open, so /api/health is fetched lazily */}
+                    <VersionInfo />
                   </div>
                 )}
               </div>

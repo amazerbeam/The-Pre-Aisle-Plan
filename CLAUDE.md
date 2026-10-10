@@ -116,6 +116,15 @@ Common levers: air-fry instead of pan-fry, sub egg whites for whole eggs, add a 
 - After a schema change, the backend may need a manual redeploy on Railway.
 - OAuth redirect URIs are environment-specific (`OAUTH_REDIRECT_URI` env var). Login flakiness has historically been fixable by refreshing `GOOGLE_CLIENT_SECRET`.
 
+## Versioning & deploy verification
+
+- **Where the version lives:** `foodbytes-app/client/package.json` → `version` and `foodbytes-app/foodbytes-api/pom.xml` → the project `<version>` (under `<artifactId>foodbytes-api</artifactId>`). They must be identical; `cd foodbytes-app/client && npm run check:version` fails if they, or the top line of `CHANGELOG.md`, disagree. Each manifest feeds its own build (Vite `define` reads package.json; Spring Boot build-info reads pom.xml) because Railway builds each service from its own folder, so a shared root file would be outside both Docker contexts. Never hard-code the version anywhere else.
+- **Bump rules (SemVer, one bump per ticket):** Bug → PATCH (1.3.0 → 1.3.1). Story or Task → MINOR and reset PATCH (1.3.1 → 1.4.0). MAJOR only on an explicit decision. Work with no Jira key: a bug fix bumps PATCH, anything else MINOR. Every fb contract carries the bump as Final-verification Task M.1 (`.claude/commands/fb-plan.md`), and `/fb-apply` QA gates on `check:version`.
+- **CHANGELOG.md** (repo root): newest first, one line per ticket, `<version> — <MPP-n>: <summary>` (use the plan slug instead of the key when there is no ticket).
+- **Commit messages carry the ticket key:** `MPP-n: <summary>`, so a ticket's commits are findable with `git log --grep "MPP-n:"`.
+- **What is deployed:** the account menu's last row shows `v<version> · web <build time> · api <build time>` (the viewer's local time). Amber means the two Railway services report different versions; usually one is still deploying. `GET /api/health` returns `version` and `builtAt`. No commit SHAs are recorded (decided on MPP-9).
+- **Is my fix live?** Look up the ticket's version in `CHANGELOG.md`. The fix is live once the deployed version is at least that version: use the web version for a frontend fix and the api version for a backend fix. Two deploys of the same version (a push that skipped the bump) can only be told apart by build time, which is one more reason never to skip the bump.
+
 ## Conventions
 
 - Frontend state for cross-cutting concerns lives in a Context — don't introduce a new global store.
