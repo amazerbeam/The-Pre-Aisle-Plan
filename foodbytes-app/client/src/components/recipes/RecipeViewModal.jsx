@@ -7,6 +7,8 @@ import { useBodyScrollLock } from '../../hooks/useBodyScrollLock'
 import { useLinkedStepSelections } from '../../hooks/useLinkedStepSelections'
 import LinkedRecipeNavigation from './LinkedRecipeNavigation'
 import MacroBadgeRow from './MacroBadgeRow'
+import RecipeStepsSection from './RecipeStepsSection'
+import MealEatenSection from './MealEatenSection'
 import WakeLockIcon from '../common/WakeLockIcon'
 import { MIN_SERVINGS, MAX_SERVINGS, SERVINGS_STEP } from '../../constants/servings'
 import './RecipeViewModal.css'
@@ -36,7 +38,8 @@ function RecipeViewModal({
                       // NOTE: never invoked today - if that changes to alter `recipeId` while
                       // mounted, see the stable-recipeId invariant in useRecipeStackServings' JSDoc
   parentRecipeId = null, // FR-091: Parent recipe ID for homemade selection lookup
-  extraChoices = null    // MPP-10: a planned meal's own choices
+  extraChoices = null,   // MPP-10: a planned meal's own choices
+  mealPlanEntry = null   // MPP-12: set only when opened from the meal plan → shows the eaten section
 }) {
   // FR-102: Full recipe data state (loaded on mount)
   const [fullRecipe, setFullRecipe] = useState(null)
@@ -352,48 +355,14 @@ function RecipeViewModal({
               </section>
 
               {/* Steps - FR-091: Handle linked steps */}
-              <section className="steps-section">
-                <h3>Instructions</h3>
-                {fullRecipe?.steps && fullRecipe.steps.length > 0 ? (
-                  <ol className="steps-list">
-                    {fullRecipe.steps.map((step, idx) => {
-                      // Handle both old format (string) and new format (object)
-                      const stepObj = typeof step === 'string'
-                        ? { instruction: step }
-                        : step
+              <RecipeStepsSection
+                steps={fullRecipe?.steps}
+                isHomemade={isHomemade}
+                onLinkedStepClick={handleLinkedStepClick}
+              />
 
-                      // FR-091: Determine what to display based on linked recipe state
-                      const hasLink = stepObj.linkedRecipeId != null
-                      const homemade = hasLink ? isHomemade(stepObj.linkedRecipeId) : true
-
-                      // Show alt instruction if linked and store-bought
-                      const displayText = hasLink && !homemade && stepObj.altInstruction
-                        ? stepObj.altInstruction
-                        : stepObj.instruction
-
-                      return (
-                        <li key={idx} className="step-item">
-                          {hasLink && homemade ? (
-                            // Linked and homemade - show as clickable link
-                            <button
-                              className="linked-step-button"
-                              onClick={() => handleLinkedStepClick(stepObj.linkedRecipeId)}
-                              title={`View ${stepObj.linkedRecipeName} recipe`}
-                            >
-                              {displayText}
-                            </button>
-                          ) : (
-                            // No link or store-bought - show as plain text
-                            <span>{displayText}</span>
-                          )}
-                        </li>
-                      )
-                    })}
-                  </ol>
-                ) : (
-                  <p className="no-content">No instructions listed</p>
-                )}
-              </section>
+              {/* MPP-12: eaten tick - meal-plan entry only, on the planned dish (not a linked sub-recipe) */}
+              {mealPlanEntry && !canGoBack && <MealEatenSection entryId={mealPlanEntry.id} />}
             </>
           )}
         </div>

@@ -1,7 +1,6 @@
 package com.foodbytes.controller;
 
 import com.foodbytes.dto.PasswordLoginRequest;
-import com.foodbytes.dto.UserDTO;
 import com.foodbytes.model.User;
 import com.foodbytes.security.JwtCookieService;
 import com.foodbytes.security.UserPrincipal;
@@ -30,16 +29,9 @@ public class AuthController {
         if (userPrincipal == null) {
             return ResponseEntity.status(401).body(Map.of("error", "Not authenticated"));
         }
-
-        UserDTO userDTO = new UserDTO(
-                userPrincipal.getId(),
-                userPrincipal.getEmail(),
-                userPrincipal.getName(),
-                userPrincipal.getAvatarUrl(),
-                userPrincipal.isAdmin(),
-                userPrincipal.getDefaultServings()
-        );
-        return ResponseEntity.ok(userDTO);
+        // MPP-13: one DTO builder for every user payload, so /me carries the
+        // effective meal times exactly as /login and the preferences PATCH do.
+        return ResponseEntity.ok(userService.getUserDTO(userPrincipal.getId()));
     }
 
     @PostMapping("/logout")

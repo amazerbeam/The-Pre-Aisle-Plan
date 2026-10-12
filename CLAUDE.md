@@ -116,6 +116,16 @@ Common levers: air-fry instead of pan-fry, sub egg whites for whole eggs, add a 
 - After a schema change, the backend may need a manual redeploy on Railway.
 - OAuth redirect URIs are environment-specific (`OAUTH_REDIRECT_URI` env var). Login flakiness has historically been fixable by refreshing `GOOGLE_CLIENT_SECRET`.
 
+### Local test database
+
+A local copy of the live DB runs in the Docker container **`foodbytes-db`** (root `docker-compose.yml`), so migrations and features can be tested before touching Railway.
+
+- **Connection:** `localhost:3306`, database `foodbytes`, user `foodbytes` / `foodbytes123` (root: `rootpassword`). These match the `application.yml` defaults, so `mvn spring-boot:run` connects with no env vars. Docker Desktop must be running.
+- **Query it:** `docker exec foodbytes-db mysql -uroot -prootpassword foodbytes -e "..."` (no `mysql` client on the host PATH).
+- **Test a migration:** `docker exec -i foodbytes-db mysql -uroot -prootpassword foodbytes < foodbytes-app/database/migrations/<file>.sql`. Applying locally does **not** replace the Railway apply — that is still required before the backend deploys.
+- **Refresh from live:** the developer exports via MySQL Workbench → Server → Data Export (`railway` schema, per-table project folder). Then back up local, concatenate the `railway_*.sql` files (skip `sys_*`), strip `GTID_PURGED` lines (live is MySQL 9.x, local 8.0), wrap in `SET FOREIGN_KEY_CHECKS=0/1`, drop + recreate `foodbytes`, and pipe it in. Claude cannot dump Railway itself (blocked as a production read), so the export is always the developer's step.
+- **State:** last refreshed 2026-10-12 (20 tables, 800 meal-plan entries) with the MPP-12 migration applied.
+
 ## Versioning & deploy verification
 
 - **Where the version lives:** `foodbytes-app/client/package.json` → `version` and `foodbytes-app/foodbytes-api/pom.xml` → the project `<version>` (under `<artifactId>foodbytes-api</artifactId>`). They must be identical; `cd foodbytes-app/client && npm run check:version` fails if they, or the top line of `CHANGELOG.md`, disagree. Each manifest feeds its own build (Vite `define` reads package.json; Spring Boot build-info reads pom.xml) because Railway builds each service from its own folder, so a shared root file would be outside both Docker contexts. Never hard-code the version anywhere else.

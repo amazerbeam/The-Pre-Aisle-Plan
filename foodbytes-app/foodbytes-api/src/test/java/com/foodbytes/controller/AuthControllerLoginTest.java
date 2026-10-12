@@ -51,7 +51,7 @@ class AuthControllerLoginTest {
                     return user;
                 });
         when(userService.convertToDTO(user))
-                .thenReturn(new UserDTO(42L, "friend@example.com", "Friend", null, false, null));
+                .thenReturn(new UserDTO(42L, "friend@example.com", "Friend", null, false, null, null));
 
         mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)

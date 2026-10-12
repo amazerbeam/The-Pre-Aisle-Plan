@@ -4,6 +4,7 @@ import { useAuth } from '../../contexts/AuthContext'
 import LoginModal from '../auth/LoginModal'
 import DateRangePicker from '../common/DateRangePicker'
 import DefaultPortionsControl from './DefaultPortionsControl'
+import MealTimesControl from './MealTimesControl'
 import VersionInfo from './VersionInfo'
 import './Header.css'
 
@@ -64,6 +65,7 @@ function Header() {
                       <span className="user-email">{user.email}</span>
                     </div>
                     <DefaultPortionsControl />
+                    <MealTimesControl />
                     <button className="logout-btn" onClick={logout}>
                       Sign Out
                     </button>

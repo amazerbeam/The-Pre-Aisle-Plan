@@ -22,6 +22,35 @@
   color: #b15a09;
 }
 
+/* MPP-12: eaten meal - green tint + ✓ badge (approved pet-mockup.html) */
+.meal-plan-entry.eaten {
+  background-color: rgba(40, 167, 69, 0.1);
+}
+
+.meal-plan-entry.eaten .recipe-name {
+  color: #1b6b2e;
+}
+
+@media (hover: hover) {
+  .meal-plan-entry.eaten:hover {
+    background-color: rgba(40, 167, 69, 0.16);
+  }
+}
+
+.entry-eaten {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background-color: var(--success);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
 .meal-plan-entry.removing {
   opacity: 0.5;
 }

@@ -43,6 +43,14 @@ public class MealPlanEntry {
     @Column(nullable = false, precision = 4, scale = 2)
     private BigDecimal servings = BigDecimal.ONE;
 
+    // MPP-12: one shared eaten state per entry (linked users write the owner's row)
+    @Column(name = "eaten", nullable = false)
+    private Boolean eaten = false;
+
+    // MPP-12: UTC wall time of the first tick; null when not eaten
+    @Column(name = "eaten_at")
+    private LocalDateTime eatenAt;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 

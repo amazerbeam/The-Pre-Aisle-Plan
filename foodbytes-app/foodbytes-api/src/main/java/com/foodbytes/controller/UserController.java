@@ -20,9 +20,9 @@ public class UserController {
     private final UserService userService;
 
     /**
-     * MPP-3: update the authenticated user's preferences.
-     * Currently one field — the default portion count. A null defaultServings
-     * clears the preference.
+     * MPP-3 / MPP-13: partially update the authenticated user's preferences —
+     * default portion count and/or meal times. Fields absent from the body are
+     * untouched; an explicit null clears (meal times: back to the defaults).
      */
     @PatchMapping("/me/preferences")
     public ResponseEntity<?> updatePreferences(
@@ -31,8 +31,7 @@ public class UserController {
         if (userPrincipal == null) {
             return ResponseEntity.status(401).body(Map.of("error", "Not authenticated"));
         }
-        UserDTO updated = userService.updateDefaultServings(
-                userPrincipal.getId(), request.getDefaultServings());
+        UserDTO updated = userService.updatePreferences(userPrincipal.getId(), request);
         return ResponseEntity.ok(updated);
     }
 

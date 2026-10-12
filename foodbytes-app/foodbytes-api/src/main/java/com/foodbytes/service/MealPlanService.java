@@ -8,7 +8,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.format.TextStyle;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -298,6 +301,40 @@ public class MealPlanService {
     }
 
     /**
+     * MPP-12: set or clear the eaten state of a meal plan entry.
+     * The entry is looked up in the caller's effective plan (meal_plan_owner_id), so a linked user
+     * writes the owner's row and both see one shared state (AC 6-7); an entry outside that plan is
+     * "not found" (AC 9), exactly as removeEntry treats it.
+     *
+     * <p>Re-ticking an already-eaten entry keeps the first eatenAt, so a partner's second tick does
+     * not move the time. eatenAt is stored as UTC wall time (the JDBC URL pins serverTimezone=UTC)
+     * and exposed as an Instant.
+     *
+     * @return the new state, or empty when the entry is not in the caller's effective plan
+     */
+    @Transactional
+    public Optional<MealPlanEntryEatenDTO> setEntryEaten(Long userId, Long entryId, boolean eaten) {
+        Long effectiveOwnerId = getEffectiveMealPlanOwnerId(userId);
+        return mealPlanEntryRepository.findByIdAndUserId(entryId, effectiveOwnerId)
+            .map(entry -> {
+                if (!eaten) {
+                    entry.setEaten(false);
+                    entry.setEatenAt(null);
+                } else if (!Boolean.TRUE.equals(entry.getEaten())) {
+                    entry.setEaten(true);
+                    entry.setEatenAt(LocalDateTime.now(ZoneOffset.UTC));
+                }
+                return new MealPlanEntryEatenDTO(entry.getId(), Boolean.TRUE.equals(entry.getEaten()),
+                    toUtcInstant(entry.getEatenAt()));
+            });
+    }
+
+    /** MPP-12: eaten_at is UTC wall time; null stays null. */
+    private static Instant toUtcInstant(LocalDateTime utcWallTime) {
+        return utcWallTime == null ? null : utcWallTime.toInstant(ZoneOffset.UTC);
+    }
+
+    /**
      * Swap all meal plan entries between two dates.
      * All meals from sourceDate move to targetDate and vice versa.
      * MPP-10: entries keep their ids, so their extra choices move with them.
@@ -473,6 +510,8 @@ public class MealPlanService {
         dto.setCarbsPerServing(macros[1]);
         dto.setFatPerServing(macros[2]);
         dto.setExtraChoices(new HashMap<>(extraChoices));
+        dto.setEaten(Boolean.TRUE.equals(entry.getEaten()));
+        dto.setEatenAt(toUtcInstant(entry.getEatenAt()));
         return dto;
     }
 }

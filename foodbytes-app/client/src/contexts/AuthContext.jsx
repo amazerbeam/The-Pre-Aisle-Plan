@@ -56,7 +56,18 @@ export const AuthProvider = ({ children }) => {
    * and revert — deliberately NOT caught into a success shape here.
    */
   const saveDefaultServings = async (defaultServings) => {
-    const updated = await userService.updatePreferences(defaultServings)
+    const updated = await userService.updatePreferences({ defaultServings })
+    setUser(updated)
+    return updated
+  }
+
+  /**
+   * MPP-13: save all three meal times, or pass null to reset to the defaults.
+   * Throws on failure so MealTimesControl can show the server's message and
+   * revert — deliberately NOT caught into a success shape here.
+   */
+  const saveMealTimes = async (mealTimes) => {
+    const updated = await userService.updatePreferences({ mealTimes })
     setUser(updated)
     return updated
   }
@@ -68,11 +79,13 @@ export const AuthProvider = ({ children }) => {
     isAuthenticated: !!user,
     isAdmin: user?.isAdmin || false,
     defaultServings: user?.defaultServings ?? null,
+    mealTimes: user?.mealTimes ?? null,
     loginWithGoogle,
     passwordLogin,
     continueAsGuest,
     logout,
     saveDefaultServings,
+    saveMealTimes,
     checkAuthStatus
   }
 

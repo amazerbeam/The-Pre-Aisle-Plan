@@ -57,6 +57,16 @@ export const getShortDayName = (date) => {
 }
 
 /**
+ * Get full day name (Monday, Tuesday, etc.)
+ * @param {Date|string} date
+ * @returns {string}
+ */
+export const formatLongWeekday = (date) => {
+  const d = typeof date === 'string' ? parseISODate(date) : date
+  return d.toLocaleDateString('en-US', { weekday: 'long' })
+}
+
+/**
  * Check if two dates are the same day
  * @param {Date|string} date1
  * @param {Date|string} date2

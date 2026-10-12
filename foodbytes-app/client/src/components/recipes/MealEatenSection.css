@@ -1,0 +1,110 @@
+/* MPP-12: end-of-recipe eaten section (approved pet-mockup.html, phone 2) */
+
+.eaten-section {
+  border-top: 2px solid var(--brand-primary);
+  padding-top: 16px;
+  margin-top: 8px;
+}
+
+.eaten-slot {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 8px 0;
+}
+
+.eaten-btn {
+  width: 100%;
+  min-height: 52px;
+  border-radius: var(--radius-md);
+  font-size: 1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: var(--bg-primary);
+  color: var(--success);
+  border: 2px solid var(--success);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.eaten-btn.on {
+  background: var(--success);
+  color: #fff;
+  cursor: default;
+}
+
+.eaten-btn:disabled {
+  opacity: 0.7;
+}
+
+.eaten-btn:active:not(.on):not(:disabled) {
+  background: rgba(40, 167, 69, 0.1);
+}
+
+@media (hover: hover) {
+  .eaten-btn:hover:not(.on):not(:disabled) {
+    background: rgba(40, 167, 69, 0.1);
+  }
+}
+
+.eaten-btn:focus-visible,
+.eaten-undo:focus-visible {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: 2px;
+}
+
+.eaten-tick {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  border: 2px solid currentColor;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.eaten-meta {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  text-align: center;
+  margin: 8px 0 0 0;
+  min-height: 44px; /* reserves the Undo row so ticking does not shift the layout */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+/* Visual is a text link; hit area expanded to 44x44 */
+.eaten-undo {
+  background: none;
+  border: none;
+  color: var(--brand-primary);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 8px;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.eaten-undo:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.eaten-error {
+  color: var(--error, #dc3545);
+  font-weight: 600;
+}

@@ -15,4 +15,5 @@ public class UserDTO {
     private String avatarUrl;
     private Boolean isAdmin;
     private BigDecimal defaultServings;   // MPP-3: null means never set
+    private MealTimesDTO mealTimes;       // MPP-13: effective times (defaults applied) + custom flag
 }

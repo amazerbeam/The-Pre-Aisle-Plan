@@ -53,6 +53,18 @@ export const mealPlanService = {
   },
 
   /**
+   * MPP-12: Mark a meal plan entry as eaten, or undo it. One shared state per entry,
+   * so a linked user's tick is the owner's tick.
+   * @param {number} entryId - Entry ID
+   * @param {boolean} eaten - Target state (explicit, not a toggle)
+   * @returns {Promise<{id: number, eaten: boolean, eatenAt: string|null}>} eatenAt is ISO-8601 UTC
+   */
+  async setEntryEaten(entryId, eaten) {
+    const response = await api.put(`/meal-plan/${entryId}/eaten`, { eaten })
+    return response.data
+  },
+
+  /**
    * FR-014: Get which days a recipe is assigned to within the date range
    * Used to highlight day buttons on RecipeCard
    * @param {number} recipeId - Recipe ID

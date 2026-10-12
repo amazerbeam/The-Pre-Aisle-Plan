@@ -4,6 +4,7 @@ import mealPlanService from '../services/mealPlanService'
 import mealPlanTemplateService from '../services/mealPlanTemplateService'
 import { getTodayISO, addDays, formatDateISO, getWeekDays } from '../utils/dateUtils'
 import { resolveStartingServings } from '../utils/servingsUtils'
+import { useEntryEaten } from '../hooks/useEntryEaten'
 
 const MealPlanContext = createContext()
 
@@ -82,6 +83,8 @@ export const MealPlanProvider = ({ children }) => {
 
   // FR-098: Assignment error state for optimistic UI rollback feedback
   const [assignmentError, setAssignmentError] = useState(null)
+  // MPP-12: eaten tick (optimistic, per-entry rollback) - logic lives in the hook
+  const { setEntryEaten, getEntryById } = useEntryEaten({ weekPlan, setWeekPlan, setAssignmentError })
 
   // Saved meal-plan templates
   const [templates, setTemplates] = useState([])
@@ -525,6 +528,8 @@ export const MealPlanProvider = ({ children }) => {
     removeEntry,
     swapDayMeals,
     copyWeek,
+    setEntryEaten,
+    getEntryById,
 
     // Saved templates
     templates,

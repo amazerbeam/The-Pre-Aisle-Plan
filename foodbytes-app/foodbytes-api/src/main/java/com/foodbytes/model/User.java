@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.math.BigDecimal;
 
 @Entity
@@ -45,6 +46,22 @@ public class User {
      */
     @Column(name = "default_servings")
     private BigDecimal defaultServings;
+
+    /**
+     * MPP-13: the time by which the user usually eats each meal. NULL means
+     * "use the default" (MealTimesPolicy) — no field initialiser, for the same
+     * reason as defaultServings: a default here would silently write the default
+     * into every new user's row, and Reset could no longer mean "clear".
+     * The three are always written together by UserService.updatePreferences.
+     */
+    @Column(name = "breakfast_by")
+    private LocalTime breakfastBy;
+
+    @Column(name = "lunch_by")
+    private LocalTime lunchBy;
+
+    @Column(name = "dinner_by")
+    private LocalTime dinnerBy;
 
     @Column(name = "meal_plan_owner_id")
     private Long mealPlanOwnerId;

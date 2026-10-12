@@ -62,7 +62,7 @@ function MealPlanEntry({ entry }) {
     <>
       <div
         ref={entryRef}
-        className={`meal-plan-entry ${removing ? 'removing' : ''}`}
+        className={`meal-plan-entry ${removing ? 'removing' : ''} ${entry.eaten ? 'eaten' : ''}`}
         onClick={handleEntryClick}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
@@ -83,6 +83,9 @@ function MealPlanEntry({ entry }) {
           <span className="entry-store-bought" role="img" aria-label="Has store-bought extras" title="Has store-bought extras">
             <CartIcon />
           </span>
+        )}
+        {entry.eaten && (
+          <span className="entry-eaten" role="img" aria-label="Eaten" title="Eaten">✓</span>
         )}
         <button
           className="remove-btn"
@@ -125,6 +128,7 @@ function MealPlanEntry({ entry }) {
           variants={entry.recipe.variants}
           parentRecipeId={entry.recipe.id}
           extraChoices={entry.extraChoices}
+          mealPlanEntry={entry}
           onSelectVariant={() => {
             // FR-013: In meal plan view, variant selection updates display only
             // (a recipe swap would require updating the meal plan entry)

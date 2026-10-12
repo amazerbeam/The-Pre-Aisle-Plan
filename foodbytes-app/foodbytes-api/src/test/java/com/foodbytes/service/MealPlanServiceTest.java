@@ -2,6 +2,7 @@ package com.foodbytes.service;
 
 import com.foodbytes.dto.MealPlanCreateRequest;
 import com.foodbytes.dto.MealPlanEntryDTO;
+import com.foodbytes.dto.MealPlanEntryEatenDTO;
 import com.foodbytes.dto.MealPlanWeekDTO;
 import com.foodbytes.model.Meal;
 import com.foodbytes.model.MealPlanEntry;
@@ -25,13 +26,18 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -449,5 +455,115 @@ class MealPlanServiceTest {
         MealPlanEntryDTO second = week.getDays().get(1).getMealsByType().get("dinner").get(0);
         assertThat(first.getExtraChoices()).isEqualTo(Map.of(EXTRA_ID, false));
         assertThat(second.getExtraChoices()).isEmpty();
+    }
+
+    // ------------------------------------------------------------------
+    // MPP-12: mark a planned meal as eaten
+    // ------------------------------------------------------------------
+
+    private static final Long ENTRY_ID = 812L;
+
+    @Test
+    void setEntryEaten_ownEntry_marksEatenWithUtcTimestamp() {
+        MealPlanEntry entry = entryWithId(ENTRY_ID, recipeWithId(82L), LocalDate.of(2026, 10, 13));
+        when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user));
+        when(mealPlanEntryRepository.findByIdAndUserId(ENTRY_ID, USER_ID)).thenReturn(Optional.of(entry));
+
+        Optional<MealPlanEntryEatenDTO> result = mealPlanService.setEntryEaten(USER_ID, ENTRY_ID, true);
+
+        assertThat(result).isPresent();
+        assertThat(result.get().eaten()).isTrue();
+        assertThat(result.get().eatenAt()).isCloseTo(Instant.now(), within(5, ChronoUnit.SECONDS));
+        assertThat(entry.getEaten()).isTrue();
+        assertThat(entry.getEatenAt().toInstant(ZoneOffset.UTC)).isEqualTo(result.get().eatenAt());
+    }
+
+    @Test
+    void setEntryEaten_alreadyEaten_keepsFirstTimestamp() {
+        MealPlanEntry entry = entryWithId(ENTRY_ID, recipeWithId(82L), LocalDate.of(2026, 10, 13));
+        LocalDateTime first = LocalDateTime.of(2026, 10, 13, 12, 12, 4);
+        entry.setEaten(true);
+        entry.setEatenAt(first);
+        when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user));
+        when(mealPlanEntryRepository.findByIdAndUserId(ENTRY_ID, USER_ID)).thenReturn(Optional.of(entry));
+
+        MealPlanEntryEatenDTO result = mealPlanService.setEntryEaten(USER_ID, ENTRY_ID, true).orElseThrow();
+
+        assertThat(entry.getEatenAt()).isEqualTo(first);
+        assertThat(result.eatenAt()).isEqualTo(first.toInstant(ZoneOffset.UTC));
+    }
+
+    @Test
+    void setEntryEaten_undo_clearsEatenAndTimestamp() {
+        MealPlanEntry entry = entryWithId(ENTRY_ID, recipeWithId(82L), LocalDate.of(2026, 10, 13));
+        entry.setEaten(true);
+        entry.setEatenAt(LocalDateTime.of(2026, 10, 13, 12, 12, 4));
+        when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user));
+        when(mealPlanEntryRepository.findByIdAndUserId(ENTRY_ID, USER_ID)).thenReturn(Optional.of(entry));
+
+        MealPlanEntryEatenDTO result = mealPlanService.setEntryEaten(USER_ID, ENTRY_ID, false).orElseThrow();
+
+        assertThat(result.eaten()).isFalse();
+        assertThat(result.eatenAt()).isNull();
+        assertThat(entry.getEaten()).isFalse();
+        assertThat(entry.getEatenAt()).isNull();
+    }
+
+    @Test
+    void setEntryEaten_linkedUser_writesTheOwnersRow() {
+        User linked = new User();
+        linked.setId(2L);
+        linked.setMealPlanOwnerId(OWNER_ID);
+        MealPlanEntry ownersEntry = entryWithId(ENTRY_ID, recipeWithId(82L), LocalDate.of(2026, 10, 13));
+        when(userRepository.findById(2L)).thenReturn(Optional.of(linked));
+        when(mealPlanEntryRepository.findByIdAndUserId(ENTRY_ID, OWNER_ID)).thenReturn(Optional.of(ownersEntry));
+
+        Optional<MealPlanEntryEatenDTO> result = mealPlanService.setEntryEaten(2L, ENTRY_ID, true);
+
+        assertThat(result).isPresent();
+        assertThat(ownersEntry.getEaten()).isTrue();
+        verify(mealPlanEntryRepository, never()).save(any(MealPlanEntry.class));
+    }
+
+    @Test
+    void setEntryEaten_entryOutsideEffectivePlan_returnsEmpty() {
+        when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user));
+        when(mealPlanEntryRepository.findByIdAndUserId(999L, USER_ID)).thenReturn(Optional.empty());
+
+        assertThat(mealPlanService.setEntryEaten(USER_ID, 999L, true)).isEmpty();
+    }
+
+    @Test
+    void assignRecipe_replacingAnEatenSlot_createsANotEatenEntry() {
+        MealPlanEntry eatenEntry = entryWithId(10L, recipeWithId(38L), LocalDate.of(2026, 10, 12));
+        eatenEntry.setEaten(true);
+        eatenEntry.setEatenAt(LocalDateTime.of(2026, 10, 12, 12, 0));
+        stubAssign(82L, eatenEntry);
+
+        mealPlanService.assignRecipe(USER_ID, assignRequest(82L, Map.of()));
+
+        verify(mealPlanEntryRepository).delete(eatenEntry);
+        verify(mealPlanEntryRepository).save(entryCaptor.capture());
+        assertThat(entryCaptor.getValue().getEaten()).isFalse();
+        assertThat(entryCaptor.getValue().getEatenAt()).isNull();
+    }
+
+    @Test
+    void getWeekPlan_exposesEatenStateOnEntries() {
+        LocalDate start = LocalDate.of(2026, 10, 12);
+        when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user));
+        MealPlanEntry eatenEntry = entryWithId(10L, recipeWithId(82L), start);
+        eatenEntry.setEaten(true);
+        eatenEntry.setEatenAt(LocalDateTime.of(2026, 10, 12, 12, 12, 4));
+        when(mealPlanEntryRepository.findByUserIdAndDateRange(USER_ID, start, start.plusDays(7)))
+                .thenReturn(List.of(eatenEntry));
+        when(extraChoiceService.getEntryChoices(List.of(10L))).thenReturn(Map.of());
+        stubWeekMacros();
+
+        MealPlanWeekDTO week = mealPlanService.getWeekPlan(USER_ID, start);
+
+        MealPlanEntryDTO dto = week.getDays().get(0).getMealsByType().get("dinner").get(0);
+        assertThat(dto.getEaten()).isTrue();
+        assertThat(dto.getEatenAt()).isEqualTo(Instant.parse("2026-10-12T12:12:04Z"));
     }
 }

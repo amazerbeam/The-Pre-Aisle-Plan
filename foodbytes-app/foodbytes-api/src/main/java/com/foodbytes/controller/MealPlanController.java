@@ -10,6 +10,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -110,6 +111,29 @@ public class MealPlanController {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.notFound().build();
+    }
+
+    /**
+     * MPP-12: Mark a meal plan entry as eaten, or undo it.
+     * PUT /api/meal-plan/{id}/eaten  body {"eaten": true|false}
+     * One shared state per entry: a linked user (meal_plan_owner_id) writes the owner's row.
+     *
+     * @return 200 with {id, eaten, eatenAt}; 404 if the entry is not in the caller's plan
+     */
+    @PutMapping("/{id}/eaten")
+    public ResponseEntity<?> setEaten(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @PathVariable Long id,
+            @Valid @RequestBody MealPlanEntryEatenRequest request) {
+
+        if (userPrincipal == null) {
+            return ResponseEntity.status(403)
+                .body(Map.of("error", "Authentication required to modify meal plan"));
+        }
+
+        return mealPlanService.setEntryEaten(userPrincipal.getId(), id, request.getEaten())
+            .<ResponseEntity<?>>map(ResponseEntity::ok)
+            .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     /**
@@ -270,5 +294,18 @@ public class MealPlanController {
             sourceChainList
         );
         return ResponseEntity.ok(breakdown);
+    }
+
+    /**
+     * There is no @ControllerAdvice in this codebase. Shapes @Valid failures as {error} so the
+     * frontend can surface the message instead of Spring's default {timestamp,status,error,path}.
+     */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<?> handleValidation(MethodArgumentNotValidException ex) {
+        String message = ex.getBindingResult().getFieldErrors().stream()
+                .findFirst()
+                .map(err -> err.getDefaultMessage())
+                .orElse("Invalid request");
+        return ResponseEntity.badRequest().body(Map.of("error", message));
     }
 }

@@ -1,0 +1,102 @@
+/* MPP-13: Meal times section of the account menu. Mirrors DefaultPortionsControl.css. */
+.meal-times {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.meal-times-label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #555;
+}
+
+.meal-times-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.meal-times-row-label {
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+.meal-times-input {
+  /* Same trick as .default-portions-input: width 0 keeps the input out of
+     .user-dropdown's shrink-to-fit max-content width, so the time inputs never
+     widen the panel past its 220px min-width (the mockup's fixed 120px would
+     have pushed it to ~245px). flex-grow fills the panel, capped at 8rem. */
+  flex: 1 1 0;
+  width: 0;
+  min-width: 0;
+  max-width: 8rem;
+  min-height: 44px;
+  padding: 0 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  background: #fff;
+  color: var(--text-primary);
+  touch-action: manipulation;
+}
+
+.meal-times-input:disabled {
+  opacity: 0.6;
+}
+
+/* Not yet chosen: the times shown are the server's defaults. Subdued like
+   MPP-3's .default-portions-input--unset. */
+.meal-times-input--default {
+  color: #999;
+  font-style: italic;
+}
+
+.meal-times-input--invalid {
+  border-color: var(--error);
+  background: #fff5f5;
+}
+
+.meal-times-error {
+  font-size: 0.75rem;
+  color: #c0392b;
+}
+
+.meal-times-reset {
+  align-self: flex-start;
+  min-height: 44px;
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--brand-primary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.meal-times-reset:disabled {
+  color: var(--text-secondary);
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (hover: hover) {
+  .meal-times-reset:not(:disabled):hover {
+    text-decoration: underline;
+  }
+}
+
+.meal-times-reset:not(:disabled):active {
+  opacity: 0.7;
+}
+
+.meal-times-input:focus-visible,
+.meal-times-reset:focus-visible {
+  outline: 2px solid #4a7c59;
+  outline-offset: 2px;
+}

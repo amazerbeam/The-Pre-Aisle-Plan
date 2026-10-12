@@ -1,12 +1,13 @@
 package com.foodbytes.service;
 
+import com.foodbytes.dto.MealTimesRequest;
 import com.foodbytes.dto.UserDTO;
+import com.foodbytes.dto.UserPreferencesUpdateRequest;
 import com.foodbytes.model.User;
 import com.foodbytes.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Service
@@ -43,20 +44,40 @@ public class UserService {
                 user.getName(),
                 user.getAvatarUrl(),
                 user.getIsAdmin(),
-                user.getDefaultServings()
+                user.getDefaultServings(),
+                MealTimesPolicy.effective(user)
         );
     }
 
+    @Transactional(readOnly = true)
+    public UserDTO getUserDTO(Long userId) {
+        return convertToDTO(findUser(userId));
+    }
+
     /**
-     * MPP-3: save the user's preferred starting portion count.
-     * A null value clears the preference, restoring the recipe-default
-     * behaviour. Validation of the range happens on the request DTO.
+     * MPP-3 / MPP-13: apply a partial preferences update. Only fields present in
+     * the request body are touched (see UserPreferencesUpdateRequest); an explicit
+     * null clears. Meal times are written as a set — all three, or all NULL — so a
+     * row never mixes saved and default times. Validation (range, HH:mm, strict
+     * order) happens on the request DTOs before this runs.
      */
     @Transactional
-    public UserDTO updateDefaultServings(Long userId, BigDecimal defaultServings) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
-        user.setDefaultServings(defaultServings);
+    public UserDTO updatePreferences(Long userId, UserPreferencesUpdateRequest request) {
+        User user = findUser(userId);
+        if (request.isDefaultServingsPresent()) {
+            user.setDefaultServings(request.getDefaultServings());
+        }
+        if (request.isMealTimesPresent()) {
+            MealTimesRequest times = request.getMealTimes();
+            user.setBreakfastBy(times == null ? null : MealTimesPolicy.parse(times.getBreakfastBy()));
+            user.setLunchBy(times == null ? null : MealTimesPolicy.parse(times.getLunchBy()));
+            user.setDinnerBy(times == null ? null : MealTimesPolicy.parse(times.getDinnerBy()));
+        }
         return convertToDTO(userRepository.save(user));
+    }
+
+    private User findUser(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
     }
 }
