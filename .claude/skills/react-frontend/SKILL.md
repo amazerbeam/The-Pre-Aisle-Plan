@@ -83,7 +83,7 @@ client/src/
   App.jsx       gates on auth → LandingPageAnimation or routed app
 ```
 
-Routes: `/`, `/search`, `/mealplan`, `/shopping`. New top-level routes are rare — prefer extending existing screens.
+Routes: `/`, `/mealplan`, `/pet`, `/shopping` (recipe search was removed in MPP-14). New top-level routes are rare — prefer extending existing screens.
 
 ## Approach
 

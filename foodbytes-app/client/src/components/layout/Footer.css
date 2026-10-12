@@ -41,9 +41,26 @@
   border-radius: var(--radius-md);
 }
 
-.footer-btn:hover {
+.footer-btn {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.footer-btn:active {
   color: var(--brand-primary);
   background: var(--bg-secondary);
+}
+
+@media (hover: hover) {
+  .footer-btn:hover {
+    color: var(--brand-primary);
+    background: var(--bg-secondary);
+  }
+}
+
+.footer-btn:focus-visible {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: 2px;
 }
 
 .footer-btn.active {
@@ -66,6 +83,21 @@
 .footer-btn svg {
   width: 24px;
   height: 24px;
+}
+
+/* MPP-14: the Pet tab's mini Mochi face is a little larger than the line icons. */
+.footer-btn svg.mochi-pet--mini {
+  width: 30px;
+  height: 30px;
+  margin: -3px 0;
+}
+
+/* A 12-character pet name must not push the tab wider than its neighbours. */
+.footer-pet-label {
+  max-width: 72px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .footer-btn span {

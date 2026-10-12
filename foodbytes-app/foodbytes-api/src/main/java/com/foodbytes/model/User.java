@@ -63,6 +63,15 @@ public class User {
     @Column(name = "dinner_by")
     private LocalTime dinnerBy;
 
+    /**
+     * MPP-14: the pet's name, stored on the meal-plan OWNER's row only (a linked
+     * user's own column stays NULL and is never read). NULL means "use the
+     * default" (PetPolicy.DEFAULT_NAME) — no initialiser, same reason as
+     * defaultServings.
+     */
+    @Column(name = "pet_name", length = 12)
+    private String petName;
+
     @Column(name = "meal_plan_owner_id")
     private Long mealPlanOwnerId;
 

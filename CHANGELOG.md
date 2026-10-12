@@ -3,6 +3,7 @@
 One line per ticket, newest first: `<version> — <ticket key>: <summary>`. Bump rules and how
 to check what is deployed: `CLAUDE.md` → Versioning & deploy verification.
 
+1.5.0 — MPP-14: Pet page (Phase 1) — Mochi with four meal-logging moods replaces the Search tab; pet name stored on the plan owner
 1.4.0 — MPP-13: Meal times (breakfast/lunch/dinner "by" times) in the account menu
 1.3.0 — MPP-12: Mark a planned meal as eaten from the recipe (shared across linked meal plans)
 1.2.2 — MPP-10: holding a "Store Bought X" row shows the meals and grams behind it

@@ -2,7 +2,7 @@
 
 > **For agentic workers:** Use `/fb-apply` to walk this contract phase-by-phase. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-Status: IN PROGRESS
+Status: COMPLETE
 Started: 2026-10-12
 
 **Goal:** Replace the Search tab with a Pet tab (live mini Mochi face + pet name), delete recipe search, and add a `/pet` page whose Content/Happy/Bored/Mischievous mood is derived in the browser from yesterday's and today's Breakfast/Lunch/Dinner entries, MPP-12 eaten ticks and the plan owner's MPP-13 meal times, with the name stored once on the plan owner's `users` row.
@@ -105,7 +105,7 @@ Expected: no output other than the password warning.
 Run: `docker exec foodbytes-db mysql -uroot -prootpassword foodbytes -e "SHOW COLUMNS FROM users LIKE 'pet_name'"`
 Expected: one row, `pet_name | varchar(12) | YES | | NULL |`.
 
-### Task 2: Developer applies the three migrations to Railway
+### Task 2: Developer applies the three migrations to Railway ✓
 
 - Skill: none — DBA operation against the live Railway MySQL
 
@@ -137,14 +137,14 @@ If any row is missing, stop and flag the card (blocked) — later backend phases
 
 Maps the column, adds the policy/DTOs, then the owner-resolved service and thin controller, each with tests. The build and the existing suite stay green at the end; nothing on the frontend calls the endpoint yet.
 
-### Task 3: Map `User.petName`
+### Task 3: Map `User.petName` ✓
 
 - Skill: java-backend
 
 **Files:**
 - Modify: `foodbytes-app/foodbytes-api/src/main/java/com/foodbytes/model/User.java` (after the `dinnerBy` field)
 
-- [ ] **Step 1: Add the field**
+- [x] **Step 1: Add the field**
 
 Insert directly after `private LocalTime dinnerBy;`:
 
@@ -160,12 +160,12 @@ Insert directly after `private LocalTime dinnerBy;`:
     private String petName;
 ```
 
-- [ ] **Step 2: Compile**
+- [x] **Step 2: Compile**
 
 Run: `cd foodbytes-app\foodbytes-api; mvn -q compile`
 Expected: `BUILD SUCCESS`, 0 errors.
 
-### Task 4: Add `PetDTO` and `PetPolicy`
+### Task 4: Add `PetDTO` and `PetPolicy` ✓
 
 - Skill: java-backend
 
@@ -173,7 +173,7 @@ Expected: `BUILD SUCCESS`, 0 errors.
 - Create: `foodbytes-app/foodbytes-api/src/main/java/com/foodbytes/dto/PetDTO.java`
 - Create: `foodbytes-app/foodbytes-api/src/main/java/com/foodbytes/service/PetPolicy.java`
 
-- [ ] **Step 1: Write `PetDTO`**
+- [x] **Step 1: Write `PetDTO`**
 
 ```java
 package com.foodbytes.dto;
@@ -196,7 +196,7 @@ public class PetDTO {
 }
 ```
 
-- [ ] **Step 2: Write `PetPolicy`**
+- [x] **Step 2: Write `PetPolicy`**
 
 ```java
 package com.foodbytes.service;
@@ -242,19 +242,19 @@ public final class PetPolicy {
 }
 ```
 
-- [ ] **Step 3: Compile**
+- [x] **Step 3: Compile**
 
 Run: `cd foodbytes-app\foodbytes-api; mvn -q compile`
 Expected: `BUILD SUCCESS`.
 
-### Task 5: Add `PetNameRequest`
+### Task 5: Add `PetNameRequest` ✓
 
 - Skill: java-backend
 
 **Files:**
 - Create: `foodbytes-app/foodbytes-api/src/main/java/com/foodbytes/dto/PetNameRequest.java`
 
-- [ ] **Step 1: Write the request DTO**
+- [x] **Step 1: Write the request DTO**
 
 ```java
 package com.foodbytes.dto;
@@ -287,12 +287,12 @@ public class PetNameRequest {
 }
 ```
 
-- [ ] **Step 2: Compile**
+- [x] **Step 2: Compile**
 
 Run: `cd foodbytes-app\foodbytes-api; mvn -q compile`
 Expected: `BUILD SUCCESS`.
 
-### Task 6: Add `PetService` (owner-resolved read + rename)
+### Task 6: Add `PetService` (owner-resolved read + rename) ✓
 
 - Skill: java-backend
 
@@ -300,7 +300,7 @@ Expected: `BUILD SUCCESS`.
 - Create: `foodbytes-app/foodbytes-api/src/main/java/com/foodbytes/service/PetService.java`
 - Test: `foodbytes-app/foodbytes-api/src/test/java/com/foodbytes/service/PetServiceTest.java`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```java
 package com.foodbytes.service;
@@ -427,12 +427,12 @@ class PetServiceTest {
 }
 ```
 
-- [ ] **Step 2: Run it — expect a compile failure**
+- [x] **Step 2: Run it — expect a compile failure**
 
 Run: `cd foodbytes-app\foodbytes-api; mvn test -Dtest=PetServiceTest`
 Expected: `COMPILATION ERROR` — `cannot find symbol: class PetService`.
 
-- [ ] **Step 3: Implement `PetService`**
+- [x] **Step 3: Implement `PetService`**
 
 ```java
 package com.foodbytes.service;
@@ -482,12 +482,12 @@ public class PetService {
 }
 ```
 
-- [ ] **Step 4: Run it — expect green**
+- [x] **Step 4: Run it — expect green**
 
 Run: `cd foodbytes-app\foodbytes-api; mvn test -Dtest=PetServiceTest`
 Expected: `Tests run: 6, Failures: 0, Errors: 0`, `BUILD SUCCESS`.
 
-### Task 7: Add `PetController`
+### Task 7: Add `PetController` ✓
 
 - Skill: java-backend
 
@@ -495,7 +495,7 @@ Expected: `Tests run: 6, Failures: 0, Errors: 0`, `BUILD SUCCESS`.
 - Create: `foodbytes-app/foodbytes-api/src/main/java/com/foodbytes/controller/PetController.java`
 - Test: `foodbytes-app/foodbytes-api/src/test/java/com/foodbytes/controller/PetControllerTest.java`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```java
 package com.foodbytes.controller;
@@ -557,12 +557,12 @@ class PetControllerTest {
 
 (`"Twelve chars"` is exactly 12 characters; `"Thirteen chars"` is 14.)
 
-- [ ] **Step 2: Run it — expect a compile failure**
+- [x] **Step 2: Run it — expect a compile failure**
 
 Run: `cd foodbytes-app\foodbytes-api; mvn test -Dtest=PetControllerTest`
 Expected: `COMPILATION ERROR` — `cannot find symbol: class PetController`.
 
-- [ ] **Step 3: Implement `PetController`**
+- [x] **Step 3: Implement `PetController`**
 
 ```java
 package com.foodbytes.controller;
@@ -618,7 +618,7 @@ public class PetController {
 }
 ```
 
-- [ ] **Step 4: Run it — expect green**
+- [x] **Step 4: Run it — expect green**
 
 Run: `cd foodbytes-app\foodbytes-api; mvn test -Dtest=PetControllerTest`
 Expected: `Tests run: 3, Failures: 0, Errors: 0`, `BUILD SUCCESS`.
@@ -629,14 +629,14 @@ Expected: `Tests run: 3, Failures: 0, Errors: 0`, `BUILD SUCCESS`.
 
 Pure helpers, services, the clock hook and `PetContext`, mounted in `main.jsx` but not yet rendered by any component. The build is green and the app behaves exactly as before at the end of this phase (one extra pair of reads after sign-in).
 
-### Task 8: Add `constants/pet.js`
+### Task 8: Add `constants/pet.js` ✓
 
 - Skill: react-frontend
 
 **Files:**
 - Create: `foodbytes-app/client/src/constants/pet.js`
 
-- [ ] **Step 1: Write the constants**
+- [x] **Step 1: Write the constants**
 
 ```js
 /**
@@ -684,12 +684,12 @@ export const PET_GUEST_MESSAGE = 'Sign in to meet your pet!'
 export const PET_CLOCK_TICK_MS = 60_000
 ```
 
-- [ ] **Step 2: Smoke-check it loads in node**
+- [x] **Step 2: Smoke-check it loads in node**
 
 Run: `cd foodbytes-app\client; node --input-type=module -e "import {PET_COUNTED_MEAL_TYPES} from './src/constants/pet.js'; console.log(PET_COUNTED_MEAL_TYPES.join(','))"`
 Expected: `breakfast,lunch,dinner`
 
-### Task 9: Add `utils/petMood.js` with its check script
+### Task 9: Add `utils/petMood.js` with its check script ✓
 
 - Skill: react-frontend
 
@@ -698,7 +698,7 @@ Expected: `breakfast,lunch,dinner`
 - Create: `foodbytes-app/client/src/utils/petMood.js`
 - Modify: `foodbytes-app/client/package.json` (`scripts`)
 
-- [ ] **Step 1: Write the check script first**
+- [x] **Step 1: Write the check script first**
 
 ```js
 // Run: npm run check:pet   (from foodbytes-app/client)
@@ -796,7 +796,7 @@ assert.equal(petChipLabel({ mood: 'mischievous', dueCount: 3 }), 'Mischievous ·
 console.log('petMood: all checks passed')
 ```
 
-- [ ] **Step 2: Add the npm script**
+- [x] **Step 2: Add the npm script**
 
 In `foodbytes-app/client/package.json` → `scripts`, after `"check:macros": …,` add:
 
@@ -804,12 +804,12 @@ In `foodbytes-app/client/package.json` → `scripts`, after `"check:macros": …
     "check:pet": "node src/utils/petMood.check.mjs",
 ```
 
-- [ ] **Step 3: Run it — expect failure**
+- [x] **Step 3: Run it — expect failure**
 
 Run: `cd foodbytes-app\client; npm run check:pet`
 Expected: fails with `ERR_MODULE_NOT_FOUND` for `petMood.js`.
 
-- [ ] **Step 4: Implement `petMood.js`**
+- [x] **Step 4: Implement `petMood.js`**
 
 ```js
 import { MEAL_TYPE_LABELS } from '../constants/mealTypes.js'
@@ -921,12 +921,12 @@ function atLocalTime(isoDate, hhmm) {
 }
 ```
 
-- [ ] **Step 5: Run it — expect green**
+- [x] **Step 5: Run it — expect green**
 
 Run: `cd foodbytes-app\client; npm run check:pet`
 Expected: `petMood: all checks passed`
 
-### Task 10: Add `petService` and a cancellable `getWeekPlan`
+### Task 10: Add `petService` and a cancellable `getWeekPlan` ✓
 
 - Skill: react-frontend
 
@@ -934,7 +934,7 @@ Expected: `petMood: all checks passed`
 - Create: `foodbytes-app/client/src/services/petService.js`
 - Modify: `foodbytes-app/client/src/services/mealPlanService.js` (`getWeekPlan`, ~lines 8-16)
 
-- [ ] **Step 1: Write `petService.js`**
+- [x] **Step 1: Write `petService.js`**
 
 ```js
 import api from './api'
@@ -966,7 +966,7 @@ export const petService = {
 export default petService
 ```
 
-- [ ] **Step 2: Make `getWeekPlan` accept an abort signal**
+- [x] **Step 2: Make `getWeekPlan` accept an abort signal**
 
 Replace:
 
@@ -993,19 +993,19 @@ with:
   },
 ```
 
-- [ ] **Step 3: Build**
+- [x] **Step 3: Build**
 
 Run: `cd foodbytes-app\client; npm run build`
 Expected: `built in <n>s`, no errors.
 
-### Task 11: Add `useMinuteClock`
+### Task 11: Add `useMinuteClock` ✓
 
 - Skill: react-frontend
 
 **Files:**
 - Create: `foodbytes-app/client/src/hooks/useMinuteClock.js`
 
-- [ ] **Step 1: Write the hook**
+- [x] **Step 1: Write the hook**
 
 ```js
 import { useEffect, useState } from 'react'
@@ -1038,12 +1038,12 @@ export function useMinuteClock(tickMs = PET_CLOCK_TICK_MS) {
 export default useMinuteClock
 ```
 
-- [ ] **Step 2: Build**
+- [x] **Step 2: Build**
 
 Run: `cd foodbytes-app\client; npm run build`
 Expected: `built in <n>s`, no errors.
 
-### Task 12: Add `PetContext` and mount it
+### Task 12: Add `PetContext` and mount it ✓
 
 - Skill: react-frontend
 
@@ -1051,7 +1051,7 @@ Expected: `built in <n>s`, no errors.
 - Create: `foodbytes-app/client/src/contexts/PetContext.jsx`
 - Modify: `foodbytes-app/client/src/main.jsx` (provider tree)
 
-- [ ] **Step 1: Write `PetContext.jsx`**
+- [x] **Step 1: Write `PetContext.jsx`**
 
 ```jsx
 import { createContext, useCallback, useContext, useEffect, useState } from 'react'
@@ -1175,7 +1175,7 @@ const isCancelled = (err) => err?.code === 'ERR_CANCELED'
 export default PetContext
 ```
 
-- [ ] **Step 2: Mount `PetProvider` inside `MealPlanProvider`**
+- [x] **Step 2: Mount `PetProvider` inside `MealPlanProvider`**
 
 In `main.jsx`, add the import after the `MealPlanProvider` import:
 
@@ -1209,7 +1209,7 @@ with:
         </MealPlanProvider>
 ```
 
-- [ ] **Step 3: Build**
+- [x] **Step 3: Build**
 
 Run: `cd foodbytes-app\client; npm run build`
 Expected: `built in <n>s`, no errors.
@@ -1220,7 +1220,7 @@ Expected: `built in <n>s`, no errors.
 
 The visible feature: the SVG, the page, the footer swap with Search deleted, the reaction in the eaten section, and the docs that named `/search`. Each task leaves the build green; the footer swap and Search deletion happen in one task so there is never a dead route or a dangling import.
 
-### Task 13: Add the `MochiPet` SVG component
+### Task 13: Add the `MochiPet` SVG component ✓
 
 - Skill: react-frontend
 
@@ -1229,7 +1229,7 @@ The visible feature: the SVG, the page, the footer swap with Search deleted, the
 - Create: `foodbytes-app/client/src/components/pet/MochiPet.jsx`
 - Create: `foodbytes-app/client/src/components/pet/MochiPet.css`
 
-- [ ] **Step 1: Write `mochiParts.jsx` (faces and props ported from the approved mockup)**
+- [x] **Step 1: Write `mochiParts.jsx` (faces and props ported from the approved mockup)**
 
 ```jsx
 import { PET_MOODS } from '../../constants/pet'
@@ -1364,7 +1364,7 @@ function Star({ x, y, r, delay }) {
 }
 ```
 
-- [ ] **Step 2: Write `MochiPet.jsx`**
+- [x] **Step 2: Write `MochiPet.jsx`**
 
 ```jsx
 import { useId } from 'react'
@@ -1423,7 +1423,7 @@ function MochiPet({ mood, variant = 'full', className = '' }) {
 export default MochiPet
 ```
 
-- [ ] **Step 3: Write `MochiPet.css`**
+- [x] **Step 3: Write `MochiPet.css`**
 
 ```css
 /* MPP-14: Mochi pet — animations ported from the approved pet-mockup.html.
@@ -1486,7 +1486,7 @@ export default MochiPet
 }
 ```
 
-- [ ] **Step 4: Build and confirm no class collision**
+- [x] **Step 4: Build and confirm no class collision**
 
 Run: `cd foodbytes-app\client; npm run build`
 Expected: `built in <n>s`, no errors.
@@ -1494,14 +1494,14 @@ Expected: `built in <n>s`, no errors.
 Run: `Get-ChildItem foodbytes-app\client\src -Recurse -Include *.css | Select-String -Pattern "\.mochi-" | Where-Object { $_.Path -notmatch "MochiPet.css" }`
 Expected: zero hits (Footer/PetReaction styles are added in later tasks).
 
-### Task 14: Add `PetMealsCard`
+### Task 14: Add `PetMealsCard` ✓
 
 - Skill: react-frontend
 
 **Files:**
 - Create: `foodbytes-app/client/src/components/pet/PetMealsCard.jsx`
 
-- [ ] **Step 1: Write the component** (styles live in `PetView.css`, Task 16)
+- [x] **Step 1: Write the component** (styles live in `PetView.css`, Task 16)
 
 ```jsx
 import { useNavigate } from 'react-router-dom'
@@ -1557,19 +1557,19 @@ function statusText(slot) {
 export default PetMealsCard
 ```
 
-- [ ] **Step 2: Build**
+- [x] **Step 2: Build**
 
 Run: `cd foodbytes-app\client; npm run build`
 Expected: `built in <n>s`, no errors.
 
-### Task 15: Add `PetNameEditor`
+### Task 15: Add `PetNameEditor` ✓
 
 - Skill: react-frontend
 
 **Files:**
 - Create: `foodbytes-app/client/src/components/pet/PetNameEditor.jsx`
 
-- [ ] **Step 1: Write the component** (styles live in `PetView.css`, Task 16)
+- [x] **Step 1: Write the component** (styles live in `PetView.css`, Task 16)
 
 ```jsx
 import { useRef, useState } from 'react'
@@ -1672,12 +1672,12 @@ function PetNameEditor({ name, onRename }) {
 export default PetNameEditor
 ```
 
-- [ ] **Step 2: Build**
+- [x] **Step 2: Build**
 
 Run: `cd foodbytes-app\client; npm run build`
 Expected: `built in <n>s`, no errors.
 
-### Task 16: Add `PetView` and the `/pet` route
+### Task 16: Add `PetView` and the `/pet` route ✓
 
 - Skill: react-frontend
 
@@ -1686,7 +1686,7 @@ Expected: `built in <n>s`, no errors.
 - Create: `foodbytes-app/client/src/components/pet/PetView.css`
 - Modify: `foodbytes-app/client/src/App.jsx` (imports + `<Routes>`)
 
-- [ ] **Step 1: Write `PetView.jsx`**
+- [x] **Step 1: Write `PetView.jsx`**
 
 ```jsx
 import { useNavigate } from 'react-router-dom'
@@ -1766,7 +1766,7 @@ function PetView() {
 export default PetView
 ```
 
-- [ ] **Step 2: Write `PetView.css`** (mobile-first; tokens and colours from the approved mockup)
+- [x] **Step 2: Write `PetView.css`** (mobile-first; tokens and colours from the approved mockup)
 
 ```css
 /* MPP-14: Pet page (approved pet-mockup.html, first phone). */
@@ -2067,7 +2067,7 @@ export default PetView
 }
 ```
 
-- [ ] **Step 3: Add the route**
+- [x] **Step 3: Add the route**
 
 In `App.jsx`, add after the `ShoppingList` import:
 
@@ -2081,12 +2081,12 @@ and add after `<Route path="/mealplan" element={<MealPlanCalendar />} />`:
           <Route path="/pet" element={<PetView />} />
 ```
 
-- [ ] **Step 4: Build**
+- [x] **Step 4: Build**
 
 Run: `cd foodbytes-app\client; npm run build`
 Expected: `built in <n>s`, no errors.
 
-### Task 17: Swap the footer's Search tab for the Pet tab and delete Search
+### Task 17: Swap the footer's Search tab for the Pet tab and delete Search ✓
 
 - Skill: react-frontend
 
@@ -2097,7 +2097,7 @@ Expected: `built in <n>s`, no errors.
 - Delete: `foodbytes-app/client/src/components/recipes/SearchView.jsx`
 - Delete: `foodbytes-app/client/src/components/recipes/SearchView.css`
 
-- [ ] **Step 1: Wire the pet into `Footer.jsx`**
+- [x] **Step 1: Wire the pet into `Footer.jsx`**
 
 Add after the `useAuth` import:
 
@@ -2155,7 +2155,7 @@ with:
         </button>
 ```
 
-- [ ] **Step 2: Style the mini face and fix the hover-only state in `Footer.css`**
+- [x] **Step 2: Style the mini face and fix the hover-only state in `Footer.css`**
 
 Replace:
 
@@ -2211,7 +2211,7 @@ After the `.footer-btn svg { … }` rule add:
 }
 ```
 
-- [ ] **Step 3: Remove Search from `App.jsx`**
+- [x] **Step 3: Remove Search from `App.jsx`**
 
 Delete the line:
 
@@ -2225,22 +2225,22 @@ and the line:
           <Route path="/search" element={<SearchView />} />
 ```
 
-- [ ] **Step 4: Delete the Search files**
+- [x] **Step 4: Delete the Search files**
 
 Run: `Remove-Item foodbytes-app\client\src\components\recipes\SearchView.jsx, foodbytes-app\client\src\components\recipes\SearchView.css -Confirm:$false`
 Expected: no output.
 
-- [ ] **Step 5: Confirm nothing references Search**
+- [x] **Step 5: Confirm nothing references Search**
 
 Run: `Get-ChildItem foodbytes-app\client\src -Recurse -Include *.js,*.jsx,*.css | Select-String -Pattern "SearchView|'/search'|search-view"`
 Expected: zero hits.
 
-- [ ] **Step 6: Build**
+- [x] **Step 6: Build**
 
 Run: `cd foodbytes-app\client; npm run build`
 Expected: `built in <n>s`, no errors.
 
-### Task 18: Add the pet reaction to the eaten section
+### Task 18: Add the pet reaction to the eaten section ✓
 
 - Skill: react-frontend
 
@@ -2249,7 +2249,7 @@ Expected: `built in <n>s`, no errors.
 - Create: `foodbytes-app/client/src/components/pet/PetReaction.css`
 - Modify: `foodbytes-app/client/src/components/recipes/MealEatenSection.jsx` (imports + after the `eaten-meta` `<p>`)
 
-- [ ] **Step 1: Write `PetReaction.jsx`**
+- [x] **Step 1: Write `PetReaction.jsx`**
 
 ```jsx
 import { usePet } from '../../contexts/PetContext'
@@ -2277,7 +2277,7 @@ function PetReaction({ mealType }) {
 export default PetReaction
 ```
 
-- [ ] **Step 2: Write `PetReaction.css`**
+- [x] **Step 2: Write `PetReaction.css`**
 
 ```css
 /* MPP-14: pet reaction under the MPP-12 eaten button (approved pet-mockup.html, phone 2). */
@@ -2313,7 +2313,7 @@ export default PetReaction
 }
 ```
 
-- [ ] **Step 3: Render it from `MealEatenSection.jsx`**
+- [x] **Step 3: Render it from `MealEatenSection.jsx`**
 
 Add after the `formatLongWeekday` import:
 
@@ -2330,12 +2330,12 @@ Directly after the closing `</p>` of `<p className="eaten-meta" aria-live="polit
       )}
 ```
 
-- [ ] **Step 4: Build**
+- [x] **Step 4: Build**
 
 Run: `cd foodbytes-app\client; npm run build`
 Expected: `built in <n>s`, no errors.
 
-### Task 19: Remove `/search` from the docs
+### Task 19: Remove `/search` from the docs ✓
 
 - Skill: none — documentation edit, no code
 
@@ -2343,15 +2343,15 @@ Expected: `built in <n>s`, no errors.
 - Modify: `CLAUDE.md` (Frontend structure → `App.jsx` bullet)
 - Modify: `.claude/skills/react-frontend/SKILL.md` (Project layout → `Routes:` line)
 
-- [ ] **Step 1: Update `CLAUDE.md`**
+- [x] **Step 1: Update `CLAUDE.md`**
 
 Replace `the routed app (\`/\`, \`/search\`, \`/mealplan\`, \`/shopping\`)` with `the routed app (\`/\`, \`/mealplan\`, \`/pet\`, \`/shopping\`)`.
 
-- [ ] **Step 2: Update the react-frontend skill**
+- [x] **Step 2: Update the react-frontend skill**
 
 Replace `Routes: \`/\`, \`/search\`, \`/mealplan\`, \`/shopping\`.` with `Routes: \`/\`, \`/mealplan\`, \`/pet\`, \`/shopping\` (recipe search was removed in MPP-14).`
 
-- [ ] **Step 3: Confirm**
+- [x] **Step 3: Confirm**
 
 Run: `Select-String -Path CLAUDE.md, .claude\skills\react-frontend\SKILL.md -Pattern "/search"`
 Expected: zero hits.
@@ -2362,7 +2362,7 @@ Expected: zero hits.
 
 The closing phase. No production changes beyond the version bump — only sanity-checks that the cumulative work is clean.
 
-### Task 20 (M.1): Bump version + CHANGELOG
+### Task 20 (M.1): Bump version + CHANGELOG ✓
 
 - Skill: none — release bookkeeping per `CLAUDE.md` → Versioning & deploy verification
 
@@ -2371,71 +2371,71 @@ The closing phase. No production changes beyond the version bump — only sanity
 - Modify: `foodbytes-app/foodbytes-api/pom.xml` (project `<version>`)
 - Modify: `CHANGELOG.md` (prepend one line)
 
-- [ ] **Step 1: Bump both manifests**
+- [x] **Step 1: Bump both manifests**
 
 Read the current version from `foodbytes-app/client/package.json`. MPP-14 is a **Story** → bump **MINOR and reset PATCH**. Write the same new version into `package.json` → `version` and `pom.xml` → the `<version>` directly under `<artifactId>foodbytes-api</artifactId>`.
 
-- [ ] **Step 2: Prepend the CHANGELOG line**
+- [x] **Step 2: Prepend the CHANGELOG line**
 
 Directly above the current top entry in `CHANGELOG.md`: `<new version> — MPP-14: Pet page (Phase 1) — Mochi with four meal-logging moods replaces the Search tab; pet name stored on the plan owner`
 
-- [ ] **Step 3: Verify agreement**
+- [x] **Step 3: Verify agreement**
 
 Run: `cd foodbytes-app\client; npm run check:version`
 Expected: `Version OK: <new version>`
 
-### Task 21 (M.2): Grep for stale references and debt
+### Task 21 (M.2): Grep for stale references and debt ✓
 
 - Skill: none — verification only
 
 **Files:**
 - (none — read-only checks)
 
-- [ ] **Step 1: No Search remnants anywhere in the client**
+- [x] **Step 1: No Search remnants anywhere in the client**
 
 Run: `Get-ChildItem foodbytes-app\client\src -Recurse -Include *.js,*.jsx,*.css | Select-String -Pattern "SearchView|/search|search-view"`
 Expected: zero hits.
 
-- [ ] **Step 2: No new `console.log` / `console.debug`**
+- [x] **Step 2: No new `console.log` / `console.debug`**
 
 Run: `Get-ChildItem foodbytes-app\client\src\components\pet, foodbytes-app\client\src\contexts\PetContext.jsx, foodbytes-app\client\src\hooks\useMinuteClock.js, foodbytes-app\client\src\utils\petMood.js, foodbytes-app\client\src\services\petService.js -Recurse | Select-String -Pattern "console\.(log|debug)"`
 Expected: zero hits.
 
-- [ ] **Step 3: No `dangerouslySetInnerHTML` in the pet**
+- [x] **Step 3: No `dangerouslySetInnerHTML` in the pet**
 
 Run: `Get-ChildItem foodbytes-app\client\src\components\pet -Recurse | Select-String -Pattern "dangerouslySetInnerHTML"`
 Expected: zero hits.
 
-- [ ] **Step 4: Line budgets**
+- [x] **Step 4: Line budgets**
 
 Run: `Get-ChildItem foodbytes-app\client\src\components\pet\*.jsx, foodbytes-app\client\src\contexts\PetContext.jsx, foodbytes-app\client\src\utils\petMood.js, foodbytes-app\client\src\components\layout\Footer.jsx, foodbytes-app\client\src\components\recipes\MealEatenSection.jsx | ForEach-Object { "{0} {1}" -f (Get-Content $_ | Measure-Object -Line).Lines, $_.Name }`
 Expected: every file under 200 lines (none may exceed 400).
 
-### Task 22 (M.3): Run the full backend test suite
+### Task 22 (M.3): Run the full backend test suite ✓
 
 - Skill: none — verification only
 
 **Files:**
 - (none)
 
-- [ ] **Step 1: Clean test run**
+- [x] **Step 1: Clean test run**
 
 Run: `cd foodbytes-app\foodbytes-api; mvn test`
 Expected: `BUILD SUCCESS`, 0 failures, 0 errors (the previous total plus 9 new tests).
 
-### Task 23 (M.4): Production build, mood checks and manual check
+### Task 23 (M.4): Production build, mood checks and manual check ✓ (Step 3 = developer manual check, open)
 
 - Skill: none — verification only
 
 **Files:**
 - (none)
 
-- [ ] **Step 1: Mood rule checks**
+- [x] **Step 1: Mood rule checks**
 
 Run: `cd foodbytes-app\client; npm run check:pet`
 Expected: `petMood: all checks passed`
 
-- [ ] **Step 2: Build the client**
+- [x] **Step 2: Build the client**
 
 Run: `cd foodbytes-app\client; npm run build`
 Expected: `built in <n>s`, no errors.
@@ -2452,14 +2452,14 @@ Expected: `built in <n>s`, no errors.
 
 Report which of these were exercised and which were not.
 
-### Task 24 (M.5): Write the PR description
+### Task 24 (M.5): Write the PR description ✓
 
 - Skill: none — documentation
 
 **Files:**
 - Create: `.claude/contract/MPP-14-pet-page-mood/pr-description.md`
 
-- [ ] **Step 1: Write `pr-description.md` for the developer to paste**
+- [x] **Step 1: Write `pr-description.md` for the developer to paste**
 
 Include:
 - Link to `plan.md` in this folder.

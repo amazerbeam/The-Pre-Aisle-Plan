@@ -1,6 +1,9 @@
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useState } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
+import { usePet } from '../../contexts/PetContext'
+import MochiPet from '../pet/MochiPet'
+import { PET_GUEST_MESSAGE, PET_GUEST_TAB_LABEL } from '../../constants/pet'
 import './Footer.css'
 
 function Footer() {
@@ -8,6 +11,7 @@ function Footer() {
   const location = useLocation()
   const { isAuthenticated, isGuest } = useAuth()
   const [showMessage, setShowMessage] = useState(null)
+  const { petName, mood } = usePet()
 
   const handleMealPlanClick = () => {
     if (!isAuthenticated) {
@@ -24,6 +28,16 @@ function Footer() {
       setTimeout(() => setShowMessage(null), 3000)
     } else {
       navigate('/shopping')
+    }
+  }
+
+  // MPP-14 AC 3: guests get the same sign-in nudge as Meal Plan and Shopping.
+  const handlePetClick = () => {
+    if (!isAuthenticated) {
+      setShowMessage(PET_GUEST_MESSAGE)
+      setTimeout(() => setShowMessage(null), 3000)
+    } else {
+      navigate('/pet')
     }
   }
 
@@ -59,15 +73,13 @@ function Footer() {
           <span>Meal Plan</span>
         </button>
 
+        {/* MPP-14 AC 2: live mini face in the current mood; label is the pet's name. */}
         <button
-          className={`footer-btn ${location.pathname === '/search' ? 'active' : ''}`}
-          onClick={() => navigate('/search')}
+          className={`footer-btn ${location.pathname === '/pet' ? 'active' : ''}`}
+          onClick={handlePetClick}
         >
-          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="11" cy="11" r="8"/>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-          </svg>
-          <span>Search</span>
+          <MochiPet mood={mood} variant="mini" />
+          <span className="footer-pet-label">{petName ?? PET_GUEST_TAB_LABEL}</span>
         </button>
 
         <button

@@ -61,7 +61,7 @@ There is no lint or test script wired into `client/package.json` — the fronten
 - **Auth**: Google OAuth → backend issues a JWT delivered as an httpOnly cookie. Frontend uses `withCredentials: true` and never sees the JWT directly. Guest mode is a localStorage flag handled entirely client-side.
 
 ### Frontend structure (`client/src/`)
-- `App.jsx` is the root: it gates on auth (`useAuth`) and shows either `LandingPageAnimation` (first-time guests) or the routed app (`/`, `/search`, `/mealplan`, `/shopping`).
+- `App.jsx` is the root: it gates on auth (`useAuth`) and shows either `LandingPageAnimation` (first-time guests) or the routed app (`/`, `/mealplan`, `/pet`, `/shopping`).
 - **Contexts** are the source of truth for cross-cutting state: `AuthContext`, `MealPlanContext`, `ShoppingListContext`, `HomemadeSelectionsContext`. Components subscribe rather than fetching directly.
 - **Services** (`services/api.js` + per-domain modules) wrap Axios. `api.js` sets `baseURL: '/api'` and `withCredentials: true`; Vite proxies `/api`, `/oauth2`, `/login` → `:8080` in dev.
 - Components are grouped by feature: `auth/`, `mealplan/`, `recipes/`, `shopping/`, `onboarding/`, `admin/`, plus `common/` and `layout/`.

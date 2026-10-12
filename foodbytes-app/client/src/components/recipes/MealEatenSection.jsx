@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { useMealPlan } from '../../contexts/MealPlanContext'
 import { MEAL_TYPE_LABELS } from '../../constants/mealTypes'
 import { formatLongWeekday } from '../../utils/dateUtils'
+import { shouldShowPetReaction } from '../../utils/petMood'
+import PetReaction from '../pet/PetReaction'
 import './MealEatenSection.css'
 
 const SAVE_ERROR = "Couldn't save — try again."
@@ -65,6 +67,9 @@ function MealEatenSection({ entryId }) {
           </>
         ) : null}
       </p>
+      {shouldShowPetReaction({ eaten, mealType: entry.mealType }) && (
+        <PetReaction mealType={entry.mealType} />
+      )}
     </section>
   )
 }

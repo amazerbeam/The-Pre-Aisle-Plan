@@ -3,9 +3,9 @@ import { Routes, Route } from 'react-router-dom'
 import Header from './components/layout/Header.jsx'
 import Footer from './components/layout/Footer.jsx'
 import RecipeList from './components/recipes/RecipeList.jsx'
-import SearchView from './components/recipes/SearchView.jsx'
 import MealPlanCalendar from './components/mealplan/MealPlanCalendar.jsx'
 import ShoppingList from './components/shopping/ShoppingList.jsx'
+import PetView from './components/pet/PetView.jsx'
 import LandingPageAnimation from './components/onboarding/LandingPageAnimation.jsx'
 import Toast from './components/common/Toast.jsx'
 import { useAuth } from './contexts/AuthContext'
@@ -47,8 +47,8 @@ function App() {
       <main className="main-content">
         <Routes>
           <Route path="/" element={<RecipeList />} />
-          <Route path="/search" element={<SearchView />} />
           <Route path="/mealplan" element={<MealPlanCalendar />} />
+          <Route path="/pet" element={<PetView />} />
           <Route path="/shopping" element={<ShoppingList />} />
         </Routes>
       </main>

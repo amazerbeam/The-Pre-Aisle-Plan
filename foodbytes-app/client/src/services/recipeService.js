@@ -23,15 +23,6 @@ export const recipeService = {
     return response.data
   },
 
-  /**
-   * FR-102: Search recipes and return summaries.
-   * Use for search results to reduce data transfer.
-   */
-  async searchRecipeSummaries(query) {
-    const response = await api.get(`/recipes/summaries/search?query=${encodeURIComponent(query)}`)
-    return response.data
-  },
-
   // ========================================
   // PUBLIC ENDPOINTS (for all users) - Full data
   // ========================================
@@ -43,11 +34,6 @@ export const recipeService = {
 
   async getRecipesByMealType(mealType) {
     const response = await api.get(`/recipes?mealType=${mealType}`)
-    return response.data
-  },
-
-  async searchRecipes(query) {
-    const response = await api.get(`/recipes/search?query=${encodeURIComponent(query)}`)
     return response.data
   },
 
