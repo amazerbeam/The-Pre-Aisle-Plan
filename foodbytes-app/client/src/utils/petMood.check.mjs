@@ -108,4 +108,22 @@ assert.equal(petChipLabel({ mood: 'happy', dueCount: 0 }), 'Happy')
 assert.equal(petChipLabel({ mood: 'bored', dueCount: 1 }), 'Bored · 1 unlogged')
 assert.equal(petChipLabel({ mood: 'mischievous', dueCount: 3 }), 'Mischievous · 3 unlogged')
 
+// MPP-18: lastLoggedAt is the latest logged slot's eatenAt (epoch ms) over yesterday + today.
+r = mood(
+  day(YESTERDAY, { dinner: [entry(at(YESTERDAY, '20:30'))] }),
+  day(TODAY, { breakfast: [entry(at(TODAY, '08:10'))], lunch: [entry(at(TODAY, '13:05'))] }),
+  at(TODAY, '14:00')
+)
+assert.equal(r.lastLoggedType, 'lunch')
+assert.equal(r.lastLoggedAt, at(TODAY, '13:05').getTime())
+// Only yesterday logged -> yesterday's time still counts.
+r = mood(day(YESTERDAY, { dinner: [entry(at(YESTERDAY, '20:30'))] }), day(TODAY, {}), at(TODAY, '07:00'))
+assert.equal(r.lastLoggedAt, at(YESTERDAY, '20:30').getTime())
+// Eaten without an eatenAt -> no usable time.
+r = mood(null, day(TODAY, { lunch: [{ eaten: true, eatenAt: null }] }), at(TODAY, '14:00'))
+assert.equal(r.lastLoggedAt, null)
+// Nothing logged, and not ready -> null.
+assert.equal(mood(null, day(TODAY, { lunch: [entry()] }), at(TODAY, '14:00')).lastLoggedAt, null)
+assert.equal(derivePetMood({ yesterday: null, today: null, mealTimes: null, now: at(TODAY, '09:00') }).lastLoggedAt, null)
+
 console.log('petMood: all checks passed')

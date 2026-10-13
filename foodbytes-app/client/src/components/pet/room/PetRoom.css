@@ -37,9 +37,69 @@
   50% { opacity: 1; transform: translateY(-5px); }
 }
 
+/* MPP-18: the cook-and-serve walk (mockup v5 #pipg + .hop). The walker's inline
+   transform changes between rug (none) and cooker; the transition is the walk. */
+.pip-walker { transition: transform 1.25s ease-in-out; }
+.pip-walker.is-walking .pip-hop { animation: pip-hop 0.32s ease-in-out infinite alternate; }
+
+@keyframes pip-hop {
+  to { transform: translateY(-6px); }
+}
+
+/* AC 6 (MPP-17) / AC 5 (MPP-18): reduced motion stops steam, z's, the hop and the walk. */
 @media (prefers-reduced-motion: reduce) {
   .pip-steam,
-  .pip-zzz {
+  .pip-zzz,
+  .pip-hop {
     animation: none !important;
   }
+
+  .pip-walker {
+    transition: none !important;
+  }
+}
+
+/* MPP-19 AC 3: the fridge button sits over the fridge art (fridgeHitBox, % of the viewBox);
+   at least 44 px however small the card gets. */
+.pip-fridge-btn {
+  position: absolute;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pip-fridge-btn:active {
+  background: rgba(255, 211, 77, 0.25);
+}
+
+@media (hover: hover) {
+  .pip-fridge-btn:hover {
+    background: rgba(255, 211, 77, 0.18);
+  }
+}
+
+.pip-fridge-btn:focus-visible {
+  outline: 3px solid #ffd34d;
+  outline-offset: 2px;
+}
+
+/* Spec: the "tap the fridge" hint, bottom-left (mockup v5 .hint). Decorative for touch, so
+   it never takes a tap. */
+.pip-room-hint {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  margin: 0;
+  padding: 5px 9px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #5c5670;
+  font-size: 0.72rem;
+  pointer-events: none;
 }

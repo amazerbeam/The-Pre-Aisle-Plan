@@ -1,0 +1,122 @@
+/* MPP-19: Pip's fridge view (mockup v5 .overlay.fridge / .fmeter / .fbody / .fshelf / .food).
+   Fills the room card and scrolls inside it (spec: mobile-first, no page scroll at 320 px). */
+
+.pip-fridge-view {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: linear-gradient(#eef6fb, #d9ebf5);
+}
+
+.pip-fridge-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.pip-fridge-head h3 {
+  margin: 0;
+  font-size: 1rem;
+  overflow-wrap: anywhere;
+}
+
+.pip-fridge-btn-text {
+  flex-shrink: 0;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.08);
+  color: inherit;
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pip-fridge-btn-text:active {
+  background: rgba(0, 0, 0, 0.16);
+}
+
+@media (hover: hover) {
+  .pip-fridge-btn-text:hover {
+    background: rgba(0, 0, 0, 0.12);
+  }
+}
+
+.pip-fridge-btn-text:focus-visible {
+  outline: 3px solid #7b5cd6;
+  outline-offset: 2px;
+}
+
+.pip-fridge-meter {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 8px;
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: #fff;
+  font-size: 0.8rem;
+}
+
+.pip-fridge-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px;
+  border: 3px solid #b7cfdd;
+  border-radius: 12px;
+  background: #f8fcff;
+}
+
+.pip-fridge-shelf {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  padding-bottom: 6px;
+  border-bottom: 4px solid #b7cfdd;
+}
+
+.pip-fridge-food {
+  display: grid;
+  place-items: center;
+  height: 40px;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 1.5rem;
+}
+
+.pip-fridge-food.is-gone {
+  border: 2px dashed #c9dbe6;
+  background: transparent;
+}
+
+.pip-fridge-footnote {
+  margin: 0;
+  font-size: 0.76rem;
+  line-height: 1.4;
+  color: #5c5670;
+}
+
+.pip-fridge-state {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+}
+
+.pip-fridge-view:focus { outline: none; }

@@ -20,4 +20,44 @@ export const DEFAULT_ROOM_LEVELS = {
 }
 
 // Mockup v5 projection space; the SVG scales to the card width.
-export const ROOM_VIEWBOX = '0 0 360 330'
+export const ROOM_VIEWBOX_SIZE = { width: 360, height: 330 }
+export const ROOM_VIEWBOX = `0 0 ${ROOM_VIEWBOX_SIZE.width} ${ROOM_VIEWBOX_SIZE.height}`
+
+// MPP-19: Pip's fridge — always 15 slots on 3 shelves (mockup v5 FRIDGE_FOOD), filled by
+// the share of this week's planned breakfast/lunch/dinner the viewer hasn't eaten.
+export const FRIDGE_SLOT_COUNT = 15
+export const FRIDGE_SHELF_COUNT = 3
+export const FRIDGE_FOOD = ['🥚', '🥛', '🧀', '🍗', '🐟', '🥩', '🥦', '🥕', '🍅', '🫑', '🥬', '🧅', '🍋', '🫐', '🍠']
+
+// AC 4: gauge green above PLENTY, amber above LOW, red at LOW or below. Retune here.
+export const FRIDGE_LOW_PCT = 20
+export const FRIDGE_PLENTY_PCT = 50
+
+export const FRIDGE_BANDS = {
+  NONE: 'none',
+  EMPTY: 'empty',
+  LOW: 'low',
+  PLENTY: 'plenty',
+  FULL: 'full'
+}
+
+export const FRIDGE_GAUGE_COLOURS = {
+  high: '#5cb85c',
+  mid: '#f0ad4e',
+  low: '#e5534b'
+}
+
+// AC 5: one note per band.
+export const FRIDGE_NOTES = {
+  none: 'Plan your week to stock the fridge',
+  empty: 'Empty! Time for a shop 🛒',
+  low: 'Running low, shopping day soon?',
+  plenty: 'Plenty left for the week',
+  full: 'Fully stocked for the week ✨'
+}
+
+export const FRIDGE_LOW_BUBBLE = 'The fridge is getting empty 👀'
+export const FRIDGE_EMPTY_METER = 'No meals planned this week'
+export const FRIDGE_FOOTNOTE = "Always 15 slots. How full it is = planned meals you haven't eaten yet ÷ meals planned this week. It restocks when you plan your week."
+export const FRIDGE_HINT = 'Tap the fridge 🧊'
+export const FRIDGE_LOAD_ERROR = "Couldn't load the fridge."

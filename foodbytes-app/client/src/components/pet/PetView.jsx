@@ -5,19 +5,30 @@ import PetRoom from './room/PetRoom'
 import PetMealsCard from './PetMealsCard'
 import PetNameEditor from './PetNameEditor'
 import { PET_GUEST_MESSAGE } from '../../constants/pet'
+import useCookAndServe from '../../hooks/useCookAndServe'
+import { cookServeBubble } from '../../utils/cookServe'
+import { fridgeBubble } from '../../utils/fridgeFill'
 import { petBubble, petChipLabel } from '../../utils/petMood'
 import './PetView.css'
 
 /**
- * MPP-14 AC 4 / MPP-16 / MPP-17: the Pet page — Pip in his room (rug, cooker or bed by
+ * MPP-14 AC 4 / MPP-16 / MPP-17 / MPP-18: the Pet page — Pip in his room (rug, cooker or bed by
  * your meal times), a speech bubble, the name, a mood chip and today's meals. Guests get
  * the sign-in prompt (AC 3) if they reach /pet directly; the footer already stops them
  * with a message.
+ * MPP-18: a newly eaten meal plays the cook-and-serve scene once (useCookAndServe).
+ * MPP-19: the fridge (gauge + view) and, when idle with a low fridge, the low-stock bubble (cook > fridge-low > mood).
  */
 function PetView() {
   const navigate = useNavigate()
-  const { isAuthenticated } = useAuth()
-  const { pet, mood, moodInfo, position, error, retry, renamePet } = usePet()
+  const { user, isAuthenticated } = useAuth()
+  const { pet, mood, moodInfo, position, fridge, error, retry, renamePet } = usePet()
+  // Before the early returns (rules of hooks); gated on a loaded pet via userId.
+  const serving = useCookAndServe({
+    userId: pet ? user?.id ?? null : null,
+    lastLoggedAt: moodInfo.lastLoggedAt,
+    lastLoggedType: moodInfo.lastLoggedType
+  })
 
   if (!isAuthenticated) {
     return (
@@ -52,7 +63,14 @@ function PetView() {
 
   return (
     <div className="pet-view">
-      <PetRoom name={pet.name} mood={mood} bubble={petBubble(moodInfo)} position={position} />
+      <PetRoom
+        name={pet.name}
+        mood={mood}
+        bubble={(serving && cookServeBubble(serving)) ?? fridgeBubble(fridge.fill, position) ?? petBubble(moodInfo)}
+        position={position}
+        serving={serving}
+        fridge={fridge}
+      />
 
       <div className="pet-meta">
         <PetNameEditor name={pet.name} onRename={renamePet} />

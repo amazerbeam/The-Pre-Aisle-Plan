@@ -2,6 +2,11 @@
 
 One line per ticket, newest first: `<version> — <ticket key>: <summary>`. Bump rules and how
 to check what is deployed: `CLAUDE.md` → Versioning & deploy verification.
+1.11.0 — MPP-20: Habit streaks backend — per-person snack-free and alcohol-free check-ins (GET /api/pet/habits, POST /api/pet/habits/{habit}/answer)
+1.10.0 — MPP-19: Pip's fridge — gauge + tappable 15-slot fridge view of this week's uneaten planned meals, low-stock bubble
+
+1.9.0 — MPP-18: Pip cooks and serves a newly eaten meal on /pet (once per meal, per-user seen marker, reduced-motion served state)
+
 1.8.0 — MPP-17: Pip's daily routine — at the cooker around your meal times, asleep in bed at night, on the rug otherwise
 
 1.7.0 — MPP-16: Pip's room — 3D corner room engine and level 1–4 furniture catalogue on the Pet page

@@ -11,11 +11,11 @@ Updated automatically by /fb-plan, /fb-apply and /fb-archive (management-jira �
 ├────┼────────┼──────────────────────────────────────────┼────────────────────────────┼────────────────┤
 │ 3  │ MPP-17 │ Pip's daily routine (rug / cooker / bed) │ 16, 33                     │ Ready for Test │
 ├────┼────────┼──────────────────────────────────────────┼────────────────────────────┼────────────────┤
-│ 4  │ MPP-18 │ Pip cooks and serves after a meal        │ 17, 33                     │ To Do          │
+│ 4  │ MPP-18 │ Pip cooks and serves after a meal        │ 17, 33                     │ Ready for Test │
 ├────┼────────┼──────────────────────────────────────────┼────────────────────────────┼────────────────┤
-│ 5  │ MPP-19 │ Fridge (% of planned meals left)         │ 16, 33                     │ To Do          │
+│ 5  │ MPP-19 │ Fridge (% of planned meals left)         │ 16, 33                     │ Ready for Test │
 ├────┼────────┼──────────────────────────────────────────┼────────────────────────────┼────────────────┤
-│ 6  │ MPP-20 │ Habit streaks backend (snacks / alcohol) │ Nothing                    │ To Do          │
+│ 6  │ MPP-20 │ Habit streaks backend (snacks / alcohol) │ Nothing                    │ Ready for Test │
 ├────┼────────┼──────────────────────────────────────────┼────────────────────────────┼────────────────┤
 │ 7  │ MPP-21 │ Check-in in Pip's bubble                 │ 16, 20                     │ To Do          │
 ├────┼────────┼──────────────────────────────────────────┼────────────────────────────┼────────────────┤

@@ -61,3 +61,25 @@ export const PIP_POSITION_LABELS = {
   cooker: 'at the cooker',
   bed: 'asleep in bed'
 }
+
+// MPP-18: Pip cooks and serves a newly eaten meal on /pet.
+export const COOK_PHASES = {
+  WALKING: 'walking',
+  COOKING: 'cooking',
+  SERVED: 'served',
+  RETURNING: 'returning'
+}
+
+// Mockup v5 logMeal(): walk 1.3 s, cook 2.2 s, plate 1.6 s, walk back. Retune here.
+export const COOK_PHASE_MS = {
+  walking: 1300,
+  cooking: 2200,
+  served: 1600,
+  returning: 1300
+}
+
+// AC 5: no movement — just the served plate, held a little longer.
+export const COOK_REDUCED_MOTION_SERVED_MS = 2500
+
+// Suffixed with the user id, so two people on one browser keep their own marker (AC 6).
+export const PIP_SEEN_EATEN_STORAGE_KEY = 'foodbytes.pip.lastSeenEatenAt'

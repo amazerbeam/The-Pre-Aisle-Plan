@@ -7,7 +7,7 @@ import {
   PET_SLOT_STATUS
 } from '../constants/pet.js'
 
-const NOT_READY = { mood: PET_MOODS.CONTENT, dueCount: 0, todaySlots: [], lastLoggedType: null, dueMealType: null }
+const NOT_READY = { mood: PET_MOODS.CONTENT, dueCount: 0, todaySlots: [], lastLoggedType: null, lastLoggedAt: null, dueMealType: null }
 
 /**
  * MPP-14 AC 6/7: the pet's mood, derived from YOUR ticks on the (possibly shared)
@@ -21,6 +21,9 @@ const NOT_READY = { mood: PET_MOODS.CONTENT, dueCount: 0, todaySlots: [], lastLo
  * AC 7 "logging any one meal returns the pet to Happy immediately": if the latest log
  * came after the latest due moment, the pet is Happy; he only turns Bored/Mischievous
  * again when another meal time passes.
+ *
+ * MPP-18: also returns lastLoggedAt, the eatenAt of that latest log, so /pet can tell
+ * whether Pip has already cooked it.
  *
  * @param {{ yesterday: Object|null, today: Object|null, mealTimes: Object|null, now: Date }} input
  *   yesterday/today are MealPlanDayDTOs; mealTimes is PetDTO.mealTimes.
@@ -44,6 +47,8 @@ export function derivePetMood({ yesterday, today, mealTimes, now }) {
       .filter(slot => slot.isToday)
       .map(({ mealType, status, byTime }) => ({ mealType, status, byTime })),
     lastLoggedType: latestLog?.mealType ?? null,
+    // MPP-18: when the latest log happened (epoch ms); null when its eatenAt was missing (mapped to 0).
+    lastLoggedAt: latestLog?.eatenAt || null,
     dueMealType: due[0]?.mealType ?? null
   }
 }

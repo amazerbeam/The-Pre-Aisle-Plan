@@ -6,7 +6,8 @@ import assert from 'node:assert/strict'
 import { P, pts, shade, boxFaces, ellipsePoints, cylinderSidePoints, ISO_C, ISO_S } from './iso.js'
 import {
   ROOM_DRAW_ORDER, PIP_HOME, PIP_SCALE, PIP_COOKER_SPOT, PIP_BED_SCALE, PIP_BED_DROP, RUG, STATION_ANCHORS,
-  pipPose, resolveRoomLevels
+  COOK_WALK_OFFSET, cookPose, pipPose, resolveRoomLevels,
+  FRIDGE_FOOTPRINT, FRIDGE_GAUGE_LIFT, FRIDGE_GAUGE_HALF_HEIGHT, fridgeHitBox
 } from './roomLayout.js'
 import { DEFAULT_ROOM_LEVELS, ROOM_MAX_LEVEL } from '../../../constants/petRoom.js'
 
@@ -79,5 +80,27 @@ for (let level = 1; level <= ROOM_MAX_LEVEL; level++) {
 }
 assert.deepEqual(pipPose('bed', 'content', { bed: 9 }).anchor, STATION_ANCHORS.bedTop[0]) // bad level → 1
 assert.deepEqual(pipPose('garage', 'happy', undefined), pipPose('rug', 'happy', undefined)) // unknown → rug
+
+// MPP-18: the walker's translate is the screen distance rug -> cooker spot, and points
+// up-left (the cooker is on the back-left wall); the scene pose is the happy rug pose.
+const [homeX, homeY] = P(...PIP_HOME)
+const [cookX, cookY] = P(...PIP_COOKER_SPOT)
+near(COOK_WALK_OFFSET, [cookX - homeX, cookY - homeY])
+assert.ok(COOK_WALK_OFFSET[1] < 0, 'the cooker spot is further back than the rug')
+assert.deepEqual(cookPose(), { face: 'happy', showProps: false, anchor: [...PIP_HOME, 0], scale: PIP_SCALE, dropPx: 0 })
+
+// MPP-19 AC 3: the fridge button covers the fridge and its gauge at every level, inside the viewBox.
+for (let level = 1; level <= ROOM_MAX_LEVEL; level++) {
+  const box = fridgeHitBox(level)
+  assert.ok(box.x >= 0 && box.y >= 0 && box.x + box.width <= 360 && box.y + box.height <= 330, `level ${level} fridge box leaves the viewBox`)
+  const inside = ([x, y]) => x >= box.x - 1e-9 && x <= box.x + box.width + 1e-9 && y >= box.y - 1e-9 && y <= box.y + box.height + 1e-9
+  const [gu, gv, gh] = STATION_ANCHORS.fridgeTop[level - 1]
+  const [gx, gy] = P(gu, gv, gh + FRIDGE_GAUGE_LIFT)
+  assert.ok(inside([gx, gy - FRIDGE_GAUGE_HALF_HEIGHT]), `level ${level} gauge top is outside the fridge box`)
+  const [u, v, du, dv] = FRIDGE_FOOTPRINT[level - 1]
+  assert.ok(inside(P(u + du / 2, v + dv / 2)), `level ${level} fridge floor centre is outside the fridge box`)
+}
+assert.ok(fridgeHitBox(4).height > fridgeHitBox(1).height, 'a bigger fridge gets a bigger button')
+assert.deepEqual(fridgeHitBox(9), fridgeHitBox(1)) // an invalid level falls back to level 1
 
 console.log('room checks passed')

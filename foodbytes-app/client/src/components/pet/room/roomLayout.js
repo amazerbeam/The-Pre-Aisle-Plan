@@ -1,5 +1,6 @@
 import { PET_MOODS, PET_SLEEP_FACE, PIP_POSITIONS } from '../../../constants/pet.js'
 import { DEFAULT_ROOM_LEVELS, ROOM_MAX_LEVEL, ROOM_MIN_LEVEL, ROOM_STATIONS } from '../../../constants/petRoom.js'
+import { P } from './iso.js'
 
 /**
  * MPP-16: where things sit in Pip's room (floor coords, see iso.js). Pure data so
@@ -24,6 +25,12 @@ export const PIP_SCALE = 0.46
 
 // MPP-17 (mockup v5 PIP_STOVE / pipBed / zzz / night overlay).
 export const PIP_COOKER_SPOT = [96, 64]
+
+// MPP-18: screen px from Pip's rug spot to his cooker spot. The cook-and-serve walker
+// translates by this, so Pip stays anchored on the rug and the CSS transition moves him.
+const [HOME_X, HOME_Y] = P(...PIP_HOME)
+const [COOKER_X, COOKER_Y] = P(...PIP_COOKER_SPOT)
+export const COOK_WALK_OFFSET = [COOKER_X - HOME_X, COOKER_Y - HOME_Y]
 export const PIP_BED_SCALE = 0.36
 export const PIP_BED_DROP = 4 // px below the bed-top point, so he sinks into the mattress
 export const SLEEP_Z_LIFT = 30 // the z's float this far above the bed top
@@ -38,6 +45,12 @@ export const STATION_ANCHORS = {
   bedTop: [[48, 148, 5], [50, 148, 30], [40, 148, 30], [40, 148, 30]]
 }
 
+// MPP-19: the outer box of FURNITURE.fridge[level - 1] as [u, v, du, dv, h]. Hand-copied
+// from furniture.jsx; keep the two in step when the fridge art changes (MPP-26).
+export const FRIDGE_FOOTPRINT = [[145, -1, 42, 30, 34], [146, 0, 40, 34, 58], [140, 0, 46, 38, 112], [124, 0, 64, 40, 120]]
+export const FRIDGE_GAUGE_LIFT = 8 // gauge centre sits this far above fridgeTop (mockup stockGauge h + 8)
+export const FRIDGE_GAUGE_HALF_HEIGHT = 7 // the gauge track's top edge is 7 px above its centre
+
 /** Any levels input → a full { bed, fridge, cooker, cabinet } of whole numbers in 1..4. */
 export function resolveRoomLevels(levels) {
   const resolved = {}
@@ -47,6 +60,29 @@ export function resolveRoomLevels(levels) {
     resolved[station] = valid ? level : DEFAULT_ROOM_LEVELS[station]
   }
   return resolved
+}
+
+/**
+ * MPP-19 AC 3: the fridge + gauge's bounding box in viewBox px, so PetRoom can lay a real
+ * <button> over it. Projects the level's footprint corners through P().
+ * @returns {{ x: number, y: number, width: number, height: number }}
+ */
+export function fridgeHitBox(level) {
+  const index = resolveRoomLevels({ fridge: level }).fridge - 1
+  const [u, v, du, dv, h] = FRIDGE_FOOTPRINT[index]
+  const corners = []
+  for (const cu of [u, u + du]) {
+    for (const cv of [v, v + dv]) {
+      for (const ch of [0, h]) corners.push(P(cu, cv, ch))
+    }
+  }
+  const [gu, gv, gh] = STATION_ANCHORS.fridgeTop[index]
+  const gaugeTop = P(gu, gv, gh + FRIDGE_GAUGE_LIFT)[1] - FRIDGE_GAUGE_HALF_HEIGHT
+  const xs = corners.map(([x]) => x)
+  const ys = [...corners.map(([, y]) => y), gaugeTop]
+  const x = Math.min(...xs)
+  const y = Math.min(...ys)
+  return { x, y, width: Math.max(...xs) - x, height: Math.max(...ys) - y }
 }
 
 /**
@@ -68,4 +104,9 @@ export function pipPose(position, mood, levels) {
     }
   }
   return { face: mood, showProps: true, anchor: [...PIP_HOME, 0], scale: PIP_SCALE, dropPx: 0 }
+}
+
+/** MPP-18: Pip during the cook-and-serve scene — anchored on the rug (the walker moves him), happy, no props. */
+export function cookPose() {
+  return { face: PET_MOODS.HAPPY, showProps: false, anchor: [...PIP_HOME, 0], scale: PIP_SCALE, dropPx: 0 }
 }

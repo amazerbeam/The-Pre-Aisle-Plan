@@ -33,7 +33,8 @@ cd foodbytes-app/client && npm install && npm run dev      # http://localhost:51
 # Frontend production build
 cd foodbytes-app/client && npm run build
 
-# Backend dev (Maven wrapper isn't checked in — use `mvn` directly or rebuild via Docker)
+# Backend dev (Maven wrapper isn't checked in — use `mvn` directly or rebuild via Docker).
+# For Google login to work locally see "Running the backend locally with Google login" below.
 cd foodbytes-app/foodbytes-api && mvn spring-boot:run      # http://localhost:8080
 
 # Backend tests
@@ -51,6 +52,23 @@ docker-compose -f foodbytes-app/docker-compose.yml up -d --build frontend
 ```
 
 There is no lint or test script wired into `client/package.json` — the frontend has no automated test suite at present.
+
+### Running the backend locally with Google login
+
+A bare `mvn spring-boot:run` does **not** read `.env`, so Google OAuth gets the `application.yml` placeholders and login breaks. `java` and `mvn` are also not on PATH. To get a working local login against the Vite dev server, start the backend from the repo root in PowerShell like this:
+
+```powershell
+Get-Content .env | Where-Object { $_ -match '^\s*([A-Z_]+)=(.*)$' } | ForEach-Object { Set-Item "env:$($Matches[1])" $Matches[2].Trim() }
+$env:FRONTEND_URL = "http://localhost:5173"   # post-login redirect; default is :3000 (the Docker frontend)
+$env:JAVA_HOME = "C:\Program Files\Eclipse Adoptium\jdk-17.0.20.8-hotspot"
+$env:PATH = "$env:JAVA_HOME\bin;C:\Users\jossd\tools\apache-maven-3.9.9\bin;$env:PATH"
+cd foodbytes-app\foodbytes-api; mvn spring-boot:run
+```
+
+What each failure looks like:
+- **"Access blocked: Authorization Error … The OAuth client was not found (401 invalid_client)"**: `GOOGLE_CLIENT_ID` was not loaded, so `.env` was skipped.
+- **Google sign-in completes, then the browser lands on a dead `localhost:3000`**: `FRONTEND_URL` was not set to `http://localhost:5173`. The JWT cookie is for `localhost` on any port, so once the redirect goes to :5173 you are logged in.
+- **`[invalid_request]` in the backend log after a restart**: that is a stale callback from a login started before the restart. Start the login again.
 
 ## Architecture
 

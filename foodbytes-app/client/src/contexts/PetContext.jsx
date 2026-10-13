@@ -5,6 +5,8 @@ import petService from '../services/petService'
 import mealPlanService from '../services/mealPlanService'
 import useMinuteClock from '../hooks/useMinuteClock'
 import { addDays, formatDateISO } from '../utils/dateUtils'
+import { fridgeFill, fridgeWindow, planCoversRange } from '../utils/fridgeFill'
+import { FRIDGE_LOAD_ERROR } from '../constants/petRoom'
 import { derivePetMood } from '../utils/petMood'
 import { pipPosition } from '../utils/pipPosition'
 
@@ -28,13 +30,22 @@ const PetContext = createContext()
  *
  * MPP-17: `position` (rug / cooker / bed) is derived from the same minute clock and
  * your own meal times, so Pip moves on the minute without a second timer.
+ *
+ * MPP-19: `fridge` ({ fill, loading, error, retry }) counts this week's planned
+ * breakfast/lunch/dinner and how many YOU haven't eaten (fridgeFill), over the 7 days
+ * fridgeWindow picks. It reads weekPlan when the calendar shows that week, otherwise one
+ * abortable fetch of it. Its error never blanks Pip.
  */
 export const PetProvider = ({ children }) => {
   const { isAuthenticated } = useAuth()
-  const { weekPlan, startDate } = useMealPlan()
+  const { weekPlan, startDate, loading: weekLoading, error: weekError, fetchWeekPlan } = useMealPlan()
   const now = useMinuteClock()
   const todayISO = formatDateISO(now)
   const yesterdayISO = formatDateISO(addDays(now, -1))
+  // MPP-19: the fridge week. When the calendar shows it, weekPlan IS it (live, optimistic
+  // ticks); aligned weeks are equal or disjoint, so the two sources never disagree on a day.
+  const fridgeRange = fridgeWindow(startDate, todayISO)
+  const calendarIsFridgeWeek = startDate === fridgeRange.start
 
   const [pet, setPet] = useState(null)
   const [recentPlan, setRecentPlan] = useState(null)
@@ -42,6 +53,8 @@ export const PetProvider = ({ children }) => {
   const [planLoading, setPlanLoading] = useState(false)
   const [petError, setPetError] = useState(null)
   const [planError, setPlanError] = useState(null)
+  const [fridgePlan, setFridgePlan] = useState(null) // { start, plan } — keyed so a stale week is never counted
+  const [fridgeError, setFridgeError] = useState(null)
   const [reloadKey, setReloadKey] = useState(0)
   const petControllerRef = useRef(null)
 
@@ -100,6 +113,24 @@ export const PetProvider = ({ children }) => {
     return () => controller.abort()
   }, [isAuthenticated, yesterdayISO, startDate, reloadKey])
 
+  // MPP-19: fetch the fridge week only when the calendar isn't showing it.
+  useEffect(() => {
+    if (!isAuthenticated || calendarIsFridgeWeek) {
+      setFridgePlan(null)
+      setFridgeError(null)
+      return undefined
+    }
+    const controller = new AbortController()
+    const start = fridgeRange.start
+    setFridgeError(null)
+    mealPlanService.getWeekPlan(start, { signal: controller.signal })
+      .then(plan => setFridgePlan({ start, plan }))
+      .catch(err => {
+        if (!isCancelled(err)) setFridgeError(err.response?.data?.error || FRIDGE_LOAD_ERROR)
+      })
+    return () => controller.abort()
+  }, [isAuthenticated, calendarIsFridgeWeek, fridgeRange.start, reloadKey])
+
   const renamePet = useCallback(async (name) => {
     // A GET still in flight would carry the old name; cancel it so it can't land after the rename.
     petControllerRef.current?.abort()
@@ -119,12 +150,24 @@ export const PetProvider = ({ children }) => {
   })
   const position = pipPosition(now, pet?.mealTimes ?? null)
 
+  // MPP-19: null fill = loading or failed, never "nothing planned" (that is planned: 0).
+  const fridgeSource = calendarIsFridgeWeek
+    ? { plan: planCoversRange(weekPlan, fridgeRange) ? weekPlan : null, error: weekError && !weekLoading ? FRIDGE_LOAD_ERROR : null, retry: fetchWeekPlan }
+    : { plan: fridgePlan?.start === fridgeRange.start ? fridgePlan.plan : null, error: fridgeError, retry }
+  const fridge = {
+    fill: fridgeSource.plan ? fridgeFill(fridgeSource.plan, fridgeRange) : null,
+    loading: !fridgeSource.plan && !fridgeSource.error,
+    error: fridgeSource.plan ? null : fridgeSource.error,
+    retry: fridgeSource.retry
+  }
+
   const value = {
     pet,
     petName: pet?.name ?? null,
     mood: moodInfo.mood,
     moodInfo,
     position,
+    fridge,
     loading: petLoading || planLoading,
     error: petError || planError,
     retry,
