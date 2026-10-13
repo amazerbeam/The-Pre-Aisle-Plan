@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pip Room Mockup</title>
+<style>
+  :root {
+    --bg: #f6f3fb; --ink: #2e2645; --muted: #6f6789; --card: #fff; --line: #e3dcf3;
+    --accent: #7b5cd6; --outline: #3b2f5c;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--ink); }
+  header { max-width: 1200px; margin: 0 auto; padding: 24px 16px 8px; }
+  h1 { margin: 0 0 6px; font-size: 1.5rem; }
+  header p { margin: 0; color: var(--muted); max-width: 760px; line-height: 1.45; }
+  .controls { max-width: 1200px; margin: 14px auto 0; padding: 0 16px; display: flex; flex-wrap: wrap; gap: 18px; align-items: center; }
+  .controls label { font-size: .9rem; font-weight: 600; display: flex; gap: 8px; align-items: center; }
+  .tiers { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; background: #fff; }
+  .tiers button { border: 0; background: none; padding: 7px 14px; font: inherit; font-size: .85rem; cursor: pointer; color: var(--muted); }
+  .tiers button.on { background: var(--accent); color: #fff; }
+  .grid { max-width: 1200px; margin: 18px auto 40px; padding: 0 16px; display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 22px; }
+  .option { background: var(--card); border-radius: 22px; padding: 14px; box-shadow: 0 4px 18px rgba(60,40,120,.08); }
+  .option h2 { margin: 2px 4px 4px; font-size: 1.05rem; }
+  .option .tag { font-size: .72rem; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: .04em; margin: 0 4px; }
+  .option p { margin: 6px 4px 12px; font-size: .85rem; color: var(--muted); line-height: 1.4; }
+  .phone { position: relative; border-radius: 20px; overflow: hidden; background: #efe9fb; }
+  .phone svg.room { display: block; width: 100%; height: auto; }
+  .slot { cursor: default; }
+  .slot rect, .slot polygon { fill: rgba(123,92,214,.08); stroke: var(--accent); stroke-width: 1.6; stroke-dasharray: 5 4; }
+  .slot text { fill: var(--accent); font-size: 14px; font-weight: 700; }
+  body:not(.show-slots) .slot { display: none; }
+  .clickable { cursor: pointer; }
+  .clickable:hover { filter: brightness(1.08) drop-shadow(0 0 4px rgba(255,211,77,.9)); }
+  .hint { position: absolute; left: 10px; top: 10px; background: rgba(255,255,255,.92); border-radius: 10px; padding: 5px 9px; font-size: .72rem; color: var(--muted); }
+  .bubble { position: absolute; top: 10px; right: 10px; background: #fff; border-radius: 12px; padding: 7px 10px; font-size: .78rem; font-weight: 500; box-shadow: 0 2px 8px rgba(0,0,0,.08); max-width: 170px; }
+
+  /* Trophy cabinet overlay (Phase D preview) */
+  .overlay { position: absolute; inset: 0; background: linear-gradient(#5b3a22, #3f2716); color: #fff7e8; padding: 14px; display: none; flex-direction: column; gap: 10px; overflow-y: auto; }
+  .overlay.open { display: flex; }
+  .overlay header { padding: 0; display: flex; justify-content: space-between; align-items: center; max-width: none; margin: 0; }
+  .overlay h3 { margin: 0; font-size: 1rem; }
+  .overlay button.close { border: 0; background: rgba(255,255,255,.15); color: #fff; border-radius: 999px; padding: 5px 11px; cursor: pointer; font: inherit; font-size: .8rem; }
+  .shelf { background: rgba(255,255,255,.07); border-bottom: 5px solid #a0703f; border-radius: 8px 8px 2px 2px; padding: 8px; }
+  .shelf h4 { margin: 0 0 6px; font-size: .74rem; text-transform: uppercase; letter-spacing: .05em; color: #f3d9a8; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .award { width: 52px; text-align: center; font-size: .62rem; line-height: 1.2; }
+  .award svg { width: 40px; height: 40px; display: block; margin: 0 auto 2px; }
+  .award.locked { opacity: .38; }
+  .streak { display: flex; justify-content: space-between; background: rgba(255,255,255,.1); border-radius: 8px; padding: 7px 9px; font-size: .78rem; margin-bottom: 5px; }
+  .streak b { color: #ffd34d; }
+  .todo { font-size: .76rem; display: flex; justify-content: space-between; padding: 4px 2px; border-bottom: 1px dashed rgba(255,255,255,.15); }
+  .todo span:last-child { color: #f3d9a8; }
+
+  .notes { max-width: 1200px; margin: 0 auto 50px; padding: 0 16px; color: var(--muted); font-size: .88rem; line-height: 1.5; }
+  .notes h3 { color: var(--ink); font-size: 1rem; }
+</style>
+</head>
+<body class="show-slots">
+<header>
+  <h1>Pip's room — perspective options</h1>
+  <p>Three ways to draw a two-wall room. Same furniture in each: <b>bed</b>, <b>fridge</b>, <b>cooking area</b> and the <b>trophy cabinet</b> (starts as planks on bricks). Use the level switch to see the upgrade path, and tap the cabinet to preview the full-screen trophy view (Phase D). Dashed boxes are empty decor spots.</p>
+</header>
+
+<div class="controls">
+  <label>Upgrade level
+    <span class="tiers" id="tiers">
+      <button data-l="1" class="on">1 Starter</button><button data-l="2">2</button><button data-l="3">3</button><button data-l="4">4 Max</button>
+    </span>
+  </label>
+  <label><input type="checkbox" id="slots" checked> Show empty decor spots</label>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<div class="notes">
+  <h3>What each option means</h3>
+  <p><b>A · Corner, angled</b> — most "room-like"; two real walls, so two sets of wall spots. Furniture against a wall is slanted to sit flat on it. Hardest to draw new items for (each wall item needs a slanted version).<br>
+  <b>B · Front-on with a side wall</b> — closest to Focus Friend's look; one big back wall holds most items, a thin side wall gives the corner. Items are drawn straight-on, so new furniture is quick to add.<br>
+  <b>C · Flat side-on</b> — today's room, just with furniture. Simplest, but it's really one wall.</p>
+</div>
+
+<script>
+const OUT = '#3b2f5c';
+const W = 360, H = 330;
+
+/* ---------- Pip (content mood, from mochiParts) ---------- */
+function pip(x, y, s) {
+  return `<g transform="translate(${x - 100 * s},${y - 188 * s}) scale(${s})">
+    <defs><linearGradient id="pf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#cdbdf3"/><stop offset="1" stop-color="#a993df"/></linearGradient></defs>
+    <ellipse cx="100" cy="190" rx="66" ry="8" fill="rgba(40,20,80,.13)"/>
+    <ellipse cx="74" cy="180" rx="15" ry="8" fill="url(#pf)" stroke="${OUT}" stroke-width="5"/>
+    <ellipse cx="126" cy="180" rx="15" ry="8" fill="url(#pf)" stroke="${OUT}" stroke-width="5"/>
+    <path d="M100 48 C152 48 182 86 182 128 C182 166 148 182 100 182 C52 182 18 166 18 128 C18 86 48 48 100 48Z" fill="url(#pf)" stroke="${OUT}" stroke-width="5" stroke-linejoin="round"/>
+    <ellipse cx="66" cy="82" rx="16" ry="8" transform="rotate(-30 66 82)" fill="#fff" opacity=".45"/>
+    <circle cx="75" cy="120" r="8" fill="${OUT}"/><circle cx="78" cy="117" r="2.6" fill="#fff"/>
+    <circle cx="125" cy="120" r="8" fill="${OUT}"/><circle cx="128" cy="117" r="2.6" fill="#fff"/>
+    <path d="M91 140 Q100 149 109 140" stroke="${OUT}" stroke-width="4" stroke-linecap="round" fill="none"/>
+    <ellipse cx="58" cy="138" rx="10" ry="6" fill="#ff8fab" opacity=".55"/><ellipse cx="142" cy="138" rx="10" ry="6" fill="#ff8fab" opacity=".55"/>
+  </g>`;
+}
+
+/* ---------- Sprites: origin = bottom-left, drawn upwards (negative y) ---------- */
+const S = { stroke: OUT, sw: 2.5 };
+const st = `stroke="${OUT}" stroke-width="2.5" stroke-linejoin="round"`;
+
+const SPRITES = {
+  bed: [
+    // 1 blanket on the floor
+    () => ({ w: 110, svg: `<rect x="0" y="-16" width="110" height="16" rx="7" fill="#9ec5e8" ${st}/>
+      <path d="M40 -16 L110 -16" stroke="#7aaad6" stroke-width="3"/>
+      <ellipse cx="22" cy="-18" rx="17" ry="8" fill="#fff" ${st}/>` }),
+    // 2 camp cot
+    () => ({ w: 116, svg: `<path d="M8 0 L20 -26 M108 0 L96 -26 M20 0 L8 -26 M96 0 L108 -26" stroke="#7a6a4f" stroke-width="3"/>
+      <rect x="2" y="-36" width="112" height="12" rx="5" fill="#8fb38a" ${st}/>
+      <ellipse cx="22" cy="-38" rx="16" ry="7" fill="#fff" ${st}/>` }),
+    // 3 wooden bed
+    () => ({ w: 124, svg: `<rect x="0" y="-70" width="16" height="70" rx="4" fill="#b98a5a" ${st}/>
+      <rect x="114" y="-38" width="10" height="38" rx="3" fill="#b98a5a" ${st}/>
+      <rect x="10" y="-40" width="110" height="22" rx="6" fill="#fff" ${st}/>
+      <rect x="44" y="-44" width="76" height="26" rx="8" fill="#f2a7bd" ${st}/>
+      <ellipse cx="30" cy="-46" rx="16" ry="8" fill="#fff" ${st}/>
+      <rect x="10" y="-18" width="110" height="10" fill="#9c7048" ${st}/>` }),
+    // 4 canopy bed
+    () => ({ w: 130, svg: `<path d="M4 -124 Q65 -100 126 -124" fill="#e9dcff" ${st}/>
+      <path d="M4 -124 Q-6 -70 10 -46 L18 -46 Q8 -80 14 -118 Z" fill="#d7c6fb" ${st}/>
+      <path d="M126 -124 Q136 -70 120 -46 L112 -46 Q122 -80 116 -118 Z" fill="#d7c6fb" ${st}/>
+      <rect x="2" y="-128" width="6" height="128" fill="#8a5a8c" ${st}/><rect x="122" y="-128" width="6" height="128" fill="#8a5a8c" ${st}/>
+      <rect x="8" y="-82" width="18" height="82" rx="5" fill="#a974b0" ${st}/>
+      <rect x="14" y="-44" width="108" height="24" rx="6" fill="#fff" ${st}/>
+      <rect x="46" y="-50" width="76" height="30" rx="9" fill="#c9a6f7" ${st}/>
+      <path d="M58 -40 h50" stroke="#fff" stroke-width="2" stroke-dasharray="4 4"/>
+      <path d="M32 -58 c-6 -8 -18 -2 -10 8 l10 8 l10 -8 c8 -10 -4 -16 -10 -8z" fill="#ff8fab" ${st}/>
+      <rect x="14" y="-20" width="108" height="10" fill="#8a5a8c" ${st}/>` }),
+  ],
+  fridge: [
+    // 1 cool box
+    () => ({ w: 54, svg: `<rect x="0" y="-36" width="54" height="36" rx="5" fill="#5fb3e8" ${st}/>
+      <rect x="-2" y="-42" width="58" height="10" rx="4" fill="#fff" ${st}/>
+      <rect x="18" y="-48" width="18" height="6" rx="3" fill="none" ${st}/>` }),
+    // 2 mini fridge
+    () => ({ w: 54, svg: `<rect x="0" y="-66" width="54" height="66" rx="6" fill="#f1f1f6" ${st}/>
+      <rect x="42" y="-50" width="5" height="22" rx="2" fill="#bbb" ${st}/>
+      <circle cx="16" cy="-50" r="4" fill="#ff8fab"/>` }),
+    // 3 full fridge
+    () => ({ w: 60, svg: `<rect x="0" y="-124" width="60" height="124" rx="8" fill="#f4f6fb" ${st}/>
+      <path d="M0 -84 H60" ${st}/>
+      <rect x="48" y="-114" width="5" height="20" rx="2" fill="#bbb" ${st}/><rect x="48" y="-74" width="5" height="30" rx="2" fill="#bbb" ${st}/>
+      <rect x="12" y="-70" width="12" height="14" fill="#ffd34d" ${st}/>` }),
+    // 4 double-door
+    () => ({ w: 84, svg: `<rect x="0" y="-130" width="84" height="130" rx="8" fill="#dfe6ef" ${st}/>
+      <path d="M42 -130 V0" ${st}/>
+      <rect x="32" y="-90" width="5" height="34" rx="2" fill="#9aa" ${st}/><rect x="47" y="-90" width="5" height="34" rx="2" fill="#9aa" ${st}/>
+      <rect x="54" y="-112" width="20" height="26" rx="3" fill="#6a7b8e" ${st}/>
+      <circle cx="14" cy="-110" r="4" fill="#ff8fab"/><circle cx="24" cy="-100" r="4" fill="#ffd34d"/><rect x="10" y="-86" width="16" height="20" fill="#fff" ${st}/>` }),
+  ],
+  stove: [
+    // 1 camping stove on a crate
+    () => ({ w: 60, svg: `<rect x="0" y="-30" width="60" height="30" fill="#c9965f" ${st}/><path d="M0 -15 H60 M20 -30 V0 M40 -30 V0" stroke="#9b6c3c" stroke-width="2"/>
+      <rect x="14" y="-40" width="32" height="10" rx="3" fill="#777" ${st}/>
+      <path d="M24 -40 q6 -10 12 0" fill="#ff9d3c"/>
+      <rect x="16" y="-60" width="28" height="16" rx="4" fill="#6c7a89" ${st}/>` }),
+    // 2 counter + hob
+    () => ({ w: 84, svg: `<rect x="0" y="-56" width="84" height="56" rx="4" fill="#f3e3c3" ${st}/>
+      <rect x="-3" y="-62" width="90" height="8" rx="3" fill="#d8c09a" ${st}/>
+      <ellipse cx="26" cy="-64" rx="13" ry="3" fill="#444"/><ellipse cx="58" cy="-64" rx="13" ry="3" fill="#444"/>
+      <rect x="8" y="-46" width="30" height="36" rx="3" fill="none" ${st}/><rect x="46" y="-46" width="30" height="36" rx="3" fill="none" ${st}/>` }),
+    // 3 range cooker with a pot
+    () => ({ w: 84, svg: `<rect x="0" y="-74" width="84" height="74" rx="5" fill="#f6f7fb" ${st}/>
+      <rect x="10" y="-52" width="64" height="40" rx="4" fill="#4b5563" ${st}/>
+      <circle cx="18" cy="-64" r="4" fill="#999"/><circle cx="32" cy="-64" r="4" fill="#999"/><circle cx="52" cy="-64" r="4" fill="#999"/><circle cx="66" cy="-64" r="4" fill="#999"/>
+      <rect x="20" y="-96" width="34" height="20" rx="5" fill="#e76f51" ${st}/><path d="M16 -92 h-6 M58 -92 h6" ${st}/>
+      <path d="M30 -102 q4 -8 0 -14 M42 -102 q4 -8 0 -14" stroke="#bbb" stroke-width="2.5" fill="none" stroke-linecap="round"/>` }),
+    // 4 chef's kitchen: hood, range, utensils
+    () => ({ w: 124, svg: `<rect x="0" y="-74" width="124" height="74" rx="5" fill="#2f3e46" ${st}/>
+      <rect x="-3" y="-80" width="130" height="8" rx="3" fill="#cfd8dc" ${st}/>
+      <rect x="30" y="-62" width="64" height="44" rx="4" fill="#ffb703" opacity=".25" ${st}/>
+      <path d="M32 -176 h60 l14 40 h-88 z" fill="#b0bec5" ${st}/>
+      <path d="M8 -150 v22 M18 -150 v18 M100 -150 v20 M112 -150 v24" ${st}/><path d="M2 -150 h120" ${st}/>
+      <rect x="40" y="-102" width="42" height="22" rx="5" fill="#e76f51" ${st}/>
+      <path d="M52 -108 q4 -8 0 -14 M66 -108 q4 -8 0 -14" stroke="#bbb" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <circle cx="12" cy="-88" r="7" fill="#7cb342" ${st}/><rect x="98" y="-96" width="16" height="16" rx="3" fill="#fff" ${st}/>` }),
+  ],
+  cabinet: [
+    // 1 planks on bricks
+    () => ({ w: 74, svg: `<rect x="2" y="-18" width="16" height="18" fill="#c0563b" ${st}/><rect x="56" y="-18" width="16" height="18" fill="#c0563b" ${st}/>
+      <rect x="0" y="-26" width="74" height="8" rx="2" fill="#c9965f" ${st}/>
+      <rect x="2" y="-52" width="16" height="26" fill="#c0563b" ${st}/><rect x="56" y="-52" width="16" height="26" fill="#c0563b" ${st}/>
+      <rect x="0" y="-60" width="74" height="8" rx="2" fill="#c9965f" ${st}/>
+      ${trophy(30, -26, .7)}` }),
+    // 2 wall shelves with brackets
+    () => ({ w: 76, svg: `<rect x="0" y="-38" width="76" height="8" rx="2" fill="#b98a5a" ${st}/><rect x="0" y="-80" width="76" height="8" rx="2" fill="#b98a5a" ${st}/>
+      <path d="M8 -30 v10 h10 M68 -30 v10 h-10 M8 -72 v10 h10 M68 -72 v10 h-10" ${st} fill="none"/>
+      ${trophy(14, -38, .7)}${ribbon(48, -40, .7)}${trophy(30, -80, .8)}` }),
+    // 3 wooden cabinet
+    () => ({ w: 74, svg: `<rect x="0" y="-116" width="74" height="116" rx="5" fill="#9c6b3f" ${st}/>
+      <rect x="7" y="-108" width="60" height="96" fill="#f3e2c4" ${st}/>
+      <path d="M7 -76 h60 M7 -44 h60" ${st}/>
+      ${trophy(12, -76, .7)}${trophy(40, -76, .7)}${ribbon(18, -46, .7)}${ribbon(44, -46, .7)}${trophy(26, -12, .7)}` }),
+    // 4 glass display cabinet with lights
+    () => ({ w: 82, svg: `<rect x="0" y="-132" width="82" height="132" rx="6" fill="#5b3a22" ${st}/>
+      <rect x="-3" y="-140" width="88" height="10" rx="3" fill="#d4a017" ${st}/>
+      <rect x="8" y="-124" width="66" height="110" fill="#fff5d6" ${st}/>
+      <rect x="8" y="-124" width="66" height="110" fill="#bde0fe" opacity=".25"/>
+      <path d="M8 -88 h66 M8 -52 h66" stroke="#d4a017" stroke-width="3"/>
+      <path d="M41 -124 V-14" stroke="#d4a017" stroke-width="2"/>
+      ${trophy(12, -88, .65)}${trophy(48, -88, .75)}${ribbon(14, -54, .65)}${ribbon(50, -54, .65)}${trophy(16, -16, .65)}${trophy(50, -16, .65)}
+      <circle cx="20" cy="-120" r="2.5" fill="#ffd34d"/><circle cx="62" cy="-120" r="2.5" fill="#ffd34d"/>` }),
+  ],
+};
+
+function trophy(x, y, s) {
+  return `<g transform="translate(${x},${y}) scale(${s})"><rect x="6" y="-6" width="20" height="6" fill="#8a5a2b" stroke="${OUT}" stroke-width="2"/>
+    <rect x="13" y="-14" width="6" height="8" fill="#ffc83d" stroke="${OUT}" stroke-width="2"/>
+    <path d="M4 -34 h24 q0 20 -12 20 q-12 0 -12 -20z" fill="#ffd34d" stroke="${OUT}" stroke-width="2"/>
+    <path d="M4 -30 q-7 2 -3 9 q3 3 6 1 M28 -30 q7 2 3 9 q-3 3 -6 1" fill="none" stroke="${OUT}" stroke-width="2"/></g>`;
+}
+function ribbon(x, y, s) {
+  return `<g transform="translate(${x},${y}) scale(${s})"><path d="M8 -10 l-4 14 l6 -3 l4 5 l2 -16 M20 -10 l4 14 l-6 -3 l-4 5 l-2 -16" fill="#e63946" stroke="${OUT}" stroke-width="2"/>
+    <circle cx="14" cy="-18" r="10" fill="#4dabf7" stroke="${OUT}" stroke-width="2"/><circle cx="14" cy="-18" r="5" fill="#ffd34d"/></g>`;
+}
+
+/* static decor */
+const windowSvg = (w = 70, h = 54) => `<rect x="0" y="${-h}" width="${w}" height="${h}" rx="6" fill="#cfe8ff" stroke="#fff" stroke-width="5"/>
+  <path d="M${w / 2} ${-h} V0" stroke="#fff" stroke-width="4"/><circle cx="${w * .75}" cy="${-h * .7}" r="7" fill="#fff6c2"/>
+  <rect x="-4" y="-2" width="${w + 8}" height="6" rx="2" fill="#d6c8f2"/>`;
+const rug = (rx, ry) => `<ellipse cx="0" cy="0" rx="${rx}" ry="${ry}" fill="#f6c6d6" stroke="#e79ab5" stroke-width="3"/><ellipse cx="0" cy="0" rx="${rx * .7}" ry="${ry * .7}" fill="none" stroke="#fff" stroke-width="2" stroke-dasharray="6 5"/>`;
+
+/* ---------- placement helper ---------- */
+function place(sprite, x, y, s, skew = 0, opts = {}) {
+  const { w, svg } = sprite();
+  const cls = opts.click ? 'class="clickable" data-cabinet="1"' : '';
+  return `<g ${cls} transform="translate(${x},${y}) skewY(${skew}) scale(${s})">${opts.click ? `<rect x="-4" y="-150" width="${w + 8}" height="154" fill="transparent"/>` : ''}${svg}</g>`;
+}
+function slotRect(x, y, w, h, skew = 0) {
+  return `<g class="slot" transform="translate(${x},${y}) skewY(${skew})"><rect x="0" y="${-h}" width="${w}" height="${h}" rx="6"/><text x="${w / 2 - 5}" y="${-h / 2 + 5}">+</text></g>`;
+}
+
+/* ---------- Option A: angled corner ---------- */
+function roomA(L) {
+  const ang = Math.atan(70 / 180) * 180 / Math.PI; // 21.25deg
+  const lw = x => 250 - x * 70 / 180;            // left wall baseline y at x
+  const rw = x => 180 + (x - 180) * 70 / 180;    // right wall baseline y at x
+  const s = .72;
+  return `
+  <polygon points="0,70 180,0 180,180 0,250" fill="#ece5fb"/>
+  <polygon points="180,0 360,70 360,250 180,180" fill="#e3daf8"/>
+  <polygon points="0,250 180,180 360,250 360,330 0,330" fill="#d6c9f0"/>
+  <path d="M180 0 V180" stroke="#cbbdea" stroke-width="2"/>
+  <path d="M0 250 L180 180 L360 250" stroke="#c4b4e6" stroke-width="3" fill="none"/>
+  <g transform="translate(205,${rw(205) - 92}) skewY(${ang})">${windowSvg(64, 52)}</g>
+  ${slotRect(40, lw(40) - 108, 40, 46, -ang)}
+  ${slotRect(318, rw(318) - 96, 30, 40, ang)}
+  ${place(SPRITES.fridge[L - 1], 8, lw(8), s, -ang)}
+  ${place(SPRITES.stove[L - 1], 78, lw(78), s, -ang)}
+  ${place(SPRITES.cabinet[L - 1], 248, rw(248), s, ang, { click: true })}
+  <g transform="translate(150,282)">${rug(78, 22)}</g>
+  ${slotRect(22, 300, 40, 40)}
+  ${place(SPRITES.bed[L - 1], 236, 316, .8)}
+  ${pip(150, 296, .5)}`;
+}
+
+/* ---------- Option B: front-on with side wall ---------- */
+function roomB(L) {
+  const s = .72;
+  return `
+  <polygon points="44,0 360,0 360,214 44,214" fill="#ece5fb"/>
+  <polygon points="0,0 44,24 44,214 0,246" fill="#ddd2f6"/>
+  <polygon points="0,246 44,214 360,214 360,330 0,330" fill="#d6c9f0"/>
+  <path d="M44 214 H360" stroke="#c4b4e6" stroke-width="3"/>
+  <g transform="translate(170,96)">${windowSvg(74, 58)}</g>
+  ${slotRect(6, 150, 30, 50, 36)}
+  ${slotRect(260, 70, 40, 46)}
+  ${place(SPRITES.fridge[L - 1], 54, 214, s)}
+  ${place(SPRITES.stove[L - 1], 120, 214, s)}
+  ${place(SPRITES.cabinet[L - 1], 296, 214, s, 0, { click: true })}
+  <g transform="translate(170,278)">${rug(84, 22)}</g>
+  ${slotRect(310, 310, 36, 40)}
+  ${place(SPRITES.bed[L - 1], 14, 322, .78)}
+  ${pip(196, 296, .5)}`;
+}
+
+/* ---------- Option C: flat side-on ---------- */
+function roomC(L) {
+  const s = .62;
+  return `
+  <rect x="0" y="0" width="360" height="252" fill="#ece5fb"/>
+  <rect x="0" y="252" width="360" height="78" fill="#d6c9f0"/>
+  <path d="M0 252 H360" stroke="#c4b4e6" stroke-width="3"/>
+  <g transform="translate(150,90)">${windowSvg(70, 54)}</g>
+  ${slotRect(250, 80, 40, 46)}
+  ${place(SPRITES.fridge[L - 1], 10, 262, s)}
+  ${place(SPRITES.stove[L - 1], 66, 262, s)}
+  ${place(SPRITES.cabinet[L - 1], 152, 262, s, 0, { click: true })}
+  ${slotRect(214, 262, 30, 40)}
+  ${place(SPRITES.bed[L - 1], 262, 262, .7)}
+  ${pip(150, 318, .46)}`;
+}
+
+/* ---------- Trophy cabinet full screen (Phase D/E preview) ---------- */
+function award(label, kind, earned) {
+  const art = kind === 't' ? trophy(4, 38, 1) : ribbon(6, 34, 1);
+  return `<div class="award ${earned ? '' : 'locked'}"><svg viewBox="0 0 40 40">${art}</svg>${label}</div>`;
+}
+const cabinetHtml = `
+  <header><h3>🏆 Pip's trophy cabinet</h3><button class="close">Back to room</button></header>
+  <div class="shelf"><h4>Followed the plan</h4><div class="row">
+    ${award('1 day', 't', 1)}${award('3 days', 't', 1)}${award('5 days', 't', 1)}${award('7 days', 't', 0)}${award('1 month', 't', 0)}</div></div>
+  <div class="shelf"><h4>Streaks</h4>
+    <div class="streak"><span>🍪 No snacks</span><span>now <b>4 days</b> · best 9</span></div>
+    <div class="streak"><span>🍷 No alcohol</span><span>now <b>12 days</b> · best 12</span></div>
+    <div class="row">${award('1 day', 'r', 1)}${award('3 days', 'r', 1)}${award('5 days', 'r', 1)}${award('1 week', 'r', 1)}${award('2 weeks', 'r', 0)}${award('1 month', 'r', 0)}</div></div>
+  <div class="shelf"><h4>Firsts — things to try</h4>
+    <div class="todo"><span>Make a template</span><span>✓ earned</span></div>
+    <div class="todo"><span>Generate a shopping list</span><span>✓ earned</span></div>
+    <div class="todo"><span>Plan a full week</span><span>to do</span></div>
+    <div class="todo"><span>Cook a homemade extra</span><span>to do</span></div></div>`;
+
+/* ---------- render ---------- */
+const OPTIONS = [
+  { key: 'A', tag: 'Option A · recommended', title: 'Corner, angled', desc: 'Looking into a corner: left wall (kitchen), right wall (window + cabinet), diamond floor.', fn: roomA },
+  { key: 'B', tag: 'Option B', title: 'Front-on with a side wall', desc: 'Big back wall faces you, thin side wall gives the corner. Closest to Focus Friend.', fn: roomB },
+  { key: 'C', tag: 'Option C', title: 'Flat side-on', desc: "Today's room with furniture in a row. Simplest, but really one wall.", fn: roomC },
+];
+let level = +(new URLSearchParams(location.search).get("l") || 1);
+const BUBBLES = ['Our little place! ✨', 'Getting cosier!', 'This is so nice!', 'Best room ever!! 💜'];
+
+function render() {
+  document.getElementById('grid').innerHTML = OPTIONS.map(o => `
+    <section class="option">
+      <div class="tag">${o.tag}</div><h2>${o.title}</h2><p>${o.desc}</p>
+      <div class="phone">
+        <svg class="room" viewBox="0 0 ${W} ${H}" role="img" aria-label="${o.title} room">${o.fn(level)}</svg>
+        <div class="bubble">${BUBBLES[level - 1]}</div>
+        <div class="hint">Tap the cabinet 🏆</div>
+        <div class="overlay">${cabinetHtml}</div>
+      </div>
+    </section>`).join('');
+}
+render();
+
+document.getElementById('tiers').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  level = +b.dataset.l;
+  document.querySelectorAll('#tiers button').forEach(x => x.classList.toggle('on', x === b));
+  render();
+});
+document.getElementById('slots').addEventListener('change', e => document.body.classList.toggle('show-slots', e.target.checked));
+document.getElementById('grid').addEventListener('click', e => {
+  const phone = e.target.closest('.phone'); if (!phone) return;
+  if (e.target.closest('[data-cabinet]')) phone.querySelector('.overlay').classList.add('open');
+  if (e.target.closest('.close')) phone.querySelector('.overlay').classList.remove('open');
+});
+</script>
+</body>
+</html>

@@ -2,7 +2,10 @@
 
 One line per ticket, newest first: `<version> — <ticket key>: <summary>`. Bump rules and how
 to check what is deployed: `CLAUDE.md` → Versioning & deploy verification.
+1.8.0 — MPP-17: Pip's daily routine — at the cooker around your meal times, asleep in bed at night, on the rug otherwise
 
+1.7.0 — MPP-16: Pip's room — 3D corner room engine and level 1–4 furniture catalogue on the Pet page
+1.6.0 — MPP-33: per-person eaten ticks and per-person Pip (meal plan stays shared)
 1.5.0 — MPP-14: Pet page (Phase 1) — Mochi with four meal-logging moods replaces the Search tab; pet name stored on the plan owner
 1.4.0 — MPP-13: Meal times (breakfast/lunch/dinner "by" times) in the account menu
 1.3.0 — MPP-12: Mark a planned meal as eaten from the recipe (shared across linked meal plans)

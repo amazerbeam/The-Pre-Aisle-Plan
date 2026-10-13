@@ -4,7 +4,7 @@ import { PET_NAME_MAX_LENGTH } from '../../constants/pet'
 const RENAME_ERROR = "Couldn't rename — try again."
 
 /**
- * MPP-14 AC 8: either linked user can rename the plan's pet. Enter or blur saves,
+ * MPP-14 / MPP-33: rename your own pet. Enter or blur saves,
  * Escape cancels. A blank name resets to the default (the server decides what that is).
  * A failed save reverts to the saved name and shows the server's message.
  */

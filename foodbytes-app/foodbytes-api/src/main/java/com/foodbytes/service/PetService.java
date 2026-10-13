@@ -4,16 +4,14 @@ import com.foodbytes.dto.PetDTO;
 import com.foodbytes.model.User;
 import com.foodbytes.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * MPP-14: the plan's pet. Every read and write goes to the meal-plan OWNER's row
- * (users.meal_plan_owner_id, else the caller), so linked users share one pet,
- * one name and the owner's meal times (AC 8).
+ * MPP-14 / MPP-33: the caller's own pet. Each person has their own Pip: the name and the MPP-13 meal
+ * times are read from and written to the caller's users row, even when users.meal_plan_owner_id
+ * links them to someone else's meal plan. The meal plan is shared; the pet is not.
  */
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PetService {
@@ -22,28 +20,15 @@ public class PetService {
 
     @Transactional(readOnly = true)
     public PetDTO getPet(Long userId) {
-        return PetPolicy.toDTO(resolveOwner(userId));
+        return PetPolicy.toDTO(findUser(userId));
     }
 
-    /** Either linked user may rename; null/blank resets to the default name. */
+    /** Renames the caller's own pet; null/blank resets to the default name. */
     @Transactional
     public PetDTO renamePet(Long userId, String name) {
-        User owner = resolveOwner(userId);
-        owner.setPetName(PetPolicy.normalise(name));
-        return PetPolicy.toDTO(userRepository.save(owner));
-    }
-
-    // Same rule as MealPlanService.getEffectiveMealPlanOwnerId (one of several private
-    // copies — consolidating them is out of scope for MPP-14).
-    private User resolveOwner(Long userId) {
         User user = findUser(userId);
-        Long ownerId = user.getMealPlanOwnerId();
-        if (ownerId == null) return user;
-        // A dangling meal_plan_owner_id must not break the pet page: fall back to the caller's own row.
-        return userRepository.findById(ownerId).orElseGet(() -> {
-            log.warn("User {} has meal_plan_owner_id {} but that user does not exist; using the caller's own pet", userId, ownerId);
-            return user;
-        });
+        user.setPetName(PetPolicy.normalise(name));
+        return PetPolicy.toDTO(userRepository.save(user));
     }
 
     private User findUser(Long userId) {

@@ -1,4 +1,4 @@
-import { PET_MOODS } from '../../constants/pet'
+import { PET_MOODS, PET_SLEEP_FACE } from '../../constants/pet'
 
 // Approved pet-mockup.html (2026-10-12): Mochi, Lavender. Geometry is copied verbatim
 // from the mockup's face()/props() so the shipped pet matches the mood sheet.
@@ -11,8 +11,12 @@ const CRUMB = '#c98a3c'
 const SWEAT = '#a8dcff'
 const STAR = '#ffd34d'
 const LINE = { stroke: MOCHI_OUTLINE, strokeWidth: 5, strokeLinecap: 'round', fill: 'none' }
+const BODY_STROKE = { stroke: MOCHI_OUTLINE, strokeWidth: 5, strokeLinejoin: 'round' }
 
-/** Face for each mood. Only the face and props change — never the body (AC 9). */
+/**
+ * Face for each mood, plus MPP-17's sleep face (a face, not a mood). Only the face and
+ * props change — never the body (AC 9).
+ */
 export function MochiFace({ mood }) {
   switch (mood) {
     case PET_MOODS.HAPPY:
@@ -48,6 +52,15 @@ export function MochiFace({ mood }) {
           <circle cx="114" cy="155" r="1.8" fill={CRUMB} />
           <Blush opacity={0.5} />
           <path d="M160 82 C166 92 168 98 163 102 C158 105 153 100 156 93 Z" fill={SWEAT} stroke={MOCHI_OUTLINE} strokeWidth="2.5" />
+        </>
+      )
+    case PET_SLEEP_FACE:
+      return (
+        <>
+          <path d="M64 120 Q75 130 86 120" {...LINE} strokeWidth="4.5" />
+          <path d="M114 120 Q125 130 136 120" {...LINE} strokeWidth="4.5" />
+          <ellipse cx="100" cy="146" rx="5" ry="4" fill={MOUTH} />
+          <Blush opacity={0.55} />
         </>
       )
     default:
@@ -103,6 +116,32 @@ export function MochiProps({ mood }) {
     default:
       return null
   }
+}
+
+/** Pip's lavender fill. Callers pass a useId-based id so several pets can share a page. */
+export function MochiGradient({ id }) {
+  return (
+    <linearGradient id={id} x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stopColor={MOCHI_FILL} />
+      <stop offset="1" stopColor={MOCHI_SHADE} />
+    </linearGradient>
+  )
+}
+
+/** Feet, body and highlight — identical in every mood (MPP-14 AC 9) and in the room (MPP-16). */
+export function MochiBody({ fill }) {
+  return (
+    <>
+      <ellipse cx="74" cy="180" rx="15" ry="8" fill={fill} {...BODY_STROKE} />
+      <ellipse cx="126" cy="180" rx="15" ry="8" fill={fill} {...BODY_STROKE} />
+      <path
+        d="M100 48 C152 48 182 86 182 128 C182 166 148 182 100 182 C52 182 18 166 18 128 C18 86 48 48 100 48Z"
+        fill={fill}
+        {...BODY_STROKE}
+      />
+      <ellipse cx="66" cy="82" rx="16" ry="8" transform="rotate(-30 66 82)" fill="#fff" opacity=".45" />
+    </>
+  )
 }
 
 function Eye({ x, y, dx = 0 }) {

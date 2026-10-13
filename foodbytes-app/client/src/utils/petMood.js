@@ -10,12 +10,12 @@ import {
 const NOT_READY = { mood: PET_MOODS.CONTENT, dueCount: 0, todaySlots: [], lastLoggedType: null, dueMealType: null }
 
 /**
- * MPP-14 AC 6/7: the pet's mood, derived from data both linked users share — so both
- * devices agree and a reload changes nothing.
+ * MPP-14 AC 6/7: the pet's mood, derived from YOUR ticks on the (possibly shared)
+ * plan (MPP-33) — so every device you use agrees and a reload changes nothing.
  *
  * Counted per meal SLOT (date × breakfast/lunch/dinner): a slot is logged when any of
  * its entries is eaten, and due when it is planned, nothing in it is eaten and its "by"
- * time (the plan owner's) has passed. Due slots are counted over yesterday + today;
+ * time (yours) has passed. Due slots are counted over yesterday + today;
  * "logged" (Content vs Happy) over today only.
  *
  * AC 7 "logging any one meal returns the pet to Happy immediately": if the latest log

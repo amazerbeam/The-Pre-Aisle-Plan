@@ -1,9 +1,6 @@
 import api from './api'
 
-/**
- * MPP-14: the plan's pet. Always the meal-plan OWNER's pet — a linked user reads and
- * renames the owner's — carrying the owner's effective meal times.
- */
+/** MPP-14 / MPP-33: your own pet — its name and your own effective meal times. A linked user has their own pet; only the meal plan is shared. */
 export const petService = {
   /**
    * @param {{ signal?: AbortSignal }} [options]

@@ -116,7 +116,7 @@ public class MealPlanController {
     /**
      * MPP-12: Mark a meal plan entry as eaten, or undo it.
      * PUT /api/meal-plan/{id}/eaten  body {"eaten": true|false}
-     * One shared state per entry: a linked user (meal_plan_owner_id) writes the owner's row.
+     * MPP-33: writes the caller's own tick; the entry must be in the caller's (possibly shared) plan.
      *
      * @return 200 with {id, eaten, eatenAt}; 404 if the entry is not in the caller's plan
      */

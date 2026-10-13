@@ -31,11 +31,11 @@ public final class PetPolicy {
         return trimmed.isEmpty() ? null : trimmed;
     }
 
-    public static PetDTO toDTO(User owner) {
-        String saved = owner.getPetName();
+    public static PetDTO toDTO(User user) {
+        String saved = user.getPetName();
         return new PetDTO(
                 saved != null ? saved : DEFAULT_NAME,
                 saved != null,
-                MealTimesPolicy.effective(owner));
+                MealTimesPolicy.effective(user));
     }
 }

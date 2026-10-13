@@ -1,0 +1,45 @@
+/* MPP-16: Pip's room — angled-corner SVG from pip-room-mockup-v5.html.
+   The SVG keeps its 360×330 aspect and scales with the card (AC 6). */
+
+.pip-room {
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+  background: #ece5fb;
+  box-shadow: var(--shadow-md);
+}
+
+.pip-room-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* MPP-17: cooker steam (mockup v5 .steam) and the sleeping z's.
+   AC 6: reduced motion stops both. */
+.pip-steam,
+.pip-zzz {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.pip-steam { animation: pip-steam 1.2s ease-in-out infinite; }
+.pip-zzz { animation: pip-zzz 2.4s ease-in-out infinite; }
+
+@keyframes pip-steam {
+  0% { opacity: 0.2; transform: translateY(2px); }
+  50% { opacity: 1; }
+  100% { opacity: 0.2; transform: translateY(-6px); }
+}
+
+@keyframes pip-zzz {
+  0%, 100% { opacity: 0.55; transform: translateY(0); }
+  50% { opacity: 1; transform: translateY(-5px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pip-steam,
+  .pip-zzz {
+    animation: none !important;
+  }
+}

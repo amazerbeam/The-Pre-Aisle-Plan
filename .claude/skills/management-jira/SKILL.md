@@ -119,6 +119,41 @@ Rules that apply to all five:
 Everything *outside* this table — a human saying "move MPP-5 to Coding" —
 is Workflow B and still requires explicit confirmation.
 
+### Epic tracker — sync after every pipeline transition
+
+The developer tracks an epic's build order and per-ticket status in two
+places, which must agree with Jira:
+
+- **`.claude/contract/to do.txt`** — a box-drawn table (`# │ Ticket │ What │
+  Can't start until │ Status`) with a `Last sync:` date in its header.
+- **The epic's description** — a `## Build order and status` section at the
+  end of the parent epic (today: MPP-15), holding the same rows as a markdown
+  table and its own `Last sync:` line.
+
+After any of the five pipeline transitions above succeeds, also run these steps,
+automatically and with no confirmation prompt:
+
+1. Read the ticket's `parent`. If the parent epic's description has no
+   `## Build order and status` section, or the ticket has no row in it, skip
+   silently. Only epics that opted in are tracked.
+2. In `to do.txt`, set that ticket's `Status` cell to the new Jira status name
+   (`To Do` / `Planning` / `Planned` / `Coding` / `Ready for Test` / `Done`).
+   Re-pad every column to its widest cell so the box lines stay aligned,
+   and update `Last sync:` to today. Keep the file UTF-8 with CRLF line
+   endings. Never reorder rows or touch `What` / `Can't start until`.
+3. In the epic, change only that row's `Status` cell and the section's
+   `Last sync:` date via `editJiraIssue`. First re-read the description
+   with `getJiraIssue`, then send it back with every other section byte-for-byte
+   unchanged. The same timeout rule as flagging applies: do not retry on
+   timeout; re-read to confirm.
+4. Report it on the same line as the transition, e.g.
+   `MPP-33 → Coding (tracker: to do.txt + MPP-15 updated)`.
+
+A tracker failure follows the same rule as a transition failure: surface it,
+never fail the command. If the file and the epic disagree, Jira's live status
+wins. Re-sync both rows from `getJiraIssue` rather than copying one into the
+other.
+
 ---
 
 ## Workflow A — Create a Ticket
@@ -417,6 +452,7 @@ wrote that; do not echo it back.
 | Transitions | Always resolve transition **ids** live from `getTransitionsForJiraIssue` — never hardcode an id |
 | Auto-transition | Ad-hoc transitions need explicit user confirmation. The five pipeline transitions in *The MPP status model* are pre-authorised and automatic |
 | Blocked work | Flag the card; never invent a `Blocked` status |
+| Epic tracker | After every pipeline transition, update the ticket's row in `.claude/contract/to do.txt` and in the parent epic's `## Build order and status` table (opted-in epics only) |
 | Instance | Resolve the site and cloud ID via `getAccessibleAtlassianResources`; ask if more than one is accessible |
 
 ## Forbidden Behaviors

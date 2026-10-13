@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { usePet } from '../../contexts/PetContext'
-import MochiPet from './MochiPet'
+import PetRoom from './room/PetRoom'
 import PetMealsCard from './PetMealsCard'
 import PetNameEditor from './PetNameEditor'
 import { PET_GUEST_MESSAGE } from '../../constants/pet'
@@ -9,14 +9,15 @@ import { petBubble, petChipLabel } from '../../utils/petMood'
 import './PetView.css'
 
 /**
- * MPP-14 AC 4: the Pet page — Mochi in its room, a speech bubble, the name, a mood
- * chip and today's meals. Guests get the sign-in prompt (AC 3) if they reach /pet
- * directly; the footer already stops them with a message.
+ * MPP-14 AC 4 / MPP-16 / MPP-17: the Pet page — Pip in his room (rug, cooker or bed by
+ * your meal times), a speech bubble, the name, a mood chip and today's meals. Guests get
+ * the sign-in prompt (AC 3) if they reach /pet directly; the footer already stops them
+ * with a message.
  */
 function PetView() {
   const navigate = useNavigate()
   const { isAuthenticated } = useAuth()
-  const { pet, mood, moodInfo, error, retry, renamePet } = usePet()
+  const { pet, mood, moodInfo, position, error, retry, renamePet } = usePet()
 
   if (!isAuthenticated) {
     return (
@@ -51,16 +52,7 @@ function PetView() {
 
   return (
     <div className="pet-view">
-      <div className="pet-room">
-        <div className="pet-room-window" aria-hidden="true" />
-        <div className="pet-room-shelf" aria-hidden="true" />
-        <div className="pet-room-jar" aria-hidden="true" />
-        <div className="pet-room-jar pet-room-jar--small" aria-hidden="true" />
-        <p className="pet-bubble" aria-live="polite">{petBubble(moodInfo)}</p>
-        <div className="pet-stage">
-          <MochiPet mood={mood} />
-        </div>
-      </div>
+      <PetRoom name={pet.name} mood={mood} bubble={petBubble(moodInfo)} position={position} />
 
       <div className="pet-meta">
         <PetNameEditor name={pet.name} onRename={renamePet} />

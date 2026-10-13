@@ -64,10 +64,8 @@ public class User {
     private LocalTime dinnerBy;
 
     /**
-     * MPP-14: the pet's name, stored on the meal-plan OWNER's row only (a linked
-     * user's own column stays NULL and is never read). NULL means "use the
-     * default" (PetPolicy.DEFAULT_NAME) — no initialiser, same reason as
-     * defaultServings.
+     * MPP-14 / MPP-33: this user's pet name. Every user has their own pet, linked or not. NULL means
+     * "use the default" (PetPolicy.DEFAULT_NAME) — no initialiser, same reason as defaultServings.
      */
     @Column(name = "pet_name", length = 12)
     private String petName;

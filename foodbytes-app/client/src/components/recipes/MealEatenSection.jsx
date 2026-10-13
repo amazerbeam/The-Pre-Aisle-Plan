@@ -12,7 +12,7 @@ const SAVE_ERROR = "Couldn't save — try again."
  * MPP-12: end-of-recipe "Mark as eaten" section, rendered by RecipeViewModal only when it was
  * opened from a meal-plan entry. Reads the entry live from MealPlanContext so the optimistic
  * flip, the server reconcile and any rollback all show while the modal stays open (AC 3).
- * One shared state per entry - no "ticked by" (AC 6). Once eaten, a second tap does nothing;
+ * The tick is the viewer's own (MPP-33); a linked partner's tick never shows here. Once eaten, a second tap does nothing;
  * Undo is the link in the meta line (approved mockup).
  */
 function MealEatenSection({ entryId }) {

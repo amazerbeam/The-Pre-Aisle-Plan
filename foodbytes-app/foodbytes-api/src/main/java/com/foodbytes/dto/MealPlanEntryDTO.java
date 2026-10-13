@@ -29,6 +29,6 @@ public class MealPlanEntryDTO {
     private Integer carbsPerServing;
     private Integer fatPerServing;
     private Map<Long, Boolean> extraChoices = new HashMap<>(); // MPP-10: stored choices for this meal; empty = all homemade
-    private Boolean eaten;            // MPP-12: one shared state per entry
-    private Instant eatenAt;          // MPP-12: null when not eaten; ISO-8601 UTC ("...Z")
+    private Boolean eaten;            // MPP-33: the CALLER's own tick (a linked partner's never shows)
+    private Instant eatenAt;          // MPP-33: caller's first tick, null when not eaten; ISO-8601 UTC ("...Z")
 }

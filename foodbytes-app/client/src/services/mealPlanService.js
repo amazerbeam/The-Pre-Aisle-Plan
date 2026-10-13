@@ -54,8 +54,8 @@ export const mealPlanService = {
   },
 
   /**
-   * MPP-12: Mark a meal plan entry as eaten, or undo it. One shared state per entry,
-   * so a linked user's tick is the owner's tick.
+   * MPP-12: Mark a meal plan entry as eaten, or undo it. The tick is yours alone (MPP-33):
+   * a linked partner ticks the same shared meal separately.
    * @param {number} entryId - Entry ID
    * @param {boolean} eaten - Target state (explicit, not a toggle)
    * @returns {Promise<{id: number, eaten: boolean, eatenAt: string|null}>} eatenAt is ISO-8601 UTC

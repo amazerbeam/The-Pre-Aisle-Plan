@@ -35,6 +35,7 @@ public class MealPlanService {
     private final MacroCalculationService macroCalculationService;
     private final ExtraChoiceService extraChoiceService;                     // MPP-10: stored extra choices
     private final RecipeFamilyMemberRepository recipeFamilyMemberRepository;   // MPP-10: same-family test for variant swaps
+    private final MealPlanEntryEatenRepository mealPlanEntryEatenRepository; // MPP-33: per-person eaten ticks
 
     /**
      * Get the effective meal plan owner ID for a user.
@@ -79,9 +80,13 @@ public class MealPlanService {
         List<MealPlanEntry> entries = mealPlanEntryRepository
             .findByUserIdAndDateRange(effectiveOwnerId, startDate, endDate);
 
+        List<Long> entryIds = entries.stream().map(MealPlanEntry::getId).toList();
+
         // MPP-10: one query for the week's stored extra choices (cart icon on the calendar)
-        Map<Long, Map<Long, Boolean>> choicesByEntry = extraChoiceService.getEntryChoices(
-            entries.stream().map(MealPlanEntry::getId).toList());
+        Map<Long, Map<Long, Boolean>> choicesByEntry = extraChoiceService.getEntryChoices(entryIds);
+
+        // MPP-33: one query for the CALLER's ticks - the plan is shared, eaten is not
+        Map<Long, LocalDateTime> eatenByEntry = getEatenAtByEntry(userId, entryIds);
 
         // Group entries by date
         Map<LocalDate, List<MealPlanEntry>> byDate = entries.stream()
@@ -95,7 +100,7 @@ public class MealPlanService {
         for (int i = 0; i < 7; i++) {
             LocalDate date = startDate.plusDays(i);
             List<MealPlanEntry> dayEntries = byDate.getOrDefault(date, List.of());
-            MealPlanDayDTO dayDTO = buildDayDTO(date, dayEntries, today, choicesByEntry);
+            MealPlanDayDTO dayDTO = buildDayDTO(date, dayEntries, today, choicesByEntry, eatenByEntry);
 
             // FR-081: Calculate daily macros
             if (!dayEntries.isEmpty()) {
@@ -227,7 +232,7 @@ public class MealPlanService {
             extraChoiceService.setEntryChoices(entry.getId(), carriedChoices);
             storedChoices = carriedChoices;
         }
-        return convertToDTO(entry, storedChoices);
+        return convertToDTO(entry, storedChoices, null); // MPP-33: a new entry is never eaten
     }
 
     /** MPP-10: true when both recipes belong to the same recipe family (Light/Moderate/Balanced). */
@@ -301,16 +306,17 @@ public class MealPlanService {
     }
 
     /**
-     * MPP-12: set or clear the eaten state of a meal plan entry.
-     * The entry is looked up in the caller's effective plan (meal_plan_owner_id), so a linked user
-     * writes the owner's row and both see one shared state (AC 6-7); an entry outside that plan is
-     * "not found" (AC 9), exactly as removeEntry treats it.
+     * MPP-12 / MPP-33: set or clear the CALLER's eaten tick on a meal plan entry.
+     * The entry is looked up in the caller's effective plan (meal_plan_owner_id), so a linked user can
+     * tick a shared meal; an entry outside that plan is "not found", exactly as removeEntry treats it.
+     * The tick itself belongs to the caller: a linked partner's tick is a separate row and is never
+     * read or written here.
      *
-     * <p>Re-ticking an already-eaten entry keeps the first eatenAt, so a partner's second tick does
-     * not move the time. eatenAt is stored as UTC wall time (the JDBC URL pins serverTimezone=UTC)
-     * and exposed as an Instant.
+     * <p>Ticking is an idempotent insert that keeps the first eaten_at; the response reads the stored
+     * row back, so a re-tick reports the original time. eaten_at is UTC wall time (the JDBC URL pins
+     * serverTimezone=UTC) and is exposed as an Instant. Unticking deletes only the caller's row.
      *
-     * @return the new state, or empty when the entry is not in the caller's effective plan
+     * @return the caller's new state, or empty when the entry is not in the caller's effective plan
      */
     @Transactional
     public Optional<MealPlanEntryEatenDTO> setEntryEaten(Long userId, Long entryId, boolean eaten) {
@@ -318,15 +324,23 @@ public class MealPlanService {
         return mealPlanEntryRepository.findByIdAndUserId(entryId, effectiveOwnerId)
             .map(entry -> {
                 if (!eaten) {
-                    entry.setEaten(false);
-                    entry.setEatenAt(null);
-                } else if (!Boolean.TRUE.equals(entry.getEaten())) {
-                    entry.setEaten(true);
-                    entry.setEatenAt(LocalDateTime.now(ZoneOffset.UTC));
+                    mealPlanEntryEatenRepository.deleteByEntryAndUser(entry.getId(), userId);
+                    return new MealPlanEntryEatenDTO(entry.getId(), false, null);
                 }
-                return new MealPlanEntryEatenDTO(entry.getId(), Boolean.TRUE.equals(entry.getEaten()),
-                    toUtcInstant(entry.getEatenAt()));
+                mealPlanEntryEatenRepository.insertIfAbsent(entry.getId(), userId, LocalDateTime.now(ZoneOffset.UTC));
+                LocalDateTime eatenAt = mealPlanEntryEatenRepository.findByMealPlanEntryIdAndUserId(entry.getId(), userId)
+                    .map(MealPlanEntryEaten::getEatenAt)
+                    .orElseThrow(() -> new IllegalStateException(
+                        "Eaten tick for entry " + entry.getId() + " and user " + userId + " was not stored"));
+                return new MealPlanEntryEatenDTO(entry.getId(), true, toUtcInstant(eatenAt));
             });
+    }
+
+    /** MPP-33: the caller's own ticks for these entries, entry id -> UTC eaten_at. Unique per (entry, user). */
+    private Map<Long, LocalDateTime> getEatenAtByEntry(Long userId, List<Long> entryIds) {
+        if (entryIds.isEmpty()) return Map.of();
+        return mealPlanEntryEatenRepository.findByUserIdAndMealPlanEntryIdIn(userId, entryIds).stream()
+            .collect(Collectors.toMap(MealPlanEntryEaten::getMealPlanEntryId, MealPlanEntryEaten::getEatenAt));
     }
 
     /** MPP-12: eaten_at is UTC wall time; null stays null. */
@@ -440,8 +454,10 @@ public class MealPlanService {
         LocalDate endDate = startDate.plusDays(7);
         List<MealPlanEntry> entries = mealPlanEntryRepository
             .findByUserIdAndRecipeIdAndDateRange(effectiveOwnerId, recipeId, startDate, endDate);
+        List<Long> entryIds = entries.stream().map(MealPlanEntry::getId).toList();
+        Map<Long, LocalDateTime> eatenByEntry = getEatenAtByEntry(userId, entryIds);
         return entries.stream()
-            .map(this::convertToDTO)
+            .map(e -> convertToDTO(e, Map.of(), eatenByEntry.get(e.getId())))
             .collect(Collectors.toList());
     }
 
@@ -460,7 +476,8 @@ public class MealPlanService {
      * Build a MealPlanDayDTO from entries for a specific date.
      */
     private MealPlanDayDTO buildDayDTO(LocalDate date, List<MealPlanEntry> entries, LocalDate today,
-                                       Map<Long, Map<Long, Boolean>> choicesByEntry) {
+                                       Map<Long, Map<Long, Boolean>> choicesByEntry,
+                                       Map<Long, LocalDateTime> eatenByEntry) {
         MealPlanDayDTO day = new MealPlanDayDTO();
         day.setDate(date);
         day.setDayOfWeek(date.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.ENGLISH));
@@ -468,7 +485,7 @@ public class MealPlanService {
 
         // Group by meal type
         Map<String, List<MealPlanEntryDTO>> byMeal = entries.stream()
-            .map(e -> convertToDTO(e, choicesByEntry.getOrDefault(e.getId(), Map.of())))
+            .map(e -> convertToDTO(e, choicesByEntry.getOrDefault(e.getId(), Map.of()), eatenByEntry.get(e.getId())))
             .collect(Collectors.groupingBy(MealPlanEntryDTO::getMealType));
 
         // Ensure all meal types exist (even if empty)
@@ -492,11 +509,7 @@ public class MealPlanService {
      * Convert MealPlanEntry entity to DTO.
      * FR-102: Uses RecipeSummaryDTO for lightweight response (no ingredients/steps).
      */
-    private MealPlanEntryDTO convertToDTO(MealPlanEntry entry) {
-        return convertToDTO(entry, Map.of());
-    }
-
-    private MealPlanEntryDTO convertToDTO(MealPlanEntry entry, Map<Long, Boolean> extraChoices) {
+    private MealPlanEntryDTO convertToDTO(MealPlanEntry entry, Map<Long, Boolean> extraChoices, LocalDateTime eatenAt) {
         MealPlanEntryDTO dto = new MealPlanEntryDTO();
         dto.setId(entry.getId());
         dto.setPlanDate(entry.getPlanDate());
@@ -510,8 +523,8 @@ public class MealPlanService {
         dto.setCarbsPerServing(macros[1]);
         dto.setFatPerServing(macros[2]);
         dto.setExtraChoices(new HashMap<>(extraChoices));
-        dto.setEaten(Boolean.TRUE.equals(entry.getEaten()));
-        dto.setEatenAt(toUtcInstant(entry.getEatenAt()));
+        dto.setEaten(eatenAt != null);              // MPP-33: the caller's own tick
+        dto.setEatenAt(toUtcInstant(eatenAt));
         return dto;
     }
 }

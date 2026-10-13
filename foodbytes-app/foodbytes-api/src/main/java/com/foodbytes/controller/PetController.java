@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 /**
- * MPP-14: the plan's pet — always the meal-plan owner's (see PetService).
+ * MPP-14 / MPP-33: the caller's own pet (see PetService).
  */
 @RestController
 @RequestMapping("/api/pet")

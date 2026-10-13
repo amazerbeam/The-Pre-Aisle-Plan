@@ -6,13 +6,14 @@ import mealPlanService from '../services/mealPlanService'
 import useMinuteClock from '../hooks/useMinuteClock'
 import { addDays, formatDateISO } from '../utils/dateUtils'
 import { derivePetMood } from '../utils/petMood'
+import { pipPosition } from '../utils/pipPosition'
 
 const LOAD_ERROR = "Couldn't load your pet."
 
 const PetContext = createContext()
 
 /**
- * MPP-14: the plan's pet — its name, the owner's meal times, and a mood derived on
+ * MPP-14: your own pet (MPP-33) — its name, your meal times, and a mood derived on
  * every render from yesterday's and today's meals.
  *
  * Yesterday must exist even when the calendar's selected week starts today (or is a
@@ -22,8 +23,11 @@ const PetContext = createContext()
  * is logged (AC 7).
  *
  * The pet refetches on sign-in, local date rollover, retry() and the tab becoming visible
- * again (picks up a partner's ticks). The recent-days week also refetches when the
+ * again (picks up ticks made on another device). The recent-days week also refetches when the
  * calendar's week changes. No polling.
+ *
+ * MPP-17: `position` (rug / cooker / bed) is derived from the same minute clock and
+ * your own meal times, so Pip moves on the minute without a second timer.
  */
 export const PetProvider = ({ children }) => {
   const { isAuthenticated } = useAuth()
@@ -113,12 +117,14 @@ export const PetProvider = ({ children }) => {
     mealTimes: pet?.mealTimes ?? null,
     now
   })
+  const position = pipPosition(now, pet?.mealTimes ?? null)
 
   const value = {
     pet,
     petName: pet?.name ?? null,
     mood: moodInfo.mood,
     moodInfo,
+    position,
     loading: petLoading || planLoading,
     error: petError || planError,
     retry,

@@ -34,7 +34,7 @@ Nothing here depends on the slug. Scan `$ARGUMENTS` and the primed brief for an 
 
 Skip silently when the brief carries no key — that work will get a date-branch slug in Step 1.7 and has no card to move. Do not create a ticket to have something to transition; `/fb-plan` plans, it does not open work.
 
-Run this **after** Step 0's refusal gate, not before it. Step 0 only refuses when there is no brief at all or the named brief is unreadable, and moving a card for a run that is about to refuse would leave the board lying. Everything else — classification, the skill confirmation, the config audit, creating the folder — comes after this transition.
+Run this **after** Step 0's refusal gate, not before it. Step 0 only refuses when there is no brief at all or the named brief is unreadable, and moving a card for a run that is about to refuse would leave the board lying. Everything else — classification, loading skills, the config audit, creating the folder — comes after this transition.
 
 ## Step 1: Defer to the skills and the shared rules
 
@@ -73,18 +73,16 @@ Pick every category that applies. A task can be in more than one (e.g. new endpo
 
 There are no skills for infrastructure, Docker, or SQL migrations. Migration *mechanics* are owned by `java-backend` (the "entity change ⇒ date-prefixed migration ⇒ developer applies it to Railway manually" contract); migration *content* is governed by the rules above.
 
-### b) Confirm the skill list with the developer
+### b) Load the skills — no confirmation prompt
 
-Build the proposed list from the classification above, then call `AskUserQuestion` **once** to confirm — a single `multiSelect: true` question listing the matched skills, each option's description naming what that skill owns for this task. `AskUserQuestion` allows at most 4 options per question; if the classification matched more, ask a second question in the same call. The developer can untick anything that doesn't apply or tick extras the classifier missed. If the runtime cannot present `AskUserQuestion` (non-interactive session), proceed with the proposed list and note in `plan.md` Part 2 that no developer override was applied.
+Do **not** ask the developer to confirm the skill list. The developer trusts the planner to pick the right skills (decided 2026-10-13, MPP-33): build the list from the classification above and load it directly. A skill the brief names explicitly (e.g. "Skills: java-backend, react-frontend" on a Jira ticket) is always included. The developer can still red-line the list at the plan-approval gate in Step 3, where it is presented alongside the plan.
 
-### c) Load the confirmed skills
-
-For each confirmed skill, invoke it via the `Skill` tool *before* writing `plan.md` and `tasks.md`. The skill content informs:
+For each skill, invoke it via the `Skill` tool *before* writing `plan.md` and `tasks.md`. The skill content informs:
 - the **Approach** section in `plan.md` Part 2 (correct layer placement, correct patterns)
 - the file paths each task names (right paths, right naming)
 - the **Tasks** in `tasks.md` (concrete steps that match house standards)
 
-Record the loaded skills in `plan.md` Part 2 under "Skills to invoke during execution" — this becomes the handoff list for the post-`/clear` execution session. If the developer overrode a skill (added or removed one), capture that in a one-line note under the skill list so the execution session understands why.
+Record the loaded skills in `plan.md` Part 2 under "Skills to invoke during execution" — this becomes the handoff list for the post-`/clear` execution session. If the developer changes the list at the Step 3 approval gate, capture that in a one-line note under the skill list so the execution session understands why.
 
 ## Step 1.6: Verify against the live database (when applicable)
 
@@ -171,7 +169,7 @@ Execution status: see `tasks.md` in this folder.
 [2-4 paragraphs on the technical shape: how the change is structured, why this shape over the alternatives (call them out by name — the developer often learns more from the road not taken), what the moving parts are, how data flows end-to-end. Reflect the conventions from the skills loaded in Step 1.5.]
 
 ### Skills to invoke during execution
-[The confirmed skill list from Step 1.5. One bullet per skill: `skill-name` — why it applies and what it owns for this task. List any `.claude/rules/` files the executor must Read on a trailing line. Note any developer override so the execution session knows why.]
+[The skill list loaded in Step 1.5. One bullet per skill: `skill-name` — why it applies and what it owns for this task. List any `.claude/rules/` files the executor must Read on a trailing line. Note any change the developer made at the approval gate so the execution session knows why.]
 
 ### Diagram
 [A Mermaid diagram of whatever matters most: sequence for request flows, component diagram for structural change, flowchart for decision logic. For a genuine single-file edit with no flow, write one line — "Diagram skipped — single-file change, no flow." Never leave an empty fence.]
@@ -214,7 +212,7 @@ Fix issues inline. Continue to Step 3.
 2. **Restated goal** from Part 1, so the developer can confirm understanding before reading the rest
 3. **Assumptions made** from Part 1 — call this out clearly; it is the part the developer most needs to red-line
 4. **Mermaid diagram** from Part 2 if you produced one
-5. **Skills loaded** during planning and **skills to invoke** during execution — flag any developer override
+5. **Skills loaded** during planning and **skills to invoke** during execution — the developer red-lines this list here, since Step 1.5 does not ask
 6. **Judgement calls** you made — pattern choice, naming, structural decisions
 7. **Any manual step the developer will own** — most often a migration that must be applied to the Railway MySQL before the backend redeploys
 

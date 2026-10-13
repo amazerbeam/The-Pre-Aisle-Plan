@@ -6,10 +6,12 @@ import com.foodbytes.dto.MealPlanEntryEatenDTO;
 import com.foodbytes.dto.MealPlanWeekDTO;
 import com.foodbytes.model.Meal;
 import com.foodbytes.model.MealPlanEntry;
+import com.foodbytes.model.MealPlanEntryEaten;
 import com.foodbytes.model.Recipe;
 import com.foodbytes.model.RecipeFamily;
 import com.foodbytes.model.RecipeFamilyMember;
 import com.foodbytes.model.User;
+import com.foodbytes.repository.MealPlanEntryEatenRepository;
 import com.foodbytes.repository.MealPlanEntryRepository;
 import com.foodbytes.repository.MealRepository;
 import com.foodbytes.repository.RecipeFamilyMemberRepository;
@@ -39,6 +41,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -66,10 +69,12 @@ class MealPlanServiceTest {
     @Mock private MacroCalculationService macroCalculationService;
     @Mock private ExtraChoiceService extraChoiceService;
     @Mock private RecipeFamilyMemberRepository recipeFamilyMemberRepository;
+    @Mock private MealPlanEntryEatenRepository mealPlanEntryEatenRepository;
 
     @InjectMocks private MealPlanService mealPlanService;
 
     @Captor private ArgumentCaptor<MealPlanEntry> entryCaptor;
+    @Captor private ArgumentCaptor<LocalDateTime> eatenAtCaptor;
 
     private static final Long USER_ID = 1L;
     private static final Long MEAL_ID = 3L;
@@ -458,112 +463,159 @@ class MealPlanServiceTest {
     }
 
     // ------------------------------------------------------------------
-    // MPP-12: mark a planned meal as eaten
+    // MPP-33: per-person eaten ticks on a shared meal plan
     // ------------------------------------------------------------------
 
     private static final Long ENTRY_ID = 812L;
+    private static final Long LINKED_ID = 2L;
 
-    @Test
-    void setEntryEaten_ownEntry_marksEatenWithUtcTimestamp() {
-        MealPlanEntry entry = entryWithId(ENTRY_ID, recipeWithId(82L), LocalDate.of(2026, 10, 13));
-        when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user));
-        when(mealPlanEntryRepository.findByIdAndUserId(ENTRY_ID, USER_ID)).thenReturn(Optional.of(entry));
+    private static MealPlanEntryEaten tick(Long entryId, Long userId, LocalDateTime at) {
+        return new MealPlanEntryEaten(null, entryId, userId, at);
+    }
 
-        Optional<MealPlanEntryEatenDTO> result = mealPlanService.setEntryEaten(USER_ID, ENTRY_ID, true);
-
-        assertThat(result).isPresent();
-        assertThat(result.get().eaten()).isTrue();
-        assertThat(result.get().eatenAt()).isCloseTo(Instant.now(), within(5, ChronoUnit.SECONDS));
-        assertThat(entry.getEaten()).isTrue();
-        assertThat(entry.getEatenAt().toInstant(ZoneOffset.UTC)).isEqualTo(result.get().eatenAt());
+    private User linkedUser() {
+        User linked = new User();
+        linked.setId(LINKED_ID);
+        linked.setMealPlanOwnerId(OWNER_ID);
+        return linked;
     }
 
     @Test
-    void setEntryEaten_alreadyEaten_keepsFirstTimestamp() {
+    void setEntryEaten_ownEntry_insertsTheCallersTickAtUtcNow() {
         MealPlanEntry entry = entryWithId(ENTRY_ID, recipeWithId(82L), LocalDate.of(2026, 10, 13));
-        LocalDateTime first = LocalDateTime.of(2026, 10, 13, 12, 12, 4);
-        entry.setEaten(true);
-        entry.setEatenAt(first);
+        LocalDateTime stored = LocalDateTime.of(2026, 10, 13, 12, 12, 4);
         when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user));
         when(mealPlanEntryRepository.findByIdAndUserId(ENTRY_ID, USER_ID)).thenReturn(Optional.of(entry));
+        when(mealPlanEntryEatenRepository.findByMealPlanEntryIdAndUserId(ENTRY_ID, USER_ID))
+                .thenReturn(Optional.of(tick(ENTRY_ID, USER_ID, stored)));
 
         MealPlanEntryEatenDTO result = mealPlanService.setEntryEaten(USER_ID, ENTRY_ID, true).orElseThrow();
 
-        assertThat(entry.getEatenAt()).isEqualTo(first);
-        assertThat(result.eatenAt()).isEqualTo(first.toInstant(ZoneOffset.UTC));
+        verify(mealPlanEntryEatenRepository).insertIfAbsent(eq(ENTRY_ID), eq(USER_ID), eatenAtCaptor.capture());
+        assertThat(eatenAtCaptor.getValue()).isCloseTo(LocalDateTime.now(ZoneOffset.UTC), within(5, ChronoUnit.SECONDS));
+        // The response carries the STORED time, so a re-tick reports the first tick's time.
+        assertThat(result.eaten()).isTrue();
+        assertThat(result.eatenAt()).isEqualTo(Instant.parse("2026-10-13T12:12:04Z"));
+        verify(mealPlanEntryRepository, never()).save(any(MealPlanEntry.class));
     }
 
     @Test
-    void setEntryEaten_undo_clearsEatenAndTimestamp() {
+    void setEntryEaten_undo_deletesOnlyTheCallersTick() {
         MealPlanEntry entry = entryWithId(ENTRY_ID, recipeWithId(82L), LocalDate.of(2026, 10, 13));
-        entry.setEaten(true);
-        entry.setEatenAt(LocalDateTime.of(2026, 10, 13, 12, 12, 4));
         when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user));
         when(mealPlanEntryRepository.findByIdAndUserId(ENTRY_ID, USER_ID)).thenReturn(Optional.of(entry));
 
         MealPlanEntryEatenDTO result = mealPlanService.setEntryEaten(USER_ID, ENTRY_ID, false).orElseThrow();
 
+        verify(mealPlanEntryEatenRepository).deleteByEntryAndUser(ENTRY_ID, USER_ID);
+        verify(mealPlanEntryEatenRepository, never()).insertIfAbsent(any(), any(), any());
         assertThat(result.eaten()).isFalse();
         assertThat(result.eatenAt()).isNull();
-        assertThat(entry.getEaten()).isFalse();
-        assertThat(entry.getEatenAt()).isNull();
     }
 
     @Test
-    void setEntryEaten_linkedUser_writesTheOwnersRow() {
-        User linked = new User();
-        linked.setId(2L);
-        linked.setMealPlanOwnerId(OWNER_ID);
-        MealPlanEntry ownersEntry = entryWithId(ENTRY_ID, recipeWithId(82L), LocalDate.of(2026, 10, 13));
-        when(userRepository.findById(2L)).thenReturn(Optional.of(linked));
-        when(mealPlanEntryRepository.findByIdAndUserId(ENTRY_ID, OWNER_ID)).thenReturn(Optional.of(ownersEntry));
+    void setEntryEaten_twoLinkedUsers_tickAndUntickIndependently() {
+        MealPlanEntry sharedEntry = entryWithId(ENTRY_ID, recipeWithId(82L), LocalDate.of(2026, 10, 13));
+        when(userRepository.findById(OWNER_ID)).thenReturn(Optional.of(user));
+        when(userRepository.findById(LINKED_ID)).thenReturn(Optional.of(linkedUser()));
+        // Both find the entry in the OWNER's plan - the plan stays shared.
+        when(mealPlanEntryRepository.findByIdAndUserId(ENTRY_ID, OWNER_ID)).thenReturn(Optional.of(sharedEntry));
+        when(mealPlanEntryEatenRepository.findByMealPlanEntryIdAndUserId(ENTRY_ID, OWNER_ID))
+                .thenReturn(Optional.of(tick(ENTRY_ID, OWNER_ID, LocalDateTime.of(2026, 10, 13, 12, 0))));
+        when(mealPlanEntryEatenRepository.findByMealPlanEntryIdAndUserId(ENTRY_ID, LINKED_ID))
+                .thenReturn(Optional.of(tick(ENTRY_ID, LINKED_ID, LocalDateTime.of(2026, 10, 13, 12, 30))));
 
-        Optional<MealPlanEntryEatenDTO> result = mealPlanService.setEntryEaten(2L, ENTRY_ID, true);
+        MealPlanEntryEatenDTO ownerTick = mealPlanService.setEntryEaten(OWNER_ID, ENTRY_ID, true).orElseThrow();
+        MealPlanEntryEatenDTO linkedTick = mealPlanService.setEntryEaten(LINKED_ID, ENTRY_ID, true).orElseThrow();
+        mealPlanService.setEntryEaten(LINKED_ID, ENTRY_ID, false);
 
-        assertThat(result).isPresent();
-        assertThat(ownersEntry.getEaten()).isTrue();
+        verify(mealPlanEntryEatenRepository).insertIfAbsent(eq(ENTRY_ID), eq(OWNER_ID), any());
+        verify(mealPlanEntryEatenRepository).insertIfAbsent(eq(ENTRY_ID), eq(LINKED_ID), any());
+        assertThat(ownerTick.eatenAt()).isEqualTo(Instant.parse("2026-10-13T12:00:00Z"));
+        assertThat(linkedTick.eatenAt()).isEqualTo(Instant.parse("2026-10-13T12:30:00Z"));
+        // The linked user's untick removes only their own row; the owner's tick stays.
+        verify(mealPlanEntryEatenRepository).deleteByEntryAndUser(ENTRY_ID, LINKED_ID);
+        verify(mealPlanEntryEatenRepository, never()).deleteByEntryAndUser(ENTRY_ID, OWNER_ID);
         verify(mealPlanEntryRepository, never()).save(any(MealPlanEntry.class));
     }
 
     @Test
-    void setEntryEaten_entryOutsideEffectivePlan_returnsEmpty() {
+    void setEntryEaten_entryOutsideEffectivePlan_returnsEmptyAndWritesNothing() {
         when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user));
         when(mealPlanEntryRepository.findByIdAndUserId(999L, USER_ID)).thenReturn(Optional.empty());
 
         assertThat(mealPlanService.setEntryEaten(USER_ID, 999L, true)).isEmpty();
+        verifyNoInteractions(mealPlanEntryEatenRepository);
     }
 
     @Test
-    void assignRecipe_replacingAnEatenSlot_createsANotEatenEntry() {
-        MealPlanEntry eatenEntry = entryWithId(10L, recipeWithId(38L), LocalDate.of(2026, 10, 12));
-        eatenEntry.setEaten(true);
-        eatenEntry.setEatenAt(LocalDateTime.of(2026, 10, 12, 12, 0));
-        stubAssign(82L, eatenEntry);
+    void assignRecipe_newEntry_isNotEaten() {
+        stubAssign(82L, null);
 
-        mealPlanService.assignRecipe(USER_ID, assignRequest(82L, Map.of()));
+        MealPlanEntryDTO dto = mealPlanService.assignRecipe(USER_ID, assignRequest(82L, Map.of()));
 
-        verify(mealPlanEntryRepository).delete(eatenEntry);
-        verify(mealPlanEntryRepository).save(entryCaptor.capture());
-        assertThat(entryCaptor.getValue().getEaten()).isFalse();
-        assertThat(entryCaptor.getValue().getEatenAt()).isNull();
+        assertThat(dto.getEaten()).isFalse();
+        assertThat(dto.getEatenAt()).isNull();
+        verifyNoInteractions(mealPlanEntryEatenRepository);
     }
 
     @Test
-    void getWeekPlan_exposesEatenStateOnEntries() {
+    void getWeekPlan_exposesTheCallersOwnTicks() {
         LocalDate start = LocalDate.of(2026, 10, 12);
         when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user));
-        MealPlanEntry eatenEntry = entryWithId(10L, recipeWithId(82L), start);
-        eatenEntry.setEaten(true);
-        eatenEntry.setEatenAt(LocalDateTime.of(2026, 10, 12, 12, 12, 4));
+        MealPlanEntry ticked = entryWithId(10L, recipeWithId(82L), start);
+        MealPlanEntry unticked = entryWithId(11L, recipeWithId(38L), start.plusDays(1));
         when(mealPlanEntryRepository.findByUserIdAndDateRange(USER_ID, start, start.plusDays(7)))
-                .thenReturn(List.of(eatenEntry));
-        when(extraChoiceService.getEntryChoices(List.of(10L))).thenReturn(Map.of());
+                .thenReturn(List.of(ticked, unticked));
+        when(mealPlanEntryEatenRepository.findByUserIdAndMealPlanEntryIdIn(USER_ID, List.of(10L, 11L)))
+                .thenReturn(List.of(tick(10L, USER_ID, LocalDateTime.of(2026, 10, 12, 12, 12, 4))));
         stubWeekMacros();
 
         MealPlanWeekDTO week = mealPlanService.getWeekPlan(USER_ID, start);
 
+        MealPlanEntryDTO first = week.getDays().get(0).getMealsByType().get("dinner").get(0);
+        MealPlanEntryDTO second = week.getDays().get(1).getMealsByType().get("dinner").get(0);
+        assertThat(first.getEaten()).isTrue();
+        assertThat(first.getEatenAt()).isEqualTo(Instant.parse("2026-10-12T12:12:04Z"));
+        assertThat(second.getEaten()).isFalse();
+        assertThat(second.getEatenAt()).isNull();
+    }
+
+    @Test
+    void getWeekPlan_linkedPartner_readsTheSharedEntriesButOnlyTheirOwnTicks() {
+        LocalDate start = LocalDate.of(2026, 10, 12);
+        when(userRepository.findById(LINKED_ID)).thenReturn(Optional.of(linkedUser()));
+        MealPlanEntry ownersTicked = entryWithId(10L, recipeWithId(82L), start);
+        when(mealPlanEntryRepository.findByUserIdAndDateRange(OWNER_ID, start, start.plusDays(7)))
+                .thenReturn(List.of(ownersTicked));
+        // The partner has no tick of their own; the owner's tick must not leak through.
+        when(mealPlanEntryEatenRepository.findByUserIdAndMealPlanEntryIdIn(LINKED_ID, List.of(10L)))
+                .thenReturn(List.of());
+        stubWeekMacros();
+
+        MealPlanWeekDTO week = mealPlanService.getWeekPlan(LINKED_ID, start);
+
         MealPlanEntryDTO dto = week.getDays().get(0).getMealsByType().get("dinner").get(0);
-        assertThat(dto.getEaten()).isTrue();
-        assertThat(dto.getEatenAt()).isEqualTo(Instant.parse("2026-10-12T12:12:04Z"));
+        assertThat(dto.getEaten()).isFalse();
+        assertThat(dto.getEatenAt()).isNull();
+        verify(mealPlanEntryEatenRepository, never()).findByUserIdAndMealPlanEntryIdIn(eq(OWNER_ID), any());
+    }
+
+    @Test
+    void getRecipeAssignments_carriesTheCallersTicks() {
+        LocalDate start = LocalDate.of(2026, 10, 12);
+        when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user));
+        MealPlanEntry assigned = entryWithId(10L, recipeWithId(82L), start);
+        when(mealPlanEntryRepository.findByUserIdAndRecipeIdAndDateRange(USER_ID, 82L, start, start.plusDays(7)))
+                .thenReturn(List.of(assigned));
+        when(mealPlanEntryEatenRepository.findByUserIdAndMealPlanEntryIdIn(USER_ID, List.of(10L)))
+                .thenReturn(List.of(tick(10L, USER_ID, LocalDateTime.of(2026, 10, 12, 8, 0))));
+        when(macroCalculationService.calculatePerServingMacros(any())).thenReturn(new int[]{0, 0, 0});
+
+        List<MealPlanEntryDTO> dtos = mealPlanService.getRecipeAssignments(USER_ID, 82L, start);
+
+        assertThat(dtos).hasSize(1);
+        assertThat(dtos.get(0).getEaten()).isTrue();
+        assertThat(dtos.get(0).getEatenAt()).isEqualTo(Instant.parse("2026-10-12T08:00:00Z"));
     }
 }

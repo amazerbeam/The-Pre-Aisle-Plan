@@ -41,3 +41,23 @@ export const PET_GUEST_TAB_LABEL = 'Pet'
 export const PET_GUEST_MESSAGE = 'Sign in to meet your pet!'
 
 export const PET_CLOCK_TICK_MS = 60_000
+
+// MPP-17: where Pip is in his room, by the viewer's own meal times (AC 2). Retune here.
+export const PIP_POSITIONS = {
+  RUG: 'rug',
+  COOKER: 'cooker',
+  BED: 'bed'
+}
+
+export const PIP_COOKER_WINDOW_MIN = 30 // at the cooker from 30 min before to 30 min after each meal time
+export const PIP_BED_AFTER_DINNER_MIN = 180 // asleep from dinner time + 3 h…
+export const PIP_WAKE_BEFORE_BREAKFAST_MIN = 60 // …until breakfast time − 1 h
+
+// A face, not a mood: never add it to PET_MOODS / PET_MOOD_LABELS (mood logic is unchanged).
+export const PET_SLEEP_FACE = 'sleep'
+
+// Room aria-label wording; the rug falls back to the mood label.
+export const PIP_POSITION_LABELS = {
+  cooker: 'at the cooker',
+  bed: 'asleep in bed'
+}
