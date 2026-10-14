@@ -1,7 +1,14 @@
 package com.foodbytes.service;
 
+import com.foodbytes.dto.HabitStatusDTO;
+import com.foodbytes.dto.PetAwardsDTO;
 import com.foodbytes.dto.PetDTO;
+import com.foodbytes.dto.PetGrowthDTO;
+import com.foodbytes.dto.PetRoomDTO;
+import com.foodbytes.dto.WardrobeDTO;
 import com.foodbytes.model.User;
+
+import java.util.List;
 
 /**
  * MPP-14: the single backend owner of the pet's default name and name rule. The
@@ -31,11 +38,18 @@ public final class PetPolicy {
         return trimmed.isEmpty() ? null : trimmed;
     }
 
-    public static PetDTO toDTO(User user) {
+    public static PetDTO toDTO(User user, PetGrowthDTO growth, WardrobeDTO wardrobe, long sprinkles,
+                               PetRoomDTO room, List<HabitStatusDTO> habits, PetAwardsDTO awards) {
         String saved = user.getPetName();
         return new PetDTO(
                 saved != null ? saved : DEFAULT_NAME,
                 saved != null,
-                MealTimesPolicy.effective(user));
+                MealTimesPolicy.effective(user),
+                growth,
+                wardrobe,
+                sprinkles,
+                room,
+                habits,
+                awards);
     }
 }

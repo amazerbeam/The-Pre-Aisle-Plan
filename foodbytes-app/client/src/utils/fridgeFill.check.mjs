@@ -4,7 +4,7 @@
 // (AC 1, 2, 4, 5) are pinned here. Mirrors cookServe.check.mjs.
 import assert from 'node:assert/strict'
 import {
-  fridgeBand, fridgeBubble, fridgeFill, fridgeGaugeColour, fridgeMeterText, fridgeNote, fridgeWindow, planCoversRange
+  fridgeBand, fridgeBubble, fridgeFill, fridgeGaugeColour, fridgeMeterText, fridgeNote, fridgeWindow, needsPetDays, petPlanRange, planCoversRange
 } from './fridgeFill.js'
 import { FRIDGE_EMPTY_METER, FRIDGE_GAUGE_COLOURS, FRIDGE_LOW_BUBBLE, FRIDGE_NOTES } from '../constants/petRoom.js'
 
@@ -109,5 +109,13 @@ assert.equal(planCoversRange({ days: [{ date: '2026-10-05' }] }, RANGE), false)
 assert.equal(planCoversRange({ days: [{ date: RANGE.start }] }, RANGE), true)
 assert.equal(planCoversRange({ startDate: RANGE.start, days: [] }, RANGE), true)
 assert.equal(planCoversRange(null, RANGE), false)
+
+// MPP-28: one plan read covers yesterday + the fridge week; none when the calendar already does.
+assert.deepEqual(petPlanRange(RANGE, '2026-10-13'), { start: '2026-10-12', days: 7 })
+assert.deepEqual(petPlanRange(RANGE, '2026-10-12'), { start: '2026-10-12', days: 7 })
+assert.deepEqual(petPlanRange(RANGE, '2026-10-11'), { start: '2026-10-11', days: 8 })
+assert.equal(needsPetDays(true, RANGE, '2026-10-13'), false)
+assert.equal(needsPetDays(true, RANGE, '2026-10-11'), true)
+assert.equal(needsPetDays(false, RANGE, '2026-10-13'), true)
 
 console.log('fridgeFill: all checks passed')

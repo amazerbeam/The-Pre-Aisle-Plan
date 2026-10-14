@@ -70,6 +70,15 @@ public class User {
     @Column(name = "pet_name", length = 12)
     private String petName;
 
+    /**
+     * MPP-31: when this user's Pip first reached Basilisk (90 points). NULL = not yet. Set once by
+     * UserRepository#markPetFullyGrown and never cleared, so Basilisk is permanent (AC 3).
+     * updatable = false: the JPQL bulk update bypasses the entity path and still writes, while an
+     * entity flush (e.g. a concurrent rename holding a stale User) can never overwrite it with NULL.
+     */
+    @Column(name = "pet_fully_grown_at", updatable = false)
+    private LocalDateTime petFullyGrownAt;
+
     @Column(name = "meal_plan_owner_id")
     private Long mealPlanOwnerId;
 

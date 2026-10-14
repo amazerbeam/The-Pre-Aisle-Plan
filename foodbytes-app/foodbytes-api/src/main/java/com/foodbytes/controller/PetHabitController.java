@@ -1,6 +1,7 @@
 package com.foodbytes.controller;
 
 import com.foodbytes.dto.HabitAnswerRequest;
+import com.foodbytes.dto.HabitFirstAnswerRequest;
 import com.foodbytes.model.Habit;
 import com.foodbytes.security.UserPrincipal;
 import com.foodbytes.service.HabitStreakService;
@@ -15,7 +16,7 @@ import java.util.Map;
 
 /**
  * MPP-20: the caller's own snack-free / alcohol-free check-in streaks (see HabitStreakService).
- * Read by Pip's speech bubble (MPP-21).
+ * Read by Pip's speech bubble (MPP-21); the one-time first answer is MPP-35.
  */
 @RestController
 @RequestMapping("/api/pet/habits")
@@ -42,6 +43,22 @@ public class PetHabitController {
         }
         try {
             return ResponseEntity.ok(habitStreakService.answer(userPrincipal.getId(), habit, request));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    /** MPP-35: the one-time "When did you last…?" answer; 400 once the habit has been answered. */
+    @PostMapping("/{habit}/first-answer")
+    public ResponseEntity<?> firstAnswer(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @PathVariable Habit habit,
+            @RequestBody HabitFirstAnswerRequest request) {
+        if (userPrincipal == null) {
+            return ResponseEntity.status(401).body(Map.of("error", "Not authenticated"));
+        }
+        try {
+            return ResponseEntity.ok(habitStreakService.firstAnswer(userPrincipal.getId(), habit, request));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }

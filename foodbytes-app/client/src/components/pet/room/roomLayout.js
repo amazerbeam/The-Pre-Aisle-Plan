@@ -1,5 +1,6 @@
 import { PET_MOODS, PET_SLEEP_FACE, PIP_POSITIONS } from '../../../constants/pet.js'
-import { DEFAULT_ROOM_LEVELS, ROOM_MAX_LEVEL, ROOM_MIN_LEVEL, ROOM_STATIONS } from '../../../constants/petRoom.js'
+import { DEFAULT_ROOM_LEVELS, ROOM_MAX_LEVEL, ROOM_MIN_LEVEL, ROOM_STATIONS, ROOM_VIEWBOX_SIZE } from '../../../constants/petRoom.js'
+import { DECOR_SPOT_SHAPES } from '../../../constants/petDecor.js'
 import { P } from './iso.js'
 
 /**
@@ -55,6 +56,60 @@ export const FRIDGE_GAUGE_HALF_HEIGHT = 7 // the gauge track's top edge is 7 px 
 // shelves float on the wall from h 30). Hand-copied from furniture.jsx; keep the two in step (MPP-26).
 export const CABINET_FOOTPRINT = [[0, 26, 24, 78, 0, 48], [0, 30, 22, 72, 30, 88], [0, 30, 26, 66, 0, 112], [0, 26, 30, 74, 0, 134]]
 
+// MPP-26: the outer box of FURNITURE.cooker / .bed [level - 1] as [u, v, du, dv, h0, h1], for the
+// shop's next-level thumbnails. Hand-copied from furniture.jsx; keep them in step with the art.
+export const COOKER_FOOTPRINT = [[96, 0, 44, 30, 0, 46], [58, 0, 84, 38, 0, 70], [70, 0, 70, 38, 0, 80], [48, 0, 94, 40, 0, 180]]
+export const BED_FOOTPRINT = [[10, 122, 74, 52, 0, 11], [4, 122, 80, 52, 0, 36], [0, 120, 91, 56, 0, 64], [0, 118, 91, 60, 0, 127]]
+const THUMB_PAD = 6
+
+const THUMB_FOOTPRINTS = {
+  [ROOM_STATIONS.BED]: BED_FOOTPRINT,
+  [ROOM_STATIONS.COOKER]: COOKER_FOOTPRINT,
+  [ROOM_STATIONS.CABINET]: CABINET_FOOTPRINT,
+  [ROOM_STATIONS.FRIDGE]: FRIDGE_FOOTPRINT.map(([u, v, du, dv, h]) => [u, v, du, dv, 0, h])
+}
+
+/**
+ * MPP-26 AC 3: a square viewBox (viewBox px) around one station at one level, so the shop can draw
+ * stationArt() as a thumbnail. An invalid level falls back to level 1.
+ * @returns {{ x: number, y: number, width: number, height: number }}
+ */
+export function stationThumbBox(station, level) {
+  const index = resolveRoomLevels({ [station]: level })[station] - 1
+  return squareAround(boundsOf(boxCorners(...THUMB_FOOTPRINTS[station][index])), THUMB_PAD)
+}
+
+// MPP-27: the spot buttons reach this far past the art's volume (mockup spotButtons pad).
+const DECOR_SPOT_PAD = 4
+
+/**
+ * MPP-27 AC 3: one decor spot's button box (viewBox px) — the spot's whole art volume plus a pad.
+ * CSS keeps it at least 44 px however small the card gets.
+ * @returns {{ x: number, y: number, width: number, height: number }}
+ */
+export function decorSpotHitBox(spot) {
+  const { x, y, width, height } = boundsOf(boxCorners(...DECOR_SPOT_SHAPES[spot].volume))
+  return { x: x - DECOR_SPOT_PAD, y: y - DECOR_SPOT_PAD, width: width + 2 * DECOR_SPOT_PAD, height: height + 2 * DECOR_SPOT_PAD }
+}
+
+/** MPP-27: a square viewBox around a spot's art volume, so the picker and the shop can draw decorArt() as a thumbnail. */
+export function decorThumbBox(spot) {
+  return squareAround(boundsOf(boxCorners(...DECOR_SPOT_SHAPES[spot].volume)), THUMB_PAD)
+}
+
+/** MPP-19 / MPP-27: a viewBox box → the % position of a button laid over the scene. */
+export function hitBoxStyle(box) {
+  const { width, height } = ROOM_VIEWBOX_SIZE
+  return {
+    left: percentOf(box.x, width),
+    top: percentOf(box.y, height),
+    width: percentOf(box.width, width),
+    height: percentOf(box.height, height)
+  }
+}
+
+const percentOf = (value, total) => `${((100 * value) / total).toFixed(2)}%`
+
 /** Any levels input → a full { bed, fridge, cooker, cabinet } of whole numbers in 1..4. */
 export function resolveRoomLevels(levels) {
   const resolved = {}
@@ -103,6 +158,12 @@ function boundsOf(points, extraYs = []) {
   const x = Math.min(...xs)
   const y = Math.min(...ys)
   return { x, y, width: Math.max(...xs) - x, height: Math.max(...ys) - y }
+}
+
+// The smallest square, centred on the box, that holds it plus pad on every side.
+function squareAround({ x, y, width, height }, pad) {
+  const side = Math.max(width, height) + 2 * pad
+  return { x: x + width / 2 - side / 2, y: y + height / 2 - side / 2, width: side, height: side }
 }
 
 /**

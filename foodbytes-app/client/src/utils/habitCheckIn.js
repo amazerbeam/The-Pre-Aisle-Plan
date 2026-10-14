@@ -1,6 +1,9 @@
 import {
+  CHECKIN_STEPS,
   CHECKIN_THANKS,
   CHECKIN_WEEKDAY_SPAN_DAYS,
+  FIRST_ANSWER_DAYS_BACK,
+  HABIT_FIRST_QUESTION,
   HABIT_FREE_LABEL,
   HABIT_ORDER,
   HABIT_QUESTION_NOUN
@@ -61,4 +64,25 @@ export function isSnoozedToday(snoozedOnISO, todayISO) {
   return snoozedOnISO != null && snoozedOnISO === todayISO
 }
 
-const dayCount = (n) => `${n} day${n === 1 ? '' : 's'}`
+/** MPP-35: a habit the person has never answered gets the one-time "When did you last…?" question. */
+export function isFirstAnswer(status) {
+  return status?.lastAnsweredDate == null
+}
+
+/** MPP-35: the earliest date the one-time question accepts — todayISO minus 30 days (UTC arithmetic). */
+export function firstAnswerEarliestISO(todayISO) {
+  const [y, m, d] = todayISO.split('-').map(Number)
+  return new Date(Date.UTC(y, m - 1, d - FIRST_ANSWER_DAYS_BACK)).toISOString().slice(0, 10)
+}
+
+/** MPP-35: "When did you last have a snack?" / "When did you last have a drink?" */
+export function firstQuestionText(habit) {
+  return HABIT_FIRST_QUESTION[habit]
+}
+
+/** The opening step for a habit: the one-time question if never answered, else the daily one. */
+export function stepFor(habit, status) {
+  return { kind: isFirstAnswer(status) ? CHECKIN_STEPS.FIRST : CHECKIN_STEPS.ASK, habit }
+}
+
+const dayCount =(n) => `${n} day${n === 1 ? '' : 's'}`

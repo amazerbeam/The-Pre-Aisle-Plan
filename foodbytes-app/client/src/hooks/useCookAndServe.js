@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react'
 import { cookServeSchedule, shouldServe } from '../utils/cookServe'
 import { readLastSeenEatenAt, writeLastSeenEatenAt } from '../utils/pipSeenStore'
-
-const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)'
+import { prefersReducedMotion } from '../utils/reducedMotion'
 
 /**
  * MPP-18: Pip's cook-and-serve scene on /pet. When the viewer's latest eaten
@@ -40,8 +39,5 @@ export function useCookAndServe({ userId, lastLoggedAt, lastLoggedType }) {
 
   return run ? { phase: run.steps[run.index].phase, mealType: run.mealType } : null
 }
-
-// AC 5: read once per scene; the CSS also stops movement on its own.
-const prefersReducedMotion = () => window.matchMedia?.(REDUCED_MOTION_QUERY).matches === true
 
 export default useCookAndServe

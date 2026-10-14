@@ -1,0 +1,314 @@
+/* MPP-32: the Dress Pip sheet (mpp-32-wardrobe-phone-mockup.html .sheet …). Full screen on a
+   phone, a centred 480 px column on wider screens; scrolls inside, never the page. */
+
+.pip-wardrobe {
+  position: fixed;
+  inset: 0;
+  z-index: 200; /* above the fixed footer (z-index 100) */
+  max-width: 480px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  color: #2c3e50;
+  box-shadow: 0 0 40px rgba(30, 40, 20, 0.25);
+  animation: pip-wardrobe-up var(--pip-sheet-in) var(--pip-sheet-ease);
+}
+
+.pip-wardrobe:focus { outline: none; }
+
+@keyframes pip-wardrobe-up {
+  from { transform: translateY(100%); }
+  to { transform: none; }
+}
+
+.pip-wardrobe-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-bottom: 1px solid #e3e9dc;
+}
+
+.pip-wardrobe-head h3 {
+  flex: 1;
+  margin: 0;
+  font-size: 1.05rem;
+  color: #4a3f80;
+  text-align: center;
+}
+
+.pip-wardrobe-icon-btn,
+.pip-wardrobe-text-btn,
+.pip-wardrobe-tab,
+.pip-wardrobe-item,
+.pip-wardrobe-lineup summary {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+}
+
+.pip-wardrobe-icon-btn {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  font-size: 1.3rem;
+}
+
+.pip-wardrobe-text-btn {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 6px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: #4a3f80;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.pip-wardrobe-text-btn:disabled { color: #9aa0a6; cursor: default; }
+
+.pip-wardrobe-preview {
+  flex: none;
+  height: 228px;
+  position: relative;
+  background: radial-gradient(circle at 50% 70%, #f6fbef, #e3efd6);
+}
+
+.pip-wardrobe-preview .pip-herb {
+  display: block;
+  width: 100%;
+  height: calc(100% - 24px);
+}
+
+.pip-wardrobe-caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 6px;
+  margin: 0;
+  text-align: center;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #2f4a22;
+}
+
+.pip-wardrobe-error {
+  margin: 8px 12px 0;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: #fdecea;
+  color: #8a1c12;
+  font-size: 0.84rem;
+}
+
+.pip-wardrobe-tabs {
+  flex: none;
+  display: flex;
+  gap: 6px;
+  padding: 10px 12px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  border-bottom: 1px solid #e3e9dc;
+}
+
+.pip-wardrobe-tabs::-webkit-scrollbar { display: none; }
+
+.pip-wardrobe-tab {
+  position: relative;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid #e3e9dc;
+  border-radius: 999px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+.pip-wardrobe-tab.is-selected { background: #4a3f80; border-color: #4a3f80; color: #fff; }
+.pip-wardrobe-tab-worn { width: 7px; height: 7px; border-radius: 50%; background: #5fae3e; }
+.pip-wardrobe-tab.is-selected .pip-wardrobe-tab-worn { background: #c8eea2; }
+
+.pip-wardrobe-tab-new {
+  position: absolute;
+  top: -3px;
+  right: -2px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #e8574a;
+  border: 2px solid #fff;
+}
+
+.pip-wardrobe-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 12px;
+}
+
+.pip-wardrobe-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pip-wardrobe-item {
+  position: relative;
+  width: 100%;
+  min-height: 44px;
+  padding: 4px 4px 8px;
+  border: 2px solid #e3e9dc;
+  border-radius: 14px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  text-align: center;
+}
+
+.pip-wardrobe-item .pip-herb {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 10px;
+  background: #f6fbef;
+}
+
+.pip-wardrobe-item.is-worn { border-color: #4a3f80; box-shadow: 0 0 0 2px rgba(74, 63, 128, 0.15); }
+
+.pip-wardrobe-item.is-worn::before {
+  content: "✓";
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #4a3f80;
+  color: #fff;
+  font-size: 0.72rem;
+}
+
+.pip-wardrobe-item.is-locked .pip-herb { filter: grayscale(1) opacity(0.45); }
+.pip-wardrobe-item.is-locked .pip-wardrobe-item-label { color: #6c757d; }
+
+.pip-wardrobe-item-label {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.pip-wardrobe-lock {
+  position: absolute;
+  top: 34%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.3rem;
+}
+
+.pip-wardrobe-new {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: #e8574a;
+  color: #fff;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.pip-wardrobe-lock-note {
+  margin: 12px 0 0;
+  padding: 9px 12px;
+  border: 1px solid #f0d78a;
+  border-radius: 12px;
+  background: #fff7e0;
+  font-size: 0.84rem;
+}
+
+.pip-wardrobe-lock-note b { display: block; }
+
+.pip-wardrobe-lineup {
+  flex: none;
+  border-top: 1px solid #e3e9dc;
+  background: #fbfdf8;
+}
+
+.pip-wardrobe-lineup summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 46px;
+  padding: 0 16px;
+  list-style: none;
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: #2f4a22;
+}
+
+.pip-wardrobe-lineup summary::-webkit-details-marker { display: none; }
+.pip-wardrobe-lineup summary::after { content: "▴"; color: #6c757d; }
+.pip-wardrobe-lineup[open] summary::after { content: "▾"; }
+
+.pip-wardrobe-forms {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 4px;
+  margin: 0;
+  padding: 0 8px 10px;
+  list-style: none;
+}
+
+.pip-wardrobe-form { text-align: center; font-size: 0.62rem; color: #6c757d; }
+.pip-wardrobe-form.is-current { color: #2f4a22; font-weight: 700; }
+.pip-wardrobe-form .pip-herb { display: block; width: 100%; height: auto; aspect-ratio: 1; }
+.pip-wardrobe-form.is-unreached .pip-herb { filter: brightness(0) opacity(0.18); }
+
+.pip-wardrobe-icon-btn:focus-visible,
+.pip-wardrobe-text-btn:focus-visible,
+.pip-wardrobe-tab:focus-visible,
+.pip-wardrobe-item:focus-visible,
+.pip-wardrobe-lineup summary:focus-visible {
+  outline: 3px solid var(--pip-focus-ring);
+  outline-offset: 2px;
+}
+
+.pip-wardrobe-item:active,
+.pip-wardrobe-tab:active,
+.pip-wardrobe-lineup summary:active { filter: brightness(0.94); }
+
+.pip-wardrobe-icon-btn:active,
+.pip-wardrobe-text-btn:not(:disabled):active { background: #ece5fb; }
+
+@media (hover: hover) {
+  .pip-wardrobe-item:hover,
+  .pip-wardrobe-tab:hover,
+  .pip-wardrobe-lineup summary:hover { filter: brightness(0.97); }
+
+  .pip-wardrobe-icon-btn:hover,
+  .pip-wardrobe-text-btn:not(:disabled):hover { background: #f6f3ff; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pip-wardrobe { animation: none; }
+}

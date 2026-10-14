@@ -51,6 +51,35 @@ public final class HabitStreakPolicy {
         }
     }
 
+    /** MPP-35: how far back the one-time "when did you last…?" answer may reach, and the most clean days it logs. */
+    public static final int FIRST_ANSWER_DAYS = 30;
+
+    /** MPP-35: the earliest last-lapse date the one-time question accepts (today - 30). */
+    public static LocalDate firstAnswerEarliest(LocalDate today) {
+        return today.minusDays(FIRST_ANSWER_DAYS);
+    }
+
+    /** MPP-35: a one-time last-lapse date must fall in firstAnswerEarliest..today. */
+    public static void requireFirstAnswerInWindow(LocalDate lastDate, LocalDate today) {
+        if (lastDate.isAfter(today)) {
+            throw new IllegalArgumentException("lastDate cannot be in the future");
+        }
+        LocalDate earliest = firstAnswerEarliest(today);
+        if (lastDate.isBefore(earliest)) {
+            throw new IllegalArgumentException("lastDate must be on or after " + earliest);
+        }
+    }
+
+    /**
+     * MPP-35: first day the one-time answer logs. Days are logged only in the 30-day window
+     * today-29..today, so the floor date (today-30, "30 days or longer") logs 30 clean days and no
+     * lapse row, and the run stays inside one award ladder cycle (AwardLadder.CYCLE).
+     */
+    public static LocalDate firstAnswerLogFrom(LocalDate lastDate, LocalDate today) {
+        LocalDate windowStart = today.minusDays(FIRST_ANSWER_DAYS - 1);
+        return lastDate.isBefore(windowStart) ? windowStart : lastDate;
+    }
+
     /** Status for one habit; row is null when the caller has never answered it. */
     public static HabitStatusDTO toDTO(Habit habit, PetHabitStreak row, LocalDate today) {
         if (row == null) {

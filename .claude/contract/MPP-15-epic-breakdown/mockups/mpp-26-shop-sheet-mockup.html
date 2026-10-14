@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MPP-26 Shop Sheet Mockup</title>
+<style>
+  :root { --bg: #f6f3fb; --ink: #2e2645; --muted: #6f6789; --card: #fff; --line: #e3dcf3; --accent: #7c5cd6; --gold: #ffd34d; --ok: #3f8f4a; --warn: #b4531b; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--ink); }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 24px 16px 48px; }
+  h1 { margin: 0 0 6px; font-size: 1.45rem; }
+  .lead { margin: 0 0 18px; color: var(--muted); max-width: 780px; line-height: 1.45; }
+  .layout { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 28px; align-items: start; }
+  @media (max-width: 860px) { .layout { grid-template-columns: 1fr; } }
+
+  /* phone frame */
+  .phone { position: relative; width: 375px; max-width: 100%; height: 720px; background: var(--card); border-radius: 28px; padding: 12px; box-shadow: 0 6px 24px rgba(60,40,120,.12); overflow: hidden; transition: width .2s; }
+  .roomwrap { position: relative; border-radius: 20px; overflow: hidden; }
+  .roomwrap svg { display: block; width: 100%; height: auto; }
+  .bubble { position: absolute; top: 10px; right: 10px; background: #fff; border-radius: 12px; padding: 7px 10px; font-size: .8rem; font-weight: 500; box-shadow: 0 2px 8px rgba(0,0,0,.1); max-width: 200px; line-height: 1.3; }
+  .counter { position: absolute; top: 10px; left: 10px; background: rgba(255,255,255,.9); border-radius: 999px; padding: 4px 10px; font-size: .78rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .strip { display: flex; justify-content: center; gap: 8px; margin: 10px 0; flex-wrap: wrap; }
+  .pill { min-height: 44px; padding: 0 14px; border: 1px solid #ddd6ee; border-radius: 999px; background: #fff; font: inherit; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+  .pill:focus-visible, .btn:focus-visible, .x:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+  .levelbar { height: 10px; border-radius: 999px; background: #e7f2df; margin: 8px 6px 0; overflow: hidden; }
+  .levelbar i { display: block; height: 100%; width: 58%; background: #6bbf59; }
+  .meta { font-size: .8rem; color: var(--muted); text-align: center; margin-top: 6px; }
+
+  /* shop sheet (same shell as the MPP-32 Dress Pip sheet) */
+  .sheet { position: absolute; inset: 0; background: #fff; display: flex; flex-direction: column; transform: translateY(100%); transition: transform .32s cubic-bezier(.2,.8,.2,1); border-radius: 28px; }
+  .sheet.open { transform: none; }
+  @media (prefers-reduced-motion: reduce) { .sheet { transition: none; } }
+  .head { display: flex; align-items: center; gap: 8px; padding: 10px 10px 8px; border-bottom: 1px solid var(--line); }
+  .head h3 { flex: 1; margin: 0; text-align: center; color: #4a3f80; font-size: 1.05rem; }
+  .x { width: 44px; height: 44px; border: 0; border-radius: 999px; background: none; font-size: 1.3rem; cursor: pointer; }
+  .bal { min-width: 44px; padding: 6px 10px; border-radius: 999px; background: #fff7d6; font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .bal.bump { animation: bump .4s; }
+  @keyframes bump { 50% { transform: scale(1.15); } }
+  .body { flex: 1; overflow-y: auto; padding: 10px 12px 16px; }
+  .intro { margin: 0 0 10px; font-size: .82rem; color: var(--muted); line-height: 1.4; }
+  .status { margin: 0 0 10px; padding: 8px 10px; border-radius: 10px; font-size: .82rem; font-weight: 600; }
+  .status.ok { background: #e8f6e8; color: var(--ok); }
+  .status.err { background: #fdecea; color: #a4281d; }
+
+  .card { display: grid; grid-template-columns: 84px minmax(0, 1fr); gap: 10px; padding: 10px; border: 1px solid var(--line); border-radius: 14px; margin-bottom: 10px; background: #fcfbff; }
+  .thumb { width: 84px; height: 84px; border-radius: 10px; background: linear-gradient(#ece5fb, #d6c9f0); display: grid; place-items: center; position: relative; }
+  .thumb svg { width: 76px; height: 76px; }
+  .thumb .tag { position: absolute; bottom: 3px; left: 3px; background: rgba(46,38,69,.8); color: #fff; font-size: .6rem; font-weight: 700; border-radius: 6px; padding: 1px 5px; }
+  .card h4 { margin: 0; font-size: .95rem; display: flex; align-items: center; gap: 6px; }
+  .dots { display: inline-flex; gap: 3px; margin-left: auto; }
+  .dots b { width: 9px; height: 9px; border-radius: 50%; background: #ddd6ee; }
+  .dots b.on { background: var(--accent); }
+  .now { margin: 2px 0 6px; font-size: .78rem; color: var(--muted); }
+  .next { margin: 0 0 8px; font-size: .82rem; }
+  .row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .btn { min-height: 44px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--accent); background: var(--accent); color: #fff; font: inherit; font-weight: 700; cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+  .btn:active { filter: brightness(.92); }
+  @media (hover: hover) { .btn:hover { filter: brightness(.96); } }
+  .btn.confirm { background: var(--gold); border-color: #e0b52c; color: #3f2716; }
+  .btn[disabled] { background: #eee9f7; border-color: #ddd6ee; color: #8d86a3; cursor: default; filter: none; }
+  .btn.busy { opacity: .7; }
+  .short { font-size: .76rem; color: var(--warn); font-weight: 600; }
+  .max { font-size: .82rem; font-weight: 700; color: var(--ok); }
+  .foot { margin: 6px 0 0; font-size: .72rem; color: var(--muted); line-height: 1.4; }
+
+  /* controls */
+  .ctl { background: var(--card); border-radius: 16px; padding: 14px 16px; margin-bottom: 14px; box-shadow: 0 2px 10px rgba(60,40,120,.06); }
+  .ctl .label { font-weight: 700; font-size: .85rem; margin-bottom: 8px; }
+  .ctl p { margin: 6px 0 0; font-size: .82rem; color: var(--muted); line-height: 1.45; }
+  .seg { display: flex; gap: 6px; flex-wrap: wrap; }
+  .seg button { border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 6px 12px; font: inherit; font-size: .82rem; cursor: pointer; }
+  .seg button.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+  input[type=range] { width: 100%; }
+  table { border-collapse: collapse; width: 100%; font-size: .8rem; }
+  td, th { border-bottom: 1px solid var(--line); padding: 5px 4px; text-align: left; }
+  .q { background: #fff7d6; border-radius: 12px; padding: 10px 12px; font-size: .82rem; line-height: 1.45; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>MPP-26 · Shop: upgrade Pip's stations</h1>
+  <p class="lead">Interactive mockup for review before any UI code. Open the shop from the strip under the room, upgrade a station, and watch the room change. Upgrades are tapped twice (the first tap turns the button into a confirm), the balance is the MPP-25 sprinkles balance, and each person has their own room. Nothing here is saved.</p>
+
+  <div class="layout">
+    <div class="phone" id="phone">
+      <div class="roomwrap">
+        <div id="room"></div>
+        <span class="counter" id="counter" aria-label="sprinkles"></span>
+        <div class="bubble" id="bubble">Morning! ☀️</div>
+      </div>
+      <div class="levelbar"><i></i></div>
+      <div class="meta">Sprig · 58% to Bushling</div>
+      <div class="strip">
+        <button class="pill" type="button" id="openShop" aria-haspopup="dialog">🛍 Shop</button>
+        <button class="pill" type="button">👕 Wardrobe</button>
+      </div>
+
+      <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="shopTitle">
+        <div class="head">
+          <button class="x" type="button" id="closeShop" aria-label="Close the shop">✕</button>
+          <h3 id="shopTitle">Shop</h3>
+          <span class="bal" id="bal" aria-live="polite"></span>
+        </div>
+        <div class="body">
+          <p class="intro">Spend sprinkles to upgrade Pip's room. Upgrades are yours forever.</p>
+          <div id="status" role="status"></div>
+          <div id="cards"></div>
+          <p class="foot">Earn sprinkles by logging meals on time, cooking homemade and planning full weeks. Prices: level 2 ✨300 · level 3 ✨600 · level 4 ✨1200.</p>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="ctl"><div class="label">Sprinkles balance</div>
+        <input type="range" id="balRange" min="0" max="4000" step="5" value="735">
+        <p>Drag to see the affordable, short and maxed states. A perfect week earns about 300–400 (MPP-25).</p></div>
+      <div class="ctl"><div class="label">Phone width</div>
+        <div class="seg" id="widths"><button data-w="320">320</button><button data-w="375" class="on">375</button><button data-w="414">414</button></div></div>
+      <div class="ctl"><div class="label">Server reply on the next upgrade</div>
+        <div class="seg" id="replies"><button data-r="ok" class="on">200 OK</button><button data-r="short">409 not enough</button><button data-r="fail">Network error</button></div>
+        <p>409 happens when another device spent the sprinkles first. The sheet shows the server's message and refreshes the balance; nothing is lost.</p></div>
+      <div class="ctl"><div class="label">Reset</div><div class="seg"><button id="reset">All stations back to level 1</button></div></div>
+      <div class="ctl"><div class="label">Station path (art from mockup v5)</div>
+        <table><tr><th>Station</th><th>L1</th><th>L2 ✨300</th><th>L3 ✨600</th><th>L4 ✨1200</th></tr>
+          <tr><td>Bed</td><td>Blanket on the floor</td><td>Camp cot</td><td>Wooden bed</td><td>Canopy bed</td></tr>
+          <tr><td>Fridge</td><td>Cool box</td><td>Mini fridge</td><td>Full fridge</td><td>Double-door</td></tr>
+          <tr><td>Cooker</td><td>Camping stove</td><td>Counter + hob</td><td>Range cooker</td><td>Chef's kitchen</td></tr>
+          <tr><td>Cabinet</td><td>Planks on bricks</td><td>Wall shelves</td><td>Wooden cabinet</td><td>Glass display</td></tr></table>
+        <p>All four stations to level 4 = ✨8,400, roughly 6 months of near-perfect weeks.</p></div>
+      <div class="ctl q"><b>For review:</b> (1) two-tap confirm vs. instant buy; (2) shop opened only from the strip button (not by tapping furniture, which already opens the fridge and cabinet); (3) MPP-27 will add "Decor" and "Walls &amp; floors" tabs to this same sheet.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const OUT = '#3b2f5c';
+const st = `stroke="${OUT}" stroke-width="2"`;
+/* ---------- isometric engine (copied from pip-room-mockup-v5.html) ---------- */
+const ISO_N = Math.hypot(180, 70), IC = 180 / ISO_N, IS = 70 / ISO_N;
+const P = (u, v, h = 0) => [180 - u * IC + v * IC, 180 + (u + v) * IS - h];
+const pts = a => a.map(p => p.map(n => n.toFixed(1)).join(',')).join(' ');
+const EDGE = `stroke="${OUT}" stroke-width="1.6" stroke-linejoin="round"`;
+const poly = (a, fill, extra = '') => `<polygon points="${pts(a)}" fill="${fill}" ${EDGE} ${extra}/>`;
+const line = (a, w = 1.6, col = OUT) => `<polyline points="${pts(a)}" fill="none" stroke="${col}" stroke-width="${w}" stroke-linecap="round"/>`;
+function shade(hex, pct) {
+  const n = parseInt(hex.slice(1), 16), f = pct / 100;
+  const ch = s => { const c = (n >> s) & 255; return Math.round(f > 0 ? c + (255 - c) * f : c * (1 + f)); };
+  return `rgb(${ch(16)},${ch(8)},${ch(0)})`;
+}
+function box(u, v, du, dv, h0, h1, col, extra = '') {
+  const U = u + du, V = v + dv;
+  return poly([P(U, v, h0), P(U, V, h0), P(U, V, h1), P(U, v, h1)], shade(col, -6), extra)
+    + poly([P(u, V, h0), P(U, V, h0), P(U, V, h1), P(u, V, h1)], shade(col, -20), extra)
+    + poly([P(u, v, h1), P(U, v, h1), P(U, V, h1), P(u, V, h1)], shade(col, 14), extra);
+}
+const rectV = (vp, u0, u1, h0, h1, fill, extra = '') => poly([P(u0, vp, h0), P(u1, vp, h0), P(u1, vp, h1), P(u0, vp, h1)], fill, extra);
+const rectU = (up, v0, v1, h0, h1, fill, extra = '') => poly([P(up, v0, h0), P(up, v1, h0), P(up, v1, h1), P(up, v0, h1)], fill, extra);
+function ellH(cu, cv, h, ru, rv, fill, extra = '') {
+  const a = []; for (let i = 0; i < 24; i++) { const t = i / 24 * Math.PI * 2; a.push(P(cu + ru * Math.cos(t), cv + rv * Math.sin(t), h)); }
+  return poly(a, fill, extra);
+}
+function cyl(cu, cv, r, h0, h1, col) {
+  const side = []; for (let i = 0; i <= 12; i++) { const t = -Math.PI / 4 + i / 12 * Math.PI; side.push(P(cu + r * Math.cos(t), cv + r * Math.sin(t), h0)); }
+  for (let i = 12; i >= 0; i--) { const t = -Math.PI / 4 + i / 12 * Math.PI; side.push(P(cu + r * Math.cos(t), cv + r * Math.sin(t), h1)); }
+  return poly(side, shade(col, -12)) + ellH(cu, cv, h1, r, r, shade(col, 12));
+}
+const bill = (u, v, h, svg) => { const [x, y] = P(u, v, h); return `<g transform="translate(${x.toFixed(1)},${y.toFixed(1)})">${svg}</g>`; };
+function trophy(x, y, s) {
+  return `<g transform="translate(${x},${y}) scale(${s})"><rect x="6" y="-6" width="20" height="6" fill="#8a5a2b" stroke="${OUT}" stroke-width="2"/>
+    <rect x="13" y="-14" width="6" height="8" fill="#ffc83d" stroke="${OUT}" stroke-width="2"/>
+    <path d="M4 -34 h24 q0 20 -12 20 q-12 0 -12 -20z" fill="#ffd34d" stroke="${OUT}" stroke-width="2"/></g>`;
+}
+function ribbon(x, y, s) {
+  return `<g transform="translate(${x},${y}) scale(${s})"><path d="M8 -10 l-4 14 l6 -3 l4 5 l2 -16 M20 -10 l4 14 l-6 -3 l-4 5 l-2 -16" fill="#e63946" stroke="${OUT}" stroke-width="2"/>
+    <circle cx="14" cy="-18" r="10" fill="#4dabf7" stroke="${OUT}" stroke-width="2"/><circle cx="14" cy="-18" r="5" fill="#ffd34d"/></g>`;
+}
+const trophyAt = (u, v, h, s = .6) => bill(u, v, h, trophy(-16 * s, 0, s));
+const ribbonAt = (u, v, h, s = .6) => bill(u, v, h, ribbon(-14 * s, 0, s));
+
+const FRIDGE = [
+  () => { const u = 146; return box(u, 0, 40, 28, 0, 24, '#5fb3e8') + box(u - 1, -1, 42, 30, 24, 31, '#ffffff') + box(u + 13, 10, 14, 8, 31, 34, '#ffffff'); },
+  () => { const u = 146; return box(u, 0, 40, 34, 0, 58, '#eef0f6') + rectV(34, u + 4, u + 7, 24, 48, '#b9bdc8') + rectV(34, u + 22, u + 32, 38, 46, '#ff8fab'); },
+  () => { const u = 140; return box(u, 0, 46, 38, 0, 112, '#f4f6fb') + line([P(u, 38, 76), P(u + 46, 38, 76)])
+    + rectV(38, u + 4, u + 7, 82, 104, '#b9bdc8') + rectV(38, u + 4, u + 7, 40, 68, '#b9bdc8') + rectV(38, u + 22, u + 34, 50, 62, '#ffd34d'); },
+  () => { const u = 124; return box(u, 0, 64, 40, 0, 120, '#d5dde8') + line([P(u + 32, 40, 0), P(u + 32, 40, 120)])
+    + rectV(40, u + 27, u + 30, 52, 92, '#8f9aa6') + rectV(40, u + 34, u + 37, 52, 92, '#8f9aa6')
+    + rectV(40, u + 42, u + 58, 70, 94, '#5d6d7e') + rectV(40, u + 6, u + 18, 84, 100, '#ffffff') + rectV(40, u + 8, u + 14, 104, 110, '#ff8fab'); },
+];
+const STOVE = [
+  () => box(96, 0, 44, 30, 0, 26, '#c9965f') + line([P(96, 30, 13), P(140, 30, 13)], 1.4, '#8a5a2b')
+      + box(106, 6, 24, 18, 26, 31, '#777777') + bill(118, 15, 33, '<path d="M-5 0 q5 -12 10 0z" fill="#ff9d3c"/>') + cyl(118, 15, 9, 33, 46, '#6c7a89'),
+  () => box(60, 0, 80, 36, 0, 50, '#f3e3c3') + rectV(36, 64, 98, 6, 44, 'none') + rectV(36, 102, 136, 6, 44, 'none')
+      + box(58, 0, 84, 38, 50, 55, '#d8c09a') + ellH(118, 19, 55, 10, 9, '#444444') + cyl(80, 19, 11, 55, 70, '#e76f51'),
+  () => box(70, 0, 70, 38, 0, 62, '#f6f7fb') + rectV(38, 78, 132, 10, 44, '#4b5563')
+      + [76, 90, 112, 126].map(u => bill(u, 38, 53, `<circle r="2.6" fill="#999" stroke="${OUT}" stroke-width="1"/>`)).join('')
+      + ellH(122, 12, 62, 7, 6, '#444444') + ellH(122, 28, 62, 7, 6, '#444444') + cyl(92, 20, 13, 62, 80, '#e76f51'),
+  () => box(84, 0, 26, 14, 136, 180, '#b0bec5') + box(70, 0, 54, 32, 124, 136, '#b0bec5')
+      + [76, 84, 112, 118].map((u, i) => line([P(u, 1, 118), P(u, 1, 104 - i * 3)], 2)).join('') + line([P(64, 1, 118), P(130, 1, 118)], 2)
+      + box(50, 0, 90, 38, 0, 58, '#2f3e46') + rectV(38, 70, 120, 10, 44, 'rgba(255,183,3,.45)')
+      + box(48, 0, 94, 40, 58, 63, '#cfd8dc') + cyl(90, 20, 13, 63, 82, '#e76f51')
+      + box(124, 8, 10, 10, 63, 72, '#a1887f') + bill(129, 13, 72, `<circle cy="-7" r="8" fill="#7cb342" stroke="${OUT}" stroke-width="1.4"/>`),
+];
+const CABINET = [
+  () => box(0, 30, 22, 14, 0, 18, '#c0563b') + box(0, 86, 22, 14, 0, 18, '#c0563b') + box(0, 26, 24, 78, 18, 24, '#c9965f')
+      + box(0, 30, 22, 14, 24, 42, '#c0563b') + box(0, 86, 22, 14, 24, 42, '#c0563b') + trophyAt(12, 64, 24, .55) + box(0, 26, 24, 78, 42, 48, '#c9965f'),
+  () => box(0, 38, 14, 3, 30, 40, '#7a5a3a') + box(0, 92, 14, 3, 30, 40, '#7a5a3a') + box(0, 30, 22, 72, 40, 46, '#b98a5a')
+      + trophyAt(10, 46, 46, .55) + ribbonAt(10, 80, 46, .55)
+      + box(0, 38, 14, 3, 72, 82, '#7a5a3a') + box(0, 92, 14, 3, 72, 82, '#7a5a3a') + box(0, 30, 22, 72, 82, 88, '#b98a5a') + trophyAt(10, 64, 88, .65),
+  () => box(0, 30, 26, 66, 0, 112, '#9c6b3f') + rectU(26, 36, 90, 8, 104, '#f3e2c4')
+      + line([P(26, 36, 40), P(26, 90, 40)]) + line([P(26, 36, 72), P(26, 90, 72)])
+      + trophyAt(27, 50, 72, .55) + trophyAt(27, 76, 72, .55) + ribbonAt(27, 50, 40, .55) + ribbonAt(27, 76, 40, .55) + trophyAt(27, 63, 8, .6),
+  () => box(0, 28, 28, 70, 0, 128, '#5b3a22') + box(0, 26, 30, 74, 128, 134, '#d4a017') + rectU(28, 34, 92, 8, 120, '#fff5d6')
+      + line([P(28, 34, 46), P(28, 92, 46)], 2.4, '#d4a017') + line([P(28, 34, 84), P(28, 92, 84)], 2.4, '#d4a017')
+      + trophyAt(29, 46, 84, .55) + trophyAt(29, 78, 84, .62) + ribbonAt(29, 46, 46, .55) + ribbonAt(29, 78, 46, .55)
+      + trophyAt(29, 46, 8, .55) + trophyAt(29, 78, 8, .55) + rectU(28, 34, 92, 8, 120, 'rgba(189,224,254,.28)'),
+];
+const BED = [
+  () => box(10, 122, 74, 52, 0, 5, '#9ec5e8') + box(12, 132, 16, 32, 5, 11, '#ffffff'),
+  () => [[6, 124], [6, 170], [80, 124]].map(([u, v]) => box(u, v, 3, 3, 0, 22, '#7a6a4f')).join('')
+      + box(4, 122, 80, 52, 22, 30, '#8fb38a') + box(8, 132, 16, 32, 30, 36, '#ffffff') + box(80, 170, 3, 3, 0, 22, '#7a6a4f'),
+  () => box(0, 120, 6, 56, 0, 64, '#b98a5a') + box(6, 120, 80, 56, 0, 18, '#9c7048') + box(8, 122, 76, 52, 18, 28, '#ffffff')
+      + box(10, 132, 16, 32, 28, 35, '#ffffff') + box(32, 121, 54, 54, 28, 32, '#f2a7bd') + box(86, 120, 5, 56, 0, 34, '#b98a5a'),
+  () => box(0, 120, 5, 5, 0, 122, '#8a5a8c') + box(0, 171, 5, 5, 0, 122, '#8a5a8c') + box(0, 124, 6, 48, 0, 82, '#a974b0')
+      + box(6, 120, 80, 56, 0, 18, '#8a5a8c') + box(8, 122, 76, 52, 18, 28, '#ffffff') + box(10, 132, 16, 32, 28, 36, '#ffffff')
+      + box(32, 121, 54, 54, 28, 32, '#c9a6f7') + box(86, 124, 5, 48, 0, 36, '#a974b0')
+      + box(86, 120, 5, 5, 0, 122, '#8a5a8c') + box(86, 171, 5, 5, 0, 122, '#8a5a8c') + box(0, 118, 91, 60, 122, 127, '#e9dcff'),
+];
+const ART = { bed: BED, fridge: FRIDGE, cooker: STOVE, cabinet: CABINET };
+
+/* ---------- shop data (mirrors the planned STATION_UPGRADE_COSTS / STATION_LEVEL_NAMES constants) ---------- */
+const STATIONS = [
+  { key: 'bed', label: 'Bed', icon: '🛏' },
+  { key: 'fridge', label: 'Fridge', icon: '🧊' },
+  { key: 'cooker', label: 'Cooker', icon: '🍳' },
+  { key: 'cabinet', label: 'Trophy cabinet', icon: '🏆' },
+];
+const LEVEL_NAMES = {
+  bed: ['Blanket on the floor', 'Camp cot', 'Wooden bed', 'Canopy bed'],
+  fridge: ['Cool box', 'Mini fridge', 'Full fridge', 'Double-door fridge'],
+  cooker: ['Camping stove', 'Counter and hob', 'Range cooker', "Chef's kitchen"],
+  cabinet: ['Planks on bricks', 'Wall shelves', 'Wooden cabinet', 'Glass display cabinet'],
+};
+const COST = { 2: 300, 3: 600, 4: 1200 };
+const MAX = 4;
+const CONFIRM_MS = 4000;
+const BUBBLES = { bed: 'A comfier bed! 😴✨', fridge: 'Look at my new fridge! 🧊✨', cooker: 'New cooker, let\'s cook! 🍳✨', cabinet: 'More room for trophies! 🏆✨' };
+
+const S = { balance: 735, levels: { bed: 1, fridge: 2, cooker: 1, cabinet: 1 }, confirming: null, busy: null, status: null, reply: 'ok' };
+let confirmTimer = null;
+
+function roomSvg() {
+  const L = S.levels;
+  return `<svg viewBox="0 0 360 330" role="img" aria-label="Pip's room">
+    <polygon points="${pts([P(193, 0, 180), P(0, 0, 180), P(0, 0, 0), P(193, 0, 0)])}" fill="#ece5fb"/>
+    <polygon points="${pts([P(0, 0, 180), P(0, 193, 180), P(0, 193, 0), P(0, 0, 0)])}" fill="#e3daf8"/>
+    <polygon points="${pts([P(0, 0), P(193, 0), P(193, 193), P(0, 193)])}" fill="#d6c9f0"/>
+    <polyline points="${pts([P(193, 0), P(0, 0), P(0, 193)])}" stroke="#c4b4e6" stroke-width="3" fill="none"/>
+    ${rectU(0, 94, 162, 104, 164, '#ffffff')}${rectU(0, 98, 158, 108, 160, '#cfe8ff', 'stroke="none"')}
+    ${ellH(100, 85, 0, 58, 44, '#f6c6d6', 'stroke="#e79ab5" stroke-width="3"')}
+    ${STOVE[L.cooker - 1]()}${FRIDGE[L.fridge - 1]()}${CABINET[L.cabinet - 1]()}${BED[L.bed - 1]()}
+    ${bill(100, 85, 0, `<ellipse cx="0" cy="0" rx="14" ry="4" fill="rgba(40,20,80,.13)"/><path d="M0 0 C-2 -14 2 -22 0 -30" stroke="#4e8a3a" stroke-width="3" fill="none"/>
+      <ellipse cx="-9" cy="-30" rx="10" ry="6" transform="rotate(-25 -9 -30)" fill="#7cc35a" stroke="${OUT}" stroke-width="1.6"/>
+      <ellipse cx="9" cy="-34" rx="10" ry="6" transform="rotate(25 9 -34)" fill="#8ed36a" stroke="${OUT}" stroke-width="1.6"/>
+      <circle cx="-4" cy="-31" r="1.4" fill="${OUT}"/><circle cx="4" cy="-33" r="1.4" fill="${OUT}"/>`)}
+  </svg>`;
+}
+
+function thumb(station, level) {
+  return `<svg viewBox="0 0 360 330" data-crop="1" aria-hidden="true"><g>${ART[station][level - 1]()}</g></svg>`;
+}
+function cropThumbs() {
+  document.querySelectorAll('svg[data-crop]').forEach(svg => {
+    const b = svg.querySelector('g').getBBox(), pad = 6, side = Math.max(b.width, b.height) + pad * 2;
+    svg.setAttribute('viewBox', `${(b.x + b.width / 2 - side / 2).toFixed(1)} ${(b.y + b.height / 2 - side / 2).toFixed(1)} ${side.toFixed(1)} ${side.toFixed(1)}`);
+  });
+}
+
+function card(s) {
+  const level = S.levels[s.key], maxed = level >= MAX, next = level + 1, cost = COST[next];
+  const dots = [1, 2, 3, 4].map(n => `<b class="${n <= level ? 'on' : ''}"></b>`).join('');
+  let action;
+  if (maxed) action = `<span class="max">✓ Max level</span>`;
+  else if (S.balance < cost) action = `<button class="btn" type="button" disabled>✨ ${cost}</button><span class="short">Need ✨ ${cost - S.balance} more</span>`;
+  else if (S.busy === s.key) action = `<button class="btn busy" type="button" disabled aria-busy="true">Upgrading…</button>`;
+  else if (S.confirming === s.key) action = `<button class="btn confirm" type="button" data-buy="${s.key}" aria-label="Confirm: upgrade ${s.label} to level ${next} for ${cost} sprinkles">Confirm ✨ ${cost}</button>`;
+  else action = `<button class="btn" type="button" data-arm="${s.key}" aria-label="Upgrade ${s.label} to level ${next} for ${cost} sprinkles">Upgrade · ✨ ${cost}</button>`;
+  return `<div class="card">
+    <div class="thumb">${thumb(s.key, maxed ? level : next)}<span class="tag">${maxed ? 'L' + level : 'L' + next}</span></div>
+    <div><h4><span aria-hidden="true">${s.icon}</span>${s.label}<span class="dots" aria-label="Level ${level} of 4">${dots}</span></h4>
+      <p class="now">Now: ${LEVEL_NAMES[s.key][level - 1]}</p>
+      ${maxed ? '<p class="next">Fully upgraded.</p>' : `<p class="next">Next: <b>${LEVEL_NAMES[s.key][next - 1]}</b></p>`}
+      <div class="row">${action}</div></div></div>`;
+}
+
+function render() {
+  document.getElementById('room').innerHTML = roomSvg();
+  document.getElementById('counter').textContent = `✨ ${S.balance}`;
+  const bal = document.getElementById('bal');
+  bal.textContent = `✨ ${S.balance}`; bal.setAttribute('aria-label', `${S.balance} sprinkles`);
+  document.getElementById('cards').innerHTML = STATIONS.map(card).join('');
+  const st = document.getElementById('status');
+  st.innerHTML = S.status ? `<p class="status ${S.status.kind}">${S.status.text}</p>` : '';
+  document.getElementById('balRange').value = S.balance;
+  cropThumbs();
+}
+
+document.getElementById('cards').addEventListener('click', e => {
+  const arm = e.target.closest('[data-arm]'), buy = e.target.closest('[data-buy]');
+  if (arm) {
+    S.confirming = arm.dataset.arm; S.status = null; clearTimeout(confirmTimer);
+    confirmTimer = setTimeout(() => { S.confirming = null; render(); }, CONFIRM_MS);
+    render(); document.querySelector('[data-buy]')?.focus();
+  } else if (buy) {
+    const key = buy.dataset.buy; clearTimeout(confirmTimer); S.confirming = null; S.busy = key; render();
+    setTimeout(() => {
+      S.busy = null;
+      const next = S.levels[key] + 1, cost = COST[next], label = STATIONS.find(s => s.key === key).label;
+      if (S.reply === 'ok') {
+        S.balance -= cost; S.levels[key] = next;
+        S.status = { kind: 'ok', text: `${label} upgraded to level ${next}: ${LEVEL_NAMES[key][next - 1]}!` };
+        document.getElementById('bubble').textContent = BUBBLES[key];
+        document.getElementById('bal').classList.add('bump'); setTimeout(() => document.getElementById('bal').classList.remove('bump'), 400);
+      } else if (S.reply === 'short') {
+        S.balance = Math.max(0, cost - 40);
+        S.status = { kind: 'err', text: `Not enough sprinkles: you have ${S.balance}, this costs ${cost}.` };
+      } else {
+        S.status = { kind: 'err', text: "Couldn't upgrade. Check your connection and try again. No sprinkles were spent." };
+      }
+      render();
+    }, 600);
+  }
+});
+
+const sheet = document.getElementById('sheet');
+document.getElementById('openShop').addEventListener('click', () => { S.status = null; sheet.classList.add('open'); render(); document.getElementById('closeShop').focus(); });
+document.getElementById('closeShop').addEventListener('click', () => { sheet.classList.remove('open'); S.confirming = null; document.getElementById('openShop').focus(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && sheet.classList.contains('open')) document.getElementById('closeShop').click(); });
+document.getElementById('balRange').addEventListener('input', e => { S.balance = Number(e.target.value); S.confirming = null; render(); });
+document.getElementById('widths').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  document.querySelectorAll('#widths button').forEach(x => x.classList.toggle('on', x === b));
+  document.getElementById('phone').style.width = b.dataset.w + 'px';
+});
+document.getElementById('replies').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  document.querySelectorAll('#replies button').forEach(x => x.classList.toggle('on', x === b));
+  S.reply = b.dataset.r;
+});
+document.getElementById('reset').addEventListener('click', () => { S.levels = { bed: 1, fridge: 1, cooker: 1, cabinet: 1 }; S.status = null; render(); });
+render();
+</script>
+</body>
+</html>

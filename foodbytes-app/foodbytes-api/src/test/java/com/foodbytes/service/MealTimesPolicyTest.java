@@ -48,4 +48,16 @@ class MealTimesPolicyTest {
         assertThat(MealTimesPolicy.isStrictlyOrdered(noon, nine, six)).isFalse();
         assertThat(MealTimesPolicy.isStrictlyOrdered(nine, six, noon)).isFalse();
     }
+
+    @Test
+    void byTime_usesSavedTimeOrDefault_andIsEmptyForNonMainMeals() {
+        User user = new User();
+        user.setLunchBy(LocalTime.of(13, 30));
+
+        assertThat(MealTimesPolicy.byTime(user, "breakfast")).contains(MealTimesPolicy.DEFAULT_BREAKFAST_BY);
+        assertThat(MealTimesPolicy.byTime(user, "lunch")).contains(LocalTime.of(13, 30));
+        assertThat(MealTimesPolicy.byTime(user, "dinner")).contains(MealTimesPolicy.DEFAULT_DINNER_BY);
+        assertThat(MealTimesPolicy.byTime(user, "snacks")).isEmpty();
+        assertThat(MealTimesPolicy.byTime(user, "extras")).isEmpty();
+    }
 }

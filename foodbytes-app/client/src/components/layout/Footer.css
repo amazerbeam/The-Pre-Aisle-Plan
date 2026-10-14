@@ -85,8 +85,8 @@
   height: 24px;
 }
 
-/* MPP-14: the Pet tab's mini Mochi face is a little larger than the line icons. */
-.footer-btn svg.mochi-pet--mini {
+/* MPP-14: the Pet tab's mini herb is a little larger than the line icons. */
+.footer-btn svg.pip-herb--mini {
   width: 30px;
   height: 30px;
   margin: -3px 0;

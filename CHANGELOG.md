@@ -2,6 +2,16 @@
 
 One line per ticket, newest first: `<version> — <ticket key>: <summary>`. Bump rules and how
 to check what is deployed: `CLAUDE.md` → Versioning & deploy verification.
+1.24.1 — MPP-29: cook scene's walk back now lasts its 0.5 s phase, so Pip is on the rug when the scene ends (no 200 ms overrun past 3 s)
+1.24.0 — MPP-29: Pip's room polish: visible focus rings and full hover/pressed states on every room control, cook scene retuned to 3 s with a pinned 3 s animation limit, one overlay entrance timing
+1.23.0 — MPP-28: Pip's room loads in one pet read (habits + cabinet in /api/pet, ≤1 meal-plan read) and Pip's bubble follows one priority order
+1.22.0 — MPP-35: carry old eaten ticks over at go-live; Pip asks once when you last had a snack / a drink (30-day cap)
+1.21.0 — MPP-27: Decor for Pip's room — 12 items for three fixed spots, paid wall and floor styles, and ✏️ Edit room to place, swap or clear them
+1.20.0 — MPP-26: Shop — spend sprinkles to upgrade Pip's bed, fridge, cooker and trophy cabinet
+1.19.0 — MPP-25: Sprinkles — a per-person, consistency-only currency (ledger, earning rules, balance on /api/pet, room counter)
+1.18.0 — MPP-32: Pip's wardrobe — 20 clothes unlocked by awards, firsts and evolutions, a tap-to-save Dress Pip screen, and outfits that fit every herb form
+1.17.0 — MPP-34: Marking a meal as eaten takes you straight to Pip
+1.16.0 — MPP-31: Pip evolves through five herb forms on a +3/−3 daily score, with a level bar, wilt and evolve / de-evolve animations
 1.15.0 — MPP-23: Trophy cabinet — tap the cabinet for plan / snack / alcohol shelves (now · best · next, ×N awards) and the firsts list; Pip's bubble announces newly earned awards
 1.14.0 — MPP-24: Pip "firsts" — template, shopping list, full week and homemade-extra firsts recorded per person, backfilled, and returned from GET /api/pet/awards
 1.13.0 — MPP-22: Plan streak + repeating milestone ladder — per-person plan streak, award ledger and GET /api/pet/awards

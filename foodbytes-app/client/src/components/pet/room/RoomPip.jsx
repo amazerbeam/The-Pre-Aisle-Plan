@@ -1,36 +1,26 @@
-import { useId } from 'react'
-import { MochiBody, MochiFace, MochiGradient, MochiProps } from '../mochiParts'
+import { PIP_DEFAULT_FORM } from '../../../constants/pipGrowth'
+import { HERB_FOOT_X, HERB_FOOT_Y } from '../herb/herbForms'
+import PipHerbFigure from '../herb/PipHerbFigure'
 import { P } from './iso'
-import '../MochiPet.css'
+import '../herb/PipHerb.css'
 
-// Pip is drawn in MochiPet's 200-unit space with his feet at (100, 188); the mockup's
-// pipFace() maps that point onto the pose's anchor.
-const FOOT_X = 100
-const FOOT_Y = 188
+const DEFAULT_HERB = { form: PIP_DEFAULT_FORM, wilted: false, phase: null, outfit: null }
 
 /**
- * MPP-16 AC 5 / MPP-17: Pip at a pose from roomLayout.pipPose — on the rug in his mood,
- * happy at the cooker, or asleep in bed. The mochi-mood-* class drives the idle
- * animation; the sleep face has no rule in MochiPet.css, so he lies still.
+ * MPP-16 AC 5 / MPP-17 / MPP-31: Pip at a pose from roomLayout.pipPose — on the rug in his
+ * mood, happy at the cooker, or asleep in bed — drawn as his current herb form. `herb`
+ * ({ form, wilted, phase }) comes from usePipGrowth. Every form has feet on HERB_FOOT_Y, so
+ * the pose anchors (cooker walk, bed) are unchanged.
+ * MPP-32: `herb.outfit` dresses him (PetView passes the wardrobe's outfit).
  */
-function RoomPip({ pose }) {
-  // useId keeps the gradient id unique if MochiPet is also on screen.
-  const gradientId = `room-pip-fill-${useId().replace(/:/g, '')}`
+function RoomPip({ pose, herb = DEFAULT_HERB }) {
   const { face, showProps, anchor, scale, dropPx } = pose
   const [x, y] = P(...anchor)
-  const transform = `translate(${(x - FOOT_X * scale).toFixed(1)},${(y + dropPx - FOOT_Y * scale).toFixed(1)}) scale(${scale})`
+  const transform = `translate(${(x - HERB_FOOT_X * scale).toFixed(1)},${(y + dropPx - HERB_FOOT_Y * scale).toFixed(1)}) scale(${scale})`
 
   return (
-    <g transform={transform} className={`mochi-mood-${face}`}>
-      <defs>
-        <MochiGradient id={gradientId} />
-      </defs>
-      <ellipse cx="100" cy="190" rx="66" ry="8" fill="rgba(40,20,80,.13)" />
-      <g className="mochi-anim">
-        <MochiBody fill={`url(#${gradientId})`} />
-        <MochiFace mood={face} />
-      </g>
-      {showProps && <MochiProps mood={face} />}
+    <g transform={transform}>
+      <PipHerbFigure form={herb.form} mood={face} wilted={herb.wilted} phase={herb.phase} showProps={showProps} outfit={herb.outfit} />
     </g>
   )
 }

@@ -1,10 +1,12 @@
 package com.foodbytes.service;
 
 import com.foodbytes.dto.HabitAnswerRequest;
+import com.foodbytes.dto.HabitFirstAnswerRequest;
 import com.foodbytes.dto.HabitStatusDTO;
 import com.foodbytes.model.Habit;
 import com.foodbytes.model.PetHabitDay;
 import com.foodbytes.model.PetHabitStreak;
+import com.foodbytes.model.StreakType;
 import com.foodbytes.repository.PetHabitDayRepository;
 import com.foodbytes.repository.PetHabitStreakRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,6 +22,8 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -198,5 +202,110 @@ class HabitStreakServiceTest {
         assertThat(habits).containsExactly(
                 new HabitStatusDTO(Habit.SNACK, 4, 4, d(12), true, TODAY),
                 new HabitStatusDTO(Habit.ALCOHOL, 13, 20, TODAY, false, TODAY.plusDays(1)));
+    }
+
+    private static HabitFirstAnswerRequest lastOn(LocalDate day) {
+        return new HabitFirstAnswerRequest(day);
+    }
+
+    @Test
+    void firstAnswer_cantRemember_startsTheStreakToday() {
+        PetHabitStreak row = stubRow(null, 0, null);
+
+        HabitStatusDTO dto = service.firstAnswer(USER_ID, Habit.SNACK, lastOn(null));
+
+        verify(streakRepository).ensureRow(USER_ID, "SNACK");
+        assertThat(savedDays()).extracting(PetHabitDay::getDay, PetHabitDay::getClean)
+                .containsExactly(tuple(TODAY, true));
+        assertThat(row.getStreakStart()).isEqualTo(TODAY);
+        assertThat(dto).isEqualTo(new HabitStatusDTO(Habit.SNACK, 1, 1, TODAY, false, TODAY.plusDays(1)));
+        verify(streakRepository).save(row);
+    }
+
+    @Test
+    void firstAnswer_today_logsTodayAsTheLapse() {
+        PetHabitStreak row = stubRow(null, 0, null);
+
+        HabitStatusDTO dto = service.firstAnswer(USER_ID, Habit.SNACK, lastOn(TODAY));
+
+        assertThat(savedDays()).extracting(PetHabitDay::getDay, PetHabitDay::getClean)
+                .containsExactly(tuple(TODAY, false));
+        assertThat(row.getStreakStart()).isEqualTo(TODAY.plusDays(1));
+        assertThat(dto).isEqualTo(new HabitStatusDTO(Habit.SNACK, 0, 0, TODAY, false, TODAY.plusDays(1)));
+    }
+
+    @Test
+    void firstAnswer_fiveDaysAgo_logsTheLapseThenFiveCleanDays() {
+        PetHabitStreak row = stubRow(null, 0, null);
+
+        HabitStatusDTO dto = service.firstAnswer(USER_ID, Habit.SNACK, lastOn(d(8)));
+
+        assertThat(savedDays()).extracting(PetHabitDay::getDay, PetHabitDay::getClean)
+                .containsExactly(tuple(d(8), false), tuple(d(9), true), tuple(d(10), true),
+                        tuple(d(11), true), tuple(d(12), true), tuple(d(13), true));
+        assertThat(row.getStreakStart()).isEqualTo(d(9));
+        assertThat(dto).isEqualTo(new HabitStatusDTO(Habit.SNACK, 5, 5, TODAY, false, TODAY.plusDays(1)));
+    }
+
+    @Test
+    void firstAnswer_thirtyDayFloor_capsTheRunAtThirtyCleanDaysWithNoLapseRow() {
+        PetHabitStreak row = stubRow(null, 0, null);
+
+        HabitStatusDTO dto = service.firstAnswer(USER_ID, Habit.SNACK, lastOn(TODAY.minusDays(30)));
+
+        List<PetHabitDay> days = savedDays();
+        assertThat(days).hasSize(30).allMatch(day -> Boolean.TRUE.equals(day.getClean()));
+        assertThat(days.get(0).getDay()).isEqualTo(TODAY.minusDays(29));
+        assertThat(row.getStreakStart()).isEqualTo(TODAY.minusDays(29));
+        assertThat(dto.getCurrent()).isEqualTo(30);
+        assertThat(dto.getBest()).isEqualTo(30);
+    }
+
+    @Test
+    void firstAnswer_thirtyDayFloor_earnsAtMostOneAwardLadderCycle() {
+        stubRow(null, 0, null);
+
+        service.firstAnswer(USER_ID, Habit.SNACK, lastOn(TODAY.minusDays(30)));
+
+        SortedMap<LocalDate, StreakRuns.DayOutcome> log = new TreeMap<>();
+        savedDays().forEach(day -> log.put(day.getDay(),
+                Boolean.TRUE.equals(day.getClean()) ? StreakRuns.DayOutcome.COUNTS : StreakRuns.DayOutcome.BREAKS));
+        List<AwardLadder.AwardKey> awards = StreakRuns.summarise(log).runs().stream()
+                .flatMap(run -> AwardLadder.awardsFor(StreakType.SNACK, run).stream())
+                .toList();
+        assertThat(awards).extracting(AwardLadder.AwardKey::cycleIndex).containsOnly(0);
+        assertThat(awards).extracting(AwardLadder.AwardKey::milestone).containsExactlyInAnyOrderElementsOf(AwardLadder.MILESTONES);
+    }
+
+    @Test
+    void firstAnswer_olderThanThirtyDays_isRejectedAndWritesNothing() {
+        stubRow(null, 0, null);
+
+        assertThatThrownBy(() -> service.firstAnswer(USER_ID, Habit.SNACK, lastOn(TODAY.minusDays(31))))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("lastDate must be on or after " + TODAY.minusDays(30));
+        verify(dayRepository, never()).saveAll(any());
+        verify(streakRepository, never()).save(any());
+    }
+
+    @Test
+    void firstAnswer_future_isRejected() {
+        stubRow(null, 0, null);
+
+        assertThatThrownBy(() -> service.firstAnswer(USER_ID, Habit.SNACK, lastOn(TODAY.plusDays(1))))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("lastDate cannot be in the future");
+        verify(dayRepository, never()).saveAll(any());
+    }
+
+    @Test
+    void firstAnswer_onceAnswered_isRefused() {
+        stubRow(d(10), 3, d(12));
+
+        assertThatThrownBy(() -> service.firstAnswer(USER_ID, Habit.SNACK, lastOn(null)))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("SNACK has already been answered");
+        verify(dayRepository, never()).saveAll(any());
+        verify(streakRepository, never()).save(any());
     }
 }

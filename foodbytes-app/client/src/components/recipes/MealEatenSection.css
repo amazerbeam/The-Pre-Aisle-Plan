@@ -108,3 +108,10 @@
   color: var(--error, #dc3545);
   font-weight: 600;
 }
+
+/* MPP-34 AC 2: the hand-off beat stays, but nothing animates under reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .eaten-btn {
+    transition: none;
+  }
+}

@@ -13,6 +13,7 @@
   overscroll-behavior: contain;
   background: linear-gradient(#5b3a22, #3f2716);
   color: #fff7e8;
+  animation: pip-overlay-in var(--pip-sheet-in) var(--pip-sheet-ease);
 }
 
 .pip-cabinet-view:focus { outline: none; }
@@ -53,7 +54,7 @@
 }
 
 .pip-cabinet-btn-text:focus-visible {
-  outline: 3px solid #ffd34d;
+  outline: 3px solid var(--pip-focus-ring-on-dark);
   outline-offset: 2px;
 }
 
@@ -158,4 +159,8 @@
   justify-content: center;
   gap: 10px;
   text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pip-cabinet-view { animation: none; }
 }

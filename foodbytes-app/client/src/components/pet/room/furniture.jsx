@@ -1,4 +1,4 @@
-import { MOCHI_OUTLINE } from '../mochiParts'
+import { ROOM_INK } from '../../../constants/petRoom'
 import { P } from './iso'
 import { Bill, Box, Cyl, EllH, IsoLine, RectU, RectV } from './isoShapes'
 import { RibbonArt, TrophyArt } from './awardArt'
@@ -8,8 +8,8 @@ import { RibbonArt, TrophyArt } from './awardArt'
  * FURNITURE[station][level - 1]() returns JSX; the bed returns { back, front } so a
  * sleeping Pip (MPP-17) can be drawn between the layers.
  */
-const ART_STROKE = { stroke: MOCHI_OUTLINE, strokeWidth: 2 }
-const KNOB_STROKE = { stroke: MOCHI_OUTLINE, strokeWidth: 1.4 }
+const ART_STROKE = { stroke: ROOM_INK, strokeWidth: 2 }
+const KNOB_STROKE = { stroke: ROOM_INK, strokeWidth: 1.4 }
 
 export const FURNITURE = {
   fridge: [
@@ -80,7 +80,7 @@ export const FURNITURE = {
         <Box u={70} v={0} du={70} dv={38} h0={0} h1={62} color="#f6f7fb" />
         <RectV vp={38} u0={78} u1={132} h0={10} h1={44} fill="#4b5563" />
         {[76, 90, 112, 126].map(u => (
-          <Bill key={u} u={u} v={38} h={53}><circle r="2.6" fill="#999" stroke={MOCHI_OUTLINE} strokeWidth="1" /></Bill>
+          <Bill key={u} u={u} v={38} h={53}><circle r="2.6" fill="#999" stroke={ROOM_INK} strokeWidth="1" /></Bill>
         ))}
         <EllH cu={122} cv={12} h={62} ru={7} rv={6} fill="#444444" />
         <EllH cu={122} cv={28} h={62} ru={7} rv={6} fill="#444444" />

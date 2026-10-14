@@ -40,6 +40,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.within;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -583,6 +584,36 @@ class MealPlanServiceTest {
         assertThat(first.getEatenAt()).isEqualTo(Instant.parse("2026-10-12T12:12:04Z"));
         assertThat(second.getEaten()).isFalse();
         assertThat(second.getEatenAt()).isNull();
+    }
+
+    /** MPP-28: the Pet page reads yesterday + the fridge week in one request (8 days). */
+    @Test
+    void getPlan_eightDays_returnsEightDaysAndTheCallersTicks() {
+        LocalDate start = LocalDate.of(2026, 10, 11);
+        when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user));
+        MealPlanEntry lastDay = entryWithId(10L, recipeWithId(82L), start.plusDays(7));
+        when(mealPlanEntryRepository.findByUserIdAndDateRange(USER_ID, start, start.plusDays(8)))
+                .thenReturn(List.of(lastDay));
+        when(mealPlanEntryEatenRepository.findByUserIdAndMealPlanEntryIdIn(USER_ID, List.of(10L)))
+                .thenReturn(List.of(tick(10L, USER_ID, LocalDateTime.of(2026, 10, 18, 19, 0))));
+        stubWeekMacros();
+
+        MealPlanWeekDTO plan = mealPlanService.getPlan(USER_ID, start, 8);
+
+        assertThat(plan.getDays()).hasSize(8);
+        assertThat(plan.getStartDate()).isEqualTo(start);
+        assertThat(plan.getEndDate()).isEqualTo(start.plusDays(7));
+        assertThat(plan.getDays().get(7).getMealsByType().get("dinner").get(0).getEaten()).isTrue();
+    }
+
+    @Test
+    void getPlan_outsideOneToFourteenDays_isRejected() {
+        LocalDate start = LocalDate.of(2026, 10, 11);
+        assertThatThrownBy(() -> mealPlanService.getPlan(USER_ID, start, 0))
+                .isInstanceOf(IllegalArgumentException.class).hasMessage("days must be between 1 and 14");
+        assertThatThrownBy(() -> mealPlanService.getPlan(USER_ID, start, 15))
+                .isInstanceOf(IllegalArgumentException.class).hasMessage("days must be between 1 and 14");
+        verifyNoInteractions(mealPlanEntryRepository);
     }
 
     @Test

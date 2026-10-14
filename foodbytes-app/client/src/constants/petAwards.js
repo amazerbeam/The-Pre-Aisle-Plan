@@ -48,7 +48,6 @@ export const FIRST_TODO_TEXT = 'to do'
 
 export const CABINET_NOTE = "The ladder starts again after a month, so every award can be won again. ×N is how many times you've earned it."
 export const CABINET_FIRSTS_TITLE = 'Firsts — things to try'
-export const CABINET_LOAD_ERROR = "Couldn't load the trophy cabinet."
 
 // AC 5: how long each "🎉 New …" line stays in Pip's bubble. Retune here.
 export const AWARD_BUBBLE_MS = 6000

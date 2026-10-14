@@ -4,9 +4,9 @@
 --   meal_plan_entry_eaten - one row per (meal_plan_entry_id, user_id) while that person has the
 --                           meal ticked; eaten_at is the UTC wall time of their first tick.
 --
--- Purely additive and lossless for existing data: no column or row changes. Existing shared ticks
--- (meal_plan_entries.eaten / eaten_at) are deliberately NOT carried over (MPP-33 AC 1) - each person
--- ticks for themselves from now on. Live counts at planning (2026-10-13): meal_plan_entries 800 rows,
+-- Purely additive and lossless for existing data: no column or row changes. This file does not
+-- carry the existing shared ticks (meal_plan_entries.eaten / eaten_at) over; MPP-35's go-live step
+-- (order 2) copies them to each entry's plan owner straight after this table is created. Live counts at planning (2026-10-13): meal_plan_entries 800 rows,
 -- 5 with eaten = 1; 2 linked users; meal_plan_entry_eaten does not exist.
 --
 -- The old meal_plan_entries.eaten / eaten_at columns stay until a follow-up cleanup migration: the

@@ -7,9 +7,12 @@ import { P, pts, shade, boxFaces, ellipsePoints, cylinderSidePoints, ISO_C, ISO_
 import {
   ROOM_DRAW_ORDER, PIP_HOME, PIP_SCALE, PIP_COOKER_SPOT, PIP_BED_SCALE, PIP_BED_DROP, RUG, STATION_ANCHORS,
   COOK_WALK_OFFSET, cookPose, pipPose, resolveRoomLevels,
-  FRIDGE_FOOTPRINT, FRIDGE_GAUGE_LIFT, FRIDGE_GAUGE_HALF_HEIGHT, fridgeHitBox, CABINET_FOOTPRINT, cabinetHitBox
+  FRIDGE_FOOTPRINT, FRIDGE_GAUGE_LIFT, FRIDGE_GAUGE_HALF_HEIGHT, fridgeHitBox, CABINET_FOOTPRINT, cabinetHitBox,
+  stationThumbBox, COOKER_FOOTPRINT, BED_FOOTPRINT, decorSpotHitBox, decorThumbBox, hitBoxStyle
 } from './roomLayout.js'
 import { DEFAULT_ROOM_LEVELS, ROOM_MAX_LEVEL } from '../../../constants/petRoom.js'
+import { DECOR_ITEMS, DECOR_SPOTS, DECOR_SPOT_SHAPES, DEFAULT_FLOOR_STYLE, DEFAULT_WALL_STYLE, ROOM_STYLES, STYLE_SPOTS } from '../../../constants/petDecor.js'
+import { catalogueFor, decorBoughtLine, ownedFor, withPlacement } from '../../../utils/roomPlacements.js'
 
 const near = (actual, expected) =>
   actual.forEach((n, i) => assert.ok(Math.abs(n - expected[i]) < 1e-9, `[${actual}] is not [${expected}]`))
@@ -117,5 +120,71 @@ for (let level = 1; level <= ROOM_MAX_LEVEL; level++) {
 }
 assert.ok(cabinetHitBox(4).height > cabinetHitBox(1).height, 'a bigger cabinet gets a bigger button')
 assert.deepEqual(cabinetHitBox(9), cabinetHitBox(1)) // an invalid level falls back to level 1
+
+// MPP-26 AC 3: every station-level thumbnail is a non-empty square that contains the station's
+// base and top centre; a bad level falls back to level 1.
+const THUMB_SOURCES = { bed: BED_FOOTPRINT, cooker: COOKER_FOOTPRINT, cabinet: CABINET_FOOTPRINT }
+for (const station of Object.keys(DEFAULT_ROOM_LEVELS)) {
+  for (let level = 1; level <= ROOM_MAX_LEVEL; level++) {
+    const box = stationThumbBox(station, level)
+    assert.ok(box.width > 0 && Math.abs(box.width - box.height) < 1e-9, `${station} L${level} thumb is not a square`)
+    const inside = ([x, y]) => x >= box.x && x <= box.x + box.width && y >= box.y && y <= box.y + box.height
+    const fp = station === 'fridge'
+      ? [...FRIDGE_FOOTPRINT[level - 1].slice(0, 4), 0, FRIDGE_FOOTPRINT[level - 1][4]]
+      : THUMB_SOURCES[station][level - 1]
+    const [u, v, du, dv, h0, h1] = fp
+    assert.ok(inside(P(u + du / 2, v + dv / 2, h0)) && inside(P(u + du / 2, v + dv / 2, h1)), `${station} L${level} thumb misses the station`)
+  }
+  assert.deepEqual(stationThumbBox(station, 9), stationThumbBox(station, 1))
+}
+
+// MPP-27 AC 3: each decor spot's button sits inside the viewBox and covers its dashed outline and
+// "+"; the three never overlap; each thumbnail is a square around its spot.
+const spotBoxes = DECOR_SPOTS.map(spot => {
+  const box = decorSpotHitBox(spot)
+  assert.ok(box.x >= 0 && box.y >= 0 && box.x + box.width <= 360 && box.y + box.height <= 330, `${spot} box leaves the viewBox`)
+  const inside = ([x, y]) => x >= box.x && x <= box.x + box.width && y >= box.y && y <= box.y + box.height
+  const { corners, plus } = DECOR_SPOT_SHAPES[spot]
+  corners.forEach(corner => assert.ok(inside(P(...corner)), `${spot} box misses its outline`))
+  assert.ok(inside(P(...plus)), `${spot} box misses its "+"`)
+  const thumb = decorThumbBox(spot)
+  assert.ok(thumb.width > 0 && Math.abs(thumb.width - thumb.height) < 1e-9, `${spot} thumb is not a square`)
+  return box
+})
+spotBoxes.forEach((a, i) => spotBoxes.slice(i + 1).forEach(b => {
+  const apart = a.x + a.width <= b.x || b.x + b.width <= a.x || a.y + a.height <= b.y || b.y + b.height <= a.y
+  assert.ok(apart, 'two decor spot buttons overlap')
+}))
+assert.deepEqual(hitBoxStyle({ x: 36, y: 33, width: 72, height: 66 }), { left: '10.00%', top: '10.00%', width: '20.00%', height: '20.00%' })
+
+// MPP-27 AC 1: four labelled items per spot; every style is a finish with its colours; the defaults exist.
+DECOR_SPOTS.forEach(spot => assert.equal(Object.values(DECOR_ITEMS).filter(item => item.spot === spot).length, 4, `${spot} needs 4 items`))
+for (const [id, style] of Object.entries(ROOM_STYLES)) {
+  assert.ok(STYLE_SPOTS.includes(style.spot), `${id} is not a finish`)
+  assert.ok(style.spot === 'wallStyle' ? style.left && style.right : style.base, `${id} has no colours`)
+}
+assert.equal(ROOM_STYLES[DEFAULT_WALL_STYLE].spot, 'wallStyle')
+assert.equal(ROOM_STYLES[DEFAULT_FLOOR_STYLE].spot, 'floorStyle')
+
+// MPP-27: optimistic placement, the picker / shop filters and the shop's status line.
+const room = { stations: {}, placements: { leftWall: 'herb-shelf', rightWall: null, floor: null, wallStyle: 'wall-mint', floorStyle: 'floor-lilac' } }
+assert.equal(withPlacement(room, 'leftWall', null).placements.leftWall, null)
+assert.equal(withPlacement(room, 'wallStyle', null).placements.wallStyle, DEFAULT_WALL_STYLE)
+assert.equal(withPlacement(room, 'floorStyle', '').placements.floorStyle, DEFAULT_FLOOR_STYLE)
+assert.equal(withPlacement(room, 'floor', 'bean-bag').placements.floor, 'bean-bag')
+assert.equal(room.placements.floor, null) // never mutated
+const decor = [
+  { id: 'mirror', kind: 'rightWall', price: 250, owned: true },
+  { id: 'bunting', kind: 'rightWall', price: 180, owned: false },
+  { id: 'future-thing', kind: 'rightWall', price: 10, owned: true }, // unknown to this client → skipped
+  { id: 'wall-lavender', kind: 'wallStyle', price: 0, owned: true }
+]
+assert.deepEqual(catalogueFor(decor, 'rightWall').map(item => item.id), ['mirror', 'bunting'])
+assert.deepEqual(ownedFor(decor, 'rightWall').map(item => item.id), ['mirror'])
+assert.deepEqual(ownedFor(decor, 'wallStyle').map(item => item.id), ['wall-lavender'])
+assert.equal(decorBoughtLine('herb-shelf', room), 'Herb shelf bought and put on the left wall.')
+assert.equal(decorBoughtLine('bunting', room), 'Bunting bought. Swap it in with ✏️ Edit room.')
+assert.equal(decorBoughtLine('wall-mint', room), 'Mint bought and applied.')
+assert.equal(decorBoughtLine('sofa', room), null)
 
 console.log('room checks passed')

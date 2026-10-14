@@ -4,9 +4,10 @@
 // (AC 1–4) are pinned here. Mirrors fridgeFill.check.mjs. 2026-10-13 is a Tuesday.
 import assert from 'node:assert/strict'
 import {
-  daysBetweenISO, habitsToAsk, isSnoozedToday, praiseText, questionText, sinceText, startOverText
+  daysBetweenISO, firstAnswerEarliestISO, firstQuestionText, habitsToAsk, isFirstAnswer, isSnoozedToday,
+  praiseText, questionText, sinceText, startOverText, stepFor
 } from './habitCheckIn.js'
-import { CHECKIN_THANKS } from '../constants/pet.js'
+import { CHECKIN_STEPS, CHECKIN_THANKS } from '../constants/pet.js'
 
 // daysBetweenISO — across a month end and the October DST change.
 assert.equal(daysBetweenISO('2026-10-13', '2026-10-13'), 0)
@@ -45,5 +46,16 @@ assert.deepEqual(habitsToAsk(null), [])
 assert.equal(isSnoozedToday('2026-10-15', '2026-10-15'), true)
 assert.equal(isSnoozedToday('2026-10-14', '2026-10-15'), false)
 assert.equal(isSnoozedToday(null, '2026-10-15'), false)
+
+// MPP-35: the one-time question
+assert.equal(isFirstAnswer({ lastAnsweredDate: null }), true)
+assert.equal(isFirstAnswer({ lastAnsweredDate: '2026-10-12' }), false)
+assert.equal(firstAnswerEarliestISO('2026-10-14'), '2026-09-14')
+assert.equal(firstAnswerEarliestISO('2026-03-15'), '2026-02-13') // across a short month
+assert.equal(firstAnswerEarliestISO('2026-10-30'), '2026-09-30') // across the October DST change
+assert.equal(firstQuestionText('SNACK'), 'When did you last have a snack?')
+assert.equal(firstQuestionText('ALCOHOL'), 'When did you last have a drink?')
+assert.deepEqual(stepFor('SNACK', { lastAnsweredDate: null }), { kind: CHECKIN_STEPS.FIRST, habit: 'SNACK' })
+assert.deepEqual(stepFor('ALCOHOL', { lastAnsweredDate: '2026-10-13' }), { kind: CHECKIN_STEPS.ASK, habit: 'ALCOHOL' })
 
 console.log('habitCheckIn: all checks passed')

@@ -64,6 +64,10 @@ public class MealPlanService {
         return user.getMealPlanOwnerId() != null ? user.getMealPlanOwnerId() : user.getId();
     }
 
+    /** MPP-28: the longest range GET /api/meal-plan returns (the Pet page reads 8 days). */
+    public static final int MAX_PLAN_DAYS = 14;
+    private static final int WEEK_DAYS = 7;
+
     /**
      * FR-007, FR-016, FR-081, FR-082: Get 7-day meal plan starting from a given date.
      * Always returns exactly 7 days, even if some are empty.
@@ -75,8 +79,20 @@ public class MealPlanService {
      */
     @Transactional(readOnly = true)
     public MealPlanWeekDTO getWeekPlan(Long userId, LocalDate startDate) {
+        return getPlan(userId, startDate, WEEK_DAYS);
+    }
+
+    /**
+     * MPP-28: `days` days from startDate (1..MAX_PLAN_DAYS) - the shared plan's entries with the
+     * caller's own ticks, exactly as getWeekPlan. Totals and averages cover the returned days.
+     */
+    @Transactional(readOnly = true)
+    public MealPlanWeekDTO getPlan(Long userId, LocalDate startDate, int numDays) {
+        if (numDays < 1 || numDays > MAX_PLAN_DAYS) {
+            throw new IllegalArgumentException("days must be between 1 and " + MAX_PLAN_DAYS);
+        }
         Long effectiveOwnerId = getEffectiveMealPlanOwnerId(userId);
-        LocalDate endDate = startDate.plusDays(7); // Exclusive end
+        LocalDate endDate = startDate.plusDays(numDays); // Exclusive end
         LocalDate today = LocalDate.now();
 
         List<MealPlanEntry> entries = mealPlanEntryRepository
@@ -99,7 +115,7 @@ public class MealPlanService {
         List<int[]> dailyMacrosForWeek = new ArrayList<>();
         int daysWithMeals = 0;
 
-        for (int i = 0; i < 7; i++) {
+        for (int i = 0; i < numDays; i++) {
             LocalDate date = startDate.plusDays(i);
             List<MealPlanEntry> dayEntries = byDate.getOrDefault(date, List.of());
             MealPlanDayDTO dayDTO = buildDayDTO(date, dayEntries, today, choicesByEntry, eatenByEntry);
@@ -137,7 +153,7 @@ public class MealPlanService {
 
         MealPlanWeekDTO weekDTO = new MealPlanWeekDTO();
         weekDTO.setStartDate(startDate);
-        weekDTO.setEndDate(startDate.plusDays(6)); // Inclusive end for display
+        weekDTO.setEndDate(startDate.plusDays(numDays - 1)); // Inclusive end for display
         weekDTO.setDays(days);
         weekDTO.setWeekTotalCalories(weekTotalCalories);
 

@@ -5,6 +5,7 @@ import com.foodbytes.model.User;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 
 /**
  * MPP-13: the single backend owner of the meal-time defaults, format and order
@@ -52,7 +53,21 @@ public final class MealTimesPolicy {
                 custom);
     }
 
+    /** MPP-25: the person's effective "by" time for a main meal key; empty for snacks and extras. */
+    public static Optional<LocalTime> byTime(User user, String mealKey) {
+        return switch (mealKey) {
+            case "breakfast" -> Optional.of(orDefault(user.getBreakfastBy(), DEFAULT_BREAKFAST_BY));
+            case "lunch" -> Optional.of(orDefault(user.getLunchBy(), DEFAULT_LUNCH_BY));
+            case "dinner" -> Optional.of(orDefault(user.getDinnerBy(), DEFAULT_DINNER_BY));
+            default -> Optional.empty();
+        };
+    }
+
+    private static LocalTime orDefault(LocalTime saved, LocalTime fallback) {
+        return saved != null ? saved : fallback;
+    }
+
     private static String format(LocalTime saved, LocalTime fallback) {
-        return (saved != null ? saved : fallback).format(HH_MM);
+        return orDefault(saved, fallback).format(HH_MM);
     }
 }

@@ -1,6 +1,7 @@
 package com.foodbytes.service;
 
 import com.foodbytes.dto.HabitAnswerRequest;
+import com.foodbytes.dto.HabitFirstAnswerRequest;
 import com.foodbytes.dto.HabitStatusDTO;
 import com.foodbytes.model.Habit;
 import com.foodbytes.model.PetHabitDay;
@@ -77,6 +78,41 @@ public class HabitStreakService {
             LocalDate runStart = row.getStreakStart() != null ? row.getStreakStart() : from;
             raiseBest(row, HabitStreakPolicy.current(runStart, lapse.minusDays(1)));
             row.setStreakStart(lapse.plusDays(1));
+        }
+
+        row.setLastAnsweredDate(today);
+        raiseBest(row, HabitStreakPolicy.current(row.getStreakStart(), today));
+        streakRepository.save(row);
+        return HabitStreakPolicy.toDTO(habit, row, today);
+    }
+
+    /**
+     * MPP-35: the one-time "When did you last have a snack / a drink?" answer, asked instead of the
+     * daily question while the habit has never been answered. lastDate null ("Can't remember")
+     * credits today only; otherwise the lapse day (if inside the 30-day window) is logged not clean
+     * and every day after it to today clean, so the run is at most 30 days. Then the daily check-in
+     * takes over from tomorrow.
+     *
+     * @throws IllegalArgumentException when already answered, or lastDate is outside today-30..today
+     */
+    @Transactional
+    public HabitStatusDTO firstAnswer(Long userId, Habit habit, HabitFirstAnswerRequest request) {
+        LocalDate today = HabitStreakPolicy.today(clock);
+        streakRepository.ensureRow(userId, habit.name());
+        PetHabitStreak row = streakRepository.findForUpdate(userId, habit)
+                .orElseThrow(() -> new IllegalStateException("Habit row missing after ensureRow: " + habit));
+        if (row.getLastAnsweredDate() != null) {
+            throw new IllegalArgumentException(habit + " has already been answered");
+        }
+
+        LocalDate lastDate = request.getLastDate();
+        if (lastDate == null) {
+            logDays(userId, habit, today, today, null);
+            row.setStreakStart(today);
+        } else {
+            HabitStreakPolicy.requireFirstAnswerInWindow(lastDate, today);
+            logDays(userId, habit, HabitStreakPolicy.firstAnswerLogFrom(lastDate, today), today, lastDate);
+            row.setStreakStart(lastDate.plusDays(1));
         }
 
         row.setLastAnsweredDate(today);

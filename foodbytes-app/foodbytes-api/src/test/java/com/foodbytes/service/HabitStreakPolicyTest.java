@@ -89,4 +89,36 @@ class HabitStreakPolicyTest {
 
         assertThat(dto).isEqualTo(new HabitStatusDTO(Habit.ALCOHOL, 10, 12, TODAY, false, TODAY.plusDays(1)));
     }
+
+    @Test
+    void firstAnswerEarliest_isThirtyDaysBack() {
+        assertThat(HabitStreakPolicy.firstAnswerEarliest(TODAY)).isEqualTo(TODAY.minusDays(30));
+    }
+
+    @Test
+    void requireFirstAnswerInWindow_acceptsTodayAndTheThirtyDayFloor() {
+        HabitStreakPolicy.requireFirstAnswerInWindow(TODAY, TODAY);
+        HabitStreakPolicy.requireFirstAnswerInWindow(TODAY.minusDays(30), TODAY);
+    }
+
+    @Test
+    void requireFirstAnswerInWindow_rejectsFuture() {
+        assertThatThrownBy(() -> HabitStreakPolicy.requireFirstAnswerInWindow(TODAY.plusDays(1), TODAY))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("lastDate cannot be in the future");
+    }
+
+    @Test
+    void requireFirstAnswerInWindow_rejectsOlderThanThirtyDays() {
+        assertThatThrownBy(() -> HabitStreakPolicy.requireFirstAnswerInWindow(TODAY.minusDays(31), TODAY))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("lastDate must be on or after " + TODAY.minusDays(30));
+    }
+
+    @Test
+    void firstAnswerLogFrom_isTheLapseInsideTheWindow_elseTheWindowStart() {
+        assertThat(HabitStreakPolicy.firstAnswerLogFrom(TODAY.minusDays(5), TODAY)).isEqualTo(TODAY.minusDays(5));
+        assertThat(HabitStreakPolicy.firstAnswerLogFrom(TODAY.minusDays(29), TODAY)).isEqualTo(TODAY.minusDays(29));
+        assertThat(HabitStreakPolicy.firstAnswerLogFrom(TODAY.minusDays(30), TODAY)).isEqualTo(TODAY.minusDays(29));
+    }
 }

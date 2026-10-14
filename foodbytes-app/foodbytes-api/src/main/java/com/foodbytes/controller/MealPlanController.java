@@ -37,20 +37,24 @@ public class MealPlanController {
      *
      * @param userPrincipal Authenticated user (required)
      * @param startDate The "From" date (required)
-     * @return MealPlanWeekDTO with 7 days
+     * @param days MPP-28: optional, 1-14, default 7 (the Pet page asks for 8)
+     * @return MealPlanWeekDTO with `days` days
      */
     @GetMapping
     public ResponseEntity<?> getWeekPlan(
             @AuthenticationPrincipal UserPrincipal userPrincipal,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate) {
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(defaultValue = "7") int days) {
 
         if (userPrincipal == null) {
             return ResponseEntity.status(403)
                 .body(Map.of("error", "Authentication required to view meal plan"));
         }
-
-        MealPlanWeekDTO weekPlan = mealPlanService.getWeekPlan(userPrincipal.getId(), startDate);
-        return ResponseEntity.ok(weekPlan);
+        try {
+            return ResponseEntity.ok(mealPlanService.getPlan(userPrincipal.getId(), startDate, days));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
     }
 
     /**

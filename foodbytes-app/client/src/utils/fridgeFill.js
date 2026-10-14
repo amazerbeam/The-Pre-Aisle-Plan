@@ -35,6 +35,21 @@ export function planCoversRange(plan, range) {
 }
 
 /**
+ * MPP-28: the one meal-plan read PetContext makes — yesterday (mood) through the fridge week's last
+ * day. The fridge week when it already holds yesterday (7 days), else from yesterday (8 days).
+ */
+export function petPlanRange(fridgeRange, yesterdayISO) {
+  return yesterdayISO < fridgeRange.start
+    ? { start: yesterdayISO, days: WINDOW_DAYS + 1 }
+    : { start: fridgeRange.start, days: WINDOW_DAYS }
+}
+
+/** MPP-28: false when the calendar's week is the fridge week AND holds yesterday — then it covers both. */
+export function needsPetDays(calendarIsFridgeWeek, fridgeRange, yesterdayISO) {
+  return !(calendarIsFridgeWeek && fridgeRange.start <= yesterdayISO)
+}
+
+/**
  * MPP-19 AC 1: planned = breakfast/lunch/dinner ENTRIES in the range (shared plan);
  * remaining = those the viewer hasn't ticked eaten (MPP-33: `eaten` is the viewer's own).
  * filledSlots is out of 15, at least 1 while anything remains.

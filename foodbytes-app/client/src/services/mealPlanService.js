@@ -9,10 +9,12 @@ export const mealPlanService = {
    * FR-007, FR-016: Get 7-day meal plan starting from a given date
    * @param {string} startDate - ISO format date string (YYYY-MM-DD)
    * @param {{ signal?: AbortSignal }} [options] - MPP-14: PetContext cancels stale reads
-   * @returns {Promise<Object>} MealPlanWeekDTO with 7 days
+   * @param {{ signal?: AbortSignal, days?: number }} [options] - MPP-28: days (1–14) defaults to 7 server-side
+   * @returns {Promise<Object>} MealPlanWeekDTO with 7 days (or `days`)
    */
-  async getWeekPlan(startDate, { signal } = {}) {
-    const response = await api.get(`/meal-plan?startDate=${startDate}`, { signal })
+  async getWeekPlan(startDate, { signal, days } = {}) {
+    const query = days ? `startDate=${startDate}&days=${days}` : `startDate=${startDate}`
+    const response = await api.get(`/meal-plan?${query}`, { signal })
     return response.data
   },
 

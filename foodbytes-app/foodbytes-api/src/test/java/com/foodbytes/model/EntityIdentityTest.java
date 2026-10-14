@@ -134,6 +134,20 @@ class EntityIdentityTest {
         assertThat(breakfast).isEqualTo(breakfast);
     }
 
+    /** MPP-26: PetStationLevel identity is its primary key; id-less rows stay distinct. */
+    @Test
+    void petStationLevelIdentityComesFromThePrimaryKey() {
+        PetStationLevel a = new PetStationLevel(7L, 1L, RoomStation.BED, 2, null);
+        PetStationLevel sameRow = new PetStationLevel(7L, 1L, RoomStation.BED, 3, null);
+        PetStationLevel unsavedOne = new PetStationLevel();
+        PetStationLevel unsavedTwo = new PetStationLevel();
+
+        assertThat(a).isEqualTo(sameRow);
+        assertThat(a.hashCode()).isEqualTo(sameRow.hashCode());
+        assertThat(unsavedOne).isNotEqualTo(unsavedTwo);
+        assertThatCode(a::toString).doesNotThrowAnyException();
+    }
+
     @Test
     void hashCodeIsStableAcrossTheTransientToPersistentTransition() {
         Recipe recipe = new Recipe();

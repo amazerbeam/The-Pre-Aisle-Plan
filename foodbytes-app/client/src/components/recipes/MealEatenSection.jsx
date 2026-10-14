@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { useMealPlan } from '../../contexts/MealPlanContext'
+import { useAuth } from '../../contexts/AuthContext'
+import { usePet } from '../../contexts/PetContext'
 import { MEAL_TYPE_LABELS } from '../../constants/mealTypes'
 import { formatLongWeekday } from '../../utils/dateUtils'
-import { shouldShowPetReaction } from '../../utils/petMood'
-import PetReaction from '../pet/PetReaction'
+import { shouldTakeToPip } from '../../utils/cookServe'
+import useTakeToPip from '../../hooks/useTakeToPip'
 import './MealEatenSection.css'
 
 const SAVE_ERROR = "Couldn't save — try again."
@@ -14,9 +16,14 @@ const SAVE_ERROR = "Couldn't save — try again."
  * flip, the server reconcile and any rollback all show while the modal stays open (AC 3).
  * The tick is the viewer's own (MPP-33); a linked partner's tick never shows here. Once eaten, a second tap does nothing;
  * Undo is the link in the meta line (approved mockup).
+ * MPP-34: once the server confirms a counted tick (today/yesterday), the button holds "✓ Eaten"
+ * for a beat and the app moves to Pip's room, where MPP-18 cooks it. Undo cancels the move.
  */
 function MealEatenSection({ entryId }) {
   const { getEntryById, setEntryEaten } = useMealPlan()
+  const { isAuthenticated } = useAuth()
+  const { pet, todayISO, yesterdayISO, refreshPet } = usePet()
+  const takeToPip = useTakeToPip()
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState(null)
 
@@ -29,10 +36,23 @@ function MealEatenSection({ entryId }) {
 
   const save = async (next) => {
     if (saving) return
+    if (!next) takeToPip.cancel() // AC 4: Undo during the beat stays on the recipe
     setSaving(true)
     setError(null)
     try {
       await setEntryEaten(entryId, next)
+      if (next) refreshPet() // MPP-25: the tick may have paid sprinkles; un-ticking never changes them
+      // Resolved = the server confirmed (AC 1); a failure throws below and never navigates (AC 4).
+      if (next && shouldTakeToPip({
+        isAuthenticated,
+        petReady: pet != null,
+        mealType: entry.mealType,
+        planDate: entry.planDate,
+        todayISO,
+        yesterdayISO
+      })) {
+        takeToPip.schedule()
+      }
     } catch {
       // The context already rolled back and raised the toast; the toast can sit behind
       // this full-screen modal, so repeat the failure inline.
@@ -67,9 +87,6 @@ function MealEatenSection({ entryId }) {
           </>
         ) : null}
       </p>
-      {shouldShowPetReaction({ eaten, mealType: entry.mealType }) && (
-        <PetReaction mealType={entry.mealType} />
-      )}
     </section>
   )
 }

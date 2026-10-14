@@ -48,7 +48,7 @@
 
 .pip-checkin-btn:focus-visible,
 .pip-checkin-date:focus-visible {
-  outline: 3px solid #ffd34d;
+  outline: 3px solid var(--pip-focus-ring);
   outline-offset: 2px;
 }
 
@@ -77,4 +77,12 @@
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+
+/* MPP-35: the one-time question's note that the earliest day stands for "longer ago" */
+.pip-checkin-hint {
+  flex-basis: 100%;
+  margin: 0;
+  font-size: 0.8rem;
+  opacity: 0.8;
 }

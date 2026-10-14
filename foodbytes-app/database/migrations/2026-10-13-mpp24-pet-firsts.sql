@@ -15,7 +15,7 @@
 -- qualifying homemade-extra ticks. Re-running the file is a no-op (ON DUPLICATE KEY UPDATE id = id).
 --
 -- MUST be applied before the backend that maps PetFirst deploys (ddl-auto: validate).
--- MPP-15 is local-first: applied to the local foodbytes-db now; listed as order 4 in
+-- MPP-15 is local-first: applied to the local foodbytes-db now; listed as order 5 in
 -- .claude/contract/MPP-15-epic-breakdown/railway-migrations.md for Railway at merge time.
 
 CREATE TABLE IF NOT EXISTS pet_firsts (

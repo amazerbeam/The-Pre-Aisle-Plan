@@ -449,6 +449,8 @@ Hard constraints on runners:
 2. A separate task — `Skill: none — DBA operation against the live Railway MySQL` — where the **developer applies it**. This task comes *before* any task that changes the matching Java type, or the backend will refuse to start.
 3. Only then the entity / DTO / service tasks.
 
+**MPP-15 epic (local-first), until it merges to master:** in step 1, the migration must be idempotent: `CREATE TABLE IF NOT EXISTS`, `ON DUPLICATE KEY UPDATE`, or an `information_schema`-guarded `ALTER`. In a multi-table `INSERT … SELECT`, qualify the no-op as `ON DUPLICATE KEY UPDATE <table>.id = <table>.id`; a bare `id = id` is ambiguous there. Step 1 also appends a row to `.claude/contract/MPP-15-epic-breakdown/railway-migrations.md` and runs `node foodbytes-app/database/build-golive.mjs`, which regenerates the single go-live file `foodbytes-app/database/mpp15-railway-golive.sql`. Step 2 applies the migration to the local `foodbytes-db`, not to Railway. Railway gets the go-live file once, at merge. Final verification runs `node foodbytes-app/database/build-golive.mjs --check` and expects `Go-live OK`.
+
 Never plan a step that applies DDL automatically, and never plan a write query against the live database.
 
 **Other rules:**

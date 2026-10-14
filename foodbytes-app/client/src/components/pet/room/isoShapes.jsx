@@ -1,4 +1,4 @@
-import { MOCHI_OUTLINE } from '../mochiParts'
+import { ROOM_INK } from '../../../constants/petRoom'
 import {
   P,
   boxFaces,
@@ -16,13 +16,13 @@ import {
  * Extra props (stroke, strokeWidth, strokeDasharray) override the default outline,
  * exactly as the mockup's `extra` string did.
  */
-const EDGE = { stroke: MOCHI_OUTLINE, strokeWidth: 1.6, strokeLinejoin: 'round' }
+const EDGE = { stroke: ROOM_INK, strokeWidth: 1.6, strokeLinejoin: 'round' }
 
 export function Poly({ points, fill, ...rest }) {
   return <polygon points={pts(points)} fill={fill} {...EDGE} {...rest} />
 }
 
-export function IsoLine({ points, width = 1.6, color = MOCHI_OUTLINE }) {
+export function IsoLine({ points, width = 1.6, color = ROOM_INK }) {
   return <polyline points={pts(points)} fill="none" stroke={color} strokeWidth={width} strokeLinecap="round" />
 }
 

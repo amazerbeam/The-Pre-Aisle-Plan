@@ -2,7 +2,10 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { useState } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import { usePet } from '../../contexts/PetContext'
-import MochiPet from '../pet/MochiPet'
+import PipHerb from '../pet/herb/PipHerb'
+import { hatMiniViewBox, hatOnly } from '../pet/herb/wardrobeLayers'
+import { PIP_DEFAULT_FORM } from '../../constants/pipGrowth'
+import { isWilted } from '../../utils/pipGrowth'
 import { PET_GUEST_MESSAGE, PET_GUEST_TAB_LABEL } from '../../constants/pet'
 import './Footer.css'
 
@@ -11,7 +14,9 @@ function Footer() {
   const location = useLocation()
   const { isAuthenticated, isGuest } = useAuth()
   const [showMessage, setShowMessage] = useState(null)
-  const { petName, mood } = usePet()
+  const { petName, mood, growth, wardrobe } = usePet()
+  const tabForm = growth?.form ?? PIP_DEFAULT_FORM
+  const tabOutfit = hatOnly(wardrobe?.outfit) // MPP-32 AC 5: hat only — a full outfit is too busy at tab size
 
   const handleMealPlanClick = () => {
     if (!isAuthenticated) {
@@ -73,12 +78,19 @@ function Footer() {
           <span>Meal Plan</span>
         </button>
 
-        {/* MPP-14 AC 2: live mini face in the current mood; label is the pet's name. */}
+        {/* MPP-14 AC 2 / MPP-31 / MPP-32: live mini herb in the current mood and form, wearing his hat; label is the pet's name. */}
         <button
           className={`footer-btn ${location.pathname === '/pet' ? 'active' : ''}`}
           onClick={handlePetClick}
         >
-          <MochiPet mood={mood} variant="mini" />
+          <PipHerb
+            form={tabForm}
+            mood={mood}
+            wilted={isWilted(growth)}
+            variant="mini"
+            outfit={tabOutfit}
+            viewBox={tabOutfit.HAT ? hatMiniViewBox(tabForm) : null}
+          />
           <span className="footer-pet-label">{petName ?? PET_GUEST_TAB_LABEL}</span>
         </button>
 

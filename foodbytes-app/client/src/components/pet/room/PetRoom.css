@@ -38,8 +38,12 @@
 }
 
 /* MPP-18: the cook-and-serve walk (mockup v5 #pipg + .hop). The walker's inline
-   transform changes between rug (none) and cooker; the transition is the walk. */
-.pip-walker { transition: transform 1.25s ease-in-out; }
+   transform changes between rug (none) and cooker; the transition is the walk.
+   MPP-29: its duration is set inline per phase from pipWalkMs (walking out, returning back). */
+.pip-walker {
+  transition-property: transform;
+  transition-timing-function: ease-in-out;
+}
 .pip-walker.is-walking .pip-hop { animation: pip-hop 0.32s ease-in-out infinite alternate; }
 
 @keyframes pip-hop {
@@ -85,8 +89,9 @@
 }
 
 .pip-station-btn:focus-visible {
-  outline: 3px solid #ffd34d;
+  outline: 3px solid var(--pip-focus-ring);
   outline-offset: 2px;
+  box-shadow: 0 0 0 2px var(--pip-focus-halo);
 }
 
 /* Spec: the "tap the fridge" hint, bottom-left (mockup v5 .hint). Decorative for touch, so
@@ -102,4 +107,234 @@
   color: #5c5670;
   font-size: 0.72rem;
   pointer-events: none;
+}
+
+/* MPP-25: sprinkles counter — the hint's bubble style, pinned top-left (.pet-bubble owns top-right) */
+.pip-room-sprinkles {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  margin: 0;
+  padding: 5px 9px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #5c5670;
+  font-size: 0.72rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* MPP-26 / MPP-27 / MPP-32: the strip under the room — 🛍 Shop, ✏️ Edit room and 👕 Wardrobe. */
+.pip-room-actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 6px 16px 10px;
+}
+
+.pip-room-action {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.pip-room-action:active { filter: brightness(0.92); }
+
+.pip-room-action-badge {
+  position: absolute;
+  top: -4px;
+  right: -3px;
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: #e8574a;
+  color: #fff;
+  font-size: 0.62rem;
+  font-weight: 800;
+  animation: pip-badge-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes pip-badge-pulse {
+  50% { transform: scale(1.25); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pip-room-action-badge { animation: none; }
+}
+
+/* MPP-27: edit mode — the dashed spots (mockup .slot), their buttons, the bar and the style chips.
+   While editing, the bubble and the hint step aside so they can't cover the right-wall and floor spots. */
+.pip-decor-spot polygon {
+  fill: rgba(255, 255, 255, 0.35);
+  stroke: #7c5cd6;
+  stroke-width: 2;
+  stroke-dasharray: 6 4;
+}
+
+.pip-decor-spot.is-filled polygon { fill: rgba(124, 92, 214, 0.08); }
+
+.pip-decor-spot.is-selected polygon {
+  stroke: #e0a400;
+  stroke-width: 3;
+  fill: rgba(255, 211, 77, 0.25);
+}
+
+.pip-decor-spot text {
+  fill: #7c5cd6;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.pip-room-scene.is-editing .pet-bubble,
+.pip-room-scene.is-editing .pip-room-hint {
+  visibility: hidden;
+}
+
+.pip-decor-spot-btn {
+  position: absolute;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pip-decor-spot-btn:active { background: rgba(255, 211, 77, 0.25); }
+
+@media (hover: hover) {
+  .pip-decor-spot-btn:hover { background: rgba(255, 211, 77, 0.18); }
+}
+
+.pip-decor-spot-btn:focus-visible {
+  outline: 3px solid var(--pip-focus-ring);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px var(--pip-focus-halo);
+}
+
+.pip-room-editbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin: 8px 12px 0;
+  padding: 6px 6px 6px 12px;
+  border-radius: 12px;
+  background: rgba(46, 38, 69, 0.88);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.pip-room-editbar button {
+  min-height: 44px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  background: #ffd34d;
+  color: #3f2716;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pip-room-editbar button:active { filter: brightness(0.92); }
+
+@media (hover: hover) {
+  .pip-room-editbar button:hover { filter: brightness(0.96); }
+}
+
+.pip-room-editbar button:focus-visible {
+  outline: 3px solid var(--pip-focus-ring-on-dark);
+  outline-offset: 2px;
+}
+
+.pip-room-editbar-error {
+  order: 3;
+  flex-basis: 100%;
+  color: #ffd0cc;
+}
+
+.pip-room-action.is-on {
+  border-color: #7c5cd6;
+  background: #7c5cd6;
+  color: #fff;
+}
+
+.pip-room-styles { padding: 0 16px 12px; }
+
+.pip-room-styles-label {
+  margin: 4px 0;
+  color: #6f6789;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.pip-room-styles-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.pip-style-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 10px;
+  border: 2px solid #e3dcf3;
+  border-radius: 999px;
+  background: #fff;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pip-style-chip[aria-pressed='true'] {
+  border-color: #7c5cd6;
+  background: #f1ecff;
+}
+
+.pip-style-chip:active { filter: brightness(0.94); }
+
+@media (hover: hover) {
+  .pip-style-chip:not([aria-pressed='true']):hover { border-color: #c9bdf0; }
+}
+
+.pip-style-chip:focus-visible {
+  outline: 3px solid var(--pip-focus-ring);
+  outline-offset: 2px;
+}
+
+.pip-style-swatch {
+  width: 18px;
+  height: 18px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 50%;
+}
+
+/* MPP-29 AC 2: the fridge and cabinet overlays fade in on the sheets' beat (--pip-sheet-in);
+   each overlay's stylesheet applies it and turns it off under reduced motion. */
+@keyframes pip-overlay-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }

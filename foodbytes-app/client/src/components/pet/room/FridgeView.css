@@ -12,6 +12,7 @@
   overflow-y: auto;
   overscroll-behavior: contain;
   background: linear-gradient(#eef6fb, #d9ebf5);
+  animation: pip-overlay-in var(--pip-sheet-in) var(--pip-sheet-ease);
 }
 
 .pip-fridge-head {
@@ -54,7 +55,7 @@
 }
 
 .pip-fridge-btn-text:focus-visible {
-  outline: 3px solid #7b5cd6;
+  outline: 3px solid var(--pip-focus-ring);
   outline-offset: 2px;
 }
 
@@ -120,3 +121,7 @@
 }
 
 .pip-fridge-view:focus { outline: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .pip-fridge-view { animation: none; }
+}

@@ -67,16 +67,6 @@ export function petBubble({ mood, lastLoggedType, dueMealType }) {
   }
 }
 
-/** AC 7: the reaction shows for an eaten breakfast/lunch/dinner entry, never a snack or extra. */
-export function shouldShowPetReaction({ eaten, mealType }) {
-  return eaten === true && PET_COUNTED_MEAL_TYPES.includes(mealType)
-}
-
-/** AC 7 reaction copy, e.g. "Pip is happy! Lunch logged." */
-export function petReactionText({ petName, mealType }) {
-  return `${petName} is happy! ${MEAL_TYPE_LABELS[mealType]} logged.`
-}
-
 export function petChipLabel({ mood, dueCount }) {
   const label = PET_MOOD_LABELS[mood]
   return mood === PET_MOODS.BORED || mood === PET_MOODS.MISCHIEVOUS ? `${label} · ${dueCount} unlogged` : label

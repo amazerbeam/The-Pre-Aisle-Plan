@@ -3,7 +3,7 @@
 // There is no test runner wired into client/package.json, so the MPP-14 mood rules
 // (AC 6, AC 7) are pinned here. Mirrors mealTimesUtils.check.mjs.
 import assert from 'node:assert/strict'
-import { derivePetMood, petBubble, petChipLabel, shouldShowPetReaction, petReactionText } from './petMood.js'
+import { derivePetMood, petBubble, petChipLabel } from './petMood.js'
 
 const TIMES = { breakfastBy: '11:00', lunchBy: '15:00', dinnerBy: '21:00', custom: false }
 const YESTERDAY = '2026-10-12'
@@ -88,15 +88,6 @@ assert.deepEqual(r.todaySlots.map(s => s.status), ['unplanned', 'unplanned', 'un
 // Custom (owner's) meal times are honoured.
 const early = { breakfastBy: '08:00', lunchBy: '12:00', dinnerBy: '18:00', custom: true }
 assert.equal(derivePetMood({ yesterday: null, today: tPlanned, mealTimes: early, now: at(TODAY, '08:01') }).mood, 'bored')
-
-// AC 7 reaction: eaten breakfast/lunch/dinner only (mealType is lowercase on the wire).
-assert.equal(shouldShowPetReaction({ eaten: true, mealType: 'lunch' }), true)
-assert.equal(shouldShowPetReaction({ eaten: true, mealType: 'breakfast' }), true)
-assert.equal(shouldShowPetReaction({ eaten: true, mealType: 'dinner' }), true)
-assert.equal(shouldShowPetReaction({ eaten: false, mealType: 'lunch' }), false)
-assert.equal(shouldShowPetReaction({ eaten: true, mealType: 'snacks' }), false)
-assert.equal(shouldShowPetReaction({ eaten: true, mealType: 'extras' }), false)
-assert.equal(petReactionText({ petName: 'Pip', mealType: 'lunch' }), 'Pip is happy! Lunch logged.')
 
 // Copy.
 assert.equal(petBubble({ mood: 'content' }), 'Nothing due yet. Just vibing.')

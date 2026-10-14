@@ -1,4 +1,4 @@
-import { MOCHI_OUTLINE } from '../mochiParts'
+import { ROOM_INK } from '../../../constants/petRoom'
 import { AWARD_KINDS } from '../../../constants/petAwards'
 
 /**
@@ -6,7 +6,7 @@ import { AWARD_KINDS } from '../../../constants/petAwards'
  * to y ≈ -34 / -28). The room's cabinet (furniture.jsx) and the trophy cabinet view both
  * draw from here, so the two can't drift.
  */
-const STROKE = { stroke: MOCHI_OUTLINE, strokeWidth: 2 }
+const STROKE = { stroke: ROOM_INK, strokeWidth: 2 }
 
 export function TrophyArt() {
   return (

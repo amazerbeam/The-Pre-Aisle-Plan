@@ -19,6 +19,9 @@ export const DEFAULT_ROOM_LEVELS = {
   cabinet: 1
 }
 
+// The room art's outline colour (the original pet outline; the herb has its own ink in herb/herbForms.js).
+export const ROOM_INK = '#3b2f5c'
+
 // Mockup v5 projection space; the SVG scales to the card width.
 export const ROOM_VIEWBOX_SIZE = { width: 360, height: 330 }
 export const ROOM_VIEWBOX = `0 0 ${ROOM_VIEWBOX_SIZE.width} ${ROOM_VIEWBOX_SIZE.height}`
@@ -60,4 +63,5 @@ export const FRIDGE_LOW_BUBBLE = 'The fridge is getting empty 👀'
 export const FRIDGE_EMPTY_METER = 'No meals planned this week'
 export const FRIDGE_FOOTNOTE = "Always 15 slots. How full it is = planned meals you haven't eaten yet ÷ meals planned this week. It restocks when you plan your week."
 export const ROOM_HINT = 'Tap the fridge 🧊 or cabinet 🏆' // MPP-23: mockup v5 .hint
+export const SPRINKLES_ICON = '✨' // MPP-25: the room's sprinkles counter
 export const FRIDGE_LOAD_ERROR = "Couldn't load the fridge."

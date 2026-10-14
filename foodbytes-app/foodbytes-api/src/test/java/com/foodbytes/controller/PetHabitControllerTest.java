@@ -69,4 +69,24 @@ class PetHabitControllerTest {
                 .andExpect(jsonPath("$.error").value("lapseDate is required when clean is false"));
         verifyNoInteractions(habitStreakService);
     }
+
+    @Test
+    void firstAnswer_withoutPrincipal_returns401() throws Exception {
+        mockMvc.perform(post("/api/pet/habits/SNACK/first-answer")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"lastDate\":null}"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.error").value("Not authenticated"));
+        verifyNoInteractions(habitStreakService);
+    }
+
+    @Test
+    void firstAnswer_unknownHabit_returns400() throws Exception {
+        mockMvc.perform(post("/api/pet/habits/CRISPS/first-answer")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("Unknown habit: CRISPS"));
+        verifyNoInteractions(habitStreakService);
+    }
 }
