@@ -1,9 +1,15 @@
 /* MPP-14: Pet page (approved pet-mockup.html, first phone). */
 
+/* MPP-37: Pip mode — header on top, the room fills the rest (main is one screen tall). */
 .pet-view {
-  padding: var(--spacing-md);
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
   max-width: 500px;
   margin: 0 auto;
+  overflow-y: auto; /* only scrolls when the content outgrows a short screen */
 }
 
 /* ---- Speech bubble (MPP-16: top-right inside Pip's room) ---- */
@@ -48,13 +54,49 @@
   outline: none;
 }
 
-/* ---- Name + chip ---- */
-.pet-meta {
+/* ---- MPP-37: Pip's slim header ---- */
+.pip-header {
+  flex: none;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--spacing-sm);
-  margin: var(--spacing-md) 2px 12px;
+  padding: 2px 8px 2px 14px;
+  background: #fff;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.pip-header-name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.pip-header-form {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+}
+
+.pip-header-right {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pip-header-sprinkles {
+  padding: 3px 9px;
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 .pet-name-block {
@@ -66,13 +108,12 @@
   align-items: center;
   gap: var(--spacing-xs);
   margin: 0;
-  font-size: 1.35rem;
+  font-size: 1.1rem;
   font-weight: 700;
   overflow-wrap: anywhere;
 }
 
 .pet-name-edit-btn,
-.pet-meals-link,
 .pet-view-state-btn {
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
@@ -133,85 +174,6 @@
 .pet-chip--bored { background: rgba(255, 193, 7, 0.22); color: #856404; }
 .pet-chip--mischievous { background: rgba(255, 107, 53, 0.18); color: #a8431a; }
 
-/* ---- Today's meals ---- */
-.pet-meals-card {
-  background: #fff;
-  border-radius: var(--radius-lg);
-  padding: 14px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-}
-
-.pet-meals-card h3 {
-  margin: 0 0 10px;
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--text-secondary);
-}
-
-.pet-meals {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.pet-meal {
-  padding: 10px 6px;
-  border-radius: var(--radius-md);
-  background: var(--bg-secondary);
-  text-align: center;
-  font-size: 0.8rem;
-  font-weight: 500;
-}
-
-.pet-meal b {
-  display: block;
-  margin-bottom: 2px;
-  font-size: 1.1rem;
-}
-
-.pet-meal small {
-  display: block;
-}
-
-.pet-meal--logged { background: rgba(40, 167, 69, 0.12); color: #1b6b2e; }
-.pet-meal--due { background: rgba(255, 107, 53, 0.14); color: #a8431a; }
-.pet-meal--upcoming,
-.pet-meal--unplanned { color: var(--text-secondary); }
-
-.pet-meals-empty {
-  margin: 0;
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-}
-
-.pet-meals-link {
-  width: 100%;
-  min-height: 44px;
-  margin-top: 12px;
-  padding: 10px;
-  border: none;
-  border-radius: var(--radius-md);
-  background: var(--brand-primary);
-  color: #fff;
-  font-size: 0.9rem;
-  font-weight: 600;
-}
-
-.pet-meals-link:active {
-  background: var(--brand-primary-dark);
-}
-
-@media (hover: hover) {
-  .pet-meals-link:hover {
-    background: var(--brand-primary-dark);
-  }
-}
-
-.pet-meals-link:focus-visible,
 .pet-name-edit-btn:focus-visible,
 .pet-view-state-btn:focus-visible {
   outline: 2px solid var(--brand-primary);
@@ -220,6 +182,9 @@
 
 /* ---- Guest / loading / error ---- */
 .pet-view-state {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto; /* main is overflow:hidden in Pip mode */
   display: flex;
   flex-direction: column;
   align-items: center;

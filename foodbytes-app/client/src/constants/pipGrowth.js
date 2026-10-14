@@ -53,3 +53,9 @@ export const PIP_FULLY_GROWN_LABEL = 'Fully grown 🌸'
 // AC 9: never shaming.
 export const PIP_SLIP_LINE = "Ouch, I lost a few leaves 🍂 A good day and I'll grow them back!"
 export const PIP_FULLY_GROWN_LINE = "I'm fully grown! 🌸 Thank you for looking after me."
+
+// MPP-38: the small level bar over Pip's head in the room.
+export const HEAD_BAR_WIDTH = 30 // room-viewBox units — same on-screen size at every form and pose
+export const HEAD_BAR_HEIGHT = 5 // room-viewBox units
+export const HEAD_BAR_GAP = 22 // herb units between the top of Pip's head and the bar's bottom edge; clears pip-bounce (−16px, 1.05 stretch)
+export const HEAD_BAR_FLASH_MS = 450 // the full bar fills, then flashes yellow, inside the 900 ms FILLING phase

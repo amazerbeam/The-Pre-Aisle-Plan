@@ -80,6 +80,10 @@
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
 
+  /* Space kept clear for the fixed footer tab bar (Footer.css). Pip mode adds the
+     bottom safe-area inset, which the footer pads itself by. */
+  --footer-clearance: 80px;
+
   /* Aisle color coding for shopping list (15 aisles) */
   --aisle-produce: #4caf50;
   --aisle-dairy: #2196f3;
@@ -127,10 +131,23 @@ body {
 .main-content {
   flex: 1;
   padding: var(--spacing-md);
-  padding-bottom: 80px; /* Space for fixed footer */
+  padding-bottom: var(--footer-clearance);
   max-width: 1200px;
   margin: 0 auto;
   width: 100%;
+}
+
+/* MPP-37: Pip mode — no top bar, the page is exactly one screen tall and never scrolls.
+   The Pip page fills it; the fixed footer sits in the bottom clearance.
+   Doubled class so it also beats the later min-width .main-content padding rules. */
+.main-content.main-content--pip {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  max-width: none;
+  padding: env(safe-area-inset-top, 0px) 0 calc(var(--footer-clearance) + env(safe-area-inset-bottom, 0px));
+  overflow: hidden;
 }
 
 /* Button Base */

@@ -1,0 +1,43 @@
+/* MPP-38: Pip's level bar over his head (colours from MPP-31's strip). */
+
+.pip-head-bar-track { fill: #e3f1d8; }
+.pip-head-bar-outline { fill: none; stroke: #2f4a22; }
+
+.pip-head-bar-fill {
+  fill: #5fae3e;
+  transform-box: fill-box;
+  transform-origin: 0 50%;
+  transition: transform 0.9s ease-in-out;
+}
+
+.pip-head-bar.is-instant .pip-head-bar-fill { transition: none; }
+
+/* AC 4: fill in the first half of FILLING, then flash yellow before Pip evolves. */
+.pip-head-bar.is-full .pip-head-bar-fill {
+  transition-duration: var(--pip-head-bar-flash);
+  animation: pip-head-bar-flash var(--pip-head-bar-flash) ease-in-out var(--pip-head-bar-flash) 1;
+}
+
+@keyframes pip-head-bar-flash {
+  50% { fill: #ffd34d; }
+}
+
+/* AC 6: the screen-reader progressbar is present but not painted. */
+.pip-head-bar-status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pip-head-bar-fill {
+    transition: none !important;
+    animation: none !important;
+  }
+}

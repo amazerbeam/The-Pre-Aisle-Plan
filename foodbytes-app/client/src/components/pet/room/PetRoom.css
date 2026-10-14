@@ -1,12 +1,30 @@
-/* MPP-16: Pip's room — angled-corner SVG from pip-room-mockup-v5.html.
-   The SVG keeps its 360×330 aspect and scales with the card (AC 6). */
-
+/* MPP-16 / MPP-37: Pip's room — angled-corner SVG from pip-room-mockup-v5.html. Full screen:
+   the stage takes every pixel the header and the rows under it leave; the scene inside is the
+   SVG's own 360×330 box (ROOM_VIEWBOX_SIZE), centred, so % hit boxes match the art. */
 .pip-room {
   position: relative;
-  border-radius: 20px;
-  overflow: hidden;
+  flex: 1;
+  /* Floor for short screens: .pet-view scrolls instead of squeezing the room to nothing. */
+  min-height: 40vh;
+  display: flex;
+  flex-direction: column;
   background: #ece5fb;
-  box-shadow: var(--shadow-md);
+}
+
+.pip-room-stage {
+  flex: 1;
+  min-height: 30vh;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  container-type: size;
+}
+
+.pip-room-scene {
+  position: relative;
+  width: 100%; /* fallback without container query units */
+  width: min(100cqw, calc(100cqh * 360 / 330));
+  aspect-ratio: 360 / 330;
 }
 
 .pip-room-svg {
@@ -109,37 +127,28 @@
   pointer-events: none;
 }
 
-/* MPP-25: sprinkles counter — the hint's bubble style, pinned top-left (.pet-bubble owns top-right) */
-.pip-room-sprinkles {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  margin: 0;
-  padding: 5px 9px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.92);
-  color: #5c5670;
-  font-size: 0.72rem;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-  pointer-events: none;
-}
-
-/* MPP-26 / MPP-27 / MPP-32: the strip under the room — 🛍 Shop, ✏️ Edit room and 👕 Wardrobe. */
+/* MPP-26 / MPP-27 / MPP-32 / MPP-37: 🛍 Shop, ✏️ Edit room and 👕 Wardrobe — one row of equal
+   columns directly above the tab bar, however many have loaded; never wraps at 360px. */
 .pip-room-actions {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
+  flex: none;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
   gap: 6px;
-  padding: 6px 16px 10px;
+  padding: 8px 10px;
+  background: #fff;
+  border-top: 1px solid #ddd6ee;
 }
 
 .pip-room-action {
   position: relative;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 5px;
+  min-width: 0;
+  padding-inline: 6px;
+  white-space: nowrap;
 }
 
 .pip-room-action:active { filter: brightness(0.92); }
@@ -223,6 +232,7 @@
 }
 
 .pip-room-editbar {
+  flex: none;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -274,7 +284,10 @@
   color: #fff;
 }
 
-.pip-room-styles { padding: 0 16px 12px; }
+.pip-room-styles {
+  flex: none;
+  padding: 0 16px 12px;
+}
 
 .pip-room-styles-label {
   margin: 4px 0;

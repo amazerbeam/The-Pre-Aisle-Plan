@@ -6,9 +6,11 @@
 // outfit gives the same items on every form, wilted or not. Mirrors room.check.mjs.
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
-import { HERB_FORMS, herbForm } from './herbForms.js'
+import { HERB_FOOT_Y, HERB_FORMS, herbForm } from './herbForms.js'
+import { headBarTop, headBarY, spokenLevelLabel } from './headBar.js'
 import { DRAWN_ITEM_IDS, glassesArt, hatArt, shoeArt, torsoArt } from './wardrobeArt.js'
 import { TORSO_ORDER, dressLayers, hatMiniViewBox, hatOnly, slotCropViewBox } from './wardrobeLayers.js'
+import { HEAD_BAR_GAP } from '../../../constants/pipGrowth.js'
 import { WARDROBE_ITEMS, WARDROBE_SLOT, WARDROBE_SLOTS } from '../../../constants/pipWardrobe.js'
 import {
   firstNewSlot, newItemIds, toggleTarget, wardrobeAnnouncement, withSlot, withSlotSeen
@@ -162,5 +164,25 @@ assert.deepEqual(wardrobe.outfit, { HAT: 'beanie' }, 'withSlot must not mutate')
 assert.equal(wardrobeAnnouncement(['wellies']), '🎉 New outfit: Wellies!')
 assert.equal(wardrobeAnnouncement(['beanie', 'jeans']), '🎉 New outfit: Beanie! (+1 more)')
 assert.equal(wardrobeAnnouncement(['jetpack']), null)
+
+// MPP-38 AC 5: the head bar clears every hat and the head growth on forms 1–4 (Basilisk has no bar, AC 8).
+for (const form of [1, 2, 3, 4]) {
+  const f = herbForm(form)
+  const k = f.scale
+  const toScaled = (y) => HERB_FOOT_Y + (y - HERB_FOOT_Y) * k
+  for (const hatId of [null, ...idsIn(WARDROBE_SLOT.HAT)]) {
+    const outfit = hatId ? { [WARDROBE_SLOT.HAT]: hatId } : null
+    const y = headBarY(form, outfit)
+    assert.ok(Number.isFinite(y), `form ${form} ${hatId}: bar y is not finite`)
+    assert.ok(y <= toScaled(f.crownTop) - HEAD_BAR_GAP + 1e-9, `form ${form} ${hatId}: bar overlaps the crown`)
+    if (hatId) assert.ok(y <= toScaled(hatArt(hatId, f).top) - HEAD_BAR_GAP + 1e-9, `form ${form} ${hatId}: bar overlaps the hat`)
+    if (f.growthRise > 0) {
+      const growthTop = dressLayers(outfit, form).growTop - f.growthRise
+      assert.ok(y <= toScaled(growthTop) - HEAD_BAR_GAP + 1e-9, `form ${form} ${hatId}: bar overlaps the head growth`)
+    }
+    assert.equal(headBarTop(form, outfit) <= f.crownTop, true)
+  }
+}
+assert.equal(spokenLevelLabel('Basil seed · 6 / 15 → Seedling'), 'Basil seed, 6 of 15 to Seedling')
 
 console.log('wardrobe checks passed')

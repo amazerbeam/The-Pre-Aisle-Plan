@@ -2,6 +2,8 @@
 
 One line per ticket, newest first: `<version> — <ticket key>: <summary>`. Bump rules and how
 to check what is deployed: `CLAUDE.md` → Versioning & deploy verification.
+1.25.0 — MPP-38: Pip's level bar is a small green bar over his head that follows him (no label), hidden once he's fully grown
+1.24.2 — MPP-37: Pip tab is full screen: no top bar, slim Pip header, room fills the screen with Shop / Edit room / Wardrobe in one row above the tab bar, Today's meals removed, room tap targets anchored to the picture
 1.24.1 — MPP-29: cook scene's walk back now lasts its 0.5 s phase, so Pip is on the rug when the scene ends (no 200 ms overrun past 3 s)
 1.24.0 — MPP-29: Pip's room polish: visible focus rings and full hover/pressed states on every room control, cook scene retuned to 3 s with a pinned 3 s animation limit, one overlay entrance timing
 1.23.0 — MPP-28: Pip's room loads in one pet read (habits + cabinet in /api/pet, ≤1 meal-plan read) and Pip's bubble follows one priority order

@@ -2,10 +2,10 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { usePet } from '../../contexts/PetContext'
 import PetRoom from './room/PetRoom'
-import PetMealsCard from './PetMealsCard'
-import PetNameEditor from './PetNameEditor'
+import PipHeader from './PipHeader'
 import CheckInActions from './room/CheckInActions'
 import { PET_GUEST_MESSAGE } from '../../constants/pet'
+import { PIP_FORM_NAMES, PIP_FORMS } from '../../constants/pipGrowth'
 import useCookAndServe from '../../hooks/useCookAndServe'
 import useHabitCheckIn from '../../hooks/useHabitCheckIn'
 import usePetAwards from '../../hooks/usePetAwards'
@@ -22,9 +22,9 @@ import './PetView.css'
 
 /**
  * MPP-14 AC 4 / MPP-16 / MPP-17 / MPP-18: the Pet page — Pip in his room (rug, cooker or bed by
- * your meal times), a speech bubble, the name, a mood chip and today's meals. Guests get
- * the sign-in prompt (AC 3) if they reach /pet directly; the footer already stops them
- * with a message.
+ * your meal times), a speech bubble, and (MPP-37) a slim header with the name, form, sprinkles
+ * and mood chip — full screen, no Today's meals. Guests get the sign-in prompt (AC 3) if they
+ * reach /pet directly; the footer already stops them with a message.
  * MPP-18: a newly eaten meal plays the cook-and-serve scene once (useCookAndServe).
  * MPP-19: the fridge (gauge + view) and a low-stock bubble.
  * MPP-21: Pip's daily snack / alcohol check-in speaks in the bubble; the cook scene hides it without resetting it.
@@ -104,10 +104,21 @@ function PetView() {
   const shop = pet.room && typeof pet.sprinkles === 'number' ? { ...shopState, room: pet.room, sprinkles: pet.sprinkles } : null
   // MPP-27: edit mode only once the room has loaded — never a picker over a fake empty room.
   const decor = pet.room ? { ...roomEdit, room: pet.room } : null
-  const levelBar = growth.barLabel ? { label: growth.barLabel, pct: growth.barPct, phase: growth.phase } : null
+  // MPP-38 AC 8: no bar once Pip is a Basilisk; during an evolve into it, Bushling's bar still fills and flashes first.
+  const levelBar = growth.barLabel && growth.displayForm !== PIP_FORMS.BASILISK
+    ? { label: growth.barLabel, pct: growth.barPct, phase: growth.phase }
+    : null
 
   return (
     <div className="pet-view">
+      <PipHeader
+        name={pet.name}
+        onRename={renamePet}
+        formName={PIP_FORM_NAMES[growth.displayForm]}
+        sprinkles={sprinkles}
+        mood={mood}
+        moodLabel={petChipLabel(moodInfo)}
+      />
       <PetRoom
         name={pet.name}
         mood={mood}
@@ -120,18 +131,10 @@ function PetView() {
         herb={herb}
         levelBar={levelBar}
         wardrobe={wardrobe}
-        sprinkles={sprinkles}
         levels={pet.room?.stations}
         shop={shop}
         decor={decor}
       />
-
-      <div className="pet-meta">
-        <PetNameEditor name={pet.name} onRename={renamePet} />
-        <span className={`pet-chip pet-chip--${mood}`}>{petChipLabel(moodInfo)}</span>
-      </div>
-
-      <PetMealsCard slots={moodInfo.todaySlots} />
     </div>
   )
 }

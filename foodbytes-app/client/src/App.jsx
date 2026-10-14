@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, useLocation } from 'react-router-dom'
 import Header from './components/layout/Header.jsx'
 import Footer from './components/layout/Footer.jsx'
 import RecipeList from './components/recipes/RecipeList.jsx'
@@ -10,10 +10,13 @@ import LandingPageAnimation from './components/onboarding/LandingPageAnimation.j
 import Toast from './components/common/Toast.jsx'
 import { useAuth } from './contexts/AuthContext'
 import { useMealPlan } from './contexts/MealPlanContext'
+import { PET_ROUTE } from './constants/pet'
 import './styles/global.css'
 
 function App() {
   const { isAuthenticated, isGuest, loading } = useAuth()
+  // MPP-37: the Pip tab is full screen — no top bar (date picker + account menu).
+  const pipMode = useLocation().pathname.replace(/\/+$/, '') === PET_ROUTE
   // FR-098: Get assignment error for toast display
   const { assignmentError, clearAssignmentError } = useMealPlan()
   const [showLanding, setShowLanding] = useState(false)
@@ -43,8 +46,8 @@ function App() {
 
   return (
     <div className="app">
-      <Header />
-      <main className="main-content">
+      {!pipMode && <Header />}
+      <main className={pipMode ? 'main-content main-content--pip' : 'main-content'}>
         <Routes>
           <Route path="/" element={<RecipeList />} />
           <Route path="/mealplan" element={<MealPlanCalendar />} />
