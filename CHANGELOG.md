@@ -2,6 +2,10 @@
 
 One line per ticket, newest first: `<version> — <ticket key>: <summary>`. Bump rules and how
 to check what is deployed: `CLAUDE.md` → Versioning & deploy verification.
+1.15.0 — MPP-23: Trophy cabinet — tap the cabinet for plan / snack / alcohol shelves (now · best · next, ×N awards) and the firsts list; Pip's bubble announces newly earned awards
+1.14.0 — MPP-24: Pip "firsts" — template, shopping list, full week and homemade-extra firsts recorded per person, backfilled, and returned from GET /api/pet/awards
+1.13.0 — MPP-22: Plan streak + repeating milestone ladder — per-person plan streak, award ledger and GET /api/pet/awards
+1.12.0 — MPP-21: Pip's daily snack / alcohol check-in in his speech bubble (No / Yes + date / Not now), kind reactions
 1.11.0 — MPP-20: Habit streaks backend — per-person snack-free and alcohol-free check-ins (GET /api/pet/habits, POST /api/pet/habits/{habit}/answer)
 1.10.0 — MPP-19: Pip's fridge — gauge + tappable 15-slot fridge view of this week's uneaten planned meals, low-stock bubble
 

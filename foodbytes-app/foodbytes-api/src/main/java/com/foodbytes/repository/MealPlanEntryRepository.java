@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -112,6 +113,47 @@ public interface MealPlanEntryRepository extends JpaRepository<MealPlanEntry, Lo
         @Param("recipeId") Long recipeId,
         @Param("startDate") LocalDate startDate,
         @Param("endDate") LocalDate endDate
+    );
+
+    /** MPP-22: id + date of one planned slot, without loading the recipe. */
+    interface PlannedMealSlot {
+        Long getId();
+        LocalDate getPlanDate();
+    }
+
+    /**
+     * MPP-22: the owner's planned slots of the given meal types (breakfast/lunch/dinner for the plan
+     * streak) between from and to, both inclusive.
+     */
+    @Query("SELECT mpe.id AS id, mpe.planDate AS planDate FROM MealPlanEntry mpe " +
+           "WHERE mpe.user.id = :ownerId " +
+           "AND mpe.meal.key IN :mealKeys " +
+           "AND mpe.planDate >= :from " +
+           "AND mpe.planDate <= :to")
+    List<PlannedMealSlot> findMainMealSlots(
+        @Param("ownerId") Long ownerId,
+        @Param("mealKeys") Collection<String> mealKeys,
+        @Param("from") LocalDate from,
+        @Param("to") LocalDate to
+    );
+
+    /**
+     * MPP-24: the owner's dates in [from, to] that have every one of mealKeys planned (keyCount =
+     * mealKeys.size()). Feeds PetFirstPolicy.containsFullWeek; same rule as the migration's backfill 3/4.
+     */
+    @Query("SELECT mpe.planDate FROM MealPlanEntry mpe " +
+           "WHERE mpe.user.id = :ownerId " +
+           "AND mpe.meal.key IN :mealKeys " +
+           "AND mpe.planDate >= :from " +
+           "AND mpe.planDate <= :to " +
+           "GROUP BY mpe.planDate " +
+           "HAVING COUNT(DISTINCT mpe.meal.key) = :keyCount")
+    List<LocalDate> findFullyPlannedDates(
+        @Param("ownerId") Long ownerId,
+        @Param("mealKeys") Collection<String> mealKeys,
+        @Param("from") LocalDate from,
+        @Param("to") LocalDate to,
+        @Param("keyCount") long keyCount
     );
 
     /**

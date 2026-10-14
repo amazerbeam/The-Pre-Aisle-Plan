@@ -1,14 +1,15 @@
-import { useId } from 'react'
+import { useEffect, useId, useRef } from 'react'
 import { MEAL_TYPE_LABELS } from '../../../constants/mealTypes'
 import { COOK_PHASES, PET_MOOD_LABELS, PIP_POSITIONS, PIP_POSITION_LABELS } from '../../../constants/pet'
-import { DEFAULT_ROOM_LEVELS, FRIDGE_HINT, ROOM_STATIONS, ROOM_VIEWBOX, ROOM_VIEWBOX_SIZE } from '../../../constants/petRoom'
+import { DEFAULT_ROOM_LEVELS, ROOM_HINT, ROOM_STATIONS, ROOM_VIEWBOX, ROOM_VIEWBOX_SIZE } from '../../../constants/petRoom'
 import useRoomOverlay from '../../../hooks/useRoomOverlay'
 import { stationArt } from './furniture'
 import FridgeView from './FridgeView'
 import { ROOM_BACKDROP } from './roomDecor'
 import { FridgeGauge, NightDim, PotSteam, ServedPlate, SleepZs } from './roomEffects'
-import { COOK_WALK_OFFSET, ROOM_DRAW_ORDER, cookPose, fridgeHitBox, pipPose, resolveRoomLevels } from './roomLayout'
+import { COOK_WALK_OFFSET, ROOM_DRAW_ORDER, cabinetHitBox, cookPose, fridgeHitBox, pipPose, resolveRoomLevels } from './roomLayout'
 import RoomPip from './RoomPip'
+import TrophyCabinetView from './TrophyCabinetView'
 import './PetRoom.css'
 
 /**
@@ -20,8 +21,11 @@ import './PetRoom.css'
  * MPP-18: `serving` ({ phase, mealType } from useCookAndServe) overrides the routine with
  * the day scene: Pip walks rug → cooker, cooks (steam), serves (plate) and walks back.
  * MPP-19: the fridge gauge, a real button over the fridge that opens FridgeView, and the "tap the fridge" hint.
+ * MPP-21: the bubble is a SpeechBubble — a live-region line of text plus optional
+ * `bubbleActions` (the check-in controls) under it.
+ * MPP-23: the cabinet — a real button over the cabinet art that opens TrophyCabinetView with `cabinet` ({ data, loading, error, retry } from usePetAwards).
  */
-function PetRoom({ name, mood, bubble, position = PIP_POSITIONS.RUG, levels = DEFAULT_ROOM_LEVELS, serving = null, fridge = null }) {
+function PetRoom({ name, mood, bubble, bubbleActions = null, position = PIP_POSITIONS.RUG, levels = DEFAULT_ROOM_LEVELS, serving = null, fridge = null, cabinet = null }) {
   const resolved = resolveRoomLevels(levels)
   const phase = serving?.phase ?? null
   const scenePosition = serving ? PIP_POSITIONS.RUG : position
@@ -30,10 +34,13 @@ function PetRoom({ name, mood, bubble, position = PIP_POSITIONS.RUG, levels = DE
   const label = `${name}'s room — ${name} is ${roomDoing(position, mood, serving)}`
 
   const fridgeOverlay = useRoomOverlay()
-  const fridgeTitleId = `pip-fridge-title-${useId().replace(/:/g, '')}`
+  const cabinetOverlay = useRoomOverlay()
+  const overlayId = useId().replace(/:/g, '')
+  const fridgeTitleId = `pip-fridge-title-${overlayId}`
+  const cabinetTitleId = `pip-cabinet-title-${overlayId}`
   const fridgeFill = fridge?.fill ?? null
-  // MPP-19: the room behind an open overlay is out of the tab order and the a11y tree.
-  const behind = fridgeOverlay.isOpen ? { inert: '', 'aria-hidden': true } : {}
+  // MPP-19 / MPP-23: the room behind an open overlay is out of the tab order and the a11y tree.
+  const behind = fridgeOverlay.isOpen || cabinetOverlay.isOpen ? { inert: '', 'aria-hidden': true } : {}
 
   return (
     <div className="pip-room">
@@ -55,12 +62,26 @@ function PetRoom({ name, mood, bubble, position = PIP_POSITIONS.RUG, levels = DE
           <PipWalker phase={phase}>{!asleep && <RoomPip pose={pose} />}</PipWalker>
           {asleep && <SleepZs level={resolved.bed} />}
         </svg>
-        <p className="pet-bubble" aria-live="polite">{bubble}</p>
-        <FridgeButton name={name} level={resolved.fridge} fill={fridgeFill} buttonRef={fridgeOverlay.triggerRef} onOpen={fridgeOverlay.open} />
-        <p className="pip-room-hint" aria-hidden="true">{FRIDGE_HINT}</p>
+        <SpeechBubble text={bubble} actions={bubbleActions} />
+        <StationButton
+          box={fridgeHitBox(resolved.fridge)}
+          label={fridgeLabel(name, fridgeFill)}
+          buttonRef={fridgeOverlay.triggerRef}
+          onOpen={fridgeOverlay.open}
+        />
+        <StationButton
+          box={cabinetHitBox(resolved.cabinet)}
+          label={`Open ${name}'s trophy cabinet`}
+          buttonRef={cabinetOverlay.triggerRef}
+          onOpen={cabinetOverlay.open}
+        />
+        <p className="pip-room-hint" aria-hidden="true">{ROOM_HINT}</p>
       </div>
       {fridgeOverlay.isOpen && (
         <FridgeView name={name} fridge={fridge} titleId={fridgeTitleId} panelRef={fridgeOverlay.panelRef} onClose={fridgeOverlay.close} />
+      )}
+      {cabinetOverlay.isOpen && (
+        <TrophyCabinetView name={name} cabinet={cabinet} titleId={cabinetTitleId} panelRef={cabinetOverlay.panelRef} onClose={cabinetOverlay.close} />
       )}
     </div>
   )
@@ -113,22 +134,43 @@ function PipWalker({ phase, children }) {
   )
 }
 
-// MPP-19 AC 3: a real button laid over the fridge art. The SVG is role="img", so it can't hold one.
-function FridgeButton({ name, level, fill, buttonRef, onOpen }) {
-  const { x, y, width, height } = fridgeHitBox(level)
+// MPP-21: the text line stays mounted so screen readers hear each new line without the
+// buttons being re-read. When the controls go away under a keyboard user (answered,
+// snoozed, or hidden by the cook scene), focus lands on the bubble instead of <body>.
+function SpeechBubble({ text, actions }) {
+  const bubbleRef = useRef(null)
+  const hadActionsRef = useRef(false)
+
+  useEffect(() => {
+    const hasActions = actions != null
+    if (hadActionsRef.current && !hasActions && document.activeElement === document.body) {
+      bubbleRef.current?.focus()
+    }
+    hadActionsRef.current = hasActions
+  })
+
+  return (
+    <div ref={bubbleRef} className={actions ? 'pet-bubble is-asking' : 'pet-bubble'} tabIndex={-1}>
+      <p className="pet-bubble-text" aria-live="polite">{text}</p>
+      {actions}
+    </div>
+  )
+}
+
+// MPP-19 AC 3 / MPP-23 AC 1: a real button laid over a station's art. The SVG is role="img", so it can't hold one.
+function StationButton({ box, label, buttonRef, onOpen }) {
   const { width: viewWidth, height: viewHeight } = ROOM_VIEWBOX_SIZE
   const style = {
-    left: percentOf(x, viewWidth),
-    top: percentOf(y, viewHeight),
-    width: percentOf(width, viewWidth),
-    height: percentOf(height, viewHeight)
+    left: percentOf(box.x, viewWidth),
+    top: percentOf(box.y, viewHeight),
+    width: percentOf(box.width, viewWidth),
+    height: percentOf(box.height, viewHeight)
   }
-  const label = fill && fill.planned > 0 ? `Open ${name}'s fridge, ${fill.pct}% full` : `Open ${name}'s fridge`
   return (
     <button
       ref={buttonRef}
       type="button"
-      className="pip-fridge-btn"
+      className="pip-station-btn"
       style={style}
       aria-label={label}
       aria-haspopup="dialog"
@@ -136,6 +178,9 @@ function FridgeButton({ name, level, fill, buttonRef, onOpen }) {
     />
   )
 }
+
+const fridgeLabel = (name, fill) =>
+  fill && fill.planned > 0 ? `Open ${name}'s fridge, ${fill.pct}% full` : `Open ${name}'s fridge`
 
 const percentOf = (value, total) => `${((100 * value) / total).toFixed(2)}%`
 

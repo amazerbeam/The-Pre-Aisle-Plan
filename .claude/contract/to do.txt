@@ -1,6 +1,6 @@
 MPP-15 Pip's room — build order and status
 Status mirrors Jira: To Do / Planning / Planned / Coding / Ready for Test / Done
-Updated automatically by /fb-plan, /fb-apply and /fb-archive (management-jira → Epic tracker). Last sync: 2026-10-13
+Updated automatically by /fb-plan, /fb-apply and /fb-archive (management-jira → Epic tracker). Last sync: 2026-10-14
 
 ┌────┬────────┬──────────────────────────────────────────┬────────────────────────────┬────────────────┐
 │ #  │ Ticket │ What                                     │ Can't start until          │ Status         │
@@ -17,15 +17,15 @@ Updated automatically by /fb-plan, /fb-apply and /fb-archive (management-jira �
 ├────┼────────┼──────────────────────────────────────────┼────────────────────────────┼────────────────┤
 │ 6  │ MPP-20 │ Habit streaks backend (snacks / alcohol) │ Nothing                    │ Ready for Test │
 ├────┼────────┼──────────────────────────────────────────┼────────────────────────────┼────────────────┤
-│ 7  │ MPP-21 │ Check-in in Pip's bubble                 │ 16, 20                     │ To Do          │
+│ 7  │ MPP-21 │ Check-in in Pip's bubble                 │ 16, 20                     │ Ready for Test │
 ├────┼────────┼──────────────────────────────────────────┼────────────────────────────┼────────────────┤
-│ 8  │ MPP-22 │ Plan streak + milestone ladder           │ 20, 33                     │ To Do          │
+│ 8  │ MPP-22 │ Plan streak + milestone ladder           │ 20, 33                     │ Ready for Test │
 ├────┼────────┼──────────────────────────────────────────┼────────────────────────────┼────────────────┤
-│ 9  │ MPP-24 │ "Firsts" achievements                    │ 22, 33                     │ To Do          │
+│ 9  │ MPP-24 │ "Firsts" achievements                    │ 22, 33                     │ Ready for Test │
 ├────┼────────┼──────────────────────────────────────────┼────────────────────────────┼────────────────┤
-│ 10 │ MPP-23 │ Trophy cabinet                           │ 16, 22, 24                 │ To Do          │
+│ 10 │ MPP-23 │ Trophy cabinet                           │ 16, 22, 24                 │ Ready for Test │
 ├────┼────────┼──────────────────────────────────────────┼────────────────────────────┼────────────────┤
-│ 11 │ MPP-31 │ Glow-up (body stages)                    │ 16, 20, 22, 33             │ To Do          │
+│ 11 │ MPP-31 │ Evolution (herb forms, wilts on a slip)  │ 16, 20, 22, 33             │ To Do          │
 ├────┼────────┼──────────────────────────────────────────┼────────────────────────────┼────────────────┤
 │ 12 │ MPP-32 │ Wardrobe (clothes)                       │ 23, 24, 31                 │ To Do          │
 ├────┼────────┼──────────────────────────────────────────┼────────────────────────────┼────────────────┤

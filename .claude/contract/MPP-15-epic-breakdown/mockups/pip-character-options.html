@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pip Character Options</title>
+<style>
+  :root {
+    --brand: #4a3f80; --brand-light: #6b5fa0;
+    --text: #2c3e50; --muted: #6c757d;
+    --bg: #f6f4fb; --card: #ffffff; --line: #e9e6f2;
+    --good: #1b6b2e; --good-bg: rgba(40,167,69,.13);
+    --warn: #856404; --warn-bg: rgba(255,193,7,.2);
+    --bad: #a71d2a; --bad-bg: rgba(220,53,69,.12);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; }
+  main { max-width: 1120px; margin: 0 auto; padding: 24px 16px 64px; }
+  h1 { color: var(--brand); margin: 0 0 4px; font-size: 1.7rem; }
+  h2 { color: var(--brand); margin: 40px 0 12px; font-size: 1.25rem; }
+  .lede { color: var(--muted); margin: 0 0 20px; max-width: 760px; }
+  .card { background: var(--card); border-radius: 18px; padding: 18px; box-shadow: 0 4px 18px rgba(74,63,128,.08); }
+  .research { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+  .research .card h3 { margin: 0 0 4px; font-size: .95rem; }
+  .research .card p { margin: 0; font-size: .85rem; color: var(--muted); }
+  .research .card b { color: var(--text); }
+
+  .controls { position: sticky; top: 0; z-index: 5; background: rgba(246,244,251,.94); backdrop-filter: blur(6px); padding: 12px 0; margin: 24px 0 8px; display: flex; flex-wrap: wrap; gap: 14px; align-items: center; border-bottom: 1px solid var(--line); }
+  .seg { display: inline-flex; background: #fff; border: 1px solid var(--line); border-radius: 999px; padding: 3px; flex-wrap: wrap; }
+  .seg button { border: 0; background: none; padding: 6px 12px; border-radius: 999px; font: inherit; font-size: .85rem; color: var(--muted); cursor: pointer; }
+  .seg button.on { background: var(--brand); color: #fff; }
+  .controls label { font-size: .8rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+
+  .option { display: grid; grid-template-columns: 300px 1fr; gap: 22px; margin-bottom: 22px; }
+  .hero { background: linear-gradient(#fbfaff, #efeaf9); border-radius: 14px; position: relative; }
+  .hero svg { width: 100%; height: auto; display: block; }
+  .tag { position: absolute; top: 10px; left: 10px; background: var(--brand); color: #fff; font-weight: 700; font-size: .8rem; border-radius: 999px; padding: 2px 10px; }
+  .option h3 { margin: 0; font-size: 1.25rem; }
+  .option .pitch { margin: 2px 0 12px; color: var(--muted); }
+  .strip { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 12px; }
+  .strip div { background: #faf8ff; border-radius: 10px; text-align: center; font-size: .7rem; color: var(--muted); padding-bottom: 4px; cursor: pointer; border: 2px solid transparent; }
+  .strip div.on { border-color: var(--brand-light); color: var(--brand); font-weight: 600; }
+  .strip svg { width: 100%; height: auto; display: block; }
+  .facts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 18px; font-size: .86rem; }
+  .facts h4 { margin: 0 0 2px; font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; color: var(--brand-light); }
+  .facts ul { margin: 0; padding-left: 18px; }
+  .facts p { margin: 0; }
+  .pill { display: inline-block; font-size: .72rem; font-weight: 700; border-radius: 999px; padding: 1px 9px; margin-left: 6px; vertical-align: middle; }
+  .pill.good { background: var(--good-bg); color: var(--good); }
+  .pill.warn { background: var(--warn-bg); color: var(--warn); }
+  .pill.bad { background: var(--bad-bg); color: var(--bad); }
+
+  table { width: 100%; border-collapse: collapse; font-size: .86rem; background: #fff; border-radius: 14px; overflow: hidden; }
+  th, td { padding: 9px 10px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { background: #f1eefa; color: var(--brand); font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; }
+  .table-wrap { overflow-x: auto; }
+  .rec { border-left: 5px solid var(--brand); }
+  .rec p { margin: 0 0 8px; }
+  .sources { font-size: .8rem; color: var(--muted); }
+  .sources a { color: var(--brand-light); }
+
+  @media (max-width: 760px) {
+    .option { grid-template-columns: 1fr; }
+    .facts { grid-template-columns: 1fr; }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .bob { animation: bob 2.6s ease-in-out infinite; transform-box: fill-box; transform-origin: 50% 100%; }
+    .mood-happy .bob { animation: bounce 1.1s ease-in-out infinite; }
+    .mood-bored .bob { animation: droop 4s ease-in-out infinite; }
+    .mood-mischievous .bob { animation: shuffle 1.6s ease-in-out infinite; }
+    .mood-sleep .bob { animation: breathe 3.6s ease-in-out infinite; }
+  }
+  @keyframes bob { 50% { transform: translateY(-4px) scale(.985, 1.015); } }
+  @keyframes bounce { 0%,100% { transform: scale(1.03,.97); } 40% { transform: translateY(-12px) scale(.97,1.04); } }
+  @keyframes droop { 0%,100% { transform: rotate(-2deg); } 50% { transform: rotate(2deg); } }
+  @keyframes shuffle { 25% { transform: translateX(-3px) rotate(-3deg); } 75% { transform: translateX(3px) rotate(3deg); } }
+  @keyframes breathe { 50% { transform: scale(1.02, .98); } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Pip: new character options</h1>
+  <p class="lede">Five directions, each drawn in every mood (content / happy / bored / mischievous / asleep) and through five growth stages that can go <b>up and down</b> with your last 30 days, as in the glow-up plan. Use the switches to compare; click a stage thumbnail to enlarge it. These are rough sketches to pick a direction from, not final art.</p>
+
+  <h2>What the research says works</h2>
+  <div class="research">
+    <div class="card"><h3>Finch: growth is the hook</h3><p>The bird starts as a <b>baby and visibly grows up</b> as you check in. People praise the art, liken it to a Tamagotchi, and stay for the "it grew because of me" feeling.</p></div>
+    <div class="card"><h3>Forest: progress you can lose</h3><p>A tree grows while you focus and <b>withers if you quit</b>. Visible loss carries more weight than a number going down.</p></div>
+    <div class="card"><h3>Pikmin: 3 readable stages</h3><p><b>Leaf → bud → flower</b>. Each stage is a single silhouette change you can read at thumbnail size.</p></div>
+    <div class="card"><h3>BitePal / LittleMoochi: food pets</h3><p>Each logged meal is a feeding, and skipping drains energy. LittleMoochi says <b>"we don't label food as good or bad"</b>, so the pet reflects habits, not judgement.</p></div>
+    <div class="card"><h3>Mascot design: silhouette first</h3><p>Fill it black: can you still tell what it is? <b>Round shapes read friendly.</b> Keep the body, proportions and one signature accessory fixed, and let only the pose and face change (KEEPLI case study).</p></div>
+    <div class="card"><h3>Why the current Pip feels flat</h3><p>It's a <b>plain lavender oval</b>: the silhouette says "blob" with no story and no food link, and the body never changes, so there's nothing to grow into. Every option below fixes at least one of these.</p></div>
+  </div>
+
+  <div class="controls">
+    <label>Mood</label>
+    <div class="seg" id="moods"></div>
+    <label>Stage</label>
+    <div class="seg" id="stages"></div>
+  </div>
+
+  <div id="options"></div>
+
+  <h2>Side by side</h2>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>Option</th><th>Silhouette</th><th>Food link</th><th>Shows growth / loss</th><th>Walks to cooker (MPP-17/18)</th><th>Wardrobe + room</th><th>Rework</th></tr></thead>
+    <tbody>
+      <tr><td><b>A · Bao</b></td><td>Strong (pleated bun)</td><td>Very strong</td><td>Dough ball → golden bao; deflates on a slip</td><td>Yes</td><td>Yes (hats sit on the pleat)</td><td>Medium: new body + faces</td></tr>
+      <tr><td><b>B · Sprout</b></td><td>Strong (leaf on head)</td><td>Medium (garden/herbs)</td><td>Seed → bloom, the clearest of all; leaves droop</td><td>Yes</td><td>Yes</td><td>Medium</td></tr>
+      <tr><td><b>C · Starter</b></td><td>Strong (jar)</td><td>Very strong, homemade-first</td><td>Rises / falls in the jar, very literal</td><td><b>No</b>: lives on the counter</td><td>Weak: no body for clothes</td><td>High: room + cook animation</td></tr>
+      <tr><td><b>D · Red-panda chef</b></td><td>Strongest (ears + tail)</td><td>Through outfits (chef hat)</td><td>Baby → head chef; shows less directly</td><td>Yes, most natural</td><td>Best fit</td><td>High: most detailed art</td></tr>
+      <tr><td><b>E · Pip 2.0</b></td><td>Better (tuft + arms)</td><td>Weak</td><td>Same as current glow-up plan</td><td>Yes</td><td>Yes</td><td>Low: keeps the existing geometry</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h2>My recommendation</h2>
+  <div class="card rec">
+    <p><b>A · Bao</b>, with <b>B · Sprout</b> as runner-up.</p>
+    <p>Bao is the only option that is food, fully mobile and round-and-friendly at once. Its growth story fits a cooking app: a dough ball proves, gets steamed, then turns golden. The "slip" state is easy to read (it deflates a little) without feeling cruel. It also keeps everything already built or planned: the room, walking to the cooker, the wardrobe and the 5-stage glow-up.</p>
+    <p>Sprout shows progress best (Pikmin's leaf → bud → flower is proven), but it's a garden character in a kitchen app. Starter is the most charming idea and fits homemade-first, but a jar can't walk to the cooker or wear clothes, so MPP-17/18 and the wardrobe would need redesigning. The red panda is the most "pet-like" (Finch's model) but the art cost is highest and the food link only comes through its outfits.</p>
+    <p>The name can stay "Pip" whichever you choose, since it's user-editable anyway.</p>
+  </div>
+
+  <h2>Sources</h2>
+  <p class="sources">
+    <a href="https://fueled.com/blog/finch-adorable-useful/">Fueled: Finch app of the week</a> ·
+    <a href="https://habi.app/insights/finch-alternatives/">Habi: Finch alternatives</a> ·
+    <a href="https://www.botany.one/a-small-dose-of-plant-science-and-focus-with-forest-app/">Botany One: Forest app</a> ·
+    <a href="https://pikminwiki.com/Special:MobileDiff/242498">Pikmin wiki: leaf/bud/flower</a> ·
+    <a href="https://consumerapplab.substack.com/p/bitepals-ai-pet-makes-meal-logging">Consumer App Lab: BitePal</a> ·
+    <a href="https://www.cmu.edu/engage/about-us/news/alumni/profile-xia.html">CMU: LittleMoochi founder</a> ·
+    <a href="https://citrusbits.com/how-gamification-has-catapulted-duolingo-strava-and-forest-to-the-top-of-their-respective-app-categories/">CitrusBits: Duolingo / Strava / Forest</a> ·
+    <a href="https://contra.com/p/om3ZAkOF-mobile-app-ui-ux-design-mascot-and-brand-system">KEEPLI mascot system</a> ·
+    <a href="https://madegooddesigns.com/character-design-basics/">Character design basics</a>
+  </p>
+</main>
+
+<script>
+const MOODS = ['content', 'happy', 'bored', 'mischievous', 'sleep'];
+const MOOD_LABELS = { content: 'Content', happy: 'Happy', bored: 'Bored', mischievous: 'Mischievous', sleep: 'Asleep' };
+const STAGE_SCALE = [0.66, 0.76, 0.86, 0.95, 1.04];
+let state = { mood: 'content', stage: 2 };
+
+/* ---------- shared face ---------- */
+function face(cx, ey, gap, mood, ink, s = 1) {
+  const L = cx - gap, R = cx + gap, my = ey + 17 * s;
+  const st = `stroke="${ink}" stroke-width="${4 * s}" stroke-linecap="round" fill="none"`;
+  const blush = (o) => `<ellipse cx="${L - 11 * s}" cy="${ey + 11 * s}" rx="${9 * s}" ry="${5 * s}" fill="#ff8fab" opacity="${o}"/><ellipse cx="${R + 11 * s}" cy="${ey + 11 * s}" rx="${9 * s}" ry="${5 * s}" fill="#ff8fab" opacity="${o}"/>`;
+  const eye = (x, dx = 0) => `<ellipse cx="${x + dx}" cy="${ey}" rx="${7 * s}" ry="${9 * s}" fill="${ink}"/><circle cx="${x + dx + 2.4 * s}" cy="${ey - 3.4 * s}" r="${2.8 * s}" fill="#fff"/>`;
+  switch (mood) {
+    case 'happy':
+      return `<path d="M${L - 9 * s} ${ey + 2 * s} Q${L} ${ey - 11 * s} ${L + 9 * s} ${ey + 2 * s}" ${st}/>
+              <path d="M${R - 9 * s} ${ey + 2 * s} Q${R} ${ey - 11 * s} ${R + 9 * s} ${ey + 2 * s}" ${st}/>
+              <path d="M${cx - 10 * s} ${my - 3 * s} Q${cx} ${my + 15 * s} ${cx + 10 * s} ${my - 3 * s} Z" fill="#7a2e45" stroke="${ink}" stroke-width="${3 * s}" stroke-linejoin="round"/>
+              ${blush(0.8)}`;
+    case 'bored':
+      return `<path d="M${L - 8 * s} ${ey} A${8 * s} ${8 * s} 0 0 0 ${L + 8 * s} ${ey} Z" fill="${ink}"/>
+              <path d="M${R - 8 * s} ${ey} A${8 * s} ${8 * s} 0 0 0 ${R + 8 * s} ${ey} Z" fill="${ink}"/>
+              <path d="M${L - 10 * s} ${ey} L${L + 10 * s} ${ey} M${R - 10 * s} ${ey} L${R + 10 * s} ${ey}" ${st}/>
+              <path d="M${cx - 7 * s} ${my + 2 * s} L${cx + 7 * s} ${my + 2 * s}" ${st}/>
+              ${blush(0.3)}`;
+    case 'mischievous':
+      return `${eye(L, 4 * s)}${eye(R, 4 * s)}
+              <path d="M${L - 10 * s} ${ey - 13 * s} Q${L} ${ey - 15 * s} ${L + 10 * s} ${ey - 20 * s}" ${st}/>
+              <path d="M${R - 10 * s} ${ey - 20 * s} Q${R} ${ey - 15 * s} ${R + 10 * s} ${ey - 13 * s}" ${st}/>
+              <path d="M${cx - 11 * s} ${my} Q${cx - 3 * s} ${my + 8 * s} ${cx + 3 * s} ${my + 1 * s} Q${cx + 8 * s} ${my - 3 * s} ${cx + 13 * s} ${my + 2 * s}" ${st}/>
+              <circle cx="${cx + 15 * s}" cy="${my + 8 * s}" r="${2.2 * s}" fill="#c98a3c"/>
+              ${blush(0.5)}`;
+    case 'sleep':
+      return `<path d="M${L - 9 * s} ${ey} Q${L} ${ey + 9 * s} ${L + 9 * s} ${ey}" ${st}/>
+              <path d="M${R - 9 * s} ${ey} Q${R} ${ey + 9 * s} ${R + 9 * s} ${ey}" ${st}/>
+              <ellipse cx="${cx}" cy="${my + 1 * s}" rx="${4 * s}" ry="${3.4 * s}" fill="#7a2e45"/>
+              ${blush(0.5)}`;
+    default:
+      return `${eye(L)}${eye(R)}
+              <path d="M${cx - 8 * s} ${my - 2 * s} Q${cx} ${my + 6 * s} ${cx + 8 * s} ${my - 2 * s}" ${st}/>
+              ${blush(0.55)}`;
+  }
+}
+
+/* Mood props that sit outside the body (drawn unscaled). */
+function props(mood, ink) {
+  if (mood === 'happy') return [[30, 60, 9], [172, 50, 7], [182, 100, 5]].map(([x, y, r]) =>
+    `<path d="M${x} ${y - r} Q${x} ${y} ${x + r} ${y} Q${x} ${y} ${x} ${y + r} Q${x} ${y} ${x - r} ${y} Q${x} ${y} ${x} ${y - r}Z" fill="#ffd34d" stroke="${ink}" stroke-width="1.6"/>`).join('');
+  if (mood === 'sleep') return `<text x="150" y="58" font-size="20" font-weight="700" fill="${ink}" opacity=".7" font-family="system-ui">z</text><text x="166" y="40" font-size="14" font-weight="700" fill="${ink}" opacity=".5" font-family="system-ui">z</text>`;
+  if (mood === 'bored') return `<ellipse cx="168" cy="44" rx="22" ry="13" fill="#fff" stroke="${ink}" stroke-width="2.5"/><circle cx="150" cy="64" r="4" fill="#fff" stroke="${ink}" stroke-width="2"/><circle cx="159" cy="45" r="2.5" fill="${ink}"/><circle cx="168" cy="45" r="2.5" fill="${ink}"/><circle cx="177" cy="45" r="2.5" fill="${ink}"/>`;
+  return '';
+}
+
+const scaled = (k, inner) => `<g transform="translate(100 184) scale(${k}) translate(-100 -184)">${inner}</g>`;
+const shadow = (k) => `<ellipse cx="100" cy="188" rx="${58 * k}" ry="6" fill="rgba(40,20,80,.12)"/>`;
+const chefHat = (x, y, w, tall, ink) => {
+  const h = tall ? 34 : 20;
+  return `<rect x="${x - w / 2}" y="${y - 6}" width="${w}" height="10" rx="3" fill="#fff" stroke="${ink}" stroke-width="3.5"/>
+          <path d="M${x - w / 2 + 2} ${y - 5} C${x - w / 2 - 12} ${y - h} ${x - w / 4} ${y - h - 18} ${x} ${y - h - 8} C${x + w / 4} ${y - h - 18} ${x + w / 2 + 12} ${y - h} ${x + w / 2 - 2} ${y - 5} Z" fill="#fff" stroke="${ink}" stroke-width="3.5" stroke-linejoin="round"/>`;
+};
+
+/* ---------- A · Bao ---------- */
+function bao(stage, mood) {
+  const ink = '#5b3a29';
+  const fill = stage === 0 ? '#f1ddb8' : stage === 4 ? '#fbe7bf' : '#fff8ec';
+  const shade = stage === 0 ? '#ddc293' : stage === 4 ? '#f0c77c' : '#efdcbc';
+  const flat = stage === 0 ? 0.78 : 1;  // dough ball is squat
+  const top = 184 - 118 * flat;
+  let s = `<defs><linearGradient id="bg${stage}${mood}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${fill}"/><stop offset="1" stop-color="${shade}"/></linearGradient></defs>`;
+  let body = '';
+  body += `<ellipse cx="76" cy="182" rx="13" ry="6" fill="${shade}" stroke="${ink}" stroke-width="4"/><ellipse cx="124" cy="182" rx="13" ry="6" fill="${shade}" stroke="${ink}" stroke-width="4"/>`;
+  body += `<path d="M24 176 C18 ${top + 40} 60 ${top} 100 ${top} C140 ${top} 182 ${top + 40} 176 176 Q100 188 24 176 Z" fill="url(#bg${stage}${mood})" stroke="${ink}" stroke-width="5" stroke-linejoin="round"/>`;
+  if (stage >= 1) { // pleats gathered at the top
+    body += `<path d="M100 ${top + 4} q-10 10 -24 8 M100 ${top + 4} q-4 12 -12 18 M100 ${top + 4} q4 12 12 18 M100 ${top + 4} q10 10 24 8" stroke="${ink}" stroke-width="3" fill="none" stroke-linecap="round" opacity=".55"/>`;
+    body += `<path d="M93 ${top + 2} q7 -10 14 0" stroke="${ink}" stroke-width="4" fill="${fill}" stroke-linecap="round"/>`;
+  }
+  if (stage >= 3) body += `<circle cx="100" cy="${top + 30}" r="4" fill="#e0574a"/>`; // char siu stamp
+  body += `<ellipse cx="58" cy="${top + 38}" rx="13" ry="7" transform="rotate(-28 58 ${top + 38})" fill="#fff" opacity=".6"/>`;
+  if (stage >= 3) body += `<path d="M28 140 q-14 4 -12 18" stroke="${ink}" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M172 140 q14 4 12 18" stroke="${ink}" stroke-width="5" fill="none" stroke-linecap="round"/>`;
+  body += face(100, top + 62 * flat, 26, mood, ink, 1);
+  if (stage === 4) body += chefHat(100, top + 4, 54, true, ink);
+  let extra = '';
+  if (stage >= 2 && mood !== 'bored') extra += `<path d="M62 ${184 - 128 * STAGE_SCALE[stage]} q-6 -10 0 -18 q6 -8 0 -16 M138 ${184 - 128 * STAGE_SCALE[stage]} q-6 -10 0 -18 q6 -8 0 -16" stroke="#b9b4c9" stroke-width="3.5" fill="none" stroke-linecap="round" opacity=".7"/>`;
+  if (stage === 4) extra += `<circle cx="100" cy="120" r="88" fill="none" stroke="#ffd34d" stroke-width="3" opacity=".35" stroke-dasharray="4 10"/>`;
+  return s + shadow(STAGE_SCALE[stage]) + extra + `<g class="bob">${scaled(STAGE_SCALE[stage], body)}</g>` + props(mood, ink);
+}
+
+/* ---------- B · Sprout ---------- */
+function sprout(stage, mood) {
+  const ink = '#2f4a22';
+  const seed = stage === 0;
+  const fill = seed ? '#d4a86a' : '#a8dc84', shade = seed ? '#b07f45' : '#74b553';
+  const droop = mood === 'bored' || mood === 'sleep';
+  let body = `<defs><linearGradient id="sg${stage}${mood}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${fill}"/><stop offset="1" stop-color="${shade}"/></linearGradient></defs>`;
+  // root feet
+  body += `<path d="M78 176 q-4 8 -12 9 M122 176 q4 8 12 9" stroke="${ink}" stroke-width="5" fill="none" stroke-linecap="round"/>`;
+  body += `<ellipse cx="100" cy="128" rx="54" ry="56" fill="url(#sg${stage}${mood})" stroke="${ink}" stroke-width="5"/>`;
+  body += `<ellipse cx="72" cy="96" rx="12" ry="7" transform="rotate(-35 72 96)" fill="#fff" opacity=".45"/>`;
+  if (seed) body += `<path d="M86 76 l8 10 l6 -8 l6 9 l8 -11" stroke="${ink}" stroke-width="3.5" fill="none" stroke-linejoin="round"/>`;
+  if (stage >= 1) {
+    const tip = droop ? 'M100 72 q6 -14 18 -10' : 'M100 72 q-2 -16 2 -28';
+    body += `<path d="${tip}" stroke="${ink}" stroke-width="5" fill="none" stroke-linecap="round"/>`;
+    const leaf = (x, y, rot, size) => `<path d="M${x} ${y} q${14 * size} ${-18 * size} ${32 * size} ${-6 * size} q${-12 * size} ${18 * size} ${-32 * size} ${6 * size} Z" transform="rotate(${rot} ${x} ${y})" fill="#7cc95a" stroke="${ink}" stroke-width="3.5" stroke-linejoin="round"/>`;
+    const lx = droop ? 116 : 102, ly = droop ? 63 : 50;
+    body += leaf(lx, ly, droop ? 40 : -10, stage >= 2 ? 1 : 0.7);
+    if (stage >= 2) body += leaf(lx - 2, ly, droop ? 140 : 190, 0.9);
+    if (stage === 3 && !droop) body += `<ellipse cx="102" cy="38" rx="8" ry="11" fill="#ff9fb8" stroke="${ink}" stroke-width="3.5"/>`;
+    if (stage === 4 && !droop) {
+      let petals = '';
+      for (let i = 0; i < 5; i++) petals += `<ellipse cx="102" cy="22" rx="8" ry="12" transform="rotate(${i * 72} 102 36)" fill="#ffb3c7" stroke="${ink}" stroke-width="3"/>`;
+      body += petals + `<circle cx="102" cy="36" r="7" fill="#ffd34d" stroke="${ink}" stroke-width="3"/>`;
+    }
+  }
+  body += face(100, 128, 22, mood, ink, 0.95);
+  return shadow(STAGE_SCALE[stage]) + `<g class="bob">${scaled(STAGE_SCALE[stage], body)}</g>` + props(mood, ink);
+}
+
+/* ---------- C · Starter ---------- */
+function starter(stage, mood) {
+  const ink = '#33505e';
+  const levels = [150, 136, 118, 98, 74];
+  let lvl = levels[stage];
+  if (mood === 'bored') lvl += 6; // sagging
+  let s = `<defs><clipPath id="jar${stage}${mood}"><rect x="52" y="58" width="96" height="128" rx="18"/></clipPath></defs>`;
+  s += shadow(0.85);
+  let inner = '';
+  inner += `<rect x="52" y="${lvl}" width="96" height="${186 - lvl}" fill="#f4e7c8"/>`;
+  if (stage === 0) inner += `<rect x="52" y="${lvl - 8}" width="96" height="10" fill="#bdb597" opacity=".85"/>`; // hooch: starter is hungry
+  const bubbles = [[70, 170, 3], [118, 164, 4], [90, 176, 2.5], [130, 150, 3], [66, 140, 3.5], [110, 128, 3], [78, 112, 4], [126, 104, 3], [96, 90, 2.5]];
+  bubbles.forEach(([x, y, r], i) => { if (y > lvl + 6 && i < 2 + stage * 2) inner += `<circle cx="${x}" cy="${y}" r="${r}" fill="none" stroke="#c9a96b" stroke-width="2"/>`; });
+  let body = `<g clip-path="url(#jar${stage}${mood})">${inner}</g>`;
+  if (stage === 4) body += `<path d="M48 76 C48 40 152 40 152 76 Z" fill="#f4e7c8" stroke="${ink}" stroke-width="4"/><circle cx="84" cy="62" r="3" fill="none" stroke="#c9a96b" stroke-width="2"/><circle cx="118" cy="56" r="3.5" fill="none" stroke="#c9a96b" stroke-width="2"/>`;
+  body += `<rect x="52" y="58" width="96" height="128" rx="18" fill="#dff1fa" fill-opacity=".28" stroke="${ink}" stroke-width="5"/>`;
+  body += `<rect x="58" y="52" width="84" height="10" rx="4" fill="#dff1fa" stroke="${ink}" stroke-width="4"/>`;
+  body += `<path d="M52 150 h96" stroke="#e8483f" stroke-width="4" opacity=".8"/>`; // elastic band marks yesterday's level
+  body += `<path d="M62 74 v60" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".7"/>`;
+  const fy = Math.min(stage === 4 ? 98 : lvl + 22, 166);
+  body += face(100, fy, 18, mood, ink, 0.8);
+  return s + `<g class="bob">${body}</g>` + props(mood, ink);
+}
+
+/* ---------- D · Red-panda chef ---------- */
+function panda(stage, mood) {
+  const ink = '#3d2318', fur = '#d9663a', dark = '#5a2d1e', cream = '#fbeedd';
+  let b = '';
+  // tail
+  b += `<path d="M128 168 C176 168 186 120 160 104 C150 98 140 108 150 118 C164 132 150 156 124 156 Z" fill="${fur}" stroke="${ink}" stroke-width="4" stroke-linejoin="round"/>`;
+  b += `<path d="M158 112 q8 6 8 14 M168 134 q-2 10 -10 16" stroke="${dark}" stroke-width="6" fill="none" stroke-linecap="round"/>`;
+  // body + legs
+  b += `<ellipse cx="84" cy="180" rx="11" ry="7" fill="${dark}" stroke="${ink}" stroke-width="4"/><ellipse cx="116" cy="180" rx="11" ry="7" fill="${dark}" stroke="${ink}" stroke-width="4"/>`;
+  b += `<ellipse cx="100" cy="156" rx="32" ry="26" fill="${dark}" stroke="${ink}" stroke-width="4.5"/>`;
+  if (stage >= 2) b += `<path d="M78 140 h44 l-4 38 q-18 6 -36 0 Z" fill="#fff" stroke="${ink}" stroke-width="3.5" stroke-linejoin="round"/><rect x="92" y="152" width="16" height="9" rx="2" fill="#f3d9c9" stroke="${ink}" stroke-width="2"/>`;
+  if (stage === 4) b += `<path d="M80 136 l20 12 l20 -12 l-6 14 l-14 -4 l-14 4 Z" fill="#e8483f" stroke="${ink}" stroke-width="3" stroke-linejoin="round"/>`;
+  // ears
+  b += `<path d="M58 78 L54 40 L88 58 Z" fill="${fur}" stroke="${ink}" stroke-width="4.5" stroke-linejoin="round"/><path d="M62 70 L60 50 L78 60 Z" fill="${cream}"/>`;
+  b += `<path d="M142 78 L146 40 L112 58 Z" fill="${fur}" stroke="${ink}" stroke-width="4.5" stroke-linejoin="round"/><path d="M138 70 L140 50 L122 60 Z" fill="${cream}"/>`;
+  // head
+  b += `<ellipse cx="100" cy="100" rx="52" ry="44" fill="${fur}" stroke="${ink}" stroke-width="5"/>`;
+  b += `<ellipse cx="74" cy="114" rx="16" ry="12" fill="${cream}"/><ellipse cx="126" cy="114" rx="16" ry="12" fill="${cream}"/><ellipse cx="100" cy="122" rx="20" ry="14" fill="${cream}"/>`;
+  b += `<path d="M76 84 q-6 4 -8 10 M124 84 q6 4 8 10" stroke="${cream}" stroke-width="7" stroke-linecap="round"/>`;
+  b += `<ellipse cx="100" cy="117" rx="5" ry="3.5" fill="${ink}"/>`;
+  b += face(100, 104, 24, mood, ink, 0.9);
+  if (stage === 1) b += `<path d="M86 60 q14 -10 28 0" stroke="${ink}" stroke-width="3" fill="#7cc5e8"/>`;
+  if (stage >= 3) b += chefHat(100, 62, 50, stage === 4, ink);
+  return shadow(STAGE_SCALE[stage]) + `<g class="bob">${scaled(STAGE_SCALE[stage], b)}</g>` + props(mood, ink);
+}
+
+/* ---------- E · Pip 2.0 ---------- */
+function pip2(stage, mood) {
+  const ink = '#3b2f5c';
+  let b = `<defs><linearGradient id="pg${stage}${mood}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9c8ff"/><stop offset="1" stop-color="#9f86e8"/></linearGradient></defs>`;
+  b += `<ellipse cx="76" cy="180" rx="14" ry="7" fill="#9f86e8" stroke="${ink}" stroke-width="4.5"/><ellipse cx="124" cy="180" rx="14" ry="7" fill="#9f86e8" stroke="${ink}" stroke-width="4.5"/>`;
+  b += `<path d="M30 132 q-16 4 -14 20" stroke="${ink}" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M170 132 q16 4 14 20" stroke="${ink}" stroke-width="5" fill="none" stroke-linecap="round"/>`;
+  b += `<path d="M100 54 C150 54 178 90 178 130 C178 166 146 182 100 182 C54 182 22 166 22 130 C22 90 50 54 100 54Z" fill="url(#pg${stage}${mood})" stroke="${ink}" stroke-width="5" stroke-linejoin="round"/>`;
+  b += `<path d="M98 56 q-8 -20 6 -26 q-2 12 10 14" fill="#cdbdf3" stroke="${ink}" stroke-width="4" stroke-linejoin="round"/>`; // signature tuft
+  b += `<path d="M42 150 q58 26 116 0" stroke="#fff" stroke-width="4" fill="none" opacity=".35"/>`; // belly line
+  b += `<ellipse cx="64" cy="86" rx="15" ry="8" transform="rotate(-30 64 86)" fill="#fff" opacity=".5"/>`;
+  b += face(100, 120, 25, mood, ink, 1);
+  if (stage >= 2) b += `<path d="M64 168 q36 10 72 0" stroke="#ffd34d" stroke-width="6" fill="none" stroke-linecap="round"/>`;
+  if (stage >= 3) b += `<circle cx="100" cy="171" r="6" fill="#ffd34d" stroke="${ink}" stroke-width="2.5"/>`;
+  if (stage === 4) b += chefHat(104, 56, 46, false, ink);
+  return shadow(STAGE_SCALE[stage]) + `<g class="bob">${scaled(STAGE_SCALE[stage], b)}</g>` + props(mood, ink);
+}
+
+const OPTIONS = [
+  { key: 'A', name: 'Bao', draw: bao, stages: ['Dough ball', 'Proofed', 'Steamed', 'Filled', 'Golden'],
+    pitch: 'A steamed bun that grows from a squat dough ball into a golden, chef-hatted bao.',
+    story: 'Logging meals "proves" the dough: it rises, gets pleats, starts steaming, then turns golden. A slip lets it sink back a stage. You can see it go flat, but it never looks sick or sad.',
+    good: ['Food mascot: says "cooking app" at a glance', 'Pleat silhouette is readable even at the 24px footer-tab size', 'Keeps legs, so the room, the cooker walk and the wardrobe all still work'],
+    bad: ['New body and faces needed for every mood', 'The "dough → bao" idea needs a line of copy the first time'],
+    fit: 'good', fitText: 'Keeps MPP-17/18 and the glow-up' },
+  { key: 'B', name: 'Sprout', draw: sprout, stages: ['Seed', 'Sprout', 'Two leaves', 'Bud', 'Bloom'],
+    pitch: 'A bean creature with a sprout on its head, like Pikmin\'s leaf → bud → flower.',
+    story: 'Consistency grows the plant on its head; a slip wilts it back a stage. Bored or asleep, the leaves droop, so mood and growth read from one feature.',
+    good: ['The clearest progress read of any option (a proven pattern)', 'Wilting is a gentle, non-judgemental way to show a slip', 'Still walks, so the room flow is unchanged'],
+    bad: ['A garden character rather than a food one', 'Looks close to Pikmin; needs its own twist (e.g. an herb or tomato plant)'],
+    fit: 'good', fitText: 'Keeps MPP-17/18 and the glow-up' },
+  { key: 'C', name: 'Starter', draw: starter, stages: ['Hungry (hooch)', 'Waking', 'Bubbly', 'Doubled', 'Overflowing'],
+    pitch: 'A sourdough starter in a jar. Feed it (log meals) and it rises past the elastic band.',
+    story: 'This is exactly how a real starter works: fed, it doubles; neglected, it goes flat and grows a grey "hooch" layer. The elastic band marks yesterday\'s level, so progress is literally visible.',
+    good: ['Very charming, and fits homemade-first perfectly', 'Rise and fall map 1:1 onto the 30-day score', 'Unique: no other habit app does this'],
+    bad: ['Can\'t walk to the cooker, so MPP-17/18 needs redesigning', 'No body for outfits, so the wardrobe would become jar lids, cloths and labels', 'Faces have less room for emotion'],
+    fit: 'bad', fitText: 'Breaks the room walk + wardrobe' },
+  { key: 'D', name: 'Red-panda chef', draw: panda, stages: ['Cub', 'Kid', 'Apron', 'Chef', 'Head chef'],
+    pitch: 'Finch\'s model: a real animal that grows up, here into a chef.',
+    story: 'It starts as a cub and earns its apron, chef hat and tall hat as consistency builds. On a slip it loses its latest piece of kit (the hat goes back on the hook) instead of shrinking.',
+    good: ['Most "pet-like"; people bond with animals most (Finch, Tamagotchi)', 'Strongest silhouette (ears + striped tail)', 'Natural fit for the room, wardrobe and cooker'],
+    bad: ['Most detailed art, so the most work per mood and outfit', 'Food link only through outfits', 'Growth is shown by kit, so the body changes least'],
+    fit: 'warn', fitText: 'Fits everything, highest art cost' },
+  { key: 'E', name: 'Pip 2.0', draw: pip2, stages: ['Tiny', 'Small', 'Belt', 'Medal', 'Chef'],
+    pitch: 'Keep Pip, but fix what makes the blob flat: a signature tuft, arms, deeper colour and a belly line.',
+    story: 'Same glow-up plan as today. The tuft and arms give the silhouette something to recognise, and the arms let Pip hold things (a spoon, a plate) in the cook animation.',
+    good: ['Cheapest: reuses the existing body path and faces', 'No change to the room, moods or code shape', 'Your users already know Pip'],
+    bad: ['Still a blob, with no food story', 'Doesn\'t fix the "nothing to grow into" problem as well as A–D'],
+    fit: 'good', fitText: 'Drop-in replacement' },
+];
+
+function svg(draw, stage, mood, vb = '0 0 200 200') {
+  return `<svg viewBox="${vb}" class="mood-${mood}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${MOOD_LABELS[mood]}">${draw(stage, mood)}</svg>`;
+}
+
+function render() {
+  document.getElementById('moods').innerHTML = MOODS.map(m => `<button class="${m === state.mood ? 'on' : ''}" data-mood="${m}">${MOOD_LABELS[m]}</button>`).join('');
+  document.getElementById('stages').innerHTML = [0, 1, 2, 3, 4].map(i => `<button class="${i === state.stage ? 'on' : ''}" data-stage="${i}">${i + 1}</button>`).join('');
+  document.getElementById('options').innerHTML = OPTIONS.map(o => `
+    <section class="card option">
+      <div class="hero"><span class="tag">${o.key}</span>${svg(o.draw, state.stage, state.mood, '0 0 200 200')}</div>
+      <div>
+        <h3>${o.key} · ${o.name} <span class="pill ${o.fit}">${o.fitText}</span></h3>
+        <p class="pitch">${o.pitch}</p>
+        <div class="strip">${o.stages.map((label, i) => `<div class="${i === state.stage ? 'on' : ''}" data-stage="${i}">${svg(o.draw, i, state.mood)}${i + 1}. ${label}</div>`).join('')}</div>
+        <div class="facts">
+          <div><h4>How progress shows</h4><p>${o.story}</p></div>
+          <div><h4>Strengths</h4><ul>${o.good.map(g => `<li>${g}</li>`).join('')}</ul></div>
+          <div><h4>Drawbacks</h4><ul>${o.bad.map(g => `<li>${g}</li>`).join('')}</ul></div>
+        </div>
+      </div>
+    </section>`).join('');
+}
+
+document.addEventListener('click', (e) => {
+  const m = e.target.closest('[data-mood]'); const s = e.target.closest('[data-stage]');
+  if (m) { state.mood = m.dataset.mood; render(); }
+  else if (s) { state.stage = +s.dataset.stage; render(); }
+});
+render();
+</script>
+</body>
+</html>

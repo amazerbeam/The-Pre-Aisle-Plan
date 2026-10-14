@@ -35,6 +35,9 @@ const PetContext = createContext()
  * breakfast/lunch/dinner and how many YOU haven't eaten (fridgeFill), over the 7 days
  * fridgeWindow picks. It reads weekPlan when the calendar shows that week, otherwise one
  * abortable fetch of it. Its error never blanks Pip.
+ *
+ * MPP-21: `todayISO` (the same minute clock's local date) so the check-in bubble re-asks
+ * after midnight without a second clock.
  */
 export const PetProvider = ({ children }) => {
   const { isAuthenticated } = useAuth()
@@ -168,6 +171,7 @@ export const PetProvider = ({ children }) => {
     moodInfo,
     position,
     fridge,
+    todayISO,
     loading: petLoading || planLoading,
     error: petError || planError,
     retry,

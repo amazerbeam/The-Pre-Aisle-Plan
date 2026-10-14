@@ -8,6 +8,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
@@ -29,6 +30,7 @@ public class PersistedShoppingListService {
     private final ShoppingListService shoppingListService;
     private final UserRepository userRepository;
     private final ObjectMapper objectMapper;
+    private final ApplicationEventPublisher eventPublisher;   // MPP-24: firsts candidates
 
     /**
      * Get the effective meal plan owner ID for a user.
@@ -126,6 +128,9 @@ public class PersistedShoppingListService {
 
         // Save all items
         items = shoppingListItemRepository.saveAll(items);
+
+        // MPP-24: credited to the person who generated it, even on a shared plan.
+        eventPublisher.publishEvent(PetFirstCandidate.of(userId, FirstKey.GENERATE_SHOPPING_LIST));
 
         return convertToDTO(shoppingList, items);
     }

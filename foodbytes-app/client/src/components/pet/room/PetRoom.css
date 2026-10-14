@@ -59,9 +59,9 @@
   }
 }
 
-/* MPP-19 AC 3: the fridge button sits over the fridge art (fridgeHitBox, % of the viewBox);
-   at least 44 px however small the card gets. */
-.pip-fridge-btn {
+/* MPP-19 / MPP-23: a station button over its art (fridgeHitBox / cabinetHitBox, % of the
+   viewBox); at least 44 px however small the card gets. */
+.pip-station-btn {
   position: absolute;
   min-width: 44px;
   min-height: 44px;
@@ -74,17 +74,17 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.pip-fridge-btn:active {
+.pip-station-btn:active {
   background: rgba(255, 211, 77, 0.25);
 }
 
 @media (hover: hover) {
-  .pip-fridge-btn:hover {
+  .pip-station-btn:hover {
     background: rgba(255, 211, 77, 0.18);
   }
 }
 
-.pip-fridge-btn:focus-visible {
+.pip-station-btn:focus-visible {
   outline: 3px solid #ffd34d;
   outline-offset: 2px;
 }

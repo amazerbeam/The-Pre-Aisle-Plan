@@ -26,6 +26,7 @@ import org.mockito.InjectMocks;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -70,6 +71,7 @@ class MealPlanServiceTest {
     @Mock private ExtraChoiceService extraChoiceService;
     @Mock private RecipeFamilyMemberRepository recipeFamilyMemberRepository;
     @Mock private MealPlanEntryEatenRepository mealPlanEntryEatenRepository;
+    @Mock private ApplicationEventPublisher eventPublisher;   // MPP-24: firsts candidates
 
     @InjectMocks private MealPlanService mealPlanService;
 
@@ -421,6 +423,7 @@ class MealPlanServiceTest {
         mealPlanService.copyWeek(USER_ID, source, target);
 
         verify(extraChoiceService).copyEntryChoices(Map.of(10L, 900L, 11L, 901L));
+        verify(eventPublisher).publishEvent(PetFirstCandidate.planned(USER_ID, target, target.plusDays(6)));
     }
 
     @Test
@@ -440,6 +443,7 @@ class MealPlanServiceTest {
         assertThat(ea.getId()).isEqualTo(10L);
         assertThat(eb.getId()).isEqualTo(11L);
         verifyNoInteractions(extraChoiceService);
+        verify(eventPublisher).publishEvent(PetFirstCandidate.planned(USER_ID, a, b));
     }
 
     @Test
@@ -617,5 +621,68 @@ class MealPlanServiceTest {
         assertThat(dtos).hasSize(1);
         assertThat(dtos.get(0).getEaten()).isTrue();
         assertThat(dtos.get(0).getEatenAt()).isEqualTo(Instant.parse("2026-10-12T08:00:00Z"));
+    }
+
+    // ------------------------------------------------------------------
+    // MPP-24: firsts candidates, always credited to the actor
+    // ------------------------------------------------------------------
+
+    @Test
+    void assignRecipe_newEntry_publishesAFullWeekCandidateForThatDay() {
+        stubHappyPath();
+
+        mealPlanService.assignRecipe(USER_ID, requestWithServings(null));
+
+        LocalDate day = LocalDate.of(2026, 7, 31);
+        verify(eventPublisher).publishEvent(PetFirstCandidate.planned(USER_ID, day, day));
+    }
+
+    @Test
+    void assignRecipe_toggleOff_publishesNothing() {
+        LocalDate day = LocalDate.of(2026, 7, 31);
+        when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user));
+        when(mealPlanEntryRepository.findByUserIdAndPlanDateAndMealIdAndRecipeId(USER_ID, day, MEAL_ID, RECIPE_ID))
+                .thenReturn(Optional.of(entryWithId(10L, recipe, day)));
+
+        assertThat(mealPlanService.assignRecipe(USER_ID, requestWithServings(null))).isNull();
+
+        verifyNoInteractions(eventPublisher);
+    }
+
+    @Test
+    void swapDays_reversedDates_publishesTheRangeInOrder() {
+        LocalDate a = LocalDate.of(2026, 10, 12);
+        LocalDate b = LocalDate.of(2026, 10, 14);
+        when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user));
+        when(mealPlanEntryRepository.findByUserIdAndPlanDate(USER_ID, b)).thenReturn(List.of());
+        when(mealPlanEntryRepository.findByUserIdAndPlanDate(USER_ID, a)).thenReturn(List.of());
+
+        mealPlanService.swapDays(USER_ID, b, a);
+
+        verify(eventPublisher).publishEvent(PetFirstCandidate.planned(USER_ID, a, b));
+    }
+
+    @Test
+    void setEntryEaten_linkedPartner_publishesTheCookedCandidateForThePartner() {
+        MealPlanEntry sharedEntry = entryWithId(ENTRY_ID, recipeWithId(82L), LocalDate.of(2026, 10, 13));
+        when(userRepository.findById(LINKED_ID)).thenReturn(Optional.of(linkedUser()));
+        when(mealPlanEntryRepository.findByIdAndUserId(ENTRY_ID, OWNER_ID)).thenReturn(Optional.of(sharedEntry));
+        when(mealPlanEntryEatenRepository.findByMealPlanEntryIdAndUserId(ENTRY_ID, LINKED_ID))
+                .thenReturn(Optional.of(tick(ENTRY_ID, LINKED_ID, LocalDateTime.of(2026, 10, 13, 12, 30))));
+
+        mealPlanService.setEntryEaten(LINKED_ID, ENTRY_ID, true);
+
+        verify(eventPublisher).publishEvent(PetFirstCandidate.cooked(LINKED_ID, ENTRY_ID));
+    }
+
+    @Test
+    void setEntryEaten_untick_publishesNothing() {
+        MealPlanEntry entry = entryWithId(ENTRY_ID, recipeWithId(82L), LocalDate.of(2026, 10, 13));
+        when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user));
+        when(mealPlanEntryRepository.findByIdAndUserId(ENTRY_ID, USER_ID)).thenReturn(Optional.of(entry));
+
+        mealPlanService.setEntryEaten(USER_ID, ENTRY_ID, false);
+
+        verifyNoInteractions(eventPublisher);
     }
 }

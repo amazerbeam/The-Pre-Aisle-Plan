@@ -1,6 +1,7 @@
 import { MOCHI_OUTLINE } from '../mochiParts'
 import { P } from './iso'
 import { Bill, Box, Cyl, EllH, IsoLine, RectU, RectV } from './isoShapes'
+import { RibbonArt, TrophyArt } from './awardArt'
 
 /**
  * MPP-16 AC 3: every station at levels 1–4, art from pip-room-mockup-v5.html.
@@ -246,10 +247,7 @@ function TrophyAt({ u, v, h, s = 0.6 }) {
   return (
     <Bill u={u} v={v} h={h}>
       <g transform={`translate(${-16 * s},0) scale(${s})`}>
-        <rect x="6" y="-6" width="20" height="6" fill="#8a5a2b" {...ART_STROKE} />
-        <rect x="13" y="-14" width="6" height="8" fill="#ffc83d" {...ART_STROKE} />
-        <path d="M4 -34 h24 q0 20 -12 20 q-12 0 -12 -20z" fill="#ffd34d" {...ART_STROKE} />
-        <path d="M4 -30 q-7 2 -3 9 q3 3 6 1 M28 -30 q7 2 3 9 q-3 3 -6 1" fill="none" {...ART_STROKE} />
+        <TrophyArt />
       </g>
     </Bill>
   )
@@ -259,9 +257,7 @@ function RibbonAt({ u, v, h, s = 0.6 }) {
   return (
     <Bill u={u} v={v} h={h}>
       <g transform={`translate(${-14 * s},0) scale(${s})`}>
-        <path d="M8 -10 l-4 14 l6 -3 l4 5 l2 -16 M20 -10 l4 14 l-6 -3 l-4 5 l-2 -16" fill="#e63946" {...ART_STROKE} />
-        <circle cx="14" cy="-18" r="10" fill="#4dabf7" {...ART_STROKE} />
-        <circle cx="14" cy="-18" r="5" fill="#ffd34d" />
+        <RibbonArt />
       </g>
     </Bill>
   )

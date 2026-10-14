@@ -34,6 +34,20 @@
   border-bottom: 0;
 }
 
+/* MPP-21: the bubble holds a text line and, while Pip asks, the check-in controls. */
+.pet-bubble-text {
+  margin: 0;
+}
+
+.pet-bubble.is-asking {
+  max-width: min(230px, 62%);
+}
+
+/* Focus lands here only programmatically (SpeechBubble), never by Tab. */
+.pet-bubble:focus {
+  outline: none;
+}
+
 /* ---- Name + chip ---- */
 .pet-meta {
   display: flex;

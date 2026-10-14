@@ -11,6 +11,7 @@ import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -25,6 +26,7 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -43,6 +45,7 @@ class MealPlanTemplateServiceTest {
     @Mock private MealPlanService mealPlanService;
     @Mock private ExtraChoiceService extraChoiceService;
     @Mock private ManageExtrasService manageExtrasService;
+    @Mock private ApplicationEventPublisher eventPublisher;   // MPP-24: firsts candidates
 
     @InjectMocks private MealPlanTemplateService service;
 
@@ -145,6 +148,7 @@ class MealPlanTemplateServiceTest {
         service.saveTemplate(USER_ID, createRequest());
 
         verify(extraChoiceService).copyEntryChoicesToTemplate(Map.of(10L, 700L, 11L, 701L));
+        verify(eventPublisher).publishEvent(PetFirstCandidate.of(USER_ID, FirstKey.MAKE_TEMPLATE));
     }
 
     @Test
@@ -159,6 +163,7 @@ class MealPlanTemplateServiceTest {
         service.applyTemplate(USER_ID, 5L, MONDAY);
 
         verify(extraChoiceService).copyTemplateChoicesToEntries(Map.of(700L, 900L, 701L, 901L));
+        verify(eventPublisher).publishEvent(PetFirstCandidate.planned(USER_ID, MONDAY, MONDAY.plusDays(6)));
     }
 
     @Test
@@ -187,6 +192,7 @@ class MealPlanTemplateServiceTest {
         InOrder order = inOrder(templateEntryRepository, extraChoiceService);
         order.verify(templateEntryRepository).deleteByTemplateId(5L);
         order.verify(extraChoiceService).copyEntryChoicesToTemplate(Map.of(10L, 710L, 11L, 711L));
+        verifyNoInteractions(eventPublisher);   // MPP-24: re-snapshotting is not "making" a template
     }
 
     @Test

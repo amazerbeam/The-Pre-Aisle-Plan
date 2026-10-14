@@ -4,6 +4,7 @@ import com.foodbytes.dto.*;
 import com.foodbytes.model.*;
 import com.foodbytes.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
@@ -41,6 +42,7 @@ public class MealPlanTemplateService {
     private final MealPlanService mealPlanService;
     private final ExtraChoiceService extraChoiceService;     // MPP-10: carries homemade/store-bought choices
     private final ManageExtrasService manageExtrasService;   // MPP-10: Extras counts in Manage templates
+    private final ApplicationEventPublisher eventPublisher;  // MPP-24: firsts candidates
 
     private Long getEffectiveMealPlanOwnerId(Long userId) {
         return userRepository.findById(userId)
@@ -90,6 +92,7 @@ public class MealPlanTemplateService {
         template = templateRepository.save(template);
 
         snapshotIntoTemplate(template, ownerId, request.getSourceStartDate());
+        eventPublisher.publishEvent(PetFirstCandidate.of(userId, FirstKey.MAKE_TEMPLATE)); // MPP-24: the clicker, not the owner
         return toDetailDTO(template);
     }
 
@@ -193,6 +196,7 @@ public class MealPlanTemplateService {
                 templateEntryToEntry.put(templateEntryIds.get(i), saved.get(i).getId());
             }
             extraChoiceService.copyTemplateChoicesToEntries(templateEntryToEntry);
+            eventPublisher.publishEvent(PetFirstCandidate.planned(userId, targetStartDate, targetStartDate.plusDays(6))); // MPP-24
         }
 
         return mealPlanService.getWeekPlan(userId, targetStartDate);

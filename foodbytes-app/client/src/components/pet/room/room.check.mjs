@@ -7,7 +7,7 @@ import { P, pts, shade, boxFaces, ellipsePoints, cylinderSidePoints, ISO_C, ISO_
 import {
   ROOM_DRAW_ORDER, PIP_HOME, PIP_SCALE, PIP_COOKER_SPOT, PIP_BED_SCALE, PIP_BED_DROP, RUG, STATION_ANCHORS,
   COOK_WALK_OFFSET, cookPose, pipPose, resolveRoomLevels,
-  FRIDGE_FOOTPRINT, FRIDGE_GAUGE_LIFT, FRIDGE_GAUGE_HALF_HEIGHT, fridgeHitBox
+  FRIDGE_FOOTPRINT, FRIDGE_GAUGE_LIFT, FRIDGE_GAUGE_HALF_HEIGHT, fridgeHitBox, CABINET_FOOTPRINT, cabinetHitBox
 } from './roomLayout.js'
 import { DEFAULT_ROOM_LEVELS, ROOM_MAX_LEVEL } from '../../../constants/petRoom.js'
 
@@ -102,5 +102,20 @@ for (let level = 1; level <= ROOM_MAX_LEVEL; level++) {
 }
 assert.ok(fridgeHitBox(4).height > fridgeHitBox(1).height, 'a bigger fridge gets a bigger button')
 assert.deepEqual(fridgeHitBox(9), fridgeHitBox(1)) // an invalid level falls back to level 1
+
+// MPP-23 AC 1: the cabinet button covers the cabinet at every level, inside the viewBox,
+// and never overlaps the fridge button (they are on opposite walls).
+for (let level = 1; level <= ROOM_MAX_LEVEL; level++) {
+  const box = cabinetHitBox(level)
+  assert.ok(box.x >= 0 && box.y >= 0 && box.x + box.width <= 360 && box.y + box.height <= 330, `level ${level} cabinet box leaves the viewBox`)
+  const inside = ([x, y]) => x >= box.x - 1e-9 && x <= box.x + box.width + 1e-9 && y >= box.y - 1e-9 && y <= box.y + box.height + 1e-9
+  const [u, v, du, dv, h0, h1] = CABINET_FOOTPRINT[level - 1]
+  assert.ok(inside(P(u + du / 2, v + dv / 2, h0)), `level ${level} cabinet base centre is outside the box`)
+  assert.ok(inside(P(u + du / 2, v + dv / 2, h1)), `level ${level} cabinet top centre is outside the box`)
+  const fridge = fridgeHitBox(level)
+  assert.ok(fridge.x + fridge.width <= box.x || box.x + box.width <= fridge.x, `level ${level} cabinet and fridge buttons overlap`)
+}
+assert.ok(cabinetHitBox(4).height > cabinetHitBox(1).height, 'a bigger cabinet gets a bigger button')
+assert.deepEqual(cabinetHitBox(9), cabinetHitBox(1)) // an invalid level falls back to level 1
 
 console.log('room checks passed')

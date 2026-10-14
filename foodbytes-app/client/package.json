@@ -1,6 +1,6 @@
 {
   "name": "foodbytes-client",
-  "version": "1.11.0",
+  "version": "1.15.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -12,6 +12,8 @@
     "check:room": "node src/components/pet/room/room.check.mjs",
     "check:cook": "node src/utils/cookServe.check.mjs",
     "check:fridge": "node src/utils/fridgeFill.check.mjs",
+    "check:checkin": "node src/utils/habitCheckIn.check.mjs",
+    "check:awards": "node src/utils/petAwards.check.mjs",
     "check:version": "node scripts/check-version.mjs"
   },
   "dependencies": {

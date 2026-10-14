@@ -1,0 +1,491 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pip Sprout Evolutions</title>
+<style>
+  :root {
+    --brand: #4a3f80; --brand-light: #6b5fa0;
+    --text: #2c3e50; --muted: #6c757d;
+    --bg: #f4f7f0; --card: #ffffff;
+    --line: #e3e9dc;
+    --good: #1b6b2e; --good-bg: rgba(40,167,69,.13);
+    --warn: #856404; --warn-bg: rgba(255,193,7,.2);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; }
+  main { max-width: 1120px; margin: 0 auto; padding: 24px 16px 64px; }
+  h1 { color: var(--brand); margin: 0 0 4px; font-size: 1.7rem; }
+  h2 { color: var(--brand); margin: 36px 0 12px; font-size: 1.25rem; }
+  .lede { color: var(--muted); margin: 0 0 16px; max-width: 780px; }
+  .card { background: var(--card); border-radius: 18px; padding: 18px; box-shadow: 0 4px 18px rgba(60,90,40,.08); }
+
+  .controls { position: sticky; top: 0; z-index: 5; background: rgba(244,247,240,.95); backdrop-filter: blur(6px); padding: 12px 0; margin: 16px 0 12px; display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; border-bottom: 1px solid var(--line); }
+  .controls label { font-size: .78rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+  .seg { display: inline-flex; background: #fff; border: 1px solid var(--line); border-radius: 999px; padding: 3px; flex-wrap: wrap; }
+  .seg button { border: 0; background: none; padding: 6px 12px; border-radius: 999px; font: inherit; font-size: .85rem; color: var(--muted); cursor: pointer; }
+  .seg button.on { background: var(--brand); color: #fff; }
+  .sim { display: inline-flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+  .sim button { border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 6px 12px; font: inherit; font-size: .85rem; cursor: pointer; }
+  .sim button.up { border-color: #8fcf6a; color: var(--good); }
+  .sim button.down { border-color: #f0b4b4; color: #a71d2a; }
+  .meter { width: 140px; height: 10px; border-radius: 999px; background: #e6ebe0; overflow: hidden; position: relative; }
+  .meter i { position: absolute; inset: 0 auto 0 0; background: linear-gradient(90deg, #a8dc84, #4caf50); border-radius: 999px; transition: width .4s; }
+  .score { font-size: .85rem; font-weight: 700; color: var(--good); min-width: 70px; }
+
+  .line { display: grid; grid-template-columns: 300px 1fr; gap: 22px; margin-bottom: 22px; }
+  .hero { background: radial-gradient(circle at 50% 70%, #f6fbef, #e3efd6); border-radius: 14px; position: relative; overflow: hidden; }
+  .hero svg { width: 100%; height: auto; display: block; }
+  .hero .form-name { position: absolute; bottom: 10px; left: 0; right: 0; text-align: center; font-weight: 700; color: #2f4a22; font-size: .9rem; }
+  .hero .wilt-note { position: absolute; top: 10px; right: 10px; background: #fff4d6; color: #856404; font-size: .72rem; font-weight: 700; border-radius: 999px; padding: 2px 9px; }
+  .tag { position: absolute; top: 10px; left: 10px; background: var(--brand); color: #fff; font-weight: 700; font-size: .8rem; border-radius: 999px; padding: 2px 10px; }
+  .line h3 { margin: 0; font-size: 1.25rem; }
+  .line .pitch { margin: 2px 0 12px; color: var(--muted); }
+
+  .evo { display: flex; align-items: center; gap: 2px; margin-bottom: 12px; }
+  .evo .form { flex: 1 1 0; min-width: 0; }
+  .evo .arrow { color: #8fcf6a; font-size: 1.1rem; font-weight: 700; flex: none; }
+  .evo .form { background: #f8fbf4; border-radius: 12px; text-align: center; padding: 4px 4px 8px; border: 2px solid transparent; }
+  .evo .form.on { border-color: #8fcf6a; }
+  .evo .form svg { width: 100%; max-width: 150px; height: auto; display: block; margin: 0 auto; }
+  .evo .form b { display: block; font-size: .78rem; color: #2f4a22; }
+  .evo .form span { font-size: .72rem; color: var(--muted); }
+  .facts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 18px; font-size: .86rem; }
+  .facts h4 { margin: 0 0 2px; font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; color: var(--brand-light); }
+  .facts ul { margin: 0; padding-left: 18px; }
+  .facts p { margin: 0; }
+
+  .moodrow { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+  .moodrow div { background: radial-gradient(circle at 50% 70%, #f6fbef, #e3efd6); border-radius: 12px; text-align: center; font-size: .8rem; font-weight: 600; color: #2f4a22; padding-bottom: 6px; }
+  .moodrow svg { width: 100%; height: auto; display: block; }
+  .note { font-size: .85rem; color: var(--muted); margin: 10px 0 0; }
+  @media (max-width: 760px) { .moodrow { grid-template-columns: repeat(3, 1fr); } }
+  .rules { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
+  .rules h3 { margin: 0 0 6px; font-size: 1rem; }
+  .rules p, .rules li { font-size: .88rem; }
+  .rules ul { padding-left: 18px; margin: 6px 0 0; }
+  .rec { border-left: 5px solid #8fcf6a; }
+  table { width: 100%; border-collapse: collapse; font-size: .86rem; }
+  th, td { padding: 7px 9px; text-align: left; border-bottom: 1px solid var(--line); }
+  th { color: var(--brand); font-size: .76rem; text-transform: uppercase; letter-spacing: .04em; }
+  .pill { display: inline-block; font-size: .72rem; font-weight: 700; border-radius: 999px; padding: 1px 9px; }
+  .pill.good { background: var(--good-bg); color: var(--good); }
+  .pill.warn { background: var(--warn-bg); color: var(--warn); }
+
+  @media (max-width: 760px) {
+    .line { grid-template-columns: 1fr; }
+    .facts { grid-template-columns: 1fr; }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .bob { animation: bob 2.6s ease-in-out infinite; transform-box: fill-box; transform-origin: 50% 100%; }
+    .mood-happy .bob { animation: bounce 1.1s ease-in-out infinite; }
+    .mood-bored .bob, .wilted .bob { animation: droop 4s ease-in-out infinite; }
+    .mood-mischievous .bob { animation: shuffle 1.6s ease-in-out infinite; }
+    .mood-sleep .bob { animation: breathe 3.6s ease-in-out infinite; }
+    .evolving svg { animation: evolve 1.6s ease-in-out; }
+    .evolving::after { content: ""; position: absolute; inset: 0; background: radial-gradient(circle, rgba(255,255,255,.95), rgba(255,255,255,0) 70%); animation: flash 1.6s ease-out forwards; pointer-events: none; }
+  }
+  @keyframes bob { 50% { transform: translateY(-4px) scale(.985, 1.015); } }
+  @keyframes bounce { 0%,100% { transform: scale(1.03,.97); } 40% { transform: translateY(-12px) scale(.97,1.04); } }
+  @keyframes droop { 0%,100% { transform: rotate(-2deg); } 50% { transform: rotate(2deg); } }
+  @keyframes shuffle { 25% { transform: translateX(-3px) rotate(-3deg); } 75% { transform: translateX(3px) rotate(3deg); } }
+  @keyframes breathe { 50% { transform: scale(1.02, .98); } }
+  /* Pokémon-style: the creature turns to a white silhouette, pulses, then resolves into the new form. */
+  @keyframes evolve {
+    0% { filter: brightness(1); }
+    15%, 70% { filter: brightness(0) invert(1) drop-shadow(0 0 10px #fff); }
+    25%, 45% { transform: scale(.85); }
+    35%, 55% { transform: scale(1.08); }
+    100% { filter: brightness(1); transform: scale(1); }
+  }
+  @keyframes flash { 0% { opacity: 0; } 60% { opacity: 1; } 100% { opacity: 0; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Pip as a sprout that evolves</h1>
+  <p class="lede">Three evolution lines, each with <b>five distinct forms</b>, one per glow-up stage, like Bulbasaur → Ivysaur → Venusaur rather than one plant slowly getting bigger. Every stage-up is an <b>evolution</b>. Use <b>Good week</b> / <b>Slip week</b> to move the 30-day score and watch an evolution play, and try both slip rules.</p>
+
+  <div class="controls">
+    <label>Mood</label>
+    <div class="seg" id="moods"></div>
+    <label>On a slip</label>
+    <div class="seg" id="slip"></div>
+    <div class="sim">
+      <button class="down" data-sim="-15">− Slip week</button>
+      <div class="meter"><i id="meter"></i></div>
+      <span class="score" id="score"></span>
+      <button class="up" data-sim="15">+ Good week</button>
+      <button data-sim="reset">Reset</button>
+    </div>
+  </div>
+
+  <div id="lines"></div>
+
+  <h2>Basilisk (herb stage 5) in every mood</h2>
+  <div class="card"><div class="moodrow" id="basilisk-moods"></div>
+  <p class="note">Content and happy get the new confident face. Bored, mischievous and asleep keep the shared faces so the mood sheet stays consistent; when drooped (bored, asleep or wilting) the vines hang and the flower closes away.</p></div>
+
+  <h2>How it would work</h2>
+  <div class="rules">
+    <div class="card">
+      <h3>5 stages = 5 forms</h3>
+      <table>
+        <thead><tr><th>30-day score</th><th>Stage</th><th>What happens</th></tr></thead>
+        <tbody>
+          <tr><td>0–19</td><td>1</td><td>Form 1 (seed)</td></tr>
+          <tr><td>20–39</td><td>2</td><td><b>Evolves → Form 2</b></td></tr>
+          <tr><td>40–59</td><td>3</td><td><b>Evolves → Form 3</b></td></tr>
+          <tr><td>60–79</td><td>4</td><td><b>Evolves → Form 4</b></td></tr>
+          <tr><td>80–100</td><td>5</td><td><b>Evolves → Form 5</b> (final)</td></tr>
+        </tbody>
+      </table>
+      <p>The score bands are placeholders. The real ones would come from the glow-up points.</p>
+    </div>
+    <div class="card">
+      <h3>On a slip: your call</h3>
+      <ul>
+        <li><b>Wilt (recommended):</b> evolutions are permanent, as in Pokémon. A slip makes Pip wilt instead: leaves droop and colours fade, and a good week perks it back up. Evolving stays a real milestone.</li>
+        <li><b>De-evolve:</b> the form follows the score both ways, like the current glow-up plan. This is more honest about the last 30 days, but losing an evolution feels harsh and is unlike any Pokémon.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>What changes elsewhere</h3>
+      <ul>
+        <li>Replaces the body-stage glow-up shapes (belt, medal, muscles) from the progression mockup.</li>
+        <li><b>Wardrobe:</b> five body shapes means a full outfit would need five fits (5× the art). Suggested: wardrobe items become accessories (hat, scarf, glasses, apron badge) that each form places at its own head/neck anchor points, so each item is drawn once.</li>
+        <li>Room, cooker walk and moods are unchanged: every form has feet.</li>
+        <li>The name stays the user's own. Form names (e.g. "Seedling") appear only as a caption.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Which line?</h2>
+  <div class="card rec">
+    <p><b>Tomato</b> is my pick. Its colour journey (cream seed → green → orange → red) makes all five forms tell-apart-able even at the 24px footer-tab size, and it's food. <b>Herb</b> is the safest and most Pikmin-like. <b>Pumpkin</b> has the most dramatic final form but reads as Halloween.</p>
+  </div>
+</main>
+
+<script>
+const MOODS = ['content', 'happy', 'bored', 'mischievous', 'sleep'];
+const MOOD_LABELS = { content: 'Content', happy: 'Happy', bored: 'Bored', mischievous: 'Mischievous', sleep: 'Asleep' };
+const SLIP = { wilt: 'Wilt (keep form)', devolve: 'De-evolve' };
+const STAGE_SCALE = [0.8, 0.86, 0.9, 0.96, 0.98];
+const FORM_OF_STAGE = [0, 1, 2, 3, 4];
+const INK = '#2f4a22';
+let state = { mood: 'content', slip: 'wilt', score: 85, peak: 4, evolving: null };
+
+/* ---------- shared drawing ---------- */
+function face(cx, ey, gap, mood, ink, s = 1) {
+  const L = cx - gap, R = cx + gap, my = ey + 17 * s;
+  const st = `stroke="${ink}" stroke-width="${4 * s}" stroke-linecap="round" fill="none"`;
+  const blush = (o) => `<ellipse cx="${L - 11 * s}" cy="${ey + 11 * s}" rx="${9 * s}" ry="${5 * s}" fill="#ff8fab" opacity="${o}"/><ellipse cx="${R + 11 * s}" cy="${ey + 11 * s}" rx="${9 * s}" ry="${5 * s}" fill="#ff8fab" opacity="${o}"/>`;
+  const eye = (x, dx = 0) => `<ellipse cx="${x + dx}" cy="${ey}" rx="${7 * s}" ry="${9 * s}" fill="${ink}"/><circle cx="${x + dx + 2.4 * s}" cy="${ey - 3.4 * s}" r="${2.8 * s}" fill="#fff"/>`;
+  switch (mood) {
+    case 'happy':
+      return `<path d="M${L - 9 * s} ${ey + 2 * s} Q${L} ${ey - 11 * s} ${L + 9 * s} ${ey + 2 * s}" ${st}/><path d="M${R - 9 * s} ${ey + 2 * s} Q${R} ${ey - 11 * s} ${R + 9 * s} ${ey + 2 * s}" ${st}/>
+              <path d="M${cx - 10 * s} ${my - 3 * s} Q${cx} ${my + 15 * s} ${cx + 10 * s} ${my - 3 * s} Z" fill="#7a2e45" stroke="${ink}" stroke-width="${3 * s}" stroke-linejoin="round"/>${blush(0.8)}`;
+    case 'bored':
+      return `<path d="M${L - 8 * s} ${ey} A${8 * s} ${8 * s} 0 0 0 ${L + 8 * s} ${ey} Z" fill="${ink}"/><path d="M${R - 8 * s} ${ey} A${8 * s} ${8 * s} 0 0 0 ${R + 8 * s} ${ey} Z" fill="${ink}"/>
+              <path d="M${L - 10 * s} ${ey} L${L + 10 * s} ${ey} M${R - 10 * s} ${ey} L${R + 10 * s} ${ey}" ${st}/><path d="M${cx - 7 * s} ${my + 2 * s} L${cx + 7 * s} ${my + 2 * s}" ${st}/>${blush(0.3)}`;
+    case 'mischievous':
+      return `${eye(L, 4 * s)}${eye(R, 4 * s)}
+              <path d="M${L - 10 * s} ${ey - 13 * s} Q${L} ${ey - 15 * s} ${L + 10 * s} ${ey - 20 * s}" ${st}/><path d="M${R - 10 * s} ${ey - 20 * s} Q${R} ${ey - 15 * s} ${R + 10 * s} ${ey - 13 * s}" ${st}/>
+              <path d="M${cx - 11 * s} ${my} Q${cx - 3 * s} ${my + 8 * s} ${cx + 3 * s} ${my + 1 * s} Q${cx + 8 * s} ${my - 3 * s} ${cx + 13 * s} ${my + 2 * s}" ${st}/>
+              <circle cx="${cx + 15 * s}" cy="${my + 8 * s}" r="${2.2 * s}" fill="#c98a3c"/>${blush(0.5)}`;
+    case 'sleep':
+      return `<path d="M${L - 9 * s} ${ey} Q${L} ${ey + 9 * s} ${L + 9 * s} ${ey}" ${st}/><path d="M${R - 9 * s} ${ey} Q${R} ${ey + 9 * s} ${R + 9 * s} ${ey}" ${st}/>
+              <ellipse cx="${cx}" cy="${my + 1 * s}" rx="${4 * s}" ry="${3.4 * s}" fill="#7a2e45"/>${blush(0.5)}`;
+    default:
+      return `${eye(L)}${eye(R)}<path d="M${cx - 8 * s} ${my - 2 * s} Q${cx} ${my + 6 * s} ${cx + 8 * s} ${my - 2 * s}" ${st}/>${blush(0.55)}`;
+  }
+}
+
+function props(mood, wilted) {
+  let s = '';
+  if (mood === 'happy' && !wilted) s += [[28, 58, 9], [174, 48, 7], [184, 98, 5]].map(([x, y, r]) =>
+    `<path d="M${x} ${y - r} Q${x} ${y} ${x + r} ${y} Q${x} ${y} ${x} ${y + r} Q${x} ${y} ${x - r} ${y} Q${x} ${y} ${x} ${y - r}Z" fill="#ffd34d" stroke="${INK}" stroke-width="1.6"/>`).join('');
+  if (mood === 'sleep') s += `<text x="152" y="56" font-size="20" font-weight="700" fill="${INK}" opacity=".7" font-family="system-ui">z</text><text x="168" y="38" font-size="14" font-weight="700" fill="${INK}" opacity=".5" font-family="system-ui">z</text>`;
+  if (mood === 'bored') s += `<ellipse cx="168" cy="40" rx="22" ry="13" fill="#fff" stroke="${INK}" stroke-width="2.5"/><circle cx="150" cy="60" r="4" fill="#fff" stroke="${INK}" stroke-width="2"/><circle cx="159" cy="41" r="2.5" fill="${INK}"/><circle cx="168" cy="41" r="2.5" fill="${INK}"/><circle cx="177" cy="41" r="2.5" fill="${INK}"/>`;
+  if (wilted) s += `<path d="M156 92 C162 102 164 108 159 112 C154 115 149 110 152 103 Z" fill="#a8dcff" stroke="${INK}" stroke-width="2.5"/>`;
+  return s;
+}
+
+/* A leaf pointing along `deg` from (x, y). Drooping swings it down toward the ground. */
+function leaf(x, y, deg, size, droop, color = '#7cc95a', shape = 'pointed') {
+  if (droop) deg += Math.cos(deg * Math.PI / 180) < 0 ? -55 : 55;
+  const d = shape === 'round'
+    ? 'M0 0 C6 -16 26 -16 30 0 C26 16 6 16 0 0 Z'
+    : 'M0 0 q14 -16 34 -2 q-14 16 -34 2 Z';
+  return `<path d="${d}" transform="translate(${x} ${y}) rotate(${deg}) scale(${size})" fill="${color}" stroke="${INK}" stroke-width="${3.5 / size}" stroke-linejoin="round"/>`;
+}
+const vein = (x, y, deg, size, droop) => { if (droop) deg += Math.cos(deg * Math.PI / 180) < 0 ? -55 : 55; return `<path d="M4 0 h22" transform="translate(${x} ${y}) rotate(${deg}) scale(${size})" stroke="${INK}" stroke-width="${2 / size}" opacity=".35"/>`; };
+const feet = (w = 22) => `<path d="M${100 - w} 176 q-4 8 -12 9 M${100 + w} 176 q4 8 12 9" stroke="${INK}" stroke-width="5" fill="none" stroke-linecap="round"/>`;
+const grad = (id, a, b) => `<linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient>`;
+const shine = (x, y) => `<ellipse cx="${x}" cy="${y}" rx="12" ry="7" transform="rotate(-35 ${x} ${y})" fill="#fff" opacity=".5"/>`;
+function star(cx, cy, R, r, n, rot = -90) {
+  let p = '';
+  for (let i = 0; i < n * 2; i++) {
+    const a = (rot + i * 180 / n) * Math.PI / 180, rad = i % 2 ? r : R;
+    p += `${i ? 'L' : 'M'}${(cx + rad * Math.cos(a)).toFixed(1)} ${(cy + rad * Math.sin(a) * 0.55).toFixed(1)} `;
+  }
+  return p + 'Z';
+}
+const curl = (x, y, dir = 1) => `<path d="M${x} ${y} q${8 * dir} -10 ${2 * dir} -18 q${-6 * dir} -6 ${-10 * dir} 2 q${-2 * dir} 6 ${4 * dir} 6" stroke="${INK}" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+
+/* A seed: form 1 of the herb and tomato lines (tomato reuses it, uncracked, for form 2). */
+function seed(id, a, b2, mood, crack = true) {
+  let b = `<defs>${grad(id, a, b2)}</defs>` + feet(15);
+  b += `<path d="M100 112 C128 122 134 150 122 170 C112 184 88 184 78 170 C66 150 72 122 100 112Z" fill="url(#${id})" stroke="${INK}" stroke-width="5" stroke-linejoin="round"/>` + shine(84, 134);
+  if (crack) b += `<path d="M90 118 l5 7 l5 -6 l5 7 l5 -6" stroke="${INK}" stroke-width="3" fill="none" stroke-linejoin="round" opacity=".7"/>`;
+  return b + face(100, 152, 14, mood, INK, 0.72);
+}
+
+/* A vine whip: dark outline under a green core, with a leaf at the tip. */
+function vine(d, tipX, tipY, tipDeg) {
+  return `<path d="${d}" stroke="${INK}" stroke-width="11" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="${d}" stroke="#5fae3e" stroke-width="5.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          ${leaf(tipX, tipY, tipDeg, 0.75, false, '#7cc95a')}`;
+}
+
+/* Stage 5 attitude: half-lidded determined eyes, heavy brows, one-sided smirk with a fang. */
+function coolFace(cx, ey, gap, mood) {
+  if (mood === 'bored' || mood === 'sleep' || mood === 'mischievous') {
+    return face(cx, ey, gap, mood, INK, 1);
+  }
+  const L = cx - gap, R = cx + gap, my = ey + 17;
+  const eye = (x) => `<ellipse cx="${x}" cy="${ey}" rx="7.5" ry="9.5" fill="${INK}"/>
+    <circle cx="${x + 2.6}" cy="${ey - 3.6}" r="3" fill="#fff"/><circle cx="${x - 2.4}" cy="${ey + 3.6}" r="1.5" fill="#fff"/>`;
+  const brows = `<path d="M${L - 9} ${ey - 15} Q${L} ${ey - 19} ${L + 9} ${ey - 16}" stroke="${INK}" stroke-width="4" fill="none" stroke-linecap="round"/>
+                 <path d="M${R - 9} ${ey - 16} Q${R} ${ey - 19} ${R + 9} ${ey - 15}" stroke="${INK}" stroke-width="4" fill="none" stroke-linecap="round"/>`;
+  const mouth = mood === 'happy'
+    ? `<path d="M${cx - 13} ${my - 3} Q${cx} ${my + 16} ${cx + 13} ${my - 3} Z" fill="#7a2e45" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><ellipse cx="${cx}" cy="${my + 6}" rx="5" ry="3" fill="#ff8fab"/>`
+    : `<path d="M${cx - 12} ${my - 2} Q${cx} ${my + 10} ${cx + 12} ${my - 2}" stroke="${INK}" stroke-width="4" fill="none" stroke-linecap="round"/>`;
+  const blush = `<ellipse cx="${L - 12}" cy="${ey + 12}" rx="9" ry="5" fill="#ff8fab" opacity=".6"/><ellipse cx="${R + 12}" cy="${ey + 12}" rx="9" ry="5" fill="#ff8fab" opacity=".6"/>`;
+  return eye(L) + eye(R) + brows + mouth + blush;
+}
+
+/* A pretty flower: two rings of petals around a golden centre. */
+function bloom(cx, cy) {
+  let f = `<path d="M${cx} ${cy + 50} V${cy + 8}" stroke="${INK}" stroke-width="4" stroke-linecap="round"/>`;
+  for (let k = 0; k < 6; k++) f += `<ellipse cx="${cx}" cy="${cy - 15}" rx="9" ry="15" transform="rotate(${k * 60 + 30} ${cx} ${cy})" fill="#ff9cc4" stroke="${INK}" stroke-width="2.8"/>`;
+  for (let k = 0; k < 6; k++) f += `<ellipse cx="${cx}" cy="${cy - 11}" rx="7" ry="11" transform="rotate(${k * 60} ${cx} ${cy})" fill="#ffd0e3" stroke="${INK}" stroke-width="2.5"/>`;
+  f += `<circle cx="${cx}" cy="${cy}" r="8" fill="#ffd34d" stroke="${INK}" stroke-width="2.8"/>`;
+  f += `<circle cx="${cx - 2.5}" cy="${cy - 2.5}" r="2.2" fill="#fff" opacity=".8"/>`;
+  return f;
+}
+
+/* Herb stage 5: Basilisk. Vine whips for arms, a swept-back leaf crown and a basil flower spike. */
+function basilisk(droop, mood) {
+  let b = '';
+  // vines behind the body: raised and curled when confident, hanging when drooped
+  b += droop
+    ? vine('M58 126 C38 134 30 152 34 170', 34, 170, 100) + vine('M142 126 C162 134 170 152 166 170', 166, 170, 80)
+    : vine('M58 126 C38 128 24 118 22 104 C20 92 28 84 20 76', 20, 76, -145) + vine('M142 126 C162 128 176 118 178 104 C180 92 172 84 180 76', 180, 76, -35);
+  b += `<path d="M${100 - 30} 176 q-6 9 -16 9 M${100 + 30} 176 q6 9 16 9" stroke="${INK}" stroke-width="6" fill="none" stroke-linecap="round"/>`;
+  // swept-back crown, drawn behind the body
+  [[-165, 1.25], [-15, 1.25], [-140, 1.45], [-40, 1.45], [-112, 1.6], [-68, 1.6]].forEach(([a, sz], i) => {
+    b += leaf(100, 90, a, sz, droop, i % 2 ? '#5fae3e' : '#6bbd4a') + vein(100, 90, a, sz, droop);
+  });
+  if (!droop) b += bloom(100, 34);
+  b += `<path d="M100 88 C146 88 162 116 162 140 C162 170 136 184 100 184 C64 184 38 170 38 140 C38 116 54 88 100 88Z" fill="url(#ID)" stroke="${INK}" stroke-width="5.5" stroke-linejoin="round"/>`;
+  b += `<ellipse cx="68" cy="112" rx="13" ry="7" transform="rotate(-30 68 112)" fill="#fff" opacity=".45"/>`;
+  b += `<path d="M64 166 q36 14 72 0" stroke="${INK}" stroke-width="3" fill="none" opacity=".18"/>`;
+  return b + coolFace(100, 136, 24, mood);
+}
+
+/* ---------- Herb line: Basil seed → Seedling → Sprig → Bushling → Basilbloom ---------- */
+function herb(stage, mood, wilted, id) {
+  const droop = wilted || mood === 'bored' || mood === 'sleep';
+  if (stage === 0) return seed(id, '#d8b98a', '#a77d4b', mood);
+  let b = `<defs>${grad(id, '#c8eea2', '#86c862')}</defs>`;
+  if (stage === 1) {
+    b += feet(18) + `<ellipse cx="100" cy="146" rx="40" ry="38" fill="url(#${id})" stroke="${INK}" stroke-width="5"/>` + shine(76, 126);
+    b += `<path d="M100 109 q-2 -12 1 -22" stroke="${INK}" stroke-width="4.5" fill="none" stroke-linecap="round"/>`;
+    b += leaf(101, 88, -25, 0.8, droop) + leaf(99, 88, -155, 0.7, droop);
+    b += face(100, 146, 17, mood, INK, 0.8);
+  } else if (stage === 2) {
+    b += feet(22) + leaf(56, 142, 160, 0.8, droop) + leaf(144, 142, 20, 0.8, droop);
+    b += `<path d="M100 74 C136 74 150 110 150 140 C150 170 128 182 100 182 C72 182 50 170 50 140 C50 110 64 74 100 74Z" fill="url(#${id})" stroke="${INK}" stroke-width="5" stroke-linejoin="round"/>` + shine(74, 104);
+    b += `<path d="M100 76 q-2 -14 0 -26" stroke="${INK}" stroke-width="5" fill="none" stroke-linecap="round"/>`;
+    b += leaf(100, 52, -35, 0.95, droop) + leaf(100, 52, -145, 0.95, droop) + leaf(100, 52, -90, 0.8, droop);
+    b += face(100, 132, 20, mood, INK, 0.9);
+  } else if (stage === 3) {
+    b += feet(24) + leaf(48, 140, 165, 0.95, droop) + leaf(152, 140, 15, 0.95, droop);
+    b += `<ellipse cx="100" cy="136" rx="54" ry="48" fill="url(#${id})" stroke="${INK}" stroke-width="5"/>` + shine(70, 106);
+    [-60, -120].forEach(a => { b += leaf(100, 90, a, 0.85, droop, '#6bbd4a'); });
+    [-30, -150, -90].forEach(a => { b += leaf(100, 90, a, 1.05, droop) + vein(100, 90, a, 1, droop); });
+    b += face(100, 136, 22, mood, INK, 0.95);
+  } else {
+    b = `<defs>${grad(id, '#b4e488', '#4f9c34')}</defs>` + basilisk(droop, mood).replace('url(#ID)', `url(#${id})`);
+  }
+  return b;
+}
+
+/* ---------- Tomato line: Seed → Sproutling → Greenling → Ripening → Tomatron ---------- */
+function tomato(stage, mood, wilted, id) {
+  const droop = wilted || mood === 'bored' || mood === 'sleep';
+  if (stage === 0) return seed(id, '#fbf0cf', '#e6cf93', mood);
+  let b = '';
+  if (stage === 1) {
+    b += seed(id, '#fbf0cf', '#e6cf93', mood, false);
+    b += `<path d="M100 114 q1 -12 -1 -20" stroke="${INK}" stroke-width="4.5" fill="none" stroke-linecap="round"/>`;
+    b += leaf(100, 94, -30, 0.7, droop, '#8ed36a', 'round') + leaf(100, 94, -150, 0.7, droop, '#8ed36a', 'round');
+  } else if (stage === 2) {
+    b += `<defs>${grad(id, '#b5e27f', '#73b64b')}</defs>` + feet(22);
+    b += `<ellipse cx="100" cy="144" rx="44" ry="38" fill="url(#${id})" stroke="${INK}" stroke-width="5"/>` + shine(76, 124);
+    b += `<path d="M100 108 v-12" stroke="${INK}" stroke-width="5" stroke-linecap="round"/>`;
+    b += `<path d="${star(100, 108, 22, 7, 5)}" fill="#4f9e35" stroke="${INK}" stroke-width="3.5" stroke-linejoin="round" transform="${droop ? 'translate(0 3)' : ''}"/>`;
+    b += face(100, 142, 18, mood, INK, 0.85);
+  } else if (stage === 3) {
+    b += `<defs>${grad(id, '#f6d27a', '#ec9a4a')}</defs>` + feet(24);
+    b += leaf(54, 146, 165, 0.8, droop, '#5fae3e') + leaf(146, 146, 15, 0.8, droop, '#5fae3e');
+    b += `<ellipse cx="100" cy="140" rx="50" ry="42" fill="url(#${id})" stroke="${INK}" stroke-width="5"/>`;
+    b += `<path d="M76 104 q-10 34 0 70 M124 104 q10 34 0 70" stroke="${INK}" stroke-width="2.5" fill="none" opacity=".18"/>` + shine(72, 118);
+    b += `<path d="M100 100 v-14" stroke="${INK}" stroke-width="5" stroke-linecap="round"/>` + (droop ? '' : curl(102, 86, 1));
+    b += `<path d="${star(100, 100, 28, 8, 5)}" fill="#4f9e35" stroke="${INK}" stroke-width="3.5" stroke-linejoin="round" transform="${droop ? 'translate(0 3)' : ''}"/>`;
+    b += face(100, 138, 20, mood, INK, 0.9);
+  } else {
+    b += `<defs>${grad(id, '#ff7a64', '#d43a2c')}</defs>` + feet(28);
+    b += leaf(40, 138, 160, 1, droop, '#5fae3e') + vein(40, 138, 160, 1, droop) + leaf(160, 138, 20, 1, droop, '#5fae3e') + vein(160, 138, 20, 1, droop);
+    b += `<path d="M100 82 C150 76 166 108 164 136 C162 170 134 184 100 184 C66 184 38 170 36 136 C34 108 50 76 100 82Z" fill="url(#${id})" stroke="${INK}" stroke-width="5" stroke-linejoin="round"/>`;
+    b += `<path d="M70 92 q-14 40 0 84 M130 92 q14 40 0 84" stroke="${INK}" stroke-width="2.5" fill="none" opacity=".15"/>` + shine(66, 108);
+    b += `<path d="M100 84 v-20" stroke="${INK}" stroke-width="6" stroke-linecap="round"/>`;
+    if (!droop) b += leaf(100, 66, -40, 0.9, false, '#6bbd4a') + curl(96, 66, -1) + curl(104, 66, 1);
+    b += `<path d="${star(100, 84, 40, 11, 6)}" fill="#4f9e35" stroke="${INK}" stroke-width="3.5" stroke-linejoin="round" transform="${droop ? 'translate(0 4)' : ''}"/>`;
+    b += `<path d="M70 166 q30 14 60 0" stroke="#4f9e35" stroke-width="7" fill="none" stroke-linecap="round"/>`; // vine scarf
+    b += face(100, 134, 24, mood, INK, 1);
+  }
+  return b;
+}
+
+/* ---------- Pumpkin line: Pepita → Sprouta → Gourdling → Gourd → Pumpking ---------- */
+function pumpkin(stage, mood, wilted, id) {
+  const droop = wilted || mood === 'bored' || mood === 'sleep';
+  let b = '';
+  if (stage <= 1) {
+    b += `<defs>${grad(id, '#fffaf0', '#eadcb8')}</defs>` + feet(16);
+    if (stage === 1) {
+      b += `<path d="M100 112 q2 -12 -1 -20" stroke="${INK}" stroke-width="4.5" fill="none" stroke-linecap="round"/>`;
+      b += leaf(99, 92, -40, 0.8, droop, '#8ed36a', 'round') + leaf(99, 92, -140, 0.75, droop, '#8ed36a', 'round') + (droop ? '' : curl(100, 94, 1));
+    }
+    b += `<ellipse cx="100" cy="148" rx="32" ry="38" fill="url(#${id})" stroke="${INK}" stroke-width="5"/>`;
+    b += `<ellipse cx="100" cy="148" rx="24" ry="30" fill="none" stroke="#d8c79c" stroke-width="3"/>` + shine(84, 130);
+    return b + face(100, 148, 14, mood, INK, 0.75);
+  }
+  if (stage <= 3) {
+    const ripe = stage === 3, top = ripe ? 104 : 108;
+    b += `<defs>${grad(id, ripe ? '#ffd27a' : '#e6ea94', ripe ? '#f0a03c' : '#b9c95a')}</defs>` + feet(24);
+    if (ripe) b += leaf(54, 146, 165, 0.75, droop, '#5fae3e', 'round') + leaf(146, 146, 15, 0.75, droop, '#5fae3e', 'round');
+    b += `<ellipse cx="100" cy="142" rx="${ripe ? 52 : 44}" ry="${ripe ? 40 : 36}" fill="url(#${id})" stroke="${INK}" stroke-width="5"/>`;
+    b += `<path d="M${ripe ? 80 : 84} 106 q-12 36 0 72 M100 106 v76 M${ripe ? 120 : 116} 106 q12 36 0 72" stroke="${INK}" stroke-width="2.5" fill="none" opacity=".2"/>`;
+    b += `<path d="M96 ${top} l2 -16 h8 l-2 16 Z" fill="#8a5a33" stroke="${INK}" stroke-width="3.5" stroke-linejoin="round"/>`;
+    if (ripe) b += leaf(104, top - 12, droop ? 20 : -20, 1, false, '#6bbd4a', 'round') + (droop ? '' : curl(96, top - 12, -1));
+    else if (!droop) b += curl(104, top - 12, 1);
+    return b + face(100, 142, ripe ? 20 : 18, mood, INK, ripe ? 0.9 : 0.85);
+  }
+  b += `<defs>${grad(id, '#ffb757', '#e3741a')}</defs>` + feet(30);
+  b += leaf(36, 140, 165, 1, droop, '#5fae3e', 'round') + leaf(164, 140, 15, 1, droop, '#5fae3e', 'round');
+  b += `<ellipse cx="62" cy="136" rx="30" ry="46" fill="url(#${id})" stroke="${INK}" stroke-width="5"/>`;
+  b += `<ellipse cx="138" cy="136" rx="30" ry="46" fill="url(#${id})" stroke="${INK}" stroke-width="5"/>`;
+  b += `<ellipse cx="100" cy="134" rx="38" ry="50" fill="url(#${id})" stroke="${INK}" stroke-width="5"/>` + shine(80, 104);
+  b += `<path d="M93 88 l1 -22 q8 -6 14 2 l-3 20 Z" fill="#8a5a33" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/>`;
+  b += leaf(108, 74, droop ? 25 : -15, 1.3, false, '#6bbd4a', 'round') + vein(108, 74, droop ? 25 : -15, 1.2, false);
+  if (!droop) b += curl(90, 76, -1) + curl(68, 92, -1);
+  return b + face(100, 132, 24, mood, INK, 1);
+}
+
+const LINES = [
+  { key: 'Herb', draw: herb, forms: ['Basil seed', 'Seedling', 'Sprig', 'Bushling', 'Basilisk'],
+    pitch: 'A basil seed sprouts into a round seedling, grows leaf arms and bushes out, then evolves into Basilisk: vine whips for arms, a swept-back leaf crown, a big pink bloom and a confident grin.',
+    story: 'The silhouette goes seed → round → pear-shaped → bushy → Basilisk. The final form changes personality too: the cute face grows into a confident, friendly grin, Ivysaur-style. Basil is something you actually cook with.',
+    good: ['Closest to your Sprout pick and the gentlest change from today', 'Leaves make wilting very readable'],
+    bad: ['Forms 2–5 are all green, so they are told apart by shape; the vines now make 5 unmistakable', 'The most Pikmin-like of the three'] },
+  { key: 'Tomato', draw: tomato, forms: ['Seed', 'Sproutling', 'Greenling', 'Ripening', 'Tomatron'],
+    pitch: 'A tomato seed sprouts, becomes a small green tomato, ripens orange and grows leaf arms, then evolves into a big red tomato with a vine scarf.',
+    story: 'Colour does the work: cream → green → orange → red. You can see Pip\'s progress from across the room, even on the tiny footer tab.',
+    good: ['Clearest evolution signal (colour plus shape)', 'Food, and "ripening" is a natural in-between stage', 'The star-shaped calyx crown is a strong signature feature'],
+    bad: ['Red final form shifts the app\'s purple palette', 'Forms 1 and 2 are both seeds (form 2 adds the sprout leaves)'] },
+  { key: 'Pumpkin', draw: pumpkin, forms: ['Pepita', 'Sprouta', 'Gourdling', 'Gourd', 'Pumpking'],
+    pitch: 'A pumpkin seed sprouts, becomes a small green gourd, ripens and grows a leaf hat, then becomes a big round pumpkin with curly tendrils.',
+    story: 'The biggest size jump of the three: the final form is wide and proud. The ribs and stem make the silhouette unmistakable.',
+    good: ['The most satisfying "you made it" final form', 'Leaf hat and tendrils are fun to animate'],
+    bad: ['Seasonal (reads as Halloween in October)', 'Final form is wide, so it needs more room in the room scene'] },
+];
+
+/* ---------- state ---------- */
+const stageOf = (score) => Math.min(4, Math.floor(score / 20));
+function shown() {
+  const stage = stageOf(state.score);
+  if (state.slip === 'devolve') return { stage, wilted: false };
+  // Wilt rule: the form never goes back. Below your peak, Pip keeps the peak form, wilted.
+  return { stage: Math.max(stage, state.peak), wilted: stage < state.peak };
+}
+
+let uid = 0;
+function svg(line, stage, mood, wilted) {
+  const id = `g${uid++}`;
+  const k = STAGE_SCALE[stage];
+  const body = `<g transform="translate(100 184) scale(${k}) translate(-100 -184)">${line.draw(stage, mood, wilted, id)}</g>`;
+  const filter = wilted ? ' style="filter: saturate(.45) brightness(.97)"' : '';
+  return `<svg viewBox="0 0 200 200" class="mood-${mood}${wilted ? ' wilted' : ''}" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="100" cy="188" rx="${58 * k}" ry="6" fill="rgba(40,60,20,.13)"/>
+    <g class="bob"${filter}>${body}</g>${props(mood, wilted)}</svg>`;
+}
+
+function render() {
+  const { stage, wilted } = shown();
+  const form = FORM_OF_STAGE[stage];
+  document.getElementById('moods').innerHTML = MOODS.map(m => `<button class="${m === state.mood ? 'on' : ''}" data-mood="${m}">${MOOD_LABELS[m]}</button>`).join('');
+  document.getElementById('slip').innerHTML = Object.entries(SLIP).map(([k, v]) => `<button class="${k === state.slip ? 'on' : ''}" data-slip="${k}">${v}</button>`).join('');
+  document.getElementById('meter').style.width = `${state.score}%`;
+  document.getElementById('score').textContent = `${state.score} · stage ${stageOf(state.score) + 1}`;
+  document.getElementById('lines').innerHTML = LINES.map(l => `
+    <section class="card line">
+      <div class="hero${state.evolving ? ' evolving' : ''}">
+        <span class="tag">${l.key}</span>
+        ${wilted ? '<span class="wilt-note">Wilting: a good week perks it up</span>' : ''}
+        ${svg(l, stage, state.mood, wilted)}
+        <div class="form-name">${state.evolving ? `What? Pip is evolving!` : `${l.forms[stage]} · stage ${stage + 1}`}</div>
+      </div>
+      <div>
+        <h3>${l.key} line</h3>
+        <p class="pitch">${l.pitch}</p>
+        <div class="evo">
+          ${[0, 1, 2, 3, 4].map(st => `${st ? '<span class="arrow">›</span>' : ''}<div class="form ${st === stage ? 'on' : ''}">${svg(l, st, state.mood, false)}<b>${l.forms[st]}</b><span>stage ${st + 1}</span></div>`).join('')}
+        </div>
+        <div class="facts">
+          <div><h4>Evolution read</h4><p>${l.story}</p></div>
+          <div><h4>Strengths</h4><ul>${l.good.map(g => `<li>${g}</li>`).join('')}</ul></div>
+          <div><h4>Drawbacks</h4><ul>${l.bad.map(g => `<li>${g}</li>`).join('')}</ul></div>
+        </div>
+      </div>
+    </section>`).join('');
+  document.getElementById('basilisk-moods').innerHTML = MOODS.map(m => `<div>${svg(LINES[0], 4, m, false)}${MOOD_LABELS[m]}</div>`).join('');
+}
+
+function setScore(next) {
+  const before = FORM_OF_STAGE[shown().stage];
+  state.score = Math.max(0, Math.min(100, next));
+  state.peak = Math.max(state.peak, stageOf(state.score));
+  const after = FORM_OF_STAGE[shown().stage];
+  if (after > before && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    state.evolving = true; render();
+    setTimeout(() => { state.evolving = null; render(); }, 1600);
+  } else render();
+}
+
+document.addEventListener('click', (e) => {
+  const m = e.target.closest('[data-mood]'), s = e.target.closest('[data-slip]'), sim = e.target.closest('[data-sim]');
+  if (m) { state.mood = m.dataset.mood; render(); }
+  else if (s) { state.slip = s.dataset.slip; render(); }
+  else if (sim) {
+    if (sim.dataset.sim === 'reset') { state.peak = 0; setScore(5); }
+    else setScore(state.score + Number(sim.dataset.sim));
+  }
+});
+render();
+</script>
+</body>
+</html>

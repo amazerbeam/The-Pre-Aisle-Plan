@@ -51,6 +51,10 @@ export const FRIDGE_FOOTPRINT = [[145, -1, 42, 30, 34], [146, 0, 40, 34, 58], [1
 export const FRIDGE_GAUGE_LIFT = 8 // gauge centre sits this far above fridgeTop (mockup stockGauge h + 8)
 export const FRIDGE_GAUGE_HALF_HEIGHT = 7 // the gauge track's top edge is 7 px above its centre
 
+// MPP-23: the outer box of FURNITURE.cabinet[level - 1] as [u, v, du, dv, h0, h1] (level 2's
+// shelves float on the wall from h 30). Hand-copied from furniture.jsx; keep the two in step (MPP-26).
+export const CABINET_FOOTPRINT = [[0, 26, 24, 78, 0, 48], [0, 30, 22, 72, 30, 88], [0, 30, 26, 66, 0, 112], [0, 26, 30, 74, 0, 134]]
+
 /** Any levels input → a full { bed, fridge, cooker, cabinet } of whole numbers in 1..4. */
 export function resolveRoomLevels(levels) {
   const resolved = {}
@@ -70,16 +74,32 @@ export function resolveRoomLevels(levels) {
 export function fridgeHitBox(level) {
   const index = resolveRoomLevels({ fridge: level }).fridge - 1
   const [u, v, du, dv, h] = FRIDGE_FOOTPRINT[index]
+  const [gu, gv, gh] = STATION_ANCHORS.fridgeTop[index]
+  const gaugeTop = P(gu, gv, gh + FRIDGE_GAUGE_LIFT)[1] - FRIDGE_GAUGE_HALF_HEIGHT
+  return boundsOf(boxCorners(u, v, du, dv, 0, h), [gaugeTop])
+}
+
+/** MPP-23 AC 1: the cabinet's bounding box in viewBox px, for the cabinet button. */
+export function cabinetHitBox(level) {
+  const index = resolveRoomLevels({ cabinet: level }).cabinet - 1
+  return boundsOf(boxCorners(...CABINET_FOOTPRINT[index]))
+}
+
+// The 8 projected corners of a floor box from h0 to h1.
+function boxCorners(u, v, du, dv, h0, h1) {
   const corners = []
   for (const cu of [u, u + du]) {
     for (const cv of [v, v + dv]) {
-      for (const ch of [0, h]) corners.push(P(cu, cv, ch))
+      for (const ch of [h0, h1]) corners.push(P(cu, cv, ch))
     }
   }
-  const [gu, gv, gh] = STATION_ANCHORS.fridgeTop[index]
-  const gaugeTop = P(gu, gv, gh + FRIDGE_GAUGE_LIFT)[1] - FRIDGE_GAUGE_HALF_HEIGHT
-  const xs = corners.map(([x]) => x)
-  const ys = [...corners.map(([, y]) => y), gaugeTop]
+  return corners
+}
+
+// Smallest rectangle around the points (and any extra y values).
+function boundsOf(points, extraYs = []) {
+  const xs = points.map(([x]) => x)
+  const ys = [...points.map(([, y]) => y), ...extraYs]
   const x = Math.min(...xs)
   const y = Math.min(...ys)
   return { x, y, width: Math.max(...xs) - x, height: Math.max(...ys) - y }

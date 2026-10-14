@@ -5,6 +5,7 @@ import com.foodbytes.model.*;
 import com.foodbytes.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
@@ -36,6 +37,7 @@ public class MealPlanService {
     private final ExtraChoiceService extraChoiceService;                     // MPP-10: stored extra choices
     private final RecipeFamilyMemberRepository recipeFamilyMemberRepository;   // MPP-10: same-family test for variant swaps
     private final MealPlanEntryEatenRepository mealPlanEntryEatenRepository; // MPP-33: per-person eaten ticks
+    private final ApplicationEventPublisher eventPublisher;                   // MPP-24: firsts candidates
 
     /**
      * Get the effective meal plan owner ID for a user.
@@ -232,6 +234,8 @@ public class MealPlanService {
             extraChoiceService.setEntryChoices(entry.getId(), carriedChoices);
             storedChoices = carriedChoices;
         }
+        // MPP-24: this slot may have completed a 7-day run of B/L/D; credited to the clicker.
+        eventPublisher.publishEvent(PetFirstCandidate.planned(userId, request.getPlanDate(), request.getPlanDate()));
         return convertToDTO(entry, storedChoices, null); // MPP-33: a new entry is never eaten
     }
 
@@ -332,6 +336,7 @@ public class MealPlanService {
                     .map(MealPlanEntryEaten::getEatenAt)
                     .orElseThrow(() -> new IllegalStateException(
                         "Eaten tick for entry " + entry.getId() + " and user " + userId + " was not stored"));
+                eventPublisher.publishEvent(PetFirstCandidate.cooked(userId, entry.getId())); // MPP-24
                 return new MealPlanEntryEatenDTO(entry.getId(), true, toUtcInstant(eatenAt));
             });
     }
@@ -378,6 +383,11 @@ public class MealPlanService {
         // Save all changes
         mealPlanEntryRepository.saveAll(sourceEntries);
         mealPlanEntryRepository.saveAll(targetEntries);
+
+        // MPP-24: moving a full day into a gap can complete a week.
+        LocalDate first = sourceDate.isBefore(targetDate) ? sourceDate : targetDate;
+        LocalDate last = sourceDate.isBefore(targetDate) ? targetDate : sourceDate;
+        eventPublisher.publishEvent(PetFirstCandidate.planned(userId, first, last));
     }
 
     /**
@@ -433,6 +443,7 @@ public class MealPlanService {
                 sourceToCopy.put(sourceIds.get(i), savedEntries.get(i).getId());
             }
             extraChoiceService.copyEntryChoices(sourceToCopy);
+            eventPublisher.publishEvent(PetFirstCandidate.planned(userId, targetStartDate, targetStartDate.plusDays(6))); // MPP-24
         }
 
         // 4. Return the target week plan

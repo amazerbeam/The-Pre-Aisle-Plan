@@ -83,3 +83,23 @@ export const COOK_REDUCED_MOTION_SERVED_MS = 2500
 
 // Suffixed with the user id, so two people on one browser keep their own marker (AC 6).
 export const PIP_SEEN_EATEN_STORAGE_KEY = 'foodbytes.pip.lastSeenEatenAt'
+
+// MPP-21: the daily snack / alcohol check-in in Pip's bubble (MPP-20 habits).
+export const HABITS = {
+  SNACK: 'SNACK',
+  ALCOHOL: 'ALCOHOL'
+}
+export const HABIT_ORDER = [HABITS.SNACK, HABITS.ALCOHOL] // snacks first, then alcohol (AC 1)
+export const HABIT_QUESTION_NOUN = { SNACK: 'snacks', ALCOHOL: 'alcohol' }
+export const HABIT_FREE_LABEL = { SNACK: 'snack-free', ALCOHOL: 'alcohol-free' }
+export const CHECKIN_STEPS = {
+  ASK: 'ask',
+  WHEN: 'when'
+}
+export const CHECKIN_REACTION_MS = 8000 // how long the last reaction stays before the usual bubble returns
+export const CHECKIN_WEEKDAY_SPAN_DAYS = 6 // "since Wednesday" up to 6 days back; a date after that
+export const CHECKIN_SNOOZE_STORAGE_KEY = 'foodbytes.pip.checkInSnoozedOn'
+export const CHECKIN_WHEN_PROMPT = "That's ok! When did you have it?"
+export const CHECKIN_SNOOZE_REPLY = "No worries, I'll ask tomorrow 💜"
+export const CHECKIN_SAVE_FAILED = "Hmm, I couldn't save that. I'll ask again next time 💜"
+export const CHECKIN_THANKS = 'Thanks for telling me 💜'

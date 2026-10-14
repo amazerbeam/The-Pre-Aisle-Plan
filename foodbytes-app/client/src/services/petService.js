@@ -18,6 +18,22 @@ export const petService = {
   async renamePet(name) {
     const response = await api.put('/pet/name', { name })
     return response.data
+  },
+
+  /**
+   * MPP-23: your own trophy cabinet — MPP-22 streaks and MPP-24 firsts. Reading it also
+   * records any award just earned (the server's ledger insert is idempotent).
+   *
+   * AwardStatus = { streakType: 'PLAN'|'SNACK'|'ALCOHOL', current: number, best: number,
+   *                 counts: { [milestone: string]: number }, next: { milestone: number, inDays: number } }
+   * FirstStatus = { key: string, earnedAt: string|null }
+   *
+   * @param {{ signal?: AbortSignal }} [options]
+   * @returns {Promise<{ streaks: Object[], firsts: Object[] }>} PetAwardsDTO
+   */
+  async getAwards({ signal } = {}) {
+    const response = await api.get('/pet/awards', { signal })
+    return response.data
   }
 }
 

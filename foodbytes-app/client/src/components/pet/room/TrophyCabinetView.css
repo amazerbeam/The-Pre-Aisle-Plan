@@ -1,0 +1,161 @@
+/* MPP-23: Pip's trophy cabinet (mockup v5 .overlay / .shelf / .award / .times / .streak / .todo / .cnote).
+   Fills the room card and scrolls inside it, like the fridge (no page scroll at 320 px). */
+
+.pip-cabinet-view {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: linear-gradient(#5b3a22, #3f2716);
+  color: #fff7e8;
+}
+
+.pip-cabinet-view:focus { outline: none; }
+
+.pip-cabinet-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.pip-cabinet-head h3 {
+  margin: 0;
+  font-size: 1rem;
+  overflow-wrap: anywhere;
+}
+
+.pip-cabinet-btn-text {
+  flex-shrink: 0;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pip-cabinet-btn-text:active { background: rgba(255, 255, 255, 0.3); }
+
+@media (hover: hover) {
+  .pip-cabinet-btn-text:hover { background: rgba(255, 255, 255, 0.22); }
+}
+
+.pip-cabinet-btn-text:focus-visible {
+  outline: 3px solid #ffd34d;
+  outline-offset: 2px;
+}
+
+.pip-cabinet-shelf {
+  padding: 8px;
+  border-bottom: 5px solid #a0703f;
+  border-radius: 8px 8px 2px 2px;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.pip-cabinet-shelf h4 {
+  margin: 0 0 6px;
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #f3d9a8;
+}
+
+.pip-cabinet-streak {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 2px 8px;
+  margin: 0 0 6px;
+  padding: 7px 9px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  font-size: 0.78rem;
+}
+
+.pip-cabinet-awards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pip-award {
+  position: relative;
+  text-align: center;
+  font-size: 0.6rem;
+  line-height: 1.2;
+}
+
+.pip-award.is-locked { opacity: 0.33; }
+
+.pip-award-icon {
+  display: block;
+  width: 38px;
+  height: 38px;
+  margin: 0 auto 2px;
+}
+
+.pip-award-times {
+  position: absolute;
+  top: -2px;
+  right: 0;
+  padding: 1px 5px;
+  border-radius: 999px;
+  background: #ffd34d;
+  color: #3f2716;
+  font-size: 0.6rem;
+  font-weight: 800;
+}
+
+.pip-cabinet-note {
+  margin: 0;
+  font-size: 0.7rem;
+  line-height: 1.35;
+  color: #f3d9a8;
+}
+
+.pip-cabinet-firsts {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pip-cabinet-first {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 2px;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.15);
+  font-size: 0.76rem;
+}
+
+.pip-cabinet-first span:last-child {
+  flex-shrink: 0;
+  color: #f3d9a8;
+}
+
+.pip-cabinet-first.is-earned span:last-child { color: #ffd34d; }
+
+.pip-cabinet-state {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+}
