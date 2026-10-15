@@ -12,7 +12,10 @@
 }
 
 .pip-room-stage {
-  flex: 1;
+  /* Zero basis + height 0: Chrome resolves cqh to 0 for a size container whose height only
+     comes from flex-grow on an auto basis, which collapsed the scene to 0×0 (MPP-37 follow-up). */
+  flex: 1 1 0;
+  height: 0;
   min-height: 30vh;
   display: grid;
   place-items: center;
