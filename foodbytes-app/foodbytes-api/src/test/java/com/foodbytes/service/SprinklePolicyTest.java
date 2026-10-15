@@ -58,4 +58,15 @@ class SprinklePolicyTest {
         assertThat(SprinklePolicy.mondaysCovering(MON.plusDays(6), MON.plusDays(7))).containsExactly(MON, MON.plusDays(7));
         assertThat(SprinklePolicy.mondaysCovering(MON, MON.plusDays(6))).containsExactly(MON);
     }
+
+    @Test
+    void weekOf_isThatWeeksMonday() {
+        assertThat(SprinklePolicy.weekOf(LocalDate.of(2026, 10, 18))).isEqualTo(LocalDate.of(2026, 10, 12)); // Sunday
+        assertThat(SprinklePolicy.weekOf(LocalDate.of(2026, 10, 12))).isEqualTo(LocalDate.of(2026, 10, 12)); // Monday
+    }
+
+    @Test
+    void mealsPerWeek_isSevenDaysOfBreakfastLunchAndDinner() {
+        assertThat(SprinklePolicy.mealsPerWeek()).isEqualTo(21);
+    }
 }

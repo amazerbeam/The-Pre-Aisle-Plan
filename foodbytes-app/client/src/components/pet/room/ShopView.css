@@ -344,3 +344,26 @@
 @media (hover: hover) {
   .pip-shop-level-chip:not(:disabled):not([aria-pressed="true"]):hover { background: #f3effc; }
 }
+
+/* MPP-42 AC 7: "See Earn →" — link-styled, with a 44px hit area. */
+.pip-shop-foot-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 4px;
+  border: 0;
+  background: none;
+  color: #7c5cd6;
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pip-shop-foot-link:active { color: #4a3f80; }
+.pip-shop-foot-link:focus-visible { outline: 2px solid #7c5cd6; outline-offset: 2px; border-radius: 4px; }
+
+@media (hover: hover) {
+  .pip-shop-foot-link:hover { color: #4a3f80; }
+}

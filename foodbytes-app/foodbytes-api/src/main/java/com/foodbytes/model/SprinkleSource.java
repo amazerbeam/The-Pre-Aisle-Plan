@@ -10,5 +10,7 @@ public enum SprinkleSource {
     FULL_WEEK,       // source_id = the week's Monday as LocalDate#toEpochDay
     HOMEMADE_EXTRA,  // source_id = meal_plan_entries.id
     STATION_UPGRADE, // MPP-26: a spend (negative amount), source_id = StationPolicy.sourceId
-    DECOR_PURCHASE   // MPP-27: a spend (negative amount), source_id = pet_decor_owned.id
+    DECOR_PURCHASE,  // MPP-27: a spend (negative amount), source_id = pet_decor_owned.id
+    SHOPPING_LIST_GENERATED, // MPP-42: source_id = the week's Monday as LocalDate#toEpochDay, paid to every plan member
+    SHOPPING_LIST_COMPLETED  // MPP-42: same key; the list had >= 1 item and every item checked
 }

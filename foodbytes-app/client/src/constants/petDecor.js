@@ -1,3 +1,5 @@
+import { EARN_TAB_LABEL } from './petSprinkles.js'
+
 /**
  * MPP-27 / MPP-40: Pip's room decor — the 12 named spots (world coords), the 55 items and the wall / floor
  * styles, from the approved pip-room-decor-spots-mockup.html. Ids, spots, prices and ownership come from the
@@ -209,9 +211,10 @@ export const DECOR_SAVE_ERROR = "Couldn't change the room. Check your connection
 export const DECOR_BUY_ERROR = "Couldn't buy that. Check your connection and try again. No sprinkles were spent."
 
 // The Shop sheet's tabs. The 🛍 pill opens Upgrades; "Buy more for this spot" opens Decor.
-export const SHOP_TAB_KEYS = { UPGRADES: 'upgrades', DECOR: 'decor', STYLES: 'styles' }
+export const SHOP_TAB_KEYS = { UPGRADES: 'upgrades', DECOR: 'decor', STYLES: 'styles', EARN: 'earn' }
 export const SHOP_TABS = [
   { key: SHOP_TAB_KEYS.UPGRADES, label: 'Upgrades' },
   { key: SHOP_TAB_KEYS.DECOR, label: 'Decor' },
-  { key: SHOP_TAB_KEYS.STYLES, label: 'Walls & floors' }
+  { key: SHOP_TAB_KEYS.STYLES, label: 'Walls & floors' },
+  { key: SHOP_TAB_KEYS.EARN, label: EARN_TAB_LABEL } // MPP-42: last; the shop still opens on Upgrades
 ]

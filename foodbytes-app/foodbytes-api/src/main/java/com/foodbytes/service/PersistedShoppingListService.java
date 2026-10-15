@@ -153,6 +153,11 @@ public class PersistedShoppingListService {
         item.setIsChecked(!item.getIsChecked());
         shoppingListItemRepository.save(item);
 
+        // MPP-42: a check might finish the list; SprinkleRecorder re-reads it after commit.
+        if (Boolean.TRUE.equals(item.getIsChecked())) {
+            eventPublisher.publishEvent(new ShoppingItemChecked(userId));
+        }
+
         return item.getIsChecked();
     }
 

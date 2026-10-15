@@ -58,6 +58,15 @@ public interface ShoppingListItemRepository extends JpaRepository<ShoppingListIt
     @Query("UPDATE ShoppingListItem i SET i.isChecked = false WHERE i.shoppingList.id = :shoppingListId")
     void uncheckAll(@Param("shoppingListId") Long shoppingListId);
 
+    /** MPP-42: how many items the list holds. */
+    long countByShoppingListId(Long shoppingListId);
+
+    /** MPP-42: items not yet checked. is_checked is nullable (DEFAULT 0), so NULL counts as unchecked. */
+    @Query("SELECT COUNT(i) FROM ShoppingListItem i " +
+           "WHERE i.shoppingList.id = :shoppingListId " +
+           "AND (i.isChecked = false OR i.isChecked IS NULL)")
+    long countUnchecked(@Param("shoppingListId") Long shoppingListId);
+
     /**
      * Delete all items for a shopping list.
      *

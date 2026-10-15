@@ -12,6 +12,7 @@ import usePetAwards from '../../hooks/usePetAwards'
 import useRoomEdit from '../../hooks/useRoomEdit'
 import usePipGrowth from '../../hooks/usePipGrowth'
 import usePetShop from '../../hooks/usePetShop'
+import useSprinkleCountUp from '../../hooks/useSprinkleCountUp'
 import usePipWardrobe from '../../hooks/usePipWardrobe'
 import { cookServeBubble } from '../../utils/cookServe'
 import { fridgeBubble } from '../../utils/fridgeFill'
@@ -34,6 +35,7 @@ import './PetView.css'
  * MPP-28: one pet read (habits + cabinet ride in /pet); the bubble order lives in pipBubble.
  * MPP-26: the room draws your own station levels; the 🛍 Shop sheet upgrades them (usePetShop), and Pip says one line after an upgrade.
  * MPP-27: your own decor and wall / floor styles in the room; ✏️ Edit room places them (useRoomEdit), the shop's Decor and Walls & floors tabs buy them, and Pip says one line after a purchase.
+ * MPP-42: the header's sprinkles count up when you come back with more, and Pip says what you earned after any award / outfit / shop line.
  */
 function PetView() {
   const navigate = useNavigate()
@@ -51,8 +53,10 @@ function PetView() {
   const dressing = usePipWardrobe({ userId: petUserId, wardrobe: pet?.wardrobe ?? null, setWardrobe })
   const shopState = usePetShop({ applyRoomWrite, refreshPet })
   const roomEdit = useRoomEdit({ room: pet?.room ?? null, setRoom, applyRoomWrite })
-  // MPP-28 AC 2: award > outfit > shop line; a stage change waits for these and for the cook scene.
-  const announcement = awards.announcement ?? dressing.announcement ?? shopState.announcement
+  // MPP-28 AC 2: award > outfit > shop line. MPP-42 AC 16: what you earned queues after them, and after the cook scene.
+  const higherAnnouncement = awards.announcement ?? dressing.announcement ?? shopState.announcement
+  const earning = useSprinkleCountUp({ userId: petUserId, sprinkles, hold: Boolean(serving) || Boolean(higherAnnouncement) })
+  const announcement = higherAnnouncement ?? earning.line
   const growth = usePipGrowth({ userId: petUserId, growth: pet?.growth ?? null, petName: pet?.name ?? null, hold: Boolean(serving) || Boolean(announcement) })
 
   if (!isAuthenticated) {
@@ -116,6 +120,7 @@ function PetView() {
         onRename={renamePet}
         formName={PIP_FORM_NAMES[growth.displayForm]}
         sprinkles={sprinkles}
+        earning={earning}
         mood={mood}
         moodLabel={petChipLabel(moodInfo)}
       />

@@ -97,6 +97,19 @@ export const petService = {
   async placeDecor(spot, itemId) {
     const response = await api.put('/pet/room/placements', { spot, itemId })
     return response.data
+  },
+
+  /**
+   * MPP-42: your own sprinkles from the last 14 days (newest first) and what each way of earning pays.
+   * Resolves RecentSprinklesDTO { entries: [{ sourceType, amount, createdAt, entryId, mealKey, planDate,
+   * station, level, decorItem, weekStart }], rates: { mealEaten, onTimeBonus, homemadeBonus, fullWeek,
+   * shoppingListGenerated, shoppingListCompleted, mealsPerWeek } }.
+   *
+   * @param {{ signal?: AbortSignal }} [options]
+   */
+  async getRecentSprinkles({ signal } = {}) {
+    const response = await api.get('/pet/sprinkles/recent', { signal })
+    return response.data
   }
 }
 

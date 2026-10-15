@@ -31,7 +31,7 @@ public class PetSprinkle {
 
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.VARCHAR)
-    @Column(name = "source_type", nullable = false, length = 16)
+    @Column(name = "source_type", nullable = false, length = 32)
     private SprinkleSource sourceType;
 
     @Column(name = "source_id", nullable = false)

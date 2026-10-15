@@ -7,7 +7,6 @@ export const SHOP_TITLE = 'Shop'
 export const SHOP_BUTTON_LABEL = 'Shop'
 export const SHOP_CLOSE_LABEL = 'Close the shop'
 export const SHOP_INTRO = "Spend sprinkles to upgrade Pip's room. Upgrades are yours forever."
-export const SHOP_FOOTNOTE = 'Earn sprinkles by logging meals on time, cooking homemade and planning full weeks.'
 export const SHOP_MAX_LEVEL_LABEL = '✓ Max level'
 export const SHOP_FULLY_UPGRADED = 'Fully upgraded.'
 export const SHOP_BUSY_LABEL = 'Upgrading…'

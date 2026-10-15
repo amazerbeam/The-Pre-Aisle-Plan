@@ -2,11 +2,14 @@ package com.foodbytes.service;
 
 import com.foodbytes.model.MealPlanEntry;
 import com.foodbytes.model.MealPlanEntryEaten;
+import com.foodbytes.model.ShoppingList;
 import com.foodbytes.model.SprinkleSource;
 import com.foodbytes.repository.MealPlanEntryEatenRepository;
 import com.foodbytes.repository.MealPlanEntryRepository;
 import com.foodbytes.repository.PetFirstRepository;
 import com.foodbytes.repository.PetSprinkleRepository;
+import com.foodbytes.repository.ShoppingListItemRepository;
+import com.foodbytes.repository.ShoppingListRepository;
 import com.foodbytes.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -22,7 +25,7 @@ import java.util.Optional;
  * MPP-25: pays sprinkles and reads the balance. Each source pays each person once ever
  * (uk_pet_sprinkles); nothing here deletes, so un-ticking never refunds (AC 3). Ticks pay the
  * person who ticked; a full week pays everyone on the shared plan (per-person Pip, MPP-33).
- * MPP-26: lockWallet + spend - the one locked debit path every purchase uses.
+ * MPP-26: lockWallet + spend - the one locked debit path every purchase uses. MPP-42: the weekly shopping-list payouts.
  */
 @Service
 @RequiredArgsConstructor
@@ -35,6 +38,8 @@ public class SprinkleService {
     private final UserRepository userRepository;
     private final ExtraChoiceService extraChoiceService;
     private final Clock clock;
+    private final ShoppingListRepository shoppingListRepository;           // MPP-42
+    private final ShoppingListItemRepository shoppingListItemRepository;   // MPP-42
 
     /**
      * A person ticked an entry eaten. Pays MEAL_EATEN plus the on-time and homemade bonuses, decided
@@ -79,10 +84,36 @@ public class SprinkleService {
                     monday.plusDays(SprinklePolicy.WEEK_DAYS - 1),
                     PlanStreakPolicy.MAIN_MEAL_KEYS.size()).size();
             if (fullDays < SprinklePolicy.WEEK_DAYS) continue;
-            for (Long memberId : userRepository.findPlanMemberIds(ownerId)) {
-                pay(memberId, SprinkleSource.FULL_WEEK, monday.toEpochDay(), SprinklePolicy.FULL_WEEK);
-            }
+            payPlan(ownerId, SprinkleSource.FULL_WEEK, monday.toEpochDay(), SprinklePolicy.FULL_WEEK);
         }
+    }
+
+    /**
+     * MPP-42 AC 10: a shopping list was generated. Pays SHOPPING_LIST_GENERATED to every member of the
+     * plan, keyed by this Dublin week's Monday - a regenerate in the same week hits uk_pet_sprinkles.
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void shoppingListGenerated(Long actorId) {
+        Long ownerId = extraChoiceService.resolveOwnerId(actorId);
+        Optional<ShoppingList> list = shoppingListRepository.findByUserId(ownerId);
+        if (list.isEmpty() || shoppingListItemRepository.countByShoppingListId(list.get().getId()) == 0) return;
+        payPlan(ownerId, SprinkleSource.SHOPPING_LIST_GENERATED, thisWeek(), SprinklePolicy.SHOPPING_LIST_GENERATED);
+    }
+
+    /**
+     * MPP-42 AC 11: an item was checked. Re-reads the plan's list after that commit (never trusting the
+     * client's optimistic state): >= 1 item and none unchecked pays SHOPPING_LIST_COMPLETED to every
+     * member, once per week.
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void shoppingListCompleted(Long actorId) {
+        Long ownerId = extraChoiceService.resolveOwnerId(actorId);
+        Optional<ShoppingList> list = shoppingListRepository.findByUserId(ownerId);
+        if (list.isEmpty()) return;
+        Long listId = list.get().getId();
+        if (shoppingListItemRepository.countByShoppingListId(listId) == 0) return;
+        if (shoppingListItemRepository.countUnchecked(listId) > 0) return;
+        payPlan(ownerId, SprinkleSource.SHOPPING_LIST_COMPLETED, thisWeek(), SprinklePolicy.SHOPPING_LIST_COMPLETED);
     }
 
     /** The person's own balance (MPP-25 AC 4). */
@@ -118,6 +149,18 @@ public class SprinkleService {
         } catch (DataIntegrityViolationException e) {
             throw new PetShopException(PetShopException.Reason.ALREADY_OWNED, "You already have that.");
         }
+    }
+
+    /** Shared work (MPP-33): pays everyone on the owner's plan, whoever did it. */
+    private void payPlan(Long ownerId, SprinkleSource source, long sourceId, int amount) {
+        for (Long memberId : userRepository.findPlanMemberIds(ownerId)) {
+            pay(memberId, source, sourceId, amount);
+        }
+    }
+
+    /** This Dublin week's Monday as an epoch day - the once-per-week key. */
+    private long thisWeek() {
+        return SprinklePolicy.weekOf(HabitStreakPolicy.today(clock)).toEpochDay();
     }
 
     private void pay(Long userId, SprinkleSource source, Long sourceId, int amount) {

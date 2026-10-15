@@ -23,6 +23,11 @@ public final class SprinklePolicy {
     public static final int HOMEMADE_BONUS = 5;
     /** A full week is Monday to Sunday, every day with breakfast, lunch and dinner planned. */
     public static final int WEEK_DAYS = 7;
+    /** MPP-42: the week's shopping list made, and the week's shopping finished. Paid to every plan member. */
+    public static final int SHOPPING_LIST_GENERATED = 10;
+    public static final int SHOPPING_LIST_COMPLETED = 15;
+    /** MPP-42: GET /api/pet/sprinkles/recent looks back this many days. */
+    public static final int RECENT_DAYS = 14;
 
     private SprinklePolicy() {
     }
@@ -41,6 +46,16 @@ public final class SprinklePolicy {
     static boolean isOnTime(LocalDateTime eatenAtUtc, LocalDate planDate, LocalTime byTime) {
         ZonedDateTime local = eatenAtUtc.atZone(ZoneOffset.UTC).withZoneSameInstant(HabitStreakPolicy.ZONE);
         return local.toLocalDate().equals(planDate) && !local.toLocalTime().isAfter(byTime);
+    }
+
+    /** MPP-42: breakfast, lunch and dinner on all seven days - the meals a full week holds (the Earn tab's good week). */
+    public static int mealsPerWeek() {
+        return WEEK_DAYS * PlanStreakPolicy.MAIN_MEAL_KEYS.size();
+    }
+
+    /** MPP-42: the Monday of the Monday-Sunday week that holds this day. */
+    static LocalDate weekOf(LocalDate day) {
+        return day.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
     }
 
     /** The Monday of every calendar week that overlaps [from, to], oldest first. */

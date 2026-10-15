@@ -137,6 +137,18 @@ public interface MealPlanEntryRepository extends JpaRepository<MealPlanEntry, Lo
         @Param("to") LocalDate to
     );
 
+    /** MPP-42: meal key + date of one planned slot, without loading the recipe. */
+    interface MealSlotContext {
+        Long getId();
+        String getMealKey();
+        LocalDate getPlanDate();
+    }
+
+    /** MPP-42: one query for the meal context of many entries (sprinkle history). */
+    @Query("SELECT mpe.id AS id, mpe.meal.key AS mealKey, mpe.planDate AS planDate FROM MealPlanEntry mpe " +
+           "WHERE mpe.id IN :ids")
+    List<MealSlotContext> findMealSlotContextByIdIn(@Param("ids") Collection<Long> ids);
+
     /**
      * MPP-24: the owner's dates in [from, to] that have every one of mealKeys planned (keyCount =
      * mealKeys.size()). Feeds PetFirstPolicy.containsFullWeek; same rule as the migration's backfill 3/4.

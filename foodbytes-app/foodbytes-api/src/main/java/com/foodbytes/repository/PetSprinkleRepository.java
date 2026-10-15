@@ -8,6 +8,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 /** MPP-25: each person's sprinkles ledger. */
 @Repository
 public interface PetSprinkleRepository extends JpaRepository<PetSprinkle, Long> {
@@ -17,6 +20,9 @@ public interface PetSprinkleRepository extends JpaRepository<PetSprinkle, Long> 
     /** The person's balance; 0 with no rows. uk_pet_sprinkles leads with user_id, so this is a range scan. */
     @Query("SELECT COALESCE(SUM(s.amount), 0) FROM PetSprinkle s WHERE s.userId = :userId")
     long sumAmountByUserId(@Param("userId") Long userId);
+
+    /** MPP-42: the person's own rows since a UTC time, newest first (uk_pet_sprinkles leads with user_id). */
+    List<PetSprinkle> findByUserIdAndCreatedAtGreaterThanEqualOrderByCreatedAtDescIdDesc(Long userId, LocalDateTime since);
 
     /**
      * Pays a source, or leaves the existing payout untouched. Two devices paying the same source at

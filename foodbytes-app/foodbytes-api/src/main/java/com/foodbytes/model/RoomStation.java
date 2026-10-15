@@ -36,4 +36,9 @@ public enum RoomStation {
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Unknown station: " + value));
     }
+
+    /** MPP-42: the station a ledger code names, or null for an unknown code. */
+    public static RoomStation fromCode(int code) {
+        return Arrays.stream(values()).filter(station -> station.code == code).findFirst().orElse(null);
+    }
 }

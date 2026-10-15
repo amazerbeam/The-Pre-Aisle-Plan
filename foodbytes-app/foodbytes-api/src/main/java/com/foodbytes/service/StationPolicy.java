@@ -33,4 +33,14 @@ public final class StationPolicy {
     public static long sourceId(RoomStation station, int level) {
         return station.code() * 10L + level;
     }
+
+    /** MPP-42: the station a STATION_UPGRADE source id names (inverse of sourceId), or null. */
+    public static RoomStation stationOf(long sourceId) {
+        return RoomStation.fromCode((int) (sourceId / 10));
+    }
+
+    /** MPP-42: the level a STATION_UPGRADE source id bought. */
+    public static int levelOf(long sourceId) {
+        return (int) (sourceId % 10);
+    }
 }

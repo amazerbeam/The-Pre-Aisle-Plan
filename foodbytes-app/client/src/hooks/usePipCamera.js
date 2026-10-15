@@ -220,6 +220,11 @@ function wireInput(stage, s, { pullTo, floatHome, setZoom, saveZoom, chase }) {
     drag = null
     if (moved) endGesture()
   }
+  // On touch the finger's original target holds an implicit capture; moving it to the stage in onMove
+  // fires a bubbling lostpointercapture on that child. Only the stage losing capture ends the gesture.
+  const onLostCapture = e => {
+    if (e.target === stage) onUp(e)
+  }
   const onClick = e => {
     if (!swallow) return
     e.preventDefault()
@@ -263,7 +268,7 @@ function wireInput(stage, s, { pullTo, floatHome, setZoom, saveZoom, chase }) {
   }
 
   const listeners = [
-    ['pointerdown', onDown], ['pointermove', onMove], ['pointerup', onUp], ['pointercancel', onUp], ['lostpointercapture', onUp], ['focusout', onFocusOut],
+    ['pointerdown', onDown], ['pointermove', onMove], ['pointerup', onUp], ['pointercancel', onUp], ['lostpointercapture', onLostCapture], ['focusout', onFocusOut],
     ['keydown', onKeyDown], ['keyup', onKeyUp]
   ]
   listeners.forEach(([type, fn]) => stage.addEventListener(type, fn))

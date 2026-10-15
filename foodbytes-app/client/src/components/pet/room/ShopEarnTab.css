@@ -1,0 +1,87 @@
+/* MPP-42: the Shop's ✨ Earn tab (pip-sprinkles-earn-mockup.html, Version B). Tokens as ShopView.css. */
+.pip-earn-ways { margin: 0; padding: 0; list-style: none; }
+
+.pip-earn-way {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 8px;
+  padding: 10px;
+  border: 1px solid #e3dcf3;
+  border-radius: 14px;
+  background: #fcfbff;
+}
+
+.pip-earn-icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: linear-gradient(#ece5fb, #d6c9f0);
+  font-size: 1.25rem;
+}
+
+.pip-earn-way h4 { margin: 0; font-size: 0.9rem; }
+.pip-earn-way p { margin: 1px 0 0; font-size: 0.74rem; color: #6f6789; line-height: 1.35; }
+
+.pip-earn-new {
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: #7c5cd6;
+  color: #fff;
+  font-size: 0.62rem;
+  font-weight: 800;
+  vertical-align: middle;
+}
+
+.pip-earn-amount {
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: #fff7d6;
+  font-weight: 800;
+  font-size: 0.82rem;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.pip-earn-week { margin: 4px 0 10px; padding: 10px 12px; border-radius: 14px; background: #f3effc; font-size: 0.82rem; }
+.pip-earn-week b { color: #4a3f80; }
+.pip-earn-week table { width: 100%; border-collapse: collapse; margin-top: 6px; font-variant-numeric: tabular-nums; }
+.pip-earn-week td { padding: 2px 0; }
+.pip-earn-week td:last-child { text-align: right; font-weight: 700; }
+.pip-earn-week-total td { border-top: 1px solid #d6c9f0; padding-top: 5px; font-weight: 800; }
+
+.pip-earn-recent { margin: 0; padding: 0; list-style: none; font-size: 0.82rem; }
+.pip-earn-recent li { display: flex; justify-content: space-between; gap: 8px; padding: 7px 2px; border-bottom: 1px solid #f0ecf8; }
+.pip-earn-recent small { display: block; color: #6f6789; font-size: 0.7rem; }
+.pip-earn-plus { color: #2f7a3a; font-weight: 800; white-space: nowrap; }
+.pip-earn-minus { color: #a4281d; font-weight: 800; white-space: nowrap; }
+
+.pip-earn-rules { margin: 0; padding-left: 18px; font-size: 0.78rem; color: #6f6789; }
+.pip-earn-rules li { margin-bottom: 4px; }
+
+.pip-earn-loading, .pip-earn-empty { margin: 8px 0; font-size: 0.82rem; color: #6f6789; }
+
+.pip-earn-error { margin: 8px 0; font-size: 0.82rem; color: #a4281d; }
+.pip-earn-error p { margin: 0 0 6px; }
+
+.pip-earn-retry {
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid #e3dcf3;
+  border-radius: 999px;
+  background: #fff;
+  font-weight: 700;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pip-earn-retry:active { background: #f3effc; }
+.pip-earn-retry:focus-visible { outline: 2px solid #7c5cd6; outline-offset: 2px; }
+
+@media (hover: hover) {
+  .pip-earn-retry:hover { background: #f3effc; }
+}

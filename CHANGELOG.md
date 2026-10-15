@@ -2,6 +2,8 @@
 
 One line per ticket, newest first: `<version> — <ticket key>: <summary>`. Bump rules and how
 to check what is deployed: `CLAUDE.md` → Versioning & deploy verification.
+1.28.1 — MPP-41: fix touch drag in Pip's room cancelling after a few px and floating back to Pip
+1.28.0 — MPP-42: Sprinkles Earn tab in the Shop, weekly shopping-list rewards, and a count-up when you return to Pip
 1.27.0 — MPP-40: Pip's room gets 12 named decor spots, a rug spot, the wardrobe station and a deeper windowsill
 1.26.0 — MPP-39: Pip's room is bigger and zoomed in: drag or pinch to look around, it floats back to Pip and follows him, zoom remembered in this browser; white walls by default (Lavender stays free), skirting and corner lines
 1.25.1 — MPP-37: fix Pip's room collapsing to nothing on phones (room picture, Pip and fridge/cabinet missing; hint and bubble squeezed to one word per line)

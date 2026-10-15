@@ -27,3 +27,4 @@ Railway already had everything up to MPP-14 when checked on 2026-10-14 (read-onl
 | 9 | MPP-26 | foodbytes-app/database/migrations/2026-10-14-mpp26-pet-station-levels.sql | 2026-10-14 | — |
 | 10 | MPP-27 | foodbytes-app/database/migrations/2026-10-14-mpp27-pet-room-decor.sql | 2026-10-14 | — |
 | 11 | MPP-40 | foodbytes-app/database/migrations/2026-10-15-mpp40-pet-room-decor-spots.sql | 2026-10-15 | — |
+| 12 | MPP-42 | foodbytes-app/database/migrations/2026-10-15-mpp42-sprinkles-shopping-sources.sql | — | — |

@@ -1,9 +1,11 @@
 import { useEffect } from 'react'
 import { ROOM_MIN_LEVEL, SPRINKLES_ICON } from '../../../constants/petRoom'
 import { DECOR_SHOP_INTRO, SHOP_TAB_KEYS } from '../../../constants/petDecor'
-import { FREE_MODE_SHOP_NOTE, SHOP_CLOSE_LABEL, SHOP_FOOTNOTE, SHOP_INTRO, SHOP_STATIONS, SHOP_TITLE } from '../../../constants/petShop'
+import { FREE_MODE_SHOP_NOTE, SHOP_CLOSE_LABEL, SHOP_INTRO, SHOP_STATIONS, SHOP_TITLE } from '../../../constants/petShop'
+import { EARN_FOOT_LINK, EARN_FOOT_TEXT } from '../../../constants/petSprinkles'
 import useBodyScrollLock from '../../../hooks/useBodyScrollLock'
 import ShopDecorTab from './ShopDecorTab'
+import ShopEarnTab from './ShopEarnTab'
 import ShopStationCard from './ShopStationCard'
 import ShopStylesTab from './ShopStylesTab'
 import ShopTabs from './ShopTabs'
@@ -17,12 +19,20 @@ import './ShopView.css'
  *
  * @param {{ shop: Object, titleId: string, panelRef: object, onClose: () => void }} props
  *   shop = { room: PetRoomDTO, sprinkles, armed, busy, status, error, tab, setTab, arm, upgrade, setLevel, buy, reset }
+ * MPP-42: a fourth ✨ Earn tab (how sprinkles are earned + your recent ones); the other tabs end with a link to it.
  * MPP-40: while shop.room.freeMode is on (local testing) a note says so and each station gets level chips.
  */
 function ShopView({ shop, titleId, panelRef, onClose }) {
   useBodyScrollLock(true)
 
   useEffect(() => shop.reset, []) // eslint-disable-line react-hooks/exhaustive-deps -- reset once, on close
+
+  // MPP-42 AC 7: the footnote link opens Earn and moves focus to its tab, as an arrow key would.
+  const openEarn = () => {
+    shop.setTab(SHOP_TAB_KEYS.EARN)
+    document.getElementById(`${titleId}-tab-${SHOP_TAB_KEYS.EARN}`)?.focus()
+  }
+  const isDecorTab = shop.tab === SHOP_TAB_KEYS.DECOR || shop.tab === SHOP_TAB_KEYS.STYLES
 
   return (
     <div ref={panelRef} className="pip-shop" role="dialog" aria-modal="true" tabIndex={-1} aria-labelledby={titleId}>
@@ -60,10 +70,16 @@ function ShopView({ shop, titleId, panelRef, onClose }) {
             </ul>
           </>
         )}
-        {shop.tab !== SHOP_TAB_KEYS.UPGRADES && <p className="pip-shop-intro">{DECOR_SHOP_INTRO}</p>}
+        {isDecorTab && <p className="pip-shop-intro">{DECOR_SHOP_INTRO}</p>}
         {shop.tab === SHOP_TAB_KEYS.DECOR && <ShopDecorTab shop={shop} />}
         {shop.tab === SHOP_TAB_KEYS.STYLES && <ShopStylesTab shop={shop} />}
-        <p className="pip-shop-foot">{SHOP_FOOTNOTE}</p>
+        {shop.tab === SHOP_TAB_KEYS.EARN && <ShopEarnTab />}
+        {shop.tab !== SHOP_TAB_KEYS.EARN && (
+          <p className="pip-shop-foot">
+            {EARN_FOOT_TEXT}{' '}
+            <button type="button" className="pip-shop-foot-link" onClick={openEarn}>{EARN_FOOT_LINK}</button>
+          </p>
+        )}
       </div>
     </div>
   )

@@ -3,12 +3,15 @@ package com.foodbytes.service;
 import com.foodbytes.model.Meal;
 import com.foodbytes.model.MealPlanEntry;
 import com.foodbytes.model.MealPlanEntryEaten;
+import com.foodbytes.model.ShoppingList;
 import com.foodbytes.model.SprinkleSource;
 import com.foodbytes.model.User;
 import com.foodbytes.repository.MealPlanEntryEatenRepository;
 import com.foodbytes.repository.MealPlanEntryRepository;
 import com.foodbytes.repository.PetFirstRepository;
 import com.foodbytes.repository.PetSprinkleRepository;
+import com.foodbytes.repository.ShoppingListItemRepository;
+import com.foodbytes.repository.ShoppingListRepository;
 import com.foodbytes.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -53,13 +56,15 @@ class SprinkleServiceTest {
     @Mock private PetFirstRepository firsts;
     @Mock private UserRepository users;
     @Mock private ExtraChoiceService extraChoiceService;
+    @Mock private ShoppingListRepository lists;
+    @Mock private ShoppingListItemRepository items;
 
     private SprinkleService service;
 
     @BeforeEach
     void setUp() {
         Clock clock = Clock.fixed(Instant.parse("2026-10-14T12:00:00Z"), HabitStreakPolicy.ZONE);
-        service = new SprinkleService(sprinkles, entries, ticks, firsts, users, extraChoiceService, clock);
+        service = new SprinkleService(sprinkles, entries, ticks, firsts, users, extraChoiceService, clock, lists, items);
     }
 
     private MealPlanEntry entry(long id, LocalDate date, String mealKey) {
@@ -248,11 +253,13 @@ class SprinkleServiceTest {
 
     @Test
     void noRuleRewardsVariety() {
-        // Earning sources only; STATION_UPGRADE (MPP-26) and DECOR_PURCHASE (MPP-27) are spends, not rewards.
+        // Earning sources only; STATION_UPGRADE (MPP-26) and DECOR_PURCHASE (MPP-27) are spends, not rewards;
+        // the two shopping sources (MPP-42) are consistency work, not variety.
         assertThat(SprinkleSource.values()).containsExactly(
                 SprinkleSource.MEAL_EATEN, SprinkleSource.MEAL_ON_TIME,
                 SprinkleSource.FULL_WEEK, SprinkleSource.HOMEMADE_EXTRA,
-                SprinkleSource.STATION_UPGRADE, SprinkleSource.DECOR_PURCHASE);
+                SprinkleSource.STATION_UPGRADE, SprinkleSource.DECOR_PURCHASE,
+                SprinkleSource.SHOPPING_LIST_GENERATED, SprinkleSource.SHOPPING_LIST_COMPLETED);
     }
 
     // ---- MPP-26: spending ----
@@ -315,5 +322,96 @@ class SprinkleServiceTest {
                 .isInstanceOf(PetShopException.class)
                 .extracting(e -> ((PetShopException) e).getReason())
                 .isEqualTo(PetShopException.Reason.ALREADY_OWNED);
+    }
+
+    private void sharedPlan() {
+        when(extraChoiceService.resolveOwnerId(2L)).thenReturn(1L);
+        when(users.findPlanMemberIds(1L)).thenReturn(List.of(1L, 2L));
+    }
+
+    private void ownersList(long total, long unchecked) {
+        ShoppingList list = new ShoppingList();
+        list.setId(50L);
+        when(lists.findByUserId(1L)).thenReturn(Optional.of(list));
+        when(items.countByShoppingListId(50L)).thenReturn(total);
+        lenient().when(items.countUnchecked(50L)).thenReturn(unchecked);
+    }
+
+    @Test
+    void shoppingListGenerated_paysBothPlanMembers_keyedByThisWeeksMonday() {
+        sharedPlan();
+        ownersList(5, 0);
+        service.shoppingListGenerated(2L);
+        verify(sprinkles).insertIfAbsent(1L, "SHOPPING_LIST_GENERATED", MON.toEpochDay(), 10);
+        verify(sprinkles).insertIfAbsent(2L, "SHOPPING_LIST_GENERATED", MON.toEpochDay(), 10);
+    }
+
+    @Test
+    void shoppingListGenerated_twiceInOneWeek_reusesTheSameKey_soTheLedgerPaysOnce() {
+        sharedPlan();
+        ownersList(5, 0);
+        service.shoppingListGenerated(2L);
+        service.shoppingListGenerated(2L);
+        // insertIfAbsent is ON DUPLICATE KEY no-op on uk_pet_sprinkles: same key twice = paid once.
+        verify(sprinkles, times(2)).insertIfAbsent(2L, "SHOPPING_LIST_GENERATED", MON.toEpochDay(), 10);
+        verify(sprinkles, never()).insertIfAbsent(eq(2L), eq("SHOPPING_LIST_GENERATED"), eq(MON.plusDays(7).toEpochDay()), anyInt());
+    }
+
+    @Test
+    void shoppingListGenerated_emptyList_paysNothing() {
+        when(extraChoiceService.resolveOwnerId(2L)).thenReturn(1L);
+        ownersList(0, 0);
+        service.shoppingListGenerated(2L);
+        verify(sprinkles, never()).insertIfAbsent(anyLong(), anyString(), anyLong(), anyInt());
+    }
+
+    @Test
+    void shoppingListGenerated_noList_paysNothing() {
+        when(extraChoiceService.resolveOwnerId(2L)).thenReturn(1L);
+        when(lists.findByUserId(1L)).thenReturn(Optional.empty());
+        service.shoppingListGenerated(2L);
+        verify(sprinkles, never()).insertIfAbsent(anyLong(), anyString(), anyLong(), anyInt());
+    }
+
+    @Test
+    void shoppingListCompleted_everyItemChecked_paysBothPlanMembers() {
+        sharedPlan();
+        ownersList(12, 0);
+        service.shoppingListCompleted(2L);
+        verify(sprinkles).insertIfAbsent(1L, "SHOPPING_LIST_COMPLETED", MON.toEpochDay(), 15);
+        verify(sprinkles).insertIfAbsent(2L, "SHOPPING_LIST_COMPLETED", MON.toEpochDay(), 15);
+    }
+
+    @Test
+    void shoppingListCompleted_anItemStillUnchecked_paysNothing() {
+        when(extraChoiceService.resolveOwnerId(2L)).thenReturn(1L);
+        ownersList(12, 1);
+        service.shoppingListCompleted(2L);
+        verify(sprinkles, never()).insertIfAbsent(anyLong(), anyString(), anyLong(), anyInt());
+    }
+
+    @Test
+    void shoppingListCompleted_emptyList_paysNothing() {
+        when(extraChoiceService.resolveOwnerId(2L)).thenReturn(1L);
+        ownersList(0, 0);
+        service.shoppingListCompleted(2L);
+        verify(sprinkles, never()).insertIfAbsent(anyLong(), anyString(), anyLong(), anyInt());
+    }
+
+    @Test
+    void shoppingListCompleted_noList_paysNothing() {
+        when(extraChoiceService.resolveOwnerId(2L)).thenReturn(1L);
+        when(lists.findByUserId(1L)).thenReturn(Optional.empty());
+        service.shoppingListCompleted(2L);
+        verifyNoInteractions(sprinkles);
+    }
+
+    @Test
+    void shoppingListCompleted_reCheckedInTheSameWeek_reusesTheSameKey() {
+        sharedPlan();
+        ownersList(12, 0);
+        service.shoppingListCompleted(2L);
+        service.shoppingListCompleted(2L);
+        verify(sprinkles, times(2)).insertIfAbsent(1L, "SHOPPING_LIST_COMPLETED", MON.toEpochDay(), 15);
     }
 }

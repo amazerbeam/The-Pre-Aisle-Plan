@@ -36,10 +36,27 @@ class SprinkleRecorderTest {
     }
 
     @Test
-    void templateAndShoppingList_payNothing() {
+    void template_paysNothing() {
         recorder.onCandidate(PetFirstCandidate.of(1L, FirstKey.MAKE_TEMPLATE));
-        recorder.onCandidate(PetFirstCandidate.of(1L, FirstKey.GENERATE_SHOPPING_LIST));
         verifyNoInteractions(sprinkleService);
+    }
+
+    @Test
+    void shoppingListGenerated_routesToShoppingListGenerated() {
+        recorder.onCandidate(PetFirstCandidate.of(2L, FirstKey.GENERATE_SHOPPING_LIST));
+        verify(sprinkleService).shoppingListGenerated(2L);
+    }
+
+    @Test
+    void itemChecked_routesToShoppingListCompleted() {
+        recorder.onShoppingItemChecked(new ShoppingItemChecked(2L));
+        verify(sprinkleService).shoppingListCompleted(2L);
+    }
+
+    @Test
+    void aShoppingFailure_isSwallowed_soTheToggleStillSucceeds() {
+        doThrow(new IllegalStateException("db down")).when(sprinkleService).shoppingListCompleted(2L);
+        assertThatCode(() -> recorder.onShoppingItemChecked(new ShoppingItemChecked(2L))).doesNotThrowAnyException();
     }
 
     @Test

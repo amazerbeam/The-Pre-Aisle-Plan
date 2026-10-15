@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.foodbytes.dto.AggregatedShoppingListDTO;
 import com.foodbytes.model.FirstKey;
 import com.foodbytes.model.ShoppingList;
+import com.foodbytes.model.ShoppingListItem;
 import com.foodbytes.model.User;
 import com.foodbytes.repository.ShoppingListItemRepository;
 import com.foodbytes.repository.ShoppingListRepository;
@@ -22,6 +23,7 @@ import java.util.Optional;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /** MPP-24: generating a list on a shared plan earns the first for whoever generated it. */
@@ -59,5 +61,31 @@ class PersistedShoppingListServiceTest {
         service.generateShoppingList(2L, start, start.plusDays(6));
 
         verify(eventPublisher).publishEvent(PetFirstCandidate.of(2L, FirstKey.GENERATE_SHOPPING_LIST));
+    }
+
+    private ShoppingListItem itemOnPartnersPlan(boolean checked) {
+        User partner = new User();
+        partner.setId(2L);
+        partner.setMealPlanOwnerId(1L);
+        when(userRepository.findById(2L)).thenReturn(Optional.of(partner));
+        ShoppingListItem item = new ShoppingListItem();
+        item.setId(7L);
+        item.setIsChecked(checked);
+        when(shoppingListItemRepository.findByIdAndUserId(7L, 1L)).thenReturn(Optional.of(item));
+        return item;
+    }
+
+    @Test
+    void toggleItemChecked_toChecked_publishesShoppingItemCheckedForTheClicker() {
+        itemOnPartnersPlan(false);
+        service.toggleItemChecked(2L, 7L);
+        verify(eventPublisher).publishEvent(new ShoppingItemChecked(2L));
+    }
+
+    @Test
+    void toggleItemChecked_toUnchecked_publishesNothing() {
+        itemOnPartnersPlan(true);
+        service.toggleItemChecked(2L, 7L);
+        verifyNoInteractions(eventPublisher);
     }
 }

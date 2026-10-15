@@ -56,6 +56,8 @@
 
 /* ---- MPP-37: Pip's slim header ---- */
 .pip-header {
+  position: relative; /* MPP-42: the "+N ✨" pill hangs below the header, over the room */
+  z-index: 3;
   flex: none;
   display: flex;
   align-items: center;

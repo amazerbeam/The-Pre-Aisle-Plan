@@ -43,6 +43,18 @@ class StationPolicyTest {
     }
 
     @Test
+    void stationOfAndLevelOf_invertSourceId() {
+        for (RoomStation station : RoomStation.values()) {
+            for (int level = 2; level <= 4; level++) {
+                long id = StationPolicy.sourceId(station, level);
+                assertThat(StationPolicy.stationOf(id)).isEqualTo(station);
+                assertThat(StationPolicy.levelOf(id)).isEqualTo(level);
+            }
+        }
+        assertThat(StationPolicy.stationOf(92)).isNull();
+    }
+
+    @Test
     void fromPath_wardrobe_isCaseInsensitive() {
         assertThat(RoomStation.fromPath("Wardrobe")).isEqualTo(RoomStation.WARDROBE);
         assertThat(StationPolicy.sourceId(RoomStation.WARDROBE, 2)).isEqualTo(52L);
