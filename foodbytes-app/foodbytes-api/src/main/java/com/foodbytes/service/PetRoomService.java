@@ -71,11 +71,11 @@ public class PetRoomService {
         return levels;
     }
 
-    /** MPP-27: every catalogue entry with whether the caller owns it; the free defaults always are. */
+    /** MPP-27 / MPP-39: every catalogue entry with whether the caller owns it; free items always are. */
     static List<DecorItemDTO> decorOf(Set<String> owned) {
         return DecorCatalogue.ITEMS.stream()
                 .map(item -> new DecorItemDTO(item.id(), item.spot().key(), item.price(),
-                        item.isDefault() || owned.contains(item.id())))
+                        item.isFree() || owned.contains(item.id())))
                 .toList();
     }
 

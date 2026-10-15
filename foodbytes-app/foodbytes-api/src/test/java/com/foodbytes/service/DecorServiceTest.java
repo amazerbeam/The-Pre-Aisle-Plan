@@ -6,6 +6,7 @@ import com.foodbytes.model.RoomSpot;
 import com.foodbytes.model.SprinkleSource;
 import com.foodbytes.repository.PetDecorOwnedRepository;
 import com.foodbytes.repository.PetRoomPlacementRepository;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InOrder;
@@ -109,10 +110,12 @@ class DecorServiceTest {
     }
 
     @Test
-    void buy_aFreeDefault_isAlreadyOwned() {
-        assertThatThrownBy(() -> decorService.buy(OWNER, "wall-lavender"))
-                .isInstanceOf(PetShopException.class)
-                .hasMessage("You already own that.");
+    void buy_aFreeItem_isAlreadyOwned() {
+        for (String free : List.of("wall-white", "wall-lavender")) {
+            assertThatThrownBy(() -> decorService.buy(OWNER, free))
+                    .isInstanceOf(PetShopException.class)
+                    .hasMessage("You already own that.");
+        }
         verify(ownedRepository, never()).save(any());
     }
 
@@ -159,11 +162,22 @@ class DecorServiceTest {
 
     @Test
     void place_theDefaultStyle_deletesTheRowInsteadOfStoringIt() {
-        decorService.place(OWNER, RoomSpot.WALL_STYLE, "wall-lavender");
+        decorService.place(OWNER, RoomSpot.WALL_STYLE, "wall-white");
 
         verify(placementRepository).deleteByUserIdAndSpot(OWNER, RoomSpot.WALL_STYLE);
         verify(ownedRepository, never()).existsByUserIdAndItemKey(anyLong(), anyString());
         verify(placementRepository, never()).upsert(anyLong(), anyString(), anyString());
+    }
+
+    @Test
+    void place_lavender_isFreeButNotTheDefault_soTheRowIsStored() {
+        when(petRoomService.write(OWNER)).thenReturn(WRITE);
+
+        assertThat(decorService.place(OWNER, RoomSpot.WALL_STYLE, "wall-lavender")).isSameAs(WRITE);
+
+        verify(placementRepository).upsert(OWNER, "WALL_STYLE", "wall-lavender");
+        verify(ownedRepository, never()).existsByUserIdAndItemKey(anyLong(), anyString());
+        verifyNoInteractions(sprinkleService);
     }
 
     @Test

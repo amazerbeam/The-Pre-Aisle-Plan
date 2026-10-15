@@ -8,7 +8,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-/** MPP-27 AC 1: the approved catalogue - 4 items per spot, one free default per finish, every other entry priced. */
+/** MPP-27 AC 1 / MPP-39: the catalogue - 4 items per spot, one default per finish (White walls, Lilac floor), free items owned by everyone, every other entry priced. */
 class DecorCatalogueTest {
 
     @Test
@@ -19,19 +19,26 @@ class DecorCatalogueTest {
     }
 
     @Test
-    void eachFinishHasExactlyOneFreeDefault() {
+    void eachFinishHasExactlyOneDefault_whiteWallsAndLilacFloor() {
         assertThat(DecorCatalogue.ITEMS).filteredOn(DecorCatalogue.Item::isDefault)
                 .extracting(DecorCatalogue.Item::id)
-                .containsExactlyInAnyOrder("wall-lavender", "floor-lilac");
-        assertThat(DecorCatalogue.ITEMS).filteredOn(DecorCatalogue.Item::isDefault)
-                .allSatisfy(item -> assertThat(item.price()).isZero());
-        assertThat(DecorCatalogue.defaultFor(RoomSpot.WALL_STYLE)).isEqualTo("wall-lavender");
+                .containsExactlyInAnyOrder("wall-white", "floor-lilac");
+        assertThat(DecorCatalogue.defaultFor(RoomSpot.WALL_STYLE)).isEqualTo("wall-white");
         assertThat(DecorCatalogue.defaultFor(RoomSpot.FLOOR_STYLE)).isEqualTo("floor-lilac");
     }
 
     @Test
+    void theDefaultsAndLavenderAreFree_andLavenderIsNoLongerTheDefault() {
+        assertThat(DecorCatalogue.ITEMS).filteredOn(DecorCatalogue.Item::isFree)
+                .extracting(DecorCatalogue.Item::id)
+                .containsExactlyInAnyOrder("wall-white", "wall-lavender", "floor-lilac");
+        assertThat(DecorCatalogue.find("wall-lavender")).get()
+                .satisfies(item -> assertThat(item.isDefault()).isFalse());
+    }
+
+    @Test
     void everythingElseIsPriced_andTheCatalogueTotals4900() {
-        assertThat(DecorCatalogue.ITEMS).filteredOn(item -> !item.isDefault())
+        assertThat(DecorCatalogue.ITEMS).filteredOn(item -> !item.isFree())
                 .allSatisfy(item -> assertThat(item.price()).isPositive());
         assertThat(DecorCatalogue.ITEMS.stream().mapToInt(DecorCatalogue.Item::price).sum()).isEqualTo(4900);
     }

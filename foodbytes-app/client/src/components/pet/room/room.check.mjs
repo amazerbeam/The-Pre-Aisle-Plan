@@ -7,10 +7,11 @@ import { P, pts, shade, boxFaces, ellipsePoints, cylinderSidePoints, ISO_C, ISO_
 import {
   ROOM_DRAW_ORDER, PIP_HOME, PIP_SCALE, PIP_COOKER_SPOT, PIP_BED_SCALE, PIP_BED_DROP, RUG, STATION_ANCHORS,
   COOK_WALK_OFFSET, cookPose, pipPose, resolveRoomLevels,
+  STATION_SHIFT, DECOR_SPOT_SHIFT, WINDOW_SHIFT, shiftPx, pipFocusPoint,
   FRIDGE_FOOTPRINT, FRIDGE_GAUGE_LIFT, FRIDGE_GAUGE_HALF_HEIGHT, fridgeHitBox, CABINET_FOOTPRINT, cabinetHitBox,
   stationThumbBox, COOKER_FOOTPRINT, BED_FOOTPRINT, decorSpotHitBox, decorThumbBox, hitBoxStyle
 } from './roomLayout.js'
-import { DEFAULT_ROOM_LEVELS, ROOM_MAX_LEVEL } from '../../../constants/petRoom.js'
+import { DEFAULT_ROOM_LEVELS, PIP_FOCUS_LIFT, ROOM_MAX_LEVEL, ROOM_SIZE, ROOM_WORLD } from '../../../constants/petRoom.js'
 import { DECOR_ITEMS, DECOR_SPOTS, DECOR_SPOT_SHAPES, DEFAULT_FLOOR_STYLE, DEFAULT_WALL_STYLE, ROOM_STYLES, STYLE_SPOTS } from '../../../constants/petDecor.js'
 import { catalogueFor, decorBoughtLine, ownedFor, withPlacement } from '../../../utils/roomPlacements.js'
 
@@ -24,10 +25,42 @@ assert.ok(Math.abs(ISO_S / ISO_C - 70 / 180) < 1e-12)
 near(P(193, 0), [180 - 193 * ISO_C, 180 + 193 * ISO_S]) // left wall runs down-left
 near(P(0, 193), [180 + 193 * ISO_C, 180 + 193 * ISO_S]) // right wall runs down-right
 
-// The whole room (walls 180 high, floor 193 deep) fits the 0 0 360 330 viewBox.
-for (const [x, y] of [P(193, 0, 180), P(0, 193, 180), P(193, 193), P(0, 0, 180), P(193, 0), P(0, 193)]) {
-  assert.ok(x >= 0 && x <= 360 && y >= 0 && y <= 330, `(${x}, ${y}) is outside the viewBox`)
+// MPP-39: the bigger room (ROOM_SIZE) sits inside the world box the SVG and hit boxes are measured against.
+const inWorld = ({ x, y, width = 0, height = 0 }) =>
+  x >= ROOM_WORLD.x && y >= ROOM_WORLD.y && x + width <= ROOM_WORLD.x + ROOM_WORLD.width && y + height <= ROOM_WORLD.y + ROOM_WORLD.height
+for (const u of [0, ROOM_SIZE.u]) for (const v of [0, ROOM_SIZE.v]) for (const h of [0, ROOM_SIZE.h]) {
+  const [x, y] = P(u, v, h)
+  assert.ok(inWorld({ x, y }), `room corner (${u}, ${v}, ${h}) is outside the world`)
 }
+assert.deepEqual([ROOM_SIZE.u, ROOM_SIZE.v, ROOM_SIZE.h], [260, 300, 150])
+
+// MPP-39: a shift is one constant screen offset (P is linear).
+near(shiftPx([30, 0]), [P(30, 0)[0] - 180, P(30, 0)[1] - 180])
+near(shiftPx([0, 0, -30]), [0, 30])
+assert.deepEqual(Object.keys(STATION_SHIFT).sort(), Object.keys(DEFAULT_ROOM_LEVELS).sort())
+
+// MPP-39: every station, at every level and after its shift, stands on the floor and under the 150 wall.
+const FOOTPRINTS = {
+  bed: BED_FOOTPRINT, cooker: COOKER_FOOTPRINT, cabinet: CABINET_FOOTPRINT,
+  fridge: FRIDGE_FOOTPRINT.map(([u, v, du, dv, h]) => [u, v, du, dv, 0, h])
+}
+for (const [station, table] of Object.entries(FOOTPRINTS)) {
+  const [su, sv] = STATION_SHIFT[station]
+  table.forEach(([u, v, du, dv, , h1], i) => {
+    assert.ok(u + su >= 0 && u + du + su <= ROOM_SIZE.u, `${station} L${i + 1} leaves the floor along u`)
+    assert.ok(v + sv >= -1 && v + dv + sv <= ROOM_SIZE.v, `${station} L${i + 1} leaves the floor along v`)
+    assert.ok(h1 <= ROOM_SIZE.h, `${station} L${i + 1} pokes above the wall`)
+  })
+}
+
+// MPP-39: the decor spots, after their shift, sit on the floor / under the wall top.
+for (const spot of DECOR_SPOTS) {
+  const [u, v, du, dv, , h1] = DECOR_SPOT_SHAPES[spot].volume
+  const [su, sv, sh] = DECOR_SPOT_SHIFT[spot]
+  assert.ok(u + su >= 0 && u + du + su <= ROOM_SIZE.u && v + sv >= 0 && v + dv + sv <= ROOM_SIZE.v, `${spot} leaves the room`)
+  assert.ok(h1 + sh <= ROOM_SIZE.h, `${spot} pokes above the wall`)
+}
+assert.ok(164 + WINDOW_SHIFT[2] <= ROOM_SIZE.h && 162 + WINDOW_SHIFT[1] <= ROOM_SIZE.v, 'the window leaves the right wall')
 
 // pts: one decimal place, comma inside a point, space between points.
 assert.equal(pts([[1, 2.34], [3.06, 4]]), '1.0,2.3 3.1,4.0')
@@ -95,13 +128,14 @@ assert.deepEqual(cookPose(), { face: 'happy', showProps: false, anchor: [...PIP_
 // MPP-19 AC 3: the fridge button covers the fridge and its gauge at every level, inside the viewBox.
 for (let level = 1; level <= ROOM_MAX_LEVEL; level++) {
   const box = fridgeHitBox(level)
-  assert.ok(box.x >= 0 && box.y >= 0 && box.x + box.width <= 360 && box.y + box.height <= 330, `level ${level} fridge box leaves the viewBox`)
+  const [fu, fv] = STATION_SHIFT.fridge
+  assert.ok(inWorld(box), `level ${level} fridge box leaves the world`)
   const inside = ([x, y]) => x >= box.x - 1e-9 && x <= box.x + box.width + 1e-9 && y >= box.y - 1e-9 && y <= box.y + box.height + 1e-9
   const [gu, gv, gh] = STATION_ANCHORS.fridgeTop[level - 1]
-  const [gx, gy] = P(gu, gv, gh + FRIDGE_GAUGE_LIFT)
+  const [gx, gy] = P(gu + fu, gv + fv, gh + FRIDGE_GAUGE_LIFT)
   assert.ok(inside([gx, gy - FRIDGE_GAUGE_HALF_HEIGHT]), `level ${level} gauge top is outside the fridge box`)
   const [u, v, du, dv] = FRIDGE_FOOTPRINT[level - 1]
-  assert.ok(inside(P(u + du / 2, v + dv / 2)), `level ${level} fridge floor centre is outside the fridge box`)
+  assert.ok(inside(P(u + du / 2 + fu, v + dv / 2 + fv)), `level ${level} fridge floor centre is outside the fridge box`)
 }
 assert.ok(fridgeHitBox(4).height > fridgeHitBox(1).height, 'a bigger fridge gets a bigger button')
 assert.deepEqual(fridgeHitBox(9), fridgeHitBox(1)) // an invalid level falls back to level 1
@@ -110,11 +144,12 @@ assert.deepEqual(fridgeHitBox(9), fridgeHitBox(1)) // an invalid level falls bac
 // and never overlaps the fridge button (they are on opposite walls).
 for (let level = 1; level <= ROOM_MAX_LEVEL; level++) {
   const box = cabinetHitBox(level)
-  assert.ok(box.x >= 0 && box.y >= 0 && box.x + box.width <= 360 && box.y + box.height <= 330, `level ${level} cabinet box leaves the viewBox`)
+  const [cu, cv] = STATION_SHIFT.cabinet
+  assert.ok(inWorld(box), `level ${level} cabinet box leaves the world`)
   const inside = ([x, y]) => x >= box.x - 1e-9 && x <= box.x + box.width + 1e-9 && y >= box.y - 1e-9 && y <= box.y + box.height + 1e-9
   const [u, v, du, dv, h0, h1] = CABINET_FOOTPRINT[level - 1]
-  assert.ok(inside(P(u + du / 2, v + dv / 2, h0)), `level ${level} cabinet base centre is outside the box`)
-  assert.ok(inside(P(u + du / 2, v + dv / 2, h1)), `level ${level} cabinet top centre is outside the box`)
+  assert.ok(inside(P(u + du / 2 + cu, v + dv / 2 + cv, h0)), `level ${level} cabinet base centre is outside the box`)
+  assert.ok(inside(P(u + du / 2 + cu, v + dv / 2 + cv, h1)), `level ${level} cabinet top centre is outside the box`)
   const fridge = fridgeHitBox(level)
   assert.ok(fridge.x + fridge.width <= box.x || box.x + box.width <= fridge.x, `level ${level} cabinet and fridge buttons overlap`)
 }
@@ -142,11 +177,13 @@ for (const station of Object.keys(DEFAULT_ROOM_LEVELS)) {
 // "+"; the three never overlap; each thumbnail is a square around its spot.
 const spotBoxes = DECOR_SPOTS.map(spot => {
   const box = decorSpotHitBox(spot)
-  assert.ok(box.x >= 0 && box.y >= 0 && box.x + box.width <= 360 && box.y + box.height <= 330, `${spot} box leaves the viewBox`)
+  assert.ok(inWorld(box), `${spot} box leaves the world`)
   const inside = ([x, y]) => x >= box.x && x <= box.x + box.width && y >= box.y && y <= box.y + box.height
   const { corners, plus } = DECOR_SPOT_SHAPES[spot]
-  corners.forEach(corner => assert.ok(inside(P(...corner)), `${spot} box misses its outline`))
-  assert.ok(inside(P(...plus)), `${spot} box misses its "+"`)
+  const [su, sv, sh] = DECOR_SPOT_SHIFT[spot]
+  corners.forEach(([u, v, h]) => assert.ok(inside(P(u + su, v + sv, h + sh)), `${spot} box misses its outline`))
+  const [pu, pv, ph] = plus
+  assert.ok(inside(P(pu + su, pv + sv, ph + sh)), `${spot} box misses its "+"`)
   const thumb = decorThumbBox(spot)
   assert.ok(thumb.width > 0 && Math.abs(thumb.width - thumb.height) < 1e-9, `${spot} thumb is not a square`)
   return box
@@ -155,7 +192,10 @@ spotBoxes.forEach((a, i) => spotBoxes.slice(i + 1).forEach(b => {
   const apart = a.x + a.width <= b.x || b.x + b.width <= a.x || a.y + a.height <= b.y || b.y + b.height <= a.y
   assert.ok(apart, 'two decor spot buttons overlap')
 }))
-assert.deepEqual(hitBoxStyle({ x: 36, y: 33, width: 72, height: 66 }), { left: '10.00%', top: '10.00%', width: '20.00%', height: '20.00%' })
+assert.deepEqual(
+  hitBoxStyle({ x: ROOM_WORLD.x + 56.4, y: ROOM_WORLD.y + 39.4, width: 112.8, height: 78.8 }),
+  { left: '10.00%', top: '10.00%', width: '20.00%', height: '20.00%' }
+)
 
 // MPP-27 AC 1: four labelled items per spot; every style is a finish with its colours; the defaults exist.
 DECOR_SPOTS.forEach(spot => assert.equal(Object.values(DECOR_ITEMS).filter(item => item.spot === spot).length, 4, `${spot} needs 4 items`))
@@ -165,6 +205,24 @@ for (const [id, style] of Object.entries(ROOM_STYLES)) {
 }
 assert.equal(ROOM_STYLES[DEFAULT_WALL_STYLE].spot, 'wallStyle')
 assert.equal(ROOM_STYLES[DEFAULT_FLOOR_STYLE].spot, 'floorStyle')
+
+// MPP-39: White is the default wall (back wall pure white, side wall grey-white); every wall style has a skirting.
+assert.equal(DEFAULT_WALL_STYLE, 'wall-white')
+assert.deepEqual([ROOM_STYLES['wall-white'].right, ROOM_STYLES['wall-white'].left], ['#ffffff', '#eceef2'])
+assert.ok(ROOM_STYLES['wall-lavender'], 'Lavender stays available')
+for (const [id, style] of Object.entries(ROOM_STYLES)) {
+  if (style.spot === 'wallStyle') assert.match(style.skirting ?? '', /^#[0-9a-f]{6}$/, `${id} has no skirting`)
+}
+assert.equal(DEFAULT_FLOOR_STYLE, 'floor-lilac')
+
+// MPP-39 AC 8 / AC 14: the camera aims a little above Pip's feet at his current spot.
+const lifted = ([x, y]) => [x, y - PIP_FOCUS_LIFT]
+near(pipFocusPoint('rug', null, undefined), lifted(P(...PIP_HOME)))
+near(pipFocusPoint('rug', 'walking', undefined), lifted(P(...PIP_COOKER_SPOT)))
+near(pipFocusPoint('rug', 'returning', undefined), lifted(P(...PIP_HOME)))
+near(pipFocusPoint('cooker', null, undefined), lifted(P(...PIP_COOKER_SPOT)))
+const [bu, bv, bh] = STATION_ANCHORS.bedTop[1]
+near(pipFocusPoint('bed', null, { bed: 2 }), lifted(P(bu + STATION_SHIFT.bed[0], bv + STATION_SHIFT.bed[1], bh)))
 
 // MPP-27: optimistic placement, the picker / shop filters and the shop's status line.
 const room = { stations: {}, placements: { leftWall: 'herb-shelf', rightWall: null, floor: null, wallStyle: 'wall-mint', floorStyle: 'floor-lilac' } }

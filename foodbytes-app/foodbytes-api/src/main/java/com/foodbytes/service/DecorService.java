@@ -30,7 +30,7 @@ public class DecorService {
     public RoomWriteDTO buy(Long userId, String itemId) {
         DecorCatalogue.Item item = known(itemId);
         sprinkleService.lockWallet(userId);
-        if (item.isDefault() || ownedRepository.existsByUserIdAndItemKey(userId, item.id())) {
+        if (item.isFree() || ownedRepository.existsByUserIdAndItemKey(userId, item.id())) {
             throw new PetShopException(PetShopException.Reason.ALREADY_OWNED, "You already own that.");
         }
         PetDecorOwned owned = ownedRepository.save(new PetDecorOwned(null, userId, item.id(), null));
@@ -42,7 +42,7 @@ public class DecorService {
         return petRoomService.write(userId);
     }
 
-    /** Puts an owned item on its spot, or clears the spot when itemId is null/blank (a finish resets to its default). */
+    /** Puts an owned (or free) item on its spot, or clears the spot when itemId is null/blank (a finish resets to its default, which is never stored). */
     @Transactional
     public RoomWriteDTO place(Long userId, RoomSpot spot, String itemId) {
         if (itemId == null || itemId.isBlank()) {
@@ -57,7 +57,7 @@ public class DecorService {
             placementRepository.deleteByUserIdAndSpot(userId, spot); // the default is never stored
             return petRoomService.write(userId);
         }
-        if (!ownedRepository.existsByUserIdAndItemKey(userId, item.id())) {
+        if (!item.isFree() && !ownedRepository.existsByUserIdAndItemKey(userId, item.id())) {
             throw new PetShopException(PetShopException.Reason.NOT_OWNED, "You don't own that yet.");
         }
         placementRepository.upsert(userId, spot.name(), item.id());

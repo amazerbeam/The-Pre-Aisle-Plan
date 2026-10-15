@@ -1,6 +1,6 @@
-/* MPP-16 / MPP-37: Pip's room — angled-corner SVG from pip-room-mockup-v5.html. Full screen:
-   the stage takes every pixel the header and the rows under it leave; the scene inside is the
-   SVG's own 360×330 box (ROOM_VIEWBOX_SIZE), centred, so % hit boxes match the art. */
+/* MPP-16 / MPP-37 / MPP-39: Pip's room — angled-corner SVG from pip-room-mockup-v5.html. Full screen:
+   the stage takes every pixel the header and the rows under it leave. MPP-39: the stage is a camera
+   viewport over a bigger world layer (usePipCamera). */
 .pip-room {
   position: relative;
   flex: 1;
@@ -8,32 +8,77 @@
   min-height: 40vh;
   display: flex;
   flex-direction: column;
-  background: #ece5fb;
+  background: #f3f1f8; /* MPP-39: the area outside the room */
 }
 
 .pip-room-stage {
-  /* Zero basis + height 0: Chrome resolves cqh to 0 for a size container whose height only
-     comes from flex-grow on an auto basis, which collapsed the scene to 0×0 (MPP-37 follow-up). */
+  /* Zero basis + height 0: see MPP-37 — the stage takes the height flex gives it. */
   flex: 1 1 0;
   height: 0;
   min-height: 30vh;
-  display: grid;
-  place-items: center;
+  position: relative;
   overflow: hidden;
-  container-type: size;
+  /* MPP-39: drag and pinch belong to the camera, not page scroll or browser zoom. */
+  touch-action: none;
+  cursor: grab;
+  outline: none;
 }
 
-.pip-room-scene {
-  position: relative;
-  width: 100%; /* fallback without container query units */
-  width: min(100cqw, calc(100cqh * 360 / 330));
-  aspect-ratio: 360 / 330;
+.pip-room-stage.is-dragging { cursor: grabbing; }
+
+.pip-room-stage:focus-visible {
+  box-shadow: inset 0 0 0 3px var(--pip-focus-ring);
 }
+
+/* MPP-39: the world layer — sized in px at ROOM_PX_PER_UNIT inline, moved by the camera's transform. */
+.pip-room-world {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  z-index: 0;
+}
+
+/* Only promote the layer while it moves, so at rest it re-rasterises sharp at any zoom. */
+.pip-room-stage.is-moving .pip-room-world { will-change: transform; }
 
 .pip-room-svg {
   display: block;
   width: 100%;
-  height: auto;
+  height: 100%;
+}
+
+/* MPP-39 AC 18: 🎯 bottom right, fixed to the screen. */
+.pip-room-recentre {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  z-index: 1;
+  min-width: 44px;
+  min-height: 44px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  font-size: 1.2rem;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pip-room-recentre:active { background: #fff3c4; }
+
+@media (hover: hover) {
+  .pip-room-recentre:hover { background: #fff; }
+}
+
+.pip-room-recentre:focus-visible {
+  outline: 3px solid var(--pip-focus-ring);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px var(--pip-focus-halo);
 }
 
 /* MPP-17: cooker steam (mockup v5 .steam) and the sleeping z's.
@@ -85,11 +130,9 @@
 }
 
 /* MPP-19 / MPP-23: a station button over its art (fridgeHitBox / cabinetHitBox, % of the
-   viewBox); at least 44 px however small the card gets. */
+   viewBox); on the world layer, scaled with the art (MPP-39: no min size — it would outgrow the art when zoomed out). */
 .pip-station-btn {
   position: absolute;
-  min-width: 44px;
-  min-height: 44px;
   padding: 0;
   border: 0;
   border-radius: 12px;
@@ -128,6 +171,7 @@
   color: #5c5670;
   font-size: 0.72rem;
   pointer-events: none;
+  z-index: 1;
 }
 
 /* MPP-26 / MPP-27 / MPP-32 / MPP-37: 🛍 Shop, ✏️ Edit room and 👕 Wardrobe — one row of equal
@@ -204,15 +248,13 @@
   font-weight: 800;
 }
 
-.pip-room-scene.is-editing .pet-bubble,
-.pip-room-scene.is-editing .pip-room-hint {
+.pip-room-stage.is-editing .pet-bubble,
+.pip-room-stage.is-editing .pip-room-hint {
   visibility: hidden;
 }
 
 .pip-decor-spot-btn {
   position: absolute;
-  min-width: 44px;
-  min-height: 44px;
   padding: 0;
   border: 0;
   border-radius: 8px;

@@ -14,7 +14,7 @@
 
     <groupId>com.foodbytes</groupId>
     <artifactId>foodbytes-api</artifactId>
-    <version>1.25.1</version>
+    <version>1.26.0</version>
     <name>FoodBytes API</name>
     <description>FoodBytes Recipe Viewer MVP Backend</description>
 

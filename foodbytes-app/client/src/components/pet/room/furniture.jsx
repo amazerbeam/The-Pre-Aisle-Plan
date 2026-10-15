@@ -87,15 +87,15 @@ export const FURNITURE = {
         <Cyl cu={92} cv={20} r={13} h0={62} h1={80} color="#e76f51" />
       </>
     ),
-    // 4 chef's kitchen: hood, range, utensils
+    // 4 chef's kitchen: hood, range, utensils (MPP-39: hood, rail and utensils 30 lower, under the 150 wall)
     () => (
       <>
-        <Box u={84} v={0} du={26} dv={14} h0={136} h1={180} color="#b0bec5" />
-        <Box u={70} v={0} du={54} dv={32} h0={124} h1={136} color="#b0bec5" />
+        <Box u={84} v={0} du={26} dv={14} h0={106} h1={150} color="#b0bec5" />
+        <Box u={70} v={0} du={54} dv={32} h0={94} h1={106} color="#b0bec5" />
         {[76, 84, 112, 118].map((u, i) => (
-          <IsoLine key={u} points={[P(u, 1, 118), P(u, 1, 104 - i * 3)]} width={2} />
+          <IsoLine key={u} points={[P(u, 1, 88), P(u, 1, 74 - i * 3)]} width={2} />
         ))}
-        <IsoLine points={[P(64, 1, 118), P(130, 1, 118)]} width={2} />
+        <IsoLine points={[P(64, 1, 88), P(130, 1, 88)]} width={2} />
         <Box u={50} v={0} du={90} dv={38} h0={0} h1={58} color="#2f3e46" />
         <RectV vp={38} u0={70} u1={120} h0={10} h1={44} fill="rgba(255,183,3,.45)" />
         <Box u={48} v={0} du={94} dv={40} h0={58} h1={63} color="#cfd8dc" />

@@ -2,6 +2,7 @@
 
 One line per ticket, newest first: `<version> — <ticket key>: <summary>`. Bump rules and how
 to check what is deployed: `CLAUDE.md` → Versioning & deploy verification.
+1.26.0 — MPP-39: Pip's room is bigger and zoomed in: drag or pinch to look around, it floats back to Pip and follows him, zoom remembered in this browser; white walls by default (Lavender stays free), skirting and corner lines
 1.25.1 — MPP-37: fix Pip's room collapsing to nothing on phones (room picture, Pip and fridge/cabinet missing; hint and bubble squeezed to one word per line)
 1.25.0 — MPP-38: Pip's level bar is a small green bar over his head that follows him (no label), hidden once he's fully grown
 1.24.2 — MPP-37: Pip tab is full screen: no top bar, slim Pip header, room fills the screen with Shop / Edit room / Wardrobe in one row above the tab bar, Today's meals removed, room tap targets anchored to the picture

@@ -69,7 +69,7 @@ class PetRoomServiceTest {
     // ---- MPP-27: decor and placements ----
 
     @Test
-    void room_newUser_emptySpotsDefaultStylesAndOnlyTheDefaultsOwned() {
+    void room_newUser_emptySpotsDefaultStylesAndOnlyFreeItemsOwned() {
         when(levelRepository.findByUserId(USER)).thenReturn(List.of());
 
         PetRoomDTO room = petRoomService.room(USER);
@@ -79,10 +79,10 @@ class PetRoomServiceTest {
         assertThat(room.getPlacements().get("leftWall")).isNull();
         assertThat(room.getPlacements().get("rightWall")).isNull();
         assertThat(room.getPlacements().get("floor")).isNull();
-        assertThat(room.getPlacements()).containsEntry("wallStyle", "wall-lavender").containsEntry("floorStyle", "floor-lilac");
+        assertThat(room.getPlacements()).containsEntry("wallStyle", "wall-white").containsEntry("floorStyle", "floor-lilac");
         assertThat(room.getDecor()).hasSize(DecorCatalogue.ITEMS.size());
         assertThat(room.getDecor()).filteredOn(DecorItemDTO::isOwned).extracting(DecorItemDTO::getId)
-                .containsExactlyInAnyOrder("wall-lavender", "floor-lilac");
+                .containsExactlyInAnyOrder("wall-white", "wall-lavender", "floor-lilac");
         assertThat(room.getDecor()).filteredOn(item -> item.getId().equals("bunting")).singleElement()
                 .satisfies(item -> {
                     assertThat(item.getKind()).isEqualTo("rightWall");
@@ -107,10 +107,19 @@ class PetRoomServiceTest {
         assertThat(room.getPlacements())
                 .containsEntry("rightWall", "mirror")
                 .containsEntry("floorStyle", "floor-oak")
-                .containsEntry("wallStyle", "wall-lavender");
+                .containsEntry("wallStyle", "wall-white");
         assertThat(room.getPlacements().get("floor")).isNull();     // unknown id -> empty
         assertThat(room.getPlacements().get("leftWall")).isNull();  // a floor item on a wall -> empty
         assertThat(room.getDecor()).filteredOn(DecorItemDTO::isOwned).extracting(DecorItemDTO::getId)
-                .containsExactlyInAnyOrder("wall-lavender", "floor-lilac", "mirror", "floor-oak");
+                .containsExactlyInAnyOrder("wall-white", "wall-lavender", "floor-lilac", "mirror", "floor-oak");
+    }
+
+    @Test
+    void room_aStoredLavenderWallIsKept() {
+        when(levelRepository.findByUserId(USER)).thenReturn(List.of());
+        when(placementRepository.findByUserId(USER)).thenReturn(List.of(
+                new PetRoomPlacement(1L, USER, RoomSpot.WALL_STYLE, "wall-lavender")));
+
+        assertThat(petRoomService.room(USER).getPlacements()).containsEntry("wallStyle", "wall-lavender");
     }
 }

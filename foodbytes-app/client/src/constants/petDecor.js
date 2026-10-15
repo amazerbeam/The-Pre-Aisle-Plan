@@ -60,17 +60,18 @@ export const DECOR_ITEMS = {
   'lemon-tree': { label: 'Potted lemon tree', spot: 'floor' }
 }
 
-// The free defaults are today's room colours (roomDecor.jsx before MPP-27), so nothing changes until someone buys.
-export const DEFAULT_WALL_STYLE = 'wall-lavender'
+// MPP-39: White is the free default wall (Lavender stays free and owned). Lilac stays the default floor.
+export const DEFAULT_WALL_STYLE = 'wall-white'
 export const DEFAULT_FLOOR_STYLE = 'floor-lilac'
 
-// left / right = the wall fills; base = the floor fill; sprigs / boards / grid / checker = the pattern over it.
+// left / right = the wall fills (right = the window wall); skirting = the board along both walls (MPP-39); base = the floor fill; sprigs / boards / grid / checker = the pattern over it.
 export const ROOM_STYLES = {
-  'wall-lavender': { label: 'Lavender', spot: 'wallStyle', left: '#ece5fb', right: '#e3daf8' },
-  'wall-mint': { label: 'Mint', spot: 'wallStyle', left: '#dff3e8', right: '#d2ecdd' },
-  'wall-peach': { label: 'Peach', spot: 'wallStyle', left: '#fde6d8', right: '#f8d9c6' },
-  'wall-sky': { label: 'Sky', spot: 'wallStyle', left: '#dcecfb', right: '#cfe2f6' },
-  'wall-sprig': { label: 'Sprig wallpaper', spot: 'wallStyle', left: '#eef6e4', right: '#e4efd8', sprigs: true },
+  'wall-white': { label: 'White', spot: 'wallStyle', left: '#eceef2', right: '#ffffff', skirting: '#dfe3e9' },
+  'wall-lavender': { label: 'Lavender', spot: 'wallStyle', left: '#ece5fb', right: '#e3daf8', skirting: '#cbbdea' },
+  'wall-mint': { label: 'Mint', spot: 'wallStyle', left: '#dff3e8', right: '#d2ecdd', skirting: '#bcdcc8' },
+  'wall-peach': { label: 'Peach', spot: 'wallStyle', left: '#fde6d8', right: '#f8d9c6', skirting: '#ecc4ab' },
+  'wall-sky': { label: 'Sky', spot: 'wallStyle', left: '#dcecfb', right: '#cfe2f6', skirting: '#b9d3ee' },
+  'wall-sprig': { label: 'Sprig wallpaper', spot: 'wallStyle', left: '#eef6e4', right: '#e4efd8', sprigs: true, skirting: '#cfe0bd' },
   'floor-lilac': { label: 'Lilac', spot: 'floorStyle', base: '#d6c9f0' },
   'floor-oak': { label: 'Oak boards', spot: 'floorStyle', base: '#d9b48a', boards: '#b98a5a' },
   'floor-terracotta': { label: 'Terracotta tiles', spot: 'floorStyle', base: '#d98b6a', grid: '#b8684a' },

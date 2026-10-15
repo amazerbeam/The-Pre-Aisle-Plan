@@ -14,12 +14,18 @@ import static com.foodbytes.model.RoomSpot.*;
  * MPP-27 AC 1: every decor item and room style, the spot it belongs to and its sprinkles price
  * (mpp-27-decor-catalogue-mockup.html, approved 2026-10-14). Adding one is a line here plus its label
  * and art on the client (constants/petDecor.js, room/decorArt.jsx). Ids are unique across spots and
- * stored in pet_decor_owned.item_key / pet_room_placements.item_key. The two defaults are free and
- * owned by everyone without a row. Prices are retunable here only; the client reads PetRoomDTO.decor.
+ * stored in pet_decor_owned.item_key / pet_room_placements.item_key. Each finish has one
+ * default, shown when nothing is stored (MPP-39: White walls, Lilac floor). Free items - the defaults and
+ * Lavender - are owned by everyone without a row. Prices are retunable here only; the client reads PetRoomDTO.decor.
  */
 public final class DecorCatalogue {
 
-    public record Item(String id, RoomSpot spot, int price, boolean isDefault) {}
+    public record Item(String id, RoomSpot spot, int price, boolean isDefault) {
+        /** MPP-39: a free item (each finish's default, and Lavender) is owned by everyone without a row. */
+        public boolean isFree() {
+            return price == 0;
+        }
+    }
 
     public static final List<Item> ITEMS = List.of(
             new Item("basil-print", LEFT_WALL, 120, false),
@@ -34,7 +40,8 @@ public final class DecorCatalogue {
             new Item("cookbook-stack", FLOOR, 180, false),
             new Item("bean-bag", FLOOR, 250, false),
             new Item("lemon-tree", FLOOR, 300, false),
-            new Item("wall-lavender", WALL_STYLE, 0, true),
+            new Item("wall-white", WALL_STYLE, 0, true),
+            new Item("wall-lavender", WALL_STYLE, 0, false),
             new Item("wall-mint", WALL_STYLE, 250, false),
             new Item("wall-peach", WALL_STYLE, 250, false),
             new Item("wall-sky", WALL_STYLE, 250, false),

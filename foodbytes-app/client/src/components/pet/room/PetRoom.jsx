@@ -2,7 +2,8 @@ import { useEffect, useId, useRef } from 'react'
 import { MEAL_TYPE_LABELS } from '../../../constants/mealTypes'
 import { COOK_PHASES, PET_MOOD_LABELS, PIP_POSITIONS, PIP_POSITION_LABELS } from '../../../constants/pet'
 import { SHOP_TAB_KEYS } from '../../../constants/petDecor'
-import { DEFAULT_ROOM_LEVELS, ROOM_HINT, ROOM_STATIONS, ROOM_VIEWBOX } from '../../../constants/petRoom'
+import { DEFAULT_ROOM_LEVELS, ROOM_CAMERA_LABEL, ROOM_HINT, ROOM_PX_PER_UNIT, ROOM_STATIONS, ROOM_WORLD, ROOM_WORLD_VIEWBOX } from '../../../constants/petRoom'
+import usePipCamera from '../../../hooks/usePipCamera'
 import useRoomOverlay from '../../../hooks/useRoomOverlay'
 import { pipWalkMs } from '../../../utils/cookServe'
 import DecorPicker from './DecorPicker'
@@ -14,8 +15,9 @@ import FridgeView from './FridgeView'
 import { FloorDecor, WallDecor } from './RoomDecorLayers'
 import { roomBackdrop } from './roomDecor'
 import { FridgeGauge, NightDim, PotSteam, ServedPlate, SleepZs } from './roomEffects'
-import { COOK_WALK_OFFSET, ROOM_DRAW_ORDER, cabinetHitBox, cookPose, fridgeHitBox, hitBoxStyle, pipPose, resolveRoomLevels } from './roomLayout'
+import { COOK_WALK_OFFSET, ROOM_DRAW_ORDER, STATION_SHIFT, cabinetHitBox, cookPose, fridgeHitBox, hitBoxStyle, pipFocusPoint, pipPose, resolveRoomLevels, shiftTransform } from './roomLayout'
 import PipHeadBarStatus from './PipHeadBarStatus'
+import RecentreButton from './RecentreButton'
 import RoomPip from './RoomPip'
 import RoomStyleChips from './RoomStyleChips'
 import ShopButton from './ShopButton'
@@ -40,7 +42,8 @@ import './PetRoom.css'
  * MPP-31: `herb` ({ form, wilted, phase }) draws Pip's current herb form; `levelBar` ({ label, pct, phase }) — MPP-38: drawn over Pip's head by RoomPip, spoken by PipHeadBarStatus.
  * MPP-32: `wardrobe` ({ data, hasNew, firstNewSlot, peakForm, equip, undress, markSeen, error }) adds the Wardrobe strip and the Dress Pip sheet.
  * MPP-25 / MPP-37: the sprinkles counter now lives in Pip's header (PipHeader), not in the room.
- * MPP-37: full screen — .pip-room-stage fills the height and .pip-room-scene is the positioned 360×330 box.
+ * MPP-37: full screen — .pip-room-stage fills the height.
+ * MPP-39: the room is a bigger world on a camera (usePipCamera) — drag, pinch, Ctrl+wheel or keys to look around; it floats back to Pip and follows him. Stations and decor spots are shifted groups (roomLayout STATION_SHIFT / DECOR_SPOT_SHIFT).
  * MPP-27: `decor` ({ room, editing, selectedSpot, openSpot, closeSpot, place, toggle, done, error }) draws your own wall / floor styles and placed decor, and drives ✏️ Edit room.
  * MPP-26: `shop` ({ room, sprinkles, armed, busy, status, error, arm, upgrade, reset }) adds the 🛍 Shop pill beside Wardrobe and the Shop sheet; `levels` (from the pet's room) draws each station at its owned level.
  */
@@ -67,6 +70,10 @@ function PetRoom({ name, mood, bubble, bubbleActions = null, position = PIP_POSI
   const shopTitleId = `pip-shop-title-${overlayId}`
   const pickerTitleId = `pip-decor-picker-title-${overlayId}`
   const editButtonRef = useRef(null)
+  // MPP-39: the camera looks at the world layer and follows Pip's spot.
+  const stageRef = useRef(null)
+  const worldRef = useRef(null)
+  const camera = usePipCamera({ stageRef, worldRef, focus: pipFocusPoint(position, phase, levels) })
   const fridgeFill = fridge?.fill ?? null
   // MPP-19 / MPP-23 / MPP-26 / MPP-27 / MPP-32: the room behind an open overlay is out of the tab order and the a11y tree.
   const anyOpen = fridgeOverlay.isOpen || cabinetOverlay.isOpen || wardrobeOverlay.isOpen || shopOverlay.isOpen || pickerOverlay.isOpen
@@ -99,33 +106,43 @@ function PetRoom({ name, mood, bubble, bubbleActions = null, position = PIP_POSI
 
   return (
     <div className="pip-room">
-      {/* MPP-37: the stage fills the height; the scene inside keeps the SVG's 360×330 shape, so
-          the % hit boxes, bubble and hint are placed against the picture, not the whole room. */}
-      <div className="pip-room-stage">
-        <div className={editing ? 'pip-room-scene is-editing' : 'pip-room-scene'} {...behind}>
-          <svg className="pip-room-svg" viewBox={ROOM_VIEWBOX} xmlns="http://www.w3.org/2000/svg" role="img" aria-label={label}>
+      {/* MPP-39: the stage is the screen-sized, focusable viewport; the world layer inside holds the
+          room SVG and its tap areas and is moved by the camera. Bubble, hint and 🎯 stay on the screen. */}
+      <div
+        ref={stageRef}
+        className={editing ? 'pip-room-stage is-editing' : 'pip-room-stage'}
+        tabIndex={anyOpen ? -1 : 0}
+        role="group"
+        aria-label={ROOM_CAMERA_LABEL}
+        {...behind}
+      >
+        <div
+          ref={worldRef}
+          className="pip-room-world"
+          style={{ width: `${ROOM_WORLD.width * ROOM_PX_PER_UNIT}px`, height: `${ROOM_WORLD.height * ROOM_PX_PER_UNIT}px` }}
+        >
+          <svg className="pip-room-svg" viewBox={ROOM_WORLD_VIEWBOX} xmlns="http://www.w3.org/2000/svg" role="img" aria-label={label}>
             {roomBackdrop(asleep, placements?.wallStyle, placements?.floorStyle)}
             <WallDecor placements={placements} editing={editing} selectedSpot={selectedSpot} />
             {ROOM_DRAW_ORDER.map(station => (
-              <Station
-                key={station}
-                station={station}
-                level={resolved[station]}
-                position={scenePosition}
-                phase={phase}
-                pose={pose}
-                herb={herb}
-                levelBar={levelBar}
-                fridgePct={fridgeFill?.pct ?? null}
-              />
+              <g key={station} transform={shiftTransform(STATION_SHIFT[station])}>
+                <Station
+                  station={station}
+                  level={resolved[station]}
+                  position={scenePosition}
+                  phase={phase}
+                  pose={pose}
+                  herb={herb}
+                  levelBar={levelBar}
+                  fridgePct={fridgeFill?.pct ?? null}
+                />
+              </g>
             ))}
             <FloorDecor placements={placements} editing={editing} selectedSpot={selectedSpot} />
             {asleep && <NightDim />}
             <PipWalker phase={phase}>{!asleep && <RoomPip pose={pose} herb={herb} levelBar={levelBar} />}</PipWalker>
             {asleep && <SleepZs level={resolved.bed} />}
           </svg>
-          {levelBar && <PipHeadBarStatus levelBar={levelBar} />}
-          <SpeechBubble text={bubble} actions={bubbleActions} />
           <StationButton
             box={fridgeHitBox(resolved.fridge)}
             label={fridgeLabel(name, fridgeFill)}
@@ -139,8 +156,11 @@ function PetRoom({ name, mood, bubble, bubbleActions = null, position = PIP_POSI
             onOpen={cabinetOverlay.open}
           />
           {editing && <DecorSpotButtons placements={placements} onSpot={openPicker} />}
-          <p className="pip-room-hint" aria-hidden="true">{ROOM_HINT}</p>
         </div>
+        {levelBar && <PipHeadBarStatus levelBar={levelBar} />}
+        <SpeechBubble text={bubble} actions={bubbleActions} />
+        <p className="pip-room-hint" aria-hidden="true">{ROOM_HINT}</p>
+        <RecentreButton onRecentre={camera.recentre} />
       </div>
       {editing && <EditRoomBar error={decor.error} overlayOpen={anyOpen} behind={behind} onDone={finishEditing} />}
       {(shop || decor || wardrobe) && (
