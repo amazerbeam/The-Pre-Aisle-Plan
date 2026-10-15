@@ -6,7 +6,8 @@ export const ROOM_STATIONS = {
   BED: 'bed',
   FRIDGE: 'fridge',
   COOKER: 'cooker',
-  CABINET: 'cabinet'
+  CABINET: 'cabinet',
+  WARDROBE: 'wardrobe' // MPP-40
 }
 
 export const ROOM_MIN_LEVEL = 1
@@ -16,7 +17,8 @@ export const DEFAULT_ROOM_LEVELS = {
   bed: 1,
   fridge: 1,
   cooker: 1,
-  cabinet: 1
+  cabinet: 1,
+  wardrobe: 1
 }
 
 // The room art's outline colour (the original pet outline; the herb has its own ink in herb/herbForms.js).
@@ -88,6 +90,6 @@ export const FRIDGE_NOTES = {
 export const FRIDGE_LOW_BUBBLE = 'The fridge is getting empty 👀'
 export const FRIDGE_EMPTY_METER = 'No meals planned this week'
 export const FRIDGE_FOOTNOTE = "Always 15 slots. How full it is = planned meals you haven't eaten yet ÷ meals planned this week. It restocks when you plan your week."
-export const ROOM_HINT = 'Drag to look around · tap the fridge 🧊 or cabinet 🏆' // MPP-23 / MPP-39
+export const ROOM_HINT = 'Drag to look around · tap the fridge 🧊, cabinet 🏆 or wardrobe 👕' // MPP-23 / MPP-39 / MPP-40
 export const SPRINKLES_ICON = '✨' // MPP-25: the room's sprinkles counter
 export const FRIDGE_LOAD_ERROR = "Couldn't load the fridge."

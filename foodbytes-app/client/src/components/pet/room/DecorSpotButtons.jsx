@@ -1,12 +1,13 @@
-import { DECOR_EMPTY_LABEL, DECOR_ITEMS, DECOR_SPOTS, DECOR_SPOT_LABELS } from '../../../constants/petDecor'
+import { DECOR_EMPTY_LABEL, DECOR_ITEMS, DECOR_SPOT_LABELS, SPOT_BUTTON_ORDER } from '../../../constants/petDecor'
 import { decorSpotHitBox, hitBoxStyle } from './roomLayout'
 
 /**
  * MPP-27 AC 3: in edit mode, a real button over each dashed spot (the SVG is role="img", so it can't
  * hold one). onSpot gets the spot and the button, so the picker can hand focus back to it.
+ * MPP-40: 12 spots; order = SPOT_BUTTON_ORDER (largest first, so smaller spots on top win the tap).
  */
 function DecorSpotButtons({ placements, onSpot }) {
-  return DECOR_SPOTS.map(spot => {
+  return SPOT_BUTTON_ORDER.map(spot => {
     const current = DECOR_ITEMS[placements?.[spot]]?.label ?? DECOR_EMPTY_LABEL.toLowerCase()
     return (
       <button

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import petService from '../services/petService'
 import { AWARD_BUBBLE_MS } from '../constants/petAwards'
 import { DECOR_BOUGHT_LINE, DECOR_BUY_ERROR, SHOP_TAB_KEYS } from '../constants/petDecor'
-import { SHOP_CONFIRM_MS, SHOP_STATIONS, SHOP_UPGRADE_ERROR, SHOP_UPGRADE_LINES, STATION_LEVEL_NAMES } from '../constants/petShop'
+import { SHOP_CONFIRM_MS, SHOP_LEVEL_ERROR, SHOP_STATIONS, SHOP_UPGRADE_ERROR, SHOP_UPGRADE_LINES, STATION_LEVEL_NAMES } from '../constants/petShop'
 import { decorBoughtLine } from '../utils/roomPlacements'
 
 /**
@@ -12,11 +12,13 @@ import { decorBoughtLine } from '../utils/roomPlacements'
  * sheet shows the true balance and room. Writes are never aborted.
  * MPP-27: the sheet's tab (Upgrades | Decor | Walls & floors) and buy(itemId) for decor and styles.
  * Station keys and decor ids never collide, so `armed` / `busy` hold either.
+ * MPP-40: setLevel(station, level) — free mode only; the server refuses it (403) otherwise.
  *
  * @param {{ applyRoomWrite: (w: { sprinkles: number, room: Object }) => void, refreshPet: () => void }} input
  * @returns {{ tab: string, setTab: (tab: string) => void, armed: string|null, busy: string|null,
  *   status: string|null, error: string|null, announcement: string|null, arm: (key: string) => void,
- *   upgrade: (station: string) => void, buy: (itemId: string) => void, reset: () => void }}
+ *   upgrade: (station: string) => void, setLevel: (station: string, level: number) => void,
+ *   buy: (itemId: string) => void, reset: () => void }}
  */
 export function usePetShop({ applyRoomWrite, refreshPet }) {
   const [tab, setTabState] = useState(SHOP_TAB_KEYS.UPGRADES)
@@ -68,6 +70,11 @@ export function usePetShop({ applyRoomWrite, refreshPet }) {
     setAnnouncement(SHOP_UPGRADE_LINES[station] ?? null)
   }, SHOP_UPGRADE_ERROR)
 
+  // MPP-40: free mode sets a station to any level, down as well as up; busy shows as "station:level".
+  const setLevel = (station, level) => purchase(`${station}:${level}`, () => petService.setStationLevel(station, level), result => {
+    setStatus(levelSetLine(station, result.room?.stations?.[station]))
+  }, SHOP_LEVEL_ERROR)
+
   // MPP-27: the server auto-places decor on an empty spot and applies a style; the line says which.
   const buy = (itemId) => purchase(itemId, () => petService.buyDecor(itemId), result => {
     setStatus(decorBoughtLine(itemId, result.room))
@@ -87,13 +94,19 @@ export function usePetShop({ applyRoomWrite, refreshPet }) {
     reset()
   }
 
-  return { tab, setTab, armed, busy, status, error, announcement, arm, upgrade, buy, reset }
+  return { tab, setTab, armed, busy, status, error, announcement, arm, upgrade, setLevel, buy, reset }
 }
 
 function upgradedLine(station, level) {
   const label = SHOP_STATIONS.find(s => s.key === station)?.label ?? station
   const name = STATION_LEVEL_NAMES[station]?.[level - 1]
   return name ? `${label} upgraded to level ${level}: ${name}!` : `${label} upgraded!`
+}
+
+function levelSetLine(station, level) {
+  const label = SHOP_STATIONS.find(s => s.key === station)?.label ?? station
+  const name = STATION_LEVEL_NAMES[station]?.[level - 1]
+  return name ? `${label} set to level ${level}: ${name}.` : `${label} level changed.`
 }
 
 export default usePetShop

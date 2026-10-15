@@ -65,6 +65,8 @@ $env:PATH = "$env:JAVA_HOME\bin;C:\Users\jossd\tools\apache-maven-3.9.9\bin;$env
 cd foodbytes-app\foodbytes-api; mvn spring-boot:run
 ```
 
+**Pet free mode (testing).** Add `$env:PET_FREE_MODE = "true"` before `mvn spring-boot:run` to unlock Pip's whole room shop for every user on that backend: every decor item and wall/floor style is owned, station upgrades cost nothing, and the Upgrades tab shows level chips that set any station to any level 1–4 (`PUT /api/pet/stations/{station}/level`, which returns 403 when free mode is off). The room shows a 🧪 Free mode badge, and the backend logs a WARN at startup. Nothing is recorded as bought and no sprinkles move, but the placements and levels you set are real rows in the local DB. It's off unless the env var is set, so **never set it on Railway**. Use it to test room art and layout at every level (MPP-40 and later room work).
+
 What each failure looks like:
 - **"Access blocked: Authorization Error … The OAuth client was not found (401 invalid_client)"**: `GOOGLE_CLIENT_ID` was not loaded, so `.env` was skipped.
 - **Google sign-in completes, then the browser lands on a dead `localhost:3000`**: `FRONTEND_URL` was not set to `http://localhost:5173`. The JWT cookie is for `localhost` on any port, so once the redirect goes to :5173 you are logged in.

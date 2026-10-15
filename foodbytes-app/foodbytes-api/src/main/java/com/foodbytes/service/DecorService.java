@@ -24,8 +24,9 @@ public class DecorService {
     private final PetRoomPlacementRepository placementRepository;
     private final SprinkleService sprinkleService;
     private final PetRoomService petRoomService;
+    private final PetFreeMode freeMode;
 
-    /** A bought item goes on its spot if that spot is empty; a bought style is applied at once. */
+    /** A bought item goes on its spot if that spot is empty; a bought style or rug is applied at once. */
     @Transactional
     public RoomWriteDTO buy(Long userId, String itemId) {
         DecorCatalogue.Item item = known(itemId);
@@ -36,13 +37,16 @@ public class DecorService {
         PetDecorOwned owned = ownedRepository.save(new PetDecorOwned(null, userId, item.id(), null));
         sprinkleService.spend(userId, SprinkleSource.DECOR_PURCHASE, owned.getId(), item.price());
         RoomSpot spot = item.spot();
-        if (spot.isStyle() || !placementRepository.existsByUserIdAndSpot(userId, spot)) {
+        if (spot.hasDefault() || !placementRepository.existsByUserIdAndSpot(userId, spot)) {
             placementRepository.upsert(userId, spot.name(), item.id());
         }
         return petRoomService.write(userId);
     }
 
-    /** Puts an owned (or free) item on its spot, or clears the spot when itemId is null/blank (a finish resets to its default, which is never stored). */
+    /**
+     * Puts an owned (or free) item on its spot, or clears the spot when itemId is null/blank (a defaulted spot resets
+     * to its default, which is never stored). MPP-40: in free mode anything can be placed, and nothing is recorded as bought.
+     */
     @Transactional
     public RoomWriteDTO place(Long userId, RoomSpot spot, String itemId) {
         if (itemId == null || itemId.isBlank()) {
@@ -57,7 +61,7 @@ public class DecorService {
             placementRepository.deleteByUserIdAndSpot(userId, spot); // the default is never stored
             return petRoomService.write(userId);
         }
-        if (!item.isFree() && !ownedRepository.existsByUserIdAndItemKey(userId, item.id())) {
+        if (!item.isFree() && !freeMode.isOn() && !ownedRepository.existsByUserIdAndItemKey(userId, item.id())) {
             throw new PetShopException(PetShopException.Reason.NOT_OWNED, "You don't own that yet.");
         }
         placementRepository.upsert(userId, spot.name(), item.id());

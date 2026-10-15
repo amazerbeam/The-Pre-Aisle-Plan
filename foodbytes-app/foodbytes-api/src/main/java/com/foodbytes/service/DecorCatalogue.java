@@ -11,35 +11,78 @@ import java.util.stream.Collectors;
 import static com.foodbytes.model.RoomSpot.*;
 
 /**
- * MPP-27 AC 1: every decor item and room style, the spot it belongs to and its sprinkles price
- * (mpp-27-decor-catalogue-mockup.html, approved 2026-10-14). Adding one is a line here plus its label
+ * MPP-27 AC 1 / MPP-40: every decor item and room style, the spot it belongs to and its sprinkles price
+ * (pip-room-decor-spots-mockup.html: 12 decor spots plus the two finishes). Adding one is a line here plus its label
  * and art on the client (constants/petDecor.js, room/decorArt.jsx). Ids are unique across spots and
- * stored in pet_decor_owned.item_key / pet_room_placements.item_key. Each finish has one
- * default, shown when nothing is stored (MPP-39: White walls, Lilac floor). Free items - the defaults and
- * Lavender - are owned by everyone without a row. Prices are retunable here only; the client reads PetRoomDTO.decor.
+ * stored in pet_decor_owned.item_key / pet_room_placements.item_key. Each defaulted spot - the finishes and the rug -
+ * has one free default, shown when nothing is stored (White walls, Lilac floor, Pink rug). Free items - the defaults
+ * and Lavender - are owned by everyone without a row. Prices are retunable here only; the client reads PetRoomDTO.decor.
  */
 public final class DecorCatalogue {
 
     public record Item(String id, RoomSpot spot, int price, boolean isDefault) {
-        /** MPP-39: a free item (each finish's default, and Lavender) is owned by everyone without a row. */
+        /** MPP-39: a free item (each defaulted spot's default, and Lavender) is owned by everyone without a row. */
         public boolean isFree() {
             return price == 0;
         }
     }
 
     public static final List<Item> ITEMS = List.of(
-            new Item("basil-print", LEFT_WALL, 120, false),
-            new Item("recipe-board", LEFT_WALL, 180, false),
-            new Item("herb-shelf", LEFT_WALL, 250, false),
-            new Item("fairy-lights", LEFT_WALL, 300, false),
-            new Item("wall-clock", RIGHT_WALL, 120, false),
-            new Item("bunting", RIGHT_WALL, 180, false),
-            new Item("pan-rail", RIGHT_WALL, 200, false),
-            new Item("mirror", RIGHT_WALL, 250, false),
-            new Item("watering-can", FLOOR, 120, false),
-            new Item("cookbook-stack", FLOOR, 180, false),
-            new Item("bean-bag", FLOOR, 250, false),
-            new Item("lemon-tree", FLOOR, 300, false),
+            new Item("basil-print", OVER_WARDROBE, 120, false),
+            new Item("recipe-board", OVER_WARDROBE, 180, false),
+            new Item("herb-shelf", OVER_WARDROBE, 250, false),
+            new Item("fairy-lights", OVER_WARDROBE, 300, false),
+            new Item("pip-portrait", OVER_WARDROBE, 250, false),
+            new Item("growth-chart", BEDSIDE_WALL, 120, false),
+            new Item("meal-calendar", BEDSIDE_WALL, 180, false),
+            new Item("wall-sconce", BEDSIDE_WALL, 250, false),
+            new Item("photo-strip", BEDSIDE_WALL, 180, false),
+            new Item("wall-clock", FRONT_RIGHT_WALL, 120, false),
+            new Item("bunting", FRONT_RIGHT_WALL, 180, false),
+            new Item("pan-rail", FRONT_RIGHT_WALL, 200, false),
+            new Item("mirror", FRONT_RIGHT_WALL, 250, false),
+            new Item("coat-hooks", FRONT_RIGHT_WALL, 180, false),
+            new Item("curtains-gingham", WINDOW_DRESSING, 180, false),
+            new Item("curtains-linen", WINDOW_DRESSING, 120, false),
+            new Item("roller-blind", WINDOW_DRESSING, 120, false),
+            new Item("window-lights", WINDOW_DRESSING, 250, false),
+            new Item("plant-hanger", WINDOW_DRESSING, 300, false),
+            new Item("sill-basil", WINDOWSILL, 120, false),
+            new Item("sill-succulents", WINDOWSILL, 180, false),
+            new Item("sill-cactus", WINDOWSILL, 180, false),
+            new Item("sill-radio", WINDOWSILL, 250, false),
+            new Item("sill-cat", WINDOWSILL, 300, false),
+            new Item("rug-pink", RUG, 0, true),
+            new Item("rug-braided", RUG, 180, false),
+            new Item("rug-leaf", RUG, 250, false),
+            new Item("rug-stripe", RUG, 250, false),
+            new Item("rug-picnic", RUG, 150, false),
+            new Item("rug-sheepskin", RUG, 300, false),
+            new Item("snake-plant", BACK_CORNER, 180, false),
+            new Item("cactus", BACK_CORNER, 120, false),
+            new Item("umbrella-stand", BACK_CORNER, 120, false),
+            new Item("broom", BACK_CORNER, 120, false),
+            new Item("side-table-lamp", BEDSIDE_NOOK, 180, false),
+            new Item("record-player", BEDSIDE_NOOK, 300, false),
+            new Item("plant-stand", BEDSIDE_NOOK, 250, false),
+            new Item("stool-books", BEDSIDE_NOOK, 120, false),
+            new Item("toy-chest", FOOT_OF_BED, 180, false),
+            new Item("bench", FOOT_OF_BED, 250, false),
+            new Item("laundry-basket", FOOT_OF_BED, 120, false),
+            new Item("slippers", FOOT_OF_BED, 120, false),
+            new Item("watering-can", BY_FRIDGE, 120, false),
+            new Item("cookbook-stack", BY_FRIDGE, 180, false),
+            new Item("bean-bag", BY_FRIDGE, 250, false),
+            new Item("lemon-tree", BY_FRIDGE, 300, false),
+            new Item("veg-basket", BY_FRIDGE, 180, false),
+            new Item("monstera", CORNER_BY_DOOR, 250, false),
+            new Item("coat-stand", CORNER_BY_DOOR, 180, false),
+            new Item("arc-lamp", CORNER_BY_DOOR, 300, false),
+            new Item("guitar", CORNER_BY_DOOR, 250, false),
+            new Item("pouffe", FRONT_OF_ROOM, 120, false),
+            new Item("tea-table", FRONT_OF_ROOM, 250, false),
+            new Item("pip-ball", FRONT_OF_ROOM, 120, false),
+            new Item("picnic-basket", FRONT_OF_ROOM, 180, false),
             new Item("wall-white", WALL_STYLE, 0, true),
             new Item("wall-lavender", WALL_STYLE, 0, false),
             new Item("wall-mint", WALL_STYLE, 250, false),
@@ -62,12 +105,12 @@ public final class DecorCatalogue {
         return id == null ? Optional.empty() : Optional.ofNullable(BY_ID.get(id));
     }
 
-    /** The free style a finish has when nothing is stored for it (WALL_STYLE / FLOOR_STYLE only). */
-    public static String defaultFor(RoomSpot styleSpot) {
+    /** A defaulted spot's free item (RUG, WALL_STYLE, FLOOR_STYLE). */
+    public static String defaultFor(RoomSpot defaultedSpot) {
         return ITEMS.stream()
-                .filter(item -> item.spot() == styleSpot && item.isDefault())
+                .filter(item -> item.spot() == defaultedSpot && item.isDefault())
                 .map(Item::id)
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException(styleSpot + " has no default"));
+                .orElseThrow(() -> new IllegalArgumentException(defaultedSpot + " has no default"));
     }
 }

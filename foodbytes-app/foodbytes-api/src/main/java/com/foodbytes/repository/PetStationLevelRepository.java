@@ -1,6 +1,7 @@
 package com.foodbytes.repository;
 
 import com.foodbytes.model.PetStationLevel;
+import com.foodbytes.model.RoomStation;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -20,4 +21,9 @@ public interface PetStationLevelRepository extends JpaRepository<PetStationLevel
                    "ON DUPLICATE KEY UPDATE level = VALUES(level)",
            nativeQuery = true)
     void upsert(@Param("userId") Long userId, @Param("station") String station, @Param("level") int level);
+
+    /** MPP-40 free mode: back to level 1 (no row). */
+    @Modifying(clearAutomatically = true)
+    @Query("DELETE FROM PetStationLevel s WHERE s.userId = :userId AND s.station = :station")
+    int deleteByUserIdAndStation(@Param("userId") Long userId, @Param("station") RoomStation station);
 }

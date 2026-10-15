@@ -86,3 +86,19 @@
   font-size: 0.8rem;
   opacity: 0.8;
 }
+
+/* MPP-40: the 🧪 badge in the room's action strip while free mode is on — informational, not a control. */
+.pip-free-mode-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #fff1c9;
+  color: #7a5800;
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+  pointer-events: none;
+}

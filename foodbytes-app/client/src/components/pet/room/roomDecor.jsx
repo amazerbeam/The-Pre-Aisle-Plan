@@ -2,8 +2,8 @@ import { ROOM_SIZE } from '../../../constants/petRoom'
 import { DEFAULT_FLOOR_STYLE, DEFAULT_WALL_STYLE, ROOM_SPOTS, ROOM_STYLES } from '../../../constants/petDecor'
 import { Leaf } from './decorArt'
 import { P, pts, shade } from './iso'
-import { Bill, Box, EllH, IsoLine, RectU } from './isoShapes'
-import { RUG, WINDOW_SHIFT, shiftTransform } from './roomLayout'
+import { Bill, Box, IsoLine, RectU } from './isoShapes'
+import { WINDOW_SHIFT, shiftTransform } from './roomLayout'
 
 /**
  * MPP-16 AC 1 + AC 5: the angled corner (left wall, right wall, diamond floor), the
@@ -23,11 +23,12 @@ const CHECKER_STEP = 25
 const SKIRTING_HEIGHT = 7
 const { u: ROOM_U, v: ROOM_V, h: WALL_HEIGHT } = ROOM_SIZE
 // The window's spot on the right wall after WINDOW_SHIFT, so the sprigs leave it clear.
-const WINDOW_GAP = { v0: 158, v1: 238, h0: 66 }
-const RUG_RING = { ru: 40, rv: 30 }
+const WINDOW_GAP = { v0: 158, v1: 238, h0: 56 }
 const DAY_GLASS = '#cfe8ff'
 const NIGHT_GLASS = '#2b2d5c'
 const SKY_GLOW = '#fff6c2'
+const SILL_TOP = '#e6dcf7'
+const SILL_BRACKET = '#cbbdea'
 
 const DAY_SKY = (
   <Bill u={0} v={145} h={146}>
@@ -65,18 +66,18 @@ function buildBackdrop(night, wall, floor) {
         <RectU up={0} v0={98} v1={158} h0={108} h1={160} fill={night ? NIGHT_GLASS : DAY_GLASS} stroke="none" />
         {night ? NIGHT_SKY : DAY_SKY}
         <RectU up={0} v0={126.5} v1={129.5} h0={108} h1={160} fill="#ffffff" stroke="none" />
-        <Box u={0} v={90} du={7} dv={76} h0={100} h1={104} color="#d6c8f2" />
       </g>
-
-      <EllH cu={RUG.cu} cv={RUG.cv} h={0} ru={RUG.ru} rv={RUG.rv} fill="#f6c6d6" stroke="#e79ab5" strokeWidth="3" />
-      <EllH cu={RUG.cu} cv={RUG.cv} h={0} ru={RUG_RING.ru} rv={RUG_RING.rv} fill="none" stroke="#fff" strokeWidth="2" strokeDasharray="6 5" />
+      {/* MPP-40 AC 6: the sill is twice as deep (7 → 14), thicker (h 68–74) and sits on two brackets. */}
+      <Box u={0} v={167} du={9} dv={3} h0={58} h1={68} color={SILL_BRACKET} />
+      <Box u={0} v={227} du={9} dv={3} h0={58} h1={68} color={SILL_BRACKET} />
+      <Box u={0} v={158} du={14} dv={80} h0={68} h1={74} color={SILL_TOP} />
     </>
   )
 }
 
 const backdrops = new Map()
 
-/** The room's walls, floor, window and rug for one (night, wall style, floor style). */
+/** The room's walls, floor, window and sill for one (night, wall style, floor style). */
 export function roomBackdrop(night, wallStyleId, floorStyleId) {
   const wallId = ROOM_STYLES[wallStyleId]?.spot === ROOM_SPOTS.WALL_STYLE ? wallStyleId : DEFAULT_WALL_STYLE
   const floorId = ROOM_STYLES[floorStyleId]?.spot === ROOM_SPOTS.FLOOR_STYLE ? floorStyleId : DEFAULT_FLOOR_STYLE

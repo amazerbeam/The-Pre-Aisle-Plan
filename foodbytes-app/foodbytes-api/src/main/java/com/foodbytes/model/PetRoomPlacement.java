@@ -8,8 +8,9 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 /**
- * MPP-27: what sits on one spot of one person's room - a decor item on LEFT_WALL / RIGHT_WALL /
- * FLOOR, or the chosen style on WALL_STYLE / FLOOR_STYLE. No row = an empty spot or the default style.
+ * MPP-27: what sits on one spot of one person's room - a decor item on one of the 12 decor spots,
+ * or the chosen wall / floor style (MPP-40). No row = an empty spot, or the default for a spot that has
+ * one (rug, finishes).
  * Written only by PetRoomPlacementRepository#upsert / #deleteByUserIdAndSpot from DecorService.
  */
 @Entity

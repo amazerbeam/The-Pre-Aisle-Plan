@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 public class RoomPlacementRequest {
     @NotBlank(message = "spot is required")
-    private String spot;     // "leftWall" | "rightWall" | "floor" | "wallStyle" | "floorStyle"
+    private String spot;     // "overWardrobe" ... "frontOfRoom" | "wallStyle" | "floorStyle"
 
     private String itemId;   // null or blank empties the spot (a finish resets to its default)
 }

@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class DecorItemDTO {
     private String id;      // "herb-shelf"
-    private String kind;    // "leftWall" | "rightWall" | "floor" | "wallStyle" | "floorStyle"
+    private String kind;    // "overWardrobe" ... "frontOfRoom" | "wallStyle" | "floorStyle"
     private int price;      // sprinkles; 0 for the free default styles
     private boolean owned;  // the defaults are always owned
 }

@@ -248,6 +248,11 @@
   font-weight: 800;
 }
 
+/* MPP-40 AC 8: each spot's name, drawn with its outline in edit mode. */
+.pip-decor-spot-tag rect { fill: #fff; stroke: #7c5cd6; stroke-width: 0.8; }
+.pip-decor-spot-tag text { font: 600 7px system-ui, sans-serif; fill: #3b2f5c; pointer-events: none; }
+.pip-decor-spot-tag { pointer-events: none; }
+
 .pip-room-stage.is-editing .pet-bubble,
 .pip-room-stage.is-editing .pip-room-hint {
   visibility: hidden;

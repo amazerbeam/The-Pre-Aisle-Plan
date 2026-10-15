@@ -53,7 +53,7 @@ class PetServiceTest {
     private static final WardrobeDTO WARDROBE = new WardrobeDTO(List.of(), Map.of(WardrobeSlot.HAT, "beanie"));
     private static final PetRoomDTO ROOM = new PetRoomDTO(
             Map.of("bed", 2, "fridge", 1, "cooker", 1, "cabinet", 1), Map.of(2, 300, 3, 600, 4, 1200),
-            List.of(), Map.of());
+            List.of(), Map.of(), false);
     private static final Long OWNER_ID = 1L;
     private static final Long LINKED_ID = 2L;
     private User owner;

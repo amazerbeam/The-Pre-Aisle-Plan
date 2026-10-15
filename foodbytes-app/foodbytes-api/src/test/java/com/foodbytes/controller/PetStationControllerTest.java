@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import com.foodbytes.dto.StationLevelRequest;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -20,6 +22,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -74,5 +77,53 @@ class PetStationControllerTest {
 
         assertThat(response.getStatusCode().value()).isEqualTo(409);
         assertThat(response.getBody()).isEqualTo(Map.of("error", "Not enough sprinkles: you have 10, this costs 300."));
+    }
+
+    // ---- MPP-40: PUT /{station}/level (free mode only) ----
+
+    @Test
+    void setLevel_returnsTheRoomWrite() {
+        RoomWriteDTO write = new RoomWriteDTO(435L, null);
+        when(stationService.setLevel(2L, RoomStation.BED, 3)).thenReturn(write);
+
+        ResponseEntity<?> response = new PetStationController(stationService).setLevel(principal(), "bed", new StationLevelRequest(3));
+
+        assertThat(response.getStatusCode().value()).isEqualTo(200);
+        assertThat(response.getBody()).isSameAs(write);
+    }
+
+    @Test
+    void setLevel_freeModeOff_returns403() {
+        when(stationService.setLevel(2L, RoomStation.BED, 3))
+                .thenThrow(new PetShopException(PetShopException.Reason.FREE_MODE_ONLY, "Free mode is off."));
+
+        ResponseEntity<?> response = new PetStationController(stationService).setLevel(principal(), "bed", new StationLevelRequest(3));
+
+        assertThat(response.getStatusCode().value()).isEqualTo(403);
+        assertThat(response.getBody()).isEqualTo(Map.of("error", "Free mode is off."));
+    }
+
+    @Test
+    void setLevel_unknownStation_returns400() {
+        ResponseEntity<?> response = new PetStationController(stationService).setLevel(principal(), "sofa", new StationLevelRequest(3));
+
+        assertThat(response.getStatusCode().value()).isEqualTo(400);
+        assertThat(response.getBody()).isEqualTo(Map.of("error", "Unknown station: sofa"));
+        verifyNoInteractions(stationService);
+    }
+
+    @Test
+    void setLevel_withoutPrincipal_returns401() throws Exception {
+        mockMvc.perform(put("/api/pet/stations/bed/level").contentType(MediaType.APPLICATION_JSON).content("{\"level\":3}"))
+                .andExpect(status().isUnauthorized());
+        verifyNoInteractions(stationService);
+    }
+
+    @Test
+    void setLevel_levelFive_returns400() throws Exception {
+        mockMvc.perform(put("/api/pet/stations/bed/level").contentType(MediaType.APPLICATION_JSON).content("{\"level\":5}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("level must be 1 to 4"));
+        verifyNoInteractions(stationService);
     }
 }

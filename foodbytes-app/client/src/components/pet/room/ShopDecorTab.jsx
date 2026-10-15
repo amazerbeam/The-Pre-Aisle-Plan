@@ -3,7 +3,7 @@ import { catalogueFor } from '../../../utils/roomPlacements'
 import DecorThumb from './DecorThumb'
 import ShopItemCard from './ShopItemCard'
 
-/** MPP-27 AC 1: the Decor tab — the items for each spot, grouped left wall / right wall / floor. */
+/** MPP-27 AC 1 / MPP-40 AC 8: the Decor tab — the items for each of the 12 spots, grouped under the spot's name. */
 function ShopDecorTab({ shop }) {
   return DECOR_SPOTS.map(spot => (
     <section key={spot}>

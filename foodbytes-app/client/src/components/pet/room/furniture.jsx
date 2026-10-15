@@ -1,10 +1,12 @@
 import { ROOM_INK } from '../../../constants/petRoom'
-import { P } from './iso'
-import { Bill, Box, Cyl, EllH, IsoLine, RectU, RectV } from './isoShapes'
+import { P, shade } from './iso'
+import { Bill, Box, Cyl, EllH, IsoLine, Poly, RectU, RectV } from './isoShapes'
 import { RibbonArt, TrophyArt } from './awardArt'
+import { Band, CylT, Flat, K, Leaf, Shine, WHITE_HI } from './decorArtWalls'
 
 /**
  * MPP-16 AC 3: every station at levels 1–4, art from pip-room-mockup-v5.html.
+ * MPP-40: the wardrobe station (levels 1–4, world coords, no shift) and the redrawn level-4 cooker hood and pot.
  * FURNITURE[station][level - 1]() returns JSX; the bed returns { back, front } so a
  * sleeping Pip (MPP-17) can be drawn between the layers.
  */
@@ -87,11 +89,10 @@ export const FURNITURE = {
         <Cyl cu={92} cv={20} r={13} h0={62} h1={80} color="#e76f51" />
       </>
     ),
-    // 4 chef's kitchen: hood, range, utensils (MPP-39: hood, rail and utensils 30 lower, under the 150 wall)
+    // 4 chef's kitchen: tapered hood + chimney, range, handled pot with a lid (inside COOKER_FOOTPRINT[3])
     () => (
       <>
-        <Box u={84} v={0} du={26} dv={14} h0={106} h1={150} color="#b0bec5" />
-        <Box u={70} v={0} du={54} dv={32} h0={94} h1={106} color="#b0bec5" />
+        <CookerHood />
         {[76, 84, 112, 118].map((u, i) => (
           <IsoLine key={u} points={[P(u, 1, 88), P(u, 1, 74 - i * 3)]} width={2} />
         ))}
@@ -99,9 +100,9 @@ export const FURNITURE = {
         <Box u={50} v={0} du={90} dv={38} h0={0} h1={58} color="#2f3e46" />
         <RectV vp={38} u0={70} u1={120} h0={10} h1={44} fill="rgba(255,183,3,.45)" />
         <Box u={48} v={0} du={94} dv={40} h0={58} h1={63} color="#cfd8dc" />
-        <Cyl cu={90} cv={20} r={13} h0={63} h1={82} color="#e76f51" />
+        <CookerPot />
         <Box u={124} v={8} du={10} dv={10} h0={63} h1={72} color="#a1887f" />
-        <Bill u={129} v={13} h={72}><circle cy="-7" r="8" fill="#7cb342" {...KNOB_STROKE} /></Bill>
+        <Bill u={129} v={13} h={72}><circle cy="-7" r="8" fill="#7cb342" {...K} /></Bill>
       </>
     )
   ],
@@ -230,6 +231,65 @@ export const FURNITURE = {
         </>
       )
     })
+  ],
+  // MPP-40: the wardrobe in the back corner along the left wall (no shift). Tapping it opens Dress Pip.
+  wardrobe: [
+    // 1 clothes rail
+    () => (
+      <>
+        <Box u={6} v={4} du={11} dv={11} h0={0} h1={3} color="#9aa3ad" />
+        <Box u={10} v={8} du={3} dv={3} h0={3} h1={82} color="#b8c0c8" />
+        <IsoLine points={[P(11.5, 9.5, 80), P(63.5, 9.5, 80)]} width={2.4} color="#8a939c" />
+        {[[20, '#e76f51'], [31, '#4dabf7'], [42, '#ffd34d'], [53, '#7cc35a']].map(([u, c]) => (
+          <g key={u}>
+            <IsoLine points={[P(u, 9.5, 80), P(u, 9.5, 75)]} width={1.2} />
+            <Poly points={[P(u - 6, 9.5, 74), P(u + 6, 9.5, 74), P(u + 5, 9.5, 46), P(u - 5, 9.5, 46)]} fill={c} />
+          </g>
+        ))}
+        <Box u={58} v={4} du={11} dv={11} h0={0} h1={3} color="#9aa3ad" />
+        <Box u={62} v={8} du={3} dv={3} h0={3} h1={82} color="#b8c0c8" />
+        <Box u={30} v={16} du={14} dv={10} h0={0} h1={7} color="#c9965f" />
+      </>
+    ),
+    // 2 chest of drawers
+    () => (
+      <>
+        <Box u={10} v={0} du={52} dv={26} h0={0} h1={58} color="#c9965f" />
+        {[6, 24, 42].map(h => (
+          <g key={h}>
+            <RectV vp={26} u0={14} u1={58} h0={h} h1={h + 13} fill="#e2b989" />
+            <Bill u={36} v={26} h={h + 6.5}><circle r="2" fill="#8a5a2b" {...K} /></Bill>
+          </g>
+        ))}
+        <Cyl cu={20} cv={12} r={5} h0={58} h1={66} color="#c0563b" />
+        <Bill u={20} v={12} h={70}><Leaf /></Bill>
+        <Box u={36} v={6} du={16} dv={12} h0={58} h1={61} color="#ff8fab" />
+      </>
+    ),
+    // 3 wooden wardrobe
+    () => (
+      <>
+        <Box u={8} v={0} du={56} dv={28} h0={0} h1={88} color="#9c6b3f" />
+        <RectV vp={28} u0={12} u1={35} h0={6} h1={82} fill="#b98a5a" />
+        <RectV vp={28} u0={37} u1={60} h0={6} h1={82} fill="#b98a5a" />
+        <Bill u={33} v={28} h={44}><circle r="2.2" fill="#ffd34d" {...K} /></Bill>
+        <Bill u={39} v={28} h={44}><circle r="2.2" fill="#ffd34d" {...K} /></Bill>
+        <Box u={6} v={0} du={60} dv={30} h0={88} h1={92} color="#7a5a3a" />
+      </>
+    ),
+    // 4 mirrored double wardrobe
+    () => (
+      <>
+        <Box u={4} v={0} du={66} dv={30} h0={0} h1={90} color="#f3e9da" />
+        <RectV vp={30} u0={8} u1={34} h0={6} h1={84} fill="#fffaf0" />
+        <RectV vp={30} u0={40} u1={66} h0={6} h1={84} fill="#cfe8ff" />
+        <IsoLine points={[P(46, 30, 70), P(52, 30, 78)]} width={2} color="#ffffff" />
+        <IsoLine points={[P(46, 30, 60), P(56, 30, 74)]} width={2} color="#ffffff" />
+        <Bill u={31} v={30} h={44}><circle r="2.4" fill="#d4a017" {...K} /></Bill>
+        <Bill u={43} v={30} h={44}><circle r="2.4" fill="#d4a017" {...K} /></Bill>
+        <Box u={2} v={0} du={70} dv={32} h0={90} h1={96} color="#d4a017" />
+      </>
+    )
   ]
 }
 
@@ -241,6 +301,46 @@ export function stationArt(station, level) {
   const key = `${station}:${level}`
   if (!artCache.has(key)) artCache.set(key, FURNITURE[station][level - 1]())
   return artCache.get(key)
+}
+
+const STEEL = '#b0bec5'
+
+// L4 hood: a canopy tapering from 54 wide at h94 to 26 wide at h112 on the left wall, a vent underside, and a
+// separate chimney up to h150 with a cap and two slats.
+function CookerHood() {
+  return (
+    <>
+      <Poly points={[P(124, 0, 94), P(124, 32, 94), P(110, 14, 112), P(110, 0, 112)]} fill={shade(STEEL, -6)} />
+      <Poly points={[P(70, 32, 94), P(124, 32, 94), P(110, 14, 112), P(84, 14, 112)]} fill={shade(STEEL, -20)} />
+      <Poly points={[P(84, 0, 112), P(110, 0, 112), P(110, 14, 112), P(84, 14, 112)]} fill={shade(STEEL, 14)} />
+      <Flat points={[P(70, 32, 94), P(124, 32, 94), P(120.9, 28, 98), P(73.1, 28, 98)]} fill="#4f5d6a" />
+      <Flat points={[P(124, 32, 94), P(124, 0, 94), P(123, 0, 97), P(120.9, 28, 98)]} fill="#5d6d7e" />
+      <IsoLine points={[P(70, 32, 94), P(124, 32, 94)]} width={2.2} color="#eef3f6" />
+      <IsoLine points={[P(76, 26.6, 104), P(106, 26.6, 104)]} width={1} color="rgba(255,255,255,.55)" />
+      <Box u={91} v={0} du={12} dv={10} h0={112} h1={150} color={STEEL} />
+      <Box u={89.5} v={0} du={15} dv={11.5} h0={146} h1={150} color="#90a4ae" />
+      <IsoLine points={[P(92.5, 10.05, 124), P(101.5, 10.05, 124)]} width={1.2} />
+      <IsoLine points={[P(92.5, 10.05, 130), P(101.5, 10.05, 130)]} width={1.2} />
+      <IsoLine points={[P(92, 10.05, 143), P(92, 10.05, 114)]} width={1} color="rgba(255,255,255,.6)" />
+    </>
+  )
+}
+
+// L4 pot: rim, two side handles (far one first, near one after the body) and a lid with a knob.
+function CookerPot() {
+  return (
+    <>
+      <Box u={74.5} v={18.5} du={4.5} dv={3} h0={71.5} h1={74.5} color="#8a5a2b" />
+      <CylT cu={90} cv={20} r0={11.5} r1={12.5} h0={63} h1={77.5} color="#e76f51" />
+      <Shine cu={90} cv={20} r={12.5} h0={63} h1={77.5} />
+      <Band cu={90} cv={20} r={12.1} h={70} color="#b8452b" w={1.2} />
+      <CylT cu={90} cv={20} r0={13.2} r1={13.2} h0={77} h1={78.6} color="#f08a6e" />
+      <Box u={101} v={18.5} du={4.5} dv={3} h0={71.5} h1={74.5} color="#8a5a2b" />
+      <CylT cu={90} cv={20} r0={12} r1={9} h0={78.6} h1={82} color="#e76f51" />
+      <IsoLine points={[P(85, 21.2, 79.2), P(87, 21.2, 81.2)]} width={1} color={WHITE_HI} />
+      <CylT cu={90} cv={20} r0={1.9} r1={1.5} h0={82} h1={85.5} color="#8a5a2b" />
+    </>
+  )
 }
 
 function TrophyAt({ u, v, h, s = 0.6 }) {

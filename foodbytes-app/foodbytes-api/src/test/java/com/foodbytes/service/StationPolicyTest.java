@@ -41,4 +41,10 @@ class StationPolicyTest {
         }
         assertThat(StationPolicy.sourceId(RoomStation.FRIDGE, 3)).isEqualTo(23L);
     }
+
+    @Test
+    void fromPath_wardrobe_isCaseInsensitive() {
+        assertThat(RoomStation.fromPath("Wardrobe")).isEqualTo(RoomStation.WARDROBE);
+        assertThat(StationPolicy.sourceId(RoomStation.WARDROBE, 2)).isEqualTo(52L);
+    }
 }

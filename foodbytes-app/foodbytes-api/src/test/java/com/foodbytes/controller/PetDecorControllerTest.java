@@ -55,7 +55,7 @@ class PetDecorControllerTest {
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.error").value("Not authenticated"));
         mockMvc.perform(put("/api/pet/room/placements").contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"spot\":\"leftWall\",\"itemId\":\"herb-shelf\"}"))
+                        .content("{\"spot\":\"overWardrobe\",\"itemId\":\"herb-shelf\"}"))
                 .andExpect(status().isUnauthorized());
         verifyNoInteractions(decorService);
     }
@@ -101,9 +101,9 @@ class PetDecorControllerTest {
 
     @Test
     void place_resolvesTheSpotKey() {
-        when(decorService.place(2L, RoomSpot.LEFT_WALL, "herb-shelf")).thenReturn(WRITE);
+        when(decorService.place(2L, RoomSpot.OVER_WARDROBE, "herb-shelf")).thenReturn(WRITE);
 
-        ResponseEntity<?> response = new PetDecorController(decorService).place(principal(), placement("leftWall", "herb-shelf"));
+        ResponseEntity<?> response = new PetDecorController(decorService).place(principal(), placement("overWardrobe", "herb-shelf"));
 
         assertThat(response.getStatusCode().value()).isEqualTo(200);
         assertThat(response.getBody()).isSameAs(WRITE);
@@ -119,11 +119,20 @@ class PetDecorControllerTest {
     }
 
     @Test
+    void place_aStaleClientsOldSpotKey_returns400() {
+        ResponseEntity<?> response = new PetDecorController(decorService).place(principal(), placement("leftWall", "herb-shelf"));
+
+        assertThat(response.getStatusCode().value()).isEqualTo(400);
+        assertThat(response.getBody()).isEqualTo(Map.of("error", "Unknown spot: leftWall"));
+        verifyNoInteractions(decorService);
+    }
+
+    @Test
     void place_notOwned_returns409() {
-        when(decorService.place(2L, RoomSpot.RIGHT_WALL, "mirror"))
+        when(decorService.place(2L, RoomSpot.FRONT_RIGHT_WALL, "mirror"))
                 .thenThrow(new PetShopException(PetShopException.Reason.NOT_OWNED, "You don't own that yet."));
 
-        ResponseEntity<?> response = new PetDecorController(decorService).place(principal(), placement("rightWall", "mirror"));
+        ResponseEntity<?> response = new PetDecorController(decorService).place(principal(), placement("frontRightWall", "mirror"));
 
         assertThat(response.getStatusCode().value()).isEqualTo(409);
         assertThat(response.getBody()).isEqualTo(Map.of("error", "You don't own that yet."));

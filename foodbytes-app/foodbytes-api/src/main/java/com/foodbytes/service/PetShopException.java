@@ -6,7 +6,7 @@ package com.foodbytes.service;
  */
 public class PetShopException extends RuntimeException {
 
-    public enum Reason { MAXED, NOT_ENOUGH_SPRINKLES, ALREADY_OWNED, NOT_OWNED }
+    public enum Reason { MAXED, NOT_ENOUGH_SPRINKLES, ALREADY_OWNED, NOT_OWNED, FREE_MODE_ONLY }
 
     private final Reason reason;
 

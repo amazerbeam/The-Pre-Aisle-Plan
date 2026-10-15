@@ -16,6 +16,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -24,6 +25,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /** MPP-26 AC 2 / AC 5: lock, then check, then debit and level up together; a partner's room is never touched. */
@@ -37,6 +39,7 @@ class StationServiceTest {
     @Mock private PetStationLevelRepository levelRepository;
     @Mock private SprinkleService sprinkleService;
     @Mock private PetRoomService petRoomService;
+    @Mock private PetFreeMode freeMode;
     @InjectMocks private StationService stationService;
 
     @Test
@@ -84,5 +87,51 @@ class StationServiceTest {
 
         assertThatThrownBy(() -> stationService.upgrade(OWNER, RoomStation.COOKER)).isInstanceOf(PetShopException.class);
         verify(levelRepository, never()).upsert(anyLong(), anyString(), anyInt());
+    }
+
+    @Test
+    void upgrade_wardrobe_spendsUnderLedgerId52AndRaisesItToTwo() {
+        when(levelRepository.findByUserId(OWNER)).thenReturn(List.of());
+
+        stationService.upgrade(OWNER, RoomStation.WARDROBE);
+
+        verify(sprinkleService).spend(OWNER, SprinkleSource.STATION_UPGRADE, 52L, 300);
+        verify(levelRepository).upsert(OWNER, "WARDROBE", 2);
+    }
+
+    // ---- MPP-40: free mode ----
+
+    @Test
+    void upgrade_freeMode_raisesTheLevelAndChargesNothing() {
+        when(freeMode.isOn()).thenReturn(true);
+        when(levelRepository.findByUserId(OWNER)).thenReturn(List.of());
+        stationService.upgrade(OWNER, RoomStation.COOKER);
+        verify(levelRepository).upsert(OWNER, "COOKER", 2);
+        verify(sprinkleService, never()).spend(anyLong(), any(), anyLong(), anyInt());
+    }
+
+    @Test
+    void setLevel_freeMode_anyLevelUpOrDown_levelOneDeletesTheRow() {
+        when(freeMode.isOn()).thenReturn(true);
+        stationService.setLevel(OWNER, RoomStation.BED, 4);
+        stationService.setLevel(OWNER, RoomStation.BED, 1);
+        verify(levelRepository).upsert(OWNER, "BED", 4);
+        verify(levelRepository).deleteByUserIdAndStation(OWNER, RoomStation.BED);
+        verify(sprinkleService, never()).spend(anyLong(), any(), anyLong(), anyInt());
+    }
+
+    @Test
+    void setLevel_freeModeOff_isRefusedAndWritesNothing() {
+        assertThatThrownBy(() -> stationService.setLevel(OWNER, RoomStation.BED, 3))
+                .isInstanceOf(PetShopException.class)
+                .extracting(e -> ((PetShopException) e).getReason()).isEqualTo(PetShopException.Reason.FREE_MODE_ONLY);
+        verifyNoInteractions(levelRepository);
+    }
+
+    @Test
+    void setLevel_freeMode_outOfRange_isRejected() {
+        when(freeMode.isOn()).thenReturn(true);
+        assertThatThrownBy(() -> stationService.setLevel(OWNER, RoomStation.BED, 5)).isInstanceOf(IllegalArgumentException.class);
+        verifyNoInteractions(levelRepository);
     }
 }

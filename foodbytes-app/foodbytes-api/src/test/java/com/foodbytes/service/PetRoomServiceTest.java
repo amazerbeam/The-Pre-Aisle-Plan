@@ -21,6 +21,9 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /** MPP-26 AC 1 / AC 4: every station has a level, 1 until upgraded; the write response carries the balance. */
@@ -33,6 +36,7 @@ class PetRoomServiceTest {
     @Mock private PetDecorOwnedRepository ownedRepository;
     @Mock private PetRoomPlacementRepository placementRepository;
     @Mock private SprinkleService sprinkleService;
+    @Mock private PetFreeMode freeMode;
     @InjectMocks private PetRoomService petRoomService;
 
     @Test
@@ -42,7 +46,7 @@ class PetRoomServiceTest {
         PetRoomDTO room = petRoomService.room(USER);
 
         assertThat(room.getStations()).containsExactly(
-                Map.entry("bed", 1), Map.entry("fridge", 1), Map.entry("cooker", 1), Map.entry("cabinet", 1));
+                Map.entry("bed", 1), Map.entry("fridge", 1), Map.entry("cooker", 1), Map.entry("cabinet", 1), Map.entry("wardrobe", 1));
         assertThat(room.getUpgradeCosts()).containsEntry(2, 300).containsEntry(3, 600).containsEntry(4, 1200);
     }
 
@@ -75,17 +79,21 @@ class PetRoomServiceTest {
         PetRoomDTO room = petRoomService.room(USER);
 
         assertThat(room.getPlacements().keySet())
-                .containsExactly("leftWall", "rightWall", "floor", "wallStyle", "floorStyle");
-        assertThat(room.getPlacements().get("leftWall")).isNull();
-        assertThat(room.getPlacements().get("rightWall")).isNull();
-        assertThat(room.getPlacements().get("floor")).isNull();
-        assertThat(room.getPlacements()).containsEntry("wallStyle", "wall-white").containsEntry("floorStyle", "floor-lilac");
+                .containsExactly("overWardrobe", "bedsideWall", "frontRightWall", "windowDressing", "windowsill", "rug",
+                        "backCorner", "bedsideNook", "footOfBed", "byFridge", "cornerByDoor", "frontOfRoom", "wallStyle", "floorStyle");
+        room.getPlacements().forEach((key, value) -> {
+            if (!key.equals("rug") && !key.endsWith("Style")) {
+                assertThat(value).as(key).isNull();
+            }
+        });
+        assertThat(room.getPlacements()).containsEntry("rug", "rug-pink")
+                .containsEntry("wallStyle", "wall-white").containsEntry("floorStyle", "floor-lilac");
         assertThat(room.getDecor()).hasSize(DecorCatalogue.ITEMS.size());
         assertThat(room.getDecor()).filteredOn(DecorItemDTO::isOwned).extracting(DecorItemDTO::getId)
-                .containsExactlyInAnyOrder("wall-white", "wall-lavender", "floor-lilac");
+                .containsExactlyInAnyOrder("wall-white", "wall-lavender", "floor-lilac", "rug-pink");
         assertThat(room.getDecor()).filteredOn(item -> item.getId().equals("bunting")).singleElement()
                 .satisfies(item -> {
-                    assertThat(item.getKind()).isEqualTo("rightWall");
+                    assertThat(item.getKind()).isEqualTo("frontRightWall");
                     assertThat(item.getPrice()).isEqualTo(180);
                 });
     }
@@ -97,21 +105,21 @@ class PetRoomServiceTest {
                 new PetDecorOwned(1L, USER, "mirror", null),
                 new PetDecorOwned(2L, USER, "floor-oak", null)));
         when(placementRepository.findByUserId(USER)).thenReturn(List.of(
-                new PetRoomPlacement(1L, USER, RoomSpot.RIGHT_WALL, "mirror"),
+                new PetRoomPlacement(1L, USER, RoomSpot.FRONT_RIGHT_WALL, "mirror"),
                 new PetRoomPlacement(2L, USER, RoomSpot.FLOOR_STYLE, "floor-oak"),
-                new PetRoomPlacement(3L, USER, RoomSpot.FLOOR, "retired-sofa"),
-                new PetRoomPlacement(4L, USER, RoomSpot.LEFT_WALL, "bean-bag")));
+                new PetRoomPlacement(3L, USER, RoomSpot.BY_FRIDGE, "retired-sofa"),
+                new PetRoomPlacement(4L, USER, RoomSpot.OVER_WARDROBE, "bean-bag")));
 
         PetRoomDTO room = petRoomService.room(USER);
 
         assertThat(room.getPlacements())
-                .containsEntry("rightWall", "mirror")
+                .containsEntry("frontRightWall", "mirror")
                 .containsEntry("floorStyle", "floor-oak")
                 .containsEntry("wallStyle", "wall-white");
-        assertThat(room.getPlacements().get("floor")).isNull();     // unknown id -> empty
-        assertThat(room.getPlacements().get("leftWall")).isNull();  // a floor item on a wall -> empty
+        assertThat(room.getPlacements().get("byFridge")).isNull();       // unknown id -> empty
+        assertThat(room.getPlacements().get("overWardrobe")).isNull();   // a floor item on a wall -> empty
         assertThat(room.getDecor()).filteredOn(DecorItemDTO::isOwned).extracting(DecorItemDTO::getId)
-                .containsExactlyInAnyOrder("wall-white", "wall-lavender", "floor-lilac", "mirror", "floor-oak");
+                .containsExactlyInAnyOrder("wall-white", "wall-lavender", "floor-lilac", "rug-pink", "mirror", "floor-oak");
     }
 
     @Test
@@ -121,5 +129,36 @@ class PetRoomServiceTest {
                 new PetRoomPlacement(1L, USER, RoomSpot.WALL_STYLE, "wall-lavender")));
 
         assertThat(petRoomService.room(USER).getPlacements()).containsEntry("wallStyle", "wall-lavender");
+    }
+
+    @Test
+    void room_aStoredRugReplacesThePinkDefault() {
+        when(levelRepository.findByUserId(USER)).thenReturn(List.of());
+        when(placementRepository.findByUserId(USER)).thenReturn(List.of(new PetRoomPlacement(1L, USER, RoomSpot.RUG, "rug-braided")));
+
+        assertThat(petRoomService.room(USER).getPlacements()).containsEntry("rug", "rug-braided");
+    }
+
+    // ---- MPP-40: free mode ----
+
+    @Test
+    void room_freeModeOff_saysSo() {
+        when(levelRepository.findByUserId(USER)).thenReturn(List.of());
+        assertThat(petRoomService.room(USER).isFreeMode()).isFalse();
+    }
+
+    @Test
+    void room_freeMode_everythingOwned_upgradesCostNothing_noRowsNeeded() {
+        when(freeMode.isOn()).thenReturn(true);
+        when(levelRepository.findByUserId(USER)).thenReturn(List.of());
+
+        PetRoomDTO room = petRoomService.room(USER);
+
+        assertThat(room.isFreeMode()).isTrue();
+        assertThat(room.getDecor()).allSatisfy(item -> assertThat(item.isOwned()).isTrue());
+        assertThat(room.getDecor()).filteredOn(item -> item.getId().equals("rug-sheepskin")).singleElement()
+                .satisfies(item -> assertThat(item.getPrice()).isEqualTo(300)); // the real price is still shown
+        assertThat(room.getUpgradeCosts()).containsOnly(Map.entry(2, 0), Map.entry(3, 0), Map.entry(4, 0));
+        verify(ownedRepository, never()).save(any());
     }
 }

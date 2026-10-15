@@ -299,3 +299,48 @@
 }
 
 .pip-shop-item .pip-shop-short { font-size: 0.68rem; }
+
+/* MPP-40: free mode (testing) — the shop note and the level chips that replace the upgrade button. */
+.pip-shop-free {
+  margin: 0 0 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: #fff1c9;
+  color: #7a5800;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.pip-shop-levels { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.pip-shop-level-chip {
+  min-width: 44px;
+  min-height: 44px;
+  border: 1px solid #ddd6ee;
+  border-radius: 999px;
+  background: #fff;
+  color: #3b2f5c;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pip-shop-level-chip[aria-pressed="true"] {
+  border-color: #7c5cd6;
+  background: #7c5cd6;
+  color: #fff;
+}
+
+.pip-shop-level-chip:active { filter: brightness(0.92); }
+.pip-shop-level-chip:disabled { cursor: default; opacity: 0.6; }
+
+.pip-shop-level-chip:focus-visible {
+  outline: 3px solid var(--pip-focus-ring);
+  outline-offset: 2px;
+}
+
+@media (hover: hover) {
+  .pip-shop-level-chip:not(:disabled):not([aria-pressed="true"]):hover { background: #f3effc; }
+}

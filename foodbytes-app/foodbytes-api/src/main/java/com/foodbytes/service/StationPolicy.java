@@ -29,7 +29,7 @@ public final class StationPolicy {
         return level >= MAX_LEVEL;
     }
 
-    /** bed 12..14, fridge 22..24, cooker 32..34, cabinet 42..44: one ledger row per (station, level) ever. */
+    /** bed 12..14, fridge 22..24, cooker 32..34, cabinet 42..44, wardrobe 52..54: one ledger row per (station, level) ever. */
     public static long sourceId(RoomStation station, int level) {
         return station.code() * 10L + level;
     }

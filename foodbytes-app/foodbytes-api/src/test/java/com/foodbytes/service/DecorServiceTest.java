@@ -45,6 +45,7 @@ class DecorServiceTest {
     @Mock private PetRoomPlacementRepository placementRepository;
     @Mock private SprinkleService sprinkleService;
     @Mock private PetRoomService petRoomService;
+    @Mock private PetFreeMode freeMode;
     @InjectMocks private DecorService decorService;
 
     // save() hands back the row with the id the database would give it.
@@ -71,14 +72,14 @@ class DecorServiceTest {
         order.verify(ownedRepository).existsByUserIdAndItemKey(LINKED, "bunting");
         order.verify(ownedRepository).save(argThat(row -> row.getUserId().equals(LINKED) && row.getItemKey().equals("bunting")));
         order.verify(sprinkleService).spend(LINKED, SprinkleSource.DECOR_PURCHASE, 55L, 180);
-        order.verify(placementRepository).upsert(LINKED, "RIGHT_WALL", "bunting");
+        order.verify(placementRepository).upsert(LINKED, "FRONT_RIGHT_WALL", "bunting");
         verify(placementRepository, never()).upsert(eq(OWNER), anyString(), anyString()); // AC 4
     }
 
     @Test
     void buy_decor_spotAlreadyFilled_keepsWhatIsThere() {
         savesWithId(56L);
-        when(placementRepository.existsByUserIdAndSpot(OWNER, RoomSpot.FLOOR)).thenReturn(true);
+        when(placementRepository.existsByUserIdAndSpot(OWNER, RoomSpot.BY_FRIDGE)).thenReturn(true);
 
         decorService.buy(OWNER, "bean-bag");
 
@@ -145,18 +146,18 @@ class DecorServiceTest {
         when(ownedRepository.existsByUserIdAndItemKey(LINKED, "herb-shelf")).thenReturn(true);
         when(petRoomService.write(LINKED)).thenReturn(WRITE);
 
-        assertThat(decorService.place(LINKED, RoomSpot.LEFT_WALL, "herb-shelf")).isSameAs(WRITE);
+        assertThat(decorService.place(LINKED, RoomSpot.OVER_WARDROBE, "herb-shelf")).isSameAs(WRITE);
 
-        verify(placementRepository).upsert(LINKED, "LEFT_WALL", "herb-shelf");
+        verify(placementRepository).upsert(LINKED, "OVER_WARDROBE", "herb-shelf");
         verifyNoInteractions(sprinkleService);
     }
 
     @Test
     void place_nullOrBlank_clearsTheSpot() {
-        decorService.place(OWNER, RoomSpot.FLOOR, null);
-        decorService.place(OWNER, RoomSpot.FLOOR, " ");
+        decorService.place(OWNER, RoomSpot.BY_FRIDGE, null);
+        decorService.place(OWNER, RoomSpot.BY_FRIDGE, " ");
 
-        verify(placementRepository, times(2)).deleteByUserIdAndSpot(OWNER, RoomSpot.FLOOR);
+        verify(placementRepository, times(2)).deleteByUserIdAndSpot(OWNER, RoomSpot.BY_FRIDGE);
         verify(placementRepository, never()).upsert(anyLong(), anyString(), anyString());
     }
 
@@ -182,9 +183,9 @@ class DecorServiceTest {
 
     @Test
     void place_wrongSpot_is400() {
-        assertThatThrownBy(() -> decorService.place(OWNER, RoomSpot.FLOOR, "herb-shelf"))
+        assertThatThrownBy(() -> decorService.place(OWNER, RoomSpot.BY_FRIDGE, "herb-shelf"))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("herb-shelf doesn't go on the floor");
+                .hasMessage("herb-shelf doesn't go on the spot by the fridge");
         assertThatThrownBy(() -> decorService.place(OWNER, RoomSpot.WALL_STYLE, "floor-oak"))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("floor-oak doesn't go on the walls");
@@ -193,18 +194,45 @@ class DecorServiceTest {
 
     @Test
     void place_unknownItem_is400() {
-        assertThatThrownBy(() -> decorService.place(OWNER, RoomSpot.FLOOR, "sofa"))
+        assertThatThrownBy(() -> decorService.place(OWNER, RoomSpot.BY_FRIDGE, "sofa"))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Unknown item: sofa");
     }
 
     @Test
     void place_notOwned_is409() {
-        assertThatThrownBy(() -> decorService.place(OWNER, RoomSpot.RIGHT_WALL, "mirror"))
+        assertThatThrownBy(() -> decorService.place(OWNER, RoomSpot.FRONT_RIGHT_WALL, "mirror"))
                 .isInstanceOf(PetShopException.class)
                 .hasMessage("You don't own that yet.")
                 .extracting(e -> ((PetShopException) e).getReason())
                 .isEqualTo(PetShopException.Reason.NOT_OWNED);
         verify(placementRepository, never()).upsert(anyLong(), anyString(), anyString());
+    }
+
+    @Test
+    void buy_rug_isPutDownAtOnceOverThePinkDefault() {
+        savesWithId(41L);
+        decorService.buy(OWNER, "rug-sheepskin");
+        verify(placementRepository).upsert(OWNER, "RUG", "rug-sheepskin");
+        verify(placementRepository, never()).existsByUserIdAndSpot(OWNER, RoomSpot.RUG);
+    }
+
+    @Test
+    void place_rugNullOrPink_deletesTheRow_soThePinkRugShows() {
+        decorService.place(OWNER, RoomSpot.RUG, null);
+        decorService.place(OWNER, RoomSpot.RUG, "rug-pink");
+        verify(placementRepository, times(2)).deleteByUserIdAndSpot(OWNER, RoomSpot.RUG);
+        verify(placementRepository, never()).upsert(anyLong(), anyString(), anyString());
+    }
+
+    // ---- MPP-40: free mode ----
+
+    @Test
+    void place_freeMode_anItemYouDoNotOwn_isPlacedWithoutAPurchase() {
+        when(freeMode.isOn()).thenReturn(true);
+        decorService.place(OWNER, RoomSpot.FRONT_RIGHT_WALL, "mirror");
+        verify(placementRepository).upsert(OWNER, "FRONT_RIGHT_WALL", "mirror");
+        verify(ownedRepository, never()).save(any());
+        verifyNoInteractions(sprinkleService);
     }
 }

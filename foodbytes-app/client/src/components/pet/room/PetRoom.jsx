@@ -11,11 +11,12 @@ import DecorSpotButtons from './DecorSpotButtons'
 import EditRoomBar from './EditRoomBar'
 import EditRoomButton from './EditRoomButton'
 import { stationArt } from './furniture'
+import FreeModeBadge from './FreeModeBadge'
 import FridgeView from './FridgeView'
-import { FloorDecor, WallDecor } from './RoomDecorLayers'
+import { DecorLayer } from './RoomDecorLayers'
 import { roomBackdrop } from './roomDecor'
 import { FridgeGauge, NightDim, PotSteam, ServedPlate, SleepZs } from './roomEffects'
-import { COOK_WALK_OFFSET, ROOM_DRAW_ORDER, STATION_SHIFT, cabinetHitBox, cookPose, fridgeHitBox, hitBoxStyle, pipFocusPoint, pipPose, resolveRoomLevels, shiftTransform } from './roomLayout'
+import { COOK_WALK_OFFSET, ROOM_DRAW_ORDER, STATION_SHIFT, cabinetHitBox, cookPose, fridgeHitBox, hitBoxStyle, pipFocusPoint, pipPose, resolveRoomLevels, shiftTransform, wardrobeHitBox } from './roomLayout'
 import PipHeadBarStatus from './PipHeadBarStatus'
 import RecentreButton from './RecentreButton'
 import RoomPip from './RoomPip'
@@ -26,6 +27,9 @@ import TrophyCabinetView from './TrophyCabinetView'
 import WardrobeButton from './WardrobeButton'
 import WardrobeView from './WardrobeView'
 import './PetRoom.css'
+
+// MPP-40: every station but the bed, back to front; the bed is drawn after the back-floor decor layer.
+const BACK_STATIONS = ROOM_DRAW_ORDER.filter(station => station !== ROOM_STATIONS.BED)
 
 /**
  * MPP-16: Pip's angled-corner room — every station at `levels` (default all 1s), drawn
@@ -43,8 +47,9 @@ import './PetRoom.css'
  * MPP-32: `wardrobe` ({ data, hasNew, firstNewSlot, peakForm, equip, undress, markSeen, error }) adds the Wardrobe strip and the Dress Pip sheet.
  * MPP-25 / MPP-37: the sprinkles counter now lives in Pip's header (PipHeader), not in the room.
  * MPP-37: full screen — .pip-room-stage fills the height.
- * MPP-39: the room is a bigger world on a camera (usePipCamera) — drag, pinch, Ctrl+wheel or keys to look around; it floats back to Pip and follows him. Stations and decor spots are shifted groups (roomLayout STATION_SHIFT / DECOR_SPOT_SHIFT).
+ * MPP-39: the room is a bigger world on a camera (usePipCamera) — drag, pinch, Ctrl+wheel or keys to look around; it floats back to Pip and follows him. Stations are shifted groups (roomLayout STATION_SHIFT); decor is drawn in world coords.
  * MPP-27: `decor` ({ room, editing, selectedSpot, openSpot, closeSpot, place, toggle, done, error }) draws your own wall / floor styles and placed decor, and drives ✏️ Edit room.
+ * MPP-40: 12 decor spots drawn in four layers among the stations (rug, wall, back floor, front floor), a wardrobe station whose button opens Dress Pip, and a 🧪 badge while the server's free mode is on.
  * MPP-26: `shop` ({ room, sprinkles, armed, busy, status, error, arm, upgrade, reset }) adds the 🛍 Shop pill beside Wardrobe and the Shop sheet; `levels` (from the pet's room) draws each station at its owned level.
  */
 function PetRoom({ name, mood, bubble, bubbleActions = null, position = PIP_POSITIONS.RUG, levels = DEFAULT_ROOM_LEVELS, serving = null, fridge = null, cabinet = null, herb, levelBar = null, wardrobe = null, shop = null, decor = null }) {
@@ -75,12 +80,14 @@ function PetRoom({ name, mood, bubble, bubbleActions = null, position = PIP_POSI
   const worldRef = useRef(null)
   const camera = usePipCamera({ stageRef, worldRef, focus: pipFocusPoint(position, phase, levels) })
   const fridgeFill = fridge?.fill ?? null
+  const stationProps = { levels: resolved, position: scenePosition, phase, pose, herb, levelBar, fridgePct: fridgeFill?.pct ?? null }
   // MPP-19 / MPP-23 / MPP-26 / MPP-27 / MPP-32: the room behind an open overlay is out of the tab order and the a11y tree.
   const anyOpen = fridgeOverlay.isOpen || cabinetOverlay.isOpen || wardrobeOverlay.isOpen || shopOverlay.isOpen || pickerOverlay.isOpen
   const behind = anyOpen ? { inert: '', 'aria-hidden': true } : {}
 
   // MPP-27: which spot's picker is open (highlighted in the room); the overlay owns open/closed.
   const selectedSpot = pickerOverlay.isOpen ? decor?.selectedSpot ?? null : null
+  const decorProps = { placements, editing, selectedSpot }
   const openShop = (tab) => {
     shop.setTab(tab)
     shopOverlay.open()
@@ -89,6 +96,11 @@ function PetRoom({ name, mood, bubble, bubbleActions = null, position = PIP_POSI
     pickerOverlay.triggerRef.current = button // focus returns to the tapped spot
     decor.openSpot(spot)
     pickerOverlay.open()
+  }
+  // MPP-40 AC 5: the wardrobe station is a second way into Dress Pip; focus returns to whichever was tapped.
+  const openWardrobe = (button) => {
+    wardrobeOverlay.triggerRef.current = button
+    wardrobeOverlay.open()
   }
   const closePicker = () => {
     pickerOverlay.close()
@@ -123,24 +135,14 @@ function PetRoom({ name, mood, bubble, bubbleActions = null, position = PIP_POSI
         >
           <svg className="pip-room-svg" viewBox={ROOM_WORLD_VIEWBOX} xmlns="http://www.w3.org/2000/svg" role="img" aria-label={label}>
             {roomBackdrop(asleep, placements?.wallStyle, placements?.floorStyle)}
-            <WallDecor placements={placements} editing={editing} selectedSpot={selectedSpot} />
-            {ROOM_DRAW_ORDER.map(station => (
-              <g key={station} transform={shiftTransform(STATION_SHIFT[station])}>
-                <Station
-                  station={station}
-                  level={resolved[station]}
-                  position={scenePosition}
-                  phase={phase}
-                  pose={pose}
-                  herb={herb}
-                  levelBar={levelBar}
-                  fridgePct={fridgeFill?.pct ?? null}
-                />
-              </g>
-            ))}
-            <FloorDecor placements={placements} editing={editing} selectedSpot={selectedSpot} />
-            {asleep && <NightDim />}
+            <DecorLayer layer="rug" {...decorProps} />
+            <DecorLayer layer="wall" {...decorProps} />
+            {BACK_STATIONS.map(station => <ShiftedStation key={station} station={station} {...stationProps} />)}
+            <DecorLayer layer="backFloor" {...decorProps} />
+            <ShiftedStation station={ROOM_STATIONS.BED} {...stationProps} />
             <PipWalker phase={phase}>{!asleep && <RoomPip pose={pose} herb={herb} levelBar={levelBar} />}</PipWalker>
+            <DecorLayer layer="frontFloor" {...decorProps} />
+            {asleep && <NightDim />}
             {asleep && <SleepZs level={resolved.bed} />}
           </svg>
           <StationButton
@@ -155,6 +157,13 @@ function PetRoom({ name, mood, bubble, bubbleActions = null, position = PIP_POSI
             buttonRef={cabinetOverlay.triggerRef}
             onOpen={cabinetOverlay.open}
           />
+          {wardrobe && (
+            <StationButton
+              box={wardrobeHitBox(resolved.wardrobe)}
+              label={`Open ${name}'s wardrobe`}
+              onOpen={event => openWardrobe(event.currentTarget)}
+            />
+          )}
           {editing && <DecorSpotButtons placements={placements} onSpot={openPicker} />}
         </div>
         {levelBar && <PipHeadBarStatus levelBar={levelBar} />}
@@ -167,7 +176,8 @@ function PetRoom({ name, mood, bubble, bubbleActions = null, position = PIP_POSI
         <div className="pip-room-actions" {...behind}>
           {shop && <ShopButton buttonRef={shopOverlay.triggerRef} onOpen={() => openShop(SHOP_TAB_KEYS.UPGRADES)} />}
           {decor && <EditRoomButton editing={editing} buttonRef={editButtonRef} onToggle={decor.toggle} />}
-          {wardrobe && <WardrobeButton hasNew={wardrobe.hasNew} buttonRef={wardrobeOverlay.triggerRef} onOpen={wardrobeOverlay.open} />}
+          {wardrobe && <WardrobeButton hasNew={wardrobe.hasNew} onOpen={event => openWardrobe(event.currentTarget)} />}
+          {decor?.room?.freeMode && <FreeModeBadge />}
         </div>
       )}
       {editing && <RoomStyleChips room={decor.room} behind={behind} onPick={decor.place} />}
@@ -229,6 +239,15 @@ function Station({ station, level, position, phase, pose, herb, levelBar, fridge
       {position === PIP_POSITIONS.BED && <RoomPip pose={pose} herb={herb} levelBar={levelBar} />}
       {art.front}
     </>
+  )
+}
+
+// MPP-39: a station drawn at its STATION_SHIFT place in the room.
+function ShiftedStation({ station, levels, ...props }) {
+  return (
+    <g transform={shiftTransform(STATION_SHIFT[station])}>
+      <Station station={station} level={levels[station]} {...props} />
+    </g>
   )
 }
 

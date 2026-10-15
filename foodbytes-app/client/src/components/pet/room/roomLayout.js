@@ -11,7 +11,9 @@ import { P } from './iso.js'
 
 // AC 4: back → front. Fixed, not depth-sorted — at level 4 the cooker's footprint
 // (u 48–142) overlaps the fridge's (u 124–188), so a sort could put the cooker on top.
+// MPP-40: the wardrobe fills the back corner, so it is drawn first.
 export const ROOM_DRAW_ORDER = [
+  ROOM_STATIONS.WARDROBE,
   ROOM_STATIONS.COOKER,
   ROOM_STATIONS.FRIDGE,
   ROOM_STATIONS.CABINET,
@@ -45,14 +47,15 @@ export const STATION_SHIFT = {
   [ROOM_STATIONS.COOKER]: [30, 0],
   [ROOM_STATIONS.FRIDGE]: [60, 0],
   [ROOM_STATIONS.CABINET]: [0, 30],
-  [ROOM_STATIONS.BED]: [0, 70]
+  [ROOM_STATIONS.BED]: [0, 70],
+  [ROOM_STATIONS.WARDROBE]: [0, 0] // MPP-40: drawn in world coords
 }
 
-// MPP-39: [du, dv, dh] per decor spot — the wall spots drop under the 150-high walls, onto free wall.
-export const DECOR_SPOT_SHIFT = {
-  leftWall: [-130, 0, -40],
-  rightWall: [0, 216, -40],
-  floor: [70, 20, 0]
+// MPP-40: MPP-27's 12 items keep their art coords; this slides them to their spot (world coords).
+export const DECOR_LEGACY_SHIFT = {
+  overWardrobe: [-130, 0, -30],
+  frontRightWall: [0, 216, -40],
+  byFridge: [70, 20, 0]
 }
 
 // MPP-39: the window (and its sky) follows the bed and sits lower on the lower wall.
@@ -100,12 +103,17 @@ export const CABINET_FOOTPRINT = [[0, 26, 24, 78, 0, 48], [0, 30, 22, 72, 30, 88
 // (MPP-39: L4's cooker hood dropped 30 to fit the 150 wall.)
 export const COOKER_FOOTPRINT = [[96, 0, 44, 30, 0, 46], [58, 0, 84, 38, 0, 70], [70, 0, 70, 38, 0, 80], [48, 0, 94, 40, 0, 150]]
 export const BED_FOOTPRINT = [[10, 122, 74, 52, 0, 11], [4, 122, 80, 52, 0, 36], [0, 120, 91, 56, 0, 64], [0, 118, 91, 60, 0, 127]]
+
+// MPP-40: the outer box of FURNITURE.wardrobe[level - 1] as [u, v, du, dv, h0, h1], world coords (no shift).
+// Hand-copied from furniture.jsx (re-measured after the art pass); keep them in step with the art.
+export const WARDROBE_FOOTPRINT = [[6, 4, 63, 22, 0, 82], [10, 0, 52, 26, 0, 78], [6, 0, 60, 30, 0, 92], [2, 0, 70, 32, 0, 96]]
 const THUMB_PAD = 6
 
 const THUMB_FOOTPRINTS = {
   [ROOM_STATIONS.BED]: BED_FOOTPRINT,
   [ROOM_STATIONS.COOKER]: COOKER_FOOTPRINT,
   [ROOM_STATIONS.CABINET]: CABINET_FOOTPRINT,
+  [ROOM_STATIONS.WARDROBE]: WARDROBE_FOOTPRINT,
   [ROOM_STATIONS.FRIDGE]: FRIDGE_FOOTPRINT.map(([u, v, du, dv, h]) => [u, v, du, dv, 0, h])
 }
 
@@ -123,14 +131,13 @@ export function stationThumbBox(station, level) {
 const DECOR_SPOT_PAD = 4
 
 /**
- * MPP-27 AC 3: one decor spot's button box (world px, shifted, MPP-39) — the spot's whole art volume plus a pad.
+ * MPP-27 AC 3: one decor spot's button box (world px, MPP-40) — the spot's whole art volume plus a pad.
  * CSS keeps it at least 44 px however small the card gets.
  * @returns {{ x: number, y: number, width: number, height: number }}
  */
 export function decorSpotHitBox(spot) {
   const { x, y, width, height } = boundsOf(boxCorners(...DECOR_SPOT_SHAPES[spot].volume))
-  const box = { x: x - DECOR_SPOT_PAD, y: y - DECOR_SPOT_PAD, width: width + 2 * DECOR_SPOT_PAD, height: height + 2 * DECOR_SPOT_PAD }
-  return offsetBox(box, DECOR_SPOT_SHIFT[spot])
+  return { x: x - DECOR_SPOT_PAD, y: y - DECOR_SPOT_PAD, width: width + 2 * DECOR_SPOT_PAD, height: height + 2 * DECOR_SPOT_PAD }
 }
 
 /** MPP-27: a square viewBox around a spot's art volume, so the picker and the shop can draw decorArt() as a thumbnail. */
@@ -151,7 +158,7 @@ export function hitBoxStyle(box) {
 
 const percentOf = (value, total) => `${((100 * value) / total).toFixed(2)}%`
 
-/** Any levels input → a full { bed, fridge, cooker, cabinet } of whole numbers in 1..4. */
+/** Any levels input → a full { bed, fridge, cooker, cabinet, wardrobe } of whole numbers in 1..4. */
 export function resolveRoomLevels(levels) {
   const resolved = {}
   for (const station of Object.keys(DEFAULT_ROOM_LEVELS)) {
@@ -179,6 +186,12 @@ export function fridgeHitBox(level) {
 export function cabinetHitBox(level) {
   const index = resolveRoomLevels({ cabinet: level }).cabinet - 1
   return offsetBox(boundsOf(boxCorners(...CABINET_FOOTPRINT[index])), STATION_SHIFT[ROOM_STATIONS.CABINET])
+}
+
+/** MPP-40 AC 5: the wardrobe's bounding box in world px, for the button that opens Dress Pip. */
+export function wardrobeHitBox(level) {
+  const index = resolveRoomLevels({ wardrobe: level }).wardrobe - 1
+  return offsetBox(boundsOf(boxCorners(...WARDROBE_FOOTPRINT[index])), STATION_SHIFT[ROOM_STATIONS.WARDROBE])
 }
 
 // The 8 projected corners of a floor box from h0 to h1.

@@ -4,14 +4,15 @@ import java.util.Arrays;
 import java.util.Locale;
 
 /**
- * MPP-26: Pip's four upgradable stations. code feeds the ledger source id (StationPolicy.sourceId);
+ * MPP-26: Pip's upgradable stations; MPP-40 adds the wardrobe. code feeds the ledger source id (StationPolicy.sourceId);
  * key is the JSON / client key (constants/petRoom.js ROOM_STATIONS); label is for messages.
  */
 public enum RoomStation {
     BED(1, "bed", "bed"),
     FRIDGE(2, "fridge", "fridge"),
     COOKER(3, "cooker", "cooker"),
-    CABINET(4, "cabinet", "trophy cabinet");
+    CABINET(4, "cabinet", "trophy cabinet"),
+    WARDROBE(5, "wardrobe", "wardrobe");
 
     private final int code;
     private final String key;

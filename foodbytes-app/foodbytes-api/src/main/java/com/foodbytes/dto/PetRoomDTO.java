@@ -11,8 +11,9 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PetRoomDTO {
-    private Map<String, Integer> stations;      // all four keys, level 1 when never upgraded
+    private Map<String, Integer> stations;      // all five keys, level 1 when never upgraded
     private Map<Integer, Integer> upgradeCosts; // {2:300, 3:600, 4:1200}
     private List<DecorItemDTO> decor;          // MPP-27: every catalogue entry, with ownership
-    private Map<String, String> placements;    // MPP-27: leftWall/rightWall/floor -> id or null; wallStyle/floorStyle -> id (the default when unset)
+    private Map<String, String> placements;    // MPP-27: decor spots -> id or null; rug / wallStyle / floorStyle -> id (the default when unset)
+    private boolean freeMode;              // MPP-40: testing switch (PetFreeMode) - everything owned, upgrades free
 }

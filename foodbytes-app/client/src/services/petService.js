@@ -11,9 +11,10 @@ export const petService = {
    * AwardStatus = { streakType: 'PLAN'|'SNACK'|'ALCOHOL', current: number, best: number,
    *                 counts: { [milestone: string]: number }, next: { milestone: number, inDays: number } }
    * FirstStatus = { key: string, earnedAt: string|null }
+   * room.placements keys (MPP-40): the 12 decor spots (rug never null), wallStyle, floorStyle
    *
    * @param {{ signal?: AbortSignal }} [options]
-   * @returns {Promise<{ name: string, customName: boolean, mealTimes: Object, habits: HabitStatus[], awards: { streaks: AwardStatus[], firsts: FirstStatus[] }, growth: { points: number, form: number, barCurrent: number|null, barSize: number|null, fullyGrown: boolean, lastDayScore: number, lastScoredDate: string|null, peakForm: number }, wardrobe: Object, room: { stations: Object, upgradeCosts: Object, decor: { id: string, kind: string, price: number, owned: boolean }[], placements: { leftWall: string|null, rightWall: string|null, floor: string|null, wallStyle: string, floorStyle: string } } }>} PetDTO (wardrobe = WardrobeDTO, see equipItem)
+   * @returns {Promise<{ name: string, customName: boolean, mealTimes: Object, habits: HabitStatus[], awards: { streaks: AwardStatus[], firsts: FirstStatus[] }, growth: { points: number, form: number, barCurrent: number|null, barSize: number|null, fullyGrown: boolean, lastDayScore: number, lastScoredDate: string|null, peakForm: number }, wardrobe: Object, room: { stations: Object, upgradeCosts: Object, decor: { id: string, kind: string, price: number, owned: boolean }[], placements: { [spot: string]: string|null } } }>} PetDTO (wardrobe = WardrobeDTO, see equipItem)
    */
   async getPet({ signal } = {}) {
     const response = await api.get('/pet', { signal })
@@ -78,10 +79,19 @@ export const petService = {
   },
 
   /**
+   * MPP-40 free mode only: sets one of your own stations to any level 1–4 (403 when free mode is off).
+   * Resolves RoomWriteDTO { sprinkles, room }.
+   */
+  async setStationLevel(station, level) {
+    const response = await api.put(`/pet/stations/${station}/level`, { level })
+    return response.data
+  },
+
+  /**
    * MPP-27: puts an owned item on a spot of your own room, free. null clears the spot (a finish
    * resets to its default). Resolves RoomWriteDTO. 409 = not owned; 400 = wrong spot / unknown.
    *
-   * @param {'leftWall'|'rightWall'|'floor'|'wallStyle'|'floorStyle'} spot
+   * @param {string} spot a ROOM_SPOTS value (12 decor spots, rug, wallStyle, floorStyle)
    * @param {string|null} itemId
    */
   async placeDecor(spot, itemId) {

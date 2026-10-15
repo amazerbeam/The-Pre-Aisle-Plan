@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { ROOM_MIN_LEVEL, SPRINKLES_ICON } from '../../../constants/petRoom'
 import { DECOR_SHOP_INTRO, SHOP_TAB_KEYS } from '../../../constants/petDecor'
-import { SHOP_CLOSE_LABEL, SHOP_FOOTNOTE, SHOP_INTRO, SHOP_STATIONS, SHOP_TITLE } from '../../../constants/petShop'
+import { FREE_MODE_SHOP_NOTE, SHOP_CLOSE_LABEL, SHOP_FOOTNOTE, SHOP_INTRO, SHOP_STATIONS, SHOP_TITLE } from '../../../constants/petShop'
 import useBodyScrollLock from '../../../hooks/useBodyScrollLock'
 import ShopDecorTab from './ShopDecorTab'
 import ShopStationCard from './ShopStationCard'
@@ -16,7 +16,8 @@ import './ShopView.css'
  * Tab trap come from useRoomOverlay (✕ takes focus). Closing forgets the armed button and message.
  *
  * @param {{ shop: Object, titleId: string, panelRef: object, onClose: () => void }} props
- *   shop = { room: PetRoomDTO, sprinkles, armed, busy, status, error, tab, setTab, arm, upgrade, buy, reset }
+ *   shop = { room: PetRoomDTO, sprinkles, armed, busy, status, error, tab, setTab, arm, upgrade, setLevel, buy, reset }
+ * MPP-40: while shop.room.freeMode is on (local testing) a note says so and each station gets level chips.
  */
 function ShopView({ shop, titleId, panelRef, onClose }) {
   useBodyScrollLock(true)
@@ -36,6 +37,7 @@ function ShopView({ shop, titleId, panelRef, onClose }) {
       <div className="pip-shop-body" id={`${titleId}-panel`} role="tabpanel" aria-labelledby={`${titleId}-tab-${shop.tab}`}>
         {shop.status && <p className="pip-shop-status" role="status">{shop.status}</p>}
         {shop.error && <p className="pip-shop-error" role="alert">{shop.error}</p>}
+        {shop.room.freeMode && <p className="pip-shop-free" role="note">{FREE_MODE_SHOP_NOTE}</p>}
         {shop.tab === SHOP_TAB_KEYS.UPGRADES && (
           <>
             <p className="pip-shop-intro">{SHOP_INTRO}</p>
@@ -49,8 +51,10 @@ function ShopView({ shop, titleId, panelRef, onClose }) {
               sprinkles={shop.sprinkles}
               armed={shop.armed}
               busy={shop.busy}
+              freeMode={shop.room.freeMode}
               onArm={shop.arm}
               onConfirm={shop.upgrade}
+              onSetLevel={shop.setLevel}
             />
           ))}
             </ul>

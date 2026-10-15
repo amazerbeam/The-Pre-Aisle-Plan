@@ -25,7 +25,8 @@ import java.util.stream.Collectors;
 
 /**
  * MPP-26: the caller's own room as the client sees it (per-person Pip, MPP-33 - never the meal-plan
- * owner's), and their owned decor and placements (MPP-27; DecorService writes them). Built from repositories only, so the services that change the room (StationService,
+ * owner's), and their owned decor and placements (MPP-27; DecorService writes them). MPP-40: PetFreeMode
+ * (testing only) marks every item owned and every upgrade free. Built from repositories only, so the services that change the room (StationService,
  * MPP-27's DecorService) depend on this and never on each other.
  */
 @Service
@@ -36,6 +37,7 @@ public class PetRoomService {
     private final PetDecorOwnedRepository ownedRepository;
     private final PetRoomPlacementRepository placementRepository;
     private final SprinkleService sprinkleService;
+    private final PetFreeMode freeMode;
 
     @Transactional(readOnly = true)
     public PetRoomDTO room(Long userId) {
@@ -47,8 +49,11 @@ public class PetRoomService {
         Set<String> owned = ownedRepository.findByUserId(userId).stream()
                 .map(PetDecorOwned::getItemKey)
                 .collect(Collectors.toSet());
-        return new PetRoomDTO(stations, new TreeMap<>(StationPolicy.UPGRADE_COSTS),
-                decorOf(owned), placementsOf(placementRepository.findByUserId(userId)));
+        boolean free = freeMode.isOn();
+        Map<Integer, Integer> costs = new TreeMap<>(StationPolicy.UPGRADE_COSTS);
+        if (free) costs.replaceAll((level, cost) -> 0);
+        return new PetRoomDTO(stations, costs, decorOf(owned, free),
+                placementsOf(placementRepository.findByUserId(userId)), free);
     }
 
     /** The response to every room write: the balance after it, and the whole room. */
@@ -71,22 +76,22 @@ public class PetRoomService {
         return levels;
     }
 
-    /** MPP-27 / MPP-39: every catalogue entry with whether the caller owns it; free items always are. */
-    static List<DecorItemDTO> decorOf(Set<String> owned) {
+    /** MPP-27 / MPP-39: every catalogue entry with whether the caller owns it; free items always are (MPP-40: and everything in free mode). */
+    static List<DecorItemDTO> decorOf(Set<String> owned, boolean free) {
         return DecorCatalogue.ITEMS.stream()
                 .map(item -> new DecorItemDTO(item.id(), item.spot().key(), item.price(),
-                        item.isFree() || owned.contains(item.id())))
+                        item.isFree() || free || owned.contains(item.id())))
                 .toList();
     }
 
     /**
      * MPP-27: each spot's effective item - null for an empty decor spot, the default for an unset
-     * finish. A row naming an id the catalogue no longer has, or one on the wrong spot, is ignored.
+     * defaulted spot (rug, finishes). A row naming an id the catalogue no longer has, or one on the wrong spot, is ignored.
      */
     static Map<String, String> placementsOf(List<PetRoomPlacement> rows) {
         Map<String, String> placements = new LinkedHashMap<>();
         for (RoomSpot spot : RoomSpot.values()) {
-            placements.put(spot.key(), spot.isStyle() ? DecorCatalogue.defaultFor(spot) : null);
+            placements.put(spot.key(), spot.hasDefault() ? DecorCatalogue.defaultFor(spot) : null);
         }
         rows.forEach(row -> DecorCatalogue.find(row.getItemKey())
                 .filter(item -> item.spot() == row.getSpot())

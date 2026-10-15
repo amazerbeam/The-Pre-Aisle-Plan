@@ -20,14 +20,16 @@ export const SHOP_STATIONS = [
   { key: 'bed', label: 'Bed', icon: '🛏' },
   { key: 'fridge', label: 'Fridge', icon: '🧊' },
   { key: 'cooker', label: 'Cooker', icon: '🍳' },
-  { key: 'cabinet', label: 'Trophy cabinet', icon: '🏆' }
+  { key: 'cabinet', label: 'Trophy cabinet', icon: '🏆' },
+  { key: 'wardrobe', label: 'Wardrobe', icon: '👕' }
 ]
 
 export const STATION_LEVEL_NAMES = {
   bed: ['Blanket on the floor', 'Camp cot', 'Wooden bed', 'Canopy bed'],
   fridge: ['Cool box', 'Mini fridge', 'Full fridge', 'Double-door fridge'],
   cooker: ['Camping stove', 'Counter and hob', 'Range cooker', "Chef's kitchen"],
-  cabinet: ['Planks on bricks', 'Wall shelves', 'Wooden cabinet', 'Glass display cabinet']
+  cabinet: ['Planks on bricks', 'Wall shelves', 'Wooden cabinet', 'Glass display cabinet'],
+  wardrobe: ['Clothes rail', 'Chest of drawers', 'Wooden wardrobe', 'Mirrored wardrobe']
 }
 
 // Pip's bubble after an upgrade (the award slot, AWARD_BUBBLE_MS).
@@ -35,5 +37,13 @@ export const SHOP_UPGRADE_LINES = {
   bed: 'A comfier bed! 😴✨',
   fridge: 'Look at my new fridge! 🧊✨',
   cooker: "New cooker, let's cook! 🍳✨",
-  cabinet: 'More room for trophies! 🏆✨'
+  cabinet: 'More room for trophies! 🏆✨',
+  wardrobe: 'A new wardrobe for my outfits! 👕✨'
 }
+
+// MPP-40: free mode (app.pet-free-mode on the server, local testing only).
+export const FREE_MODE_BADGE = '🧪 Free mode'
+export const FREE_MODE_BADGE_LABEL = 'Free mode is on: everything in the shop is unlocked and free (testing)'
+export const FREE_MODE_SHOP_NOTE = 'Free mode (testing): everything is unlocked and free. Nothing here costs sprinkles.'
+export const FREE_MODE_LEVEL_LABEL = level => `Set to level ${level}`
+export const SHOP_LEVEL_ERROR = "Couldn't change the level. Check your connection and try again."
