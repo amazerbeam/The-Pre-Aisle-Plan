@@ -2,6 +2,7 @@
 
 One line per ticket, newest first: `<version> — <ticket key>: <summary>`. Bump rules and how
 to check what is deployed: `CLAUDE.md` → Versioning & deploy verification.
+1.28.2 — MPP-44: Pip room night dim covers the whole stage; curtains centred on the window and stop at the sill
 1.28.1 — MPP-41: fix touch drag in Pip's room cancelling after a few px and floating back to Pip
 1.28.0 — MPP-42: Sprinkles Earn tab in the Shop, weekly shopping-list rewards, and a count-up when you return to Pip
 1.27.0 — MPP-40: Pip's room gets 12 named decor spots, a rug spot, the wardrobe station and a deeper windowsill

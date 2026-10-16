@@ -4,13 +4,19 @@ import { Bill, Box, IsoLine } from './isoShapes'
 import { Band, CylT, EllU, FAIRY_BULBS, K, ScaledLeaf, Shine, SlabU, Soil, WHITE_HI } from './decorArtWalls'
 
 /**
- * MPP-40: the window-dressing and windowsill decor items in world coords (right wall u = 0, window at v 158–238).
- * The sill top is h 74, u 0–14 (roomDecor.jsx); sill items stand on it.
+ * MPP-40: the window-dressing and windowsill decor items in world coords (right wall u = 0). The window frame
+ * runs v 164–232 and the sill v 158–238, both centred on v 198; the sill top is h 74, u 0–14 (roomDecor.jsx).
+ * Sill items stand on it; MPP-44: curtains mirror about v 198 and stop at the sill top.
  */
-const GINGHAM_PANELS = [[157, 172], [228, 243]]
-const LINEN_LEFT = [[157, 141], [175, 141], [170, 104], [168, 100], [170, 96], [177, 62], [157, 62]]
-const LINEN_RIGHT = LINEN_LEFT.map(([v, h]) => [400 - v, h])
-const CURTAIN_END_CAPS = [156, 242.5]
+const WINDOW_MIRROR = 396 // twice the window/sill centre line, v 198
+const SILL_TOP_H = 74
+const CURTAIN_ROD = { v: 155, dv: 86 }
+const CURTAIN_END_CAPS = [154, 240.5]
+const GINGHAM_PANELS = [[158, 173], [223, 238]]
+const LINEN_LEFT = [[158, 141], [176, 141], [171, 104], [169, 100], [171, 96], [178, SILL_TOP_H], [158, SILL_TOP_H]]
+const LINEN_RIGHT = LINEN_LEFT.map(([v, h]) => [WINDOW_MIRROR - v, h])
+const LINEN_FOLDS = [161.5, 165.5].flatMap(v => [v, WINDOW_MIRROR - v])
+const LINEN_TIEBACKS = [[158, 169], [WINDOW_MIRROR - 158, WINDOW_MIRROR - 169]]
 const LIGHT_STRAND_STARTS = [160, 236]
 const SUCCULENTS = [[-4, -2, -35], [4, -2, 35], [-2.6, -4.6, -10], [2.6, -4.6, 10], [0, -3, 0]]
 
@@ -53,11 +59,11 @@ export const WINDOW_BUILDERS = {
   // Window dressing
   'curtains-gingham': () => (
     <>
-      <Box u={0.4} v={157} du={2} dv={86} h0={141} h1={143.5} color="#8a5a2b" />
+      <Box u={0.4} v={CURTAIN_ROD.v} du={2} dv={CURTAIN_ROD.dv} h0={141} h1={143.5} color="#8a5a2b" />
       {GINGHAM_PANELS.map(([a, b]) => (
         <g key={a}>
-          <Box u={0.5} v={a} du={1.8} dv={b - a} h0={66} h1={141} color="#ffc2d1" />
-          {[a + 3.75, a + 7.5, a + 11.25].map(x => <IsoLine key={x} points={[P(2.35, x, 66), P(2.35, x, 141)]} width={1} color="#ffffff" />)}
+          <Box u={0.5} v={a} du={1.8} dv={b - a} h0={SILL_TOP_H} h1={141} color="#ffc2d1" />
+          {[a + 3.75, a + 7.5, a + 11.25].map(x => <IsoLine key={x} points={[P(2.35, x, SILL_TOP_H), P(2.35, x, 141)]} width={1} color="#ffffff" />)}
           {[76, 90, 104, 118, 132].map(h => <IsoLine key={h} points={[P(2.35, a, h), P(2.35, b, h)]} width={1} color="#ffffff" />)}
           <IsoLine points={[P(2.45, a, 100), P(2.45, b, 100)]} width={2.4} color="#e76f51" />
         </g>
@@ -67,13 +73,12 @@ export const WINDOW_BUILDERS = {
   ),
   'curtains-linen': () => (
     <>
-      <Box u={0.4} v={157} du={2} dv={86} h0={141} h1={143.5} color="#d4a017" />
+      <Box u={0.4} v={CURTAIN_ROD.v} du={2} dv={CURTAIN_ROD.dv} h0={141} h1={143.5} color="#d4a017" />
       {CURTAIN_END_CAPS.map(v => <Box key={v} u={0.4} v={v} du={2} dv={1.5} h0={139.5} h1={146} color="#d4a017" />)}
       <SlabU up={0.6} th={1.6} vh={LINEN_LEFT} fill="#f3ead8" />
       <SlabU up={0.6} th={1.6} vh={LINEN_RIGHT} fill="#f3ead8" />
-      {[160.5, 164.5, 239.5, 235.5].map(v => <IsoLine key={v} points={[P(2.2, v, 140), P(2.2, v, 63)]} width={1} color={shade('#f3ead8', -20)} />)}
-      <IsoLine points={[P(2.3, 157, 100), P(2.3, 168, 100)]} width={2.6} color="#d4a017" />
-      <IsoLine points={[P(2.3, 243, 100), P(2.3, 232, 100)]} width={2.6} color="#d4a017" />
+      {LINEN_FOLDS.map(v => <IsoLine key={v} points={[P(2.2, v, 140), P(2.2, v, SILL_TOP_H + 1)]} width={1} color={shade('#f3ead8', -20)} />)}
+      {LINEN_TIEBACKS.map(([from, to]) => <IsoLine key={from} points={[P(2.3, from, 100), P(2.3, to, 100)]} width={2.6} color="#d4a017" />)}
     </>
   ),
   'roller-blind': () => (

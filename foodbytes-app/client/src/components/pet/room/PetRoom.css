@@ -48,6 +48,15 @@
   height: 100%;
 }
 
+/* MPP-44: the night dim covers the whole stage wherever the camera is; after the world in the DOM so it
+   paints over it at the same z-index, under the bubble, hint and 🎯 (z 1). Never takes a drag or tap. */
+.pip-room-night-dim {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
 /* MPP-39 AC 18: 🎯 bottom right, fixed to the screen. */
 .pip-room-recentre {
   position: absolute;

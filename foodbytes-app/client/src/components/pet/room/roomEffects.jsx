@@ -7,6 +7,7 @@ const GAUGE_TRACK = 34 // px of fill at 100 % (mockup v5 stockGauge)
 
 /**
  * MPP-17/18/19: the cooker idle scene, the served plate, the fridge gauge and the night scene, from mockup v5's roomSvg().
+ * NightDim is HTML, rendered in the stage rather than the SVG (MPP-44).
  * Each takes the station's resolved level (1–4) so it follows upgrades.
  */
 
@@ -47,9 +48,9 @@ export function FridgeGauge({ level, pct }) {
   )
 }
 
-/** AC 4: the whole room dims while Pip sleeps. Percentages fill the viewBox. */
+/** AC 4 / MPP-44: the whole stage dims while Pip sleeps — a screen-fixed layer over the camera-moved world. */
 export function NightDim() {
-  return <rect x="0" y="0" width="100%" height="100%" fill={NIGHT_DIM_FILL} />
+  return <div className="pip-room-night-dim" style={{ background: NIGHT_DIM_FILL }} aria-hidden="true" />
 }
 
 /** AC 4: "z z" floating above the sleeping Pip. */

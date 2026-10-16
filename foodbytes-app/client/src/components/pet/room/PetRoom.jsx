@@ -119,7 +119,7 @@ function PetRoom({ name, mood, bubble, bubbleActions = null, position = PIP_POSI
   return (
     <div className="pip-room">
       {/* MPP-39: the stage is the screen-sized, focusable viewport; the world layer inside holds the
-          room SVG and its tap areas and is moved by the camera. Bubble, hint and 🎯 stay on the screen. */}
+          room SVG and its tap areas and is moved by the camera. Bubble, hint and 🎯 stay on the screen, above the night dim (MPP-44). */}
       <div
         ref={stageRef}
         className={editing ? 'pip-room-stage is-editing' : 'pip-room-stage'}
@@ -142,7 +142,6 @@ function PetRoom({ name, mood, bubble, bubbleActions = null, position = PIP_POSI
             <ShiftedStation station={ROOM_STATIONS.BED} {...stationProps} />
             <PipWalker phase={phase}>{!asleep && <RoomPip pose={pose} herb={herb} levelBar={levelBar} />}</PipWalker>
             <DecorLayer layer="frontFloor" {...decorProps} />
-            {asleep && <NightDim />}
             {asleep && <SleepZs level={resolved.bed} />}
           </svg>
           <StationButton
@@ -166,6 +165,7 @@ function PetRoom({ name, mood, bubble, bubbleActions = null, position = PIP_POSI
           )}
           {editing && <DecorSpotButtons placements={placements} onSpot={openPicker} />}
         </div>
+        {asleep && <NightDim />}
         {levelBar && <PipHeadBarStatus levelBar={levelBar} />}
         <SpeechBubble text={bubble} actions={bubbleActions} />
         <p className="pip-room-hint" aria-hidden="true">{ROOM_HINT}</p>
