@@ -13,7 +13,7 @@ const DEFAULT_HERB = { form: PIP_DEFAULT_FORM, wilted: false, phase: null, outfi
  * ({ form, wilted, phase }) comes from usePipGrowth. Every form has feet on HERB_FOOT_Y, so
  * the pose anchors (cooker walk, bed) are unchanged.
  * MPP-32: `herb.outfit` dresses him (PetView passes the wardrobe's outfit).
- * MPP-38: `levelBar` ({ pct, phase }) draws the small bar over his head — inside this transform,
+ * MPP-38: `levelBar` ({ pct, phase, gain }) draws the small bar over his head — inside this transform,
  * outside the figure's .pip-anim, so it follows every pose and walk but not the bob.
  */
 function RoomPip({ pose, herb = DEFAULT_HERB, levelBar = null }) {
@@ -25,7 +25,7 @@ function RoomPip({ pose, herb = DEFAULT_HERB, levelBar = null }) {
     <g transform={transform}>
       <PipHerbFigure form={herb.form} mood={face} wilted={herb.wilted} phase={herb.phase} showProps={showProps} outfit={herb.outfit} />
       {levelBar && (
-        <PipHeadBar form={herb.form} outfit={herb.outfit} pct={levelBar.pct} phase={levelBar.phase} poseScale={scale} />
+        <PipHeadBar form={herb.form} outfit={herb.outfit} pct={levelBar.pct} phase={levelBar.phase} gain={levelBar.gain} poseScale={scale} />
       )}
     </g>
   )

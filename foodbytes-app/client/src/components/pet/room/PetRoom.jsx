@@ -43,7 +43,7 @@ const BACK_STATIONS = ROOM_DRAW_ORDER.filter(station => station !== ROOM_STATION
  * MPP-21: the bubble is a SpeechBubble — a live-region line of text plus optional
  * `bubbleActions` (the check-in controls) under it.
  * MPP-23: the cabinet — a real button over the cabinet art that opens TrophyCabinetView with `cabinet` ({ data, loading, error, retry } from usePetAwards).
- * MPP-31: `herb` ({ form, wilted, phase }) draws Pip's current herb form; `levelBar` ({ label, pct, phase }) — MPP-38: drawn over Pip's head by RoomPip, spoken by PipHeadBarStatus.
+ * MPP-31: `herb` ({ form, wilted, phase }) draws Pip's current herb form; `levelBar` ({ label, pct, phase, gain }) — MPP-38: drawn over Pip's head by RoomPip, spoken by PipHeadBarStatus.
  * MPP-32: `wardrobe` ({ data, hasNew, firstNewSlot, peakForm, equip, undress, markSeen, error }) adds the Wardrobe strip and the Dress Pip sheet.
  * MPP-25 / MPP-37: the sprinkles counter now lives in Pip's header (PipHeader), not in the room.
  * MPP-37: full screen — .pip-room-stage fills the height.

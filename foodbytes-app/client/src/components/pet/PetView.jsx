@@ -110,7 +110,7 @@ function PetView() {
   const decor = pet.room ? { ...roomEdit, room: pet.room } : null
   // MPP-38 AC 8: no bar once Pip is a Basilisk; during an evolve into it, Bushling's bar still fills and flashes first.
   const levelBar = growth.barLabel && growth.displayForm !== PIP_FORMS.BASILISK
-    ? { label: growth.barLabel, pct: growth.barPct, phase: growth.phase }
+    ? { label: growth.barLabel, pct: growth.barPct, phase: growth.phase, gain: growth.gain }
     : null
 
   return (

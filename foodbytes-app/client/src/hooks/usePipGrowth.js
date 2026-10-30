@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react'
-import { PIP_DEFAULT_FORM, PIP_GROWTH_PHASES } from '../constants/pipGrowth'
-import { growthBubble, growthChange, growthSchedule, growthView } from '../utils/pipGrowth'
+import { HEAD_BAR_GAIN_MS, PIP_DEFAULT_FORM, PIP_GROWTH_PHASES } from '../constants/pipGrowth'
+import { growthBubble, growthChange, growthGain, growthSchedule, growthView } from '../utils/pipGrowth'
 import { readSeenGrowth, writeSeenGrowth } from '../utils/pipGrowthSeenStore'
 import { prefersReducedMotion } from '../utils/reducedMotion'
 
-const NO_GROWTH = { displayForm: PIP_DEFAULT_FORM, barPct: 0, barLabel: null, phase: PIP_GROWTH_PHASES.IDLE, bubble: null }
+const NO_GROWTH = { displayForm: PIP_DEFAULT_FORM, barPct: 0, barLabel: null, phase: PIP_GROWTH_PHASES.IDLE, bubble: null, gain: null }
+
+// Each pop gets a fresh id, so its <g> remounts and the CSS animation replays even for a repeat value.
+let gainSeq = 0
 
 /**
  * MPP-31 AC 5 / AC 8 / AC 9: what Pip and his level bar show on /pet. When the server's growth
@@ -16,11 +19,15 @@ const NO_GROWTH = { displayForm: PIP_DEFAULT_FORM, barPct: 0, barLabel: null, ph
  * MPP-28: `hold` (true while the cook scene or an announcement speaks) neither starts nor advances
  * a run; the current step restarts in full when it lifts, so a stage change waits its turn (AC 2).
  *
+ * `gain` ({ id, text, gained, count, delayMs }) is the "+3" then "3 / 15" over the bar. It outlives
+ * the run (a bar move is only 900 ms) and clears once its animation has played.
+ *
  * @param {{ userId: number|null, growth: Object|null, petName: string|null, hold?: boolean }} input
- * @returns {{ displayForm: number, barPct: number, barLabel: string|null, phase: string, bubble: string|null }}
+ * @returns {{ displayForm: number, barPct: number, barLabel: string|null, phase: string, bubble: string|null, gain: Object|null }}
  */
 export function usePipGrowth({ userId, growth, petName, hold = false }) {
   const [run, setRun] = useState(null) // { change, seen, growth, steps, index }
+  const [gain, setGain] = useState(null)
 
   // Read during render too, so the frame before the run starts already shows the old state.
   const seen = !run && userId != null && growth ? readSeenGrowth(userId) : null
@@ -37,8 +44,22 @@ export function usePipGrowth({ userId, growth, petName, hold = false }) {
       }
       return
     }
-    setRun({ change, seen: last, growth, steps: growthSchedule(change, prefersReducedMotion()), index: 0 })
+    const steps = growthSchedule(change, prefersReducedMotion())
+    const popped = growthGain(last, growth, steps)
+    setGain(popped && { ...popped, id: ++gainSeq })
+    setRun({ change, seen: last, growth, steps, index: 0 })
   }, [run, hold, userId, growth])
+
+  // A hold drops the pop: the run replays the bar when it lifts, the numbers are not replayed.
+  useEffect(() => {
+    if (hold) {
+      setGain(null)
+      return undefined
+    }
+    if (!gain) return undefined
+    const timerId = setTimeout(() => setGain(null), gain.delayMs + HEAD_BAR_GAIN_MS)
+    return () => clearTimeout(timerId)
+  }, [gain, hold])
 
   // Mark seen as the closing step begins; one timer per step, cleared if /pet unmounts.
   useEffect(() => {
@@ -63,12 +84,13 @@ export function usePipGrowth({ userId, growth, petName, hold = false }) {
       barPct: view.pct,
       barLabel: view.label,
       phase,
-      bubble: growthBubble({ change: run.change, phase, petName, seen: run.seen, growth: run.growth })
+      bubble: growthBubble({ change: run.change, phase, petName, seen: run.seen, growth: run.growth }),
+      gain
     }
   }
 
   const view = growthView(pending ? null : PIP_GROWTH_PHASES.IDLE, seen, growth)
-  return { displayForm: view.form, barPct: view.pct, barLabel: view.label, phase: PIP_GROWTH_PHASES.IDLE, bubble: null }
+  return { displayForm: view.form, barPct: view.pct, barLabel: view.label, phase: PIP_GROWTH_PHASES.IDLE, bubble: null, gain }
 }
 
 export default usePipGrowth

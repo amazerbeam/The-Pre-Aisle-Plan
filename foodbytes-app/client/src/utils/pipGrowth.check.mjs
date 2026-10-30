@@ -4,9 +4,9 @@
 // (AC 5, 7, 8, 9) are pinned here. Mirrors petMood.check.mjs.
 import assert from 'node:assert/strict'
 import {
-  GROWTH_CHANGES, barPct, growthBubble, growthChange, growthSchedule, growthView, isWilted, levelBarLabel
+  GROWTH_CHANGES, barPct, growthBubble, growthChange, growthGain, growthSchedule, growthView, isWilted, levelBarLabel
 } from './pipGrowth.js'
-import { PIP_GROWTH_PHASES } from '../constants/pipGrowth.js'
+import { HEAD_BAR_GAIN_DELTA_MS, HEAD_BAR_GAIN_MS, PIP_GROWTH_PHASES } from '../constants/pipGrowth.js'
 import { PIP_ANIMATION_MAX_MS } from '../constants/pet.js'
 
 const g = (over) => ({ points: 21, form: 2, barCurrent: 6, barSize: 21, fullyGrown: false, lastDayScore: 3, lastScoredDate: '2026-10-13', ...over })
@@ -72,5 +72,17 @@ for (const change of [GROWTH_CHANGES.EVOLVE, GROWTH_CHANGES.DEVOLVE]) {
     assert.ok(animatedMs(growthSchedule(change, reduced)) <= PIP_ANIMATION_MAX_MS, `${change} over the 3 s limit`)
   }
 }
+
+// The points pop over the bar
+const moveSteps = growthSchedule(GROWTH_CHANGES.MOVE, false)
+assert.deepEqual(growthGain(g({ points: 18, barCurrent: 3 }), g(), moveSteps), { text: '+3', gained: true, count: '6 / 21', delayMs: 0 })
+assert.deepEqual(growthGain(g(), g({ points: 18, barCurrent: 3 }), moveSteps), { text: '−3', gained: false, count: '3 / 21', delayMs: 0 })
+assert.equal(growthGain(g(), g({ lastDayScore: -3 }), moveSteps), null, 'a floored slip moves no points')
+assert.equal(growthGain(g({ form: 1, points: 12 }), g(), growthSchedule(GROWTH_CHANGES.EVOLVE, false)).delayMs, 2500, 'count waits for the evolve')
+assert.equal(growthGain(g({ form: 4, points: 87 }), BASILISK, growthSchedule(GROWTH_CHANGES.EVOLVE, false)), null, 'no pop into Basilisk — the bar goes away')
+assert.equal(growthGain(BASILISK, g({ form: 4, points: 87 }), growthSchedule(GROWTH_CHANGES.DEVOLVE, false)), null, 'no pop out of Basilisk')
+
+// pip-gain-count stays hidden for its first ~half, so the +3 must be gone by then.
+assert.ok(HEAD_BAR_GAIN_DELTA_MS <= HEAD_BAR_GAIN_MS / 2, 'the +3 would overlap the count')
 
 console.log('pipGrowth checks passed')

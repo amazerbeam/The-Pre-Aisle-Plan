@@ -22,6 +22,41 @@
   50% { fill: #ffd34d; }
 }
 
+/* The points pop: "+3" floats up and fades, then "3 / 15" takes its place and fades.
+   Durations come from HEAD_BAR_GAIN_DELTA_MS / HEAD_BAR_GAIN_MS via PipHeadBar; the count
+   also waits out any evolve (--pip-gain-delay). */
+.pip-head-bar-gain text {
+  text-anchor: middle;
+  font-weight: 800;
+  paint-order: stroke;
+  stroke: #fff;
+  stroke-linejoin: round;
+  opacity: 0;
+}
+
+.pip-head-bar-delta { animation: pip-gain-delta var(--pip-gain-delta-ms) ease-out 1 both; }
+.pip-head-bar-delta.is-up { fill: #3f8f27; }
+.pip-head-bar-delta.is-down { fill: #b5563a; }
+
+.pip-head-bar-count {
+  fill: #2f4a22;
+  animation: pip-gain-count var(--pip-gain-ms) ease-in-out var(--pip-gain-delay, 0ms) 1 both;
+}
+
+@keyframes pip-gain-delta {
+  0% { opacity: 0; transform: translateY(0); }
+  20% { opacity: 1; }
+  70% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(var(--pip-gain-rise)); }
+}
+
+/* Holds back until the +3 has gone (HEAD_BAR_GAIN_DELTA_MS is half of HEAD_BAR_GAIN_MS), then shows and fades. */
+@keyframes pip-gain-count {
+  0%, 45% { opacity: 0; }
+  55%, 85% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
 /* AC 6: the screen-reader progressbar is present but not painted. */
 .pip-head-bar-status {
   position: absolute;
@@ -40,4 +75,15 @@
     transition: none !important;
     animation: none !important;
   }
+
+  /* Still shown, just without the rise — the count's opacity fade is not motion. The landing
+     page's global reduced-motion rule shortens every animation to 0.01ms, which would end
+     these at opacity 0 before they are seen. */
+  .pip-head-bar-delta { animation-name: pip-gain-delta-still; animation-duration: var(--pip-gain-delta-ms) !important; }
+  .pip-head-bar-count { animation-duration: var(--pip-gain-ms) !important; }
+}
+
+@keyframes pip-gain-delta-still {
+  0%, 70% { opacity: 1; }
+  100% { opacity: 0; }
 }

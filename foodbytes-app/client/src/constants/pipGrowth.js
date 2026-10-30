@@ -59,3 +59,6 @@ export const HEAD_BAR_WIDTH = 30 // room-viewBox units — same on-screen size a
 export const HEAD_BAR_HEIGHT = 5 // room-viewBox units
 export const HEAD_BAR_GAP = 22 // herb units between the top of Pip's head and the bar's bottom edge; clears pip-bounce (−16px, 1.05 stretch)
 export const HEAD_BAR_FLASH_MS = 450 // the full bar fills, then flashes yellow, inside the 900 ms FILLING phase
+// The points pop over the bar: the "+3" floats up and fades, then the "3 / 15" count takes its place and fades.
+export const HEAD_BAR_GAIN_DELTA_MS = 1200 // the "+3"
+export const HEAD_BAR_GAIN_MS = 2400 // the count (after any evolve); usePipGrowth clears the pop once it has played

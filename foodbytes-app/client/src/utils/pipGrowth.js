@@ -65,6 +65,23 @@ export function growthView(phase, seen, growth) {
   }
 }
 
+/**
+ * The "+3" / "−3" and "3 / 15" that pop over the bar for a change; null when the points didn't move
+ * or either side has no bar (Basilisk), since there is nothing to pop over.
+ * The count waits out the animated steps (`delayMs`), so it reads beside the settled bar.
+ */
+export function growthGain(seen, growth, steps) {
+  const delta = growth.points - seen.points
+  if (!delta || seen.barSize == null || growth.barSize == null) return null
+  const delayMs = steps.filter(({ phase }) => phase !== REVEALED).reduce((sum, { ms }) => sum + ms, 0)
+  return {
+    text: delta > 0 ? `+${delta}` : `−${-delta}`,
+    gained: delta > 0,
+    count: `${growth.barCurrent} / ${growth.barSize}`,
+    delayMs
+  }
+}
+
 export const evolvingLine = (name) => `What? ${name} is evolving!`
 export const evolvedLine = (name, form) => `${name} evolved into ${PIP_FORM_NAMES[form]}! 🌱`
 export const devolvedLine = (form) => `I shrank back to ${PIP_FORM_NAMES[form]} 🌱 A few good days and I'll grow again!`
