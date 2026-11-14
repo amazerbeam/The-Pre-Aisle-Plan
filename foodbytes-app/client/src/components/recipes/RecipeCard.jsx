@@ -1,258 +1,88 @@
-import { useState, useMemo, useEffect, useRef } from 'react'
+import { useState } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import DayAssignmentButtons from './DayAssignmentButtons'
 import RecipeViewModal from './RecipeViewModal'
-import { MIN_SERVINGS, MAX_SERVINGS, SERVINGS_STEP } from '../../constants/servings'
-import { parseServings, formatServings, stepServings, resolveStartingServings } from '../../utils/servingsUtils'
+import RecipeCardMenu from './RecipeCardMenu'
+import VariantSegment from './VariantSegment'
+import ServingsChip from './ServingsChip'
+import MacroChips from '../common/MacroChips'
+import { MACRO_TARGETS } from '../../constants/macroTargets'
+import { resolveStartingServings } from '../../utils/servingsUtils'
+import { cardMacros } from '../../utils/recipeCatalogueUtils'
 import './RecipeCard.css'
 
-function RecipeCard({ recipe, currentMealType, onSelectVariant, onEdit }) {
+function RecipeCard({
+  recipe, currentMealType, inPlan, isHidden, canHide, onHide, onUnhide, onEdit, onSelectVariant, pickDate, onAssigned
+}) {
   const { isAdmin, defaultServings: userDefaultServings } = useAuth()
-  const [showDetails, setShowDetails] = useState(false)
-  // MPP-3: the user's preference moves the STARTING value only. scaleQuantity
-  // and perServingCalories below still divide by recipe.defaultServings — the
-  // scaling basis is the recipe's, not the user's (AC 7).
-  // Computed once (not inside two separate lazy-initializer closures) so both
-  // states seed from the identical value.
-  const startingServings = resolveStartingServings(recipe, userDefaultServings)
-  const [servings, setServings] = useState(() => startingServings)
-  // Display buffer so a partially-typed value ("0." ) doesn't clobber the numeric state
-  const [servingsDisplay, setServingsDisplay] = useState(() => formatServings(startingServings))
-  // FR-043: Track selected variant (default to current recipe)
+  // MPP-3: the user's preference moves the STARTING value only. Per-serving kcal still divides by
+  // recipe.defaultServings — the scaling basis is the recipe's, not the user's (AC 7).
+  const [servings, setServings] = useState(() => resolveStartingServings(recipe, userDefaultServings))
+  // FR-043: the selected variant (defaults to this recipe)
   const [selectedVariantId, setSelectedVariantId] = useState(recipe.id)
-  // FR-043: Track if calorie dropdown is open
-  const [showCalorieDropdown, setShowCalorieDropdown] = useState(false)
-  // Fullscreen recipe view state
   const [showFullscreen, setShowFullscreen] = useState(false)
-  const dropdownRef = useRef(null)
-
-  // FR-043: Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setShowCalorieDropdown(false)
-      }
-    }
-    if (showCalorieDropdown) {
-      document.addEventListener('mousedown', handleClickOutside)
-      return () => document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [showCalorieDropdown])
-
-  const scaleQuantity = (originalQty) => {
-    const scaled = (originalQty / recipe.defaultServings) * servings
-    // Round to 2 decimal places, but show as integer if whole number
-    return Number.isInteger(scaled) ? scaled : scaled.toFixed(2)
-  }
-
-  const handleServingsChange = (e) => {
-    setServingsDisplay(e.target.value)
-    const parsed = parseServings(e.target.value)
-    if (parsed !== null) setServings(parsed)
-  }
-
-  const handleServingsBlur = () => {
-    setServingsDisplay(formatServings(servings))
-  }
-
-  const adjustServings = (delta) => {
-    const next = stepServings(servings, delta)
-    setServings(next)
-    setServingsDisplay(formatServings(next))
-  }
 
   // FR-036: Fixed per-serving calories (does NOT scale with servings)
   const perServingCalories = Math.round(recipe.calories / recipe.defaultServings)
 
-  // FR-043: Check if recipe has variants
-  const hasVariants = recipe.variants && recipe.variants.length >= 2
+  const currentVariantCalories =
+    recipe.variants?.find((v) => v.recipeId === selectedVariantId)?.caloriesPerServing ?? perServingCalories
 
-  // FR-043: Sort variants by display order (Moderate first, then Light, then Balanced)
-  const sortedVariants = useMemo(() => {
-    if (!hasVariants) return []
-    return [...recipe.variants].sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0))
-  }, [recipe.variants, hasVariants])
-
-  // FR-043: Handle variant selection from calorie dropdown
-  const handleVariantSelect = (variantId) => {
-    setSelectedVariantId(variantId)
-    setShowCalorieDropdown(false)
-    if (variantId !== recipe.id && onSelectVariant) {
-      onSelectVariant(variantId, servings)
-    }
-  }
-
-  // FR-043: Get current variant's calories for display
-  const getCurrentVariantCalories = () => {
-    if (!hasVariants) return perServingCalories
-    const currentVariant = sortedVariants.find(v => v.recipeId === selectedVariantId)
-    return currentVariant ? currentVariant.caloriesPerServing : perServingCalories
-  }
-
-  // FR-013: Handle variant selection in fullscreen modal (update content in-place)
-  // RecipeViewModal now handles variant switching internally - just sync local state
+  // FR-013: the modal switches variants internally and stays open — just sync local state
   const handleModalVariantSelect = async (variantId) => {
-    // Sync local selectedVariantId state for consistency
-    // Modal fetches recipe data internally to stay open
     setSelectedVariantId(variantId)
   }
 
-  // Generate consistent stripe color based on recipe id
-  const stripeColors = ['purple', 'teal', 'coral', 'gold', 'blue', 'rose']
-  const stripeColor = stripeColors[recipe.id % stripeColors.length]
+  const macros = cardMacros(recipe, selectedVariantId)
 
   return (
-    <article className="recipe-card">
-      {/* Colored stripe at top */}
-      <div className={`card-stripe ${stripeColor}`}></div>
-
-      {/* Recipe title section */}
-      <div className="card-title-section">
-        <h3 className="recipe-name">{recipe.name}</h3>
+    <article className={`recipe-card ${inPlan ? 'is-in-plan' : ''} ${isHidden ? 'is-hidden' : ''}`}>
+      <div className="recipe-card-top">
+        <button type="button" className="recipe-card-name" onClick={() => setShowFullscreen(true)}>{recipe.name}</button>
         {recipe.isCheat && <span className="cheat-badge">Cheat</span>}
         {isAdmin && recipe.macrosAudited && (
           <span className="audited-badge" title="Macros and calories signed off">✓ Audited</span>
         )}
+        <RecipeCardMenu
+          recipeName={recipe.name}
+          isHidden={isHidden}
+          canHide={canHide}
+          isAdmin={isAdmin && !!onEdit}
+          onView={() => setShowFullscreen(true)}
+          onHide={() => onHide(recipe)}
+          onUnhide={() => onUnhide(recipe)}
+          onEdit={() => onEdit(selectedVariantId)}
+        />
       </div>
 
-      {/* Meta Pill Bar: Calories | Variant | Servings */}
-      <div className="meta-pill">
-        {/* FR-043: Calorie dropdown with variants */}
-        {hasVariants ? (
-          <div className="calorie-dropdown-container" ref={dropdownRef}>
-            <button
-              className="cal-dropdown"
-              onClick={() => setShowCalorieDropdown(!showCalorieDropdown)}
-              aria-expanded={showCalorieDropdown}
-              aria-haspopup="listbox"
-            >
-              {getCurrentVariantCalories()} cal
-              <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path d="M19 9l-7 7-7-7"/>
-              </svg>
-            </button>
-            {showCalorieDropdown && (
-              <ul className="calorie-dropdown-menu" role="listbox">
-                {sortedVariants.map((variant) => (
-                  <li
-                    key={variant.recipeId}
-                    className={`calorie-dropdown-item ${variant.recipeId === selectedVariantId ? 'selected' : ''}`}
-                    onClick={() => handleVariantSelect(variant.recipeId)}
-                    role="option"
-                    aria-selected={variant.recipeId === selectedVariantId}
-                  >
-                    <span className="variant-name">{variant.variantLabel || 'Moderate'}</span>
-                    <span className="variant-calories">{variant.caloriesPerServing} cal</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        ) : (
-          <button className="cal-dropdown" disabled>
-            {perServingCalories} cal
-          </button>
-        )}
-
-        {/* Variant label in center */}
-        <span className="variant-badge">
-          {recipe.variantLabel || 'Moderate'}
-        </span>
-
-        {/* Servings pill with +/- buttons */}
-        <div className="servings-pill">
-          <button
-            className="servings-btn"
-            onClick={() => adjustServings(-SERVINGS_STEP)}
-            disabled={servings <= MIN_SERVINGS}
-            aria-label="Decrease servings"
-          >
-            −
-          </button>
-          <input
-            type="number"
-            inputMode="decimal"
-            min={MIN_SERVINGS}
-            max={MAX_SERVINGS}
-            step={SERVINGS_STEP}
-            value={servingsDisplay}
-            onChange={handleServingsChange}
-            onBlur={handleServingsBlur}
-            className="servings-input"
-            aria-label="Number of servings"
-          />
-          <button
-            className="servings-btn"
-            onClick={() => adjustServings(SERVINGS_STEP)}
-            disabled={servings >= MAX_SERVINGS}
-            aria-label="Increase servings"
-          >
-            +
-          </button>
-        </div>
-      </div>
-
-      {/* FR-014, FR-015, FR-043: Day assignment buttons (hidden for guests) */}
-      <DayAssignmentButtons
-        recipe={recipe}
-        servings={servings}
-        currentMealType={currentMealType}
-        selectedRecipeId={selectedVariantId}
+      <VariantSegment
+        variants={recipe.variants || []}
+        selectedId={selectedVariantId}
+        onSelect={(id) => {
+          setSelectedVariantId(id)
+          if (id !== recipe.id) onSelectVariant?.(id, servings)
+        }}
+        fallbackKcal={perServingCalories}
       />
 
-      {/* Card footer with View Recipe and Edit buttons */}
-      <div className="card-footer">
-        <button
-          className="view-recipe-btn"
-          onClick={() => setShowFullscreen(true)}
-        >
-          View Recipe
-        </button>
-        {/* FR-033: Edit button for admins - uses selected variant ID */}
-        {isAdmin && onEdit && (
-          <button
-            className="edit-btn"
-            onClick={() => onEdit(selectedVariantId)}
-          >
-            Edit
-          </button>
-        )}
+      <div className="recipe-card-row">
+        {macros && <MacroChips macros={macros} targets={MACRO_TARGETS} />}
+        <ServingsChip servings={servings} onChange={setServings} />
+        {inPlan && <span className="in-plan-badge">In plan</span>}
       </div>
 
-      {/* Show Details button hidden - users can use fullscreen modal instead
-      <button
-        className="details-toggle"
-        onClick={() => setShowDetails(!showDetails)}
-      >
-        {showDetails ? 'Hide Details' : 'Show Details'}
-      </button>
-
-      {showDetails && (
-        <div className="recipe-details">
-          <div className="ingredients-section">
-            <h4>Ingredients</h4>
-            <ul className="ingredients-list">
-              {recipe.ingredients.map((ing, idx) => (
-                <li key={idx}>
-                  <span className="quantity">{scaleQuantity(ing.quantity)}</span>
-                  <span className="unit">{ing.unit}</span>
-                  <span className="ingredient-name">{ing.name}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="steps-section">
-            <h4>Instructions</h4>
-            <ol className="steps-list">
-              {recipe.steps.map((step, idx) => (
-                <li key={idx}>{step}</li>
-              ))}
-            </ol>
-          </div>
-        </div>
-      )}
-      */}
+      {isHidden
+        ? <button type="button" className="unhide-btn" onClick={() => onUnhide(recipe)}>👁 Unhide</button>
+        : (
+          <DayAssignmentButtons
+            recipe={recipe}
+            servings={servings}
+            currentMealType={currentMealType}
+            selectedRecipeId={selectedVariantId}
+            pickDate={pickDate}
+            onAssigned={onAssigned}
+          />
+        )}
 
       {/* FR-013, FR-102: Fullscreen Recipe View Modal with on-demand loading */}
       {showFullscreen && (
@@ -260,7 +90,7 @@ function RecipeCard({ recipe, currentMealType, onSelectVariant, onEdit }) {
           recipeId={selectedVariantId}
           recipeName={recipe.name}
           servings={servings}
-          caloriesPerServing={getCurrentVariantCalories()}
+          caloriesPerServing={currentVariantCalories}
           isCheat={recipe.isCheat}
           hasExtras={recipe.hasExtras}
           onClose={() => setShowFullscreen(false)}

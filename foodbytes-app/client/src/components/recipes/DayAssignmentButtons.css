@@ -1,83 +1,139 @@
-/* DayAssignmentButtons - Pill Bar Design
- * 7-column grid with calories inside each day button
+/* DayAssignmentButtons - day-name buttons (no kcal) or one picking-mode button.
+ * States: selected (this recipe), already-selected (another recipe holds the slot), unselected.
  */
 
 /* Days grid - 7 columns */
 .days-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 6px;
+  gap: 5px;
 }
 
-/* Day button - vertical layout with calories inside */
+/* The button is the 44px hit area; .day-btn-face is the 40px painted button inside it. */
 .day-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 8px 4px;
-  background: var(--bg-secondary, #f8f9fa);
-  border: 2px solid transparent;
-  border-radius: 10px;
+  min-height: 44px;
+  padding: 2px 0;
+  background: transparent;
+  border: 0;
+  font: inherit;
   cursor: pointer;
-  transition: all 0.15s;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.day-btn:hover {
+.day-btn-face {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  height: 40px;
+  background: #fff;
+  border: 1.5px solid var(--border-color, #dee2e6);
+  border-radius: 10px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary, #6c757d);
+}
+
+@media (hover: hover) {
+  .day-btn.unselected:hover .day-btn-face,
+  .day-btn.already-selected:hover .day-btn-face {
+    border-color: var(--brand-primary-light, #6b5fa0);
+    color: var(--brand-primary, #4a3f80);
+  }
+}
+
+.day-btn.unselected:active .day-btn-face,
+.day-btn.already-selected:active .day-btn-face {
   border-color: var(--brand-primary-light, #6b5fa0);
-  background: #f0eef5;
+  color: var(--brand-primary, #4a3f80);
 }
 
-/* Calorie value inside button */
-.day-cal {
-  font-size: 0.65rem;
-  font-weight: 600;
-  margin-bottom: 2px;
-  opacity: 0.9;
-}
-
-/* Day name inside button */
-.day-name {
-  font-size: 0.75rem;
-  font-weight: 600;
-}
-
-/* Selected state - THIS recipe is assigned (purple) */
-.day-btn.selected {
-  background: var(--brand-primary, #4a3f80);
-  color: white;
-}
-
-.day-btn.selected:hover {
-  background: var(--brand-primary-dark, #3a3266);
-  border-color: transparent;
-}
-
-.day-btn.selected .day-cal,
-.day-btn.selected .day-name {
-  color: white;
-}
-
-/* Unselected state - slot is available (gray) */
-.day-btn.unselected {
+/* Another recipe holds this slot: muted, with a dot top-right */
+.day-btn.already-selected .day-btn-face {
   background: var(--bg-secondary, #f8f9fa);
-  color: var(--text-primary, #2c3e50);
+  color: #9aa1a8;
 }
 
-/* Already-selected state - ANOTHER recipe is assigned (green) */
-.day-btn.already-selected {
-  background: #e8f5e9;
-  color: var(--text-primary, #2c3e50);
+.day-btn.already-selected .day-btn-face::after {
+  content: "";
+  position: absolute;
+  right: 5px;
+  top: 5px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #b8b2d6;
 }
 
-.day-btn.already-selected:hover {
-  background: #c8e6c9;
+/* THIS recipe is assigned */
+.day-btn.selected .day-btn-face {
+  background: var(--brand-primary, #4a3f80);
+  border-color: var(--brand-primary, #4a3f80);
+  color: #fff;
 }
 
-/* Disabled state */
-.day-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  pointer-events: none;
+.day-btn.selected .day-btn-face::before {
+  content: "✓ ";
+  white-space: pre;
+}
+
+@media (hover: hover) {
+  .day-btn.selected:hover .day-btn-face {
+    background: var(--brand-primary-dark, #3a3266);
+  }
+}
+
+.day-btn.selected:active .day-btn-face {
+  background: var(--brand-primary-dark, #3a3266);
+}
+
+.day-btn:focus-visible,
+.pick-btn:focus-visible {
+  outline: 2px solid var(--brand-primary, #4a3f80);
+  outline-offset: 2px;
+  border-radius: 10px;
+}
+
+/* Picking mode: one full-width button */
+.pick-btn {
+  width: 100%;
+  min-height: 44px;
+  border: none;
+  border-radius: 10px;
+  background: var(--brand-primary, #4a3f80);
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  font-size: 0.875rem;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pick-btn.selected {
+  background: var(--success, #28a745);
+}
+
+@media (hover: hover) {
+  .pick-btn:hover {
+    background: var(--brand-primary-dark, #3a3266);
+  }
+
+  .pick-btn.selected:hover {
+    background: var(--success, #28a745);
+    filter: brightness(0.92);
+  }
+}
+
+.pick-btn:active {
+  background: var(--brand-primary-dark, #3a3266);
+}
+
+.pick-btn.selected:active {
+  background: var(--success, #28a745);
+  filter: brightness(0.92);
 }
 
 /* Mobile responsive */
@@ -86,15 +142,7 @@
     gap: 4px;
   }
 
-  .day-btn {
-    padding: 6px 2px;
-  }
-
-  .day-cal {
-    font-size: 0.6rem;
-  }
-
-  .day-name {
-    font-size: 0.7rem;
+  .day-btn-face {
+    font-size: 0.72rem;
   }
 }

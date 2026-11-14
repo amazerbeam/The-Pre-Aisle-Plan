@@ -33,6 +33,9 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ShoppingListService {
 
+    /** The aggregator (and the plan-changed fingerprint) always cover startDate..startDate+6. */
+    public static final int WINDOW_DAYS = 7;
+
     private final MealPlanEntryRepository mealPlanEntryRepository;
     private final RecipeRepository recipeRepository;
     private final RecipeExtrasService recipeExtrasService;
@@ -80,7 +83,7 @@ public class ShoppingListService {
     public AggregatedShoppingListDTO getShoppingList(Long userId, LocalDate startDate) {
         Long effectiveOwnerId = getEffectiveMealPlanOwnerId(userId);
         // Calculate endDate = startDate + 7 days
-        LocalDate endDate = startDate.plusDays(7);
+        LocalDate endDate = startDate.plusDays(WINDOW_DAYS);
 
         // Fetch meal plan entries for user in date range
         List<MealPlanEntry> entries = mealPlanEntryRepository
@@ -256,7 +259,7 @@ public class ShoppingListService {
                                                           String unit, LocalDate startDate,
                                                           List<Long> sourceChain) {
         Long effectiveOwnerId = getEffectiveMealPlanOwnerId(userId);
-        LocalDate endDate = startDate.plusDays(7);
+        LocalDate endDate = startDate.plusDays(WINDOW_DAYS);
 
         // Fetch meal plan entries for user in date range
         List<MealPlanEntry> entries = mealPlanEntryRepository

@@ -1,80 +1,122 @@
-/* DateRangePicker - FR-007: Date range selector in header */
+/* DateRangePicker - FR-007: week pill in the header ("‹ 📅 Nov 9 – 15 ›") */
 
 .date-range-picker {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  background-color: transparent;
-  border-radius: 20px;
+  gap: 4px;
+  padding: 4px;
+  background: rgba(0, 0, 0, 0.18);
+  border-radius: 999px;
   font-size: 14px;
+}
+
+/* White range pill; the invisible native date input covers it */
+.date-range-pill {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--brand-primary);
   cursor: pointer;
-  transition: background-color 0.2s ease;
 }
 
-.date-range-picker:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+.date-range-pill:focus-within {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
 }
 
-.date-label {
-  color: rgba(255, 255, 255, 0.9);
+.date-range-text {
+  font-weight: 700;
   white-space: nowrap;
 }
 
 .date-input {
-  padding: 4px 8px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 4px;
-  background-color: rgba(255, 255, 255, 0.95);
-  color: #333;
-  font-size: 14px;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
   cursor: pointer;
+  touch-action: manipulation;
 }
 
-.date-input:focus {
-  outline: none;
-  border-color: #fff;
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+/* Week arrows: 32px visual circle inside a 44px hit area */
+.week-arrow {
+  position: relative;
+  isolation: isolate; /* keeps the circle behind the glyph */
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #fff;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.date-arrow {
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 16px;
+.week-arrow::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 32px;
+  height: 32px;
+  margin: -16px 0 0 -16px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+  z-index: -1;
 }
 
-.date-end {
-  color: rgba(255, 255, 255, 0.9);
-  font-weight: 500;
+.week-arrow:active::before {
+  background: rgba(255, 255, 255, 0.26);
+}
+
+.week-arrow:focus-visible,
+.this-week-btn:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+/* Yellow text link inside the pill, shown only when off the current week */
+.this-week-btn {
+  min-height: 44px;
+  padding: 0 10px 0 4px;
+  border: none;
+  background: transparent;
+  color: #ffd34d;
+  font-size: 12px;
+  font-weight: 700;
   white-space: nowrap;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
-/* Dropdown chevron */
-.date-range-picker .dropdown-chevron {
-  width: 16px;
-  height: 16px;
-  opacity: 0.7;
-  margin-left: 4px;
+.this-week-btn:active {
+  text-decoration: underline;
 }
 
-/* Mobile responsive */
-@media (max-width: 600px) {
+@media (hover: hover) {
+  .week-arrow:hover::before {
+    background: rgba(255, 255, 255, 0.26);
+  }
+
+  .this-week-btn:hover {
+    text-decoration: underline;
+  }
+}
+
+/* Mobile: the pill takes the whole second header row */
+@media (max-width: 767px) {
   .date-range-picker {
-    padding: 6px 10px;
-    gap: 4px;
-    font-size: 12px;
-  }
-
-  .date-label {
-    display: none; /* Hide label emoji on mobile to save space */
-  }
-
-  .date-input {
-    padding: 3px 6px;
-    font-size: 12px;
-    max-width: 110px;
-  }
-
-  .date-arrow {
-    font-size: 12px;
+    width: 100%;
   }
 }

@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Header and Logo</title>
+<style>
+:root{
+  --brand-primary:#4a3f80; --brand-primary-dark:#3a3266; --brand-primary-light:#6b5fa0; --brand-tint:#efedf7;
+  --pip-green:#7cc36b; --text-primary:#2c3e50; --text-secondary:#6c757d; --bg-secondary:#f8f9fa; --border-color:#e9ecef;
+  --shadow-lg:0 10px 25px rgba(0,0,0,.15);
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color:var(--text-primary);background:#e7e5ef}
+button{font:inherit;cursor:pointer}
+.chrome{position:sticky;top:0;z-index:200;background:#1f1a3a;color:#fff;display:flex;gap:8px;align-items:center;padding:10px 16px;flex-wrap:wrap}
+.chrome h1{font-size:15px;margin:0 12px 0 0;font-weight:600}
+.chrome .tab{background:transparent;border:1px solid #5b5390;color:#d9d4f5;border-radius:999px;padding:6px 14px;font-size:13px}
+.chrome .tab.on{background:#fff;color:#1f1a3a;border-color:#fff}
+.chrome .pick{margin-left:auto;display:flex;gap:6px;align-items:center;font-size:12px;color:#bdb6e6}
+.chrome .pick button{background:transparent;border:1px solid #5b5390;color:#d9d4f5;border-radius:8px;padding:5px 10px;font-size:12px}
+.chrome .pick button.on{background:#ffd34d;color:#1f1a3a;border-color:#ffd34d;font-weight:700}
+.view{display:none}.view.on{display:block}
+.marker{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:#ff4f8b;color:#fff;font-size:11px;font-weight:700;box-shadow:0 0 0 2px #fff;flex:none;cursor:pointer}
+
+/* ---------- NEW HEADER ---------- */
+.hdr{background:var(--brand-primary);color:#fff;position:relative;z-index:100;box-shadow:0 2px 10px rgba(0,0,0,.12)}
+.hdr-in{max-width:1200px;margin:0 auto;height:64px;display:flex;align-items:center;gap:16px;padding:0 20px}
+.brand{display:flex;align-items:center;gap:10px;background:none;border:none;color:#fff;padding:4px 8px 4px 0;border-radius:12px;min-height:44px}
+.brand .mark{width:40px;height:40px;flex:none;filter:drop-shadow(0 2px 4px rgba(0,0,0,.18))}
+.brand .word{font-size:19px;font-weight:800;letter-spacing:-.01em;white-space:nowrap}
+.brand .word span{font-weight:500;opacity:.85}
+.nav{display:flex;gap:4px;margin-left:8px}
+.nav a{color:#d9d4f5;text-decoration:none;font-size:15px;font-weight:600;padding:10px 14px;border-radius:10px;display:flex;gap:7px;align-items:center;min-height:44px}
+.nav a:hover{background:rgba(255,255,255,.1);color:#fff}
+.nav a.on{background:rgba(255,255,255,.16);color:#fff}
+.week{margin-left:auto;display:flex;align-items:center;gap:4px;background:rgba(0,0,0,.18);border-radius:999px;padding:4px}
+.week .ar{width:36px;height:36px;border-radius:50%;border:none;background:transparent;color:#fff;font-size:18px}
+.week .ar:hover{background:rgba(255,255,255,.14)}
+.week .rng{border:none;background:#fff;color:var(--brand-primary);font-weight:700;border-radius:999px;padding:8px 14px;font-size:14px;display:flex;gap:8px;align-items:center;white-space:nowrap}
+.week .tw{border:none;background:transparent;color:#ffd34d;font-weight:700;font-size:12px;padding:0 10px 0 4px}
+.acct{position:relative}
+.av{width:40px;height:40px;border-radius:50%;border:2px solid rgba(255,255,255,.5);background:linear-gradient(135deg,#f6a5c0,#7c5cd6);color:#fff;font-weight:700;display:grid;place-items:center;font-size:16px}
+.menu{position:absolute;right:0;top:calc(100% + 10px);width:300px;background:#fff;color:var(--text-primary);border-radius:14px;box-shadow:var(--shadow-lg);overflow:hidden;display:none}
+.menu.open{display:block}
+.menu .who{display:flex;gap:12px;align-items:center;padding:14px 16px;background:var(--brand-tint)}
+.menu .who b{display:block}.menu .who small{color:var(--text-secondary)}
+.menu .sec{padding:10px 16px;border-top:1px solid var(--border-color)}
+.menu .sec h5{margin:0 0 8px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-secondary)}
+.menu .row{display:flex;align-items:center;justify-content:space-between;font-size:14px;min-height:40px}
+.step{display:flex;align-items:center;gap:6px}
+.step button{width:32px;height:32px;border-radius:50%;border:1px solid var(--border-color);background:var(--bg-secondary)}
+.times{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.times label{font-size:11px;color:var(--text-secondary);display:flex;flex-direction:column;gap:2px}
+.times input{border:1px solid var(--border-color);border-radius:8px;padding:6px;font-size:13px;width:100%}
+.menu .item{display:flex;gap:10px;align-items:center;width:100%;border:none;background:none;padding:12px 16px;font-size:14px;text-align:left;border-top:1px solid var(--border-color)}
+.menu .item:hover{background:var(--bg-secondary)}
+.menu .out{color:#c0392b}
+.menu .ver{padding:8px 16px 12px;font-size:11px;color:var(--text-secondary);background:var(--bg-secondary)}
+
+/* page under header */
+.page{max-width:1200px;margin:0 auto;padding:28px 20px;color:var(--text-secondary)}
+.page .ghost{height:120px;border:2px dashed #d3cfe5;border-radius:14px;display:grid;place-items:center;margin-top:14px}
+.old{background:#fff;border-radius:14px;padding:16px;margin:0 auto 20px;max-width:1200px}
+.old h3{margin:0 0 8px;font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-secondary)}
+.oldbar{background:var(--brand-primary);padding:10px;border-radius:10px;display:flex;justify-content:center}
+.oldpill{background:var(--brand-primary-dark);border-radius:999px;display:flex;align-items:center;gap:40px;padding:5px 8px;color:#fff;font-size:14px;min-width:560px;justify-content:space-between}
+.oldlogo{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.1);display:grid;place-items:center}
+.oldlogo svg{width:16px;height:16px}
+.olddate{display:flex;gap:8px;align-items:center}.olddate span.in{background:#fff;color:#333;border-radius:4px;padding:4px 8px}
+
+/* mobile */
+.mobile-stage{display:flex;gap:40px;justify-content:center;align-items:flex-start;padding:28px 16px 60px;flex-wrap:wrap}
+.phone{width:390px;height:844px;border-radius:46px;background:#111;padding:12px;box-shadow:0 30px 60px rgba(0,0,0,.35);flex:none}
+.screen{width:100%;height:100%;border-radius:36px;overflow:hidden;background:var(--bg-secondary);position:relative;display:flex;flex-direction:column}
+.sb{height:34px;display:flex;justify-content:space-between;align-items:center;padding:0 26px;font-size:13px;font-weight:600;background:var(--brand-primary);color:#fff;flex:none}
+.mh{background:var(--brand-primary);color:#fff;padding:6px 12px 10px;flex:none;position:relative;z-index:5}
+.mh .r1{display:flex;align-items:center;gap:8px;height:48px}
+.mh .brand .mark{width:36px;height:36px}
+.mh .brand .word{font-size:17px}
+.mh .av{margin-left:auto;width:38px;height:38px}
+.mh .week{margin:6px 0 0;width:100%;justify-content:space-between}
+.mh .week .rng{flex:1;justify-content:center}
+.mh .menu{right:0;top:52px;width:calc(390px - 48px)}
+.mb{flex:1;padding:14px;color:var(--text-secondary);overflow:auto}
+.mb .ghost{height:150px;border:2px dashed #d3cfe5;border-radius:14px;display:grid;place-items:center;margin-bottom:12px}
+.mnav{position:absolute;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border-color);display:flex;justify-content:space-around;padding:8px 0 22px;font-size:11px;color:var(--text-secondary)}
+.mnav span{display:flex;flex-direction:column;align-items:center;gap:2px}.mnav .on{color:var(--brand-primary);font-weight:700}
+.notes{max-width:420px;font-size:14px;line-height:1.55;color:#2c2850}
+.notes h3{color:var(--brand-primary);margin-top:0}
+
+/* logo board */
+.board{max-width:1100px;margin:0 auto;padding:28px 20px 60px}
+.board h2{color:var(--brand-primary);margin:0 0 4px}
+.board .sub{color:var(--text-secondary);margin:0 0 18px}
+.opts{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.opt{background:#fff;border:2px solid transparent;border-radius:16px;padding:18px;cursor:pointer;text-align:left}
+.opt.on{border-color:#ffd34d;box-shadow:0 0 0 4px rgba(255,211,77,.35)}
+.opt .big{display:grid;place-items:center;height:170px;background:var(--brand-tint);border-radius:12px}
+.opt .big svg{width:120px;height:120px}
+.opt h4{margin:12px 0 4px}.opt p{margin:0;font-size:13px;color:var(--text-secondary);line-height:1.45}
+.sizes{background:#fff;border-radius:16px;padding:18px;margin-top:18px}
+.sizes h3{margin:0 0 12px;font-size:14px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-secondary)}
+.srow{display:flex;gap:28px;align-items:flex-end;flex-wrap:wrap}
+.scell{display:flex;flex-direction:column;align-items:center;gap:8px;font-size:12px;color:var(--text-secondary)}
+.dark{background:var(--brand-primary);padding:12px;border-radius:12px}
+.everywhere{display:grid;grid-template-columns:1.2fr 1fr;gap:16px;margin-top:18px}
+.card{background:#fff;border-radius:16px;padding:18px}
+.card h3{margin:0 0 12px;font-size:14px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-secondary)}
+.btab{display:flex;align-items:center;gap:8px;background:#dfe3ea;border-radius:10px 10px 0 0;padding:8px 12px;width:260px;font-size:13px}
+.btab svg{width:16px;height:16px;flex:none}
+.burl{background:#f1f3f6;padding:8px 12px;font-size:12px;color:#555;border-radius:0 0 10px 10px;width:420px;max-width:100%}
+.home{display:grid;grid-template-columns:repeat(4,64px);gap:16px;background:linear-gradient(160deg,#2b2b52,#5a3e7a);padding:18px;border-radius:18px;width:max-content}
+.app{display:flex;flex-direction:column;align-items:center;gap:5px;font-size:11px;color:#fff}
+.app .ic{width:58px;height:58px;border-radius:14px;overflow:hidden;background:#ccc}
+.app .ic.ours svg{width:58px;height:58px}
+.login{border:1px solid var(--border-color);border-radius:14px;padding:22px;text-align:center;max-width:320px}
+.login svg{width:72px;height:72px}
+.login h4{margin:10px 0 4px;color:var(--brand-primary);font-size:20px}
+.login p{margin:0 0 14px;font-size:13px;color:var(--text-secondary)}
+.gbtn{border:1px solid #dadce0;background:#fff;border-radius:999px;padding:10px 16px;font-weight:600;width:100%}
+
+/* proposal */
+.prop{max-width:980px;margin:0 auto;padding:32px 20px 80px;background:#fff;min-height:100vh}
+.prop h2{color:var(--brand-primary);font-size:30px;margin:0 0 6px}
+.prop .lede{color:var(--text-secondary);font-size:16px;line-height:1.6;max-width:760px}
+.audit{border:1px solid var(--border-color);border-radius:12px;overflow:hidden;margin:20px 0 30px}
+.audit table{width:100%;border-collapse:collapse;font-size:14px}
+.audit th,.audit td{padding:9px 12px;border-bottom:1px solid var(--border-color);text-align:left;vertical-align:top}
+.audit th{background:var(--bg-secondary);font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--text-secondary)}
+.pain{color:#c0392b;font-weight:600}
+.idea{border:1px solid var(--border-color);border-radius:14px;padding:18px 20px;margin:14px 0;display:grid;grid-template-columns:40px 1fr;gap:4px 14px}
+.idea .num{width:34px;height:34px;border-radius:50%;background:#ff4f8b;color:#fff;font-weight:700;display:grid;place-items:center}
+.idea h3{margin:4px 0 6px}.idea .pitch{font-size:15px;line-height:1.55;margin:8px 0 10px}
+.idea .cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:13px;line-height:1.5}
+.idea .cols div{background:var(--bg-secondary);border-radius:8px;padding:10px 12px}
+.idea .cols b{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-secondary);margin-bottom:3px}
+.tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;margin-right:6px;background:#e3f4e7;color:#1b6b2e}
+.spec{background:#1f1a3a;color:#e7e3ff;border-radius:14px;padding:18px 22px;margin-top:30px;font-size:14px;line-height:1.6}
+.spec h3{color:#fff;margin-top:0}.spec code{background:rgba(255,255,255,.1);padding:1px 5px;border-radius:4px}
+@media (max-width:900px){.opts,.everywhere{grid-template-columns:1fr}.nav{display:none}.oldpill{min-width:0}.idea .cols{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="chrome">
+  <h1>Header &amp; logo — mockup</h1>
+  <button class="tab on" data-view="web">Web header</button>
+  <button class="tab" data-view="mobile">Mobile header</button>
+  <button class="tab" data-view="logo">Logo everywhere</button>
+  <button class="tab" data-view="proposal">Proposal</button>
+  <div class="pick">Logo: <button data-logo="a">A · Calendar P</button><button data-logo="b">B · Pantry jar</button><button data-logo="c">C · Plate P</button></div>
+</div>
+
+<!-- WEB -->
+<section class="view on" id="v-web">
+  <div class="old"><h3>Today</h3>
+    <div class="oldbar"><div class="oldpill"><div class="oldlogo" id="oldLogo"></div>
+      <div class="olddate">📅 From: <span class="in">09/11/2026 ▾</span> → Nov 15</div><div class="oldlogo" style="background:#fff;color:#4a3f80;font-weight:700">J</div></div></div>
+  </div>
+  <div style="max-width:1200px;margin:0 auto 6px;padding:0 4px;font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-secondary);font-weight:700">Proposed</div>
+  <header class="hdr"><div class="hdr-in">
+    <span class="marker" data-goto="1">1</span>
+    <button class="brand" title="Go to Recipes"><span class="logo-slot mark"></span><span class="word">My Pantry <span>Plan</span></span></button>
+    <span class="marker" data-goto="3">3</span>
+    <nav class="nav"><a class="on" href="#">☰ Recipes</a><a href="#">📅 Meal Plan</a><a href="#">🌱 Pip</a><a href="#">🛒 Shopping</a></nav>
+    <span class="marker" data-goto="4" style="margin-left:auto">4</span>
+    <div class="week" style="margin-left:0"><button class="ar" title="Previous week">‹</button><button class="rng">📅 Nov 9 – 15</button><button class="ar" title="Next week">›</button></div>
+    <div class="acct"><span class="marker" data-goto="5" style="position:absolute;left:-14px;top:-6px">5</span><button class="av" onclick="toggleMenu(this)">J</button>
+      <div class="menu" onclick="event.stopPropagation()">
+        <div class="who"><div class="av">J</div><div><b>Your name</b><small>you@example.com</small></div></div>
+        <div class="sec"><h5>Portions</h5><div class="row">Default servings when adding<div class="step"><button>−</button><b>2</b><button>+</button></div></div></div>
+        <div class="sec"><h5>Meal times</h5><div class="times"><label>Breakfast<input value="08:00"></label><label>Lunch<input value="13:00"></label><label>Dinner<input value="19:00"></label></div></div>
+        <button class="item out">↩ Sign out</button>
+        <div class="ver">v1.29.0 · web 14 Nov 13:02 · api 14 Nov 12:58</div>
+      </div></div>
+  </div></header>
+  <div class="page">Page content (Recipes / Meal Plan / …) starts here. On desktop the bottom nav bar goes away, because the four sections now sit in the header.
+    <div class="ghost">page</div></div>
+</section>
+
+<!-- MOBILE -->
+<section class="view" id="v-mobile">
+  <div class="mobile-stage">
+    <div class="phone"><div class="screen">
+      <div class="sb"><span>13:40</span><span>▮▮▮ 40%</span></div>
+      <div class="mh">
+        <div class="r1"><button class="brand"><span class="logo-slot mark"></span><span class="word">My Pantry <span>Plan</span></span></button>
+          <div class="acct" style="margin-left:auto"><button class="av" onclick="toggleMenu(this)">J</button>
+            <div class="menu" onclick="event.stopPropagation()">
+              <div class="who"><div class="av">J</div><div><b>Your name</b><small>you@example.com</small></div></div>
+              <div class="sec"><h5>Portions</h5><div class="row">Default servings<div class="step"><button>−</button><b>2</b><button>+</button></div></div></div>
+              <div class="sec"><h5>Meal times</h5><div class="times"><label>Breakfast<input value="08:00"></label><label>Lunch<input value="13:00"></label><label>Dinner<input value="19:00"></label></div></div>
+              <button class="item out">↩ Sign out</button>
+              <div class="ver">v1.29.0 · web 14 Nov 13:02 · api 14 Nov 12:58</div>
+            </div></div></div>
+        <div class="week"><button class="ar">‹</button><button class="rng">📅 Nov 9 – 15 · This week</button><button class="ar">›</button></div>
+      </div>
+      <div class="mb"><div class="ghost">page content</div><div class="ghost">page content</div><div class="ghost">page content</div></div>
+      <div class="mnav"><span class="on">☰<br>Recipes</span><span>📅<br>Meal Plan</span><span>🌱<br>Pip</span><span>🛒<br>Shopping</span></div>
+    </div></div>
+    <div class="notes">
+      <h3>Mobile header</h3>
+      <p>Today the mobile header is one row: a 16px logo in a big circle, a native date box that shows the full date <code>09/11/2026 ▾</code>, and the avatar. The logo is unreadable, and the date box is the widest thing on the screen.</p>
+      <p><b>Proposed:</b> two compact rows, 98px in total.</p>
+      <ul>
+        <li><b>Row 1:</b> the 36px logo mark and the "My Pantry Plan" wordmark, with the avatar on the right.</li>
+        <li><b>Row 2:</b> a full-width week pill, "‹ Nov 9 – 15 · This week ›". Tap the middle to open the date picker.</li>
+      </ul>
+      <p>The bottom nav stays on phones, where it belongs. Tap the avatar to see the new account menu.</p>
+    </div>
+  </div>
+</section>
+
+<!-- LOGO -->
+<section class="view" id="v-logo">
+  <div class="board">
+    <h2>Pick a logo</h2>
+    <p class="sub">Click a card (or use the yellow buttons at the top). Every preview in this file switches to the one you pick.</p>
+    <div class="opts">
+      <button class="opt" data-logo="a"><div class="big" data-logo-big="a"></div><h4>A · Calendar P, bold</h4><p>Keeps today's idea (a plan on a calendar) so nobody has to relearn it. Thick strokes, a heavy sans "P" and a solid white tile mean it survives at 16px.</p></button>
+      <button class="opt" data-logo="b"><div class="big" data-logo-big="b"></div><h4>B · Pantry jar + sprout</h4><p>Says "pantry" literally. The sprout links to Pip and to cooking fresh. Friendlier, and it reads as food rather than as a calendar app.</p></button>
+      <button class="opt" data-logo="c"><div class="big" data-logo-big="c"></div><h4>C · Plate P ✓ chosen 2026-11-14</h4><p>A plate seen from above, with the "P" as the meal and a leaf garnish. Simplest silhouette of the three, so it's strongest as a favicon and app icon.</p></button>
+    </div>
+    <div class="sizes"><h3>At every size it's used</h3>
+      <div class="srow">
+        <div class="scell"><span class="logo-slot" style="width:16px;height:16px"></span>16 · favicon</div>
+        <div class="scell"><span class="logo-slot" style="width:32px;height:32px"></span>32 · tab @2x</div>
+        <div class="scell dark"><span class="logo-slot" style="width:36px;height:36px"></span><span style="color:#fff">36 · mobile header</span></div>
+        <div class="scell dark"><span class="logo-slot" style="width:40px;height:40px"></span><span style="color:#fff">40 · web header</span></div>
+        <div class="scell"><span class="logo-slot" style="width:72px;height:72px"></span>72 · sign-in</div>
+        <div class="scell"><span class="logo-slot" style="width:120px;height:120px"></span>120 · landing</div>
+        <div class="scell"><span class="logo-slot" style="width:180px;height:180px"></span>180 · iPhone home screen</div>
+      </div>
+    </div>
+    <div class="everywhere">
+      <div class="card"><h3>Browser tab + home screen</h3>
+        <div class="btab"><span class="logo-slot"></span>My Pantry Plan<span style="margin-left:auto;color:#888">×</span></div>
+        <div class="burl">🔒 mypantryplan.com/mealplan</div>
+        <div style="height:16px"></div>
+        <div class="home">
+          <div class="app"><div class="ic" style="background:#4285f4"></div>Maps</div>
+          <div class="app"><div class="ic ours logo-slot"></div>Pantry Plan</div>
+          <div class="app"><div class="ic" style="background:#25d366"></div>Chat</div>
+          <div class="app"><div class="ic" style="background:#ff9500"></div>Notes</div>
+        </div>
+        <p style="font-size:12px;color:var(--text-secondary)">Today there's no home-screen icon at all. A phone uses a screenshot or a blank letter instead.</p>
+      </div>
+      <div class="card"><h3>Sign-in modal</h3>
+        <div class="login"><span class="logo-slot" style="display:inline-block;width:72px;height:72px"></span><h4>Welcome to My Pantry Plan</h4><p>Plan the week, shop once, cook it.</p><button class="gbtn">G&nbsp; Continue with Google</button></div>
+        <p style="font-size:12px;color:var(--text-secondary)">Today: no logo, just the heading.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROPOSAL -->
+<section class="view" id="v-proposal">
+  <div class="prop">
+    <h2>Header &amp; logo: make the brand visible and the bar useful</h2>
+    <p class="lede">The logo is drawn with thin strokes at 32px inside a translucent circle, so on screen it shows as a smudge. It's the only branding in the app: the tab title says "Recipe Viewer", the sign-in screen has no mark, and phones get no home-screen icon. Meanwhile the bar's middle is a raw date box. These ideas give the app a name you can see and a header that helps you get around.</p>
+    <h3>What's there today</h3>
+    <div class="audit"><table>
+      <tr><th>Element</th><th>Today</th><th>Problem</th></tr>
+      <tr><td>Logo</td><td>Calendar + serif "P", 6-unit strokes in a 100 viewBox, drawn at 32px in a 44px translucent circle</td><td class="pain">Strokes render about 2px wide, white on purple at 10% contrast. It reads as a dot.</td></tr>
+      <tr><td>Name</td><td>Nowhere in the header</td><td class="pain">There's no wordmark, so first-time users don't learn the app's name</td></tr>
+      <tr><td>Favicon</td><td>Same drawing, purple <code>#6B46C1</code> (not the brand <code>#4a3f80</code>)</td><td class="pain">Unreadable at 16px, and the wrong purple</td></tr>
+      <tr><td>Tab title</td><td>"My Pantry Plan - Recipe Viewer"</td><td>"Recipe Viewer" is out of date: the app plans, shops and has Pip</td></tr>
+      <tr><td>Home-screen / PWA icon</td><td>None</td><td class="pain">"Add to Home Screen" gives a generic letter tile</td></tr>
+      <tr><td>Sign-in modal, landing</td><td>No logo</td><td>A missed first impression</td></tr>
+      <tr><td>Date control</td><td>Native <code>From: 09/11/2026 ▾ → Nov 15</code></td><td class="pain">Wide, US/EU format ambiguity (is 09/11 9 Nov or Sep 11?), no prev/next</td></tr>
+      <tr><td>Desktop nav</td><td>A phone-style bottom bar on a 1920px screen</td><td>Navigation sits as far as possible from where you're looking</td></tr>
+      <tr><td>Account menu</td><td>Name, email, portions, meal times, sign out, version, stacked</td><td>Works, but has no grouping; sign out sits mid-list</td></tr>
+    </table></div>
+    <h3>The ideas</h3>
+    <div id="ideas"></div>
+    <div class="spec"><h3>Spec panel (please red-line)</h3>
+      <ul>
+        <li><b>Chosen logo: C · Plate P</b> (2026-11-14): a purple <code>#4a3f80</code> rounded tile, a white plate, a purple "P" as the meal, and a Pip-green leaf.</li>
+        <li><b>One logo source:</b> a <code>BrandMark</code> React component (an inline SVG with a <code>size</code> prop, solid white tile + brand glyph) used in the header, sign-in modal and landing. Static exports (<code>favicon.svg</code>, <code>apple-touch-icon.png</code> 180, <code>icon-192.png</code>, <code>icon-512.png</code>, <code>icon-maskable-512.png</code>) are generated from the same SVG.</li>
+        <li><b>Sizes:</b> 40px web header, 36px mobile header, 72px sign-in, 120px landing, 16/32 favicon, 180 Apple, 192/512 PWA. The mark never sits inside a translucent circle again; it <i>is</i> the tile.</li>
+        <li><b>Colours:</b> the brand purple <code>#4a3f80</code> (replacing the favicon's <code>#6B46C1</code>), white tile, Pip green <code>#7cc36b</code> only for the sprout/leaf accent (B, C).</li>
+        <li><b>Wordmark:</b> "My Pantry <b>Plan</b>", system font, 800/500 weights. It shows on desktop and on phones ≥360px wide; below that, the mark only.</li>
+        <li><b>Header height:</b> 64px on web, 98px on mobile (two rows). The header stays the z-index 100 stacking context (see the comment in <code>Header.css</code>).</li>
+        <li><b>Desktop nav in the header</b> from 1024px up. The bottom <code>Footer</code> nav hides at that width; below it, nothing changes.</li>
+        <li><b>The week control</b> is the one from the Meal Plan redesign (Task 12), just restyled here as a pill. It's the same component, not a second one.</li>
+        <li><b>Tab title:</b> "My Pantry Plan", plus the section name per route ("Meal Plan · My Pantry Plan").</li>
+        <li>The account menu keeps every control it has today (DefaultPortionsControl, MealTimesControl, Sign out, VersionInfo); only the grouping and order change.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<script>
+const P='#4a3f80', G='#7cc36b';
+const LOGOS={
+ a:(s)=>`<svg viewBox="0 0 100 100" width="${s}" height="${s}" aria-hidden="true"><rect width="100" height="100" rx="24" fill="#fff"/>
+   <rect x="18" y="24" width="64" height="58" rx="10" fill="none" stroke="${P}" stroke-width="9"/>
+   <rect x="18" y="24" width="64" height="16" rx="8" fill="${P}"/>
+   <rect x="31" y="14" width="9" height="18" rx="4.5" fill="${P}"/><rect x="60" y="14" width="9" height="18" rx="4.5" fill="${P}"/>
+   <path d="M41 74V47h12a9 9 0 0 1 0 18H41" fill="none" stroke="${P}" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"/></svg>`,
+ b:(s)=>`<svg viewBox="0 0 100 100" width="${s}" height="${s}" aria-hidden="true"><rect width="100" height="100" rx="24" fill="#fff"/>
+   <rect x="30" y="14" width="40" height="12" rx="4" fill="${P}"/>
+   <path d="M27 30h46a6 6 0 0 1 6 6v42a10 10 0 0 1-10 10H31a10 10 0 0 1-10-10V36a6 6 0 0 1 6-6z" fill="none" stroke="${P}" stroke-width="8"/>
+   <path d="M50 78V55" stroke="${G}" stroke-width="7" stroke-linecap="round"/>
+   <path d="M50 60c-3-11-12-15-20-14 1 9 8 15 20 14z" fill="${G}"/><path d="M50 56c2-10 10-14 18-13-1 8-7 13-18 13z" fill="${G}"/></svg>`,
+ c:(s)=>`<svg viewBox="0 0 100 100" width="${s}" height="${s}" aria-hidden="true"><rect width="100" height="100" rx="24" fill="${P}"/>
+   <circle cx="50" cy="52" r="33" fill="#fff"/><circle cx="50" cy="52" r="24" fill="none" stroke="#e3dff2" stroke-width="3"/>
+   <path d="M42 70V36h12a10 10 0 0 1 0 20H42" fill="none" stroke="${P}" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"/>
+   <path d="M66 30c-8-1-14 4-14 11 8 1 14-4 14-11z" fill="${G}"/></svg>`
+};
+const OLD=`<svg viewBox="0 0 100 100" fill="none" style="color:#fff"><rect x="15" y="20" width="70" height="65" rx="8" stroke="currentColor" stroke-width="6"/><line x1="15" y1="38" x2="85" y2="38" stroke="currentColor" stroke-width="6"/><line x1="30" y1="12" x2="30" y2="28" stroke="currentColor" stroke-width="6" stroke-linecap="round"/><line x1="70" y1="12" x2="70" y2="28" stroke="currentColor" stroke-width="6" stroke-linecap="round"/><text x="50" y="70" font-family="Georgia, serif" font-size="32" font-weight="bold" fill="currentColor" text-anchor="middle">P</text></svg>`;
+document.getElementById('oldLogo').innerHTML=OLD;
+let cur='c';
+function paint(){
+  document.querySelectorAll('.logo-slot').forEach(el=>{const w=el.offsetWidth||parseInt(el.style.width)||40;el.innerHTML=LOGOS[cur]('100%');el.style.display=el.style.display||'inline-block';el.firstChild.style.display='block'});
+  document.querySelectorAll('[data-logo-big]').forEach(el=>el.innerHTML=LOGOS[el.dataset.logoBig]('120'));
+  document.querySelectorAll('[data-logo]').forEach(b=>b.classList.toggle('on',b.dataset.logo===cur));
+  const link=document.querySelector('link[rel=icon]')||Object.assign(document.head.appendChild(document.createElement('link')),{rel:'icon'});
+  link.href='data:image/svg+xml,'+encodeURIComponent(LOGOS[cur](64));
+}
+document.querySelectorAll('[data-logo]').forEach(b=>b.addEventListener('click',()=>{cur=b.dataset.logo;paint()}));
+function toggleMenu(btn){event.stopPropagation();const m=btn.parentNode.querySelector('.menu');const o=m.classList.contains('open');document.querySelectorAll('.menu.open').forEach(x=>x.classList.remove('open'));if(!o)m.classList.add('open')}
+document.addEventListener('click',()=>document.querySelectorAll('.menu.open').forEach(x=>x.classList.remove('open')));
+document.querySelectorAll('.chrome .tab').forEach(b=>b.onclick=()=>show(b.dataset.view));
+function show(v){document.querySelectorAll('.chrome .tab').forEach(x=>x.classList.toggle('on',x.dataset.view===v));document.querySelectorAll('.view').forEach(x=>x.classList.toggle('on',x.id==='v-'+v));scrollTo(0,0);paint()}
+document.addEventListener('click',e=>{const m=e.target.closest('.marker');if(m){e.stopPropagation();show('proposal');setTimeout(()=>document.getElementById('idea'+m.dataset.goto).scrollIntoView({behavior:'smooth',block:'center'}),50)}},true);
+const IDEAS=[
+ {t:'A logo you can actually see',pitch:'The mark becomes its own solid white tile with a bold purple glyph: 40px on web, 36px on phones. No translucent circle, no 2px strokes. Pick A, B or C at the top of this page. All three are built to stay readable at 16px.',why:'It\'s the only branding in the app, and today it reads as a dot. A tile also gives you a ready-made app icon.',cost:'One <code>BrandMark</code> component plus a refreshed <code>favicon.svg</code>. Frontend only.'},
+ {t:'The name next to it',pitch:'"My Pantry Plan" sits beside the mark (Pantry Plan in two weights). Clicking either still goes to Recipes, as today (FR-039). On very narrow phones (<360px) only the mark shows.',why:'People remember names, not icons. It also tells a first-time user, or a partner you\'ve shared the plan with, which app they\'re in.',cost:'Frontend, CSS only.'},
+ {t:'Desktop: navigation in the header',pitch:'From 1024px up, Recipes / Meal Plan / Pip / Shopping move into the header as tabs, with the current one highlighted, and the bottom bar disappears. Phones keep the bottom bar.',why:'On a 1920px monitor the bottom bar is a phone pattern stretched across the floor of the screen. Top tabs are where desktop users look first, and it frees 70px of height on every page.',cost:'Frontend. <code>Footer</code> gets a ≥1024px hide; <code>Header</code> renders the same four links (one shared route list in <code>constants/</code>).'},
+ {t:'A week pill instead of a date box',pitch:'"From: 09/11/2026 ▾ → Nov 15" becomes "‹ Nov 9 – 15 ›". The arrows step a week, and tapping the middle opens the date picker. On phones it gets its own full-width row and adds "This week" when you\'re on it.',why:'The raw date is ambiguous (9 Nov or Sep 11?) and wide. This is the same week control as the Meal Plan redesign, so both plans line up.',cost:'Frontend. It restyles the <code>DateRangePicker</code> already being extended in the Meal Plan contract (Task 12), so there\'s no second component.'},
+ {t:'A tidier account menu',pitch:'Your name and email in a tinted header, then grouped sections: <b>Portions</b> (default servings), <b>Meal times</b> (three time boxes side by side), <b>Sign out</b> in red at the bottom, and the version line underneath.',why:'Same controls, but you can find each one at a glance, and sign out is no longer in the middle where it can be tapped by accident.',cost:'Frontend. It re-lays out <code>DefaultPortionsControl</code> / <code>MealTimesControl</code> / <code>VersionInfo</code> without changing their logic.'},
+ {t:'The logo everywhere else too',pitch:'The same mark goes on the browser tab (16/32), the iPhone/Android home screen (180/192/512 + maskable), the sign-in modal (72px) and the landing page (120px). The tab title becomes "My Pantry Plan", or "Meal Plan · My Pantry Plan" per page.',why:'"Fix it everywhere": right now the brand appears in exactly one tiny spot. A home-screen icon also makes the app feel installed rather than like a bookmark.',cost:'Frontend + static assets: PNGs exported from the SVG into <code>public/icons/</code>, Apple meta tags in <code>index.html</code>, and a per-route <code>document.title</code>. The full PWA install (service worker) stays out of scope.'},
+];
+document.getElementById('ideas').innerHTML=IDEAS.map((x,i)=>`<div class="idea" id="idea${i+1}"><div class="num">${i+1}</div><div><h3>${x.t}</h3><span class="tag">Frontend only</span><p class="pitch">${x.pitch}</p><div class="cols"><div><b>Why it's worth it</b>${x.why}</div><div><b>What it costs</b>${x.cost}</div></div></div></div>`).join('');
+paint();
+</script>
+</body>
+</html>

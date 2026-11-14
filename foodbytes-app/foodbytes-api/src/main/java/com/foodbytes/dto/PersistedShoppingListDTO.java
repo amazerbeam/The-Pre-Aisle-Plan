@@ -25,4 +25,5 @@ public class PersistedShoppingListDTO {
     private List<PersistedShoppingAisleDTO> aisles;
     private Integer totalItems;
     private Integer checkedItems;
+    private Boolean planChangedSinceGenerated;   // false when the list predates fingerprints
 }

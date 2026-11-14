@@ -1,0 +1,12 @@
+.macro-chips { display: inline-flex; gap: 4px; flex-wrap: wrap; }
+.macro-chip { font-size: 11px; font-weight: 600; padding: 2px 6px; border-radius: 999px; white-space: nowrap; }
+.macro-chip--under { background: var(--macro-under-target-pill-bg); color: var(--macro-under-target-pill-text); }
+.macro-chip--near  { background: var(--macro-near-target-pill-bg);  color: var(--macro-near-target-pill-text); }
+.macro-chip--on    { background: var(--macro-on-target-pill-bg);    color: var(--macro-on-target-pill-text); }
+.macro-chip--over  { background: var(--macro-over-target-pill-bg);  color: var(--macro-over-target-pill-text); }
+.macro-chips--onDark .macro-chip { background: #fff; }
+.macro-chips--large .macro-chip { font-size: 14px; padding: 4px 10px; }
+.macro-chip--button { border: none; font-family: inherit; cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+.macro-chip--button:focus-visible { outline: 2px solid var(--pip-focus-ring-on-dark, #ffd34d); outline-offset: 2px; }
+.macro-chips--header .macro-chip { background: #fff; display: inline-flex; gap: 5px; align-items: center; font-size: 13px; font-weight: 700; min-height: 32px; padding: 5px 11px; }
+.macro-chips--header .macro-chip::before { content: ''; width: 9px; height: 9px; border-radius: 50%; background: currentColor; }

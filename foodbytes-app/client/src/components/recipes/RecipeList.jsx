@@ -1,190 +1,121 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useState } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import { useMealPlan } from '../../contexts/MealPlanContext'
+import usePickingMode from '../../hooks/usePickingMode'
+import useRecipeCatalogue from '../../hooks/useRecipeCatalogue'
+import useHiddenRecipes from '../../hooks/useHiddenRecipes'
 import recipeService from '../../services/recipeService'
+import { RECIPE_TAB_LABELS } from '../../constants/recipesUi'
+import { hideKeyOf, recipeIdsInWeek } from '../../utils/recipeCatalogueUtils'
 import RecipeCard from './RecipeCard'
+import RecipeToolbar from './RecipeToolbar'
+import WeekSlotStrip from './WeekSlotStrip'
+import PickingBanner from './PickingBanner'
+import RecipeViewModal from './RecipeViewModal'
 import RecipeEditModal from '../admin/RecipeEditModal'
+import UndoToast from '../common/UndoToast'
 import './RecipeList.css'
 
-const MEAL_TYPES = ['breakfast', 'lunch', 'dinner', 'snacks', 'extras']
-
 function RecipeList() {
-  const { isAdmin } = useAuth()
+  const { isAdmin, isAuthenticated } = useAuth()
   const { weekPlan } = useMealPlan()
-  const [searchParams, setSearchParams] = useSearchParams()
-  const [recipes, setRecipes] = useState([])
-
-  // Read initial meal type from URL params, default to 'breakfast'
-  const urlMealType = searchParams.get('mealType')
-  const initialMeal = MEAL_TYPES.includes(urlMealType) ? urlMealType : 'breakfast'
-  const [activeMeal, setActiveMeal] = useState(initialMeal)
-
-  // Clear the mealType param from URL after reading it (keeps URL clean)
-  useEffect(() => {
-    if (urlMealType && MEAL_TYPES.includes(urlMealType)) {
-      searchParams.delete('mealType')
-      setSearchParams(searchParams, { replace: true })
-    }
-  }, []) // Run once on mount
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-  // FR-033: Admin edit modal state
+  const { activeMeal, setActiveMeal, pickDate, startPicking, finishPicking } = usePickingMode()
+  const { recipesByMeal, loading, error, reload } = useRecipeCatalogue({ isAdmin })
+  const hidden = useHiddenRecipes({ isAuthenticated })
+  const [query, setQuery] = useState('')
+  const [showHidden, setShowHidden] = useState(false)
+  const [openRecipeEntry, setOpenRecipeEntry] = useState(null) // strip -> RecipeViewModal
+  // FR-043: a selected variant replaces its family's card; keyed by the family's hide key
+  const [overrides, setOverrides] = useState({})
+  // FR-033 / FR-047: admin edit modal state
   const [editingRecipeId, setEditingRecipeId] = useState(null)
   const [showNewRecipe, setShowNewRecipe] = useState(false)
 
-  // FR-101: Use ref to track weekPlan without causing callback recreation
-  // This breaks the dependency chain that causes double spinner
-  const weekPlanRef = useRef(weekPlan)
-  useEffect(() => {
-    weekPlanRef.current = weekPlan
-  }, [weekPlan])
+  const planIds = recipeIdsInWeek(weekPlan)
+  const mealLabel = RECIPE_TAB_LABELS[activeMeal]
 
-  /**
-   * FR-101: Get all recipe IDs currently in the user's meal plan.
-   * Uses ref instead of direct dependency to avoid recreation on weekPlan changes.
-   */
-  const getMealPlanRecipeIds = useCallback(() => {
-    const currentWeekPlan = weekPlanRef.current
-    if (!currentWeekPlan?.days) return new Set()
+  const visible = (recipesByMeal[activeMeal] || [])
+    .map((r) => overrides[hideKeyOf(r)] ?? r)
+    .filter((r) => (showHidden ? hidden.isHidden(r) : !hidden.isHidden(r)))
+    .filter((r) => r.name.toLowerCase().includes(query.trim().toLowerCase()))
+  const visibleCounts = Object.fromEntries(
+    Object.entries(recipesByMeal).map(([k, list]) => [k, list.filter((r) => !hidden.isHidden(r)).length])
+  )
+  const hiddenCount = new Set(
+    Object.values(recipesByMeal).flat().filter(hidden.isHidden).map(hideKeyOf)
+  ).size
+  const inPlan = (r) => [r.id, ...(r.variants || []).map((v) => v.recipeId)].some((id) => planIds.has(id))
 
-    const recipeIds = new Set()
-    currentWeekPlan.days.forEach(day => {
-      if (day.mealsByType) {
-        Object.values(day.mealsByType).forEach(entries => {
-          entries.forEach(entry => {
-            if (entry.recipe?.id) {
-              recipeIds.add(entry.recipe.id)
-            }
-          })
-        })
-      }
-    })
-    return recipeIds
-  }, []) // Empty deps - reads from ref
-
-  /**
-   * FR-102: Swap recipes with variants if the variant is in the meal plan.
-   * Uses summary data - only needs to check variant IDs, no full data fetch needed.
-   */
-  const swapWithMealPlanVariants = useCallback((loadedRecipes) => {
-    const mealPlanRecipeIds = getMealPlanRecipeIds()
-    if (mealPlanRecipeIds.size === 0) return loadedRecipes
-
-    return loadedRecipes.map((recipe) => {
-      // Check if this recipe has variants
-      if (!recipe.variants || recipe.variants.length < 2) return recipe
-
-      // Check if any variant (other than current) is in the meal plan
-      const variantInPlan = recipe.variants.find(
-        v => v.recipeId !== recipe.id && mealPlanRecipeIds.has(v.recipeId)
-      )
-
-      if (variantInPlan) {
-        // FR-102: Create a summary-like object from variant info
-        // This avoids needing to fetch full recipe data
-        return {
-          ...recipe,
-          id: variantInPlan.recipeId,
-          name: variantInPlan.recipeName,
-          variantLabel: variantInPlan.variantLabel,
-          isDefault: variantInPlan.isDefault,
-          calories: variantInPlan.caloriesPerServing * recipe.defaultServings
-        }
-      }
-
-      return recipe
-    })
-  }, [getMealPlanRecipeIds])
-
-  /**
-   * FR-102: Load lightweight recipe summaries (no ingredients/steps).
-   * FR-101: Only depends on isAdmin, not on weekPlan.
-   */
-  const loadRecipes = useCallback(async (mealType) => {
-    setLoading(true)
-    setError(null)
-    try {
-      // FR-102: Use summary endpoint for lightweight data
-      // Admin users see all recipes (including hidden), regular users see only live recipes
-      const data = isAdmin
-        ? await recipeService.getAllRecipesAdmin(mealType)
-        : await recipeService.getRecipeSummariesByMealType(mealType)
-
-      // Swap default recipes with variants if variant is in meal plan
-      const swappedData = swapWithMealPlanVariants(data)
-      setRecipes(swappedData)
-    } catch (err) {
-      setError('Failed to load recipes. Please try again.')
-      console.error('Error loading recipes:', err)
-    } finally {
-      setLoading(false)
-    }
-  }, [isAdmin, swapWithMealPlanVariants])
-
-  // FR-101: Only reload on tab change, not on weekPlan changes
-  useEffect(() => {
-    loadRecipes(activeMeal)
-  }, [activeMeal, loadRecipes])
-
-  // FR-033: Handle edit button click
-  const handleEdit = (recipeId) => {
-    setEditingRecipeId(recipeId)
-  }
-
-  // FR-033: Handle modal close
   const handleModalClose = () => {
     setEditingRecipeId(null)
     setShowNewRecipe(false)
   }
 
-  // FR-033: Handle recipe save (refresh list)
-  const handleRecipeSave = (savedRecipe) => {
-    // Reload recipes to show updated data
-    loadRecipes(activeMeal)
+  const handleRecipeSave = () => {
+    setOverrides({})
+    reload()
   }
 
-  // FR-043: Handle variant selection - fetch full recipe and replace in list
-  const handleSelectVariant = async (variantRecipeId, currentServings) => {
+  // FR-043: fetch the full variant and show it in place of the family's card
+  const handleSelectVariant = async (variantRecipeId) => {
+    const family = (recipesByMeal[activeMeal] || []).find((r) => r.variants?.some((v) => v.recipeId === variantRecipeId))
+    if (!family) return
     try {
       const variantRecipe = await recipeService.getRecipeById(variantRecipeId)
-      if (variantRecipe) {
-        // Replace the recipe in the list with the selected variant
-        setRecipes(prevRecipes =>
-          prevRecipes.map(recipe =>
-            recipe.variants?.some(v => v.recipeId === variantRecipeId)
-              ? variantRecipe
-              : recipe
-          )
-        )
-      }
-    } catch (error) {
-      console.error('Failed to load variant recipe:', error)
+      if (variantRecipe) setOverrides((prev) => ({ ...prev, [hideKeyOf(family)]: variantRecipe }))
+    } catch (err) {
+      console.error('Failed to load variant recipe:', err)
     }
   }
 
+  const emptyMessage = showHidden
+    ? `Nothing hidden in ${mealLabel}.`
+    : query.trim()
+      ? `No ${mealLabel} recipes match "${query.trim()}".`
+      : `No recipes found for ${mealLabel}.`
+
   return (
     <div className="recipe-list-container">
-      <nav className="meal-tabs">
-        {MEAL_TYPES.map((meal) => (
-          <button
-            key={meal}
-            className={`meal-tab ${activeMeal === meal ? 'active' : ''}`}
-            onClick={() => setActiveMeal(meal)}
-          >
-            {meal.charAt(0).toUpperCase() + meal.slice(1)}
-          </button>
-        ))}
-        {/* FR-047: Add Recipe button for admins */}
-        {isAdmin && (
-          <button
-            className="add-recipe-button"
-            onClick={() => setShowNewRecipe(true)}
-          >
-            + Add Recipe
-          </button>
-        )}
-      </nav>
+      <RecipeToolbar
+        activeMeal={activeMeal}
+        counts={visibleCounts}
+        onMealChange={setActiveMeal}
+        query={query}
+        onQueryChange={setQuery}
+        hiddenCount={hiddenCount}
+        showHidden={showHidden}
+        onToggleHidden={() => setShowHidden((s) => !s)}
+        hiddenAvailable={isAuthenticated && !hidden.loadFailed}
+        isAdmin={isAdmin}
+        onAddRecipe={() => setShowNewRecipe(true)}
+      />
+
+      {hidden.loadFailed && (
+        <div className="recipe-notice" role="alert">
+          <span>Couldn't load your hidden recipes.</span>
+          <button type="button" onClick={hidden.retry}>Retry</button>
+        </div>
+      )}
+
+      {!showHidden && isAuthenticated && (
+        <WeekSlotStrip
+          weekPlan={weekPlan}
+          mealKey={activeMeal}
+          mealLabel={mealLabel}
+          pickDate={pickDate}
+          onPickDay={startPicking}
+          onOpenRecipe={setOpenRecipeEntry}
+        />
+      )}
+      {!showHidden && pickDate && (
+        <PickingBanner mealLabel={mealLabel} pickDate={pickDate} onCancel={() => setActiveMeal(activeMeal)} />
+      )}
+
+      {showHidden && (
+        <p className="recipe-hidden-note">
+          Hidden recipes are only hidden from this list. Anything already in your meal plan stays there.
+        </p>
+      )}
 
       {loading && (
         <div className="loading">
@@ -192,27 +123,51 @@ function RecipeList() {
         </div>
       )}
 
-      {error && (
-        <div className="error-message">
-          {error}
+      {!loading && error && (
+        <div className="error-message" role="alert">
+          <span>{error}</span>
+          <button type="button" className="recipe-retry-btn" onClick={reload}>Retry</button>
         </div>
       )}
 
       {!loading && !error && (
         <div className="recipe-grid">
-          {recipes.map((recipe) => (
+          {visible.map((recipe) => (
             <RecipeCard
-              key={recipe.id}
+              key={hideKeyOf(recipe)}
               recipe={recipe}
               currentMealType={activeMeal}
-              onEdit={handleEdit}
+              inPlan={inPlan(recipe)}
+              isHidden={hidden.isHidden(recipe)}
+              canHide={hidden.canHide}
+              onHide={hidden.hide}
+              onUnhide={hidden.unhide}
+              onEdit={isAdmin ? setEditingRecipeId : undefined}
               onSelectVariant={handleSelectVariant}
+              pickDate={pickDate}
+              onAssigned={() => { if (pickDate) finishPicking() }}
             />
           ))}
-          {recipes.length === 0 && (
-            <p className="no-recipes">No recipes found for {activeMeal}.</p>
-          )}
+          {visible.length === 0 && <p className="no-recipes">{emptyMessage}</p>}
         </div>
+      )}
+
+      <UndoToast toast={hidden.toast} onUndo={hidden.undo} />
+
+      {openRecipeEntry?.recipe?.id && (
+        <RecipeViewModal
+          recipeId={openRecipeEntry.recipe.id}
+          recipeName={openRecipeEntry.recipe.name}
+          servings={openRecipeEntry.servings}
+          caloriesPerServing={openRecipeEntry.caloriesPerServing}
+          isCheat={openRecipeEntry.recipe.isCheat}
+          hasExtras={openRecipeEntry.recipe.hasExtras}
+          onClose={() => setOpenRecipeEntry(null)}
+          variants={openRecipeEntry.recipe.variants}
+          parentRecipeId={openRecipeEntry.recipe.id}
+          extraChoices={openRecipeEntry.extraChoices}
+          mealPlanEntry={openRecipeEntry}
+        />
       )}
 
       {/* FR-033: Recipe Edit Modal */}

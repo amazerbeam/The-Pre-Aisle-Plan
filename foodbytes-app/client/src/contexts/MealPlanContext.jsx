@@ -5,6 +5,7 @@ import mealPlanTemplateService from '../services/mealPlanTemplateService'
 import { getTodayISO, addDays, formatDateISO, getWeekDays } from '../utils/dateUtils'
 import { resolveStartingServings } from '../utils/servingsUtils'
 import { useEntryEaten } from '../hooks/useEntryEaten'
+import { useEntryUpdate } from '../hooks/useEntryUpdate'
 
 const MealPlanContext = createContext()
 
@@ -27,21 +28,6 @@ const MEAL_ID_TO_TYPE = {
 
 // localStorage key for persisting startDate
 const START_DATE_STORAGE_KEY = 'foodbytes_startDate'
-
-// FR-103: Shopping list cache key (shared with ShoppingListContext)
-const SHOPPING_LIST_INVALIDATED_KEY = 'shoppingListInvalidated'
-
-/**
- * FR-103: Invalidate shopping list cache when meal plan changes
- * Called directly to avoid circular dependency with ShoppingListContext
- */
-const invalidateShoppingListCache = () => {
-  try {
-    localStorage.setItem(SHOPPING_LIST_INVALIDATED_KEY, 'true')
-  } catch (err) {
-    console.error('Failed to invalidate shopping list cache:', err)
-  }
-}
 
 /**
  * Get initial start date from localStorage or default to today
@@ -73,6 +59,7 @@ export const MealPlanProvider = ({ children }) => {
   // FR-007: Date range state - initialize from localStorage
   const initialDate = getInitialStartDate()
   const [startDate, setStartDateState] = useState(initialDate)
+  const startDateRef = useRef(initialDate)   // current week, so a slow response for a previous week is dropped
   const [endDate, setEndDate] = useState(formatDateISO(addDays(initialDate, 6)))
   const [weekDays, setWeekDays] = useState(getWeekDays(initialDate))
 
@@ -98,6 +85,7 @@ export const MealPlanProvider = ({ children }) => {
    * Persists to localStorage for use across Recipes, Meal Plan, and Shopping List
    */
   const setStartDate = useCallback((newStartDate) => {
+    startDateRef.current = newStartDate
     setStartDateState(newStartDate)
     setEndDate(formatDateISO(addDays(newStartDate, 6)))
     setWeekDays(getWeekDays(newStartDate))
@@ -122,17 +110,21 @@ export const MealPlanProvider = ({ children }) => {
     setLoading(true)
     setError(null)
 
+    const isStale = () => startDateRef.current !== startDate
     try {
       const data = await mealPlanService.getWeekPlan(startDate)
-      setWeekPlan(data)
+      if (!isStale()) setWeekPlan(data)
     } catch (err) {
+      if (isStale()) return
       console.error('Failed to fetch meal plan:', err)
       setError('Failed to load meal plan')
       setWeekPlan(null)
     } finally {
-      setLoading(false)
+      if (!isStale()) setLoading(false)
     }
   }, [isAuthenticated, startDate])
+
+  const { updateEntry } = useEntryUpdate({ weekPlan, setWeekPlan, setAssignmentError, fetchWeekPlan })
 
   // Fetch week plan when startDate or auth changes
   useEffect(() => {
@@ -275,8 +267,6 @@ export const MealPlanProvider = ({ children }) => {
     // Fire API call in background (don't await)
     mealPlanService.assignRecipe(planDate, mealId, recipeId, servings, extraChoices)
       .then(() => {
-        // FR-103: Invalidate shopping list cache on successful meal plan change
-        invalidateShoppingListCache()
         // Success - silently refresh to sync with server (gets real IDs, etc.)
         return fetchWeekPlan()
       })
@@ -308,8 +298,6 @@ export const MealPlanProvider = ({ children }) => {
 
     try {
       await mealPlanService.removeEntry(entryId)
-      // FR-103: Invalidate shopping list cache on successful removal
-      invalidateShoppingListCache()
       // Refresh the week plan
       await fetchWeekPlan()
     } catch (err) {
@@ -365,8 +353,6 @@ export const MealPlanProvider = ({ children }) => {
 
     try {
       await mealPlanService.swapDays(sourceDateISO, targetDateISO)
-      // FR-103: Invalidate shopping list cache on successful swap
-      invalidateShoppingListCache()
       // Refresh to sync with server
       await fetchWeekPlan()
     } catch (err) {
@@ -391,7 +377,6 @@ export const MealPlanProvider = ({ children }) => {
 
     try {
       const result = await mealPlanService.copyWeek(startDate, targetStartDate)
-      invalidateShoppingListCache()
       setWeekPlan(result)
       setStartDate(targetStartDate)
     } catch (err) {
@@ -471,7 +456,6 @@ export const MealPlanProvider = ({ children }) => {
     if (!isAuthenticated) throw new Error('Authentication required')
     try {
       const result = await mealPlanTemplateService.apply(templateId, startDate)
-      invalidateShoppingListCache()
       setWeekPlan(result)
       return result
     } catch (err) {
@@ -530,6 +514,7 @@ export const MealPlanProvider = ({ children }) => {
     copyWeek,
     setEntryEaten,
     getEntryById,
+    updateEntry,
 
     // Saved templates
     templates,

@@ -1,0 +1,343 @@
+/* Desktop timetable - values from the approved mockup (.web-wrap / .toolbar / .tt / .dayhead / .cell / .add) */
+
+.week-desktop {
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 24px 24px 0;
+}
+
+/* ---------- Title row + toolbar ---------- */
+.week-desktop-title {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.week-desktop-title h2 {
+  margin: 0;
+  font-size: 28px;
+  color: var(--brand-primary);
+}
+
+.week-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.toolbar-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 8px 12px;
+  font: inherit;
+  font-size: 13px;
+  color: var(--text-primary);
+  background: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.toolbar-btn:active,
+.toolbar-btn[aria-expanded='true'] {
+  border-color: var(--brand-primary-light);
+  background: #eeebf7;
+}
+
+.toolbar-btn:focus-visible {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: 2px;
+}
+
+@media (hover: hover) {
+  .toolbar-btn:hover {
+    border-color: var(--brand-primary-light);
+    background: #eeebf7;
+  }
+}
+
+.toolbar-btn--primary,
+.toolbar-btn--primary:active {
+  color: #fff;
+  background: var(--brand-primary);
+  border-color: var(--brand-primary);
+}
+
+@media (hover: hover) {
+  .toolbar-btn--primary:hover {
+    color: #fff;
+    background: var(--brand-primary-dark);
+    border-color: var(--brand-primary-dark);
+  }
+}
+
+.toolbar-dd {
+  position: relative;
+}
+
+.toolbar-dd-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 20;
+  min-width: 220px;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  background: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+}
+
+.toolbar-dd-menu button {
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  padding: 9px 10px;
+  font: inherit;
+  font-size: 14px;
+  text-align: left;
+  color: var(--text-primary);
+  background: none;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.toolbar-dd-menu button:active,
+.toolbar-dd-menu button:focus-visible {
+  background: #eeebf7;
+  outline: none;
+}
+
+@media (hover: hover) {
+  .toolbar-dd-menu button:hover {
+    background: #eeebf7;
+  }
+}
+
+/* ---------- Timetable ---------- */
+.timetable {
+  display: grid;
+  grid-template-columns: 92px repeat(7, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 20px;
+}
+
+/* Rows only group their cells for the markup; the cells sit on the timetable grid */
+.timetable-row {
+  display: contents;
+}
+
+.timetable-rowlabel {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding-left: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+}
+
+.timetable-rowtime {
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+/* ---------- Day header ---------- */
+.day-header {
+  position: relative;
+  padding: 10px 10px 8px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg) var(--radius-lg) 6px 6px;
+}
+
+.day-header.is-today {
+  color: #fff;
+  background: var(--brand-primary);
+  border-color: var(--brand-primary);
+}
+
+.day-header-top {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  padding-right: 30px;
+}
+
+.day-header-name {
+  font-weight: 700;
+}
+
+.day-header-date {
+  font-size: 13px;
+  opacity: 0.75;
+}
+
+/* 26px visual, 44px hit area */
+.day-header-swap {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  font-size: 14px;
+  color: inherit;
+  background: transparent;
+  border: none;
+  opacity: 0.55;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.day-header-swap:active,
+.day-header-swap:focus-visible {
+  opacity: 1;
+}
+
+.day-header-swap:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: -6px;
+  border-radius: 8px;
+}
+
+@media (hover: hover) {
+  .day-header-swap:hover {
+    opacity: 1;
+  }
+}
+
+.day-header-macros {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  width: 100%;
+  min-height: 44px;
+  margin-top: 4px;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.day-header-macros:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+.day-header-kcal {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* ---------- Slot cell ---------- */
+.slot-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  min-height: 92px;
+}
+
+.slot-cell.is-today-col {
+  padding: 4px;
+  margin: -4px;
+  background: #efedf7;
+  border-radius: 8px;
+}
+
+.slot-cell.is-drop-target {
+  outline: 2px dashed var(--brand-primary);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+.meal-card-desktop {
+  position: relative;
+}
+
+.meal-card-desktop .meal-card-name {
+  padding-right: 20px;
+}
+
+@media (hover: hover) {
+  .meal-card-desktop .meal-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+  }
+}
+
+.slot-add {
+  min-height: 44px;
+  padding: 8px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+  color: var(--brand-primary-light);
+  background: transparent;
+  border: 1.5px dashed #cfcbe0;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.slot-add:active,
+.slot-add:focus-visible {
+  background: #eeebf7;
+  border-color: var(--brand-primary-light);
+}
+
+.slot-add:focus-visible {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: 2px;
+}
+
+@media (hover: hover) {
+  .slot-add:hover {
+    background: #eeebf7;
+    border-color: var(--brand-primary-light);
+  }
+
+  /* The Replace link is quiet until the cell is hovered or focused */
+  .slot-add--ghost {
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+
+  .slot-cell:hover .slot-add--ghost,
+  .slot-cell:focus-within .slot-add--ghost {
+    opacity: 0.7;
+  }
+
+  .slot-cell .slot-add--ghost:hover,
+  .slot-cell .slot-add--ghost:focus-visible {
+    opacity: 1;
+  }
+}

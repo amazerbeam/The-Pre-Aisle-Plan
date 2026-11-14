@@ -182,11 +182,15 @@ public class RecipeService {
      * Does NOT include ingredients or steps - only summary data needed for list views.
      */
     private RecipeSummaryDTO convertToSummaryDTO(Recipe recipe) {
+        int[] perServing = macroCalculationService.calculatePerServingMacros(recipe);
         RecipeSummaryDTO dto = RecipeSummaryDTO.builder()
                 .id(recipe.getId())
                 .name(recipe.getName())
                 .defaultServings(recipe.getDefaultServings())
                 .calories(macroCalculationService.calculateRecipeTotalCalories(recipe))
+                .proteinPerServing(perServing[0])
+                .carbsPerServing(perServing[1])
+                .fatPerServing(perServing[2])
                 .isCheat(recipe.getIsCheat())
                 .mealTypes(recipe.getMeals().stream()
                         .map(m -> m.getMeal().getKey())
@@ -223,22 +227,7 @@ public class RecipeService {
             // Only include variants if 2+ members
             if (allMembers.size() >= 2) {
                 dto.setVariants(allMembers.stream()
-                    .map(m -> {
-                        Recipe variantRecipe = m.getRecipe();
-                        // FR-043: Derived per-serving kcal for dropdown display.
-                        // BigDecimal division inside the service — the Integer/Integer
-                        // form this replaces truncated (1025/2 gave 512, not 513).
-                        Integer caloriesPerServing =
-                            macroCalculationService.calculateCaloriesPerServing(variantRecipe);
-                        return new RecipeVariantDTO(
-                            variantRecipe.getId(),
-                            variantRecipe.getName(),
-                            m.getVariantLabel(),
-                            m.getIsDefault(),
-                            m.getDisplayOrder(),
-                            caloriesPerServing
-                        );
-                    })
+                    .map(m -> RecipeVariantMapper.toDto(m, macroCalculationService))
                     .collect(Collectors.toList()));
             } else {
                 dto.setVariants(new ArrayList<>());
@@ -284,22 +273,7 @@ public class RecipeService {
             // Only include variants if 2+ members
             if (allMembers.size() >= 2) {
                 dto.setVariants(allMembers.stream()
-                    .map(m -> {
-                        Recipe variantRecipe = m.getRecipe();
-                        // FR-043: Derived per-serving kcal for dropdown display.
-                        // BigDecimal division inside the service — the Integer/Integer
-                        // form this replaces truncated (1025/2 gave 512, not 513).
-                        Integer caloriesPerServing =
-                            macroCalculationService.calculateCaloriesPerServing(variantRecipe);
-                        return new RecipeVariantDTO(
-                            variantRecipe.getId(),
-                            variantRecipe.getName(),
-                            m.getVariantLabel(),
-                            m.getIsDefault(),
-                            m.getDisplayOrder(),
-                            caloriesPerServing
-                        );
-                    })
+                    .map(m -> RecipeVariantMapper.toDto(m, macroCalculationService))
                     .collect(Collectors.toList()));
             } else {
                 dto.setVariants(new ArrayList<>());

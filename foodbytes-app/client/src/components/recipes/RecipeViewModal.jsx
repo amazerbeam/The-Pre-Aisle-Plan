@@ -1,29 +1,36 @@
-import { useEffect, useState, useRef, useMemo, useCallback } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { recipeService } from '../../services/recipeService'
 import useServingsInput from '../../hooks/useServingsInput'
 import useRecipeStackServings from '../../hooks/useRecipeStackServings'
 import useWakeLock from '../../hooks/useWakeLock'
+import useMealEatenSave from '../../hooks/useMealEatenSave'
+import useExtraChoiceToggle from '../../hooks/useExtraChoiceToggle'
 import { useBodyScrollLock } from '../../hooks/useBodyScrollLock'
 import { useLinkedStepSelections } from '../../hooks/useLinkedStepSelections'
-import LinkedRecipeNavigation from './LinkedRecipeNavigation'
-import MacroBadgeRow from './MacroBadgeRow'
+import { useMealPlan } from '../../contexts/MealPlanContext'
+import { hasMealMacroTargets, hasUsableMacros } from '../../utils/macroStatus'
+import RecipeViewHeader from './RecipeViewHeader'
+import IngredientsPanel from './IngredientsPanel'
+import ExtrasPanel from './ExtrasPanel'
 import RecipeStepsSection from './RecipeStepsSection'
 import MealEatenSection from './MealEatenSection'
-import WakeLockIcon from '../common/WakeLockIcon'
-import { MIN_SERVINGS, MAX_SERVINGS, SERVINGS_STEP } from '../../constants/servings'
+import MacroTargetPopup from './MacroTargetPopup'
+import CookMode from './CookMode'
 import './RecipeViewModal.css'
 
+const TAB_INGREDIENTS = 'ingredients'
+const TAB_STEPS = 'steps'
+
 /**
- * FR-013, FR-029, FR-091, FR-092, FR-095, FR-102: RecipeViewModal - Fullscreen recipe view popup
- * - White text on dark background
- * - Variant dropdown for recipe families (same as RecipeCard)
+ * FR-013, FR-029, FR-091, FR-092, FR-095, FR-102: RecipeViewModal - the recipe view popup.
+ * - Sticky header (RecipeViewHeader): variant switch, servings stepper, macro chips, keep-screen-on
  * - Keeps popup open when variant changes (updates content in-place)
- * - 99vh height with 0.5vh even margins
- * - FR-029: Screen wake lock activates when modal opens
- * - FR-091: Linked steps display as clickable links
+ * - FR-029: Screen wake lock activates when modal opens (cook mode forces it on)
+ * - FR-091: Linked steps open the sub-recipe; extras toggle homemade / store-bought
  * - FR-092: Navigation stack for browsing linked recipes
  * - FR-095: Independent servings per recipe (extras show at their default servings)
  * - FR-102: On-demand loading - header displays immediately, content fetches full data
+ * Desktop: ingredients column beside the steps. Mobile: full screen with Ingredients | Steps tabs.
  */
 function RecipeViewModal({
   recipeId,           // FR-102: Recipe ID to fetch full data
@@ -31,33 +38,40 @@ function RecipeViewModal({
   servings,
   caloriesPerServing,
   isCheat,            // FR-102: For immediate header display
-  hasExtras,          // FR-102: For extras indicator
   onClose,
   variants,           // Array of variant objects from recipe family
-  onSelectVariant,    // Callback when variant is selected: (variantId, servings) => void
+  onSelectVariant,    // Optional. Callback when variant is selected: (variantId, servings) => void
                       // NOTE: never invoked today - if that changes to alter `recipeId` while
                       // mounted, see the stable-recipeId invariant in useRecipeStackServings' JSDoc
   parentRecipeId = null, // FR-091: Parent recipe ID for homemade selection lookup
   extraChoices = null,   // MPP-10: a planned meal's own choices
-  mealPlanEntry = null   // MPP-12: set only when opened from the meal plan → shows the eaten section
+  mealPlanEntry = null   // MPP-12: set only when opened from the meal plan → plan bar + eaten section
 }) {
   // FR-102: Full recipe data state (loaded on mount)
   const [fullRecipe, setFullRecipe] = useState(null)
   const [contentLoading, setContentLoading] = useState(true)
   const [contentError, setContentError] = useState(null)
 
-  const homemadeSelections = useLinkedStepSelections(parentRecipeId, extraChoices) // FR-090 / MPP-10
+  // MPP-10: read the entry live so a toggle flips the wording once the week reloads.
+  const { getEntryById } = useMealPlan()
+  const liveChoices = (mealPlanEntry && getEntryById(mealPlanEntry.id)?.extraChoices) || extraChoices
+  const dishId = parentRecipeId ?? recipeId
+  const homemadeSelections = useLinkedStepSelections(dishId, liveChoices) // FR-090 / MPP-10
+  const extraToggle = useExtraChoiceToggle({ parentRecipeId: dishId, mealPlanEntry })
+  const eatenSave = useMealEatenSave(mealPlanEntry?.id)
 
-  // FR-029: Screen wake lock with clickable icon next to Ingredients
-  const { isLocked, isSupported, isAnimating, toggle: toggleWakeLock } = useWakeLock(true)
+  // FR-029: Screen wake lock, on by default; toggled from the header
+  const wakeLock = useWakeLock(true)
 
-  // State for variant dropdown
   const [selectedVariantId, setSelectedVariantId] = useState(recipeId)
-  const [showCalorieDropdown, setShowCalorieDropdown] = useState(false)
   const [currentRecipeName, setCurrentRecipeName] = useState(recipeName)
   const [currentCalories, setCurrentCalories] = useState(caloriesPerServing)
   const [currentIsCheat, setCurrentIsCheat] = useState(isCheat)
-  const dropdownRef = useRef(null)
+  const [openMacroKey, setOpenMacroKey] = useState(null)
+  const [tab, setTab] = useState(TAB_INGREDIENTS)
+  const [doneSteps, setDoneSteps] = useState(() => new Set())
+  const [cookIndex, setCookIndex] = useState(null)
+  const [wasLockedBeforeCook, setWasLockedBeforeCook] = useState(false)
 
   // FR-095: Independent servings state per recipe in navigation stack.
   // Decimal-aware: parsing, clamping and the typing buffer live in the hook.
@@ -69,10 +83,8 @@ function RecipeViewModal({
     resetServings
   } = useServingsInput(servings)
 
-  // FR-092, FR-095: Owns the linked-recipe navigation stack, keeps the
-  // displayed recipe and its servings in step as it changes, and provides
-  // the linked-step click handler. Full rationale (recipeId-seeding, the
-  // recipeId-stability invariant, and the live-ref staleness fix) documented
+  // FR-092, FR-095: Owns the linked-recipe navigation stack, keeps the displayed recipe and its
+  // servings in step as it changes, and provides the linked-step click handler. Full rationale
   // on the hook itself.
   const {
     handleLinkedStepClick,
@@ -115,11 +127,8 @@ function RecipeViewModal({
     fetchFullRecipe()
   }, [recipeId, resetStack])
 
-  /**
-   * FR-091: Check if a linked recipe is marked as homemade
-   */
+  // FR-091: homemade unless the choice says store-bought
   const isHomemade = useCallback((linkedRecipeId) => {
-    // Default to true (homemade) if no selection saved
     return homemadeSelections[linkedRecipeId] !== false
   }, [homemadeSelections])
 
@@ -128,70 +137,58 @@ function RecipeViewModal({
     setCurrentCalories(caloriesPerServing)
   }, [caloriesPerServing])
 
-  // Close calorie dropdown on click outside
+  // A different recipe (variant or linked sub-recipe) starts with no steps done and no popup open.
+  // The ingredient ticks reset by remounting IngredientsPanel (keyed on the recipe id below).
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setShowCalorieDropdown(false)
-      }
-    }
-    if (showCalorieDropdown) {
-      document.addEventListener('mousedown', handleClickOutside)
-      return () => document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [showCalorieDropdown])
+    setDoneSteps(new Set())
+    setOpenMacroKey(null)
+  }, [fullRecipe?.id])
 
-  // Close on Escape key
+  // Close on Escape key (cook mode owns Escape while it is open)
   useEffect(() => {
+    if (cookIndex !== null) return undefined
     const handleKeyDown = (e) => {
-      if (e.key === 'Escape') {
-        if (showCalorieDropdown) {
-          setShowCalorieDropdown(false)
-        } else {
-          onClose()
-        }
-      }
+      if (e.key === 'Escape') onClose()
     }
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [onClose, showCalorieDropdown])
+  }, [onClose, cookIndex])
 
   // Lock body scroll while open; guard mirrors the `!recipeId` early return below
   // (locking while rendering null would pin the shared reference count).
   useBodyScrollLock(!!recipeId)
 
-  // Check if recipe has variants (2+ required for dropdown)
-  const hasVariants = variants && variants.length >= 2
+  // A linked sub-recipe has no family, so the variant switch only shows on the top-level recipe.
+  const hasVariants = !canGoBack && variants && variants.length >= 2
+  const selectedVariant = hasVariants ? variants.find((v) => v.recipeId === selectedVariantId) : null
 
-  // Sort variants by displayOrder
-  const sortedVariants = useMemo(() => {
-    if (!hasVariants) return []
-    return [...variants].sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0))
-  }, [variants, hasVariants])
-
-  // The variant on screen — resolved once for the calorie badge and the macro popup.
-  const selectedVariant = hasVariants
-    ? sortedVariants.find((v) => v.recipeId === selectedVariantId)
-    : null
-
+  // A sub-recipe shows its own per-serving kcal (recipes.calories is whole-recipe).
+  const linkedKcal = fullRecipe?.calories != null && fullRecipe.defaultServings
+    ? Math.round(fullRecipe.calories / fullRecipe.defaultServings)
+    : currentCalories
   // `?? currentCalories` keeps the old fallback for no-family and not-found paths.
-  const currentVariantCalories = selectedVariant?.caloriesPerServing ?? currentCalories
+  const displayedKcal = canGoBack ? linkedKcal : (selectedVariant?.caloriesPerServing ?? currentCalories)
 
   // FR-104: Popup subtitle context only; the bands are identical across variants.
   // The displayed recipe is the only source — never selectedVariant, whose label still
   // names the parent's variant after navigating into a family-less linked sub-recipe.
-  // null (not a literal) is correct: MacroTargetPopup then omits the ` · ` segment.
   const currentVariantLabel = fullRecipe?.variantLabel ?? null
+
+  const hasMacroData = !!fullRecipe && ['protein', 'carbs', 'fat'].some((k) => fullRecipe[k] != null)
+  const macros = hasMacroData
+    ? { protein: fullRecipe.protein, carbs: fullRecipe.carbs, fat: fullRecipe.fat }
+    : null
+  // Components (pesto, dough...) and all-zero data get plain grams, never a verdict.
+  const macrosJudged = !!macros && hasMealMacroTargets(fullRecipe) && hasUsableMacros(macros)
 
   // Handle variant selection - update in-place without closing popup
   // FR-013, FR-102: Fetch variant recipe data internally to keep modal open
   const handleVariantSelect = async (variantId) => {
     setSelectedVariantId(variantId)
-    setShowCalorieDropdown(false)
 
     // Update calories and header immediately from variant data. Own lookup, by the
     // just-clicked id: selectedVariantId state has not settled yet.
-    const variant = sortedVariants.find(v => v.recipeId === variantId)
+    const variant = (variants || []).find(v => v.recipeId === variantId)
     if (variant) {
       setCurrentCalories(variant.caloriesPerServing)
       setCurrentRecipeName(variant.recipeName)
@@ -214,6 +211,27 @@ function RecipeViewModal({
     }
   }
 
+  const toggleStepDone = (idx) => setDoneSteps((prev) => {
+    const next = new Set(prev)
+    if (next.has(idx)) next.delete(idx)
+    else next.add(idx)
+    return next
+  })
+
+  // Cook mode forces the wake lock on and puts it back as it was on exit.
+  const startCook = (index) => {
+    setWasLockedBeforeCook(wakeLock.isLocked)
+    if (!wakeLock.isLocked) wakeLock.request()
+    setCookIndex(index)
+  }
+  const exitCook = (index, finished) => {
+    const total = fullRecipe?.steps?.length ?? 0
+    const upTo = finished ? total : index
+    setDoneSteps((prev) => new Set([...prev, ...Array.from({ length: upTo }, (_, i) => i)]))
+    if (!wasLockedBeforeCook) wakeLock.release()
+    setCookIndex(null)
+  }
+
   // FR-102: Don't block render - show header immediately even without full data
   if (!recipeId) return null
 
@@ -221,151 +239,134 @@ function RecipeViewModal({
   // FR-102: Only scale when fullRecipe is loaded
   const scaleQuantity = (originalQty) => {
     if (!fullRecipe?.defaultServings) return originalQty
-    const scaled = (originalQty / fullRecipe.defaultServings) * currentServings
-    return Number.isInteger(scaled) ? scaled : scaled.toFixed(2)
+    return (originalQty / fullRecipe.defaultServings) * currentServings
   }
+
+  const steps = fullRecipe?.steps || []
+  const ingredients = fullRecipe?.ingredients || []
+  const extras = [...new Map(
+    steps.filter((s) => s.linkedRecipeId != null)
+      .map((s) => [s.linkedRecipeId, { recipeId: s.linkedRecipeId, name: s.linkedRecipeName }])
+  ).values()]
 
   return (
     <div className="recipe-view-overlay" onClick={onClose}>
       <div className="recipe-view-modal" onClick={(e) => e.stopPropagation()}>
         {/* Header - FR-102: Displays immediately from summary props */}
-        <header className="recipe-view-header">
-          <div className="header-content">
-            {/* FR-092: Back navigation for linked recipes */}
-            <LinkedRecipeNavigation
-              canGoBack={canGoBack}
-              previousRecipeName={previousRecipeName}
-              breadcrumbs={breadcrumbs}
-              onBack={popRecipe}
-              showBreadcrumbs={false}
-            />
-            <h2 className="recipe-title">{currentRecipeName}</h2>
-            <div className="recipe-meta">
-              {/* FR-013: Variant dropdown OR plain calories badge */}
-              {hasVariants ? (
-                <div className="calorie-dropdown-container" ref={dropdownRef}>
-                  <button
-                    className="calorie-dropdown-trigger"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      setShowCalorieDropdown(!showCalorieDropdown)
-                    }}
-                    aria-expanded={showCalorieDropdown}
-                    aria-haspopup="listbox"
-                  >
-                    <span className="calories-text">{currentVariantCalories} cal</span>
-                    <span className="dropdown-chevron">▼</span>
-                  </button>
-                  {showCalorieDropdown && (
-                    <ul className="calorie-dropdown-menu" role="listbox">
-                      {sortedVariants.map((variant) => (
-                        <li
-                          key={variant.recipeId}
-                          className={`calorie-dropdown-item ${variant.recipeId === selectedVariantId ? 'selected' : ''}`}
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleVariantSelect(variant.recipeId)
-                          }}
-                          role="option"
-                          aria-selected={variant.recipeId === selectedVariantId}
-                        >
-                          <span className="variant-name">{variant.variantLabel || 'Moderate'}</span>
-                          <span className="variant-calories">{variant.caloriesPerServing} cal</span>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              ) : (
-                <span className="calories-badge">{currentCalories} cal/serving</span>
-              )}
-              {/* FR-095: Servings input (independent per recipe) */}
-              <div className="servings-input-container">
-                <input
-                  type="number"
-                  inputMode="decimal"
-                  min={MIN_SERVINGS}
-                  max={MAX_SERVINGS}
-                  step={SERVINGS_STEP}
-                  value={servingsDisplay}
-                  onChange={handleServingsChange}
-                  onBlur={handleServingsBlur}
-                  onClick={(e) => e.stopPropagation()}
-                  className="servings-input"
-                  aria-label="Number of servings"
-                />
-                <span className="servings-label">serving{currentServings !== 1 ? 's' : ''}</span>
-              </div>
-              {currentIsCheat && <span className="cheat-badge">Cheat</span>}
-            </div>
-            {/* FR-104: Traffic-lit macro badges; tapping one opens its target popup */}
-            <MacroBadgeRow
-              recipe={fullRecipe}
-              variantLabel={currentVariantLabel}
-              displayedCaloriesPerServing={currentVariantCalories}
-            />
+        <RecipeViewHeader
+          name={currentRecipeName}
+          isCheat={currentIsCheat}
+          nav={{ canGoBack, previousRecipeName, breadcrumbs, onBack: popRecipe }}
+          planEntry={mealPlanEntry}
+          eatenSave={eatenSave}
+          variants={hasVariants ? variants : []}
+          selectedVariantId={selectedVariantId}
+          onSelectVariant={handleVariantSelect}
+          fallbackKcal={displayedKcal}
+          servings={currentServings}
+          servingsDisplay={servingsDisplay}
+          onServingsInput={handleServingsChange}
+          onServingsBlur={handleServingsBlur}
+          onServings={resetServings}
+          macros={macros}
+          macrosJudged={macrosJudged}
+          onMacroClick={setOpenMacroKey}
+          wakeLock={wakeLock}
+          onClose={onClose}
+        />
+
+        {contentLoading ? (
+          <div className="content-loading">
+            <div className="spinner"></div>
+            <p>Loading recipe details...</p>
           </div>
-          <button
-            className="close-button"
-            onClick={onClose}
-            aria-label="Close recipe view"
-          >
-            ×
-          </button>
-        </header>
-
-        {/* Content - FR-102: Shows spinner while loading, then ingredients/steps */}
-        <div className="recipe-view-content">
-          {contentLoading ? (
-            <div className="content-loading">
-              <div className="spinner"></div>
-              <p>Loading recipe details...</p>
+        ) : contentError ? (
+          <div className="content-error">
+            <p>{contentError}</p>
+          </div>
+        ) : (
+          <div className="rv-scroll" data-tab={tab}>
+            <div className="rv-tabs" role="tablist">
+              <button
+                type="button"
+                role="tab"
+                aria-selected={tab === TAB_INGREDIENTS}
+                className={tab === TAB_INGREDIENTS ? 'on' : ''}
+                onClick={() => setTab(TAB_INGREDIENTS)}
+              >
+                Ingredients ({ingredients.length})
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={tab === TAB_STEPS}
+                className={tab === TAB_STEPS ? 'on' : ''}
+                onClick={() => setTab(TAB_STEPS)}
+              >
+                Steps ({doneSteps.size}/{steps.length})
+              </button>
             </div>
-          ) : contentError ? (
-            <div className="content-error">
-              <p>{contentError}</p>
-            </div>
-          ) : (
-            <>
-              {/* Ingredients */}
-              <section className="ingredients-section">
-                <h3>
-                  Ingredients
-                  {/* FR-029: Wake lock icon - clickable to toggle screen lock */}
-                  <WakeLockIcon
-                    isLocked={isLocked}
-                    isAnimating={isAnimating}
-                    isSupported={isSupported}
-                    onToggle={toggleWakeLock}
+            <div className="rv-body">
+              <IngredientsPanel
+                key={fullRecipe?.id}
+                ingredients={ingredients}
+                scale={scaleQuantity}
+                servings={currentServings}
+              >
+                {!canGoBack && extras.length > 0 && (
+                  <ExtrasPanel
+                    extras={extras}
+                    isHomemade={isHomemade}
+                    onToggle={extraToggle.setChoice}
+                    onOpen={handleLinkedStepClick}
+                    saving={extraToggle.saving}
+                    error={extraToggle.error}
+                    locked={extraToggle.locked}
+                    hint={extraToggle.hint}
                   />
-                </h3>
-                {fullRecipe?.ingredients && fullRecipe.ingredients.length > 0 ? (
-                  <ul className="ingredients-list">
-                    {fullRecipe.ingredients.map((ing, idx) => (
-                      <li key={idx} className="ingredient-item">
-                        <span className="ingredient-quantity">{scaleQuantity(ing.quantity)}</span>
-                        <span className="ingredient-unit">{ing.unit}</span>
-                        <span className="ingredient-name">{ing.name}</span>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="no-content">No ingredients listed</p>
                 )}
-              </section>
+              </IngredientsPanel>
+              <div className="rv-steps">
+                {/* Steps - FR-091: Handle linked steps */}
+                <RecipeStepsSection
+                  steps={fullRecipe?.steps}
+                  isHomemade={isHomemade}
+                  onLinkedStepClick={handleLinkedStepClick}
+                  done={doneSteps}
+                  onToggleDone={toggleStepDone}
+                  onStartCook={startCook}
+                />
+                {/* MPP-12: eaten tick - meal-plan entry only, on the planned dish (not a linked sub-recipe) */}
+                {mealPlanEntry && !canGoBack && (
+                  <MealEatenSection entryId={mealPlanEntry.id} eatenSave={eatenSave} />
+                )}
+              </div>
+            </div>
+          </div>
+        )}
 
-              {/* Steps - FR-091: Handle linked steps */}
-              <RecipeStepsSection
-                steps={fullRecipe?.steps}
-                isHomemade={isHomemade}
-                onLinkedStepClick={handleLinkedStepClick}
-              />
+        {cookIndex !== null && steps.length > 0 && (
+          <CookMode
+            recipeName={currentRecipeName}
+            steps={steps}
+            ingredients={ingredients}
+            scale={scaleQuantity}
+            isHomemade={isHomemade}
+            startIndex={cookIndex}
+            onExit={exitCook}
+          />
+        )}
 
-              {/* MPP-12: eaten tick - meal-plan entry only, on the planned dish (not a linked sub-recipe) */}
-              {mealPlanEntry && !canGoBack && <MealEatenSection entryId={mealPlanEntry.id} />}
-            </>
-          )}
-        </div>
+        {/* FR-104: portaled, but kept inside the modal tree so its clicks never reach the overlay's close */}
+        {openMacroKey && macros && (
+          <MacroTargetPopup
+            macroKey={openMacroKey}
+            macros={macros}
+            variantLabel={currentVariantLabel}
+            displayedCaloriesPerServing={displayedKcal}
+            onClose={() => setOpenMacroKey(null)}
+          />
+        )}
       </div>
     </div>
   )

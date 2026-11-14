@@ -20,6 +20,9 @@ public class RecipeSummaryDTO {
     private String name;
     private Integer defaultServings;
     private Integer calories;
+    private Integer proteinPerServing;     // grams per serving, homemade basis
+    private Integer carbsPerServing;
+    private Integer fatPerServing;
     private Boolean isCheat;
     private List<String> mealTypes;
 

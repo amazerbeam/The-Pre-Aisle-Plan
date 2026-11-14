@@ -357,6 +357,59 @@ public class MealPlanService {
             });
     }
 
+    /**
+     * Move an entry to another day/meal and/or change its servings. Moving onto an occupied slot
+     * swaps the occupant into the source slot (one meal per slot). Ids are kept, so eaten ticks
+     * (MPP-33) and extra choices (MPP-10) travel with the meal.
+     */
+    @Transactional
+    public Optional<MealPlanEntryDTO> updateEntry(Long userId, Long entryId, MealPlanEntryUpdateRequest request) {
+        Long effectiveOwnerId = getEffectiveMealPlanOwnerId(userId);
+        return mealPlanEntryRepository.findByIdAndUserId(entryId, effectiveOwnerId).map(entry -> {
+            if (request.getPlanDate() != null) {
+                moveEntry(userId, effectiveOwnerId, entry, request);
+            }
+            if (request.getServings() != null) {
+                entry.setServings(request.getServings());
+            }
+            MealPlanEntry saved = mealPlanEntryRepository.save(entry);
+            Map<Long, Boolean> choices = extraChoiceService.getEntryChoices(List.of(saved.getId()))
+                .getOrDefault(saved.getId(), Map.of());
+            LocalDateTime eatenAt = getEatenAtByEntry(userId, List.of(saved.getId())).get(saved.getId());
+            return convertToDTO(saved, choices, eatenAt);
+        });
+    }
+
+    /** Moves the entry to the requested slot, swapping any occupant into the source slot. */
+    private void moveEntry(Long userId, Long ownerId, MealPlanEntry entry, MealPlanEntryUpdateRequest request) {
+        LocalDate sourceDate = entry.getPlanDate();
+        Meal sourceMeal = entry.getMeal();
+        LocalDate targetDate = request.getPlanDate();
+        if (sourceDate.equals(targetDate) && sourceMeal.getId().equals(request.getMealId())) {
+            return;
+        }
+        // Resolve the target meal first so an unknown mealId is a client error before anything is swapped.
+        Meal targetMeal = mealRepository.findById(request.getMealId())
+            .orElseThrow(() -> new IllegalArgumentException("Meal type not found"));
+        mealPlanEntryRepository
+            .findByUserIdAndPlanDateAndMealId(ownerId, targetDate, request.getMealId())
+            .filter(occupant -> !occupant.getId().equals(entry.getId()))
+            .ifPresent(occupant -> {
+                occupant.setPlanDate(sourceDate);
+                occupant.setMeal(sourceMeal);
+                mealPlanEntryRepository.save(occupant);
+            });
+        entry.setPlanDate(targetDate);
+        entry.setMeal(targetMeal);
+        publishPlannedEvent(userId, sourceDate, targetDate);
+    }
+
+    private void publishPlannedEvent(Long userId, LocalDate a, LocalDate b) {
+        LocalDate first = a.isBefore(b) ? a : b;   // MPP-24
+        LocalDate last = a.isBefore(b) ? b : a;
+        eventPublisher.publishEvent(PetFirstCandidate.planned(userId, first, last));
+    }
+
     /** MPP-33: the caller's own ticks for these entries, entry id -> UTC eaten_at. Unique per (entry, user). */
     private Map<Long, LocalDateTime> getEatenAtByEntry(Long userId, List<Long> entryIds) {
         if (entryIds.isEmpty()) return Map.of();

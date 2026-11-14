@@ -3,6 +3,8 @@ import { useMealPlan } from '../../contexts/MealPlanContext'
 import { useAuth } from '../../contexts/AuthContext'
 import { recipeService } from '../../services/recipeService'
 import ExtrasSelectionPopup from './ExtrasSelectionPopup'
+import { MEAL_SLOTS, SNACKS_SLOT } from '../../constants/mealPlanUi'
+import { slotEntryFor } from '../../utils/recipeCatalogueUtils'
 // FR-041: Emojis are only shown in Meal Plan view, NOT on day assignment buttons
 import './DayAssignmentButtons.css'
 
@@ -10,7 +12,9 @@ import './DayAssignmentButtons.css'
  * DayAssignmentButtons - FR-014, FR-015, FR-037, NFR-016, FR-041, FR-043, FR-050, FR-087, FR-098
  * Day-of-week buttons for recipe assignment with swap behavior
  * Hidden for guest users (as per user preference)
- * FR-050: Shows cumulative daily calories above each day button
+ * FR-050 (daily calories on each day button) was removed by the Meal Plan / Recipes redesign:
+ * the buttons show the day name only. With `pickDate` set (picking mode) the 7 buttons collapse to one
+ * "Add to {Day}" button for that date; `onAssigned(dateStr)` fires after a real assign (not a toggle-off).
  * FR-087: Shows extras selection popup for recipes with linked extras
  * FR-098: Optimistic UI - no loading state, instant feedback
  *
@@ -22,11 +26,11 @@ import './DayAssignmentButtons.css'
  * FR-041: Buttons display food emojis themed by meal type
  * FR-043: selectedRecipeId prop allows assigning a variant instead of base recipe
  */
-function DayAssignmentButtons({ recipe, servings, currentMealType, selectedRecipeId }) {
+function DayAssignmentButtons({ recipe, servings, currentMealType, selectedRecipeId, pickDate = null, onAssigned }) {
   // FR-043: Use selectedRecipeId if provided (for variants), otherwise use recipe.id
   const recipeIdToAssign = selectedRecipeId || recipe.id
   const { isAuthenticated } = useAuth()
-  const { weekDays, weekPlan, assignRecipe, isRecipeAssigned, getDailyCalories } = useMealPlan()
+  const { weekDays, weekPlan, assignRecipe, isRecipeAssigned } = useMealPlan()
   // FR-098: Removed loading state - using optimistic UI instead
 
   // FR-087: State for extras popup
@@ -41,15 +45,8 @@ function DayAssignmentButtons({ recipe, servings, currentMealType, selectedRecip
   }
 
   // Map meal type string to meal ID
-  const getMealId = (mealType) => {
-    const mealIds = {
-      breakfast: 1,
-      lunch: 2,
-      dinner: 3,
-      snacks: 4
-    }
-    return mealIds[mealType?.toLowerCase()] || 1
-  }
+  const getMealId = (mealType) =>
+    [...MEAL_SLOTS, SNACKS_SLOT].find((s) => s.key === mealType?.toLowerCase())?.mealId ?? 1
 
   /**
    * FR-037: Determine button class based on slot state
@@ -83,12 +80,13 @@ function DayAssignmentButtons({ recipe, servings, currentMealType, selectedRecip
   /**
    * FR-087, FR-098: Perform the actual recipe assignment with optimistic UI
    */
-  const performAssignment = (dateStr, extraChoices = null) => {
+  const performAssignment = (dateStr, extraChoices = null, isToggleOff = false) => {
     const mealId = getMealId(currentMealType)
     // FR-043: Use recipeIdToAssign to assign selected variant
     // FR-098: Pass recipe data for optimistic calorie calculation
     // MPP-10: extraChoices from the popup are stored server-side with the assign
     assignRecipe(recipeIdToAssign, dateStr, mealId, servings, recipe, extraChoices)
+    if (!isToggleOff) onAssigned?.(dateStr)
   }
 
   /** MPP-10: when the slot holds a sibling variant, pre-fill the popup with that meal's own choices. */
@@ -113,7 +111,7 @@ function DayAssignmentButtons({ recipe, servings, currentMealType, selectedRecip
     const buttonClass = getButtonClass(dateStr)
     if (buttonClass === 'selected') {
       // Toggle off - remove recipe, no popup needed
-      performAssignment(dateStr)
+      performAssignment(dateStr, null, true)
       return
     }
 
@@ -151,7 +149,7 @@ function DayAssignmentButtons({ recipe, servings, currentMealType, selectedRecip
 
     if (pendingDate) {
       // MPP-10: the popup refreshes the local default cache; the server stores the choices with the assign
-      await performAssignment(pendingDate, selections)
+      await performAssignment(pendingDate, selections, getButtonClass(pendingDate) === 'selected')
       setPendingDate(null)
     }
     setPendingInitialSelections(undefined)
@@ -174,10 +172,33 @@ function DayAssignmentButtons({ recipe, servings, currentMealType, selectedRecip
       case 'selected':
         return `Remove from ${dayName}`
       case 'already-selected':
-        return `Replace meal on ${dayName}`
+        return `Replace ${slotEntryFor(weekPlan, dateStr, currentMealType?.toLowerCase())?.recipe?.name} on ${dayName}`
       default:
         return `Add to ${dayName}`
     }
+  }
+
+  // Picking mode: one full-width button for the chosen date
+  const renderPickButton = () => {
+    const buttonClass = getButtonClass(pickDate)
+    const dayName = weekDays.find((d) => d.date === pickDate)?.dayName
+      ?? new Date(`${pickDate}T00:00:00`).toLocaleDateString('en-GB', { weekday: 'short' })
+    const dayNumber = Number(pickDate.slice(8, 10))
+    const label = buttonClass === 'selected' ? `✓ On ${dayName}`
+      : `${buttonClass === 'already-selected' ? 'Replace on' : 'Add to'} ${dayName} ${dayNumber}`
+    const title = getButtonTitle(pickDate, dayName, buttonClass)
+    return (
+      <button
+        type="button"
+        className={`pick-btn ${buttonClass}`}
+        onClick={() => handleDayClick(pickDate)}
+        title={title}
+        aria-label={title}
+        aria-pressed={buttonClass === 'selected'}
+      >
+        {label}
+      </button>
+    )
   }
 
   // Build recipe object with extras for popup
@@ -188,26 +209,28 @@ function DayAssignmentButtons({ recipe, servings, currentMealType, selectedRecip
 
   return (
     <>
-      <div className="days-grid">
-        {weekDays.map((day) => {
-          const buttonClass = getButtonClass(day.date)
-          // FR-050: Get daily calories for display inside button
-          const dailyCalories = getDailyCalories(day.date)
+      {pickDate ? renderPickButton() : (
+        <div className="days-grid">
+          {weekDays.map((day) => {
+            const buttonClass = getButtonClass(day.date)
+            const title = getButtonTitle(day.date, day.dayName, buttonClass)
 
-          return (
-            <button
-              key={day.date}
-              className={`day-btn ${buttonClass}`}
-              onClick={() => handleDayClick(day.date)}
-              title={getButtonTitle(day.date, day.dayName, buttonClass)}
-              aria-label={getButtonTitle(day.date, day.dayName, buttonClass)}
-            >
-              <span className="day-cal">{dailyCalories}</span>
-              <span className="day-name">{day.dayName}</span>
-            </button>
-          )
-        })}
-      </div>
+            return (
+              <button
+                key={day.date}
+                type="button"
+                className={`day-btn ${buttonClass}`}
+                onClick={() => handleDayClick(day.date)}
+                title={title}
+                aria-label={title}
+                aria-pressed={buttonClass === 'selected'}
+              >
+                <span className="day-btn-face">{day.dayName}</span>
+              </button>
+            )
+          })}
+        </div>
+      )}
 
       {/* FR-087: Extras selection popup */}
       {showExtrasPopup && extrasData && (

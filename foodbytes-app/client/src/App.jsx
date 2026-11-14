@@ -11,12 +11,14 @@ import Toast from './components/common/Toast.jsx'
 import { useAuth } from './contexts/AuthContext'
 import { useMealPlan } from './contexts/MealPlanContext'
 import { PET_ROUTE } from './constants/pet'
+import useDocumentTitle from './hooks/useDocumentTitle'
 import './styles/global.css'
 
 function App() {
   const { isAuthenticated, isGuest, loading } = useAuth()
   // MPP-37: the Pip tab is full screen — no top bar (date picker + account menu).
   const pipMode = useLocation().pathname.replace(/\/+$/, '') === PET_ROUTE
+  useDocumentTitle()
   // FR-098: Get assignment error for toast display
   const { assignmentError, clearAssignmentError } = useMealPlan()
   const [showLanding, setShowLanding] = useState(false)
@@ -55,7 +57,7 @@ function App() {
           <Route path="/shopping" element={<ShoppingList />} />
         </Routes>
       </main>
-      <Footer />
+      <Footer alwaysVisible={pipMode} />
       {/* FR-098: Toast for assignment errors */}
       <Toast message={assignmentError} onClose={clearAssignmentError} />
     </div>

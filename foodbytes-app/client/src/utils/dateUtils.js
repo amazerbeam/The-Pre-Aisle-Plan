@@ -128,6 +128,19 @@ export const formatDateRange = (startDate, endDate) => {
 }
 
 /**
+ * Compact week label for the header pill ("Nov 9 – 15"; across months "Nov 30 – Dec 6").
+ * @param {string} startISO - ISO format
+ * @param {string} endISO - ISO format
+ * @returns {string}
+ */
+export const formatWeekRange = (startISO, endISO) => {
+  const start = parseISODate(startISO)
+  const end = parseISODate(endISO)
+  const sameMonth = start.getMonth() === end.getMonth() && start.getFullYear() === end.getFullYear()
+  return `${formatDateShort(start)} – ${sameMonth ? end.getDate() : formatDateShort(end)}`
+}
+
+/**
  * MPP-9: format a build timestamp for the version line (e.g., "10 Oct 14:02").
  * Viewer local time zone, 24-hour (en-GB uses h23, so midnight is "00:05", never "24:05").
  * @param {string} iso - ISO-8601 timestamp, or unknown

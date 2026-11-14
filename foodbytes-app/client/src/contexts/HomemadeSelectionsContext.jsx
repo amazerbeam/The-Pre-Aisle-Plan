@@ -3,21 +3,6 @@ import { useAuth } from './AuthContext'
 import extraChoicesService from '../services/extraChoicesService'
 import { LEGACY_SELECTIONS_KEY_PREFIX } from '../constants/extraChoices'
 
-// FR-103: Shopping list cache key (shared with ShoppingListContext and MealPlanContext)
-const SHOPPING_LIST_INVALIDATED_KEY = 'shoppingListInvalidated'
-
-/**
- * FR-103: Invalidate shopping list cache when homemade selections change
- * Called directly to avoid circular dependency with ShoppingListContext
- */
-const invalidateShoppingListCache = () => {
-  try {
-    localStorage.setItem(SHOPPING_LIST_INVALIDATED_KEY, 'true')
-  } catch (err) {
-    console.error('Failed to invalidate shopping list cache:', err)
-  }
-}
-
 const readLocal = (key) => {
   try {
     const stored = localStorage.getItem(key)
@@ -100,7 +85,6 @@ export const HomemadeSelectionsProvider = ({ children }) => {
           console.error('Error saving homemade selections:', err)
         }
       }
-      invalidateShoppingListCache()
       return updated
     })
   }, [isAuthenticated, storageKey])

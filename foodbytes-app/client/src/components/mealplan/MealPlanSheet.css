@@ -1,0 +1,222 @@
+/* MealPlanSheet, MoveMealSheet, ServingsSheet - bottom sheet on mobile, centred card on desktop */
+
+.meal-sheet-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.meal-sheet-backdrop {
+  position: absolute;
+  inset: 0;
+  border: none;
+  padding: 0;
+  background: rgba(20, 16, 40, 0.4);
+  cursor: default;
+}
+
+.meal-sheet {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-height: 85vh;
+  max-height: 85dvh;
+  padding: 8px 16px calc(20px + env(safe-area-inset-bottom, 0px));
+  background: #fff;
+  border-radius: 20px 20px 0 0;
+  animation: mealSheetUp 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes mealSheetUp {
+  from { transform: translateY(100%); }
+  to { transform: none; }
+}
+
+.meal-sheet-grab {
+  width: 40px;
+  height: 4px;
+  margin: 4px auto 8px;
+  border-radius: 2px;
+  background: #d0cde0;
+}
+
+.meal-sheet-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.meal-sheet-title {
+  margin: 4px 0 8px;
+  color: var(--brand-primary);
+}
+
+.meal-sheet-close {
+  min-width: 44px;
+  min-height: 44px;
+  border: none;
+  background: none;
+  font-size: 24px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.meal-sheet-content {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* Shared row/button styles for the sheet bodies */
+.meal-sheet-section {
+  margin: 12px 0 6px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.meal-sheet-slots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.meal-sheet-slot {
+  min-height: 44px;
+  padding: 6px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  background: #fff;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.meal-sheet-slot small {
+  display: block;
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.meal-sheet-slot:active:not(:disabled) {
+  background: var(--bg-secondary, #f4f2fa);
+  border-color: var(--brand-primary-light);
+}
+
+.meal-sheet-slot:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.meal-sheet-slot:focus-visible,
+.meal-sheet-close:focus-visible,
+.servings-sheet-step:focus-visible {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: 2px;
+}
+
+/* ServingsSheet */
+.servings-sheet-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 8px 0 12px;
+}
+
+.servings-sheet-step {
+  min-width: 44px;
+  min-height: 44px;
+  border: 1px solid var(--border-color);
+  border-radius: 50%;
+  background: #fff;
+  font-size: 22px;
+  color: var(--brand-primary);
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.servings-sheet-step:active:not(:disabled) {
+  background: var(--bg-secondary, #f4f2fa);
+}
+
+.servings-sheet-input {
+  width: 90px;
+  min-height: 44px;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  font-size: 18px;
+  text-align: center;
+}
+
+.servings-sheet-error {
+  margin: 0 0 8px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--error, #dc3545);
+}
+
+.servings-sheet-save {
+  width: 100%;
+  min-height: 44px;
+  border: none;
+  border-radius: 10px;
+  background: var(--brand-primary);
+  color: #fff;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.servings-sheet-save:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+@media (hover: hover) {
+  .meal-sheet-slot:hover:not(:disabled) {
+    background: var(--bg-secondary, #f4f2fa);
+    border-color: var(--brand-primary-light);
+  }
+
+  .servings-sheet-step:hover:not(:disabled) {
+    background: var(--bg-secondary, #f4f2fa);
+  }
+}
+
+/* Desktop: centred card */
+@media (min-width: 769px) {
+  .meal-sheet-overlay {
+    align-items: center;
+  }
+
+  .meal-sheet {
+    max-width: 440px;
+    padding-bottom: 20px;
+    border-radius: 14px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+    animation: none;
+  }
+
+  .meal-sheet-grab {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .meal-sheet {
+    animation: none;
+  }
+}

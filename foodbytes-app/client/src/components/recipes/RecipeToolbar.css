@@ -1,0 +1,188 @@
+/* Recipes toolbar, week strip and picking banner (recipes-mockup.html) */
+.recipe-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 90;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  background: #fff;
+  border-bottom: 1px solid var(--border-color);
+  padding: 10px 12px 8px;
+}
+
+.recipe-tabs { display: flex; gap: 6px; order: 2; width: 100%; }
+
+.recipe-tab {
+  flex: 1;
+  min-height: 44px;
+  padding: 0 4px;
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--text-secondary);
+  font-size: 13px;
+  white-space: nowrap;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+.recipe-tab.on {
+  background: var(--brand-primary);
+  border-color: var(--brand-primary);
+  color: #fff;
+  font-weight: 600;
+}
+.recipe-tab .tab-count { display: none; font-size: 11px; opacity: .7; margin-left: 3px; }
+
+.recipe-search {
+  order: 1;
+  width: 100%;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  background: #fff;
+  font-size: 16px;
+}
+
+.recipe-chip {
+  order: 3;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px dashed #c9c3e6;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--brand-primary-light);
+  font-size: 13px;
+  white-space: nowrap;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+.recipe-chip.on {
+  border-style: solid;
+  background: #eeebf7;
+  color: var(--brand-primary);
+  font-weight: 600;
+}
+
+.recipe-add-btn {
+  order: 4;
+  min-height: 44px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 10px;
+  background: var(--success);
+  color: #fff;
+  font-weight: 600;
+  white-space: nowrap;
+  margin-left: auto;
+}
+@media (hover: hover) {
+  .recipe-tab:hover:not(.on) { background: var(--bg-secondary); }
+  .recipe-add-btn:hover { background: #1a7f37; }
+}
+.recipe-tab:active:not(.on) { background: var(--bg-secondary); }
+.recipe-tab:focus-visible,
+.recipe-chip:focus-visible,
+.recipe-add-btn:focus-visible,
+.week-tile:focus-visible,
+.picking-banner button:focus-visible {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: 2px;
+}
+
+@media (min-width: 769px) {
+  .recipe-toolbar { padding: 12px 4px 10px; }
+  .recipe-tabs { order: 1; width: auto; }
+  .recipe-tab { flex: none; padding: 0 14px; font-size: 14px; }
+  .recipe-tab .tab-count { display: inline; }
+  .recipe-search { order: 2; width: auto; flex: 1; min-width: 200px; font-size: 15px; }
+  .recipe-chip { order: 3; }
+  .recipe-add-btn { margin-left: 0; }
+}
+
+/* Week strip */
+.week-strip {
+  margin-top: 14px;
+  background: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 8px;
+}
+.week-strip-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+.week-strip-gap { margin-left: auto; text-transform: none; letter-spacing: 0; font-weight: 600; color: #9a5b00; }
+.week-strip-days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+
+.week-tile {
+  min-height: 44px;
+  padding: 5px 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  text-align: center;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  background: var(--bg-secondary);
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+.week-tile-day { font-size: 12px; font-weight: 700; }
+.week-tile-day span { font-weight: 400; color: var(--text-secondary); }
+.week-tile-name { display: none; font-size: 12px; color: var(--text-secondary); }
+.week-tile-dot { width: 7px; height: 7px; border-radius: 50%; background: #b8b2d6; margin-top: 2px; }
+.week-tile.is-empty { border: 1.5px dashed #e3b45c; background: #fffaf0; }
+.week-tile.is-empty .week-tile-dot { background: #e3b45c; }
+.week-tile.is-empty .week-tile-name { color: #9a5b00; font-weight: 600; }
+.week-tile.is-today { box-shadow: inset 0 0 0 2px var(--brand-primary); }
+.week-tile.is-picking { background: var(--brand-primary); border-color: var(--brand-primary); color: #fff; }
+.week-tile.is-picking .week-tile-name,
+.week-tile.is-picking .week-tile-day span { color: #e0dcf5; }
+
+@media (min-width: 769px) {
+  .week-strip { padding: 10px 12px; }
+  .week-strip-days { gap: 6px; }
+  .week-tile { min-height: 56px; padding: 6px 8px; align-items: flex-start; text-align: left; }
+  .week-tile-name {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .week-tile-dot { display: none; }
+}
+
+/* Picking banner */
+.picking-banner {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--brand-primary);
+  color: #fff;
+  font-size: 14px;
+}
+.picking-banner button {
+  margin-left: auto;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .15);
+  color: #fff;
+  touch-action: manipulation;
+}

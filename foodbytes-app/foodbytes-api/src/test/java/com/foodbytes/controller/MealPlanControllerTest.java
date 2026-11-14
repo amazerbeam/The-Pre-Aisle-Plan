@@ -2,7 +2,9 @@ package com.foodbytes.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.foodbytes.dto.MealPlanEntryDTO;
 import com.foodbytes.dto.MealPlanEntryEatenDTO;
+import com.foodbytes.dto.MealPlanEntryUpdateRequest;
 import com.foodbytes.dto.MealPlanEntryEatenRequest;
 import com.foodbytes.security.UserPrincipal;
 import com.foodbytes.service.MealPlanService;
@@ -12,8 +14,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.http.ResponseEntity;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.Optional;
 
@@ -70,5 +75,63 @@ class MealPlanControllerTest {
 
         assertThat(response.getStatusCode().value()).isEqualTo(403);
         verifyNoInteractions(mealPlanService);
+    }
+
+    @Test
+    void updateEntry_returns200WithEntry() {
+        when(userPrincipal.getId()).thenReturn(7L);
+        MealPlanEntryDTO dto = new MealPlanEntryDTO();
+        dto.setId(812L);
+        MealPlanEntryUpdateRequest req = new MealPlanEntryUpdateRequest(null, null, new BigDecimal("2"));
+        when(mealPlanService.updateEntry(7L, 812L, req)).thenReturn(Optional.of(dto));
+
+        ResponseEntity<?> response = controller.updateEntry(userPrincipal, 812L, req);
+
+        assertThat(response.getStatusCode().value()).isEqualTo(200);
+        assertThat(response.getBody()).isSameAs(dto);
+    }
+
+    @Test
+    void updateEntry_entryNotInPlan_returns404() {
+        when(userPrincipal.getId()).thenReturn(7L);
+        MealPlanEntryUpdateRequest req = new MealPlanEntryUpdateRequest(null, null, BigDecimal.ONE);
+        when(mealPlanService.updateEntry(7L, 999L, req)).thenReturn(Optional.empty());
+
+        assertThat(controller.updateEntry(userPrincipal, 999L, req).getStatusCode().value()).isEqualTo(404);
+    }
+
+    @Test
+    void updateEntry_unauthenticated_returns403() {
+        ResponseEntity<?> response = controller.updateEntry(null, 812L, new MealPlanEntryUpdateRequest(null, null, BigDecimal.ONE));
+        assertThat(response.getStatusCode().value()).isEqualTo(403);
+        verifyNoInteractions(mealPlanService);
+    }
+
+    @Test
+    void updateEntry_concurrentConflict_returns409() {
+        when(userPrincipal.getId()).thenReturn(7L);
+        MealPlanEntryUpdateRequest req = new MealPlanEntryUpdateRequest(null, null, BigDecimal.ONE);
+        when(mealPlanService.updateEntry(7L, 812L, req)).thenThrow(new DataIntegrityViolationException("dup"));
+
+        assertThat(controller.updateEntry(userPrincipal, 812L, req).getStatusCode().value()).isEqualTo(409);
+    }
+
+    @Test
+    void updateEntry_duplicateSlotRows_returns409() {
+        when(userPrincipal.getId()).thenReturn(7L);
+        MealPlanEntryUpdateRequest req = new MealPlanEntryUpdateRequest(null, null, BigDecimal.ONE);
+        when(mealPlanService.updateEntry(7L, 812L, req))
+            .thenThrow(new IncorrectResultSizeDataAccessException(1, 2));
+
+        assertThat(controller.updateEntry(userPrincipal, 812L, req).getStatusCode().value()).isEqualTo(409);
+    }
+
+    @Test
+    void updateEntry_unknownMeal_returns400() {
+        when(userPrincipal.getId()).thenReturn(7L);
+        MealPlanEntryUpdateRequest req = new MealPlanEntryUpdateRequest(null, null, BigDecimal.ONE);
+        when(mealPlanService.updateEntry(7L, 812L, req)).thenThrow(new IllegalArgumentException("Meal type not found"));
+
+        assertThat(controller.updateEntry(userPrincipal, 812L, req).getStatusCode().value()).isEqualTo(400);
     }
 }

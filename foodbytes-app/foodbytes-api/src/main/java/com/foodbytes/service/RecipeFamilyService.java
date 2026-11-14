@@ -300,18 +300,7 @@ public class RecipeFamilyService {
     }
 
     private RecipeVariantDTO toVariantDTO(RecipeFamilyMember member) {
-        Recipe recipe = member.getRecipe();
-        // FR-043: Derived per-serving kcal for dropdown display — homemade basis,
-        // matching RecipeService.addVariantInfo.
-        Integer caloriesPerServing = macroCalculationService.calculateCaloriesPerServing(recipe);
-        return new RecipeVariantDTO(
-            recipe.getId(),
-            recipe.getName(),
-            member.getVariantLabel(),
-            member.getIsDefault(),
-            member.getDisplayOrder(),
-            caloriesPerServing
-        );
+        return RecipeVariantMapper.toDto(member, macroCalculationService);
     }
 
     private RecipeFamilyDTO toFamilyDTO(RecipeFamily family) {

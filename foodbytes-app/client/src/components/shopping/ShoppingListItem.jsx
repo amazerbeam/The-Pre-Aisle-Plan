@@ -28,11 +28,31 @@ const ShoppingListItem = ({ item, startDate }) => {
   }
 
   const handleKeyDown = (e) => {
+    // The ⓘ button inside the row handles its own keys
+    if (e.target !== e.currentTarget) return
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault()
       toggleItem(item.id)
     }
   }
+
+  // FR-042: Fetch the breakdown (long press and the ⓘ button share this)
+  const openBreakdown = useCallback(async () => {
+    try {
+      // sourceChain is still sent for API compatibility, but the endpoint accepts and ignores
+      // it — the backend scans the whole week itself. See ShoppingListService's javadoc.
+      const data = await shoppingService.getIngredientBreakdown(
+        item.ingredientId,
+        item.unit,
+        startDate,
+        item.sourceChain
+      )
+      setBreakdown(data)
+      setShowBreakdown(true)
+    } catch (error) {
+      console.error('Failed to fetch ingredient breakdown:', error)
+    }
+  }, [item.ingredientId, item.unit, startDate, item.sourceChain])
 
   // FR-042: Start long press timer
   const startLongPress = useCallback(() => {
@@ -43,24 +63,10 @@ const ShoppingListItem = ({ item, startDate }) => {
     setIsLongPressing(true)
 
     longPressTimer.current = setTimeout(async () => {
-      // Fetch breakdown from API
-      try {
-        // sourceChain is still sent for API compatibility, but the endpoint accepts and ignores
-        // it — the backend scans the whole week itself. See ShoppingListService's javadoc.
-        const data = await shoppingService.getIngredientBreakdown(
-          item.ingredientId,
-          item.unit,
-          startDate,
-          item.sourceChain
-        )
-        setBreakdown(data)
-        setShowBreakdown(true)
-      } catch (error) {
-        console.error('Failed to fetch ingredient breakdown:', error)
-      }
+      await openBreakdown()
       setIsLongPressing(false)
     }, LONG_PRESS_DURATION)
-  }, [checked, item.ingredientId, item.unit, startDate, item.sourceChain, item.id])
+  }, [checked, openBreakdown])
 
   // FR-042: Cancel long press timer
   const cancelLongPress = useCallback(() => {
@@ -125,23 +131,31 @@ const ShoppingListItem = ({ item, startDate }) => {
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
         onTouchMove={handleTouchMove}
-        role="button"
+        role="checkbox"
+        aria-checked={checked}
+        aria-label={item.ingredientName}
         tabIndex={0}
       >
-        <input
-          type="checkbox"
-          checked={checked}
-          onChange={() => {}} // Controlled by parent click handler
-          aria-label={`Check off ${item.ingredientName}`}
-          tabIndex={-1} // Parent handles keyboard
-        />
-        <span className="item-name">{item.ingredientName}</span>
+        <span className="tick-circle" aria-hidden="true">{checked ? '✓' : ''}</span>
         <span className="item-quantity">
           {formatQuantity(item.quantity)} {item.unit}
         </span>
+        <span className="item-name">{item.ingredientName}</span>
         {/* FR-042: Visual feedback during long press */}
         {isLongPressing && !checked && (
           <span className="long-press-indicator">Hold...</span>
+        )}
+        {!checked && (
+          <button
+            type="button"
+            className="info-btn"
+            aria-label={`Which meals use ${item.ingredientName}?`}
+            onClick={(e) => { e.stopPropagation(); openBreakdown() }}
+            onMouseDown={(e) => e.stopPropagation()}
+            onTouchStart={(e) => e.stopPropagation()}
+          >
+            ⓘ
+          </button>
         )}
       </div>
 

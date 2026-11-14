@@ -3,12 +3,12 @@ import './MealPlanMenu.css'
 
 /**
  * Overflow menu trigger in the Meal Plan header. Replaces the standalone
- * "C" copy-week button. Exposes Copy week / Manage extras (this week) /
- * Save as / Apply / Manage templates.
+ * "C" copy-week button. Exposes Copy week / Swap two days (optional) /
+ * Manage extras (this week) / Save as / Apply / Manage templates.
  *
  * See requirement-meal-plan-templates-2026-05-09.md.
  */
-function MealPlanMenu({ onCopyWeek, onManageExtras, onSaveAs, onApply, onManage }) {
+function MealPlanMenu({ onCopyWeek, onSwapDays, onManageExtras, onSaveAs, onApply, onManage }) {
   const [open, setOpen] = useState(false)
   const wrapperRef = useRef(null)
 
@@ -79,6 +79,13 @@ function MealPlanMenu({ onCopyWeek, onManageExtras, onSaveAs, onApply, onManage 
                 Copy week…
               </button>
             </li>
+            {onSwapDays && (
+              <li role="none">
+                <button role="menuitem" type="button" onClick={choose(onSwapDays)}>
+                  Swap two days…
+                </button>
+              </li>
+            )}
             <li role="none">
               <button role="menuitem" type="button" onClick={choose(onManageExtras)}>
                 Manage extras…

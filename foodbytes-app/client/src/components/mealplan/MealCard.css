@@ -1,0 +1,180 @@
+/* MealCard - values from the approved mockup (.meal / .mcard) */
+
+.meal-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff;
+  border: 1px solid var(--border-color);
+  border-left: 4px solid var(--brand-primary-light);
+  border-radius: 8px;
+  padding: 8px 4px 8px 10px;
+  cursor: pointer;
+  transition: box-shadow 0.15s, transform 0.15s;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.meal-card:focus-visible {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: 2px;
+}
+
+.meal-card.is-eaten {
+  background: #eef8f0;
+  border-left-color: var(--success);
+}
+
+.meal-card-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.meal-card-name {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.meal-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.meal-card-servings {
+  background: var(--brand-tint, #eeebf7);
+  color: var(--brand-primary);
+  border-radius: 999px;
+  padding: 1px 7px;
+  font-weight: 600;
+  font-size: 11px;
+}
+
+.meal-card-cart {
+  display: inline-flex;
+  font-size: 13px;
+}
+
+/* 44x44 hit area around a 24px visual circle */
+.meal-card-tick {
+  position: relative;
+  isolation: isolate;
+  flex: none;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: transparent;
+  font-size: 12px;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.meal-card-tick::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 24px;
+  height: 24px;
+  margin: -12px 0 0 -12px;
+  box-sizing: border-box;
+  border-radius: 50%;
+  border: 2px solid #cfd4da;
+  background: #fff;
+  z-index: -1;
+}
+
+.meal-card-tick:active {
+  color: var(--success);
+}
+
+.meal-card-tick:active::before {
+  border-color: var(--success);
+}
+
+.meal-card-tick:focus-visible {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: -4px;
+  border-radius: 50%;
+}
+
+.is-eaten .meal-card-tick {
+  color: #fff;
+  cursor: default;
+}
+
+.is-eaten .meal-card-tick::before {
+  background: var(--success);
+  border-color: var(--success);
+}
+
+/* Large (mobile day view) */
+.meal-card--large {
+  padding: 12px 6px 12px 12px;
+  gap: 12px;
+  border-radius: 14px;
+  border-left-width: 1px;
+}
+
+.meal-card--large.is-eaten {
+  border-color: #cfe9d5;
+}
+
+.meal-card--large .meal-card-name {
+  font-size: 15px;
+}
+
+.meal-card--large .meal-card-meta {
+  margin-top: 3px;
+  flex-wrap: wrap;
+  white-space: normal;
+}
+
+.meal-card-thumb {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: var(--brand-tint, #eeebf7);
+  font-size: 26px;
+}
+
+.meal-card--large .meal-card-tick {
+  font-size: 15px;
+}
+
+.meal-card--large .meal-card-tick::before {
+  width: 34px;
+  height: 34px;
+  margin: -17px 0 0 -17px;
+}
+
+@media (hover: hover) {
+  .meal-card:hover {
+    box-shadow: var(--shadow-md, 0 4px 12px rgba(0, 0, 0, 0.12));
+    transform: translateY(-1px);
+  }
+
+  .meal-card-tick:hover:not(:disabled) {
+    color: var(--success);
+  }
+
+  .meal-card-tick:hover:not(:disabled)::before {
+    border-color: var(--success);
+  }
+}

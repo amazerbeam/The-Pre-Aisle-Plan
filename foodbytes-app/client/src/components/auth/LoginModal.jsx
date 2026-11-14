@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
+import BrandMark from '../common/BrandMark'
 import './LoginModal.css'
 
 function LoginModal({ onClose }) {
@@ -44,6 +45,7 @@ function LoginModal({ onClose }) {
         </button>
 
         <div className="modal-header">
+          <BrandMark size={72} className="login-brand-mark" />
           <h2>Welcome to My Pantry Plan</h2>
           <p>Sign in to unlock all features</p>
         </div>

@@ -5,6 +5,7 @@ import PetRoom from './room/PetRoom'
 import PipHeader from './PipHeader'
 import CheckInActions from './room/CheckInActions'
 import { PET_GUEST_MESSAGE } from '../../constants/pet'
+import { RECIPES_PATH } from '../../constants/appRoutes'
 import { PIP_FORM_NAMES, PIP_FORMS } from '../../constants/pipGrowth'
 import useCookAndServe from '../../hooks/useCookAndServe'
 import useHabitCheckIn from '../../hooks/useHabitCheckIn'
@@ -63,7 +64,7 @@ function PetView() {
     return (
       <div className="pet-view-state">
         <h2>{PET_GUEST_MESSAGE}</h2>
-        <button type="button" className="pet-view-state-btn" onClick={() => navigate('/')}>
+        <button type="button" className="pet-view-state-btn" onClick={() => navigate(RECIPES_PATH)}>
           Go to Recipes
         </button>
       </div>

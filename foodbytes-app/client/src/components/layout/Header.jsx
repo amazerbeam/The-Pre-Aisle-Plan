@@ -2,10 +2,13 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import LoginModal from '../auth/LoginModal'
+import BrandMark from '../common/BrandMark'
 import DateRangePicker from '../common/DateRangePicker'
+import HeaderNav from './HeaderNav'
 import DefaultPortionsControl from './DefaultPortionsControl'
 import MealTimesControl from './MealTimesControl'
 import VersionInfo from './VersionInfo'
+import { RECIPES_PATH } from '../../constants/appRoutes'
 import './Header.css'
 
 function Header() {
@@ -14,75 +17,65 @@ function Header() {
   const [showUserMenu, setShowUserMenu] = useState(false)
   const navigate = useNavigate()
 
+  const avatar = user?.avatarUrl ? (
+    <img src={user.avatarUrl} alt="" className="avatar" />
+  ) : (
+    <div className="avatar-placeholder">{user?.name?.charAt(0).toUpperCase()}</div>
+  )
+
   return (
     <header className="header">
       <div className="header-content">
-        {/* Pill Bar Layout */}
-        <div className="header-pill">
-          {/* FR-039: Clickable logo navigates to Recipes */}
-          <button
-            className="logo-btn"
-            onClick={() => navigate('/')}
-            title="Go to Recipes"
-            aria-label="Go to Recipes"
-          >
-            <svg className="logo-icon" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-              <rect x="15" y="20" width="70" height="65" rx="8" stroke="currentColor" strokeWidth="6"/>
-              <line x1="15" y1="38" x2="85" y2="38" stroke="currentColor" strokeWidth="6"/>
-              <line x1="30" y1="12" x2="30" y2="28" stroke="currentColor" strokeWidth="6" strokeLinecap="round"/>
-              <line x1="70" y1="12" x2="70" y2="28" stroke="currentColor" strokeWidth="6" strokeLinecap="round"/>
-              <text x="50" y="70" fontFamily="Georgia, serif" fontSize="32" fontWeight="bold" fill="currentColor" textAnchor="middle">P</text>
-            </svg>
-          </button>
+        {/* FR-039: the brand navigates to Recipes */}
+        <button className="brand-btn" onClick={() => navigate(RECIPES_PATH)} title="Go to Recipes" aria-label="My Pantry Plan, go to Recipes">
+          <BrandMark size={40} className="brand-mark" />
+          <span className="brand-word" aria-hidden="true">My Pantry <span>Plan</span></span>
+        </button>
 
-          {/* FR-007: Date Range Picker */}
-          <div className="header-pill-center">
-            <DateRangePicker />
-          </div>
+        <HeaderNav />
 
-          {/* User Avatar / Sign In */}
-          <div className="header-pill-right">
-            {isAuthenticated ? (
-              <div className="user-menu-container">
-                <button
-                  className="avatar-btn"
-                  onClick={() => setShowUserMenu(!showUserMenu)}
-                  aria-label="User menu"
-                >
-                  {user.avatarUrl ? (
-                    <img src={user.avatarUrl} alt={user.name} className="avatar" />
-                  ) : (
-                    <div className="avatar-placeholder">
-                      {user.name?.charAt(0).toUpperCase()}
-                    </div>
-                  )}
-                </button>
+        {/* FR-007: week pill (renders nothing for guests) */}
+        <div className="header-week"><DateRangePicker /></div>
 
-                {showUserMenu && (
-                  <div className="user-dropdown">
+        <div className="header-account">
+          {isAuthenticated ? (
+            <div className="user-menu-container">
+              <button
+                className="avatar-btn"
+                onClick={() => setShowUserMenu(!showUserMenu)}
+                aria-label="User menu"
+                aria-expanded={showUserMenu}
+                aria-haspopup="menu"
+              >
+                {user.avatarUrl ? (
+                  <img src={user.avatarUrl} alt={user.name} className="avatar" />
+                ) : (
+                  <div className="avatar-placeholder">{user.name?.charAt(0).toUpperCase()}</div>
+                )}
+              </button>
+
+              {showUserMenu && (
+                <div className="user-dropdown" role="menu" aria-label="Account">
+                  <div className="user-who">
+                    {avatar}
                     <div className="user-info">
                       <span className="user-name-full">{user.name}</span>
                       <span className="user-email">{user.email}</span>
                     </div>
-                    <DefaultPortionsControl />
-                    <MealTimesControl />
-                    <button className="logout-btn" onClick={logout}>
-                      Sign Out
-                    </button>
-                    {/* MPP-9: mounts only while the menu is open, so /api/health is fetched lazily */}
-                    <VersionInfo />
                   </div>
-                )}
-              </div>
-            ) : (
-              <button
-                className="sign-in-btn-pill"
-                onClick={() => setShowLoginModal(true)}
-              >
-                Sign In
-              </button>
-            )}
-          </div>
+                  <section className="user-section" aria-label="Portions"><DefaultPortionsControl /></section>
+                  <section className="user-section" aria-label="Meal times"><MealTimesControl /></section>
+                  <button className="logout-btn" onClick={logout}>↩ Sign out</button>
+                  {/* MPP-9: mounts only while the menu is open, so /api/health is fetched lazily */}
+                  <VersionInfo />
+                </div>
+              )}
+            </div>
+          ) : (
+            <button className="sign-in-btn-pill" onClick={() => setShowLoginModal(true)}>
+              Sign In
+            </button>
+          )}
         </div>
       </div>
 

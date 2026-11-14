@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Recipes Redesign</title>
+<style>
+/* Tokens mirror client/src/styles/global.css */
+:root{
+  --brand-primary:#4a3f80; --brand-primary-dark:#3a3266; --brand-primary-light:#6b5fa0; --brand-tint:#efedf7;
+  --text-primary:#2c3e50; --text-secondary:#6c757d; --bg-primary:#fff; --bg-secondary:#f8f9fa; --border-color:#e9ecef;
+  --success:#28a745; --error:#dc3545; --cheat:#ff6b35; --cart:#e8890c;
+  --shadow-md:0 4px 6px rgba(0,0,0,.1); --shadow-lg:0 10px 25px rgba(0,0,0,.15);
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color:var(--text-primary);background:#e7e5ef}
+button{font:inherit;cursor:pointer}
+input{font:inherit}
+
+/* mockup chrome */
+.chrome{position:sticky;top:0;z-index:50;background:#1f1a3a;color:#fff;display:flex;gap:8px;align-items:center;padding:10px 16px;flex-wrap:wrap}
+.chrome h1{font-size:15px;margin:0 12px 0 0;font-weight:600}
+.chrome .tab{background:transparent;border:1px solid #5b5390;color:#d9d4f5;border-radius:999px;padding:6px 14px;font-size:13px}
+.chrome .tab.on{background:#fff;color:#1f1a3a;border-color:#fff}
+.chrome label{font-size:12px;color:#bdb6e6;margin-left:auto;display:flex;gap:6px;align-items:center}
+.view{display:none}.view.on{display:block}
+.marker{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:#ff4f8b;color:#fff;font-size:11px;font-weight:700;box-shadow:0 0 0 2px #fff;flex:none;cursor:pointer;vertical-align:middle}
+body:not(.show-markers) .marker{display:none}
+
+/* header pill (from meal plan redesign) */
+.app-header{background:var(--brand-primary);padding:12px 16px;display:flex;justify-content:center}
+.pill{background:var(--brand-primary-dark);border-radius:999px;display:flex;align-items:center;gap:16px;padding:6px 8px;color:#fff;min-width:560px;justify-content:space-between}
+.pill .logo{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.12);display:grid;place-items:center}
+.pill .avatar{width:36px;height:36px;border-radius:50%;background:#fff;color:var(--brand-primary);display:grid;place-items:center;font-weight:700}
+.weeknav{display:flex;align-items:center;gap:6px}
+.weeknav .arrow{width:32px;height:32px;border-radius:50%;border:none;background:rgba(255,255,255,.14);color:#fff;font-size:16px}
+.weeknav .range{background:#fff;color:var(--brand-primary);border:none;border-radius:999px;padding:7px 14px;font-weight:600;font-size:14px}
+
+/* ---------- shared recipe UI (used by web + phone) ---------- */
+.toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.search{flex:1;min-width:200px;display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--border-color);border-radius:12px;padding:0 12px;height:44px}
+.search input{border:none;outline:none;flex:1;font-size:15px;background:transparent}
+.mtabs{display:flex;gap:6px}
+.mtab{border:1px solid var(--border-color);background:#fff;border-radius:999px;padding:9px 14px;font-size:14px;color:var(--text-secondary);white-space:nowrap}
+.mtab .n{font-size:11px;opacity:.7;margin-left:3px}
+.mtab.on{background:var(--brand-primary);border-color:var(--brand-primary);color:#fff;font-weight:600}
+.fchip{border:1px dashed #c9c3e6;background:transparent;border-radius:999px;padding:8px 12px;font-size:13px;color:var(--brand-primary-light);white-space:nowrap}
+.fchip.on{border-style:solid;background:var(--brand-tint);color:var(--brand-primary);font-weight:600}
+.addbtn{background:var(--success);color:#fff;border:none;border-radius:10px;padding:10px 14px;font-weight:600}
+.admin-only{display:none}body.admin .admin-only{display:inline-flex}
+
+/* week strip (idea 2) */
+.week{margin-top:14px;background:#fff;border:1px solid var(--border-color);border-radius:14px;padding:10px 12px}
+.week-h{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--text-secondary);margin-bottom:8px}
+.week-h .gap{margin-left:auto;text-transform:none;letter-spacing:0;font-weight:600;color:#9a5b00}
+.wdays{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.wday{border:1px solid var(--border-color);background:var(--bg-secondary);border-radius:10px;padding:6px 8px;text-align:left;min-height:56px;display:flex;flex-direction:column;gap:2px}
+.wday .d{font-size:12px;font-weight:700}.wday .d span{font-weight:400;color:var(--text-secondary)}
+.wday .r{font-size:12px;color:var(--text-secondary);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.wday.empty{border:1.5px dashed #e3b45c;background:#fffaf0}
+.wday.empty .r{color:#9a5b00;font-weight:600}
+.wday.today{box-shadow:inset 0 0 0 2px var(--brand-primary)}
+.wday.picking{background:var(--brand-primary);color:#fff;border-color:var(--brand-primary)}
+.wday.picking .r,.wday.picking .d span{color:#e0dcf5}
+
+/* picking banner (idea 3) */
+.pickbar{margin-top:12px;background:var(--brand-primary);color:#fff;border-radius:12px;padding:10px 14px;display:none;align-items:center;gap:10px}
+.pickbar.on{display:flex}
+.pickbar button{margin-left:auto;background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:8px;padding:6px 10px}
+
+/* card */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;margin-top:16px}
+.card{background:#fff;border:1px solid var(--border-color);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px;position:relative;transition:opacity .25s,transform .25s}
+.card.inplan{border-color:#cfc9ea;box-shadow:inset 4px 0 0 var(--brand-primary)}
+.card.hiding{opacity:0;transform:scale(.96)}
+.card.is-hidden{opacity:.6;background:var(--bg-secondary)}
+.ctop{display:flex;gap:8px;align-items:flex-start}
+.cname{font-size:16px;font-weight:700;line-height:1.25;flex:1;cursor:pointer;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.cname:hover{color:var(--brand-primary)}
+.badge{font-size:11px;font-weight:700;border-radius:6px;padding:2px 7px;white-space:nowrap}
+.b-cheat{background:var(--cheat);color:#fff}.b-aud{background:#e3f4e7;color:#1b6b2e}
+.b-plan{background:var(--brand-tint);color:var(--brand-primary)}
+.kebab{width:32px;height:32px;border:none;background:transparent;border-radius:8px;color:var(--text-secondary);font-size:18px;line-height:1;flex:none}
+.kebab:hover{background:var(--bg-secondary)}
+.cmenu{position:absolute;right:10px;top:46px;z-index:15;background:#fff;border:1px solid var(--border-color);border-radius:10px;box-shadow:var(--shadow-lg);padding:4px;min-width:200px;display:none}
+.cmenu.open{display:block}
+.cmenu button{display:block;width:100%;text-align:left;border:none;background:none;padding:9px 10px;font-size:14px;border-radius:6px}
+.cmenu button:hover{background:var(--brand-tint)}
+/* variant segment (idea 4) */
+.seg{display:grid;grid-template-columns:repeat(3,1fr);background:var(--bg-secondary);border-radius:10px;padding:3px;gap:3px}
+.seg button{border:none;background:transparent;border-radius:8px;padding:5px 0;display:flex;flex-direction:column;align-items:center;font-size:12px;color:var(--text-secondary);min-height:40px;justify-content:center}
+.seg button b{font-size:14px;color:var(--text-primary)}
+.seg button.on{background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.12);color:var(--brand-primary)}
+.seg button.on b{color:var(--brand-primary)}
+.single{font-size:14px;font-weight:700}
+.single span{font-weight:400;color:var(--text-secondary);font-size:12px}
+.mrow{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.mchip{font-size:12px;font-weight:600;padding:3px 8px;border-radius:999px}
+.m-on{background:rgba(40,167,69,.15);color:#1b6b2e}.m-near{background:rgba(255,193,7,.22);color:#856404}
+.m-under{background:rgba(74,163,240,.2);color:#10527f}.m-over{background:rgba(220,53,69,.15);color:#a71d2a}
+.ppl{margin-left:auto;border:1px solid var(--border-color);background:#fff;border-radius:999px;padding:4px 10px;font-size:12px;color:var(--brand-primary);font-weight:600;position:relative}
+.stepper{position:absolute;right:0;top:calc(100% + 6px);background:#fff;border:1px solid var(--border-color);border-radius:12px;box-shadow:var(--shadow-lg);padding:6px;display:none;gap:6px;align-items:center;z-index:16}
+.stepper.open{display:flex}
+.stepper button{width:36px;height:36px;border-radius:50%;border:1px solid var(--border-color);background:var(--bg-secondary);font-size:18px}
+.stepper span{min-width:28px;text-align:center;font-weight:700;color:var(--text-primary)}
+/* day picker (idea 6) */
+.dlabel{font-size:12px;color:var(--text-secondary);display:flex;justify-content:space-between}
+.days{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.dbtn{position:relative;height:40px;border-radius:10px;border:1.5px solid var(--border-color);background:#fff;font-size:13px;font-weight:600;color:var(--text-secondary)}
+.dbtn:hover{border-color:var(--brand-primary-light);color:var(--brand-primary)}
+.dbtn.other{background:var(--bg-secondary);color:#9aa1a8}
+.dbtn.other::after{content:"";position:absolute;right:5px;top:5px;width:6px;height:6px;border-radius:50%;background:#b8b2d6}
+.dbtn.mine{background:var(--brand-primary);border-color:var(--brand-primary);color:#fff}
+.dbtn.mine::before{content:"✓ ";}
+.dbtn.target{border-color:var(--brand-primary);box-shadow:0 0 0 3px rgba(74,63,128,.2);color:var(--brand-primary)}
+.addto{width:100%;height:44px;border:none;border-radius:10px;background:var(--brand-primary);color:#fff;font-weight:700;font-size:14px}
+.addto.done{background:var(--success)}
+.legend{display:flex;gap:14px;font-size:12px;color:var(--text-secondary);margin-top:10px;flex-wrap:wrap}
+.legend i{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin-right:4px;border:1.5px solid var(--border-color);background:#fff}
+.legend i.o{background:var(--bg-secondary)}.legend i.m{background:var(--brand-primary);border-color:var(--brand-primary)}
+.hidden-note{grid-column:1/-1;background:#fff;border:1px dashed #c9c3e6;border-radius:12px;padding:12px 14px;font-size:14px;color:var(--text-secondary)}
+.unhide{border:none;background:var(--brand-primary);color:#fff;border-radius:8px;padding:8px 12px;font-weight:600}
+
+/* tooltip, toast, modal */
+.tip{position:fixed;z-index:60;background:#1f1a3a;color:#fff;border-radius:8px;padding:6px 9px;font-size:12px;pointer-events:none;display:none;max-width:240px}
+.toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%) translateY(20px);background:#1f1a3a;color:#fff;padding:10px 12px 10px 16px;border-radius:10px;display:flex;gap:14px;align-items:center;font-size:14px;opacity:0;pointer-events:none;transition:.2s;z-index:90}
+.toast.show{opacity:1;transform:translateX(-50%);pointer-events:auto}
+.toast button{background:none;border:none;color:#ffd34d;font-weight:700}
+.scrim{position:fixed;inset:0;background:rgba(20,16,40,.45);display:none;align-items:center;justify-content:center;z-index:80}
+.scrim.open{display:flex}
+.modal{background:#fff;border-radius:14px;padding:18px 20px;width:min(420px,92vw);box-shadow:var(--shadow-lg)}
+.modal h3{margin:0 0 8px;color:var(--brand-primary)}.modal p{margin:6px 0;color:var(--text-secondary);font-size:14px}
+.modal .close{float:right;border:none;background:none;font-size:20px;color:var(--text-secondary)}
+
+/* web page */
+.web-page{background:var(--bg-primary);min-height:calc(100vh - 50px);padding-bottom:90px}
+.web-wrap{max-width:1180px;margin:0 auto;padding:22px 24px 0}
+.footnav{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--border-color);display:flex;justify-content:center;gap:48px;padding:10px 0 12px;z-index:30}
+.footnav span{font-size:14px;color:var(--text-secondary)}
+.footnav .on{color:var(--brand-primary);font-weight:600;border-bottom:3px solid var(--brand-primary);padding-bottom:4px}
+
+/* phone */
+.mobile-stage{display:flex;gap:40px;justify-content:center;align-items:flex-start;padding:28px 16px 60px;flex-wrap:wrap}
+.phone{width:390px;height:844px;border-radius:46px;background:#111;padding:12px;box-shadow:0 30px 60px rgba(0,0,0,.35);flex:none}
+.screen{width:100%;height:100%;border-radius:36px;overflow:hidden;background:var(--bg-secondary);position:relative;display:flex;flex-direction:column}
+.statusbar{height:34px;display:flex;justify-content:space-between;align-items:center;padding:0 26px;font-size:13px;font-weight:600;background:var(--brand-primary);color:#fff;flex:none}
+.m-head{background:var(--brand-primary);padding:4px 12px 10px;flex:none;color:#fff}
+.m-week{display:flex;align-items:center;justify-content:space-between;font-size:14px;font-weight:600}
+.m-week button{background:none;border:none;color:#fff;font-size:18px;width:36px;height:32px}
+.m-sticky{background:#fff;border-bottom:1px solid var(--border-color);padding:10px 12px 8px;flex:none}
+.m-sticky .search{height:40px;min-width:0}
+.m-sticky .mtabs{margin-top:8px;justify-content:space-between}
+.m-sticky .mtab{padding:7px 0;flex:1;text-align:center;font-size:13px}
+.m-sticky .mtab .n{display:none}
+.m-filters{display:flex;gap:6px;margin-top:8px;overflow-x:auto}
+.m-filters .fchip{padding:6px 10px;font-size:12px}
+.m-body{flex:1;overflow-y:auto;padding:10px 12px 90px}
+.m-body .week{margin-top:0;padding:8px}
+.m-body .wdays{gap:4px}
+.m-body .wday{min-height:44px;padding:5px 4px;align-items:center;text-align:center}
+.m-body .wday .r{display:none}
+.m-body .wday .dot{width:7px;height:7px;border-radius:50%;background:#b8b2d6;margin-top:2px}
+.m-body .wday.empty .dot{background:#e3b45c}
+.m-body .grid{grid-template-columns:1fr;gap:10px;margin-top:10px}
+.m-body .card{padding:12px;gap:9px}
+.m-body .cname{font-size:15px}
+.m-body .dbtn{height:38px;font-size:12px}
+.m-body .legend{display:none}
+.m-nav{position:absolute;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border-color);display:flex;justify-content:space-around;padding:8px 0 22px;font-size:11px;color:var(--text-secondary)}
+.m-nav span{display:flex;flex-direction:column;align-items:center;gap:2px}
+.m-nav .on{color:var(--brand-primary);font-weight:700}
+.screen .toast{position:absolute;bottom:84px}
+.phone-notes{max-width:420px;font-size:14px;line-height:1.5;color:#2c2850}
+.phone-notes h3{color:var(--brand-primary);margin-top:0}
+.phone-notes li{margin-bottom:8px}
+
+/* proposal */
+.prop{max-width:980px;margin:0 auto;padding:32px 20px 80px;background:#fff;min-height:100vh}
+.prop h2{color:var(--brand-primary);font-size:30px;margin:0 0 6px}
+.prop .lede{color:var(--text-secondary);font-size:16px;line-height:1.6;max-width:760px}
+.audit{border:1px solid var(--border-color);border-radius:12px;overflow:hidden;margin:20px 0 30px}
+.audit table{width:100%;border-collapse:collapse;font-size:14px}
+.audit th,.audit td{padding:9px 12px;border-bottom:1px solid var(--border-color);text-align:left;vertical-align:top}
+.audit th{background:var(--bg-secondary);font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--text-secondary)}
+.audit tr:last-child td{border-bottom:none}
+.pain{color:var(--error);font-weight:600}
+.idea{border:1px solid var(--border-color);border-radius:14px;padding:18px 20px;margin:14px 0;display:grid;grid-template-columns:40px 1fr;gap:4px 14px}
+.idea .num{width:34px;height:34px;border-radius:50%;background:#ff4f8b;color:#fff;font-weight:700;display:grid;place-items:center}
+.idea h3{margin:4px 0 6px}
+.idea .pitch{font-size:15px;line-height:1.55;margin:8px 0 10px}
+.idea .cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:13px;line-height:1.5}
+.idea .cols div{background:var(--bg-secondary);border-radius:8px;padding:10px 12px}
+.idea .cols b{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-secondary);margin-bottom:3px}
+.tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;margin-right:6px}
+.t-s{background:#e3f4e7;color:#1b6b2e}.t-m{background:#fff3cd;color:#856404}.t-l{background:#fde2e4;color:#a71d2a}
+.t-fe{background:var(--brand-tint);color:var(--brand-primary)}.t-be{background:#ffe8d6;color:#8a4500}
+.spec{background:#1f1a3a;color:#e7e3ff;border-radius:14px;padding:18px 22px;margin-top:30px;font-size:14px;line-height:1.6}
+.spec h3{color:#fff;margin-top:0}
+.spec code{background:rgba(255,255,255,.1);padding:1px 5px;border-radius:4px}
+@media (max-width:700px){.idea .cols{grid-template-columns:1fr}.pill{min-width:0}}
+</style>
+</head>
+<body class="show-markers">
+
+<div class="chrome">
+  <h1>Recipes redesign — mockup</h1>
+  <button class="tab on" data-view="web">Web</button>
+  <button class="tab" data-view="mobile">Mobile</button>
+  <button class="tab" data-view="proposal">Proposal</button>
+  <label><input type="checkbox" id="adm"> View as admin</label>
+  <label style="margin-left:12px"><input type="checkbox" id="mk" checked> Show idea markers</label>
+</div>
+
+<!-- ============ WEB ============ -->
+<section class="view on" id="v-web">
+  <div class="app-header"><div class="pill"><div class="logo">📅</div>
+    <div class="weeknav"><button class="arrow">‹</button><span class="range">📅 Nov 9 – Nov 15</span><button class="arrow">›</button></div>
+    <div class="avatar">J</div></div></div>
+  <div class="web-page"><div class="web-wrap" id="webRoot"></div></div>
+  <div class="footnav"><span class="on">☰ Recipes</span><span>📅 Meal Plan</span><span>🌱 Pip</span><span>🛒 Shopping</span></div>
+</section>
+
+<!-- ============ MOBILE ============ -->
+<section class="view" id="v-mobile">
+  <div class="mobile-stage">
+    <div class="phone"><div class="screen" id="screen">
+      <div class="statusbar"><span>13:40</span><span>▮▮▮ 40%</span></div>
+      <div class="m-head"><div class="m-week"><button>‹</button><span>Nov 9 – Nov 15</span><button>›</button></div></div>
+      <div class="m-sticky" id="mSticky"></div>
+      <div class="m-body" id="mBody"></div>
+      <div class="m-nav"><span class="on">☰<br>Recipes</span><span>📅<br>Meal Plan</span><span>🌱<br>Pip</span><span>🛒<br>Shopping</span></div>
+      <div class="toast" id="mtoast"><span></span><button onclick="undo()">Undo</button></div>
+    </div></div>
+    <div class="phone-notes">
+      <h3>Try it</h3>
+      <ul>
+        <li><b>All five meal tabs fit</b>: no hidden Snacks / Extras off the right edge.</li>
+        <li>The <b>week strip</b> shows which days already have breakfast. An amber dot means the slot is empty. <b>Tap an empty day</b> to start picking for it: every card swaps its 7 day buttons for one big <b>"Add to Sat"</b> button.</li>
+        <li><b>Light / Moderate / Balanced</b> is one tap, and the kcal and macros update with it.</li>
+        <li><b>⋯ → Hide from my recipes</b> hides a recipe and offers Undo. The <b>Hidden (n)</b> chip lists hidden recipes so you can bring them back.</li>
+        <li>A card is about <b>half the height</b> of today's, so you see roughly two and a half per screen instead of one and a bit.</li>
+      </ul>
+      <p style="color:#6c757d">Recipes, macros and the week's plan are illustrative, not read from the database.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PROPOSAL ============ -->
+<section class="view" id="v-proposal">
+  <div class="prop">
+    <h2>Recipes: pick a meal for a gap, not hunt through 7 numbers</h2>
+    <p class="lede">You come to the Recipes screen to fill your week. Today every card repeats the same seven daily calorie totals, shows the calories twice (as a dropdown and as a label), and shows no macros. Nothing tells you which days still need a breakfast. These ideas make the screen answer "what should I put where?". They also add the one thing you asked for: hiding recipes you never want to see.</p>
+
+    <h3>What's there today (audit)</h3>
+    <div class="audit"><table>
+      <tr><th>Element</th><th>What it does</th><th>Problem</th></tr>
+      <tr><td>Meal tabs</td><td>Breakfast / Lunch / Dinner / Snacks / Extras</td><td class="pain">On a phone, Snacks and Extras sit off-screen behind a scroll</td></tr>
+      <tr><td>Coloured stripe</td><td>Colour chosen from <code>recipe.id % 6</code></td><td class="pain">Looks meaningful, means nothing</td></tr>
+      <tr><td>"565 cal ▾"</td><td>Opens the variant dropdown</td><td class="pain">The variant control is hidden inside a calorie number</td></tr>
+      <tr><td>"Moderate" label</td><td>Shows the current variant</td><td class="pain">Duplicates the dropdown; looks clickable but isn't</td></tr>
+      <tr><td>– 2 + stepper</td><td>Servings to add</td><td>Takes a third of the card's width for a value most people never change (MPP-3 default)</td></tr>
+      <tr><td>7 day buttons</td><td>Add / remove / replace, each showing that day's total kcal</td><td class="pain">The same 7 numbers on every card; "already has a meal" and "empty" both look green; nothing tells you a click will <i>replace</i> something</td></tr>
+      <tr><td>View Recipe</td><td>Opens the full recipe</td><td>A big button for something the name could do</td></tr>
+      <tr><td>Edit (admin)</td><td>Opens the editor</td><td>Fine, but takes a whole row slot</td></tr>
+      <tr><td>Macros</td><td>Only inside the recipe view</td><td class="pain">You can't compare protein between recipes without opening each one</td></tr>
+      <tr><td>Search / hide</td><td>None</td><td class="pain">The list only grows; recipes you never cook stay in your way</td></tr>
+    </table></div>
+
+    <h3>The ideas</h3>
+    <div id="ideas"></div>
+
+    <div class="spec">
+      <h3>Spec panel: the rules this design encodes (please red-line)</h3>
+      <ul>
+        <li><b>Hide is per person</b> (your partner on a shared plan keeps seeing it) and stored on the account, so it follows you across devices. <i>Needs a small table, e.g. <code>user_hidden_recipes(user_id, recipe_family_id or recipe_id)</code>, plus 3 endpoints.</i> Hiding a recipe <b>never removes it from your meal plan</b>; it only leaves the Recipes list. Hiding hides the whole family (Light/Moderate/Balanced), not one variant.</li>
+        <li>Admins' existing "not live" recipes are a different thing (hidden for <i>everyone</i>). They keep working as today, and the menu wording is "Hide from <b>my</b> recipes" so the two don't get confused.</li>
+        <li><b>Day buttons</b> have three states: empty (white), has another recipe (grey + dot, tooltip "Replaces Hash Browns…"), this recipe (filled ✓). They no longer show daily kcal; the week strip owns "what's in each day".</li>
+        <li><b>Picking mode</b> (tap an empty day in the strip, or arrive from Meal Plan's "+ Add lunch" with <code>?mealType=lunch&amp;date=2026-11-15</code>): each card shows one "Add to Sun" button. Adding exits picking mode and returns to normal (or back to Meal Plan when you came from there).</li>
+        <li><b>Macro chips</b> per serving use the meal traffic light (<code>MACRO_TARGETS</code>, already used by <code>MacroBadgeRow</code> in the recipe view). kcal is shown, never judged. <i>Needs P/C/F per serving on the recipe summary (the card's list endpoint doesn't carry them today).</i></li>
+        <li><b>Variant segment</b> only appears when the family has ≥2 members. Default selection follows today's rule: the variant already in your plan, otherwise Moderate.</li>
+        <li><b>Servings chip</b> opens the same stepper (0.25–20). It starts at your default portions (MPP-3).</li>
+        <li>Cheat badge stays for everyone; Audited stays admin-only. The coloured stripe is replaced by a purple left edge that means "this recipe is in your plan this week".</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<div class="tip" id="tip"></div>
+<div class="toast" id="toast"><span></span><button onclick="undo()">Undo</button></div>
+<div class="scrim" id="scrim" onclick="if(event.target===this)closeModal()"><div class="modal"><button class="close" onclick="closeModal()">×</button><h3 id="mt"></h3><p id="mp"></p></div></div>
+
+<script>
+const DAYS=[{d:'Mon',n:9},{d:'Tue',n:10},{d:'Wed',n:11},{d:'Thu',n:12},{d:'Fri',n:13},{d:'Sat',n:14,today:1},{d:'Sun',n:15}];
+const V=(l,k,p,c,f)=>({l,k,p,c,f});
+const R=(id,name,o={})=>({id,name,cheat:!!o.cheat,aud:o.aud!==false,vars:o.vars||null,single:o.single||null,sel:o.sel??1,srv:2,hidden:false});
+const DATA={
+ breakfast:[
+  R(1,'Apple, Cinnamon & Walnut Porridge',{vars:[V('Light',470,36,62,13),V('Moderate',565,40,72,16),V('Balanced',720,46,88,22)]}),
+  R(2,'Avocado Toast',{cheat:1,aud:false,vars:[V('Light',520,24,48,28),V('Moderate',600,26,54,32),V('Balanced',677,28,58,38)],sel:2}),
+  R(3,'Cheese & Ham Omelette with Toast',{vars:[V('Light',510,42,48,16),V('Moderate',643,46,62,22),V('Balanced',760,52,76,26)]}),
+  R(4,'French Toast',{cheat:1,aud:false,vars:[V('Light',480,30,62,14),V('Moderate',530,32,68,15),V('Balanced',575,33,72,17)],sel:2}),
+  R(5,'Fried Eggs with Halloumi & Toast',{vars:[V('Light',520,38,52,18),V('Moderate',627,42,64,22),V('Balanced',740,46,80,26)]}),
+  R(6,'Frozen Banana Smoothie',{vars:[V('Light',494,36,62,11),V('Moderate',580,40,74,13),V('Balanced',710,44,92,17)],sel:0}),
+  R(7,'Greek Yogurt & Granola Bowl',{vars:[V('Light',480,38,58,12),V('Moderate',581,42,70,15),V('Balanced',700,46,86,19)]}),
+  R(8,'Hash Browns & Diced Chicken',{vars:[V('Light',455,36,44,15),V('Moderate',582,40,55,20),V('Balanced',700,44,70,24)],sel:0}),
+  R(9,'Mixed Berry & Greek Yogurt Smoothie',{vars:[V('Light',470,35,60,10),V('Moderate',558,39,70,13),V('Balanced',690,43,88,16)]}),
+ ],
+ lunch:[
+  R(21,'Chicken Shawarma Rice Bowl',{vars:[V('Light',470,40,52,12),V('Moderate',550,42,60,15),V('Balanced',720,48,80,21)]}),
+  R(22,'Chicken Caesar Wrap',{vars:[V('Light',480,40,50,14),V('Moderate',550,41,55,18),V('Balanced',710,46,70,24)]}),
+  R(23,'All Real Protein Bar (Choc Hazelnut)',{single:V('',166,15,14,6)}),
+ ],
+ dinner:[
+  R(31,'Pad Thai with Chicken',{vars:[V('Light',470,38,56,12),V('Moderate',546,40,62,14),V('Balanced',720,46,84,20)]}),
+  R(32,"Furey's-Style Tomato Beef Curry",{vars:[V('Light',560,44,62,18),V('Moderate',650,46,72,21),V('Balanced',743,48,80,24)],sel:2}),
+  R(33,'Spaghetti Bolognese',{vars:[V('Light',600,46,70,15),V('Moderate',720,50,82,20),V('Balanced',851,52,95,26)],sel:2}),
+ ],
+ snacks:[R(41,'Protein Popcorn',{single:V('',210,12,24,7)})],
+ extras:[R(51,'Pita Bread',{single:V('',180,6,34,3)}),R(52,'Tzatziki',{single:V('',90,6,5,5)})],
+};
+// what's planned this week per meal: day index -> recipe id
+const PLAN={breakfast:{0:7,1:8,2:5,3:3,4:6},lunch:{0:21,1:22,2:21,5:23},dinner:{0:31,5:32,6:33},snacks:{},extras:{}};
+const LABEL={breakfast:'Breakfast',lunch:'Lunch',dinner:'Dinner',snacks:'Snacks',extras:'Extras'};
+let meal='breakfast',query='',showHidden=false,picking=null,lastUndo=null;
+
+const byId=id=>Object.values(DATA).flat().find(r=>r.id===id);
+const cur=r=>r.vars?r.vars[r.sel]:r.single;
+function status(v){const kc=v.p*4+v.c*4+v.f*9,cp=v.c*4/kc*100,fp=v.f*9/kc*100;
+  return{p:v.p>=35?'on':v.p>=33?'near':'under',c:cp>53?'over':cp>=40?'on':cp>=38?'near':'under',f:fp>35?'over':fp>=25?'on':'under',cp:Math.round(cp),fp:Math.round(fp)}}
+function inPlan(r){return Object.values(PLAN[meal]).includes(r.id)}
+const visible=()=>DATA[meal].filter(r=>(showHidden?r.hidden:!r.hidden)&&r.name.toLowerCase().includes(query));
+
+function toolbarHTML(mobile){
+  const hiddenN=Object.values(DATA).flat().filter(r=>r.hidden).length;
+  const tabs=Object.keys(DATA).map(k=>`<button class="mtab ${k===meal?'on':''}" onclick="setMeal('${k}')">${LABEL[k]}<span class="n">${DATA[k].filter(r=>!r.hidden).length}</span></button>`).join('');
+  const filters=`<button class="fchip ${showHidden?'on':''}" onclick="toggleHidden()">🙈 Hidden (${hiddenN})</button>`;
+  if(mobile)return `<div class="search">🔍<input placeholder="Search recipes" value="${query}" oninput="setQuery(this.value)"></div>
+    <div class="mtabs">${tabs}</div><div class="m-filters">${filters}<button class="fchip">✓ Audited only</button><button class="fchip">↑ Most protein</button></div>`;
+  return `<div class="toolbar"><span class="marker" data-goto="1">1</span><div class="mtabs">${tabs}</div>
+    <div class="search">🔍<input placeholder="Search ${LABEL[meal].toLowerCase()} recipes" value="${query}" oninput="setQuery(this.value)"></div>
+    <span class="marker" data-goto="8">8</span>${filters}
+    <button class="addbtn admin-only" onclick="openModal('Add recipe','Existing RecipeEditModal (admin).')">+ Add Recipe</button></div>`;
+}
+function weekHTML(mobile){
+  const empties=DAYS.filter((_,i)=>PLAN[meal][i]==null).length;
+  return `<div class="week"><div class="week-h">${mobile?'':'<span class="marker" data-goto="2">2</span>'}This week's ${LABEL[meal].toLowerCase()}<span class="gap">${empties?`${empties} day${empties>1?'s':''} still empty`:'All 7 days planned ✓'}</span></div>
+    <div class="wdays">${DAYS.map((d,i)=>{const rid=PLAN[meal][i];const r=rid&&byId(rid);
+      return `<button class="wday ${r?'':'empty'} ${d.today?'today':''} ${picking===i?'picking':''}" onclick="${r?`openModal('${d.d} ${LABEL[meal].toLowerCase()}','${r.name.replace(/'/g,"\\'")} (opens the recipe)')`:`pick(${i})`}" title="${r?r.name:'Empty: tap to pick a recipe for this day'}">
+        <span class="d">${d.d} <span>${d.n}</span></span><span class="r">${r?r.name:'+ Pick one'}</span>${mobile?'<span class="dot"></span>':''}</button>`}).join('')}</div></div>
+    <div class="pickbar ${picking!=null?'on':''}">${picking!=null?`<span class="marker" data-goto="3">3</span> Picking <b>${LABEL[meal].toLowerCase()}</b> for <b>${DAYS[picking].d} ${DAYS[picking].n}</b>. Tap “Add to ${DAYS[picking].d}” on any recipe.`:''}<button onclick="pick(null)">Cancel</button></div>`;
+}
+function cardHTML(r,first){
+  const v=cur(r),s=status(v),ip=inPlan(r);
+  const seg=r.vars?`<div class="seg">${r.vars.map((x,i)=>`<button class="${i===r.sel?'on':''}" onclick="setVar(${r.id},${i})">${x.l}<b>${x.k}</b></button>`).join('')}</div>`
+    :`<div class="single">${v.k} kcal <span>per serving</span></div>`;
+  const days=picking!=null
+    ? (()=>{const mine=PLAN[meal][picking]===r.id;const other=PLAN[meal][picking]!=null&&!mine;
+        return `<button class="addto ${mine?'done':''}" onclick="assign(${r.id},${picking})">${mine?`✓ On ${DAYS[picking].d}`:`${other?'Replace on':'Add to'} ${DAYS[picking].d} ${DAYS[picking].n}`}</button>`})()
+    : `<div class="dlabel"><span>Add to a day</span>${first?'<span class="marker" data-goto="6">6</span>':''}</div><div class="days">${DAYS.map((d,i)=>{const rid=PLAN[meal][i];const cls=rid===r.id?'mine':rid?'other':'';
+        const t=rid===r.id?`Remove from ${d.d}`:rid?`Replace ${byId(rid).name} on ${d.d}`:`Add to ${d.d}`;
+        return `<button class="dbtn ${cls}" data-tip="${t.replace(/"/g,'&quot;')}" onmouseenter="tipOn(event)" onmouseleave="tipOff()" onclick="assign(${r.id},${i})">${d.d}</button>`}).join('')}</div>`;
+  return `<article class="card ${ip?'inplan':''} ${r.hidden?'is-hidden':''}" id="c${r.id}">
+    <div class="ctop">
+      <div class="cname" onclick="openModal('${r.name.replace(/'/g,"\\'")}','Existing RecipeViewModal opens (the whole name is the button now).')">${r.name}</div>
+      ${r.cheat?'<span class="badge b-cheat">Cheat</span>':''}${r.aud?'<span class="badge b-aud admin-only">✓ Audited</span>':''}
+      ${first?'<span class="marker" data-goto="7">7</span>':''}
+      <button class="kebab" onclick="event.stopPropagation();toggleMenu(${r.id})" aria-label="More actions">⋯</button>
+    </div>
+    <div class="cmenu" id="m${r.id}">
+      <button onclick="openModal('${r.name.replace(/'/g,"\\'")}','Existing RecipeViewModal.')">📖 View recipe</button>
+      ${r.hidden?`<button onclick="unhide(${r.id})">👁 Unhide</button>`:`<button onclick="hide(${r.id})">🙈 Hide from my recipes</button>`}
+      <button class="admin-only" onclick="openModal('Edit recipe','Existing RecipeEditModal (admin), for the selected variant.')">✏️ Edit (admin)</button>
+    </div>
+    ${first?'<span class="marker" data-goto="4" style="position:absolute;left:-8px;top:52px">4</span>':''}
+    ${seg}
+    <div class="mrow">${first?'<span class="marker" data-goto="5">5</span>':''}
+      <span class="mchip m-${s.p}">P ${v.p}g</span><span class="mchip m-${s.c}">C ${s.cp}%</span><span class="mchip m-${s.f}">F ${s.fp}%</span>
+      <button class="ppl" onclick="event.stopPropagation();toggleStep(${r.id})">👥 ${r.srv} ▾<span class="stepper" id="s${r.id}" onclick="event.stopPropagation()"><button onclick="srv(${r.id},-1)">−</button><span>${r.srv}</span><button onclick="srv(${r.id},1)">+</button></span></button>
+      ${ip?'<span class="badge b-plan">In plan</span>':''}
+    </div>
+    ${r.hidden?`<button class="unhide" onclick="unhide(${r.id})">👁 Unhide</button>`:days}
+  </article>`;
+}
+function gridHTML(){
+  const list=visible();
+  let h='<div class="grid">';
+  if(showHidden)h+=`<div class="hidden-note">🙈 <b>Hidden recipes.</b> These don't appear in your lists. Meals already in your plan stay put. ${list.length?'':'<br>Nothing hidden in '+LABEL[meal]+'.'}</div>`;
+  list.forEach((r,i)=>h+=cardHTML(r,i===0&&!showHidden));
+  if(!list.length&&!showHidden)h+=`<div class="hidden-note">No ${LABEL[meal].toLowerCase()} recipes match “${query}”.</div>`;
+  return h+'</div>';
+}
+function render(){
+  document.getElementById('webRoot').innerHTML=toolbarHTML(false)+(showHidden?'':weekHTML(false))+gridHTML()+
+    `<div class="legend"><span><i></i>Empty slot</span><span><i class="o"></i>Has another recipe (click to replace)</span><span><i class="m"></i>This recipe ✓ (click to remove)</span></div>`;
+  document.getElementById('mSticky').innerHTML=toolbarHTML(true);
+  document.getElementById('mBody').innerHTML=(showHidden?'':weekHTML(true))+gridHTML();
+}
+function setMeal(k){meal=k;picking=null;render()}
+function setQuery(q){query=q.toLowerCase();const a=document.activeElement,isM=a&&a.closest('#mSticky');render();const el=document.querySelector(isM?'#mSticky input':'#webRoot input');el.focus();el.setSelectionRange(q.length,q.length)}
+function toggleHidden(){showHidden=!showHidden;picking=null;render()}
+function setVar(id,i){byId(id).sel=i;render()}
+function pick(i){picking=i;render()}
+function assign(id,di){
+  const r=byId(id),prev=PLAN[meal][di];
+  if(prev===id){delete PLAN[meal][di];toast(`Removed from ${DAYS[di].d}`)}
+  else{PLAN[meal][di]=id;toast(prev?`Added to ${DAYS[di].d} · replaced ${byId(prev).name}`:`Added to ${DAYS[di].d}`);
+    if(picking!=null)picking=null;}
+  render();
+}
+function hide(id){const r=byId(id);const el=document.querySelectorAll('#c'+id);el.forEach(e=>e.classList.add('hiding'));
+  setTimeout(()=>{r.hidden=true;lastUndo=()=>{r.hidden=false};render();toast(`Hid ${r.name}`,true)},220)}
+function unhide(id){byId(id).hidden=false;render();toast(`${byId(id).name} is back in ${LABEL[meal]}`)}
+function undo(){if(lastUndo){lastUndo();lastUndo=null;render()}hideToasts()}
+function srv(id,d){const r=byId(id);r.srv=Math.max(1,Math.min(20,r.srv+d));render();toggleStep(id)}
+function toggleStep(id){document.querySelectorAll('#s'+id).forEach(s=>s.classList.toggle('open'))}
+function toggleMenu(id){const open=document.querySelector('.cmenu.open');document.querySelectorAll('.cmenu.open').forEach(m=>m.classList.remove('open'));if(!open||open.id!=='m'+id)document.querySelectorAll('#m'+id).forEach(m=>m.classList.add('open'))}
+document.addEventListener('click',e=>{if(!e.target.closest('.cmenu,.kebab'))document.querySelectorAll('.cmenu.open').forEach(m=>m.classList.remove('open'));if(!e.target.closest('.ppl'))document.querySelectorAll('.stepper.open').forEach(m=>m.classList.remove('open'))});
+let tt;
+function toast(msg,canUndo){const mob=document.getElementById('v-mobile').classList.contains('on');const el=document.getElementById(mob?'mtoast':'toast');
+  el.querySelector('span').textContent=msg;el.querySelector('button').style.display=canUndo?'':'none';if(!canUndo)lastUndo=null;
+  el.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>{el.classList.remove('show')},canUndo?5000:2500)}
+function hideToasts(){document.querySelectorAll('.toast').forEach(t=>t.classList.remove('show'))}
+function tipOn(e){const t=document.getElementById('tip'),r=e.currentTarget.getBoundingClientRect();t.textContent=e.currentTarget.dataset.tip;t.style.display='block';t.style.left=Math.min(r.left,innerWidth-250)+'px';t.style.top=(r.bottom+6)+'px'}
+function tipOff(){document.getElementById('tip').style.display='none'}
+function openModal(t,p){document.getElementById('mt').textContent=t;document.getElementById('mp').textContent=p;document.getElementById('scrim').classList.add('open')}
+function closeModal(){document.getElementById('scrim').classList.remove('open')}
+
+const IDEAS=[
+ {t:'Search, and every meal tab visible',size:'s',be:0,pitch:'A search box sits next to the meal tabs, and each tab shows how many recipes it holds. On a phone all five tabs fit across the screen, so Snacks and Extras stop hiding behind a sideways scroll.',why:'Finding "the omelette" becomes typing four letters instead of scrolling a grid. Extras (pita, tzatziki, sauces) become discoverable on mobile.',cost:'Frontend only: filter the loaded list by name. Counts come from the list already fetched per tab.'},
+ {t:'"This week\'s breakfast" strip',size:'m',be:0,pitch:'One strip above the cards shows Mon–Sun for the tab you\'re on: what\'s already planned, and an amber "+ Pick one" on every empty day, with a "2 days still empty" count. It replaces the seven daily-kcal numbers that are copied onto every single card today.',why:'You see the gaps you came to fill at a glance, and the noise on every card disappears.',cost:'Frontend only. The week plan is already in MealPlanContext.'},
+ {t:'Picking mode: fill one day at a time',size:'m',be:0,pitch:'Tap an empty day in the strip (or arrive from Meal Plan\'s new "+ Add lunch" link) and the screen switches into "Picking lunch for Sun 15". Every card shows one big "Add to Sun" (or "Replace on Sun") button instead of seven small ones. Adding takes you out of picking mode, or back to the Meal Plan if that\'s where you came from.',why:'It closes the loop with the Meal Plan redesign: "+ Add lunch" there lands here ready to go, and one tap finishes the job. There\'s no chance of tapping Saturday when you meant Sunday.',cost:'Frontend. Recipes reads a new <code>?date=</code> param next to the existing <code>?mealType=</code>; Meal Plan\'s links add it.'},
+ {t:'One variant control instead of two',size:'s',be:0,pitch:'"565 cal ▾" plus a grey "Moderate" label become one segmented control: <b>Light 470 · Moderate 565 · Balanced 720</b>. One tap switches the variant, and you can see all three calorie options before you choose.',why:'The family exists so you can pick a calorie level (recipe-variants rule). That choice should be visible, not hidden inside a number. It also removes a label that looks like a button but isn\'t.',cost:'Frontend. The variants and their kcal are already on the summary (<code>RecipeVariantDTO.caloriesPerServing</code>).'},
+ {t:'Macros on the card',size:'m',be:1,pitch:'Each card shows P / C / F per serving in the same traffic-light chips as the recipe view and the meal plan. Switching the variant updates them.',why:'"Which breakfast has the most protein?" becomes a glance, not nine modal opens. kcal stays a plain number.',cost:'Small backend change: add protein/carbs/fat per serving to <code>RecipeVariantDTO</code> (and the summary). They\'re already computed by <code>MacroCalculationService</code> for the recipe view; the summary endpoint just doesn\'t send them yet. Watch the cost: compute in the existing batch, not per card.'},
+ {t:'Day buttons that say what a tap will do',size:'s',be:0,pitch:'Three clear states: <b>empty</b> (white), <b>has another recipe</b> (grey with a dot; hover says "Replace Hash Browns on Tue"), and <b>this recipe</b> (filled ✓; hover says "Remove from Fri"). The daily kcal numbers go, because the strip owns that now.',why:'Today "empty" and "already has a meal" are both green, so it\'s easy to overwrite a planned meal by accident. Now a replace is never a surprise.',cost:'Frontend. Same <code>getButtonClass</code> states as today, just styled and labelled differently.'},
+ {t:'A calmer card',size:'s',be:0,pitch:'Tap the name to open the recipe (no separate "View Recipe" button). Servings become a small "👥 2 ▾" chip that opens the stepper. Edit moves into the ⋯ menu for admins. The random colour stripe goes; a purple left edge + "In plan" badge now <i>means</i> something: this recipe is in your week.',why:'The card is about half the height, so you see two to three recipes per phone screen instead of about one, with nothing removed.',cost:'Frontend only.'},
+ {t:'Hide recipes you never cook',size:'m',be:1,pitch:'⋯ → <b>Hide from my recipes</b> removes it from your lists straight away, with Undo. A <b>Hidden (n)</b> chip shows everything you\'ve hidden, so you can unhide any of it. Hiding affects only you and only the Recipes list: anything already in your meal plan stays.',why:'The list only grows as recipes are added. Hiding the ones you don\'t eat keeps each tab short enough to actually browse.',cost:'Backend: a <code>user_hidden_recipes</code> table (migration), GET / PUT / DELETE endpoints, and the summary list filtered or flagged per user. Frontend: menu item, undo toast, Hidden chip. Admin "not live" status is untouched.'},
+];
+document.getElementById('ideas').innerHTML=IDEAS.map((x,i)=>`<div class="idea" id="idea${i+1}"><div class="num">${i+1}</div><div><h3>${x.t}</h3>
+  <span class="tag t-${x.size}">${{s:'Small',m:'Medium',l:'Large'}[x.size]} effort</span><span class="tag ${x.be?'t-be':'t-fe'}">${x.be?'Frontend + backend':'Frontend only'}</span>
+  <p class="pitch">${x.pitch}</p><div class="cols"><div><b>Why it's worth it</b>${x.why}</div><div><b>What it costs</b>${x.cost}</div></div></div></div>`).join('');
+
+document.querySelectorAll('.chrome .tab').forEach(b=>b.onclick=()=>show(b.dataset.view));
+function show(v){document.querySelectorAll('.chrome .tab').forEach(x=>x.classList.toggle('on',x.dataset.view===v));document.querySelectorAll('.view').forEach(x=>x.classList.toggle('on',x.id==='v-'+v));scrollTo(0,0);hideToasts()}
+document.getElementById('mk').onchange=e=>document.body.classList.toggle('show-markers',e.target.checked);
+document.getElementById('adm').onchange=e=>document.body.classList.toggle('admin',e.target.checked);
+document.addEventListener('click',e=>{const m=e.target.closest('.marker');if(m){e.stopPropagation();show('proposal');setTimeout(()=>document.getElementById('idea'+m.dataset.goto).scrollIntoView({behavior:'smooth',block:'center'}),50)}},true);
+render();
+</script>
+</body>
+</html>

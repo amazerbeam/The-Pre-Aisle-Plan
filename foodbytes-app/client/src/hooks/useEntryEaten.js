@@ -1,5 +1,6 @@
 import { useCallback } from 'react'
 import mealPlanService from '../services/mealPlanService'
+import { findEntry, patchEntry } from '../utils/weekPlanEntryUtils'
 
 const EATEN_ERROR_MESSAGE = "Couldn't update eaten status. Please try again."
 const ERROR_TOAST_MS = 3000
@@ -34,32 +35,6 @@ export function useEntryEaten({ weekPlan, setWeekPlan, setAssignmentError }) {
   }, [weekPlan, setWeekPlan, setAssignmentError])
 
   return { setEntryEaten, getEntryById }
-}
-
-const findEntry = (weekPlan, entryId) => {
-  for (const day of weekPlan?.days || []) {
-    for (const entries of Object.values(day.mealsByType || {})) {
-      const match = entries.find(e => e.id === entryId)
-      if (match) return match
-    }
-  }
-  return null
-}
-
-const patchEntry = (weekPlan, entryId, fields) => {
-  if (!weekPlan?.days) return weekPlan
-  return {
-    ...weekPlan,
-    days: weekPlan.days.map(day => ({
-      ...day,
-      mealsByType: Object.fromEntries(
-        Object.entries(day.mealsByType || {}).map(([type, entries]) => [
-          type,
-          entries.map(e => (e.id === entryId ? { ...e, ...fields } : e))
-        ])
-      )
-    }))
-  }
 }
 
 export default useEntryEaten

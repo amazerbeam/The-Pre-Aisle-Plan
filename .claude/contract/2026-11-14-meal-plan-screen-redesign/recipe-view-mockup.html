@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Recipe View Redesign</title>
+<style>
+:root{
+  --brand:#4a3f80; --brand-dark:#3a3266; --brand-light:#6b5fa0; --tint:#efedf7;
+  --text:#2c3e50; --muted:#6c757d; --bg2:#f8f9fa; --border:#e9ecef; --ok:#28a745; --err:#dc3545; --cheat:#ff6b35;
+  --shadow:0 20px 50px rgba(0,0,0,.3);
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color:var(--text);background:#e7e5ef}
+button{font:inherit;cursor:pointer;color:inherit}
+.chrome{position:sticky;top:0;z-index:300;background:#1f1a3a;color:#fff;display:flex;gap:8px;align-items:center;padding:10px 16px;flex-wrap:wrap}
+.chrome h1{font-size:15px;margin:0 12px 0 0;font-weight:600}
+.chrome .tab{background:transparent;border:1px solid #5b5390;color:#d9d4f5;border-radius:999px;padding:6px 14px;font-size:13px}
+.chrome .tab.on{background:#fff;color:#1f1a3a;border-color:#fff}
+.chrome select,.chrome label{margin-left:auto;font-size:12px;color:#bdb6e6;display:flex;gap:6px;align-items:center}
+.chrome select{margin-left:0;background:#3a3361;color:#fff;border:1px solid #5b5390;border-radius:8px;padding:5px 8px}
+.chrome label + label{margin-left:12px}
+.view{display:none}.view.on{display:block}
+
+/* ---------- recipe view (shared) ---------- */
+.rv{background:#fff;display:flex;flex-direction:column;overflow:hidden;position:relative}
+.rv-head{background:var(--brand);color:#fff;padding:14px 20px 16px;position:relative;flex:none}
+.crumbs{display:flex;align-items:center;gap:8px;font-size:13px;margin-bottom:8px}
+.crumbs button{border:none;background:rgba(255,255,255,.16);color:#fff;border-radius:999px;padding:6px 12px;min-height:36px}
+.crumbs span{opacity:.75}
+.rv-title{display:flex;gap:12px;align-items:flex-start}
+.rv-title h2{margin:0;font-size:24px;line-height:1.2;flex:1}
+.rv .x{width:44px;height:44px;border-radius:50%;border:none;background:rgba(255,255,255,.18);color:#fff;font-size:22px;flex:none}
+.rv .x:hover{background:rgba(255,255,255,.3)}
+.ctx{margin-top:10px;display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.12);border-radius:12px;padding:8px 10px;font-size:14px}
+.ctx b{font-weight:700}
+.eat{margin-left:auto;border:none;border-radius:999px;background:#fff;color:var(--brand);font-weight:700;padding:8px 14px;min-height:40px;display:flex;gap:6px;align-items:center;white-space:nowrap}
+.eat.on{background:var(--ok);color:#fff}
+.ctrl{margin-top:12px;display:flex;gap:10px;align-items:stretch;flex-wrap:wrap}
+.vseg{display:grid;grid-template-columns:repeat(3,1fr);background:rgba(0,0,0,.2);border-radius:12px;padding:3px;gap:3px;flex:1;min-width:250px}
+.vseg button{border:none;background:transparent;border-radius:9px;padding:4px 0;display:flex;flex-direction:column;align-items:center;font-size:12px;color:#d9d4f5;min-height:44px;justify-content:center}
+.vseg button b{font-size:15px;color:#fff}
+.vseg button.on{background:#fff;color:var(--brand)}
+.vseg button.on b{color:var(--brand)}
+.srv{display:flex;align-items:center;gap:4px;background:rgba(0,0,0,.2);border-radius:12px;padding:3px}
+.srv button{width:40px;height:44px;border:none;border-radius:9px;background:transparent;color:#fff;font-size:20px}
+.srv button:hover{background:rgba(255,255,255,.14)}
+.srv span{min-width:70px;text-align:center;font-size:13px;color:#d9d4f5}
+.srv span b{display:block;font-size:17px;color:#fff}
+.macros{margin-top:12px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:12px;color:#d9d4f5}
+.mc{font-size:13px;font-weight:700;padding:5px 11px;border-radius:999px;border:none;background:#fff;display:inline-flex;gap:5px;align-items:center;min-height:32px}
+.s-on{color:#1b6b2e}.s-near{color:#856404}.s-under{color:#10527f}.s-over{color:#a71d2a}
+.mc i{width:9px;height:9px;border-radius:50%;display:inline-block}
+.s-on i{background:#28a745}.s-near i{background:#ffc107}.s-under i{background:#4aa3f0}.s-over i{background:#dc3545}
+.cheat{background:var(--cheat);color:#fff;font-size:11px;font-weight:700;border-radius:6px;padding:3px 8px}
+.awake{margin-left:auto;border:1px solid rgba(255,255,255,.35);background:transparent;color:#fff;border-radius:999px;padding:6px 12px;font-size:12px;min-height:36px;display:flex;gap:6px;align-items:center}
+.awake.on{background:#ffd34d;color:#1f1a3a;border-color:#ffd34d;font-weight:700}
+
+.rv-body{flex:1;overflow:auto;display:grid;grid-template-columns:minmax(260px,360px) 1fr;gap:0}
+.col{padding:18px 22px}
+.col.ing{background:var(--bg2);border-right:1px solid var(--border)}
+.col h3{margin:0 0 10px;font-size:16px;color:var(--brand);display:flex;align-items:center;gap:8px}
+.col h3 small{margin-left:auto;font-weight:500;font-size:12px;color:var(--muted)}
+.ilist{list-style:none;margin:0;padding:0}
+.ilist li{display:flex;align-items:center;gap:10px;min-height:44px;border-bottom:1px solid var(--border);cursor:pointer;font-size:15px;user-select:none}
+.ilist li .cb{width:22px;height:22px;border-radius:6px;border:2px solid #c9ced4;flex:none;display:grid;place-items:center;color:transparent;font-size:13px;font-weight:700}
+.ilist li .q{font-weight:700;color:var(--brand);min-width:78px}
+.ilist li.on .cb{background:var(--ok);border-color:var(--ok);color:#fff}
+.ilist li.on .q,.ilist li.on .n{color:#a0a6ad;text-decoration:line-through}
+.ilist li .x2{margin-left:auto;font-size:11px;font-weight:700;color:var(--brand);background:var(--tint);border-radius:999px;padding:2px 8px}
+.extras{margin-top:16px}
+.extra{background:#fff;border:1px solid var(--border);border-radius:12px;padding:10px 12px;margin-bottom:8px}
+.extra .t{display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px}
+.tog{margin-left:auto;display:flex;background:var(--bg2);border-radius:999px;padding:2px}
+.tog button{border:none;background:transparent;border-radius:999px;padding:5px 10px;font-size:12px;color:var(--muted);min-height:32px}
+.tog button.on{background:var(--brand);color:#fff;font-weight:600}
+.extra .open{margin-top:6px;border:none;background:none;color:var(--brand-light);font-weight:600;font-size:13px;padding:4px 0}
+.steps{list-style:none;margin:0;padding:0;counter-reset:s}
+.step{display:flex;gap:14px;padding:12px 10px;border-radius:12px;cursor:pointer;margin-bottom:4px}
+.step:hover{background:var(--bg2)}
+.step .num{width:32px;height:32px;border-radius:50%;background:var(--tint);color:var(--brand);font-weight:800;display:grid;place-items:center;flex:none}
+.step .txt{font-size:16px;line-height:1.6}
+.step.cur{background:#fffaf0;box-shadow:inset 3px 0 0 #e3b45c}
+.step.done .num{background:var(--ok);color:#fff}
+.step.done .txt{color:#a0a6ad}
+.step .link{display:inline-flex;margin-top:6px;border:1px solid var(--brand-light);background:#fff;color:var(--brand);border-radius:999px;padding:5px 12px;font-size:13px;font-weight:600}
+.step .sb{display:inline-block;margin-top:6px;font-size:12px;color:#8a4500;background:#ffe8d6;border-radius:6px;padding:2px 8px}
+.cookbtn{border:none;background:var(--brand);color:#fff;border-radius:999px;padding:8px 14px;font-weight:700;font-size:13px;min-height:38px}
+.eatbox{margin:18px 0 6px;border:1px solid var(--border);border-radius:14px;padding:14px;text-align:center}
+.eatbox h4{margin:0 0 8px;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.05em}
+.eatbox .big{border:none;border-radius:12px;background:var(--brand);color:#fff;font-weight:700;padding:12px 18px;min-height:48px;width:100%}
+.eatbox .big.on{background:var(--ok)}
+.eatbox p{margin:8px 0 0;font-size:13px;color:var(--muted)}
+.eatbox p button{border:none;background:none;color:var(--brand-light);font-weight:600;text-decoration:underline}
+
+/* cook mode */
+.cook{position:absolute;inset:0;background:#1f1a3a;color:#fff;display:none;flex-direction:column;z-index:20}
+.cook.on{display:flex}
+.cook .top{display:flex;align-items:center;gap:10px;padding:14px 18px}
+.cook .top b{flex:1}
+.cook .top button{border:none;background:rgba(255,255,255,.15);color:#fff;border-radius:999px;padding:8px 14px;min-height:40px}
+.cook .dots{display:flex;gap:5px;padding:0 18px}
+.cook .dots i{flex:1;height:5px;border-radius:3px;background:rgba(255,255,255,.2)}
+.cook .dots i.f{background:#ffd34d}
+.cook .main{flex:1;display:flex;flex-direction:column;justify-content:center;padding:24px 28px}
+.cook .k{color:#bdb6e6;font-size:14px;margin-bottom:10px}
+.cook .s{font-size:26px;line-height:1.45}
+.cook .uses{margin-top:18px;display:flex;gap:6px;flex-wrap:wrap}
+.cook .uses span{background:rgba(255,255,255,.12);border-radius:999px;padding:5px 11px;font-size:13px}
+.cook .nav{display:grid;grid-template-columns:1fr 2fr;gap:10px;padding:16px 18px 22px}
+.cook .nav button{min-height:56px;border:none;border-radius:14px;font-weight:700;font-size:16px}
+.cook .prev{background:rgba(255,255,255,.12);color:#fff}
+.cook .next{background:#ffd34d;color:#1f1a3a}
+
+/* web frame */
+.webstage{position:relative;min-height:calc(100vh - 50px);background:#f1f0f6;overflow:hidden}
+.ghostapp{padding:30px 40px;opacity:.5;filter:blur(1px)}
+.ghostapp .bar{height:64px;background:var(--brand);margin:-30px -40px 30px}
+.ghostapp .g{height:120px;border-radius:14px;background:#fff;margin-bottom:14px}
+.webscrim{position:absolute;inset:0;background:rgba(20,16,40,.45);display:flex;align-items:center;justify-content:center;padding:24px}
+.webscrim .rv{width:min(1040px,100%);height:min(780px,calc(100vh - 110px));border-radius:18px;box-shadow:var(--shadow)}
+
+/* mobile */
+.mobile-stage{display:flex;gap:40px;justify-content:center;align-items:flex-start;padding:28px 16px 60px;flex-wrap:wrap}
+.phone{width:414px;height:868px;border-radius:48px;background:#111;padding:12px;box-shadow:0 30px 60px rgba(0,0,0,.35);flex:none}
+.screen{width:390px;height:844px;border-radius:36px;overflow:hidden;position:relative;display:flex;flex-direction:column;background:#fff}
+.sbar{height:30px;background:var(--brand);color:#fff;font-size:12px;font-weight:600;display:flex;justify-content:space-between;align-items:center;padding:0 24px;flex:none}
+.screen .rv{flex:1}
+.m .rv-head{padding:10px 14px 12px}
+.m .rv-title h2{font-size:20px}
+.m .vseg{min-width:0;flex-basis:100%}
+.m .srv{flex:1;justify-content:space-between}
+.m .rv-body{display:block}
+.m .col{padding:14px}
+.m .col.ing{border-right:none;border-bottom:1px solid var(--border)}
+.mtabs{display:flex;position:sticky;top:0;background:#fff;z-index:5;border-bottom:1px solid var(--border)}
+.mtabs button{flex:1;border:none;background:none;padding:12px 0;font-weight:700;color:var(--muted);border-bottom:3px solid transparent;min-height:46px}
+.mtabs button.on{color:var(--brand);border-bottom-color:var(--brand)}
+.m .hide{display:none}
+.m .cook .s{font-size:22px}
+.notes{max-width:420px;font-size:14px;line-height:1.55;color:#2c2850}
+.notes h3{color:var(--brand);margin-top:0}
+
+/* proposal */
+.prop{max-width:980px;margin:0 auto;padding:32px 20px 80px;background:#fff;min-height:100vh}
+.prop h2{color:var(--brand);font-size:30px;margin:0 0 6px}
+.prop .lede{color:var(--muted);font-size:16px;line-height:1.6;max-width:760px}
+.audit{border:1px solid var(--border);border-radius:12px;overflow:hidden;margin:20px 0 30px}
+.audit table{width:100%;border-collapse:collapse;font-size:14px}
+.audit th,.audit td{padding:9px 12px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+.audit th{background:var(--bg2);font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.good{color:#1b6b2e;font-weight:600}.pain{color:#c0392b;font-weight:600}
+.idea{border:1px solid var(--border);border-radius:14px;padding:18px 20px;margin:14px 0;display:grid;grid-template-columns:40px 1fr;gap:4px 14px}
+.idea .num2{width:34px;height:34px;border-radius:50%;background:#ff4f8b;color:#fff;font-weight:700;display:grid;place-items:center}
+.idea h3{margin:4px 0 6px}.idea .pitch{font-size:15px;line-height:1.55;margin:8px 0 10px}
+.idea .cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:13px;line-height:1.5}
+.idea .cols div{background:var(--bg2);border-radius:8px;padding:10px 12px}
+.idea .cols b{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:3px}
+.tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;background:#e3f4e7;color:#1b6b2e}
+.spec{background:#1f1a3a;color:#e7e3ff;border-radius:14px;padding:18px 22px;margin-top:30px;font-size:14px;line-height:1.6}
+.spec h3{color:#fff;margin-top:0}.spec code{background:rgba(255,255,255,.1);padding:1px 5px;border-radius:4px}
+@media (max-width:800px){.rv-body{grid-template-columns:1fr}.idea .cols{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="chrome">
+  <h1>Recipe view — mockup</h1>
+  <button class="tab on" data-view="web">Web</button>
+  <button class="tab" data-view="mobile">Mobile</button>
+  <button class="tab" data-view="proposal">Proposal</button>
+  <label>Recipe <select id="pick"><option value="stir">Stir-fry (no extras)</option><option value="pita">Pita bowl (homemade extras)</option></select></label>
+  <label><input type="checkbox" id="fromPlan" checked> Opened from the meal plan</label>
+</div>
+
+<section class="view on" id="v-web"><div class="webstage">
+  <div class="ghostapp"><div class="bar"></div><div class="g"></div><div class="g"></div><div class="g"></div></div>
+  <div class="webscrim"><div class="rv" id="rvWeb"></div></div>
+</div></section>
+
+<section class="view" id="v-mobile"><div class="mobile-stage">
+  <div class="phone"><div class="screen m"><div class="sbar"><span>15:07</span><span>▮▮▮ 42%</span></div><div class="rv" id="rvMob"></div></div></div>
+  <div class="notes"><h3>Try it</h3><ul>
+    <li><b>Light / Moderate / Balanced</b> and <b>− 2 +</b>: kcal, macros and every quantity update.</li>
+    <li><b>Ingredients | Steps</b> tabs, so the steps aren't three screens down.</li>
+    <li><b>Tap an ingredient</b> to tick it off as you get it out (just on screen, not saved).</li>
+    <li><b>Tap a step</b> to mark it done; the next one is highlighted.</li>
+    <li><b>▶ Cook mode</b>: one big step at a time, with that step's ingredients, and Next/Back buttons sized for messy hands.</li>
+    <li>Switch the recipe at the top to <b>Pita bowl</b> to see extras: Homemade / Store-bought per extra, and the linked step that opens the sub-recipe with a ← back button.</li>
+    <li>With <b>"Opened from the meal plan"</b> on, the header shows which meal it is, plus <b>Mark as eaten</b>.</li>
+  </ul><p style="color:#6c757d">Recipes, steps and numbers are illustrative.</p></div>
+</div></section>
+
+<section class="view" id="v-proposal"><div class="prop">
+  <h2>Recipe view: built for cooking, not just reading</h2>
+  <p class="lede">The recipe view is where you actually use the app with flour on your hands. Today it's a single narrow column: a purple header, then a long ingredient table, then the steps far below. Variants hide inside a calorie dropdown, and the "keep screen on" control is a padlock emoji. These ideas keep every feature and make the screen work at the stove.</p>
+  <h3>What's there today</h3>
+  <div class="audit"><table>
+    <tr><th>Element</th><th>Today</th><th>Verdict</th></tr>
+    <tr><td>Header</td><td>Title, "635 cal ▾", a "2 servings" input, P/C/F badges</td><td>Scrolls away; on a phone you lose the title (your screenshot starts mid-header)</td></tr>
+    <tr><td>Variant</td><td>Hidden in the "cal ▾" dropdown</td><td class="pain">Same problem as the old recipe card</td></tr>
+    <tr><td>Servings</td><td>A bare number box</td><td>No − / +; hard to tap on a phone</td></tr>
+    <tr><td>Macro badges</td><td>"C 67g ✓", "F 14g ↓": grams, judged on %</td><td class="pain">The number shown isn't the number being judged; every other screen now shows C/F as %</td></tr>
+    <tr><td>Keep screen on</td><td>🔓/🔒 emoji next to "Ingredients" (on by default)</td><td class="pain">Nobody knows it's a button, or what the padlock means</td></tr>
+    <tr><td>Ingredients</td><td>Qty · unit · name rows, scaled to servings</td><td class="good">Keep. Add tick-off and nicer fractions ("½" not "0.50")</td></tr>
+    <tr><td>Steps</td><td>A numbered list of long paragraphs below the ingredients</td><td>Hard to keep your place; on a phone they're 2–3 screens down</td></tr>
+    <tr><td>Linked steps (extras)</td><td>Homemade: the step is a link to the sub-recipe; store-bought: alt text</td><td class="good">Keep. Make it look like a link, and show the homemade/store-bought choice</td></tr>
+    <tr><td>Back through sub-recipes</td><td>← Pizza breadcrumb</td><td class="good">Keep</td></tr>
+    <tr><td>Mark as eaten</td><td>At the very bottom, only when opened from the plan</td><td>You have to scroll past every step to find it</td></tr>
+    <tr><td>Desktop</td><td>A 600px column with empty space either side</td><td>Ingredients and steps could sit side by side</td></tr>
+  </table></div>
+  <h3>The ideas</h3><div id="ideas"></div>
+  <div class="spec"><h3>Spec panel (please red-line)</h3><ul>
+    <li><b>Nothing new is stored.</b> Ingredient ticks, step progress and cook mode are screen-only and reset when the view closes. The variant, servings and eaten tick behave exactly as today.</li>
+    <li><b>Macros</b> show <code>P g · C % · F %</code> per serving with the same colours as the cards and plan (<code>MACRO_TARGETS</code>). Tapping a chip still opens <code>MacroTargetPopup</code>.</li>
+    <li><b>Fractions:</b> quantities round to the nearest ¼ / ⅓ / ½ / ¾ for counts, tbsp, tsp and cups (0.50 → ½, 1.25 → 1¼, 0.33 → ⅓). Grams and ml stay whole numbers. It's display only; the scaling maths is unchanged.</li>
+    <li><b>Keep screen on</b> is the existing <code>useWakeLock</code>, still on by default, now shown as a labelled toggle in the header. It's hidden where the browser doesn't support it.</li>
+    <li><b>Extras:</b> the Homemade / Store-bought toggle edits the same choice the add-to-day popup sets (<code>HomemadeSelectionsContext</code>, or the meal's own choices when opened from the plan, as with MPP-10). Store-bought swaps the linked step to its <code>alt_instruction</code>, as today.</li>
+    <li><b>Cook mode</b> shows one step at a time, with the ingredients that step names (matched by name in the step text). Wake lock is forced on while it's open.</li>
+    <li><b>Plan context bar</b> appears only when opened from a meal plan entry: "Sat · Dinner · 👥 2" plus the existing eaten button (one tap; Undo keeps working, MPP-12). The bottom eaten section stays as well.</li>
+    <li><b>Layout:</b> desktop is a wide modal (up to 1040px) with ingredients in a sticky left column and steps on the right; mobile is full screen with Ingredients | Steps tabs and a header that stays put.</li>
+  </ul></div>
+</div></section>
+
+<script>
+const RECIPES={
+ stir:{name:'Rosemary Garlic Chicken Stir-Fry with Rice Noodles',cheat:false,base:2,
+  vars:[{l:'Light',k:540,p:44,c:58,f:15},{l:'Moderate',k:635,p:47,c:67,f:20},{l:'Balanced',k:760,p:52,c:84,f:25}],
+  ing:[[270,'g','Chicken breast'],[120,'g','Flat rice noodles'],[1,'tbsp','Olive oil'],[1,'tbsp','Sesame oil'],[4,'clove','Garlic'],[2,'tsp','Ginger'],[2,'tsp','Fresh rosemary'],[2,'tbsp','Soy sauce'],[2,'tsp','Dark soy sauce'],[0.5,'','Red bell pepper'],[1,'large','Carrot'],[4,'stalk','Spring onions'],[4,'tsp','Lime juice'],[0.5,'tsp','Chilli flakes'],[0.5,'tsp','Black pepper']],
+  steps:[{t:'Pat the chicken strips dry and season with a pinch of salt and black pepper.'},{t:'Soak the flat rice noodles in just-boiled water for 6 minutes, then drain and toss with the sesame oil.'},{t:'Heat the olive oil in a wok over high heat. Stir-fry the chicken for 5–6 minutes until golden and cooked through, then set aside.'},{t:'Add the garlic, ginger and fresh rosemary; fry for 30 seconds. Add the red bell pepper and carrot and cook for 3 minutes.'},{t:'Return the chicken, add the noodles, soy sauce, dark soy sauce and chilli flakes. Toss for 2 minutes.'},{t:'Finish with lime juice and spring onions. Serve straight away.'}],extras:[]},
+ pita:{name:'Greek Chicken Pita Bowl',cheat:false,base:2,
+  vars:[{l:'Light',k:500,p:44,c:52,f:13},{l:'Moderate',k:600,p:47,c:64,f:17},{l:'Balanced',k:740,p:52,c:82,f:22}],
+  ing:[[300,'g','Chicken breast'],[1,'tsp','Dried oregano'],[1,'tbsp','Olive oil'],[1,'','Cucumber'],[200,'g','Cherry tomatoes'],[0.5,'','Red onion'],[100,'g','Pita Bread (homemade)'],[120,'g','Tzatziki (homemade)']],
+  steps:[{t:'Toss the chicken with the oregano and olive oil and air-fry at 200°C for 14 minutes.'},{t:'Prepare the Pita Bread according to the linked recipe. Use 100 g.',link:'Pita Bread',alt:'Warm 2 store-bought wholemeal pittas in a dry pan for 1 minute each side.'},{t:'Prepare the Tzatziki according to the linked recipe. Use 120 g.',link:'Tzatziki',alt:'Use 120 g of store-bought tzatziki.'},{t:'Dice the cucumber, halve the cherry tomatoes and thinly slice the red onion.'},{t:'Slice the chicken and build the bowls: pita, salad, chicken, a spoon of tzatziki.'}],
+  extras:['Pita Bread','Tzatziki']},
+ 'Pita Bread':{name:'Pita Bread',base:6,sub:true,vars:[{l:'',k:180,p:6,c:34,f:3}],ing:[[300,'g','Bread flour'],[1,'tsp','Dried yeast'],[1,'tsp','Sugar'],[2,'tbsp','Olive oil'],[190,'ml','Warm water']],steps:[{t:'Mix the flour, yeast and sugar. Add the oil and warm water and knead for 8 minutes.'},{t:'Rest for 1 hour, divide into 6 and roll out thinly.'},{t:'Cook each in a very hot dry pan for 1–2 minutes a side until puffed.'}],extras:[]},
+ 'Tzatziki':{name:'Tzatziki',base:4,sub:true,vars:[{l:'',k:90,p:6,c:5,f:5}],ing:[[300,'g','Greek yogurt (0%)'],[0.5,'','Cucumber'],[1,'clove','Garlic'],[1,'tbsp','Lemon juice'],[1,'tbsp','Fresh dill']],steps:[{t:'Grate the cucumber and squeeze out the water.'},{t:'Mix with the yogurt, crushed garlic, lemon juice and dill. Season.'}],extras:[]}
+};
+let st;
+function reset(){st={stack:[document.getElementById('pick').value],vi:1,srv:2,ingOn:{},stepDone:{},cur:0,cook:false,cookI:0,awake:true,eaten:false,home:{'Pita Bread':true,'Tzatziki':true},tab:'ing'}}
+const cur=()=>RECIPES[st.stack[st.stack.length-1]];
+const FR={0.25:'¼',0.33:'⅓',0.5:'½',0.67:'⅔',0.75:'¾'};
+function qty(q,u){const r=cur(),n=q*st.srv/(r.base||2)*(r.sub?1:1);if(/^(g|ml)$/.test(u))return Math.round(n)+' '+u;
+  const w=Math.floor(n),f=Math.round((n-w)*100)/100,fk=Object.keys(FR).map(Number).reduce((a,b)=>Math.abs(b-f)<Math.abs(a-f)?b:a,0.25);
+  const frac=f<0.12?'':(f>0.88?'':FR[fk]);const whole=f>0.88?w+1:w;return `${whole||frac?'':'0'}${whole?whole:''}${frac}${u?' '+u:''}`}
+function status(v){const kc=v.p*4+v.c*4+v.f*9,cp=v.c*4/kc*100,fp=v.f*9/kc*100;return[['P',v.p+'g',v.p>=35?'on':v.p>=33?'near':'under'],['C',Math.round(cp)+'%',cp>53?'over':cp>=40?'on':cp>=38?'near':'under'],['F',Math.round(fp)+'%',fp>35?'over':fp>=25?'on':'under']]}
+function stepIngs(t){return cur().ing.filter(([,,n])=>t.toLowerCase().includes(n.toLowerCase().split(' (')[0].split(' ').slice(-1)[0].toLowerCase()))}
+function view(mob){
+  const r=cur(),v=r.vars[r.vars.length>1?st.vi:0],fromPlan=document.getElementById('fromPlan').checked&&st.stack.length===1;
+  const steps=r.steps.map((s,i)=>{const store=s.link&&!st.home[s.link];return `<li class="step ${st.stepDone[i]?'done':''} ${i===st.cur&&!st.stepDone[i]?'cur':''}" onclick="stepTap(${i})"><span class="num">${st.stepDone[i]?'✓':i+1}</span><div><div class="txt">${store?s.alt:s.t}</div>
+     ${s.link&&!store?`<button class="link" onclick="event.stopPropagation();openSub('${s.link}')">Open ${s.link} recipe →</button>`:''}${store?`<span class="sb">🛒 Store-bought ${s.link}</span>`:''}</div></li>`}).join('');
+  const done=r.steps.filter((_,i)=>st.stepDone[i]).length;
+  const ingCol=`<div class="col ing ${mob&&st.tab!=='ing'?'hide':''}"><h3>Ingredients <small>for ${st.srv} ${st.srv==1?'person':'people'}</small></h3>
+    <ul class="ilist">${r.ing.map(([q,u,n],i)=>`<li class="${st.ingOn[i]?'on':''}" onclick="st.ingOn[${i}]=!st.ingOn[${i}];render()"><span class="cb">✓</span><span class="q">${qty(q,u)}</span><span class="n">${n}</span></li>`).join('')}</ul>
+    ${r.extras.length?`<div class="extras"><h3>Extras</h3>${r.extras.map(x=>`<div class="extra"><div class="t">${x}<div class="tog"><button class="${st.home[x]?'on':''}" onclick="st.home['${x}']=true;render()">Homemade</button><button class="${st.home[x]?'':'on'}" onclick="st.home['${x}']=false;render()">Store-bought</button></div></div>${st.home[x]?`<button class="open" onclick="openSub('${x}')">Open ${x} recipe →</button>`:''}</div>`).join('')}<p style="font-size:12px;color:var(--muted);margin:4px 0 0">Macros always use the homemade version.</p></div>`:''}</div>`;
+  const stepCol=`<div class="col ${mob&&st.tab!=='steps'?'hide':''}"><h3>Steps <small>${done}/${r.steps.length} done</small><button class="cookbtn" onclick="st.cook=true;st.cookI=Math.min(st.cur,r.steps.length-1);render()">▶ Cook mode</button></h3>
+    <ol class="steps">${steps}</ol>
+    ${fromPlan?`<div class="eatbox"><h4>Saturday dinner</h4><button class="big ${st.eaten?'on':''}" onclick="st.eaten=true;render()">${st.eaten?'✓ Eaten':'Mark as eaten'}</button>${st.eaten?`<p>Eaten at 19:42 · <button onclick="st.eaten=false;render()">Undo</button></p>`:''}</div>`:''}</div>`;
+  const cs=r.steps[st.cookI]||r.steps[0];
+  return `<div class="rv-head">
+    ${st.stack.length>1?`<div class="crumbs"><button onclick="st.stack.pop();st.cur=0;st.stepDone={};render()">← ${RECIPES[st.stack[st.stack.length-2]].name.split(' with')[0]}</button><span>${st.stack.map(k=>RECIPES[k].name.split(' with')[0]).join(' › ')}</span></div>`:''}
+    <div class="rv-title"><h2>${r.name}</h2>${r.cheat?'<span class="cheat">Cheat</span>':''}<button class="x" aria-label="Close" onclick="alert('Closes the view (Esc / tap outside also work).')">×</button></div>
+    ${fromPlan?`<div class="ctx">📅 <span><b>Sat 14 · Dinner</b> · from your plan</span><button class="eat ${st.eaten?'on':''}" onclick="st.eaten=true;render()">${st.eaten?'✓ Eaten':'○ Mark as eaten'}</button></div>`:''}
+    <div class="ctrl">${r.vars.length>1?`<div class="vseg" role="radiogroup" aria-label="Variant">${r.vars.map((x,i)=>`<button class="${i===st.vi?'on':''}" onclick="st.vi=${i};render()">${x.l}<b>${x.k}</b></button>`).join('')}</div>`:`<div class="vseg" style="grid-template-columns:1fr"><button class="on">kcal per serving<b>${v.k}</b></button></div>`}
+      <div class="srv"><button onclick="st.srv=Math.max(1,st.srv-1);render()" aria-label="Fewer servings">−</button><span><b>${st.srv}</b>${st.srv==1?'person':'people'}</span><button onclick="st.srv=Math.min(20,st.srv+1);render()" aria-label="More servings">+</button></div></div>
+    <div class="macros">${status(v).map(([k,val,s])=>`<button class="mc s-${s}" title="Tap for the target band" onclick="alert('Opens the existing macro target popup for ${k}.')"><i></i>${k} ${val}</button>`).join('')}<span>per serving</span>
+      <button class="awake ${st.awake?'on':''}" onclick="st.awake=!st.awake;render()">🔆 ${st.awake?'Screen stays on':'Keep screen on'}</button></div>
+  </div>
+  ${mob?`<div class="mtabs"><button class="${st.tab==='ing'?'on':''}" onclick="st.tab='ing';render()">Ingredients (${r.ing.length})</button><button class="${st.tab==='steps'?'on':''}" onclick="st.tab='steps';render()">Steps (${done}/${r.steps.length})</button></div>`:''}
+  <div class="rv-body">${ingCol}${stepCol}</div>
+  <div class="cook ${st.cook?'on':''}"><div class="top"><b>${r.name}</b><button onclick="st.cook=false;render()">✕ Exit</button></div>
+    <div class="dots">${r.steps.map((_,i)=>`<i class="${i<=st.cookI?'f':''}"></i>`).join('')}</div>
+    <div class="main"><div class="k">Step ${st.cookI+1} of ${r.steps.length} · screen stays on</div><div class="s">${cs.link&&!st.home[cs.link]?cs.alt:cs.t}</div>
+      <div class="uses">${stepIngs(cs.t).map(([q,u,n])=>`<span>${qty(q,u)} ${n}</span>`).join('')}</div></div>
+    <div class="nav"><button class="prev" onclick="st.cookI=Math.max(0,st.cookI-1);render()">← Back</button><button class="next" onclick="cookNext()">${st.cookI>=r.steps.length-1?'Finish ✓':'Next step →'}</button></div></div>`;
+}
+function stepTap(i){st.stepDone[i]=!st.stepDone[i];const r=cur();st.cur=r.steps.findIndex((_,j)=>!st.stepDone[j]);if(st.cur<0)st.cur=r.steps.length;render()}
+function cookNext(){const r=cur();st.stepDone[st.cookI]=true;if(st.cookI>=r.steps.length-1){st.cook=false;st.cur=r.steps.length}else{st.cookI++;st.cur=st.cookI}render()}
+function openSub(k){st.stack.push(k);st.stepDone={};st.cur=0;st.ingOn={};render()}
+function render(){document.getElementById('rvWeb').innerHTML=view(false);document.getElementById('rvMob').innerHTML=view(true)}
+document.getElementById('pick').onchange=()=>{reset();render()};
+document.getElementById('fromPlan').onchange=render;
+document.querySelectorAll('.chrome .tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.chrome .tab').forEach(x=>x.classList.toggle('on',x===b));document.querySelectorAll('.view').forEach(x=>x.classList.toggle('on',x.id==='v-'+b.dataset.view));scrollTo(0,0)});
+const IDEAS=[
+ {t:'A header that stays put, with the plan context',pitch:'The title, variant, servings and macros stay pinned while you scroll. When you open a meal from the plan, a bar says which one it is ("Sat 14 · Dinner") with a one-tap <b>Mark as eaten</b>, so you don\'t have to scroll past every step to find it.',why:'On a phone today the title scrolls away, so mid-recipe you lose what you\'re cooking. Logging the meal is the habit Pip rewards, so put it where your thumb is.',cost:'Frontend. The same <code>MealEatenSection</code> logic in a compact header button; the bottom section stays.'},
+ {t:'The same variant switch and servings stepper as the cards',pitch:'<b>Light 540 · Moderate 635 · Balanced 760</b> as a segmented switch, and <b>− 2 people +</b> instead of a bare number box.',why:'It matches the new recipe card, so you learn it once. The family exists so you can pick a calorie level; that choice should be visible.',cost:'Frontend. The variant fetch and servings hook (<code>useRecipeStackServings</code>) are unchanged.'},
+ {t:'Macros that match the rest of the app',pitch:'P <b>47g</b> · C <b>42%</b> · F <b>28%</b> per serving, the same chips and colours as the recipe cards and the Meal Plan. Tap one for the target band, as now.',why:'Today it shows "C 67g ✓" while judging on %, so the number and the tick are about different things.',cost:'Frontend. Reuse the shared <code>MacroChips</code> from the Meal Plan / Recipes contract.'},
+ {t:'"Keep screen on" you can see',pitch:'The 🔓/🔒 padlock becomes a labelled <b>🔆 Screen stays on</b> toggle in the header. Still on by default.',why:'It\'s a great feature nobody can find, and a padlock reads as "locked recipe".',cost:'Frontend. Same <code>useWakeLock</code>; replaces <code>WakeLockIcon</code>\'s placement and label.'},
+ {t:'Tick off ingredients, nicer fractions',pitch:'Tap an ingredient to tick it as you get it out. Quantities read "½ red bell pepper" and "1¼ tbsp" instead of "0.50 piece" and "1.25 tbsp".',why:'Mise en place without a paper list, and fractions are how people measure with spoons.',cost:'Frontend, display only. Ticks live in component state and aren\'t saved.'},
+ {t:'Steps you can keep your place in',pitch:'Steps become cards with a big number. Tap one to mark it done; the next one is highlighted. A "3/6 done" counter sits in the heading.',why:'With long paragraphs it\'s easy to lose your place while your hands are busy.',cost:'Frontend (<code>RecipeStepsSection</code>), screen-only state.'},
+ {t:'▶ Cook mode',pitch:'Full screen, one step at a time in big text, with the ingredients that step uses listed underneath. Big Back / Next buttons, and the screen stays on.',why:'It\'s the thing people want at the stove: no scrolling, no tiny text, nothing to tap by accident.',cost:'Frontend. A new <code>CookMode</code> overlay inside the view; it matches ingredient names in the step text.'},
+ {t:'Extras: choose homemade or store-bought right here',pitch:'For recipes with extras (pita, tzatziki, dough…), an <b>Extras</b> box lists each one with a Homemade / Store-bought toggle and an "Open recipe →" link. The linked step looks like a button, and on store-bought it shows the store-bought instruction with a 🛒 tag.',why:'Today the choice is only made at add-to-day, and the linked step is a plain-looking line of text that happens to be clickable.',cost:'Frontend. It writes the same choice <code>HomemadeSelectionsContext</code> / MPP-10 meal choices hold. Macros stay homemade-basis (project rule).'},
+ {t:'Desktop: side by side; phone: tabs',pitch:'On desktop the view widens to about 1040px, with ingredients in a sticky left column and steps on the right. On a phone it\'s full screen with <b>Ingredients | Steps</b> tabs.',why:'No scrolling between the list and the method, on either size.',cost:'CSS + a tab state in <code>RecipeViewModal</code>; the 400-line budget means splitting the header into <code>RecipeViewHeader</code>.'},
+];
+document.getElementById('ideas').innerHTML=IDEAS.map((x,i)=>`<div class="idea"><div class="num2">${i+1}</div><div><h3>${x.t}</h3><span class="tag">Frontend only</span><p class="pitch">${x.pitch}</p><div class="cols"><div><b>Why it's worth it</b>${x.why}</div><div><b>What it costs</b>${x.cost}</div></div></div></div>`).join('');
+reset();render();
+</script>
+</body>
+</html>

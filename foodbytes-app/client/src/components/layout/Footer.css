@@ -115,3 +115,10 @@
     font-size: 0.875rem;
   }
 }
+
+/* Desktop: the header nav replaces the tab bar (kept on /pet, which has no header). */
+@media (min-width: 1024px) {
+  .footer:not(.footer--always) {
+    display: none;
+  }
+}

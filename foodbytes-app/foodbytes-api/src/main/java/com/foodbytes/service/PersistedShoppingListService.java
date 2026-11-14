@@ -31,6 +31,7 @@ public class PersistedShoppingListService {
     private final UserRepository userRepository;
     private final ObjectMapper objectMapper;
     private final ApplicationEventPublisher eventPublisher;   // MPP-24: firsts candidates
+    private final MealPlanFingerprintService fingerprintService;
 
     /**
      * Get the effective meal plan owner ID for a user.
@@ -61,7 +62,13 @@ public class PersistedShoppingListService {
         List<ShoppingListItem> items = shoppingListItemRepository
             .findByShoppingListIdOrderByAisle(list.getId());
 
-        return convertToDTO(list, items);
+        return convertToDTO(list, items, isPlanChanged(list, effectiveOwnerId));
+    }
+
+    /** Legacy lists (no stored fingerprint) report unchanged until regenerated. */
+    private boolean isPlanChanged(ShoppingList list, Long ownerId) {
+        return list.getPlanFingerprint() != null
+            && !list.getPlanFingerprint().equals(fingerprintService.fingerprint(ownerId, list.getStartDate()));
     }
 
     /**
@@ -105,6 +112,7 @@ public class PersistedShoppingListService {
         shoppingList.setUser(user);
         shoppingList.setStartDate(startDate);
         shoppingList.setEndDate(endDate);
+        shoppingList.setPlanFingerprint(fingerprintService.fingerprint(effectiveOwnerId, startDate));
         shoppingList = shoppingListRepository.save(shoppingList);
 
         // Convert aggregated items to persisted items
@@ -132,7 +140,7 @@ public class PersistedShoppingListService {
         // MPP-24: credited to the person who generated it, even on a shared plan.
         eventPublisher.publishEvent(PetFirstCandidate.of(userId, FirstKey.GENERATE_SHOPPING_LIST));
 
-        return convertToDTO(shoppingList, items);
+        return convertToDTO(shoppingList, items, false);
     }
 
     /**
@@ -188,7 +196,7 @@ public class PersistedShoppingListService {
     /**
      * Convert ShoppingList entity to DTO.
      */
-    private PersistedShoppingListDTO convertToDTO(ShoppingList list, List<ShoppingListItem> items) {
+    private PersistedShoppingListDTO convertToDTO(ShoppingList list, List<ShoppingListItem> items, boolean planChanged) {
         // Group items by aisle
         Map<Long, List<PersistedShoppingItemDTO>> itemsByAisle = items.stream()
             .map(this::convertItemToDTO)
@@ -224,6 +232,7 @@ public class PersistedShoppingListService {
             .aisles(aisles)
             .totalItems(items.size())
             .checkedItems((int) items.stream().filter(ShoppingListItem::getIsChecked).count())
+            .planChangedSinceGenerated(planChanged)
             .build();
     }
 

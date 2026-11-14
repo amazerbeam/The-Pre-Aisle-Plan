@@ -1,0 +1,8 @@
+schema_version: "1.1"
+name: claire-light-background
+context:
+  scaffold_script: place-files.sh
+expected_outcome: |
+  A true-vector flat-colour SVG of the character (no embedded image, strokes,
+  gradients or facial features, no white gaps), viewBox height equal to
+  real_cm x 6/185 x 100, recognisably matching the reference, with previews.

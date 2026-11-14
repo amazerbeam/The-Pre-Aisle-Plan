@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
+import BrandMark from '../common/BrandMark'
 import './LandingPageAnimation.css'
 
 // Phase content constants
@@ -205,6 +206,7 @@ function LandingPageAnimation({ onComplete }) {
         {/* Phase 3: The Solution */}
         {currentPhase === 2 && (
           <div className="phase-3">
+            <BrandMark size={120} className="landing-brand-mark animate-fade-in" />
             <h1 className="solution-primary animate-fade-in">
               The Solution
             </h1>

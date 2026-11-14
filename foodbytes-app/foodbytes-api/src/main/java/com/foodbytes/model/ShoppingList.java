@@ -38,6 +38,9 @@ public class ShoppingList {
     @Column(name = "generated_at")
     private LocalDateTime generatedAt;
 
+    @Column(name = "plan_fingerprint", columnDefinition = "CHAR(64)")
+    private String planFingerprint;
+
     @OneToMany(mappedBy = "shoppingList", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @ToString.Exclude
     private List<ShoppingListItem> items = new ArrayList<>();

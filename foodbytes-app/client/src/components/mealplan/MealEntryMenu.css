@@ -1,0 +1,95 @@
+/* Meal card menu (⋯): desktop card and the mobile keyboard fallback. */
+.entry-menu {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+}
+
+.entry-menu-trigger {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  font-size: 15px;
+  line-height: 1;
+  color: var(--text-secondary);
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.entry-menu-trigger:active,
+.entry-menu-trigger[aria-expanded='true'] {
+  background: var(--bg-secondary);
+}
+
+.entry-menu-trigger:focus-visible {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: -4px;
+}
+
+@media (hover: hover) {
+  .entry-menu-trigger {
+    opacity: 0;
+  }
+
+  .meal-card-desktop:hover .entry-menu-trigger,
+  .meal-card-desktop:focus-within .entry-menu-trigger,
+  .entry-menu.is-open .entry-menu-trigger {
+    opacity: 1;
+  }
+
+  .entry-menu-trigger:hover {
+    background: var(--bg-secondary);
+  }
+}
+
+.entry-menu-list {
+  position: absolute;
+  top: 38px;
+  right: 8px;
+  z-index: 15;
+  min-width: 190px;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  background: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+}
+
+.entry-menu-list button {
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  padding: 9px 10px;
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  color: var(--text-primary);
+  background: none;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.entry-menu-list button:active,
+.entry-menu-list button:focus-visible {
+  background: #eeebf7;
+  outline: none;
+}
+
+@media (hover: hover) {
+  .entry-menu-list button:hover {
+    background: #eeebf7;
+  }
+}
+
+.entry-menu-list .is-danger {
+  color: var(--error);
+}

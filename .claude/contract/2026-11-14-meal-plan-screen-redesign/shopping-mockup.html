@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shopping Redesign</title>
+<style>
+:root{
+  --brand-primary:#4a3f80; --brand-primary-dark:#3a3266; --brand-primary-light:#6b5fa0; --brand-tint:#efedf7;
+  --text-primary:#2c3e50; --text-secondary:#6c757d; --bg-primary:#fff; --bg-secondary:#f8f9fa; --border-color:#e9ecef;
+  --success:#28a745; --error:#dc3545; --shadow-lg:0 10px 25px rgba(0,0,0,.15);
+  --aisle-produce:#4caf50; --aisle-dairy:#2196f3; --aisle-meat:#f44336; --aisle-bakery:#ff9800; --aisle-grains:#795548;
+  --aisle-canned:#9e9e9e; --aisle-condiments:#ffc107; --aisle-frozen:#03a9f4; --aisle-spices:#8bc34a; --aisle-oils:#e0c200;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color:var(--text-primary);background:#e7e5ef}
+button{font:inherit;cursor:pointer}
+.chrome{position:sticky;top:0;z-index:200;background:#1f1a3a;color:#fff;display:flex;gap:8px;align-items:center;padding:10px 16px;flex-wrap:wrap}
+.chrome h1{font-size:15px;margin:0 12px 0 0;font-weight:600}
+.chrome .tab{background:transparent;border:1px solid #5b5390;color:#d9d4f5;border-radius:999px;padding:6px 14px;font-size:13px}
+.chrome .tab.on{background:#fff;color:#1f1a3a;border-color:#fff}
+.chrome label{font-size:12px;color:#bdb6e6;display:flex;gap:6px;align-items:center}
+.chrome label:first-of-type{margin-left:auto}
+.view{display:none}.view.on{display:block}
+.marker{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:#ff4f8b;color:#fff;font-size:11px;font-weight:700;box-shadow:0 0 0 2px #fff;flex:none;cursor:pointer;vertical-align:middle}
+
+/* new header (from the header redesign) */
+.hdr{background:var(--brand-primary);color:#fff}
+.hdr-in{max-width:1200px;margin:0 auto;height:64px;display:flex;align-items:center;gap:16px;padding:0 20px}
+.brand{display:flex;align-items:center;gap:10px;color:#fff;font-weight:800;font-size:19px}
+.brand span{font-weight:500;opacity:.85}
+.mark{width:40px;height:40px}
+.nav{display:flex;gap:4px;margin-left:8px}
+.nav a{color:#d9d4f5;text-decoration:none;font-size:15px;font-weight:600;padding:10px 14px;border-radius:10px}
+.nav a.on{background:rgba(255,255,255,.16);color:#fff}
+.wk{margin-left:auto;display:flex;gap:4px;align-items:center;background:rgba(0,0,0,.18);border-radius:999px;padding:4px}
+.wk button{border:none;background:transparent;color:#fff;width:34px;height:34px;border-radius:50%;font-size:18px}
+.wk .rng{background:#fff;color:var(--brand-primary);font-weight:700;border-radius:999px;padding:8px 14px;width:auto;height:auto;font-size:14px}
+.av{width:40px;height:40px;border-radius:50%;border:2px solid rgba(255,255,255,.5);background:linear-gradient(135deg,#f6a5c0,#7c5cd6);display:grid;place-items:center;font-weight:700}
+
+/* shopping UI (shared) */
+.sl{max-width:1100px;margin:0 auto;padding:22px 20px 100px}
+.top{display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap}
+.top h2{margin:0;color:var(--brand-primary);font-size:28px}
+.top .meta{font-size:13px;color:var(--text-secondary);margin-top:4px}
+.top .actions{margin-left:auto;display:flex;gap:8px;align-items:center}
+.btn{border:1px solid var(--border-color);background:#fff;border-radius:10px;padding:9px 13px;font-size:14px;min-height:44px;display:flex;gap:6px;align-items:center}
+.btn.primary{background:var(--brand-primary);border-color:var(--brand-primary);color:#fff;font-weight:600}
+.btn.on{background:var(--brand-tint);border-color:var(--brand-primary-light);color:var(--brand-primary);font-weight:600}
+.kebab{width:44px;height:44px;border-radius:10px;border:1px solid var(--border-color);background:#fff;font-size:18px;position:relative}
+.menu{position:absolute;right:0;top:calc(100% + 6px);background:#fff;border:1px solid var(--border-color);border-radius:12px;box-shadow:var(--shadow-lg);padding:4px;min-width:230px;display:none;z-index:30;text-align:left}
+.menu.open{display:block}
+.menu button{display:block;width:100%;text-align:left;border:none;background:none;padding:11px 12px;font-size:14px;border-radius:8px}
+.menu button:hover{background:var(--brand-tint)}
+.prog{margin-top:14px;background:#fff;border:1px solid var(--border-color);border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:14px}
+.prog .big{font-size:20px;font-weight:800;color:var(--brand-primary);white-space:nowrap}
+.bar{flex:1;height:10px;border-radius:5px;background:#e6e3f0;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--success);border-radius:5px;transition:width .3s}
+.prog .sm{font-size:12px;color:var(--text-secondary);white-space:nowrap}
+.stale{margin-top:10px;background:#fff7e6;border:1px solid #f3d39a;border-radius:12px;padding:10px 14px;display:flex;gap:10px;align-items:center;font-size:14px;color:#7a4b00}
+.stale button{margin-left:auto;border:none;background:var(--brand-primary);color:#fff;border-radius:8px;padding:8px 12px;font-weight:600;white-space:nowrap}
+.aisles{margin-top:16px;columns:2 420px;column-gap:16px}
+.aisle{break-inside:avoid;background:#fff;border:1px solid var(--border-color);border-radius:14px;margin:0 0 14px;overflow:hidden}
+.ah{display:flex;align-items:center;gap:10px;padding:11px 14px;cursor:pointer;min-height:48px;border-bottom:1px solid var(--border-color)}
+.ah .dot{width:12px;height:12px;border-radius:4px;flex:none}
+.ah b{font-size:15px}
+.ah .cnt{margin-left:auto;font-size:12px;font-weight:700;color:var(--text-secondary);background:var(--bg-secondary);border-radius:999px;padding:3px 9px}
+.ah .chev{color:var(--text-secondary);font-size:12px;width:16px;text-align:center}
+.aisle.done .ah{border-bottom:none;background:#f3faf4}
+.aisle.done .cnt{background:#d8f0dd;color:#1b6b2e}
+.aisle.closed .items{display:none}
+.it{display:flex;align-items:center;gap:12px;padding:0 8px 0 14px;min-height:52px;border-bottom:1px solid #f2f3f5;cursor:pointer;user-select:none}
+.it:last-child{border-bottom:none}
+.ck{width:26px;height:26px;border-radius:50%;border:2px solid #c9ced4;flex:none;display:grid;place-items:center;color:transparent;font-size:14px;font-weight:700}
+.it.on .ck{color:#fff}
+.qty{font-weight:700;min-width:74px;font-size:14px}
+.nm{flex:1;font-size:15px}
+.it.on .qty,.it.on .nm{color:#a0a6ad;text-decoration:line-through}
+.info{width:40px;height:40px;border:none;background:transparent;border-radius:50%;color:var(--brand-primary-light);font-size:16px;flex:none}
+.info:hover{background:var(--brand-tint)}
+.it.on .info{visibility:hidden}
+.hiddenNote{font-size:12px;color:var(--text-secondary);padding:8px 14px;background:var(--bg-secondary)}
+.toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%) translateY(20px);background:#1f1a3a;color:#fff;padding:10px 16px;border-radius:10px;font-size:14px;opacity:0;pointer-events:none;transition:.2s;z-index:90}
+.toast.show{opacity:1;transform:translateX(-50%)}
+.scrim{position:fixed;inset:0;background:rgba(20,16,40,.45);display:none;align-items:flex-end;justify-content:center;z-index:80}
+.scrim.open{display:flex}
+@media (min-width:700px){.scrim{align-items:center}}
+.sheet{background:#fff;border-radius:18px 18px 0 0;padding:16px 18px 24px;width:min(460px,100vw)}
+@media (min-width:700px){.sheet{border-radius:16px}}
+.sheet h3{margin:0 0 4px;color:var(--brand-primary)}
+.sheet p{margin:4px 0 12px;color:var(--text-secondary);font-size:14px}
+.sheet .row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border-color);font-size:14px}
+.sheet .big{width:100%;min-height:52px;border:none;border-radius:12px;background:var(--brand-primary);color:#fff;font-weight:700;font-size:15px;margin-top:6px}
+.sheet .link{width:100%;border:none;background:none;color:var(--brand-primary-light);font-weight:600;padding:12px;font-size:14px}
+.sheet .dates{display:none;gap:10px;margin-top:6px}.sheet .dates.on{display:flex}
+.sheet .dates label{flex:1;font-size:12px;color:var(--text-secondary);display:flex;flex-direction:column;gap:4px}
+.sheet .dates input{border:1px solid var(--border-color);border-radius:8px;padding:9px;font-size:14px}
+.sheet .warn{background:#fff7e6;border-radius:10px;padding:8px 10px;font-size:13px;color:#7a4b00;margin-top:10px}
+.footnav{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--border-color);display:none}
+.old{background:#fff;border-radius:14px;padding:14px 16px;max-width:1100px;margin:16px auto 0;font-size:13px;color:var(--text-secondary)}
+
+/* phone */
+.mobile-stage{display:flex;gap:40px;justify-content:center;align-items:flex-start;padding:28px 16px 60px;flex-wrap:wrap}
+.phone{width:390px;height:844px;border-radius:46px;background:#111;padding:12px;box-shadow:0 30px 60px rgba(0,0,0,.35);flex:none}
+.screen{width:100%;height:100%;border-radius:36px;overflow:hidden;background:var(--bg-secondary);position:relative;display:flex;flex-direction:column}
+.sb{height:34px;display:flex;justify-content:space-between;align-items:center;padding:0 26px;font-size:13px;font-weight:600;background:var(--brand-primary);color:#fff;flex:none}
+.mh{background:var(--brand-primary);color:#fff;padding:6px 12px 10px;flex:none}
+.mh .r1{display:flex;align-items:center;gap:8px;height:46px}
+.mh .mark{width:36px;height:36px}.mh .brand{font-size:17px}
+.mh .av{margin-left:auto;width:38px;height:38px}
+.mh .wk{margin:4px 0 0;width:100%;justify-content:space-between}
+.mb{flex:1;overflow-y:auto;padding:0 0 90px}
+.mb .sl{padding:12px 12px 0}
+.mb .top h2{font-size:22px}
+.mb .top .actions .lbl{display:none}
+.mb .prog{position:sticky;top:0;z-index:5;margin-top:10px}
+.mb .aisles{columns:1}
+.mnav{position:absolute;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border-color);display:flex;justify-content:space-around;padding:8px 0 22px;font-size:11px;color:var(--text-secondary)}
+.mnav span{display:flex;flex-direction:column;align-items:center;gap:2px}.mnav .on{color:var(--brand-primary);font-weight:700}
+.screen .scrim,.screen .toast{position:absolute}
+.notes{max-width:420px;font-size:14px;line-height:1.55;color:#2c2850}
+.notes h3{color:var(--brand-primary);margin-top:0}
+
+/* proposal */
+.prop{max-width:980px;margin:0 auto;padding:32px 20px 80px;background:#fff;min-height:100vh}
+.prop h2{color:var(--brand-primary);font-size:30px;margin:0 0 6px}
+.prop .lede{color:var(--text-secondary);font-size:16px;line-height:1.6;max-width:760px}
+.audit{border:1px solid var(--border-color);border-radius:12px;overflow:hidden;margin:20px 0 30px}
+.audit table{width:100%;border-collapse:collapse;font-size:14px}
+.audit th,.audit td{padding:9px 12px;border-bottom:1px solid var(--border-color);text-align:left;vertical-align:top}
+.audit th{background:var(--bg-secondary);font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--text-secondary)}
+.good{color:#1b6b2e;font-weight:600}.pain{color:#c0392b;font-weight:600}
+.idea{border:1px solid var(--border-color);border-radius:14px;padding:18px 20px;margin:14px 0;display:grid;grid-template-columns:40px 1fr;gap:4px 14px}
+.idea .num{width:34px;height:34px;border-radius:50%;background:#ff4f8b;color:#fff;font-weight:700;display:grid;place-items:center}
+.idea h3{margin:4px 0 6px}.idea .pitch{font-size:15px;line-height:1.55;margin:8px 0 10px}
+.idea .cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:13px;line-height:1.5}
+.idea .cols div{background:var(--bg-secondary);border-radius:8px;padding:10px 12px}
+.idea .cols b{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-secondary);margin-bottom:3px}
+.tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;margin-right:6px;background:#e3f4e7;color:#1b6b2e}
+.spec{background:#1f1a3a;color:#e7e3ff;border-radius:14px;padding:18px 22px;margin-top:30px;font-size:14px;line-height:1.6}
+.spec h3{color:#fff;margin-top:0}.spec code{background:rgba(255,255,255,.1);padding:1px 5px;border-radius:4px}
+@media (max-width:900px){.nav{display:none}.idea .cols{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="chrome">
+  <h1>Shopping list — mockup</h1>
+  <button class="tab on" data-view="web">Web</button>
+  <button class="tab" data-view="mobile">Mobile</button>
+  <button class="tab" data-view="proposal">Proposal</button>
+  <label><input type="checkbox" id="staleT" checked> Plan changed since list was made</label>
+</div>
+
+<section class="view on" id="v-web">
+  <header class="hdr"><div class="hdr-in">
+    <div class="brand"><span class="logo"></span>My Pantry <span>Plan</span></div>
+    <nav class="nav"><a href="#">☰ Recipes</a><a href="#">📅 Meal Plan</a><a href="#">🌱 Pip</a><a class="on" href="#">🛒 Shopping</a></nav>
+    <div class="wk"><button>‹</button><button class="rng">📅 Nov 9 – 15</button><button>›</button></div>
+    <div class="av">J</div>
+  </div></header>
+  <div id="webRoot"></div>
+</section>
+
+<section class="view" id="v-mobile">
+  <div class="mobile-stage">
+    <div class="phone"><div class="screen" id="screen">
+      <div class="sb"><span>17:20</span><span>▮▮▮ 61%</span></div>
+      <div class="mh"><div class="r1"><div class="brand"><span class="logo"></span>My Pantry <span>Plan</span></div><div class="av">J</div></div>
+        <div class="wk"><button>‹</button><button class="rng" style="flex:1">📅 Nov 9 – 15 · This week</button><button>›</button></div></div>
+      <div class="mb" id="mobRoot"></div>
+      <div class="mnav"><span>☰<br>Recipes</span><span>📅<br>Meal Plan</span><span>🌱<br>Pip</span><span class="on">🛒<br>Shopping</span></div>
+    </div></div>
+    <div class="notes">
+      <h3>Try it</h3>
+      <ul>
+        <li><b>Tap an item</b> to tick it. It drops to the bottom of its aisle (as today) and the progress bar fills.</li>
+        <li><b>Tick everything in an aisle</b> and the aisle folds into a green "✓ done" row and moves to the end, so the next aisle you need is always at the top.</li>
+        <li><b>ⓘ</b> shows which meals need that ingredient. Today that's a hidden 1-second long-press, which still works.</li>
+        <li><b>Hide ticked</b> shortens the list while you're in the shop.</li>
+        <li><b>🔆 Keep screen on</b> stops the phone sleeping mid-aisle (the same wake lock the recipe view already uses).</li>
+        <li><b>⋯</b> holds Regenerate, Uncheck all and Change dates. The new-list sheet suggests <b>this week</b> in one tap.</li>
+      </ul>
+      <p style="color:#6c757d">Items, quantities and the breakdown are illustrative, not read from the database.</p>
+    </div>
+  </div>
+</section>
+
+<section class="view" id="v-proposal">
+  <div class="prop">
+    <h2>Shopping: keep what works, make it fit the new look</h2>
+    <p class="lede">The shopping list already does the hard part well: one persisted list, grouped by aisle, ticks that sync, checked items sinking to the bottom. These ideas don't rebuild it. They bring it into the new header/card style and fix the few things that get in the way <i>while you're standing in the shop</i>.</p>
+    <h3>What's there today</h3>
+    <div class="audit"><table>
+      <tr><th>Element</th><th>Today</th><th>Verdict</th></tr>
+      <tr><td>Aisle grouping, colour edge per aisle</td><td>Collapsible sections</td><td class="good">Keep</td></tr>
+      <tr><td>Tick an item</td><td>Tap anywhere on the row; synced, optimistic</td><td class="good">Keep</td></tr>
+      <tr><td>Ticked items sink</td><td>Unchecked first, then A–Z</td><td class="good">Keep</td></tr>
+      <tr><td>Header</td><td>"Shopping List", "Dec 1 - Dec 7", "12/48 items checked", "Generated: …"</td><td>Four separate lines of text; progress only as a count</td></tr>
+      <tr><td>Regenerate / Uncheck All</td><td>Two big buttons, always visible</td><td>Rarely used, but take the prime spot; Regenerate sits next to your thumb mid-shop</td></tr>
+      <tr><td>New list dates</td><td>Defaults to today → +6 days</td><td class="pain">Doesn't match the week you planned (e.g. a Mon–Sun plan viewed on Saturday)</td></tr>
+      <tr><td>Ingredient breakdown</td><td>Long-press for 1 second</td><td class="pain">Undiscoverable; "Hold…" appears on every slow tap</td></tr>
+      <tr><td>Finished aisles</td><td>Stay expanded at full height</td><td>You scroll past aisles you've finished</td></tr>
+      <tr><td>Plan changed after the list</td><td>A per-device <code>shoppingListInvalidated</code> flag is written on every plan change, but nothing ever reads it. The only warning is inside the Manage-extras modal (MPP-10).</td><td class="pain">The Shopping screen never tells you the list is out of date, and a partner's edits on a shared plan wouldn't set your device's flag anyway</td></tr>
+      <tr><td>Screen sleep</td><td>Phone dims mid-shop</td><td>The wake-lock hook exists (recipe view), just not here</td></tr>
+    </table></div>
+    <h3>The ideas</h3>
+    <div id="ideas"></div>
+    <div class="spec"><h3>Spec panel (please red-line)</h3>
+      <ul>
+        <li><b>No behaviour changes</b> to ticking, sorting, persistence or generation. Same <code>ShoppingListContext</code> calls (<code>toggleItem</code>, <code>uncheckAll</code>, <code>generateShoppingList</code>).</li>
+        <li><b>Done aisles</b> are a display rule only: an aisle with every item ticked collapses and renders after the unfinished aisles. Tapping it re-opens it. Unticking anything brings it back in place.</li>
+        <li><b>Hide ticked</b> is a per-device view toggle (localStorage, try/catch), shown with "12 ticked hidden". It never unticks anything.</li>
+        <li><b>ⓘ</b> calls the same breakdown endpoint as the long-press (FR-042); long-press keeps working. It's hidden on ticked rows (as the long-press is today).</li>
+        <li><b>New-list default range</b> = the week shown in the header pill (<code>MealPlanContext</code> start/end). "Choose dates" reveals today's two date inputs. The "replaces your current list" warning stays.</li>
+        <li><b>Out-of-date banner</b> is driven by a new server-side boolean on the shopping-list response (<code>planChangedSinceGenerated</code>): the plan owner's entries or extra choices in the list's range changed after the list's <code>generated_at</code>. A removal leaves no row behind, so that case must be detectable too (e.g. record a "plan changed at" time per owner on every add/remove/move/choice change). That's decided at planning. Regenerate keeps the list's own dates. The unused <code>shoppingListInvalidated</code> localStorage flag is removed.</li>
+        <li><b>Keep screen on</b> uses the existing <code>useWakeLock</code> + <code>WakeLockIcon</code>. It's off by default and released when you leave the page.</li>
+        <li>Desktop shows aisles in two columns; phones show one, with the progress bar sticky under the header.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<div class="toast" id="toast"></div>
+<div class="scrim" id="scrim" onclick="if(event.target===this)closeSheet()"><div class="sheet" id="sheet"></div></div>
+
+<script>
+const LOGO=`<svg class="mark" viewBox="0 0 100 100"><rect width="100" height="100" rx="24" fill="#4a3f80"/><circle cx="50" cy="52" r="33" fill="#fff"/><circle cx="50" cy="52" r="24" fill="none" stroke="#e3dff2" stroke-width="3"/><path d="M42 70V36h12a10 10 0 0 1 0 20H42" fill="none" stroke="#4a3f80" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"/><path d="M66 30c-8-1-14 4-14 11 8 1 14-4 14-11z" fill="#7cc36b"/></svg>`;
+document.querySelectorAll('.logo').forEach(e=>e.outerHTML=LOGO);
+const I=(n,q,u,c)=>({id:Math.random().toString(36).slice(2),n,q,u,c:!!c});
+const AISLES=[
+ {k:'produce',name:'Produce',col:'var(--aisle-produce)',items:[I('Banana',4,'',1),I('Broccoli',300,'g'),I('Cherry tomato',250,'g'),I('Garlic',6,'cloves',1),I('Lemon',2,''),I('Red onion',2,''),I('Spinach',200,'g')]},
+ {k:'meat',name:'Meat & Fish',col:'var(--aisle-meat)',items:[I('Beef mince (5% fat)',750,'g'),I('Chicken breast',1.2,'kg'),I('Salmon fillet',2,'')]},
+ {k:'dairy',name:'Dairy & Eggs',col:'var(--aisle-dairy)',items:[I('Egg',12,'',1),I('Greek yogurt (0%)',1,'kg',1),I('Halloumi',225,'g',1),I('Parmesan',60,'g',1)]},
+ {k:'bakery',name:'Bakery',col:'var(--aisle-bakery)',items:[I('Sourdough loaf',1,''),I('Wholemeal pitta',6,'')]},
+ {k:'grains',name:'Grains & Pasta',col:'var(--aisle-grains)',items:[I('Basmati rice',500,'g'),I('Rice noodles',400,'g'),I('Spaghetti',500,'g',1),I('Rolled oats',500,'g')]},
+ {k:'canned',name:'Tins & Jars',col:'var(--aisle-canned)',items:[I('Chopped tomatoes',2,'tins'),I('Coconut milk (light)',1,'tin')]},
+ {k:'spices',name:'Herbs & Spices',col:'var(--aisle-spices)',items:[I('Smoked paprika',1,'jar'),I('Ground cumin',1,'jar')]},
+];
+let hideTicked=false, wake=false;
+const fmt=x=>x.q%1?x.q.toFixed(1):x.q;
+function render(){
+  const all=AISLES.flatMap(a=>a.items),done=all.filter(i=>i.c).length,pct=Math.round(done/all.length*100);
+  const stale=document.getElementById('staleT').checked;
+  const order=[...AISLES].sort((a,b)=>(a.items.every(i=>i.c)?1:0)-(b.items.every(i=>i.c)?1:0));
+  const html=`<div class="sl">
+   <div class="top"><div><h2>Shopping list</h2><div class="meta">For <b>Nov 9 – 15</b> · made Sat 14 Nov, 13:02</div></div>
+     <div class="actions">
+       <button class="btn ${hideTicked?'on':''}" onclick="hideTicked=!hideTicked;render()">${hideTicked?'👁 Show ticked':'🙈 Hide ticked'}</button>
+       <button class="btn ${wake?'on':''}" onclick="wake=!wake;render();toast(wake?'Screen will stay on while this page is open':'Screen can sleep again')">🔆 <span class="lbl">Keep screen on</span></button>
+       <button class="kebab" onclick="event.stopPropagation();this.querySelector('.menu').classList.toggle('open')">⋯
+         <span class="menu" onclick="event.stopPropagation()"><button onclick="openGen(true)">↻ Regenerate for Nov 9 – 15</button><button onclick="openGen(false)">📅 New list for other dates…</button><button onclick="uncheck()">☐ Uncheck all…</button></span></button>
+     </div></div>
+   <div class="prog"><span class="big">${done} / ${all.length}</span><div class="bar"><i style="width:${pct}%"></i></div><span class="sm">${pct===100?'All done 🎉':pct+'% in the basket'}</span></div>
+   ${stale?`<div class="stale">⚠️ Your meal plan changed after this list was made.<button onclick="regen()">Regenerate</button></div>`:''}
+   <div class="aisles">${order.map(a=>{
+      const tick=a.items.filter(i=>i.c).length,isDone=tick===a.items.length,open=a.open??!isDone;
+      const items=[...a.items].sort((x,y)=>(x.c-y.c)||x.n.localeCompare(y.n));
+      const shown=hideTicked?items.filter(i=>!i.c):items;
+      return `<div class="aisle ${isDone?'done':''} ${open?'':'closed'}">
+        <div class="ah" onclick="toggleAisle('${a.k}')"><span class="dot" style="background:${a.col}"></span><b>${isDone?'✓ ':''}${a.name}</b><span class="cnt">${tick}/${a.items.length}</span><span class="chev">${open?'▾':'▸'}</span></div>
+        <div class="items">${shown.map(i=>`<div class="it ${i.c?'on':''}" onclick="tick('${i.id}')"><span class="ck" style="${i.c?`background:${a.col};border-color:${a.col}`:''}">✓</span><span class="qty">${fmt(i)} ${i.u}</span><span class="nm">${i.n}</span><button class="info" title="Which meals use this?" onclick="event.stopPropagation();breakdown('${i.n}')">ⓘ</button></div>`).join('')}
+        ${hideTicked&&tick&&!isDone?`<div class="hiddenNote">${tick} ticked hidden</div>`:''}</div></div>`}).join('')}</div></div>`;
+  document.getElementById('webRoot').innerHTML=html;
+  document.getElementById('mobRoot').innerHTML=html;
+}
+function find(id){for(const a of AISLES){const i=a.items.find(x=>x.id===id);if(i)return{a,i}}}
+function tick(id){const {a,i}=find(id);i.c=!i.c;if(a.items.every(x=>x.c)){a.open=undefined;toast(`✓ ${a.name} done`)}else a.open=undefined;render()}
+function toggleAisle(k){const a=AISLES.find(x=>x.k===k);const isDone=a.items.every(i=>i.c);a.open=!(a.open??!isDone);render()}
+function uncheck(){openSheet(`<h3>Uncheck all items?</h3><p>Every item goes back to unticked. Your list itself doesn't change.</p><button class="big" onclick="AISLES.forEach(a=>a.items.forEach(i=>i.c=false));closeSheet();render()">Uncheck all</button><button class="link" onclick="closeSheet()">Cancel</button>`)}
+function regen(){toast('List regenerated for Nov 9 – 15');document.getElementById('staleT').checked=false;render()}
+function openGen(thisWeek){openSheet(`<h3>New shopping list</h3><p>Builds the list from your meal plan.</p>
+  <div class="row"><span>Meal plan week</span><b>Mon 9 – Sun 15 Nov</b></div><div class="row"><span>Meals in it</span><b>20</b></div>
+  <div class="dates ${thisWeek?'':'on'}" id="dates"><label>From<input type="date" value="2026-11-09"></label><label>To<input type="date" value="2026-11-15"></label></div>
+  <div class="warn">This replaces your current list. Ticks are reset.</div>
+  <button class="big" onclick="closeSheet();regen()">Make list for ${thisWeek?'Nov 9 – 15':'these dates'}</button>
+  ${thisWeek?`<button class="link" onclick="document.getElementById('dates').classList.add('on');this.remove()">Choose other dates…</button>`:''}<button class="link" onclick="closeSheet()">Cancel</button>`)}
+function breakdown(n){openSheet(`<h3>${n}</h3><p>Used in these meals this week (existing breakdown popup):</p>
+  <div class="row"><span>Mon · Chicken Shawarma Rice Bowl</span><b>400 g</b></div><div class="row"><span>Wed · Chicken Shawarma Rice Bowl</span><b>400 g</b></div><div class="row"><span>Thu · Chicken Tikka Wrap</span><b>400 g</b></div>
+  <button class="link" onclick="closeSheet()">Close</button>`)}
+function openSheet(h){document.querySelectorAll('.menu.open').forEach(m=>m.classList.remove('open'));const mob=document.getElementById('v-mobile').classList.contains('on');const sc=document.getElementById('scrim');(mob?document.getElementById('screen'):document.body).appendChild(sc);document.getElementById('sheet').innerHTML=h;sc.classList.add('open')}
+function closeSheet(){document.getElementById('scrim').classList.remove('open')}
+let tt;function toast(m){const mob=document.getElementById('v-mobile').classList.contains('on');const t=document.getElementById('toast');(mob?document.getElementById('screen'):document.body).appendChild(t);t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),2500)}
+document.addEventListener('click',()=>document.querySelectorAll('.menu.open').forEach(m=>m.classList.remove('open')));
+document.getElementById('staleT').onchange=render;
+document.querySelectorAll('.chrome .tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.chrome .tab').forEach(x=>x.classList.toggle('on',x===b));document.querySelectorAll('.view').forEach(x=>x.classList.toggle('on',x.id==='v-'+b.dataset.view));closeSheet();scrollTo(0,0)});
+const IDEAS=[
+ {t:'A header that fits the new design',pitch:'The four text lines become one title, "For <b>Nov 9 – 15</b> · made Sat 14 Nov, 13:02", and a progress card (<b>16 / 24</b>, a green bar, "67% in the basket"). It sits under the new Plate P header with the Shopping tab active.',why:'You see how far through the shop you are at a glance. It matches the summary tiles on Meal Plan and Recipes.',cost:'Frontend: restyle <code>ShoppingListHeader</code>. Same data (<code>checkedItems</code>, <code>totalItems</code>, <code>generatedAt</code>).'},
+ {t:'Rare actions move into ⋯',pitch:'Regenerate, "New list for other dates" and Uncheck all move into a ⋯ menu. The always-visible buttons become the ones you use <i>in the shop</i>: Hide ticked and Keep screen on.',why:'Regenerate wipes your ticks, so it shouldn\'t sit next to your thumb while you shop. Uncheck all keeps its confirm step.',cost:'Frontend. Same handlers.'},
+ {t:'New list defaults to the week you planned',pitch:'"Make list" offers the week shown in the header (e.g. Mon 9 – Sun 15) with the number of meals in it. One tap. "Choose other dates…" reveals today\'s two date boxes.',why:'Today it defaults to today + 6 days, which on a Saturday covers next week\'s Mon–Fri and misses this weekend\'s meals.',cost:'Frontend: <code>GenerateShoppingListModal</code> seeds from <code>MealPlanContext</code> start/end instead of today.'},
+ {be:1,t:'Out-of-date warning on the Shopping screen itself',pitch:'If your plan changed after the list was made, an amber banner says so with a Regenerate button. It\'s the same rule as the warning in Manage extras.',why:'The one way a shopping list goes wrong is silently: you swap a dinner and buy the old ingredients.',cost:'<b>Small backend change.</b> The shopping-list response gains <code>planChangedSinceGenerated</code>, true when the plan in the list\'s date range changed after the list was made. It\'s worked out on the server, so a shared plan works across both people\'s devices. The existing per-device localStorage flag is written but never read and can\'t see a partner\'s edits, so it would be removed.'},
+ {t:'Finished aisles fold away',pitch:'Tick the last item in an aisle and it collapses into a green "✓ Produce 7/7" row and moves to the end. Tap it to re-open.',why:'The next aisle you need is always at the top, with no scrolling past aisles you\'ve finished.',cost:'Frontend display rule in <code>ShoppingList</code> / <code>ShoppingListAisle</code>. No data change.'},
+ {t:'Bigger rows, quantity first, ⓘ for "which meals?"',pitch:'Rows are 52px tall with a round tick in the aisle colour. The quantity comes first ("750 g Beef mince"), the way people write lists. A visible ⓘ opens the existing breakdown popup, and the 1-second long-press still works.',why:'Easier to hit one-handed with a basket. The breakdown is useful ("do I need all that chicken?") but almost nobody finds a hidden long-press.',cost:'Frontend: <code>ShoppingListItem</code> layout + a button that calls the same breakdown fetch.'},
+ {t:'Hide ticked + keep the screen on',pitch:'Two in-shop toggles: <b>Hide ticked</b> (remembered on the device) shortens the list to what\'s left, and <b>Keep screen on</b> stops the phone dimming between aisles.',why:'Small, but they\'re exactly the moments the list is used. The wake lock already exists for cooking.',cost:'Frontend: <code>useWakeLock</code> + <code>WakeLockIcon</code> reused; Hide ticked uses localStorage.'},
+ {t:'Two columns on desktop',pitch:'On a wide screen aisles flow into two columns, so a 60-item list fits without endless scrolling (handy for checking the list before you go).',why:'Uses the width the new header frees up.',cost:'CSS only.'},
+];
+document.getElementById('ideas').innerHTML=IDEAS.map((x,i)=>`<div class="idea"><div class="num">${i+1}</div><div><h3>${x.t}</h3><span class="tag" style="${x.be?'background:#ffe8d6;color:#8a4500':''}">${x.be?'Frontend + small backend':'Frontend only'}</span><p class="pitch">${x.pitch}</p><div class="cols"><div><b>Why it's worth it</b>${x.why}</div><div><b>What it costs</b>${x.cost}</div></div></div></div>`).join('');
+render();
+</script>
+</body>
+</html>

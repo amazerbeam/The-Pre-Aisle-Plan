@@ -1,27 +1,30 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState } from 'react'
 import { useMealPlan } from '../../contexts/MealPlanContext'
 import { useAuth } from '../../contexts/AuthContext'
 import { useNavigate } from 'react-router-dom'
-import MealPlanDay from './MealPlanDay'
+import MealPlanWeekDesktop from './MealPlanWeekDesktop'
+import MealPlanWeekMobile from './MealPlanWeekMobile'
+import DailyMacroPopup from './DailyMacroPopup'
 import WeeklyMacroPopup from './WeeklyMacroPopup'
 import SwapDaysModal from './SwapDaysModal'
 import CopyWeekModal from './CopyWeekModal'
-import MealPlanMenu from './MealPlanMenu'
 import SaveTemplateModal from './SaveTemplateModal'
 import ApplyTemplateModal from './ApplyTemplateModal'
 import ManageTemplatesModal from './ManageTemplatesModal'
 import WeekExtrasModal from './WeekExtrasModal'
 import TemplateExtrasModal from './TemplateExtrasModal'
 import { useHomemadeSelections } from '../../contexts/HomemadeSelectionsContext'
-import { formatDateRange } from '../../utils/dateUtils'
+import useMediaQuery from '../../hooks/useMediaQuery'
+import { MOBILE_MEDIA_QUERY } from '../../constants/mealPlanUi'
+import { RECIPES_PATH } from '../../constants/appRoutes'
+import { todayOrFirstDay } from '../../utils/mealPlanDayUtils'
 import './MealPlanCalendar.css'
 
 /**
  * MealPlanCalendar - FR-016: 7-day calendar view of meal plan
  * FR-082: Clickable week total showing macro summary popup
- * Swap days feature: Click day header to swap with another day
- * Auto-scrolls to today on mobile
- * Shows recipes organized by date and meal type
+ * Swap days feature: day header (desktop) or the menu (mobile) opens the swap modal
+ * Shell only: picks the desktop timetable or the mobile day view and owns the modals.
  */
 function MealPlanCalendar() {
   const { isAuthenticated } = useAuth()
@@ -34,6 +37,7 @@ function MealPlanCalendar() {
   const navigate = useNavigate()
   const [showWeeklyPopup, setShowWeeklyPopup] = useState(false)
   const [swapSourceDay, setSwapSourceDay] = useState(null)
+  const [dailyPopupDay, setDailyPopupDay] = useState(null)
   const [showCopyModal, setShowCopyModal] = useState(false)
   const [showSaveModal, setShowSaveModal] = useState(false)
   const [showApplyModal, setShowApplyModal] = useState(false)
@@ -41,7 +45,7 @@ function MealPlanCalendar() {
   const [showWeekExtras, setShowWeekExtras] = useState(false)     // MPP-10
   const [extrasTemplate, setExtrasTemplate] = useState(null)      // MPP-10: template whose extras are open
   const { reloadSelections } = useHomemadeSelections()
-  const todayRef = useRef(null)
+  const isMobile = useMediaQuery(MOBILE_MEDIA_QUERY)
 
   const currentWeekHasMeals = !!(weekPlan?.days?.some(d =>
     Object.values(d.mealsByType || {}).some(entries => entries.length > 0)
@@ -77,22 +81,13 @@ function MealPlanCalendar() {
     if (backToManage) setShowManageModal(true)
   }
 
-  // Auto-scroll to today on mobile when weekPlan loads
-  useEffect(() => {
-    if (weekPlan && todayRef.current) {
-      // Only scroll on mobile (screen width <= 768px)
-      const isMobile = window.innerWidth <= 768
-      if (isMobile) {
-        // Small delay to ensure DOM is ready
-        setTimeout(() => {
-          todayRef.current?.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
-          })
-        }, 100)
-      }
-    }
-  }, [weekPlan])
+  const menuHandlers = {
+    onCopyWeek: () => setShowCopyModal(true),
+    onManageExtras: () => setShowWeekExtras(true),
+    onSaveAs: () => setShowSaveModal(true),
+    onApply: openApply,
+    onManage: openManage
+  }
 
   // Redirect to home if not authenticated
   if (!isAuthenticated) {
@@ -100,12 +95,13 @@ function MealPlanCalendar() {
       <div className="meal-plan-auth-required">
         <h2>Sign In Required</h2>
         <p>Please sign in to view and manage your meal plan.</p>
-        <button onClick={() => navigate('/')}>Go to Recipes</button>
+        <button onClick={() => navigate(RECIPES_PATH)}>Go to Recipes</button>
       </div>
     )
   }
 
-  if (loading) {
+  // A refetch (after an entry edit) sets loading again; only block the screen on first load.
+  if (loading && !weekPlan) {
     return (
       <div className="meal-plan-loading">
         <div className="spinner"></div>
@@ -125,48 +121,22 @@ function MealPlanCalendar() {
 
   return (
     <div className="meal-plan-calendar">
-      <header className="calendar-header">
-        {/* FR-038: Recipes button moved to Footer.jsx - DO NOT add navigation buttons here */}
-        <h2>Meal Plan</h2>
-        <MealPlanMenu
-          onCopyWeek={() => setShowCopyModal(true)}
-          onManageExtras={() => setShowWeekExtras(true)}
-          onSaveAs={() => setShowSaveModal(true)}
-          onApply={openApply}
-          onManage={openManage}
+      {weekPlan && (isMobile ? (
+        <MealPlanWeekMobile
+          weekPlan={weekPlan}
+          onOpenDayMacros={setDailyPopupDay}
+          onOpenWeekMacros={() => setShowWeeklyPopup(true)}
+          menuHandlers={{ ...menuHandlers, onSwapDays: () => handleSwapClick(todayOrFirstDay(weekPlan)) }}
         />
-        <span className="date-range">{formatDateRange(startDate, endDate)}</span>
-        {/* FR-082: Make week total clickable */}
-        {weekPlan && (
-          <span
-            className="week-calories week-calories-clickable"
-            onClick={() => setShowWeeklyPopup(true)}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault()
-                setShowWeeklyPopup(true)
-              }
-            }}
-            aria-label="View weekly macro summary"
-          >
-            Week Total: {weekPlan.weekTotalCalories} cal
-          </span>
-        )}
-      </header>
-
-      <div className="calendar-grid">
-        {weekPlan?.days?.map((day) => (
-          <MealPlanDay
-            key={day.date}
-            day={day}
-            onSwapClick={handleSwapClick}
-            isSwapSource={swapSourceDay?.date === day.date}
-            ref={day.isToday ? todayRef : null}
-          />
-        ))}
-      </div>
+      ) : (
+        <MealPlanWeekDesktop
+          weekPlan={weekPlan}
+          onSwap={handleSwapClick}
+          onOpenDayMacros={setDailyPopupDay}
+          onOpenWeekMacros={() => setShowWeeklyPopup(true)}
+          toolbarHandlers={menuHandlers}
+        />
+      ))}
 
       {(!weekPlan || weekPlan.days?.every(d =>
         Object.values(d.mealsByType || {}).every(entries => entries.length === 0)
@@ -183,6 +153,10 @@ function MealPlanCalendar() {
           weekData={weekPlan}
           onClose={() => setShowWeeklyPopup(false)}
         />
+      )}
+
+      {dailyPopupDay && (
+        <DailyMacroPopup day={dailyPopupDay} onClose={() => setDailyPopupDay(null)} />
       )}
 
       {/* Swap Days Modal */}

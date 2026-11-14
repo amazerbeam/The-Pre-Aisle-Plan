@@ -68,6 +68,18 @@ export const mealPlanService = {
   },
 
   /**
+   * Move an entry and/or change its servings. planDate + mealId travel together;
+   * moving onto a filled slot swaps the two meals server-side.
+   * @param {number} entryId
+   * @param {{planDate?: string, mealId?: number, servings?: number}} patch
+   * @returns {Promise<Object>} the updated MealPlanEntryDTO
+   */
+  async updateEntry(entryId, patch) {
+    const response = await api.patch(`/meal-plan/${entryId}`, patch)
+    return response.data
+  },
+
+  /**
    * FR-014: Get which days a recipe is assigned to within the date range
    * Used to highlight day buttons on RecipeCard
    * @param {number} recipeId - Recipe ID

@@ -1,9 +1,13 @@
 import { useState } from 'react'
 import { useShoppingList } from '../../contexts/ShoppingListContext'
+import useHideTicked from '../../hooks/useHideTicked'
+import useWakeLock from '../../hooks/useWakeLock'
 import ShoppingListHeader from './ShoppingListHeader'
 import ShoppingListAisle from './ShoppingListAisle'
 import GenerateShoppingListModal from './GenerateShoppingListModal'
 import './ShoppingList.css'
+
+const isAisleDone = (aisle) => aisle.items.every(i => i.isChecked)
 
 /**
  * ShoppingList - Main container for shopping list feature
@@ -13,6 +17,31 @@ import './ShoppingList.css'
 const ShoppingList = () => {
   const { shoppingList, sortedAisles, loading, error, isGenerating, listExists } = useShoppingList()
   const [showGenerateModal, setShowGenerateModal] = useState(false)
+  const [generateMode, setGenerateMode] = useState('week')
+  const [hideTicked, setHideTicked] = useHideTicked()
+  const wakeLock = useWakeLock(false)
+
+  const openGenerate = (mode = 'week') => {
+    setGenerateMode(mode)
+    setShowGenerateModal(true)
+  }
+
+  const generateModal = (showWarning) => showGenerateModal && (
+    <GenerateShoppingListModal
+      onClose={() => setShowGenerateModal(false)}
+      showWarning={showWarning}
+      mode={generateMode}
+    />
+  )
+
+  const header = (
+    <ShoppingListHeader
+      onGenerateClick={openGenerate}
+      hideTicked={hideTicked}
+      onToggleHideTicked={setHideTicked}
+      wakeLock={wakeLock}
+    />
+  )
 
   // Show generating spinner
   if (isGenerating) {
@@ -46,17 +75,12 @@ const ShoppingList = () => {
           <p>{error}</p>
           <button
             className="btn-primary generate-btn"
-            onClick={() => setShowGenerateModal(true)}
+            onClick={() => openGenerate('week')}
           >
             Generate Shopping List
           </button>
         </div>
-        {showGenerateModal && (
-          <GenerateShoppingListModal
-            onClose={() => setShowGenerateModal(false)}
-            showWarning={false}
-          />
-        )}
+        {generateModal(false)}
       </div>
     )
   }
@@ -71,17 +95,12 @@ const ShoppingList = () => {
           <p>Generate one based on your meal plan!</p>
           <button
             className="btn-primary generate-btn"
-            onClick={() => setShowGenerateModal(true)}
+            onClick={() => openGenerate('week')}
           >
             Generate Shopping List
           </button>
         </div>
-        {showGenerateModal && (
-          <GenerateShoppingListModal
-            onClose={() => setShowGenerateModal(false)}
-            showWarning={false}
-          />
-        )}
+        {generateModal(false)}
       </div>
     )
   }
@@ -90,40 +109,34 @@ const ShoppingList = () => {
   if (!sortedAisles || sortedAisles.length === 0) {
     return (
       <div className="shopping-list-page">
-        <ShoppingListHeader onGenerateClick={() => setShowGenerateModal(true)} />
+        {header}
         <div className="empty-state">
           <p>Your shopping list is empty.</p>
           <p>Add recipes to your meal plan and regenerate!</p>
         </div>
-        {showGenerateModal && (
-          <GenerateShoppingListModal
-            onClose={() => setShowGenerateModal(false)}
-            showWarning={true}
-          />
-        )}
+        {generateModal(true)}
       </div>
     )
   }
 
+  // Finished aisles go last; sort is stable so the server's aisle order holds within each group
+  const orderedAisles = [...sortedAisles].sort((a, b) => isAisleDone(a) - isAisleDone(b))
+
   // Show full shopping list
   return (
     <div className="shopping-list-page">
-      <ShoppingListHeader onGenerateClick={() => setShowGenerateModal(true)} />
+      {header}
       <div className="shopping-list-content">
-        {sortedAisles.map(aisleData => (
+        {orderedAisles.map(aisleData => (
           <ShoppingListAisle
             key={aisleData.aisleId || 'other'}
             aisleData={aisleData}
             startDate={shoppingList?.startDate}
+            hideTicked={hideTicked}
           />
         ))}
       </div>
-      {showGenerateModal && (
-        <GenerateShoppingListModal
-          onClose={() => setShowGenerateModal(false)}
-          showWarning={true}
-        />
-      )}
+      {generateModal(true)}
     </div>
   )
 }

@@ -9,8 +9,8 @@ export const recipeService = {
    * FR-102: Get all recipe summaries (no ingredients/steps).
    * Use for list views to reduce data transfer.
    */
-  async getAllRecipeSummaries() {
-    const response = await api.get('/recipes/summaries')
+  async getAllRecipeSummaries({ signal } = {}) {
+    const response = await api.get('/recipes/summaries', { signal })
     return response.data
   },
 
@@ -59,9 +59,9 @@ export const recipeService = {
   // ADMIN ENDPOINTS (FR-033, FR-047)
   // ========================================
 
-  async getAllRecipesAdmin(mealType = null) {
+  async getAllRecipesAdmin(mealType = null, { signal } = {}) {
     const url = mealType ? `/recipes/admin?mealType=${mealType}` : '/recipes/admin'
-    const response = await api.get(url)
+    const response = await api.get(url, { signal })
     return response.data
   },
 

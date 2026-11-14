@@ -233,9 +233,20 @@ input:focus, select:focus {
 }
 
 @media (min-width: 1024px) {
+  /* The footer tab bar is hidden at desktop width (the header carries the nav). */
+  :root {
+    --footer-clearance: 0px;
+  }
+
   .main-content {
     padding: var(--spacing-xl);
   }
+}
+
+/* /pet keeps its footer at every width (Footer alwaysVisible), so it keeps the space.
+   Declared after the media block so it wins at equal specificity-or-higher. */
+body:has(.footer--always) {
+  --footer-clearance: 80px;
 }
 
 /* App Loading State */

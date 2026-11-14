@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -138,6 +139,37 @@ public class MealPlanController {
         return mealPlanService.setEntryEaten(userPrincipal.getId(), id, request.getEaten())
             .<ResponseEntity<?>>map(ResponseEntity::ok)
             .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    /**
+     * Move a meal to another day/meal (swapping with the slot's occupant) and/or change its servings.
+     * PATCH /api/meal-plan/{id}  body {"planDate":"2026-11-15","mealId":2,"servings":1.5} - any subset; date+meal together.
+     *
+     * @return 200 with the updated MealPlanEntryDTO; 404 if the entry is not in the caller's plan
+     */
+    @PatchMapping("/{id}")
+    public ResponseEntity<?> updateEntry(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @PathVariable Long id,
+            @Valid @RequestBody MealPlanEntryUpdateRequest request) {
+
+        if (userPrincipal == null) {
+            return ResponseEntity.status(403)
+                .body(Map.of("error", "Authentication required to modify meal plan"));
+        }
+        try {
+            return mealPlanService.updateEntry(userPrincipal.getId(), id, request)
+                .<ResponseEntity<?>>map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+        } catch (DataIntegrityViolationException e) {
+            return ResponseEntity.status(409).body(Map.of("error",
+                "That meal was changed at the same time on another device. Try again."));
+        } catch (IncorrectResultSizeDataAccessException e) {
+            return ResponseEntity.status(409).body(Map.of("error",
+                "That slot holds more than one meal. Remove the extra meal and try again."));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
     }
 
     /**

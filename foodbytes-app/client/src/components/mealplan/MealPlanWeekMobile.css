@@ -1,0 +1,446 @@
+/* Mobile day view - values from the approved mockup (.m-head / .chip / .dsum / .mcard / .m-add / hint) */
+
+.week-mobile {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---------- Header ---------- */
+.m-head {
+  padding: 8px 14px 12px;
+  color: #fff;
+  background: var(--brand-primary);
+}
+
+.m-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.m-top h2 {
+  margin: 0;
+  font-size: 22px;
+}
+
+/* The existing ⋯ trigger is brand-coloured; on the brand header it needs the translucent-white look */
+.m-top .meal-plan-menu-trigger {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* ---------- Week bar ---------- */
+.m-weekbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 44px;
+  margin-top: 8px;
+  padding: 8px 10px;
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.m-weekbar b {
+  white-space: nowrap;
+}
+
+.m-weekbar .macro-chips {
+  flex-wrap: nowrap;
+}
+
+.m-weekbar:active {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.m-weekbar:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+.m-weekbar-go {
+  margin-left: auto;
+  opacity: 0.8;
+}
+
+/* ---------- Day chips ---------- */
+.day-chips {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.day-chip {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+  min-height: 56px;
+  padding: 6px 0 7px;
+  font: inherit;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.day-chip-name {
+  font-size: 11px;
+  opacity: 0.8;
+}
+
+.day-chip-num {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.day-chip-dots {
+  display: flex;
+  gap: 2px;
+  height: 5px;
+}
+
+.day-chip-dots i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.day-chip-dots i.is-filled {
+  background: #9be29b;
+}
+
+.day-chip.is-selected {
+  color: var(--brand-primary);
+  background: #fff;
+}
+
+.day-chip.is-selected .day-chip-dots i {
+  background: #d8d4ea;
+}
+
+.day-chip.is-selected .day-chip-dots i.is-filled {
+  background: var(--success);
+}
+
+.day-chip.is-today:not(.is-selected) {
+  box-shadow: inset 0 0 0 1.5px #ffd34d;
+}
+
+.day-chip:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+.day-chip.is-selected:focus-visible {
+  outline-color: #ffd34d;
+}
+
+/* ---------- Body ---------- */
+.m-body {
+  padding: 12px 14px var(--footer-clearance);
+  background: var(--bg-secondary);
+}
+
+.day-summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 44px;
+  padding: 12px;
+  font: inherit;
+  text-align: left;
+  color: inherit;
+  background: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.day-summary:active {
+  border-color: var(--brand-primary-light);
+}
+
+.day-summary:focus-visible {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: 2px;
+}
+
+.day-summary-main {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.day-summary-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.day-summary-kcal {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--brand-primary);
+}
+
+.day-summary-main .macro-chips {
+  margin-top: 4px;
+}
+
+.day-summary-go {
+  margin-left: auto;
+  font-size: 20px;
+  color: var(--brand-primary-light);
+}
+
+/* ---------- Slots ---------- */
+.m-slot {
+  margin-top: 14px;
+}
+
+.m-slot-head {
+  margin: 0 2px 6px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.m-entry {
+  position: relative;
+  margin-bottom: 8px;
+}
+
+.m-add {
+  width: 100%;
+  min-height: 44px;
+  padding: 14px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--brand-primary-light);
+  background: #fff;
+  border: 1.5px dashed #cfcbe0;
+  border-radius: 14px;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.m-add:active,
+.m-add:focus-visible {
+  background: #eeebf7;
+  border-color: var(--brand-primary-light);
+}
+
+.m-add:focus-visible {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: 2px;
+}
+
+.m-empty {
+  margin: 16px 0 0;
+  font-size: 13px;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+/* ---------- Keyboard fallback for the swipe actions ---------- */
+.m-entry-fallback {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 3;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.m-entry-fallback:focus-within {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.m-entry-fallback .entry-menu {
+  top: 4px;
+  right: 52px;
+}
+
+.m-entry-fallback .entry-menu-trigger {
+  background: #fff;
+  border: 1px solid var(--border-color);
+}
+
+.m-entry-fallback .entry-menu-trigger:focus-visible {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: 2px;
+}
+
+/* ---------- Replace sheet rows ---------- */
+.m-sheet-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 4px;
+  font: inherit;
+  font-size: 15px;
+  text-align: left;
+  color: var(--text-primary);
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--border-color);
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.m-sheet-row:last-child {
+  border-bottom: none;
+}
+
+.m-sheet-row:active,
+.m-sheet-row:focus-visible {
+  background: var(--bg-secondary);
+  outline: none;
+}
+
+/* ---------- Swipeable row ---------- */
+.swipe-row {
+  position: relative;
+  overflow: hidden;
+  border-radius: 14px;
+}
+
+.swipe-row-actions {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.swipe-row-action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  width: 76px;
+  padding: 0;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.swipe-row-action--replace {
+  background: var(--brand-primary);
+}
+
+.swipe-row-action--move {
+  background: var(--brand-primary-light);
+}
+
+.swipe-row-action--remove {
+  background: var(--error);
+}
+
+.swipe-row-action:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: -4px;
+}
+
+.swipe-row-face {
+  position: relative;
+  touch-action: pan-y;
+  transition: transform 0.2s;
+}
+
+/* ---------- First-run swipe hint ---------- */
+@keyframes swipe-peek {
+  0%, 12% { transform: none; }
+  32%, 52% { transform: translateX(-150px); }
+  72%, 100% { transform: none; }
+}
+
+@keyframes swipe-hand {
+  0% { opacity: 0; transform: translate(0, -50%); }
+  12% { opacity: 1; transform: translate(0, -50%); }
+  32%, 52% { opacity: 1; transform: translate(-150px, -50%); }
+  66%, 100% { opacity: 0; transform: translate(-150px, -50%); }
+}
+
+.is-hinting .swipe-row-face {
+  animation: swipe-peek 2.6s ease-in-out 0.7s 3;
+}
+
+.swipe-row-hand {
+  position: absolute;
+  top: 50%;
+  right: 26px;
+  z-index: 3;
+  font-size: 30px;
+  opacity: 0;
+  pointer-events: none;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.3));
+  animation: swipe-hand 2.6s ease-in-out 0.7s 3;
+}
+
+.swipe-hint-bubble {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 10px;
+  padding: 8px 12px;
+  font-size: 13px;
+  color: #fff;
+  background: #1f1a3a;
+  border-radius: 10px;
+}
+
+.swipe-hint-bubble::after {
+  content: '';
+  position: absolute;
+  left: 24px;
+  bottom: -6px;
+  border: 6px solid transparent;
+  border-bottom: 0;
+  border-top-color: #1f1a3a;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .is-hinting .swipe-row-face,
+  .swipe-row-hand {
+    animation: none;
+  }
+
+  .swipe-row-hand {
+    display: none;
+  }
+}

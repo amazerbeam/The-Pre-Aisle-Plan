@@ -3,6 +3,7 @@ package com.foodbytes.service;
 import com.foodbytes.dto.MealPlanCreateRequest;
 import com.foodbytes.dto.MealPlanEntryDTO;
 import com.foodbytes.dto.MealPlanEntryEatenDTO;
+import com.foodbytes.dto.MealPlanEntryUpdateRequest;
 import com.foodbytes.dto.MealPlanWeekDTO;
 import com.foodbytes.model.Meal;
 import com.foodbytes.model.MealPlanEntry;
@@ -715,5 +716,121 @@ class MealPlanServiceTest {
         mealPlanService.setEntryEaten(USER_ID, ENTRY_ID, false);
 
         verifyNoInteractions(eventPublisher);
+    }
+
+    // ---- updateEntry (PATCH /api/meal-plan/{id}) ----
+
+    private static Meal mealWithId(Long id, String key) {
+        Meal m = new Meal();
+        m.setId(id);
+        m.setKey(key);
+        return m;
+    }
+
+    private void stubUpdateSave() {
+        when(mealPlanEntryRepository.save(any(MealPlanEntry.class))).thenAnswer(i -> i.getArgument(0));
+        when(macroCalculationService.calculatePerServingMacros(any())).thenReturn(new int[]{0, 0, 0});
+    }
+
+    @Test
+    void updateEntry_moveToEmptySlot_movesInPlaceAndKeepsId() {
+        LocalDate from = LocalDate.of(2026, 11, 14), to = LocalDate.of(2026, 11, 15);
+        when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user));
+        MealPlanEntry e = entryWithId(10L, recipeWithId(82L), from);   // meal = dinner(3) per fixture
+        when(mealPlanEntryRepository.findByIdAndUserId(10L, USER_ID)).thenReturn(Optional.of(e));
+        when(mealPlanEntryRepository.findByUserIdAndPlanDateAndMealId(USER_ID, to, 2L)).thenReturn(Optional.empty());
+        when(mealRepository.findById(2L)).thenReturn(Optional.of(mealWithId(2L, "lunch")));
+        stubUpdateSave();
+
+        Optional<MealPlanEntryDTO> dto = mealPlanService.updateEntry(USER_ID, 10L, new MealPlanEntryUpdateRequest(to, 2L, null));
+
+        assertThat(dto).isPresent();
+        assertThat(e.getId()).isEqualTo(10L);
+        assertThat(e.getPlanDate()).isEqualTo(to);
+        assertThat(e.getMeal().getId()).isEqualTo(2L);
+        verify(eventPublisher).publishEvent(PetFirstCandidate.planned(USER_ID, from, to));
+    }
+
+    @Test
+    void updateEntry_moveOntoFilledSlot_swapsTheOccupantIntoTheSourceSlot() {
+        LocalDate from = LocalDate.of(2026, 11, 14), to = LocalDate.of(2026, 11, 12);
+        when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user));
+        MealPlanEntry moving = entryWithId(10L, recipeWithId(82L), from);
+        MealPlanEntry occupant = entryWithId(11L, recipeWithId(38L), to);
+        Meal sourceMeal = moving.getMeal();
+        when(mealPlanEntryRepository.findByIdAndUserId(10L, USER_ID)).thenReturn(Optional.of(moving));
+        when(mealPlanEntryRepository.findByUserIdAndPlanDateAndMealId(USER_ID, to, 3L)).thenReturn(Optional.of(occupant));
+        when(mealRepository.findById(3L)).thenReturn(Optional.of(sourceMeal));
+        stubUpdateSave();
+
+        mealPlanService.updateEntry(USER_ID, 10L, new MealPlanEntryUpdateRequest(to, 3L, null));
+
+        assertThat(moving.getPlanDate()).isEqualTo(to);
+        assertThat(occupant.getPlanDate()).isEqualTo(from);
+        assertThat(occupant.getMeal()).isSameAs(sourceMeal);
+        verify(eventPublisher).publishEvent(PetFirstCandidate.planned(USER_ID, to, from));
+    }
+
+    @Test
+    void updateEntry_servingsOnly_setsServingsWithoutMoving() {
+        LocalDate d = LocalDate.of(2026, 11, 14);
+        when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user));
+        MealPlanEntry e = entryWithId(10L, recipeWithId(82L), d);
+        when(mealPlanEntryRepository.findByIdAndUserId(10L, USER_ID)).thenReturn(Optional.of(e));
+        stubUpdateSave();
+
+        mealPlanService.updateEntry(USER_ID, 10L, new MealPlanEntryUpdateRequest(null, null, new BigDecimal("1.50")));
+
+        assertThat(e.getServings()).isEqualByComparingTo("1.50");
+        assertThat(e.getPlanDate()).isEqualTo(d);
+        verify(mealPlanEntryRepository, never()).findByUserIdAndPlanDateAndMealId(any(), any(), any());
+        verify(eventPublisher, never()).publishEvent(any());
+    }
+
+    @Test
+    void updateEntry_entryNotInPlan_returnsEmpty() {
+        when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user));
+        when(mealPlanEntryRepository.findByIdAndUserId(99L, USER_ID)).thenReturn(Optional.empty());
+
+        assertThat(mealPlanService.updateEntry(USER_ID, 99L,
+            new MealPlanEntryUpdateRequest(null, null, BigDecimal.ONE))).isEmpty();
+    }
+
+    @Test
+    void updateEntry_unknownMealId_throwsIllegalArgument_andSwapsNothing() {
+        LocalDate from = LocalDate.of(2026, 11, 14), to = LocalDate.of(2026, 11, 15);
+        when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user));
+        MealPlanEntry e = entryWithId(10L, recipeWithId(82L), from);
+        when(mealPlanEntryRepository.findByIdAndUserId(10L, USER_ID)).thenReturn(Optional.of(e));
+        when(mealRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> mealPlanService.updateEntry(USER_ID, 10L, new MealPlanEntryUpdateRequest(to, 99L, null)))
+            .isInstanceOf(IllegalArgumentException.class);
+
+        verify(mealPlanEntryRepository, never()).findByUserIdAndPlanDateAndMealId(any(), any(), any());
+        verify(mealPlanEntryRepository, never()).save(any());
+        assertThat(e.getPlanDate()).isEqualTo(from);
+    }
+
+    @Test
+    void updateEntry_linkedUser_looksUpAndSwapsAgainstTheOwnersPlan() {
+        LocalDate from = LocalDate.of(2026, 11, 14), to = LocalDate.of(2026, 11, 12);
+        when(userRepository.findById(LINKED_ID)).thenReturn(Optional.of(linkedUser()));
+        MealPlanEntry ownersEntry = entryWithId(10L, recipeWithId(82L), from);
+        MealPlanEntry occupant = entryWithId(11L, recipeWithId(38L), to);
+        when(mealPlanEntryRepository.findByIdAndUserId(10L, OWNER_ID)).thenReturn(Optional.of(ownersEntry));
+        when(mealPlanEntryRepository.findByUserIdAndPlanDateAndMealId(OWNER_ID, to, 2L)).thenReturn(Optional.of(occupant));
+        when(mealRepository.findById(2L)).thenReturn(Optional.of(mealWithId(2L, "lunch")));
+        stubUpdateSave();
+
+        Optional<MealPlanEntryDTO> dto = mealPlanService.updateEntry(LINKED_ID, 10L, new MealPlanEntryUpdateRequest(to, 2L, null));
+
+        assertThat(dto).isPresent();
+        assertThat(dto.get().getId()).isEqualTo(10L);
+        verify(mealPlanEntryRepository).findByIdAndUserId(10L, OWNER_ID);
+        verify(mealPlanEntryRepository, never()).findByIdAndUserId(10L, LINKED_ID);
+        verify(mealPlanEntryRepository).findByUserIdAndPlanDateAndMealId(OWNER_ID, to, 2L);
+        assertThat(occupant.getPlanDate()).isEqualTo(from);
+        assertThat(ownersEntry.getPlanDate()).isEqualTo(to);
     }
 }

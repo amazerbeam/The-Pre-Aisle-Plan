@@ -18,4 +18,7 @@ public class RecipeVariantDTO {
     private Boolean isDefault;
     private Integer displayOrder;
     private Integer caloriesPerServing; // FR-043: Calories per serving for dropdown display
+    private Integer proteinPerServing;  // grams, homemade basis (MacroCalculationService)
+    private Integer carbsPerServing;
+    private Integer fatPerServing;
 }

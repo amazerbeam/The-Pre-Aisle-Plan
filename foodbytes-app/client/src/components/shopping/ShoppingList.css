@@ -2,7 +2,7 @@
 
 /* Page Container */
 .shopping-list-page {
-  max-width: 800px;
+  max-width: 1100px;
   margin: 0 auto;
 }
 
@@ -11,162 +11,431 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: var(--spacing-lg);
-  padding-bottom: var(--spacing-md);
-  border-bottom: 2px solid var(--brand-primary);
+  flex-wrap: wrap;
+  margin-bottom: var(--spacing-md);
   gap: var(--spacing-md);
 }
 
 .header-left {
   flex: 1;
+  min-width: 0;
 }
 
 .shopping-list-header h1 {
   font-size: 1.75rem;
   color: var(--brand-primary);
-  margin-bottom: var(--spacing-xs);
+  margin: 0;
 }
 
-.date-range {
+.list-meta {
   color: var(--text-secondary);
-  font-size: 0.875rem;
-  margin-bottom: var(--spacing-xs);
-}
-
-.item-count {
-  color: var(--text-secondary);
-  font-size: 0.875rem;
-  font-weight: 500;
-}
-
-.generated-at {
-  color: var(--text-muted);
-  font-size: 0.75rem;
-  margin-top: var(--spacing-xs);
+  font-size: 0.8125rem;
+  margin: var(--spacing-xs) 0 0;
 }
 
 .header-actions {
   display: flex;
   gap: var(--spacing-sm);
+  align-items: center;
   flex-shrink: 0;
 }
 
-.generate-list-btn {
+.sl-btn,
+.sl-kebab {
+  min-height: 44px;
+  border: 1px solid var(--border-color);
+  background: #fff;
+  color: var(--text-primary);
+  border-radius: 10px;
+  padding: 0 13px;
+  font-size: 0.875rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
   white-space: nowrap;
-  padding: var(--spacing-sm) var(--spacing-md);
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.uncheck-all-btn {
-  white-space: nowrap;
-  padding: var(--spacing-sm) var(--spacing-md);
+.sl-btn[aria-pressed="true"] {
+  background: #eeebf7;
+  border-color: var(--brand-primary-light);
+  color: var(--brand-primary);
+  font-weight: 600;
 }
 
-/* Content Area */
-.shopping-list-content {
+.sl-kebab {
+  min-width: 44px;
+  justify-content: center;
+  font-size: 1.125rem;
+  padding: 0;
+}
+
+.sl-kebab[aria-expanded="true"] {
+  background: #eeebf7;
+}
+
+@media (hover: hover) {
+  .sl-btn:hover,
+  .sl-kebab:hover {
+    background: #eeebf7;
+  }
+}
+
+.sl-btn:active,
+.sl-kebab:active {
+  background: #e3dff2;
+}
+
+.sl-btn:focus-visible,
+.sl-kebab:focus-visible,
+.sl-menu-list button:focus-visible,
+.sl-stale button:focus-visible,
+.aisle-header:focus-visible,
+.shopping-item:focus-visible,
+.info-btn:focus-visible {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: 2px;
+}
+
+/* Actions menu */
+.sl-menu {
+  position: relative;
+}
+
+.sl-menu-list {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 200;
+  min-width: 240px;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  background: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.sl-menu-list button {
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  text-align: left;
+  border: none;
+  background: none;
+  padding: 11px 12px;
+  font-size: 0.875rem;
+  border-radius: 8px;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (hover: hover) {
+  .sl-menu-list button:hover {
+    background: #eeebf7;
+  }
+}
+
+.sl-menu-list button:active {
+  background: #e3dff2;
+}
+
+/* Progress card */
+.sl-progress {
+  margin-bottom: var(--spacing-md);
+  background: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 12px 14px;
   display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
+  align-items: center;
+  gap: 14px;
 }
+
+.sl-progress-count {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--brand-primary);
+  white-space: nowrap;
+}
+
+.sl-progress-bar {
+  flex: 1;
+  height: 10px;
+  border-radius: 5px;
+  background: #e6e3f0;
+  overflow: hidden;
+}
+
+.sl-progress-bar i {
+  display: block;
+  height: 100%;
+  background: var(--success);
+  border-radius: 5px;
+  transition: width 0.3s ease;
+}
+
+.sl-progress-note {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+/* Out-of-date banner */
+.sl-stale {
+  margin-bottom: var(--spacing-md);
+  background: #fff7e6;
+  border: 1px solid #f3d39a;
+  border-radius: 12px;
+  padding: 10px 14px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  font-size: 0.875rem;
+  color: #7a4b00;
+}
+
+.sl-stale button {
+  margin-left: auto;
+  min-height: 44px;
+  border: none;
+  background: var(--brand-primary);
+  color: #fff;
+  border-radius: 8px;
+  padding: 0 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Content Area: one column on phones, two on desktop */
+.shopping-list-content {
+  columns: 1;
+}
+
+@media (min-width: 900px) {
+  .shopping-list-content {
+    columns: 2 420px;
+    column-gap: 16px;
+  }
+}
+
+/* Aisle colour: each [data-aisle] sets --aisle-color for its descendants */
+[data-aisle] {
+  --aisle-color: var(--aisle-misc);
+}
+
+[data-aisle="produce"] { --aisle-color: var(--aisle-produce); }
+[data-aisle="dairy & eggs"],
+[data-aisle="dairy"] { --aisle-color: var(--aisle-dairy); }
+[data-aisle="meat & poultry"],
+[data-aisle="meat"] { --aisle-color: var(--aisle-meat); }
+[data-aisle="seafood"] { --aisle-color: var(--aisle-seafood); }
+[data-aisle="bakery"] { --aisle-color: var(--aisle-bakery); }
+[data-aisle="grains & pasta"],
+[data-aisle="grains"] { --aisle-color: var(--aisle-grains); }
+[data-aisle="canned goods"],
+[data-aisle="canned"] { --aisle-color: var(--aisle-canned); }
+[data-aisle="condiments & sauces"],
+[data-aisle="condiments"] { --aisle-color: var(--aisle-condiments); }
+[data-aisle="snacks"] { --aisle-color: var(--aisle-snacks); }
+[data-aisle="beverages"] { --aisle-color: var(--aisle-beverages); }
+[data-aisle="frozen foods"],
+[data-aisle="frozen"] { --aisle-color: var(--aisle-frozen); }
+[data-aisle="spices & seasonings"],
+[data-aisle="spices"] { --aisle-color: var(--aisle-spices); }
+[data-aisle="oils & vinegars"],
+[data-aisle="oils"] { --aisle-color: var(--aisle-oils); }
+[data-aisle="baking supplies"],
+[data-aisle="baking"] { --aisle-color: var(--aisle-baking); }
+[data-aisle="miscellaneous"],
+[data-aisle="misc"] { --aisle-color: var(--aisle-misc); }
 
 /* Aisle Section */
 .shopping-aisle {
+  break-inside: avoid;
   background: white;
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-sm);
+  border-radius: 14px;
   border: 1px solid var(--border-color);
+  margin: 0 0 14px;
   overflow: hidden;
 }
 
 .aisle-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: var(--spacing-md);
-  background: var(--bg-secondary);
+  gap: 10px;
+  width: 100%;
+  min-height: 48px;
+  padding: 11px 14px;
+  border: none;
+  border-bottom: 1px solid var(--border-color);
+  background: white;
+  font: inherit;
+  text-align: left;
   cursor: pointer;
   user-select: none;
-  transition: background-color 0.2s ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.aisle-header:hover {
-  background: var(--border-color);
+.shopping-aisle.is-done .aisle-header {
+  border-bottom: none;
+  background: #f3faf4;
 }
 
-.aisle-header:focus {
-  outline: 2px solid var(--brand-primary);
-  outline-offset: -2px;
+@media (hover: hover) {
+  .aisle-header:hover {
+    background: var(--bg-secondary);
+  }
+
+  .shopping-aisle.is-done .aisle-header:hover {
+    background: #e8f5ea;
+  }
+}
+
+.aisle-header:active {
+  background: var(--bg-secondary);
+}
+
+.aisle-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 4px;
+  flex: none;
+  background: var(--aisle-color);
 }
 
 .aisle-name {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: var(--brand-primary);
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--text-primary);
   margin: 0;
+}
+
+.aisle-count {
+  margin-left: auto;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  background: var(--bg-secondary);
+  border-radius: 999px;
+  padding: 3px 9px;
+}
+
+.shopping-aisle.is-done .aisle-count {
+  background: #d8f0dd;
+  color: #1b6b2e;
 }
 
 .expand-icon {
   color: var(--text-secondary);
-  font-size: 0.875rem;
-  transition: transform 0.2s ease;
+  font-size: 0.75rem;
+  width: 16px;
+  text-align: center;
 }
 
-/* Aisle Items */
-.aisle-items {
-  padding: var(--spacing-sm);
+.hidden-note {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  padding: 8px 14px;
+  background: var(--bg-secondary);
 }
 
 /* Shopping Item */
 .shopping-item {
   display: flex;
   align-items: center;
-  gap: var(--spacing-md);
-  padding: var(--spacing-md);
-  border-radius: var(--radius-sm);
-  border-left: 4px solid var(--aisle-misc);
+  gap: 12px;
+  min-height: 52px;
+  padding: 0 8px 0 14px;
+  border-bottom: 1px solid #f2f3f5;
   cursor: pointer;
-  transition: opacity 0.3s ease, transform 0.2s ease, background-color 0.15s ease;
+  transition: opacity 0.3s ease, background-color 0.15s ease;
   user-select: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.shopping-item:hover {
-  background: var(--bg-secondary);
-  transform: translateX(4px);
+.shopping-item:last-child {
+  border-bottom: none;
 }
 
-.shopping-item:focus {
-  outline: 2px solid var(--brand-primary);
-  outline-offset: -2px;
+@media (hover: hover) {
+  .shopping-item:hover {
+    background: var(--bg-secondary);
+  }
 }
 
-/* Checkbox */
-.shopping-item input[type="checkbox"] {
-  width: 20px;
-  height: 20px;
-  cursor: pointer;
-  flex-shrink: 0;
-  margin: 0;
-  accent-color: var(--brand-primary);
+.tick-circle {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid #c9ced4;
+  flex: none;
+  display: grid;
+  place-items: center;
+  color: transparent;
+  font-size: 0.875rem;
+  font-weight: 700;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.shopping-item.checked .tick-circle {
+  background: var(--aisle-color);
+  border-color: var(--aisle-color);
+  color: #fff;
 }
 
 /* Item Text */
-.item-name {
-  flex: 1;
-  font-size: 1rem;
-  color: var(--text-primary);
-  transition: all 0.2s ease;
-}
-
 .item-quantity {
   font-size: 0.875rem;
-  color: var(--text-secondary);
-  font-weight: 500;
+  font-weight: 700;
+  min-width: 74px;
+  color: var(--text-primary);
   white-space: nowrap;
-  transition: all 0.2s ease;
 }
 
-/* Checked State */
-.shopping-item.checked {
-  transition: opacity 0.3s ease 0.1s;
+.item-name {
+  flex: 1;
+  font-size: 0.9375rem;
+  color: var(--text-primary);
+}
+
+.shopping-item.checked .item-name,
+.shopping-item.checked .item-quantity {
+  text-decoration: line-through;
+  color: #a0a6ad;
+}
+
+.info-btn {
+  min-width: 44px;
+  min-height: 44px;
+  border: none;
+  background: transparent;
+  border-radius: 50%;
+  color: var(--brand-primary-light);
+  font-size: 1rem;
+  flex: none;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (hover: hover) {
+  .info-btn:hover {
+    background: #eeebf7;
+  }
+}
+
+.info-btn:active {
+  background: #e3dff2;
 }
 
 /* FR-042: Long Press State */
@@ -197,12 +466,6 @@
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
-}
-
-.shopping-item.checked .item-name,
-.shopping-item.checked .item-quantity {
-  text-decoration: line-through;
-  opacity: 0.6;
 }
 
 /* Loading State */
@@ -279,134 +542,61 @@
   margin-top: var(--spacing-md);
 }
 
+/* Generate modal: summary rows and the "Choose other dates" link (modal CSS is not in this change's file list) */
+.generate-summary {
+  margin-bottom: 12px;
+}
+
+.generate-summary-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.875rem;
+}
+
+.choose-dates-btn {
+  width: 100%;
+  min-height: 44px;
+  margin-bottom: 12px;
+  border: none;
+  background: none;
+  color: var(--brand-primary-light);
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
 /* Mobile Responsive */
 @media (max-width: 768px) {
-  .shopping-list-header {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .header-actions {
-    flex-direction: column;
-    width: 100%;
-  }
-
-  .generate-list-btn,
-  .uncheck-all-btn {
-    width: 100%;
-  }
-
   .shopping-list-header h1 {
     font-size: 1.5rem;
   }
 
-  .shopping-item {
-    padding: var(--spacing-sm) var(--spacing-md);
+  .sl-btn-label {
+    display: none;
   }
 
-  .item-name {
-    font-size: 0.9375rem;
+  .sl-progress {
+    gap: 10px;
   }
 
-  .item-quantity {
-    font-size: 0.8125rem;
+  .sl-stale {
+    flex-wrap: wrap;
   }
-}
-
-/* Tablet Responsive */
-@media (min-width: 769px) and (max-width: 1024px) {
-  .shopping-list-page {
-    max-width: 700px;
-  }
-}
-
-/* Aisle-specific color coding via data-aisle attribute */
-.shopping-item[data-aisle="produce"] {
-  border-left-color: var(--aisle-produce);
-}
-
-.shopping-item[data-aisle="dairy & eggs"],
-.shopping-item[data-aisle="dairy"] {
-  border-left-color: var(--aisle-dairy);
-}
-
-.shopping-item[data-aisle="meat & poultry"],
-.shopping-item[data-aisle="meat"] {
-  border-left-color: var(--aisle-meat);
-}
-
-.shopping-item[data-aisle="seafood"] {
-  border-left-color: var(--aisle-seafood);
-}
-
-.shopping-item[data-aisle="bakery"] {
-  border-left-color: var(--aisle-bakery);
-}
-
-.shopping-item[data-aisle="grains & pasta"],
-.shopping-item[data-aisle="grains"] {
-  border-left-color: var(--aisle-grains);
-}
-
-.shopping-item[data-aisle="canned goods"],
-.shopping-item[data-aisle="canned"] {
-  border-left-color: var(--aisle-canned);
-}
-
-.shopping-item[data-aisle="condiments & sauces"],
-.shopping-item[data-aisle="condiments"] {
-  border-left-color: var(--aisle-condiments);
-}
-
-.shopping-item[data-aisle="snacks"] {
-  border-left-color: var(--aisle-snacks);
-}
-
-.shopping-item[data-aisle="beverages"] {
-  border-left-color: var(--aisle-beverages);
-}
-
-.shopping-item[data-aisle="frozen foods"],
-.shopping-item[data-aisle="frozen"] {
-  border-left-color: var(--aisle-frozen);
-}
-
-.shopping-item[data-aisle="spices & seasonings"],
-.shopping-item[data-aisle="spices"] {
-  border-left-color: var(--aisle-spices);
-}
-
-.shopping-item[data-aisle="oils & vinegars"],
-.shopping-item[data-aisle="oils"] {
-  border-left-color: var(--aisle-oils);
-}
-
-.shopping-item[data-aisle="baking supplies"],
-.shopping-item[data-aisle="baking"] {
-  border-left-color: var(--aisle-baking);
-}
-
-.shopping-item[data-aisle="miscellaneous"],
-.shopping-item[data-aisle="misc"] {
-  border-left-color: var(--aisle-misc);
 }
 
 /* Print styles for shopping list */
 @media print {
-  .shopping-list-header button {
+  .shopping-list-header button,
+  .sl-stale button,
+  .info-btn {
     display: none;
   }
 
   .shopping-aisle {
     page-break-inside: avoid;
-  }
-
-  .shopping-item {
-    border-left-width: 2px;
-  }
-
-  .shopping-item input[type="checkbox"] {
-    -webkit-appearance: checkbox;
-    appearance: checkbox;
   }
 }

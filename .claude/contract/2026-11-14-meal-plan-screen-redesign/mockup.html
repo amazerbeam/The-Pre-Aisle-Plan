@@ -1,0 +1,637 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Meal Plan Redesign</title>
+<style>
+/* Tokens mirror client/src/styles/global.css */
+:root{
+  --brand-primary:#4a3f80; --brand-primary-dark:#3a3266; --brand-primary-light:#6b5fa0;
+  --brand-tint:#efedf7;
+  --text-primary:#2c3e50; --text-secondary:#6c757d;
+  --bg-primary:#fff; --bg-secondary:#f8f9fa; --border-color:#e9ecef;
+  --success:#28a745; --warning:#ffc107; --error:#dc3545; --cart:#e8890c;
+  --macro-under:#4aa3f0; --macro-near:#ffc107; --macro-on:#28a745; --macro-over:#dc3545;
+  --radius-sm:4px; --radius-md:8px; --radius-lg:12px;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.05); --shadow-md:0 4px 6px rgba(0,0,0,.1); --shadow-lg:0 10px 25px rgba(0,0,0,.15);
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color:var(--text-primary);background:#e7e5ef}
+button{font:inherit;cursor:pointer}
+
+/* ---------- Mockup chrome (not part of design) ---------- */
+.chrome{position:sticky;top:0;z-index:50;background:#1f1a3a;color:#fff;display:flex;gap:8px;align-items:center;padding:10px 16px;flex-wrap:wrap}
+.chrome h1{font-size:15px;margin:0 12px 0 0;font-weight:600}
+.chrome .tab{background:transparent;border:1px solid #5b5390;color:#d9d4f5;border-radius:999px;padding:6px 14px;font-size:13px}
+.chrome .tab.on{background:#fff;color:#1f1a3a;border-color:#fff}
+.chrome label{font-size:12px;color:#bdb6e6;margin-left:auto;display:flex;gap:6px;align-items:center}
+.view{display:none}.view.on{display:block}
+.marker{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:#ff4f8b;color:#fff;font-size:11px;font-weight:700;box-shadow:0 0 0 2px #fff;flex:none;cursor:pointer}
+body:not(.show-markers) .marker{display:none}
+
+/* ---------- App header (existing pill, kept) ---------- */
+.app-header{background:var(--brand-primary);padding:12px 16px;display:flex;justify-content:center}
+.pill{background:var(--brand-primary-dark);border-radius:999px;display:flex;align-items:center;gap:16px;padding:6px 8px;color:#fff;min-width:560px;justify-content:space-between}
+.pill .logo{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.12);display:grid;place-items:center}
+.pill .avatar{width:36px;height:36px;border-radius:50%;background:#fff;color:var(--brand-primary);display:grid;place-items:center;font-weight:700}
+
+/* week navigator (idea 1) */
+.weeknav{display:flex;align-items:center;gap:6px}
+.weeknav .arrow{width:32px;height:32px;border-radius:50%;border:none;background:rgba(255,255,255,.14);color:#fff;font-size:16px}
+.weeknav .arrow:hover{background:rgba(255,255,255,.26)}
+.weeknav .range{background:#fff;color:var(--brand-primary);border:none;border-radius:999px;padding:7px 14px;font-weight:600;font-size:14px;display:flex;gap:8px;align-items:center}
+.weeknav .this-week{background:transparent;border:1px solid rgba(255,255,255,.4);color:#fff;border-radius:999px;padding:6px 10px;font-size:12px}
+
+/* ---------- WEB ---------- */
+.web-page{background:var(--bg-primary);min-height:calc(100vh - 50px);padding-bottom:90px}
+.web-wrap{max-width:1360px;margin:0 auto;padding:24px 24px 0}
+.title-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.title-row h2{margin:0;color:var(--brand-primary);font-size:28px}
+.toolbar{display:flex;gap:8px;margin-left:auto;flex-wrap:wrap;align-items:center}
+.tbtn{border:1px solid var(--border-color);background:#fff;border-radius:var(--radius-md);padding:8px 12px;font-size:13px;color:var(--text-primary);display:flex;gap:6px;align-items:center}
+.tbtn:hover{border-color:var(--brand-primary-light);background:var(--brand-tint)}
+.tbtn.primary{background:var(--brand-primary);color:#fff;border-color:var(--brand-primary)}
+.dd{position:relative}
+.dd-menu{position:absolute;right:0;top:calc(100% + 6px);background:#fff;border:1px solid var(--border-color);border-radius:var(--radius-md);box-shadow:var(--shadow-lg);min-width:200px;padding:6px;z-index:20;display:none}
+.dd.open .dd-menu{display:block}
+.dd-menu button{display:block;width:100%;text-align:left;border:none;background:none;padding:9px 10px;border-radius:6px;font-size:14px}
+.dd-menu button:hover{background:var(--brand-tint)}
+
+/* week summary (idea 2) */
+.summary{margin-top:18px;display:grid;grid-template-columns:2.4fr 1fr;gap:12px}
+.week-tile{display:flex;align-items:center;gap:28px}
+.week-tile .wk-macros{border-left:1px solid var(--border-color);padding-left:24px}
+.week-tile .macro-chips .mchip{font-size:14px;padding:4px 10px}
+.wk-more{margin-left:auto;color:var(--brand-primary-light);font-size:13px;font-weight:600;align-self:flex-end}
+.m-weekbar{margin-top:8px;width:100%;display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.12);border:none;border-radius:12px;padding:8px 10px;color:#fff;font-size:13px;text-align:left}
+.m-weekbar b{white-space:nowrap}
+.m-weekbar .macro-chips{margin:0;gap:4px;flex-wrap:nowrap}
+.m-weekbar .mchip{background:#fff;font-size:11px;padding:2px 7px}
+.m-weekbar .mchip::before{display:none}
+.m-weekbar .go{margin-left:auto;opacity:.8}
+.stat{background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:var(--radius-lg);padding:12px 14px;cursor:pointer;position:relative}
+.stat:hover{border-color:var(--brand-primary-light)}
+.stat .k{font-size:12px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.04em}
+.stat .v{font-size:22px;font-weight:700;color:var(--brand-primary);margin-top:2px}
+.stat .s{font-size:12px;color:var(--text-secondary)}
+.bar{height:6px;border-radius:3px;background:#e2e0ea;margin-top:8px;overflow:hidden}
+.bar>i{display:block;height:100%;background:var(--brand-primary-light);border-radius:3px}
+.macro-chips{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.mchip{font-size:12px;font-weight:600;padding:3px 8px;border-radius:999px;display:inline-flex;gap:4px;align-items:center}
+.mchip::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+.m-on{background:rgba(40,167,69,.15);color:#1b6b2e}
+.m-near{background:rgba(255,193,7,.22);color:#856404}
+.m-under{background:rgba(74,163,240,.2);color:#10527f}
+.m-over{background:rgba(220,53,69,.15);color:#a71d2a}
+.stale{background:#fff7e6;border-color:#f3d39a}
+.stale .v{color:#9a5b00;font-size:15px}
+.linkbtn{border:none;background:var(--brand-primary);color:#fff;border-radius:6px;padding:5px 10px;font-size:12px;margin-top:6px}
+
+/* timetable grid (idea 3) */
+.tt{margin-top:20px;display:grid;grid-template-columns:92px repeat(7,minmax(0,1fr));gap:8px}
+.tt .corner{}
+.dayhead{background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:var(--radius-lg) var(--radius-lg) 6px 6px;padding:10px 10px 8px;position:relative}
+.dayhead.today{background:var(--brand-primary);color:#fff;border-color:var(--brand-primary)}
+.dayhead.past{opacity:.78}
+.dayhead .dn{font-weight:700}.dayhead .dd2{font-size:13px;opacity:.75;margin-left:4px}
+.dayhead .swap{position:absolute;right:6px;top:6px;width:26px;height:26px;border-radius:6px;border:1px solid transparent;background:transparent;color:inherit;opacity:.55;font-size:14px}
+.dayhead .swap:hover{opacity:1;border-color:currentColor}
+.dayhead.swap-pick{outline:3px dashed var(--brand-primary-light);outline-offset:2px}
+.ring-row{display:flex;align-items:center;gap:8px;margin-top:8px}
+.kring{width:38px;height:38px;flex:none}
+.kring .bg{stroke:#e2e0ea}.today .kring .bg{stroke:rgba(255,255,255,.25)}
+.kring .fg{stroke:var(--brand-primary-light)}.today .kring .fg{stroke:#ffd34d}
+.ring-row .kc{font-size:13px;font-weight:700}
+.ring-row .dots{display:flex;gap:3px;margin-top:3px}
+.dot{width:9px;height:9px;border-radius:50%}
+.d-on{background:var(--macro-on)}.d-near{background:var(--macro-near)}.d-under{background:var(--macro-under)}.d-over{background:var(--macro-over)}
+.macro-chips.hdr{gap:3px;margin-top:4px}.macro-chips.hdr .mchip{font-size:11px;padding:2px 6px}.macro-chips.hdr .mchip::before{display:none}
+.today .mchip{background:#fff}
+.rowlabel{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding-left:4px;font-size:12px;font-weight:700;letter-spacing:.05em;color:var(--text-secondary);text-transform:uppercase}
+.rowlabel .t{font-weight:400;letter-spacing:0;text-transform:none;font-size:11px}
+.cell{min-height:92px;display:flex;flex-direction:column;gap:6px}
+.cell.todaycol{background:var(--brand-tint);border-radius:8px;padding:4px;margin:-4px}
+
+.meal{position:relative;background:#fff;border:1px solid var(--border-color);border-left:4px solid var(--brand-primary-light);border-radius:var(--radius-md);padding:8px 8px 8px 10px;cursor:pointer;transition:box-shadow .15s,transform .15s}
+.meal:hover{box-shadow:var(--shadow-md);transform:translateY(-1px)}
+.meal.eaten{background:#eef8f0;border-left-color:var(--success)}
+.meal .nm{font-size:13px;font-weight:600;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;padding-right:20px}
+.meal .meta{display:flex;align-items:center;gap:6px;margin-top:6px;font-size:12px;color:var(--text-secondary);white-space:nowrap}
+.meal .ppl{background:var(--brand-tint);color:var(--brand-primary);border-radius:999px;padding:1px 7px;font-weight:600;font-size:11px}
+.meal .cart{color:var(--cart);font-size:13px}
+.tick{margin-left:auto;width:24px;height:24px;border-radius:50%;border:2px solid #cfd4da;background:#fff;display:grid;place-items:center;font-size:12px;color:transparent;flex:none}
+.tick:hover{border-color:var(--success);color:var(--success)}
+.meal.eaten .tick{background:var(--success);border-color:var(--success);color:#fff;cursor:default}
+.kebab{position:absolute;right:4px;top:4px;width:22px;height:22px;border:none;background:transparent;border-radius:5px;color:var(--text-secondary);opacity:0;font-size:15px;line-height:1}
+.meal:hover .kebab{opacity:1}.kebab:hover{background:var(--bg-secondary)}
+.mmenu{position:absolute;right:4px;top:28px;z-index:15;background:#fff;border:1px solid var(--border-color);border-radius:8px;box-shadow:var(--shadow-lg);padding:4px;min-width:170px;display:none}
+.mmenu.open{display:block}
+.mmenu button{display:block;width:100%;text-align:left;border:none;background:none;padding:7px 9px;font-size:13px;border-radius:5px}
+.mmenu button:hover{background:var(--brand-tint)}
+.mmenu .danger{color:var(--error)}
+.add{border:1.5px dashed #cfcbe0;background:transparent;border-radius:var(--radius-md);color:var(--brand-primary-light);font-size:12px;font-weight:600;padding:8px;min-height:44px;text-align:center}
+.add:hover{background:var(--brand-tint);border-color:var(--brand-primary-light)}
+.cell .add.ghost{opacity:0;transition:opacity .15s}
+.tt:hover .cell .add.ghost{opacity:.6}
+.meal.dragging{opacity:.4}
+.cell.drop{outline:2px dashed var(--brand-primary);outline-offset:2px;border-radius:8px}
+
+/* tooltip */
+.tip{position:fixed;z-index:60;background:#1f1a3a;color:#fff;border-radius:8px;padding:8px 10px;font-size:12px;pointer-events:none;display:none;max-width:220px}
+.tip b{display:block;margin-bottom:3px}
+
+/* footer nav */
+.footnav{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--border-color);display:flex;justify-content:center;gap:48px;padding:10px 0 12px;z-index:30}
+.footnav span{font-size:14px;color:var(--text-secondary);display:flex;gap:6px;align-items:center}
+.footnav .on{color:var(--brand-primary);font-weight:600;border-bottom:3px solid var(--brand-primary);padding-bottom:4px}
+
+/* toast */
+.toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%) translateY(20px);background:#1f1a3a;color:#fff;padding:10px 12px 10px 16px;border-radius:10px;display:flex;gap:14px;align-items:center;font-size:14px;opacity:0;pointer-events:none;transition:.2s;z-index:70}
+.toast.show{opacity:1;transform:translateX(-50%);pointer-events:auto}
+.toast button{background:none;border:none;color:#ffd34d;font-weight:700}
+.toast .pip{color:#9be29b;font-weight:600}
+
+/* modal (generic) */
+.scrim{position:fixed;inset:0;background:rgba(20,16,40,.45);display:none;align-items:center;justify-content:center;z-index:80}
+.scrim.open{display:flex}
+.modal{background:#fff;border-radius:14px;padding:18px 20px;width:min(420px,92vw);box-shadow:var(--shadow-lg)}
+.modal h3{margin:0 0 8px;color:var(--brand-primary)}
+.modal p{margin:6px 0;color:var(--text-secondary);font-size:14px}
+.modal .close{float:right;border:none;background:none;font-size:20px;color:var(--text-secondary)}
+
+/* ---------- MOBILE ---------- */
+.mobile-stage{display:flex;gap:40px;justify-content:center;align-items:flex-start;padding:28px 16px 60px;flex-wrap:wrap}
+.phone{width:390px;height:844px;border-radius:46px;background:#111;padding:12px;box-shadow:0 30px 60px rgba(0,0,0,.35);flex:none}
+.screen{width:100%;height:100%;border-radius:36px;overflow:hidden;background:var(--bg-primary);position:relative;display:flex;flex-direction:column}
+.statusbar{height:34px;display:flex;justify-content:space-between;align-items:center;padding:0 26px;font-size:13px;font-weight:600;background:var(--brand-primary);color:#fff;flex:none}
+.m-head{background:var(--brand-primary);color:#fff;padding:6px 14px 12px;flex:none}
+.m-top{display:flex;align-items:center;justify-content:space-between}
+.m-top h2{margin:0;font-size:22px}
+.m-top .icons{display:flex;gap:8px}
+.m-icon{width:36px;height:36px;border-radius:50%;border:none;background:rgba(255,255,255,.15);color:#fff;font-size:16px}
+.m-week{display:flex;align-items:center;justify-content:space-between;margin-top:8px;font-size:14px}
+.m-week button{background:none;border:none;color:#fff;font-size:18px;width:32px}
+.m-week .lbl{font-weight:600}
+.chips{display:flex;gap:6px;margin-top:10px}
+.chip{flex:1;border:none;border-radius:12px;background:rgba(255,255,255,.12);color:#fff;padding:6px 0 7px;display:flex;flex-direction:column;align-items:center;gap:2px}
+.chip .a{font-size:11px;opacity:.8}.chip .b{font-size:16px;font-weight:700}
+.chip .pips{display:flex;gap:2px;height:5px}
+.chip .pips i{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.3)}
+.chip .pips i.f{background:#9be29b}
+.chip.on{background:#fff;color:var(--brand-primary)}
+.chip.on .pips i{background:#d8d4ea}.chip.on .pips i.f{background:var(--success)}
+.chip.today:not(.on){box-shadow:inset 0 0 0 1.5px #ffd34d}
+.m-body{flex:1;overflow-y:auto;padding:12px 14px 90px;background:var(--bg-secondary)}
+.dsum{background:#fff;border:1px solid var(--border-color);border-radius:14px;padding:12px;display:flex;gap:12px;align-items:center}
+.dsum .kring{width:56px;height:56px}
+.dsum .big{font-size:20px;font-weight:700;color:var(--brand-primary)}
+.dsum .sm{font-size:12px;color:var(--text-secondary)}
+.dsum .macro-chips{margin-top:4px}
+.dsum .more{margin-left:auto;border:none;background:none;color:var(--brand-primary-light);font-size:20px}
+.slot{margin-top:14px}
+.slot-h{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;letter-spacing:.05em;color:var(--text-secondary);text-transform:uppercase;margin:0 2px 6px}
+.slot-h .t{font-weight:400;text-transform:none;letter-spacing:0;margin-left:auto}
+.mcard{position:relative;overflow:hidden;border-radius:14px;margin-bottom:8px}
+.mcard .under{position:absolute;inset:0;display:flex;justify-content:flex-end}
+.mcard .under button{border:none;color:#fff;font-weight:600;font-size:13px;width:76px}
+.mcard .under .rep{background:var(--brand-primary)}
+.mcard .under .swp{background:var(--brand-primary-light)}
+.mcard .under .del{background:var(--error)}
+.mcard .face{position:relative;background:#fff;border:1px solid var(--border-color);border-radius:14px;padding:12px;display:flex;gap:12px;align-items:center;transition:transform .2s;touch-action:pan-y}
+.mcard.eaten .face{background:#eef8f0;border-color:#cfe9d5}
+.thumb{width:48px;height:48px;border-radius:10px;background:var(--brand-tint);display:grid;place-items:center;font-size:24px;flex:none}
+.mcard .nm{font-weight:600;font-size:15px;line-height:1.25}
+.mcard .meta{font-size:12px;color:var(--text-secondary);margin-top:3px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.mcard .tick{width:34px;height:34px;font-size:15px}
+.mcard.eaten .tick{background:var(--success);border-color:var(--success);color:#fff}
+/* first-run swipe hint */
+@keyframes peek{0%,12%{transform:none}32%,52%{transform:translateX(-150px)}72%,100%{transform:none}}
+@keyframes hand{0%{opacity:0;transform:translate(0,-50%)}12%{opacity:1;transform:translate(0,-50%)}32%,52%{opacity:1;transform:translate(-150px,-50%)}66%,100%{opacity:0;transform:translate(-150px,-50%)}}
+.mcard.hint .face{animation:peek 2.6s ease-in-out .7s 3}
+.mcard .hand{position:absolute;right:26px;top:50%;font-size:30px;z-index:3;pointer-events:none;opacity:0;animation:hand 2.6s ease-in-out .7s 3;filter:drop-shadow(0 2px 3px rgba(0,0,0,.3))}
+.hint-bubble{background:#1f1a3a;color:#fff;font-size:13px;border-radius:10px;padding:8px 12px;margin:0 0 8px;position:relative;display:flex;gap:8px;align-items:center}
+.hint-bubble::after{content:"";position:absolute;left:24px;bottom:-6px;border:6px solid transparent;border-bottom:0;border-top-color:#1f1a3a}
+.replay{margin-top:6px;border:1px solid #c9c3e6;background:#fff;border-radius:8px;padding:6px 10px;font-size:13px;color:var(--brand-primary)}
+.m-add{width:100%;border:1.5px dashed #cfcbe0;background:#fff;border-radius:14px;padding:14px;color:var(--brand-primary-light);font-weight:600;font-size:14px}
+.m-nav{position:absolute;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border-color);display:flex;justify-content:space-around;padding:8px 0 22px;font-size:11px;color:var(--text-secondary)}
+.m-nav span{display:flex;flex-direction:column;align-items:center;gap:2px}
+.m-nav .on{color:var(--brand-primary);font-weight:700}
+.sheet-scrim{position:absolute;inset:0;background:rgba(20,16,40,.4);display:none;z-index:20}
+.sheet-scrim.open{display:block}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:#fff;border-radius:20px 20px 0 0;padding:8px 16px 28px;transform:translateY(100%);transition:transform .28s cubic-bezier(.2,.8,.2,1);z-index:21}
+.sheet.open{transform:none}
+.sheet .grab{width:40px;height:4px;border-radius:2px;background:#d0cde0;margin:4px auto 12px}
+.sheet h4{margin:4px 0 8px;color:var(--brand-primary)}
+.sheet button.row{display:flex;width:100%;gap:12px;align-items:center;border:none;background:none;padding:12px 4px;font-size:15px;border-bottom:1px solid var(--border-color);text-align:left}
+.sheet button.row:last-child{border-bottom:none}
+.m-toast{position:absolute;left:12px;right:12px;bottom:84px;background:#1f1a3a;color:#fff;border-radius:12px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;font-size:14px;opacity:0;transform:translateY(10px);transition:.2s;pointer-events:none;z-index:25}
+.m-toast.show{opacity:1;transform:none;pointer-events:auto}
+.m-toast button{background:none;border:none;color:#ffd34d;font-weight:700}
+.phone-notes{max-width:420px;font-size:14px;line-height:1.5;color:#2c2850}
+.phone-notes h3{color:var(--brand-primary);margin-top:0}
+.phone-notes li{margin-bottom:8px}
+
+/* ---------- PROPOSAL ---------- */
+.prop{max-width:980px;margin:0 auto;padding:32px 20px 80px;background:#fff;min-height:100vh}
+.prop h2{color:var(--brand-primary);font-size:30px;margin:0 0 6px}
+.prop .lede{color:var(--text-secondary);font-size:16px;line-height:1.6;max-width:760px}
+.audit{border:1px solid var(--border-color);border-radius:12px;overflow:hidden;margin:20px 0 30px}
+.audit table{width:100%;border-collapse:collapse;font-size:14px}
+.audit th,.audit td{padding:9px 12px;border-bottom:1px solid var(--border-color);text-align:left;vertical-align:top}
+.audit th{background:var(--bg-secondary);font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--text-secondary)}
+.audit tr:last-child td{border-bottom:none}
+.pain{color:var(--error);font-weight:600}
+.idea{border:1px solid var(--border-color);border-radius:14px;padding:18px 20px;margin:14px 0;display:grid;grid-template-columns:40px 1fr;gap:4px 14px}
+.idea .num{width:34px;height:34px;border-radius:50%;background:#ff4f8b;color:#fff;font-weight:700;display:grid;place-items:center}
+.idea h3{margin:4px 0 6px;color:var(--text-primary)}
+.idea .pitch{font-size:15px;line-height:1.55;margin:0 0 10px}
+.idea .cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:13px;line-height:1.5}
+.idea .cols div{background:var(--bg-secondary);border-radius:8px;padding:10px 12px}
+.idea .cols b{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-secondary);margin-bottom:3px}
+.tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;margin-right:6px}
+.t-s{background:#e3f4e7;color:#1b6b2e}.t-m{background:#fff3cd;color:#856404}.t-l{background:#fde2e4;color:#a71d2a}
+.t-fe{background:var(--brand-tint);color:var(--brand-primary)}
+.spec{background:#1f1a3a;color:#e7e3ff;border-radius:14px;padding:18px 22px;margin-top:30px;font-size:14px;line-height:1.6}
+.spec h3{color:#fff;margin-top:0}
+.spec code{background:rgba(255,255,255,.1);padding:1px 5px;border-radius:4px}
+
+@media (prefers-reduced-motion:reduce){.mcard.hint .face,.mcard .hand{animation:none}.mcard .hand{display:none}}
+@media (max-width:1100px){.summary{grid-template-columns:1fr}.pill{min-width:0}}
+@media (max-width:700px){.idea .cols{grid-template-columns:1fr}}
+</style>
+</head>
+<body class="show-markers">
+
+<div class="chrome">
+  <h1>Meal Plan redesign — mockup</h1>
+  <button class="tab on" data-view="web">Web</button>
+  <button class="tab" data-view="mobile">Mobile</button>
+  <button class="tab" data-view="proposal">Proposal</button>
+  <label><input type="checkbox" id="mk" checked> Show idea markers</label>
+</div>
+
+<!-- =================== WEB =================== -->
+<section class="view on" id="v-web">
+  <div class="app-header">
+    <div class="pill">
+      <div class="logo">📅</div>
+      <div class="weeknav">
+        <span class="marker" data-goto="1">1</span>
+        <button class="arrow" onclick="shiftWeek(-1)" title="Previous week">‹</button>
+        <button class="range" onclick="openModal('Pick a start date','The existing date picker opens here — the arrows cover 90% of week changes, the calendar covers the rest.')">📅 <span class="wk-label">Nov 9 – Nov 15</span></button>
+        <button class="arrow" onclick="shiftWeek(1)" title="Next week">›</button>
+        <button class="this-week" onclick="shiftWeek(0)">This week</button>
+      </div>
+      <div class="avatar">J</div>
+    </div>
+  </div>
+
+  <div class="web-page">
+    <div class="web-wrap">
+      <div class="title-row">
+        <h2>Meal Plan</h2>
+        <div class="toolbar">
+          <span class="marker" data-goto="6">6</span>
+          <button class="tbtn" onclick="openModal('Copy week','Existing CopyWeekModal — unchanged, just one click closer.')">⧉ Copy week</button>
+          <div class="dd" id="tplDD">
+            <button class="tbtn" onclick="toggleDD('tplDD')">🗂 Templates ▾</button>
+            <div class="dd-menu">
+              <button onclick="openModal('Save as template','Existing SaveTemplateModal.')">Save this week as template…</button>
+              <button onclick="openModal('Apply template','Existing ApplyTemplateModal.')">Apply template…</button>
+              <button onclick="openModal('Manage templates','Existing ManageTemplatesModal.')">Manage templates…</button>
+            </div>
+          </div>
+          <button class="tbtn" onclick="openModal('Manage extras','Existing WeekExtrasModal (homemade vs store-bought for the week).')">🛒 Extras</button>
+          <button class="tbtn primary" onclick="openModal('Shopping list','Generates / opens the shopping list for this week.')">Build shopping list →</button>
+        </div>
+      </div>
+
+      <!-- Week summary -->
+      <div class="summary">
+        <div class="stat week-tile" onclick="openModal('Weekly macros','Existing WeeklyMacroPopup (full breakdown per day).')">
+          <span class="marker" data-goto="2" style="position:absolute;right:8px;top:8px">2</span>
+          <div>
+            <div class="k">This week</div>
+            <div class="v" id="wkKcal"></div>
+            <div class="s" id="wkSub"></div>
+          </div>
+          <div class="wk-macros">
+            <div class="k">Week macros <span style="text-transform:none;letter-spacing:0">(avg / day)</span></div>
+            <div class="macro-chips" id="wkChips"></div>
+          </div>
+          <span class="wk-more">Details ›</span>
+        </div>
+        <div class="stat stale">
+          <div class="k">Shopping list</div>
+          <div class="v">Made before 2 changes</div>
+          <button class="linkbtn">Regenerate</button>
+        </div>
+      </div>
+
+      <!-- Timetable -->
+      <div class="tt" id="tt"></div>
+    </div>
+  </div>
+  <div class="footnav"><span>☰ Recipes</span><span class="on">📅 Meal Plan</span><span>🌱 Pip</span><span>🛒 Shopping</span></div>
+</section>
+
+<!-- =================== MOBILE =================== -->
+<section class="view" id="v-mobile">
+  <div class="mobile-stage">
+    <div class="phone"><div class="screen" id="screen">
+      <div class="statusbar"><span>13:38</span><span>▮▮▮ 38%</span></div>
+      <div class="m-head">
+        <div class="m-top">
+          <h2>Meal Plan <span class="marker" data-goto="8">8</span></h2>
+          <div class="icons">
+            <button class="m-icon" onclick="openSheet('week')" title="Week actions">⋯</button>
+            <button class="m-icon" style="background:#fff;color:var(--brand-primary);font-weight:700">J</button>
+          </div>
+        </div>
+        <div class="m-week"><button onclick="shiftWeek(-1)">‹</button><span class="lbl wk-label">Nov 9 – Nov 15</span><button onclick="shiftWeek(1)">›</button></div>
+        <button class="m-weekbar" onclick="openSheet('weekmacros')"><b id="mWkKcal"></b><span class="macro-chips" id="mWkChips"></span><span class="go">›</span></button>
+        <div class="chips" id="chips"></div>
+      </div>
+      <div class="m-body" id="mbody"></div>
+      <div class="m-nav"><span>☰<br>Recipes</span><span class="on">📅<br>Meal Plan</span><span>🌱<br>Pip</span><span>🛒<br>Shopping</span></div>
+      <div class="sheet-scrim" id="sheetScrim" onclick="closeSheet()"></div>
+      <div class="sheet" id="sheet"></div>
+      <div class="m-toast" id="mtoast"><span id="mtoastTxt"></span><button onclick="undo()">Undo</button></div>
+    </div></div>
+    <div class="phone-notes">
+      <h3>Try it</h3>
+      <ul>
+        <li><b>Tap a day chip</b> to jump days — the dots under each chip show how many meals are planned (3 = full day).</li>
+        <li><b>Tap the circle</b> on a meal to mark it eaten. One-way, like today's "Mark as eaten" — no second tap undo, matching MPP-12.</li>
+        <li><b>Drag a meal card left</b> (or click-drag with the mouse) to reveal <b>Replace</b>, Move and Remove. Replace opens a sheet with recent picks + browse; Remove shows an Undo toast.</li>
+        <li><b>Tap the day summary</b> for the daily macro breakdown. <b>⋯</b> opens the week actions bottom sheet.</li>
+        <li>Empty slots show <b>+ Add lunch</b> in place, which deep-links to Recipes filtered to that meal (today's <code>/?mealType=lunch</code>).</li>
+      </ul>
+      <h3 style="margin-top:18px">First-run swipe hint</h3>
+      <p>The first time someone opens the plan on a phone, the first meal card slides left to show the hidden actions, three times, with a 👆 and a tip bubble. The tip stays until they <b>actually swipe</b> a card. Then a flag is saved and it never shows again on that device. Tapping or switching days doesn't count.</p>
+      <button class="replay" onclick="resetHint()">↺ Replay first-run hint</button>
+      <p style="color:#6c757d">Meal names are illustrative — completed from the truncated screenshot, not read from the database.</p>
+    </div>
+  </div>
+</section>
+
+<!-- =================== PROPOSAL =================== -->
+<section class="view" id="v-proposal">
+  <div class="prop">
+    <h2>Meal Plan: from a list of names to a plan you can act on</h2>
+    <p class="lede">The current screen does its job: it stores the week. But it doesn't help you use it. On desktop the seven narrow columns cut every name to "Froze…" or "R…". On a phone you scroll through seven tall cards to reach today. The useful features (swapping days, macros, marking a meal eaten, templates) are hidden behind clicks on things that don't look clickable. These eight ideas keep every existing feature and modal and change how you get to them.</p>
+
+    <h3>What's there today (audit)</h3>
+    <div class="audit"><table>
+      <tr><th>Element</th><th>What it does</th><th>Problem</th></tr>
+      <tr><td>Header date input</td><td>Sets the week start (<code>DateRangePicker</code>)</td><td class="pain">Changing week needs a native date picker every time; no prev/next</td></tr>
+      <tr><td>"⋯" button</td><td>Copy week, Manage extras, Save / Apply / Manage templates</td><td class="pain">Five features behind an unlabelled icon</td></tr>
+      <tr><td>Week Total pill</td><td>Opens WeeklyMacroPopup</td><td class="pain">Only shows kcal; macros hidden until clicked; looks like a label</td></tr>
+      <tr><td>Day header</td><td>Click opens SwapDaysModal</td><td class="pain">No visual cue it's clickable; most people won't find it</td></tr>
+      <tr><td>Meal entry</td><td>Click opens recipe; hover tooltip with P/C/F</td><td class="pain">Names cut to 5 chars on desktop; tooltip doesn't work on touch</td></tr>
+      <tr><td>Green ✓</td><td>Status only (eaten)</td><td class="pain">Looks like a button but does nothing; marking eaten needs open recipe → scroll to bottom</td></tr>
+      <tr><td>× button</td><td>Removes the entry instantly</td><td class="pain">One tap, no confirm, no undo, right next to the ✓</td></tr>
+      <tr><td>🛒 orange cart</td><td>Meal has store-bought extras</td><td>Fine, but unexplained</td></tr>
+      <tr><td>"× 2"</td><td>Servings</td><td>Reads like a multiply sign / close icon</td></tr>
+      <tr><td>"+ Lunch" links</td><td>Go to Recipes filtered to that meal</td><td class="pain">Only when another slot is filled; rows don't line up across days</td></tr>
+      <tr><td>Day total</td><td>Opens DailyMacroPopup</td><td>Number with no context (good or bad?)</td></tr>
+      <tr><td>Mobile</td><td>Stacked days, auto-scroll to today</td><td class="pain">~7 screens of scrolling; jumping days means scrolling past everything</td></tr>
+    </table></div>
+
+    <h3>The ideas</h3>
+    <div id="ideas"></div>
+
+    <div class="spec">
+      <h3>Spec panel: the rules this design encodes (please red-line)</h3>
+      <ul>
+        <li><b>No new data needed for 1, 3, 4, 5, 6, 8.</b> They only rearrange data the week endpoint already returns (<code>mealsByType</code>, <code>eaten</code>, <code>extraChoices</code>, <code>totalProtein/Carbs/Fat</code>).</li>
+        <li><b>Macro dots/chips</b> reuse <code>evaluateMacro</code> + <code>DAILY_MACRO_TARGETS</code> and the four directional colours (blue under · amber near · green on · red over). kcal is <i>not</i> traffic-lit, consistent with <code>macroTargets.js</code>.</li>
+        <li><b>No calorie target anywhere on the plan.</b> kcal is shown as a plain number (day, week, avg/day) with no ring, bar or colour. A target would depend on the person (men vs women, size, goal), which the app doesn't model.</li>
+        <li><b>Eaten tick</b> is one-way, the same rule as <code>MealEatenSection</code> (MPP-12), and per-person (MPP-33). Ticking is only allowed for today and past days. Future days show no tick.</li>
+        <li><b>Remove</b> is never one tap. Desktop: ⋯ → Remove. Mobile: swipe → Remove. Both show a 5 s Undo toast, and the delete request goes out after the toast closes.</li>
+        <li><b>Swap days</b> keeps <code>SwapDaysModal</code>. Only the trigger changes, to a visible ⇄ button on each day header.</li>
+        <li><b>First-run swipe hint (mobile).</b> Shown until the user completes a real swipe (≥ 70 px left). Then <code>localStorage['fb.mealplan.swipeHintSeen']='1'</code> is written and it never shows again. Only a swipe dismisses it: viewing, tapping or changing day doesn't. It's per device (a new phone sees it once). Reads and writes are wrapped in try/catch; if storage is blocked, the hint shows every session rather than breaking. <i>Alternative if you want it once per account: a <code>users</code> preference column. Costs a migration.</i> Respects <code>prefers-reduced-motion</code> (bubble only, no animation).</li>
+        <li><b>One meal per slot</b>, as today. A filled slot offers <b>Replace Breakfast/Lunch/Dinner</b> (on hover and in the ⋯ menu), never "add another". Dropping a meal onto a filled slot swaps the two.</li>
+        <li><b>Drag-to-move</b> (desktop) calls the existing move/swap logic for one entry. If there's no single-entry move endpoint, this becomes a new backend task; flagged as the only real API change.</li>
+        <li><b>Pip nudge</b> copy uses the existing +3/day rule (consistency only, never variety).</li>
+        <li>Header pill, footer nav, colours and fonts are unchanged. This is a Meal Plan screen redesign, not a rebrand.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<div class="tip" id="tip"></div>
+<div class="toast" id="toast"><span id="toastTxt"></span><button onclick="undo()">Undo</button></div>
+<div class="scrim" id="scrim" onclick="if(event.target===this)closeModal()"><div class="modal"><button class="close" onclick="closeModal()">×</button><h3 id="mt"></h3><p id="mp"></p></div></div>
+
+<script>
+const SLOTS=[{k:'breakfast',l:'Breakfast',t:'8:00',e:'🍳'},{k:'lunch',l:'Lunch',t:'13:00',e:'🥗'},{k:'dinner',l:'Dinner',t:'19:00',e:'🍝'}];
+const M=(n,kcal,srv,p,c,f,o={})=>({id:Math.random().toString(36).slice(2),n,kcal,srv,p,c,f,eaten:!!o.e,cart:!!o.cart,e:o.emoji||'🍽️'});
+const days=[
+ {dn:'Mon',d:'Nov 9',b:[M('Frozen Berry Protein Oats',602,1,38,72,16,{e:1,emoji:'🫐'})],l:[M('Chicken Shawarma Rice Bowl',550,2,42,60,15,{e:1,emoji:'🍗'})],dn2:[M('Pad Thai with Chicken',546,2,40,62,14,{e:1,emoji:'🍜'})]},
+ {dn:'Tue',d:'Nov 10',b:[M('Hash Browns & Diced Chicken',455,2,36,44,15,{e:1,emoji:'🥔'})],l:[M('Chicken Caesar Wrap',550,2,41,55,18,{e:1,emoji:'🌯'})],dn2:[M('Drunken Noodles',529,2,37,61,15,{e:1,emoji:'🍜'})]},
+ {dn:'Wed',d:'Nov 11',b:[M('Peanut Butter Banana Toast',526,1,35,58,17,{e:1,emoji:'🍌'})],l:[M('Chicken Shawarma Rice Bowl',550,2,42,60,15,{e:1,emoji:'🍗'})],dn2:[M('Pizza Margherita',650,2,38,78,20,{e:1,cart:1,emoji:'🍕'})]},
+ {dn:'Thu',d:'Nov 12',b:[M('Peanut Butter Banana Toast',526,1,35,58,17,{e:1,emoji:'🍌'})],l:[M('Chicken Tikka Wrap',554,2,43,57,17,{e:1,emoji:'🌯'})],dn2:[M('Rosemary Picanha & Mash',635,2,46,62,22,{e:1,emoji:'🥩'})]},
+ {dn:'Fri',d:'Nov 13',b:[M('Frozen Berry Protein Oats',494,1,36,60,13,{e:1,emoji:'🫐'})],l:[M('Ramen with Soy Egg',471,2,35,55,13,{e:1,cart:1,emoji:'🍜'})],dn2:[M('Pizza Pepperoni',787,2,44,90,27,{e:1,emoji:'🍕'})]},
+ {dn:'Sat',d:'Nov 14',today:1,b:[M('Hash Browns & Diced Chicken',582,2,40,55,20,{e:1,emoji:'🥔'})],l:[M('All Real Protein Bar (Choc Hazelnut)',166,1,15,14,6,{emoji:'🍫'})],dn2:[M("Furey's-Style Tomato Beef Curry",743,2,48,80,24,{emoji:'🍛'})]},
+ {dn:'Sun',d:'Nov 15',future:1,b:[M('Hash Browns & Diced Chicken',582,2,40,55,20,{emoji:'🥔'})],l:[M('All Real Protein Bar (Choc Hazelnut)',166,1,15,14,6,{emoji:'🍫'})],dn2:[M('Spaghetti Bolognese',851,2,52,95,26,{cart:1,emoji:'🍝'})]},
+];
+days.forEach(d=>{d.slots={breakfast:d.b,lunch:d.l,dinner:d.dn2}});
+// demo: make Sunday lunch empty to show the + Add slot
+days[6].slots.lunch=[];
+const PAST=i=>i<5;
+const REF=1950;
+let curMobile=5,lastRemoved=null,weekOff=0;
+
+const sum=(d,k)=>Object.values(d.slots).flat().reduce((a,m)=>a+m[k],0);
+function macroStatus(d){
+  const p=sum(d,'p'),c=sum(d,'c'),f=sum(d,'f');const kc=p*4+c*4+f*9||1;
+  const cp=c*4/kc*100,fp=f*9/kc*100;
+  return {p:Math.round(p),cp:Math.round(cp),fp:Math.round(fp),
+    ps:p>=100?'on':p>=98?'near':'under',
+    cs:cp>53?'over':cp>=40?'on':cp>=38?'near':'under',
+    fs:fp>35?'over':fp>=25?'on':'under'};
+}
+function ring(kcal,size=38){
+  const r=15,c=2*Math.PI*r,pct=Math.min(kcal/REF,1);
+  return `<svg class="kring" viewBox="0 0 38 38"><circle class="bg" cx="19" cy="19" r="${r}" fill="none" stroke-width="5"/><circle class="fg" cx="19" cy="19" r="${r}" fill="none" stroke-width="5" stroke-linecap="round" stroke-dasharray="${c*pct} ${c}" transform="rotate(-90 19 19)"/></svg>`;
+}
+const ppl=s=>s===1?'1 person':`${s} people`;
+
+/* ---------- WEB render ---------- */
+function renderWeb(){
+  const tt=document.getElementById('tt');let h='<div class="corner"></div>';
+  days.forEach((d,i)=>{
+    const kc=sum(d,'kcal'),ms=macroStatus(d);
+    h+=`<div class="dayhead ${d.today?'today':''} ${PAST(i)?'past':''}" id="dh${i}">
+      ${i===0?'<span class="marker" data-goto="4" style="position:absolute;left:-8px;top:-8px">4</span>':''}
+      <button class="swap" title="Swap this day with another" onclick="swapPick(${i})">⇄</button>
+      <span class="dn">${d.dn}</span><span class="dd2">${d.d}</span>
+      <div class="ring-row" style="cursor:pointer" onclick="openModal('${d.dn} ${d.d} macros','Existing DailyMacroPopup, now one click from a ring that already tells you most of it.')">
+        <div><div class="kc">${kc.toLocaleString()} kcal</div>
+        <div class="macro-chips hdr"><span class="mchip m-${ms.ps}">P ${ms.p}g</span><span class="mchip m-${ms.cs}">C ${ms.cp}%</span><span class="mchip m-${ms.fs}">F ${ms.fp}%</span></div></div>
+      </div></div>`;
+  });
+  SLOTS.forEach((s,si)=>{
+    h+=`<div class="rowlabel">${si===0?'<span class="marker" data-goto="3">3</span>':''}${s.e} ${s.l}<span class="t">${s.t}</span></div>`;
+    days.forEach((d,i)=>{
+      const list=d.slots[s.k];
+      h+=`<div class="cell ${d.today?'todaycol':''}" data-day="${i}" data-slot="${s.k}" ondragover="event.preventDefault();this.classList.add('drop')" ondragleave="this.classList.remove('drop')" ondrop="dropMeal(event,${i},'${s.k}')">`;
+      list.forEach(m=>{
+        const canTick=!d.future;
+        h+=`<div class="meal ${m.eaten?'eaten':''}" draggable="true" ondragstart="dragStart(event,'${m.id}')" ondragend="this.classList.remove('dragging')" onmouseenter="tipOn(event,'${m.id}')" onmouseleave="tipOff()" onclick="openModal('${m.n.replace(/'/g,"\\'")}','Existing RecipeViewModal opens here.')">
+          <div class="nm">${m.n}</div>
+          <div class="meta">${m.kcal} kcal <span class="ppl" title="${ppl(m.srv)}">👥 ${m.srv}</span>${m.cart?'<span class="cart" title="Has store-bought extras">🛒</span>':''}
+            ${canTick?`<button class="tick" title="${m.eaten?'Eaten':'Mark as eaten'}" onclick="event.stopPropagation();tick('${m.id}')">✓</button>`:''}</div>
+          <button class="kebab" onclick="event.stopPropagation();toggleMM(this)">⋯</button>
+          <div class="mmenu" onclick="event.stopPropagation()">
+            <button onclick="openModal('Change servings','Servings stepper (existing endpoint).')">👥 Change servings</button>
+            <button onclick="openModal('Swap variant','Light / Moderate / Balanced picker.')">⚖️ Light / Moderate / Balanced</button>
+            <button onclick="openModal('Replace ${s.l}','Goes to Recipes for ${s.k}; the pick replaces this meal.')">↻ Replace ${s.l}</button>
+            <button onclick="openModal('Move to…','Pick day + meal (or just drag the card). Onto a filled slot the two meals swap.')">↔ Move to…</button>
+            <button class="danger" onclick="removeMeal('${m.id}')">🗑 Remove</button>
+          </div></div>`;
+      });
+      h+=list.length
+        ? `<button class="add ghost" onclick="openModal('Replace ${s.l} on ${d.dn}','Goes to Recipes with /?mealType=${s.k} and this day preselected. Picking a recipe replaces the current one, same as assigning to a filled slot today.')">↻ Replace ${s.l}</button>`
+        : `<button class="add" onclick="openModal('Add ${s.l.toLowerCase()} for ${d.dn}','Goes to Recipes with /?mealType=${s.k} and this day preselected.')">+ Add ${s.l.toLowerCase()}</button>`;
+      h+='</div>';
+    });
+  });
+  tt.innerHTML=h;
+  // marker 5 on a tick
+  const firstTick=tt.querySelector('.todaycol .meal:not(.eaten) .tick');
+  if(firstTick&&!firstTick.parentNode.querySelector('.marker')){const mk=document.createElement('span');mk.className='marker';mk.dataset.goto='5';mk.textContent='5';firstTick.before(mk)}
+  const kb=tt.querySelector('.kebab');if(kb){const mk=document.createElement('span');mk.className='marker';mk.dataset.goto='7';mk.textContent='7';mk.style.cssText='position:absolute;right:-8px;bottom:-8px';kb.parentNode.appendChild(mk)}
+  updateCounts();
+}
+function weekStats(){
+  const all=days.flatMap(d=>Object.values(d.slots).flat());
+  const kcal=all.reduce((a,m)=>a+m.kcal,0),P=all.reduce((a,m)=>a+m.p,0),C=all.reduce((a,m)=>a+m.c,0),F=all.reduce((a,m)=>a+m.f,0);
+  const mk=P*4+C*4+F*9||1,p=Math.round(P/7),cp=Math.round(C*4/mk*100),fp=Math.round(F*9/mk*100);
+  const ps=p>=100?'on':p>=98?'near':'under',cs=cp>53?'over':cp>=40?'on':cp>=38?'near':'under',fs=fp>35?'over':fp>=25?'on':'under';
+  const planned=days.reduce((a,d)=>a+SLOTS.filter(x=>d.slots[x.k].length).length,0);
+  return {kcal,avg:Math.round(kcal/7),planned,p,cp,fp,
+    chips:`<span class="mchip m-${ps}">P ${p}g</span><span class="mchip m-${cs}">C ${cp}%</span><span class="mchip m-${fs}">F ${fp}%</span>`};
+}
+function updateCounts(){
+  const w=weekStats();
+  document.getElementById('wkKcal').textContent=w.kcal.toLocaleString()+' kcal';
+  document.getElementById('wkSub').textContent=`avg ${w.avg.toLocaleString()} / day · ${w.planned} of 21 meals planned`;
+  document.getElementById('wkChips').innerHTML=w.chips;
+  document.getElementById('mWkKcal').textContent='Week '+w.kcal.toLocaleString()+' kcal';
+  document.getElementById('mWkChips').innerHTML=w.chips;
+}
+function find(id){for(const [di,d] of days.entries())for(const k in d.slots){const i=d.slots[k].findIndex(m=>m.id===id);if(i>-1)return{d,di,k,i,m:d.slots[k][i]}}}
+function tick(id){const f=find(id);if(f.m.eaten)return;f.m.eaten=true;rerender();toast(`Marked as eaten · <span class="pip">Pip +3 🌱</span>`,false)}
+function removeMeal(id){const f=find(id);lastRemoved=f;f.d.slots[f.k].splice(f.i,1);rerender();toast(`Removed ${f.m.n.split(' ').slice(0,3).join(' ')}…`,true)}
+function undo(){if(!lastRemoved)return;const f=lastRemoved;f.d.slots[f.k].splice(f.i,0,f.m);lastRemoved=null;rerender();hideToasts()}
+let tt1,tt2;
+function toast(html,canUndo){
+  const web=document.getElementById('v-web').classList.contains('on');
+  const el=web?document.getElementById('toast'):document.getElementById('mtoast');
+  el.querySelector('span').innerHTML=html;el.querySelector('button').style.display=canUndo?'':'none';
+  el.classList.add('show');clearTimeout(tt1);tt1=setTimeout(()=>{el.classList.remove('show');lastRemoved=null},5000);
+}
+function hideToasts(){document.querySelectorAll('.toast,.m-toast').forEach(t=>t.classList.remove('show'))}
+function toggleMM(b){const m=b.nextElementSibling;const o=m.classList.contains('open');document.querySelectorAll('.mmenu.open').forEach(x=>x.classList.remove('open'));if(!o)m.classList.add('open')}
+function toggleDD(id){document.getElementById(id).classList.toggle('open')}
+document.addEventListener('click',e=>{if(!e.target.closest('.dd'))document.querySelectorAll('.dd.open').forEach(x=>x.classList.remove('open'));if(!e.target.closest('.meal'))document.querySelectorAll('.mmenu.open').forEach(x=>x.classList.remove('open'))});
+let dragId=null;
+function dragStart(e,id){dragId=id;e.target.classList.add('dragging');tipOff()}
+function dropMeal(e,di,k){e.preventDefault();document.querySelectorAll('.drop').forEach(x=>x.classList.remove('drop'));if(!dragId)return;const f=find(dragId);const tgt=days[di].slots[k];if(tgt[0]===f.m){dragId=null;return}const other=tgt[0];f.d.slots[f.k].splice(f.i,1);if(other){f.d.slots[f.k].splice(f.i,0,other)}days[di].slots[k]=[f.m];dragId=null;rerender();toast(other?`Swapped with ${days[di].dn} ${k}`:`Moved to ${days[di].dn} ${k}`,false)}
+let swapFrom=null;
+function swapPick(i){event.stopPropagation();if(swapFrom===null){swapFrom=i;document.getElementById('dh'+i).classList.add('swap-pick');toast(`Pick the day to swap ${days[i].dn} with (or open the swap dialog)`,false)}else{if(swapFrom!==i){const a=days[swapFrom].slots;days[swapFrom].slots=days[i].slots;days[i].slots=a;toast(`Swapped ${days[swapFrom].dn} ↔ ${days[i].dn}`,false)}swapFrom=null;rerender()}}
+function tipOn(e,id){const m=find(id).m,t=document.getElementById('tip'),r=e.currentTarget.getBoundingClientRect();t.innerHTML=`<b>${m.n}</b>${m.kcal} kcal · P ${m.p}g · C ${m.c}g · F ${m.f}g`;t.style.display='block';t.style.left=Math.min(r.left,innerWidth-230)+'px';t.style.top=(r.bottom+6)+'px'}
+function tipOff(){document.getElementById('tip').style.display='none'}
+function openModal(t,p){document.getElementById('mt').textContent=t;document.getElementById('mp').textContent=p;document.getElementById('scrim').classList.add('open')}
+function closeModal(){document.getElementById('scrim').classList.remove('open')}
+function shiftWeek(n){weekOff=n===0?0:weekOff+n;const base=new Date(2026,10,9);base.setDate(base.getDate()+weekOff*7);const end=new Date(base);end.setDate(end.getDate()+6);const f=d=>d.toLocaleDateString('en-GB',{month:'short',day:'numeric'}).replace(/(\d+) (\w+)/,'$2 $1');document.querySelectorAll('.wk-label').forEach(l=>l.textContent=`${f(base)} – ${f(end)}${weekOff===0?'':' (demo data)'}`)}
+
+/* ---------- MOBILE render ---------- */
+function renderMobile(){
+  document.getElementById('chips').innerHTML=days.map((d,i)=>{
+    const n=SLOTS.filter(s=>d.slots[s.k].length).length;
+    return `<button class="chip ${i===curMobile?'on':''} ${d.today?'today':''}" onclick="curMobile=${i};renderMobile()"><span class="a">${d.dn}</span><span class="b">${d.d.split(' ')[1]}</span><span class="pips">${[0,1,2].map(x=>`<i class="${x<n?'f':''}"></i>`).join('')}</span></button>`}).join('');
+  const d=days[curMobile],kc=sum(d,'kcal'),ms=macroStatus(d);
+  let h=`<div class="dsum" onclick="openSheet('macros')"><div><div class="sm">${d.today?'Today · ':''}${d.dn} ${d.d}</div><div class="big">${kc.toLocaleString()} kcal</div>
+    <div class="macro-chips"><span class="mchip m-${ms.ps}">P ${ms.p}g</span><span class="mchip m-${ms.cs}">C ${ms.cp}%</span><span class="mchip m-${ms.fs}">F ${ms.fp}%</span></div></div><button class="more">›</button></div>`;
+  SLOTS.forEach(s=>{
+    const list=d.slots[s.k];
+    h+=`<div class="slot"><div class="slot-h">${s.e} ${s.l}<span class="t">${s.t}</span></div>`;
+    list.forEach(m=>{
+      h+=`<div class="mcard ${m.eaten?'eaten':''}" data-id="${m.id}"><div class="under"><button class="rep" onclick="openSheet('replace','${s.l}')">↻<br>Replace</button><button class="swp" onclick="openSheet('move')">↔<br>Move</button><button class="del" onclick="removeMeal('${m.id}')">🗑<br>Remove</button></div>
+        <div class="face"><div class="thumb">${m.e}</div><div style="flex:1;min-width:0"><div class="nm">${m.n}</div>
+        <div class="meta">${m.kcal} kcal · <span class="ppl" style="background:var(--brand-tint);color:var(--brand-primary);border-radius:999px;padding:1px 7px;font-weight:600">${ppl(m.srv)}</span>${m.cart?'<span style="color:var(--cart)">🛒 store-bought</span>':''}</div></div>
+        ${d.future?'':`<button class="tick" onclick="event.stopPropagation();tick('${m.id}')">✓</button>`}</div></div>`;
+    });
+    if(!list.length)h+=`<button class="m-add" onclick="openSheet('add','${s.l}')">+ Add ${s.l.toLowerCase()}</button>`;
+    h+='</div>';
+  });
+  if(d.today){const left=Object.values(d.slots).flat().filter(m=>!m.eaten).length;if(left)h+=`<p style="text-align:center;font-size:13px;color:var(--text-secondary);margin-top:16px">🌱 Tick ${left} more meal${left>1?'s':''} today to keep Pip growing</p>`}
+  document.getElementById('mbody').innerHTML=h;
+  document.querySelectorAll('.mcard .face').forEach(bindSwipe);
+  if(!hintSeen()){
+    const first=document.querySelector('#mbody .mcard');
+    if(first){
+      first.classList.add('hint');
+      first.insertAdjacentHTML('beforeend','<span class="hand">👆</span>');
+      first.insertAdjacentHTML('beforebegin','<div class="hint-bubble" id="hintBubble">👈 Swipe a meal left to <b>Replace</b>, <b>Move</b> or <b>Remove</b></div>');
+    }
+  }
+}
+function bindSwipe(face){
+  let x0=null,dx=0,moved=false;
+  const down=e=>{if(e.target.closest('button'))return;face.parentNode.classList.remove('hint');face.parentNode.querySelector('.hand')?.remove();x0=(e.touches?e.touches[0]:e).clientX;dx=0;moved=false;face.style.transition='none'};
+  const move=e=>{if(x0===null)return;dx=Math.min(0,(e.touches?e.touches[0]:e).clientX-x0);if(dx<-6)moved=true;face.style.transform=`translateX(${Math.max(dx,-240)}px)`};
+  const up=()=>{if(x0===null)return;face.style.transition='';face.style.transform=dx<-70?'translateX(-228px)':'';if(dx<-70)markHintSeen();x0=null;if(!moved){const id=face.parentNode.dataset.id;const f=find(id);if(face.style.transform)face.style.transform='';else openSheet('recipe',f.m.n)}};
+  face.addEventListener('mousedown',down);face.addEventListener('touchstart',down,{passive:true});
+  window.addEventListener('mousemove',move);face.addEventListener('touchmove',move,{passive:true});
+  window.addEventListener('mouseup',up);face.addEventListener('touchend',up);
+}
+/* First-run hint: a per-device flag, set the first time the user actually swipes (not on view). */
+const HINT_KEY='fb.mealplan.swipeHintSeen';
+function hintSeen(){try{return localStorage.getItem(HINT_KEY)==='1'}catch{return false}}
+function markHintSeen(){try{localStorage.setItem(HINT_KEY,'1')}catch{}document.getElementById('hintBubble')?.remove();document.querySelectorAll('.mcard.hint').forEach(c=>{c.classList.remove('hint');c.querySelector('.hand')?.remove()})}
+function resetHint(){try{localStorage.removeItem(HINT_KEY)}catch{}renderMobile()}
+function openSheet(kind,arg){
+  const s=document.getElementById('sheet');let h='<div class="grab"></div>';
+  if(kind==='week')h+=`<h4>This week</h4><button class="row">⧉ Copy week…</button><button class="row">⇄ Swap two days…</button><button class="row">🛒 Manage extras…</button><button class="row">🗂 Save as template…</button><button class="row">📥 Apply template…</button><button class="row">⚙️ Manage templates…</button>`;
+  else if(kind==='macros'){const d=days[curMobile],ms=macroStatus(d);h+=`<h4>${d.dn} ${d.d}: macros</h4><p style="font-size:14px;color:var(--text-secondary)">Existing DailyMacroPopup content, as a bottom sheet (it already supports pull-to-dismiss).</p><div class="macro-chips"><span class="mchip m-${ms.ps}">Protein ${ms.p}g</span><span class="mchip m-${ms.cs}">Carbs ${ms.cp}%</span><span class="mchip m-${ms.fs}">Fat ${ms.fp}%</span></div>`}
+  else if(kind==='move')h+=`<h4>Move to…</h4>${days.map(d=>`<button class="row">${d.dn} ${d.d}</button>`).join('')}`;
+  else if(kind==='weekmacros'){const w=weekStats();h+=`<h4>Week macros: ${document.querySelector('.wk-label').textContent}</h4><p style="font-size:14px;color:var(--text-secondary);margin:0 0 8px">${w.kcal.toLocaleString()} kcal · avg ${w.avg.toLocaleString()} / day. Existing WeeklyMacroPopup content, as a bottom sheet.</p>${w.chips}`}
+  else if(kind==='replace')h+=`<h4>Replace ${arg}</h4><p style="font-size:13px;color:var(--text-secondary);margin:0 0 4px">Your pick replaces the current ${arg.toLowerCase()}.</p><button class="row">🔍 Browse recipes for ${arg.toLowerCase()}</button><button class="row">🕘 Recent: Hash Browns & Diced Chicken</button><button class="row">🕘 Recent: Chicken Shawarma Rice Bowl</button><button class="row">⇄ Swap with another day's ${arg.toLowerCase()}</button>`;
+  else if(kind==='add')h+=`<h4>Add ${arg.toLowerCase()}</h4><button class="row">🔍 Browse recipes for ${arg.toLowerCase()}</button><button class="row">🕘 Recent: Hash Browns & Diced Chicken</button><button class="row">🕘 Recent: Chicken Shawarma Rice Bowl</button>`;
+  else if(kind==='recipe')h+=`<h4>${arg}</h4><p style="font-size:14px;color:var(--text-secondary)">Existing RecipeViewModal opens full-screen here.</p>`;
+  s.innerHTML=h;s.classList.add('open');document.getElementById('sheetScrim').classList.add('open');
+}
+function closeSheet(){document.getElementById('sheet').classList.remove('open');document.getElementById('sheetScrim').classList.remove('open')}
+
+function rerender(){renderWeb();renderMobile()}
+
+/* ---------- ideas ---------- */
+const IDEAS=[
+ {t:'Week arrows instead of a date box',size:'s',pitch:'Most of the time you\'re moving one week forward or back. Today that means opening a native date picker and choosing a Monday. Arrows make it one click, "This week" gets you home, and tapping the range still opens the full picker.',why:'One click instead of three. Works the same on desktop and phone. The same habit as every calendar app.',cost:'Frontend only: <code>DateRangePicker</code> gets ‹ › and a reset button on top of the same context setter.'},
+ {t:'Week total and week macros, side by side',size:'s',pitch:'"Week Total: 11515 cal" is the only weekly number today, and the macros sit behind a click on it. Show the week\'s kcal, average per day, and the week\'s P / C / F (average per day, traffic-light chips) together. Next to them sits the existing out-of-date shopping list warning, moved where you\'ll see it. On mobile the same numbers sit in one slim bar under the week arrows. Tap either one for the full WeeklyMacroPopup.',why:'Answers "is this week on track?" without opening anything, on both desktop and phone. Reuses the traffic-light colours you already know from the macro popups.',cost:'Frontend only. The week response already carries every number; the stale check exists (<code>ShoppingListStaleBar</code>).'},
+ {t:'Aligned meal rows with full names',size:'m',pitch:'Breakfast, lunch and dinner become rows that line up across the week, like a timetable. Each card gets up to two lines, so you read "Furey\'s-Style Tomato Beef Curry" instead of "Furey\'s-St…" or "R…". Empty slots show a dashed "+ Add lunch" exactly where the meal would go, and it still deep-links to Recipes like the current "+ Lunch" link.',why:'You can see gaps and repeats across the week at a glance. Names are readable. It also uses the empty half of the screen below the grid today.',cost:'Frontend layout change in <code>MealPlanCalendar</code>/<code>MealPlanDay</code> (CSS grid by row instead of column). No data change.'},
+ {t:'Each day tells you how it\'s doing',size:'s',pitch:'Every day header shows its kcal plus labelled P / C / F chips in the existing traffic-light colours (e.g. P 112g · C 44% · F 34%). No calorie ring: how much someone should eat depends on the person (sex, size, goal), so kcal stays a plain number and only the macro split is judged. Swap is now a visible ⇄ button instead of a hidden click on the header.',why:'You spot the day that\'s under on protein without opening seven popups, without the app pretending to know your calorie needs. Swap stops being a secret feature.',cost:'Frontend. <code>evaluateMacro</code> and <code>DAILY_MACRO_TARGETS</code> already do the maths; <code>SwapDaysModal</code> is unchanged.'},
+ {t:'Tick a meal as eaten right on the plan',size:'m',pitch:'The green ✓ on the plan looks like a button today but isn\'t. To log a meal you open the recipe and scroll to the bottom. Make the circle the button: one tap logs it, the card turns green, and a toast says "Pip +3". Same one-way rule as now, and only for today and past days.',why:'Logging is the habit Pip rewards, so it should be the easiest thing on the screen. Fewer missed ticks means a happier Pip and more accurate weekly numbers.',cost:'Frontend. Calls the same eaten endpoint <code>MealEatenSection</code> uses. Optimistic update + rollback already exists in the context (MPP-12).'},
+ {t:'Label the hidden menu',size:'s',pitch:'Copy week, Templates and Extras get labelled buttons on desktop, and "Build shopping list" becomes the main call to action, since it\'s usually the next step after planning. On mobile they stay in ⋯, but as a proper bottom sheet that also includes Swap two days.',why:'Features you can\'t see don\'t get used. Templates and extras took real work (MPP-10, templates spec) and are buried behind three dots.',cost:'Frontend. Same handlers as <code>MealPlanMenu</code>, just rendered differently per breakpoint.'},
+ {t:'Safer remove, with undo',size:'s',pitch:'× sits one tap from the eaten tick and deletes instantly. Move it into a per-meal ⋯ menu on desktop and a swipe on mobile, and every remove gets a 5-second Undo. The same menu adds things you can\'t do from the plan today: change servings, switch Light/Moderate/Balanced, and move to another day.',why:'No more accidental deletes on a phone. Frequent edits move from "remove + re-add from Recipes" to one action.',cost:'Remove + undo: frontend only (delay the DELETE). Servings / variant / move may need small endpoints, depending on what <code>MealPlanContext</code> exposes. Check during planning.'},
+ {t:'Mobile: one day at a time, with a day strip',size:'m',pitch:'Instead of scrolling through seven stacked cards, the phone shows a Mon–Sun chip strip with dots for how full each day is. Tap a chip to jump to that day. Each day shows a summary card (ring + macros), then big meal cards with a picture, full name, a large tick target, and a swipe for Move / Remove.',why:'Reaching any day takes one tap instead of up to ~7 screens of scrolling. Opens on today, like the current auto-scroll, but without the jump. Touch targets are 34 px or more (the current × is about 24 px).',cost:'Frontend. A new mobile layout for the same data. Bottom sheets reuse the <code>usePullToDismiss</code> pattern the macro popups already use.'},
+];
+document.getElementById('ideas').innerHTML=IDEAS.map((x,i)=>`<div class="idea" id="idea${i+1}"><div class="num">${i+1}</div><div><h3>${x.t}</h3>
+  <span class="tag t-${x.size}">${{s:'Small',m:'Medium',l:'Large'}[x.size]} effort</span><span class="tag t-fe">${x.cost.includes('endpoint')?'Frontend + maybe API':'Frontend only'}</span>
+  <p class="pitch" style="margin-top:8px">${x.pitch}</p><div class="cols"><div><b>Why it's worth it</b>${x.why}</div><div><b>What it costs</b>${x.cost}</div></div></div></div>`).join('');
+
+/* ---------- chrome ---------- */
+document.querySelectorAll('.chrome .tab').forEach(b=>b.onclick=()=>show(b.dataset.view));
+function show(v){document.querySelectorAll('.chrome .tab').forEach(x=>x.classList.toggle('on',x.dataset.view===v));document.querySelectorAll('.view').forEach(x=>x.classList.toggle('on',x.id==='v-'+v));scrollTo(0,0);hideToasts()}
+document.getElementById('mk').onchange=e=>document.body.classList.toggle('show-markers',e.target.checked);
+document.addEventListener('click',e=>{const m=e.target.closest('.marker');if(m){e.stopPropagation();show('proposal');setTimeout(()=>document.getElementById('idea'+m.dataset.goto).scrollIntoView({behavior:'smooth',block:'center'}),50)}},true);
+if(location.hash==='#mobile')show('mobile');if(location.hash==='#proposal')show('proposal');
+rerender();
+</script>
+</body>
+</html>
