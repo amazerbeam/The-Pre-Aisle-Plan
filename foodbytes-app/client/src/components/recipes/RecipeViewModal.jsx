@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
+import { createPortal } from 'react-dom'
 import { recipeService } from '../../services/recipeService'
 import useServingsInput from '../../hooks/useServingsInput'
 import useRecipeStackServings from '../../hooks/useRecipeStackServings'
@@ -20,6 +21,7 @@ import './RecipeViewModal.css'
 
 const TAB_INGREDIENTS = 'ingredients'
 const TAB_STEPS = 'steps'
+const stopPropagation = (e) => e.stopPropagation()
 
 /**
  * FR-013, FR-029, FR-091, FR-092, FR-095, FR-102: RecipeViewModal - the recipe view popup.
@@ -249,8 +251,14 @@ function RecipeViewModal({
       .map((s) => [s.linkedRecipeId, { recipeId: s.linkedRecipeId, name: s.linkedRecipeName }])
   ).values()]
 
-  return (
-    <div className="recipe-view-overlay" onClick={onClose}>
+  // Portal to <body>: an opener inside a transformed or clipped ancestor (the mobile
+  // SwipeableRow) would otherwise contain this position:fixed overlay. React events still
+  // bubble to the opener through the portal, so pointer events stop here and can't drive
+  // the swipe gesture on the row behind.
+  return createPortal(
+    <div className="recipe-view-overlay" onClick={onClose}
+         onPointerDown={stopPropagation} onPointerMove={stopPropagation}
+         onPointerUp={stopPropagation} onPointerCancel={stopPropagation}>
       <div className="recipe-view-modal" onClick={(e) => e.stopPropagation()}>
         {/* Header - FR-102: Displays immediately from summary props */}
         <RecipeViewHeader
@@ -368,7 +376,8 @@ function RecipeViewModal({
           />
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }
 
