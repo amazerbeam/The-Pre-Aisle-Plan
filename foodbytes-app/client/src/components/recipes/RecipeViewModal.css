@@ -304,6 +304,29 @@
   color: var(--text-secondary);
 }
 
+/* Mobile only (rendered when the mobile media query matches): opens the full-screen list */
+.recipe-view-modal .ing-expand {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  height: 40px;
+  padding: 0 12px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--brand-primary);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.recipe-view-modal .ing-expand span { font-size: 16px; }
+.recipe-view-modal .ing-expand:focus-visible { outline: 2px solid var(--brand-primary); outline-offset: 2px; }
+
 .recipe-view-modal .steps-section h3 small {
   font-weight: 500;
   font-size: 12px;

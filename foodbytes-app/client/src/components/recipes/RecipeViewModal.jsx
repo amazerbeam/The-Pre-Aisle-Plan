@@ -8,7 +8,9 @@ import useMealEatenSave from '../../hooks/useMealEatenSave'
 import useExtraChoiceToggle from '../../hooks/useExtraChoiceToggle'
 import { useBodyScrollLock } from '../../hooks/useBodyScrollLock'
 import { useLinkedStepSelections } from '../../hooks/useLinkedStepSelections'
+import useMediaQuery from '../../hooks/useMediaQuery'
 import { useMealPlan } from '../../contexts/MealPlanContext'
+import { MOBILE_MEDIA_QUERY } from '../../constants/mealPlanUi'
 import { hasMealMacroTargets, hasUsableMacros } from '../../utils/macroStatus'
 import RecipeViewHeader from './RecipeViewHeader'
 import IngredientsPanel from './IngredientsPanel'
@@ -17,6 +19,7 @@ import RecipeStepsSection from './RecipeStepsSection'
 import MealEatenSection from './MealEatenSection'
 import MacroTargetPopup from './MacroTargetPopup'
 import CookMode from './CookMode'
+import IngredientsFullscreen from './IngredientsFullscreen'
 import './RecipeViewModal.css'
 
 const TAB_INGREDIENTS = 'ingredients'
@@ -72,6 +75,10 @@ function RecipeViewModal({
   const [openMacroKey, setOpenMacroKey] = useState(null)
   const [tab, setTab] = useState(TAB_INGREDIENTS)
   const [doneSteps, setDoneSteps] = useState(() => new Set())
+  // Ingredient ticks live here so the panel and the mobile full-screen list share them.
+  const [tickedIngredients, setTickedIngredients] = useState(() => new Set())
+  const [ingredientsMaximised, setIngredientsMaximised] = useState(false)
+  const isMobile = useMediaQuery(MOBILE_MEDIA_QUERY)
   const [cookIndex, setCookIndex] = useState(null)
   const [wasLockedBeforeCook, setWasLockedBeforeCook] = useState(false)
 
@@ -139,22 +146,30 @@ function RecipeViewModal({
     setCurrentCalories(caloriesPerServing)
   }, [caloriesPerServing])
 
-  // A different recipe (variant or linked sub-recipe) starts with no steps done and no popup open.
-  // The ingredient ticks reset by remounting IngredientsPanel (keyed on the recipe id below).
+  // A different recipe (variant or linked sub-recipe) starts with no steps done, no ingredients
+  // ticked and no popup open.
   useEffect(() => {
     setDoneSteps(new Set())
+    setTickedIngredients(new Set())
     setOpenMacroKey(null)
   }, [fullRecipe?.id])
 
-  // Close on Escape key (cook mode owns Escape while it is open)
+  // The full-screen list is mobile only: rotating or resizing past the breakpoint closes it.
   useEffect(() => {
-    if (cookIndex !== null) return undefined
+    if (!isMobile) setIngredientsMaximised(false)
+  }, [isMobile])
+
+  const closeIngredientsFullscreen = useCallback(() => setIngredientsMaximised(false), [])
+
+  // Close on Escape key (cook mode and the full-screen list own Escape while open)
+  useEffect(() => {
+    if (cookIndex !== null || ingredientsMaximised) return undefined
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') onClose()
     }
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [onClose, cookIndex])
+  }, [onClose, cookIndex, ingredientsMaximised])
 
   // Lock body scroll while open; guard mirrors the `!recipeId` early return below
   // (locking while rendering null would pin the shared reference count).
@@ -213,12 +228,14 @@ function RecipeViewModal({
     }
   }
 
-  const toggleStepDone = (idx) => setDoneSteps((prev) => {
+  const toggleInSet = (setter) => (idx) => setter((prev) => {
     const next = new Set(prev)
     if (next.has(idx)) next.delete(idx)
     else next.add(idx)
     return next
   })
+  const toggleStepDone = toggleInSet(setDoneSteps)
+  const toggleIngredient = toggleInSet(setTickedIngredients)
 
   // Cook mode forces the wake lock on and puts it back as it was on exit.
   const startCook = (index) => {
@@ -316,10 +333,12 @@ function RecipeViewModal({
             </div>
             <div className="rv-body">
               <IngredientsPanel
-                key={fullRecipe?.id}
                 ingredients={ingredients}
                 scale={scaleQuantity}
                 servings={currentServings}
+                ticked={tickedIngredients}
+                onToggle={toggleIngredient}
+                onExpand={isMobile ? () => setIngredientsMaximised(true) : undefined}
               >
                 {!canGoBack && extras.length > 0 && (
                   <ExtrasPanel
@@ -351,6 +370,20 @@ function RecipeViewModal({
               </div>
             </div>
           </div>
+        )}
+
+        {ingredientsMaximised && isMobile && !contentLoading && !contentError && (
+          <IngredientsFullscreen
+            recipeName={currentRecipeName}
+            ingredients={ingredients}
+            scale={scaleQuantity}
+            ticked={tickedIngredients}
+            onToggle={toggleIngredient}
+            servings={currentServings}
+            onServings={resetServings}
+            screenOn={wakeLock.isLocked}
+            onClose={closeIngredientsFullscreen}
+          />
         )}
 
         {cookIndex !== null && steps.length > 0 && (
