@@ -2,6 +2,7 @@
 // Default values are never retuned by this contract; known Default misses are listed in KNOWN_EXCEPTIONS.
 import { readFileSync, existsSync } from 'node:fs'
 import { THEMES, DEFAULT_THEME_ID } from '../src/constants/themes.js'
+import { PIP_LINE_COPY } from '../src/constants/pipLines.js'
 
 const root = new URL('../', import.meta.url)
 const read = (relativePath) => readFileSync(new URL(relativePath, root), 'utf8')
@@ -129,6 +130,10 @@ const bootFallback = indexHtml.match(/c\[t\]\|\|'(#[0-9a-fA-F]+)'/)?.[1]
 if (bootFallback !== defaultTheme.themeColor) failures.push(`index.html boot script fallback colour ${bootFallback} does not match Default themeColor ${defaultTheme.themeColor}`)
 for (const theme of THEMES.filter((t) => t.id !== DEFAULT_THEME_ID)) {
   if (bootMap[theme.id] !== theme.themeColor) failures.push(`index.html boot script colour for ${theme.id} (${bootMap[theme.id]}) does not match its themeColor ${theme.themeColor}`)
+}
+
+for (const theme of THEMES) {
+  if (!(theme.pipLine in PIP_LINE_COPY)) failures.push(`${theme.id}: pipLine "${theme.pipLine}" is not a known Pip line (${Object.keys(PIP_LINE_COPY)})`)
 }
 
 notes.forEach((message) => console.log(message))

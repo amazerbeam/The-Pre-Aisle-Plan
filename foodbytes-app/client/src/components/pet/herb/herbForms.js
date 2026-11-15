@@ -1,12 +1,9 @@
 // MPP-31: Pip's herb line, ported verbatim from the approved
 // .claude/contract/MPP-15-epic-breakdown/mockups/pip-herb-wardrobe.html (FORMS, 2026-10-13).
-// Every form is drawn in the same 200-unit space with its feet on y = HERB_FOOT_Y, scaled by
-// `scale` about (100, HERB_FOOT_Y).
+// Every form is drawn in the same 200-unit space with its feet on y = PIP_FOOT_Y (pip/pipSpace.js), scaled by
+// `scale` about (100, PIP_FOOT_Y).
 
 export const HERB_INK = '#2f4a22'
-export const HERB_FOOT_X = 100
-export const HERB_FOOT_Y = 186
-export const HERB_FULL_VIEWBOX = '0 -40 200 240'
 
 const ellipsePath = (cx, cy, rx, ry) =>
   `M${cx - rx} ${cy} A${rx} ${ry} 0 1 0 ${cx + rx} ${cy} A${rx} ${ry} 0 1 0 ${cx - rx} ${cy} Z`
@@ -59,18 +56,3 @@ export const HERB_FORMS = [
     miniViewBox: '-6 4 212 212'
   }
 ]
-
-/** The form's geometry; unknown forms fall back to the seed so a bad payload never blanks Pip. */
-export const herbForm = (form) => HERB_FORMS[form - 1] ?? HERB_FORMS[0]
-
-/**
- * AC 6: the anchors every form exposes for MPP-32's wardrobe, in the unscaled 200-unit space
- * (apply the form's `scale` about (HERB_FOOT_X, HERB_FOOT_Y) to place them). Keyed by form 1–5.
- */
-export const PIP_FORM_ANCHORS = Object.fromEntries(HERB_FORMS.map((f, i) => [i + 1, {
-  hat: f.hat,
-  eyes: { y: f.eyes.y, gap: f.eyes.gap },
-  neck: f.neck,
-  waist: f.waist,
-  feetTips: f.feet.map(([, tip]) => tip)
-}]))

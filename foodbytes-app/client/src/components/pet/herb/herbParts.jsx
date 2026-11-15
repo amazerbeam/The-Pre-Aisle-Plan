@@ -145,30 +145,30 @@ export function HerbGrowth({ form, droop, base }) {
 }
 
 /** Full-variant mood props: happy sparkles, bored thought bubble, sleep z's; none otherwise. */
-export function HerbProps({ mood }) {
+export function HerbProps({ mood, ink = HERB_INK }) {
   if (mood === PET_MOODS.HAPPY) {
     return SPARKLES.map(([x, y, r, delay]) => (
       <path key={x} className="pip-sparkle" style={{ animationDelay: delay }}
         d={`M${x} ${y - r} Q${x} ${y} ${x + r} ${y} Q${x} ${y} ${x} ${y + r} Q${x} ${y} ${x - r} ${y} Q${x} ${y} ${x} ${y - r}Z`}
-        fill={STAR} stroke={HERB_INK} strokeWidth="1.6" />
+        fill={STAR} stroke={ink} strokeWidth="1.6" />
     ))
   }
   if (mood === PET_SLEEP_FACE) {
     return (
       <>
-        <text x="156" y="40" fontSize="20" fontWeight="700" fill={HERB_INK} opacity=".7" fontFamily="system-ui">z</text>
-        <text x="172" y="22" fontSize="14" fontWeight="700" fill={HERB_INK} opacity=".5" fontFamily="system-ui">z</text>
+        <text x="156" y="40" fontSize="20" fontWeight="700" fill={ink} opacity=".7" fontFamily="system-ui">z</text>
+        <text x="172" y="22" fontSize="14" fontWeight="700" fill={ink} opacity=".5" fontFamily="system-ui">z</text>
       </>
     )
   }
   if (mood === PET_MOODS.BORED) {
     return (
       <>
-        <ellipse cx="170" cy="24" rx="22" ry="13" fill="#fff" stroke={HERB_INK} strokeWidth="2.5" />
-        <circle cx="152" cy="44" r="4" fill="#fff" stroke={HERB_INK} strokeWidth="2" />
-        <circle cx="161" cy="25" r="2.5" fill={HERB_INK} />
-        <circle cx="170" cy="25" r="2.5" fill={HERB_INK} />
-        <circle cx="179" cy="25" r="2.5" fill={HERB_INK} />
+        <ellipse cx="170" cy="24" rx="22" ry="13" fill="#fff" stroke={ink} strokeWidth="2.5" />
+        <circle cx="152" cy="44" r="4" fill="#fff" stroke={ink} strokeWidth="2" />
+        <circle cx="161" cy="25" r="2.5" fill={ink} />
+        <circle cx="170" cy="25" r="2.5" fill={ink} />
+        <circle cx="179" cy="25" r="2.5" fill={ink} />
       </>
     )
   }

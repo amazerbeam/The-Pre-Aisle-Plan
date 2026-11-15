@@ -6,6 +6,7 @@ The design reference for the client UI. **Keep these files in step with the live
 |---|---|
 | `app-mockup.html` | The full app as an interactive prototype (Recipes, Meal Plan desktop + mobile, recipe view, ingredients full screen, cook mode, Shopping, Pip, every dialog, the user menu). Draws the **Cyberpunk** theme. Deep links: `#mobile`, `#acct`, `#lowfx`, `#audit`, `#r=mealplan\|shopping\|pet`, `#dlg=recipe`, `#max`, `#cook`. |
 | `parchment-theme.html` | The **Parchment** theme (Receipts, Ledger desktop + mobile, open-book recipe view, Provisions scroll, account menu with three tiles). Deep links: `#mobile`, `#r=mealplan\|shopping\|pet`, `#dlg=recipe`, `#acct`, `#lowfx`. |
+| `pip-themed-lines.html` | Pip's three lines (herb, dragon for Parchment, robot for Cyberpunk), every form bare and in a full outfit, mini sizes on each theme's footer, wilted/asleep samples, the per-creature wardrobe (all 20 items drawn and named three ways, with animations that stop under Low FX and reduced motion), a live preview of the planned growth behaviour (theme switch, form from peak, bar labels, evolve bubbles, the `PetGrowthDTO` payload) and the geometry/fit table. Source of the dragon/robot geometry in `client/src/components/pet/dragon\|robot/*Forms.js`. Contract `2026-11-15-themed-pip-lines`, approved 2026-11-15. |
 | `user-menu-themes.html` | The user menu and theme picker in Default and Cyberpunk (Parchment is a third tile that points to `parchment-theme.html`), web and mobile, with the three picker styles explored (A tiles was chosen). Query params: `?theme=`, `?mode=mobile`, `?pick=`. |
 
 ## Known gap
@@ -35,3 +36,7 @@ History: the Cyberpunk mockup was approved 2026-11-14 (design rules: `.claude/co
 ## Synced with the implementation (2026-11-15, contract `2026-11-15-parchment-theme`)
 
 `parchment-theme.html` shows the plain meal names (Breakfast / Lunch / Dinner / Snacks) and plain aisle names, as the live theme does. Meal and aisle renames were deferred; only the nav (Receipts / Ledger / Provisions) and page headings are themed.
+
+## Synced with the implementation (2026-11-15, contract `2026-11-15-themed-pip-lines`)
+
+No divergence: the shipped dragon and robot match the approved mockup. `pip-themed-lines.html` stays the source of the geometry, art, wardrobe drawings and item names (`WARDROBE_ITEM_LABELS`) in `client/src/components/pet/dragon|robot/` and `client/src/constants/pipWardrobe.js`.

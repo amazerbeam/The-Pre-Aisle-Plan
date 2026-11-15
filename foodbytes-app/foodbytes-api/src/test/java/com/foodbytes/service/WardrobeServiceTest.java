@@ -65,7 +65,7 @@ class WardrobeServiceTest {
     }
 
     private static PetGrowthDTO growth(int form, int peakForm, int lastDayScore) {
-        return new PetGrowthDTO(0, form, 0, 15, false, lastDayScore, null, peakForm);
+        return new PetGrowthDTO(0, lastDayScore, null, peakForm, java.util.Map.of());
     }
 
     private static PetWardrobeUnlock unlock(String id, boolean seen) {

@@ -1,12 +1,13 @@
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { usePet } from '../../contexts/PetContext'
+import { useTheme } from '../../contexts/ThemeContext'
 import PetRoom from './room/PetRoom'
 import PipHeader from './PipHeader'
 import CheckInActions from './room/CheckInActions'
 import { PET_GUEST_MESSAGE } from '../../constants/pet'
 import { RECIPES_PATH } from '../../constants/appRoutes'
-import { PIP_FORM_NAMES, PIP_FORMS } from '../../constants/pipGrowth'
+import { formName } from '../../constants/pipLines'
 import useCookAndServe from '../../hooks/useCookAndServe'
 import useHabitCheckIn from '../../hooks/useHabitCheckIn'
 import usePetAwards from '../../hooks/usePetAwards'
@@ -19,7 +20,7 @@ import { cookServeBubble } from '../../utils/cookServe'
 import { fridgeBubble } from '../../utils/fridgeFill'
 import { petBubble, petChipLabel } from '../../utils/petMood'
 import { pipBubble } from '../../utils/pipBubble'
-import { isWilted } from '../../utils/pipGrowth'
+import { isWilted, lineGrowth } from '../../utils/pipGrowth'
 import './PetView.css'
 
 /**
@@ -41,6 +42,8 @@ import './PetView.css'
 function PetView() {
   const navigate = useNavigate()
   const { user, isAuthenticated } = useAuth()
+  const { theme } = useTheme()
+  const line = theme.pipLine
   const { pet, petDay, mood, moodInfo, position, fridge, todayISO, loading, error, retry, renamePet, setWardrobe, sprinkles, applyRoomWrite, refreshPet, setRoom } = usePet()
   // Before the early returns (rules of hooks); gated on a loaded pet via userId.
   const petUserId = pet ? user?.id ?? null : null
@@ -51,14 +54,14 @@ function PetView() {
     lastLoggedAt: moodInfo.lastLoggedAt,
     lastLoggedType: moodInfo.lastLoggedType
   })
-  const dressing = usePipWardrobe({ userId: petUserId, wardrobe: pet?.wardrobe ?? null, setWardrobe })
+  const dressing = usePipWardrobe({ userId: petUserId, wardrobe: pet?.wardrobe ?? null, setWardrobe, line })
   const shopState = usePetShop({ applyRoomWrite, refreshPet })
   const roomEdit = useRoomEdit({ room: pet?.room ?? null, setRoom, applyRoomWrite })
   // MPP-28 AC 2: award > outfit > shop line. MPP-42 AC 16: what you earned queues after them, and after the cook scene.
   const higherAnnouncement = awards.announcement ?? dressing.announcement ?? shopState.announcement
   const earning = useSprinkleCountUp({ userId: petUserId, sprinkles, hold: Boolean(serving) || Boolean(higherAnnouncement) })
   const announcement = higherAnnouncement ?? earning.line
-  const growth = usePipGrowth({ userId: petUserId, growth: pet?.growth ?? null, petName: pet?.name ?? null, hold: Boolean(serving) || Boolean(announcement) })
+  const growth = usePipGrowth({ userId: petUserId, growth: pet?.growth ?? null, line, petName: pet?.name ?? null, hold: Boolean(serving) || Boolean(announcement) })
 
   if (!isAuthenticated) {
     return (
@@ -101,16 +104,16 @@ function PetView() {
     moodLine: petBubble(moodInfo)
   })
   const bubbleActions = said.actions ? <CheckInActions {...said.actions} /> : null
-  const herb = { form: growth.displayForm, wilted: isWilted(pet.growth), phase: growth.phase, outfit: pet.wardrobe?.outfit ?? null }
+  const herb = { line, form: growth.displayForm, wilted: isWilted(pet.growth), phase: growth.phase, outfit: pet.wardrobe?.outfit ?? null }
   const wardrobe = pet.wardrobe
-    ? { ...dressing, data: pet.wardrobe, peakForm: pet.growth?.peakForm ?? growth.displayForm }
+    ? { ...dressing, data: pet.wardrobe, peakForm: lineGrowth(pet.growth, line)?.peakForm ?? growth.displayForm }
     : null
   // MPP-26: the shop only once the room and balance have loaded — never a sheet of fake level-1 data.
   const shop = pet.room && typeof pet.sprinkles === 'number' ? { ...shopState, room: pet.room, sprinkles: pet.sprinkles } : null
   // MPP-27: edit mode only once the room has loaded — never a picker over a fake empty room.
   const decor = pet.room ? { ...roomEdit, room: pet.room } : null
-  // MPP-38 AC 8: no bar once Pip is a Basilisk; during an evolve into it, Bushling's bar still fills and flashes first.
-  const levelBar = growth.barLabel && growth.displayForm !== PIP_FORMS.BASILISK
+  // MPP-38 AC 8: no bar once the line's last form is reached; during an evolve into it the previous bar still fills and flashes first.
+  const levelBar = growth.barLabel && growth.displayForm !== growth.lastForm
     ? { label: growth.barLabel, pct: growth.barPct, phase: growth.phase, gain: growth.gain }
     : null
 
@@ -119,7 +122,7 @@ function PetView() {
       <PipHeader
         name={pet.name}
         onRename={renamePet}
-        formName={PIP_FORM_NAMES[growth.displayForm]}
+        formName={formName(line, growth.displayForm)}
         sprinkles={sprinkles}
         earning={earning}
         mood={mood}

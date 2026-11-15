@@ -51,7 +51,8 @@ public class PetGrowthService {
 
     /**
      * Writes at most once per user, ever: the first time the replayed total has reached 90 it
-     * records users.pet_fully_grown_at, which keeps the form at Basilisk for good (AC 3).
+     * records users.pet_fully_grown_at, which floors the peak at Basilisk for good
+     * (PetGrowthPolicy#effectivePeak), so no backdated correction can shrink a line that reached it.
      */
     @Transactional
     public PetGrowthDTO growth(User user) {

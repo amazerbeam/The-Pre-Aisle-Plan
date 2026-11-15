@@ -1,6 +1,7 @@
 package com.foodbytes.service;
 
 import com.foodbytes.dto.PetGrowthDTO;
+import com.foodbytes.dto.PetLineGrowthDTO;
 import com.foodbytes.model.Habit;
 import com.foodbytes.model.PetHabitDay;
 import com.foodbytes.model.User;
@@ -54,6 +55,10 @@ class PetGrowthServiceTest {
     @Mock private UserRepository userRepository;
 
     private PetGrowthService service;
+
+    private static PetLineGrowthDTO herb(PetGrowthDTO growth) {
+        return growth.getLines().get("herb");
+    }
 
     @BeforeEach
     void setUp() {
@@ -123,8 +128,8 @@ class PetGrowthServiceTest {
         PetGrowthDTO growth = service.growth(user(OWNER));
 
         assertThat(growth.getPoints()).isZero();
-        assertThat(growth.getForm()).isEqualTo(1);
-        assertThat(growth.getBarSize()).isEqualTo(15);
+        assertThat(herb(growth).getForm()).isEqualTo(1);
+        assertThat(herb(growth).getBarSize()).isEqualTo(15);
         verifyNoInteractions(mealPlanEntryRepository, eatenRepository);
     }
 
@@ -135,14 +140,14 @@ class PetGrowthServiceTest {
         stub(OWNER, answers(OWNER, from, 6, -1), oneMealPerDay(from, 6), ids(from, 6));   // 6 perfect = 18
         stub(PARTNER, answers(PARTNER, from, 6, -1), oneMealPerDay(from, 6), List.of());  // 6 slips → 0
 
-        assertThat(service.growth(user(OWNER)).getForm()).isEqualTo(2);
-        assertThat(service.growth(user(PARTNER)).getForm()).isEqualTo(1);
+        assertThat(herb(service.growth(user(OWNER))).getForm()).isEqualTo(2);
+        assertThat(herb(service.growth(user(PARTNER))).getForm()).isEqualTo(1);
         assertThat(service.growth(user(PARTNER)).getLastDayScore()).isEqualTo(-3);
     }
 
     /** AC 1: a backdated lapse (MPP-20 catch-up) re-scores that day on the next read. */
     @Test
-    void backdatedAnswer_reScoresTheDay() {
+    void backdatedAnswer_reScoresTheDay_keepsThePeakForm() {
         LocalDate from = firstOf(5);
         stub(OWNER, answers(OWNER, from, 5, -1), oneMealPerDay(from, 5), ids(from, 5));
         assertThat(service.growth(user(OWNER)).getPoints()).isEqualTo(15);
@@ -150,7 +155,7 @@ class PetGrowthServiceTest {
         stub(OWNER, answers(OWNER, from, 5, 4), oneMealPerDay(from, 5), ids(from, 5));    // day 5 now a lapse
         PetGrowthDTO growth = service.growth(user(OWNER));
         assertThat(growth.getPoints()).isEqualTo(9);
-        assertThat(growth.getForm()).isEqualTo(1);
+        assertThat(herb(growth).getForm()).isEqualTo(1);   // replayed peak is 12 (day 5 now a lapse), below 15
     }
 
     /** AC 1: days the check-in hasn't covered, and clean days with nothing planned, score 0. */
@@ -173,9 +178,9 @@ class PetGrowthServiceTest {
 
         PetGrowthDTO growth = service.growth(user(OWNER));
 
-        assertThat(growth.getForm()).isEqualTo(5);
-        assertThat(growth.isFullyGrown()).isTrue();
-        assertThat(growth.getBarSize()).isNull();
+        assertThat(herb(growth).getForm()).isEqualTo(5);
+        assertThat(herb(growth).isFullyGrown()).isTrue();
+        assertThat(herb(growth).getBarSize()).isNull();
         verify(userRepository).markPetFullyGrown(eq(OWNER), eq(LocalDateTime.now(CLOCK)));
     }
 
@@ -190,8 +195,8 @@ class PetGrowthServiceTest {
         PetGrowthDTO growth = service.growth(grown);
 
         assertThat(growth.getPoints()).isZero();
-        assertThat(growth.getForm()).isEqualTo(5);
-        assertThat(growth.isFullyGrown()).isTrue();
+        assertThat(herb(growth).getForm()).isEqualTo(5);
+        assertThat(herb(growth).isFullyGrown()).isTrue();
         verify(userRepository, never()).markPetFullyGrown(anyLong(), any());
     }
 
@@ -204,7 +209,7 @@ class PetGrowthServiceTest {
         PetGrowthDTO growth = service.growth(user(OWNER));
 
         assertThat(growth.getPoints()).isEqualTo(84);
-        assertThat(growth.getForm()).isEqualTo(5);
+        assertThat(herb(growth).getForm()).isEqualTo(5);
         verify(userRepository).markPetFullyGrown(eq(OWNER), any());
     }
 }

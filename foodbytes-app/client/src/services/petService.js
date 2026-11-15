@@ -14,7 +14,7 @@ export const petService = {
    * room.placements keys (MPP-40): the 12 decor spots (rug never null), wallStyle, floorStyle
    *
    * @param {{ signal?: AbortSignal }} [options]
-   * @returns {Promise<{ name: string, customName: boolean, mealTimes: Object, habits: HabitStatus[], awards: { streaks: AwardStatus[], firsts: FirstStatus[] }, growth: { points: number, form: number, barCurrent: number|null, barSize: number|null, fullyGrown: boolean, lastDayScore: number, lastScoredDate: string|null, peakForm: number }, wardrobe: Object, room: { stations: Object, upgradeCosts: Object, decor: { id: string, kind: string, price: number, owned: boolean }[], placements: { [spot: string]: string|null } } }>} PetDTO (wardrobe = WardrobeDTO, see equipItem)
+   * @returns {Promise<{ name: string, customName: boolean, mealTimes: Object, habits: HabitStatus[], awards: { streaks: AwardStatus[], firsts: FirstStatus[] }, growth: { points: number, lastDayScore: number, lastScoredDate: string|null, peakForm: number, lines: { [line: string]: { form: number, peakForm: number, formStart: number, barCurrent: number|null, barSize: number|null, fullyGrown: boolean } } }, wardrobe: Object, room: { stations: Object, upgradeCosts: Object, decor: { id: string, kind: string, price: number, owned: boolean }[], placements: { [spot: string]: string|null } } }>} PetDTO (wardrobe = WardrobeDTO, see equipItem)
    */
   async getPet({ signal } = {}) {
     const response = await api.get('/pet', { signal })

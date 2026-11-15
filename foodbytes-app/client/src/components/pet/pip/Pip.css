@@ -1,0 +1,120 @@
+/* Pip's figure (every line) — idle moods, wilt filter, evolve pulse. */
+
+.pip-herb {
+  display: block;
+  overflow: visible;
+}
+
+.pip-anim {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+}
+
+.pip-mood-content .pip-anim { animation: pip-bob 2.6s ease-in-out infinite; }
+.pip-mood-happy .pip-anim { animation: pip-bounce 1.1s ease-in-out infinite; }
+.pip-mood-bored .pip-anim { animation: pip-droop 4s ease-in-out infinite; }
+.pip-mood-mischievous .pip-anim { animation: pip-shuffle 1.6s ease-in-out infinite; }
+
+/* AC 7: wilted — colours fade; the leaves droop in the SVG itself. Moods keep animating on top. */
+.pip-herb-figure.is-wilted .pip-anim { filter: saturate(0.45) brightness(0.97); }
+
+/* AC 8: evolving — a white silhouette pulse. */
+.pip-herb-figure.is-evolving .pip-anim { animation: pip-evolve 1.6s ease-in-out; }
+
+/* MPP-32: Dress Pip item cards and the evolution lineup hold still. */
+.pip-herb-figure.is-still .pip-anim { animation: none !important; }
+
+.pip-sparkle {
+  animation: pip-twinkle 1.4s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@keyframes pip-bob {
+  0%, 100% { transform: translateY(0) scale(1, 1); }
+  50% { transform: translateY(-5px) scale(0.98, 1.02); }
+}
+
+@keyframes pip-bounce {
+  0%, 100% { transform: translateY(0) scale(1.04, 0.96); }
+  40% { transform: translateY(-16px) scale(0.96, 1.05); }
+  70% { transform: translateY(0) scale(1.06, 0.94); }
+}
+
+@keyframes pip-droop {
+  0%, 100% { transform: rotate(-2deg) scale(1.02, 0.97); }
+  50% { transform: rotate(2deg) scale(1.02, 0.97); }
+}
+
+@keyframes pip-shuffle {
+  0%, 100% { transform: translateX(0) rotate(0); }
+  25% { transform: translateX(-4px) rotate(-3deg); }
+  75% { transform: translateX(4px) rotate(3deg); }
+}
+
+@keyframes pip-twinkle {
+  0%, 100% { opacity: 0.2; transform: scale(0.6); }
+  50% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes pip-evolve {
+  0% { filter: brightness(1); }
+  15%, 70% { filter: brightness(0) invert(1) drop-shadow(0 0 10px #fff); }
+  25%, 45% { transform: scale(0.85); }
+  35%, 55% { transform: scale(1.08); }
+  100% { filter: brightness(1); transform: scale(1); }
+}
+
+/* AC 8: reduced motion — no movement at all; the bubbles still tell the story. */
+@media (prefers-reduced-motion: reduce) {
+  .pip-anim,
+  .pip-sparkle {
+    animation: none !important;
+  }
+}
+
+/* Themed lines: animated wardrobe parts (fxGroup in pip/wardrobeShapes.js). Every one stops under
+   reduced motion, under Low FX (body.lowfx) and on still figures (Dress Pip cards, lineup). */
+.pip-fx { transform-box: fill-box; transform-origin: center; }
+.pip-fx--spin { animation: pip-fx-spin 1.1s linear infinite; }
+.pip-fx--scan { animation: pip-fx-scan 2.2s ease-in-out infinite alternate; }
+.pip-fx--smoke { animation: pip-fx-smoke 2.1s ease-out infinite; }
+.pip-fx--sway { transform-origin: 50% 100%; animation: pip-fx-sway 3s ease-in-out infinite; }
+.pip-fx--flicker { animation: pip-fx-flicker 3.4s linear infinite; }
+.pip-fx--blink { animation: pip-fx-blink 3.6s infinite; }
+.pip-fx--pulse { animation: pip-fx-pulse 1s ease-in-out infinite; }
+.pip-fx--drop { animation: pip-fx-drop .9s cubic-bezier(.3, 1.6, .6, 1) 1 both; }
+.pip-fx--flap { transform-origin: 0% 50%; animation: pip-fx-flap .8s ease-in-out infinite alternate; }
+.pip-fx--glow { animation: pip-fx-glow 1.8s ease-in-out infinite; }
+.pip-fx--charge { animation: pip-fx-charge 2.1s linear infinite; }
+.pip-fx--chase { animation: pip-fx-chase .8s linear infinite; }
+.pip-fx--hover { animation: pip-fx-hover 1.1s ease-in-out infinite; }
+.pip-fx--wobble { transform-origin: 50% 100%; animation: pip-fx-wobble 2.6s ease-in-out infinite; }
+.pip-fx--sparkle { animation: pip-fx-sparkle 1.6s ease-in-out infinite; }
+.pip-fx--rise { animation: pip-fx-rise 2.2s ease-out infinite; }
+.pip-fx--cape { transform-origin: 50% 0; animation: pip-fx-cape 3.4s ease-in-out infinite; }
+
+@keyframes pip-fx-spin { to { transform: rotate(360deg); } }
+@keyframes pip-fx-scan { from { transform: translateX(0); } to { transform: translateX(600%); } }
+@keyframes pip-fx-smoke { 0% { opacity: 0; transform: translateY(4px) scale(.6); } 30% { opacity: .9; } 100% { opacity: 0; transform: translateY(-10px) scale(1.3); } }
+@keyframes pip-fx-sway { 0%, 100% { transform: rotate(-8deg); } 50% { transform: rotate(8deg); } }
+@keyframes pip-fx-flicker { 0%, 40%, 46%, 52%, 100% { opacity: 1; } 43% { opacity: .3; } 49% { opacity: .55; } }
+@keyframes pip-fx-blink { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(.1); } }
+@keyframes pip-fx-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.18); } }
+@keyframes pip-fx-drop { from { transform: translateY(-16px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+@keyframes pip-fx-flap { from { transform: rotate(-10deg); } to { transform: rotate(12deg); } }
+@keyframes pip-fx-glow { 0%, 100% { opacity: .8; } 50% { opacity: 1; filter: brightness(1.25); } }
+@keyframes pip-fx-charge { 0% { opacity: .15; } 35%, 90% { opacity: 1; } 100% { opacity: .15; } }
+@keyframes pip-fx-chase { 0%, 24% { opacity: 1; } 25%, 100% { opacity: .25; } }
+@keyframes pip-fx-hover { 0%, 100% { transform: scaleX(1); opacity: .8; } 50% { transform: scaleX(.7); opacity: .4; } }
+@keyframes pip-fx-wobble { 0%, 70%, 100% { transform: rotate(0); } 78% { transform: rotate(-9deg); } 86% { transform: rotate(8deg); } 94% { transform: rotate(-4deg); } }
+@keyframes pip-fx-sparkle { 0%, 100% { transform: scale(.3); opacity: .2; } 50% { transform: scale(1); opacity: 1; } }
+@keyframes pip-fx-rise { 0% { transform: translateY(0); opacity: 0; } 20% { opacity: 1; } 100% { transform: translateY(-12px); opacity: 0; } }
+@keyframes pip-fx-cape { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(1.6deg); } }
+
+body.lowfx .pip-fx,
+.pip-herb-figure.is-still .pip-fx { animation: none !important; }
+body.lowfx .pip-herb-figure [style*="drop-shadow"] { filter: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  .pip-fx { animation: none !important; }
+}

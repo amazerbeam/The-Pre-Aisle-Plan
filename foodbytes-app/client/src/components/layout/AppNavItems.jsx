@@ -3,10 +3,10 @@ import { useTheme } from '../../contexts/ThemeContext'
 import PixelIcon from '../common/PixelIcon'
 import EngravedIcon from '../common/EngravedIcon'
 import { navLabel } from '../../utils/themeCopy'
-import PipHerb from '../pet/herb/PipHerb'
-import { hatMiniViewBox, hatOnly } from '../pet/herb/wardrobeLayers'
+import Pip from '../pet/pip/Pip'
+import { hatMiniViewBox, hatOnly } from '../pet/pip/wardrobeLayers'
 import { PIP_DEFAULT_FORM } from '../../constants/pipGrowth'
-import { isWilted } from '../../utils/pipGrowth'
+import { isWilted, lineGrowth } from '../../utils/pipGrowth'
 import { PET_GUEST_TAB_LABEL } from '../../constants/pet'
 
 const ICON_PROPS = { viewBox: '0 0 24 24', width: 24, height: 24, fill: 'none', stroke: 'currentColor', strokeWidth: 2 }
@@ -57,7 +57,8 @@ const NAV_ICONS = {
 function AppNavItems({ variant = 'footer', items, message }) {
   const { petName, mood, growth, wardrobe } = usePet()
   const { theme } = useTheme()
-  const tabForm = growth?.form ?? PIP_DEFAULT_FORM
+  const line = theme.pipLine
+  const tabForm = lineGrowth(growth, line)?.form ?? PIP_DEFAULT_FORM
   const tabOutfit = hatOnly(wardrobe?.outfit)
   const messageClass = variant === 'footer' ? 'footer-message' : 'header-nav-message'
 
@@ -75,13 +76,14 @@ function AppNavItems({ variant = 'footer', items, message }) {
           >
             {item.key === 'pet' ? (
               <>
-                <PipHerb
+                <Pip
+                  line={line}
                   form={tabForm}
                   mood={mood}
                   wilted={isWilted(growth)}
                   variant="mini"
                   outfit={tabOutfit}
-                  viewBox={tabOutfit.HAT ? hatMiniViewBox(tabForm) : null}
+                  viewBox={tabOutfit.HAT ? hatMiniViewBox(line, tabForm) : null}
                 />
                 <span className="footer-pet-label">{petName ?? PET_GUEST_TAB_LABEL}</span>
               </>

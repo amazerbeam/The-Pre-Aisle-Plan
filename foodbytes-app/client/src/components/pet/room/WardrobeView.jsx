@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
-import { PIP_FORM_NAMES } from '../../../constants/pipGrowth'
+import { formName } from '../../../constants/pipLines'
 import {
   WARDROBE_CLOSE_LABEL, WARDROBE_ITEMS, WARDROBE_LOCK_PREFIX, WARDROBE_SLOTS, WARDROBE_TITLE, WARDROBE_UNDRESS_LABEL
 } from '../../../constants/pipWardrobe'
 import useBodyScrollLock from '../../../hooks/useBodyScrollLock'
-import { wornCount } from '../../../utils/pipWardrobe'
-import PipHerb from '../herb/PipHerb'
+import { wardrobeItemLabel, wornCount } from '../../../utils/pipWardrobe'
+import Pip from '../pip/Pip'
 import WardrobeItemGrid from './WardrobeItemGrid'
 import WardrobeLineup from './WardrobeLineup'
 import WardrobeSlotTabs from './WardrobeSlotTabs'
@@ -18,7 +18,7 @@ import './WardrobeView.css'
  * trap come from useRoomOverlay (the panel's first button, ✕, takes focus). Opens on the first
  * slot with something new; opening a tab marks its new items seen. Every tap saves (usePipWardrobe).
  *
- * @param {{ mood: string, herb: { form: number, wilted: boolean }, wardrobe: Object, titleId: string, panelRef: object, onClose: () => void }} props
+ * @param {{ mood: string, herb: { line: string, form: number, wilted: boolean }, wardrobe: Object, titleId: string, panelRef: object, onClose: () => void }} props
  *   wardrobe = { data: WardrobeDTO, peakForm, firstNewSlot, equip, undress, markSeen, error }
  */
 function WardrobeView({ mood, herb, wardrobe, titleId, panelRef, onClose }) {
@@ -56,23 +56,23 @@ function WardrobeView({ mood, herb, wardrobe, titleId, panelRef, onClose }) {
         </button>
       </div>
       <div className="pip-wardrobe-preview">
-        <PipHerb form={herb.form} mood={mood} wilted={herb.wilted} outfit={outfit} />
+        <Pip line={herb.line} form={herb.form} mood={mood} wilted={herb.wilted} outfit={outfit} />
         <p className="pip-wardrobe-caption">
-          {PIP_FORM_NAMES[herb.form]} · wearing {wornCount(outfit)} of {WARDROBE_SLOTS.length}
+          {formName(herb.line, herb.form)} · wearing {wornCount(outfit)} of {WARDROBE_SLOTS.length}
         </p>
       </div>
       {wardrobe.error && <p className="pip-wardrobe-error" role="alert">{wardrobe.error}</p>}
       <WardrobeSlotTabs wardrobe={wardrobe.data} selected={slot} onSelect={chooseSlot} />
       <div className="pip-wardrobe-body">
-        <WardrobeItemGrid wardrobe={wardrobe.data} slot={slot} form={herb.form} onTap={tapItem} />
+        <WardrobeItemGrid wardrobe={wardrobe.data} slot={slot} line={herb.line} form={herb.form} onTap={tapItem} />
         {lockedId && (
           <p className="pip-wardrobe-lock-note" role="status">
-            <b>🔒 {WARDROBE_ITEMS[lockedId].label}</b>
+            <b>🔒 {wardrobeItemLabel(herb.line, lockedId)}</b>
             {WARDROBE_LOCK_PREFIX} {WARDROBE_ITEMS[lockedId].unlockHint}
           </p>
         )}
       </div>
-      <WardrobeLineup outfit={outfit} currentForm={herb.form} peakForm={wardrobe.peakForm} />
+      <WardrobeLineup outfit={outfit} line={herb.line} currentForm={herb.form} peakForm={wardrobe.peakForm} />
     </div>
   )
 }

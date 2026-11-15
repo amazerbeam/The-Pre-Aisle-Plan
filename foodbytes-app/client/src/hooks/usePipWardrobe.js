@@ -16,12 +16,13 @@ import {
  * AC 6: new unlocks not yet announced in this browser queue one "🎉 New outfit" line, shown for
  * AWARD_BUBBLE_MS. The ids are recorded before the line shows, so a reload never repeats it.
  *
- * @param {{ userId: number|null, wardrobe: Object|null, setWardrobe: (w: Object) => void }} input
+ * @param {{ userId: number|null, wardrobe: Object|null, setWardrobe: (w: Object) => void, line: string }} input
+ *   `line` is the active theme's Pip line: the "New outfit" line names the item the way that creature does.
  * @returns {{ announcement: string|null, hasNew: boolean, firstNewSlot: string|null,
  *   equip: (slot: string, itemId: string|null) => void, undress: () => void,
  *   markSeen: (slot: string) => void, error: string|null }}
  */
-export function usePipWardrobe({ userId, wardrobe, setWardrobe }) {
+export function usePipWardrobe({ userId, wardrobe, setWardrobe, line }) {
   const [announcement, setAnnouncement] = useState(null)
   const [error, setError] = useState(null)
   const seqRef = useRef(0)
@@ -39,8 +40,8 @@ export function usePipWardrobe({ userId, wardrobe, setWardrobe }) {
     const fresh = newItemIds(wardrobe).filter(id => !announced.has(id))
     if (fresh.length === 0) return
     writeAnnounced(userId, [...announced, ...fresh])
-    setAnnouncement(wardrobeAnnouncement(fresh))
-  }, [userId, wardrobe])
+    setAnnouncement(wardrobeAnnouncement(fresh, line))
+  }, [userId, wardrobe, line]) // announced ids are recorded first, so a theme switch never repeats the line
 
   useEffect(() => {
     if (!announcement) return undefined

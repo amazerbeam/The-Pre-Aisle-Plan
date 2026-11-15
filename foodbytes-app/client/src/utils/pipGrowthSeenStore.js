@@ -7,7 +7,7 @@ const memory = new Map()
 const keyFor = (userId) => `${PIP_GROWTH_SEEN_STORAGE_KEY}.${userId}`
 
 /**
- * MPP-31: the growth (PetGrowthDTO shape) Pip last finished showing this user here, or null for a
+ * MPP-31: the growth payload (PetGrowthDTO, every line) Pip last finished showing this user here, or null for a
  * first visit. This page load's memory wins over storage, since it is always written last.
  */
 export function readSeenGrowth(userId) {
@@ -31,7 +31,7 @@ export function writeSeenGrowth(userId, growth) {
   }
 }
 
-// Only a value with a numeric form and points is a marker; anything else reads as a first visit.
+// Only a payload with numeric points and a lines map is a marker; a pre-themed-lines marker reads as a first visit.
 function toGrowth(value) {
-  return value && Number.isFinite(value.form) && Number.isFinite(value.points) ? value : null
+  return value && Number.isFinite(value.points) && value.lines && typeof value.lines === 'object' ? value : null
 }

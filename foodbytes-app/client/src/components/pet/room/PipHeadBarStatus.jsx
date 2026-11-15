@@ -1,4 +1,4 @@
-import { spokenLevelLabel } from '../herb/headBar'
+import { spokenLevelLabel } from '../pip/headBar'
 import './PipHeadBar.css'
 
 /**

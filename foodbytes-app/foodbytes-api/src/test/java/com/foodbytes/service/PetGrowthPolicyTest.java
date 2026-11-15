@@ -1,6 +1,8 @@
 package com.foodbytes.service;
 
 import com.foodbytes.dto.PetGrowthDTO;
+import com.foodbytes.dto.PetLineGrowthDTO;
+import com.foodbytes.service.PetGrowthPolicy.Line;
 import com.foodbytes.service.PetGrowthPolicy.Replay;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -69,14 +71,6 @@ class PetGrowthPolicyTest {
         assertThat(PetGrowthPolicy.dayScore(0, 0, false, true, false)).isEqualTo(-3);
     }
 
-    // ---- AC 2: thresholds ----
-
-    @ParameterizedTest
-    @CsvSource({"0,1", "14,1", "15,2", "35,2", "36,3", "59,3", "60,4", "89,4", "90,5", "120,5"})
-    void formFor_eachThresholdBoundary(int points, int form) {
-        assertThat(PetGrowthPolicy.formFor(points)).isEqualTo(form);
-    }
-
     // ---- AC 2 / AC 3: floored replay, both directions ----
 
     @Test
@@ -98,58 +92,6 @@ class PetGrowthPolicyTest {
     }
 
     @Test
-    void slipRightAfterEvolving_deEvolves() {
-        Replay evolved = PetGrowthPolicy.replay(days(repeat(3, 5)));               // 15 points
-        assertThat(PetGrowthPolicy.toDTO(evolved, false).getForm()).isEqualTo(2);
-
-        int[] thenSlip = java.util.Arrays.copyOf(repeat(3, 5), 6);
-        thenSlip[5] = -3;                                                         // 12 points
-        assertThat(PetGrowthPolicy.toDTO(PetGrowthPolicy.replay(days(thenSlip)), false).getForm()).isEqualTo(1);
-    }
-
-    // ---- MPP-32: peakForm, the highest form reached (evolution unlocks, lineup silhouettes) ----
-
-    @Test
-    void peakForm_staysAtTheHighestFormAfterADeEvolve() {
-        int[] thenSlip = java.util.Arrays.copyOf(repeat(3, 5), 6);
-        thenSlip[5] = -3;                                                         // 15 -> 12 points
-        PetGrowthDTO dto = PetGrowthPolicy.toDTO(PetGrowthPolicy.replay(days(thenSlip)), false);
-        assertThat(dto.getForm()).isEqualTo(1);
-        assertThat(dto.getPeakForm()).isEqualTo(2);
-    }
-
-    @Test
-    void peakForm_equalsTheFormWhenNeverHigher() {
-        PetGrowthDTO dto = PetGrowthPolicy.toDTO(PetGrowthPolicy.replay(days(repeat(3, 12))), false); // 36
-        assertThat(dto.getForm()).isEqualTo(3);
-        assertThat(dto.getPeakForm()).isEqualTo(3);
-    }
-
-    @Test
-    void peakForm_isBasiliskWhenFullyGrown_whateverThePoints() {
-        PetGrowthDTO dto = PetGrowthPolicy.toDTO(PetGrowthPolicy.replay(days(repeat(3, 2))), true);
-        assertThat(dto.getPeakForm()).isEqualTo(5);
-    }
-
-    @Test
-    void peakForm_ofTheEmptyReplay_isTheSeed() {
-        assertThat(PetGrowthPolicy.toDTO(Replay.EMPTY, false).getPeakForm()).isEqualTo(1);
-    }
-
-    @Test
-    void eachThreshold_crossedUpThenDown() {
-        // 12 → 15 (Seedling) → 12 (seed); 33 → 36 (Sprig) → 33; 57 → 60 (Bushling) → 57
-        for (int[] pair : new int[][] {{4, 1}, {11, 2}, {19, 3}}) {
-            int ups = pair[0] + 1;
-            Replay up = PetGrowthPolicy.replay(days(repeat(3, ups)));
-            assertThat(PetGrowthPolicy.formFor(up.points())).isEqualTo(pair[1] + 1);
-            int[] down = java.util.Arrays.copyOf(repeat(3, ups), ups + 1);
-            down[ups] = -3;
-            assertThat(PetGrowthPolicy.formFor(PetGrowthPolicy.replay(days(down)).points())).isEqualTo(pair[1]);
-        }
-    }
-
-    @Test
     void peak_tracksTheHighestRunningTotal() {
         int[] scores = java.util.Arrays.copyOf(repeat(3, 30), 32);                // 90 …
         scores[30] = -3;
@@ -160,24 +102,127 @@ class PetGrowthPolicyTest {
         assertThat(PetGrowthPolicy.reachedBasilisk(replay)).isTrue();
     }
 
-    // ---- AC 4: bar fields ----
+    private static PetLineGrowthDTO line(PetGrowthDTO dto, Line line) {
+        return dto.getLines().get(line.key());
+    }
+
+    private static int[] upThenDown(int ups, int downs) {
+        int[] out = java.util.Arrays.copyOf(repeat(3, ups), ups + downs);
+        java.util.Arrays.fill(out, ups, ups + downs, -3);
+        return out;
+    }
+
+    // ---- line registry ----
 
     @Test
-    void toDTO_barIsPointsMinusThreshold_overTheFormsBarSize() {
-        PetGrowthDTO dto = PetGrowthPolicy.toDTO(PetGrowthPolicy.replay(days(repeat(3, 7))), false); // 21
-        assertThat(dto.getForm()).isEqualTo(2);
-        assertThat(dto.getBarCurrent()).isEqualTo(6);
-        assertThat(dto.getBarSize()).isEqualTo(21);
-        assertThat(dto.isFullyGrown()).isFalse();
+    void registry_herbDragonRobot_inOrder_withTheirThresholds() {
+        assertThat(Line.values()).containsExactly(Line.HERB, Line.DRAGON, Line.ROBOT);
+        assertThat(Line.HERB.thresholds()).containsExactly(0, 15, 36, 60, 90);
+        assertThat(Line.DRAGON.thresholds()).containsExactly(0, 15, 36);
+        assertThat(Line.ROBOT.thresholds()).containsExactly(0, 15, 36);
+        assertThat(Line.HERB.key()).isEqualTo("herb");
+        assertThat(Line.DRAGON.lastForm()).isEqualTo(3);
+        assertThat(PetGrowthPolicy.FORM_THRESHOLDS).isEqualTo(Line.HERB.thresholds());
+    }
+
+    @ParameterizedTest
+    @CsvSource({"0,1", "14,1", "15,2", "35,2", "36,3", "59,3", "60,4", "89,4", "90,5", "120,5"})
+    void formFor_herb_eachThresholdBoundary(int points, int form) {
+        assertThat(PetGrowthPolicy.formFor(Line.HERB, points)).isEqualTo(form);
+    }
+
+    @ParameterizedTest
+    @CsvSource({"0,1", "14,1", "15,2", "35,2", "36,3", "90,3"})
+    void formFor_dragonAndRobot_eachThresholdBoundary(int points, int form) {
+        assertThat(PetGrowthPolicy.formFor(Line.DRAGON, points)).isEqualTo(form);
+        assertThat(PetGrowthPolicy.formFor(Line.ROBOT, points)).isEqualTo(form);
     }
 
     @Test
-    void toDTO_fullyGrown_isBasiliskWithNoBar_whateverThePoints() {
-        PetGrowthDTO dto = PetGrowthPolicy.toDTO(PetGrowthPolicy.replay(days(repeat(3, 20))), true); // 60
-        assertThat(dto.getForm()).isEqualTo(5);
-        assertThat(dto.getBarCurrent()).isNull();
-        assertThat(dto.getBarSize()).isNull();
-        assertThat(dto.isFullyGrown()).isTrue();
-        assertThat(dto.getPoints()).isEqualTo(60);
+    void toDTO_hasEveryLine_inRegistryOrder() {
+        PetGrowthDTO dto = PetGrowthPolicy.toDTO(Replay.EMPTY, false);
+        assertThat(dto.getLines()).containsOnlyKeys("herb", "dragon", "robot");
+        assertThat(dto.getLines().keySet()).containsExactly("herb", "dragon", "robot");
+        for (Line l : Line.values()) {
+            assertThat(line(dto, l).getForm()).isEqualTo(1);
+            assertThat(line(dto, l).getBarCurrent()).isZero();
+            assertThat(line(dto, l).getBarSize()).isEqualTo(15);
+        }
+        assertThat(dto.getPeakForm()).isEqualTo(1);
+    }
+
+    // ---- never de-evolve: form from peak, every line (herb included) ----
+
+    @Test
+    void slipRightAfterEvolving_noLineDeEvolves_andTheBarSitsEmpty() {
+        PetGrowthDTO dto = PetGrowthPolicy.toDTO(PetGrowthPolicy.replay(days(upThenDown(5, 1))), false); // 15 -> 12
+        assertThat(dto.getPoints()).isEqualTo(12);
+        for (Line l : Line.values()) {
+            PetLineGrowthDTO g = line(dto, l);
+            assertThat(g.getForm()).as(l.key()).isEqualTo(2);
+            assertThat(g.getPeakForm()).isEqualTo(2);
+            assertThat(g.getFormStart()).isEqualTo(15);
+            assertThat(g.getBarCurrent()).isZero();
+            assertThat(g.getBarSize()).isEqualTo(21);
+        }
+    }
+
+    @Test
+    void eachThreshold_crossedUpThenDown_keepsTheHigherForm() {
+        // 15 -> 12, 36 -> 33, 60 -> 57: herb stays 2 / 3 / 4
+        for (int[] pair : new int[][] {{5, 2}, {12, 3}, {20, 4}}) {
+            PetGrowthDTO dto = PetGrowthPolicy.toDTO(PetGrowthPolicy.replay(days(upThenDown(pair[0], 1))), false);
+            assertThat(line(dto, Line.HERB).getForm()).isEqualTo(pair[1]);
+            assertThat(dto.getPeakForm()).isEqualTo(pair[1]);
+        }
+    }
+
+    @Test
+    void dragonAndRobot_reachTheirLastFormAt36_andStayFullyGrownAfterSlips() {
+        PetGrowthDTO dto = PetGrowthPolicy.toDTO(PetGrowthPolicy.replay(days(upThenDown(12, 10))), false); // 36 -> 6
+        for (Line l : new Line[] {Line.DRAGON, Line.ROBOT}) {
+            PetLineGrowthDTO g = line(dto, l);
+            assertThat(g.getForm()).isEqualTo(3);
+            assertThat(g.isFullyGrown()).isTrue();
+            assertThat(g.getBarCurrent()).isNull();
+            assertThat(g.getBarSize()).isNull();
+            assertThat(g.getFormStart()).isEqualTo(36);
+        }
+        PetLineGrowthDTO herb = line(dto, Line.HERB);
+        assertThat(herb.getForm()).isEqualTo(3);
+        assertThat(herb.isFullyGrown()).isFalse();
+        assertThat(herb.getBarCurrent()).isZero();          // 6 points, below Sprig's 36
+        assertThat(herb.getBarSize()).isEqualTo(24);
+    }
+
+    @Test
+    void bar_isPointsMinusFormStart_overTheGapToTheNextForm() {
+        PetGrowthDTO dto = PetGrowthPolicy.toDTO(PetGrowthPolicy.replay(days(repeat(3, 7))), false); // 21
+        PetLineGrowthDTO herb = line(dto, Line.HERB);
+        assertThat(herb.getForm()).isEqualTo(2);
+        assertThat(herb.getBarCurrent()).isEqualTo(6);
+        assertThat(herb.getBarSize()).isEqualTo(21);
+        assertThat(herb.isFullyGrown()).isFalse();
+    }
+
+    // ---- the fully-grown marker floors the peak at Basilisk ----
+
+    @Test
+    void fullyGrownMarker_isBasiliskAndEveryLineAtItsLastForm_whateverThePoints() {
+        PetGrowthDTO dto = PetGrowthPolicy.toDTO(PetGrowthPolicy.replay(days(repeat(3, 2))), true); // 6 points
+        assertThat(dto.getPoints()).isEqualTo(6);
+        assertThat(dto.getPeakForm()).isEqualTo(5);
+        assertThat(line(dto, Line.HERB).getForm()).isEqualTo(5);
+        for (Line l : Line.values()) {
+            assertThat(line(dto, l).isFullyGrown()).isTrue();
+            assertThat(line(dto, l).getBarSize()).isNull();
+        }
+    }
+
+    @Test
+    void effectivePeak_floorsAtNinetyOnlyWhenFullyGrown() {
+        Replay replay = PetGrowthPolicy.replay(days(repeat(3, 4)));                 // peak 12
+        assertThat(PetGrowthPolicy.effectivePeak(replay, false)).isEqualTo(12);
+        assertThat(PetGrowthPolicy.effectivePeak(replay, true)).isEqualTo(90);
     }
 }

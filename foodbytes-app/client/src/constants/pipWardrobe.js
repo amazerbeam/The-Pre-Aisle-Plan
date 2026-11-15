@@ -1,6 +1,8 @@
+import { PIP_LINE } from './pipLines.js'
+
 /**
- * MPP-32: Pip's wardrobe — slots, item labels and unlock hints. Ids, slots and the unlock rules
- * themselves live on the server (WardrobeCatalogue); this file only names them. Hints follow the
+ * MPP-32: Pip's wardrobe — slots and unlock hints (names live per creature in WARDROBE_ITEM_LABELS). Ids,
+ * slots and the unlock rules themselves live on the server (WardrobeCatalogue); this file only names them. Hints follow the
  * phone mockup's UNLOCKS (mpp-32-wardrobe-phone-mockup.html).
  */
 export const WARDROBE_SLOT = {
@@ -28,26 +30,51 @@ const { HAT, GLASSES, SCARF, JACKET, BELT, PANTS, SHOES } = WARDROBE_SLOT
 
 // AC 1: the 20 items, in the server's catalogue order.
 export const WARDROBE_ITEMS = {
-  beanie: { slot: HAT, label: 'Beanie', unlockHint: 'Owned from the start' },
-  cap: { slot: HAT, label: 'Cap', unlockHint: '5 days alcohol-free' },
-  'chef-hat': { slot: HAT, label: 'Chef hat', unlockHint: 'Your first homemade extra' },
-  'straw-hat': { slot: HAT, label: 'Straw hat', unlockHint: 'Grow to Sprig' },
-  'top-hat': { slot: HAT, label: 'Top hat', unlockHint: 'Any 1-month streak' },
-  'round-specs': { slot: GLASSES, label: 'Round specs', unlockHint: 'Your first full week planned' },
-  'heart-glasses': { slot: GLASSES, label: 'Heart glasses', unlockHint: '2 weeks alcohol-free' },
-  sunglasses: { slot: GLASSES, label: 'Sunglasses', unlockHint: 'Grow to Basilisk' },
-  'red-scarf': { slot: SCARF, label: 'Red scarf', unlockHint: '1 week alcohol-free' },
-  'striped-scarf': { slot: SCARF, label: 'Striped scarf', unlockHint: '3 weeks snack-free' },
-  'chef-whites': { slot: JACKET, label: 'Chef whites', unlockHint: '3 days following the plan' },
-  'denim-jacket': { slot: JACKET, label: 'Denim jacket', unlockHint: '2 weeks following the plan' },
-  puffer: { slot: JACKET, label: 'Puffer', unlockHint: '3 weeks following the plan' },
-  'leather-belt': { slot: BELT, label: 'Leather belt', unlockHint: '3 weeks alcohol-free' },
-  'champion-belt': { slot: BELT, label: 'Champion belt', unlockHint: 'A 1-month streak on the plan, snacks and alcohol' },
-  jeans: { slot: PANTS, label: 'Jeans', unlockHint: 'Owned from the start' },
-  joggers: { slot: PANTS, label: 'Joggers', unlockHint: '2 weeks snack-free' },
-  dungarees: { slot: PANTS, label: 'Dungarees', unlockHint: '1 week following the plan' },
-  sneakers: { slot: SHOES, label: 'Sneakers', unlockHint: '1 week snack-free' },
-  wellies: { slot: SHOES, label: 'Wellies', unlockHint: 'Grow to Bushling' }
+  beanie: { slot: HAT, unlockHint: 'Owned from the start' },
+  cap: { slot: HAT, unlockHint: '5 days alcohol-free' },
+  'chef-hat': { slot: HAT, unlockHint: 'Your first homemade extra' },
+  'straw-hat': { slot: HAT, unlockHint: 'Grow to Sprig' },
+  'top-hat': { slot: HAT, unlockHint: 'Any 1-month streak' },
+  'round-specs': { slot: GLASSES, unlockHint: 'Your first full week planned' },
+  'heart-glasses': { slot: GLASSES, unlockHint: '2 weeks alcohol-free' },
+  sunglasses: { slot: GLASSES, unlockHint: 'Grow to Basilisk' },
+  'red-scarf': { slot: SCARF, unlockHint: '1 week alcohol-free' },
+  'striped-scarf': { slot: SCARF, unlockHint: '3 weeks snack-free' },
+  'chef-whites': { slot: JACKET, unlockHint: '3 days following the plan' },
+  'denim-jacket': { slot: JACKET, unlockHint: '2 weeks following the plan' },
+  puffer: { slot: JACKET, unlockHint: '3 weeks following the plan' },
+  'leather-belt': { slot: BELT, unlockHint: '3 weeks alcohol-free' },
+  'champion-belt': { slot: BELT, unlockHint: 'A 1-month streak on the plan, snacks and alcohol' },
+  jeans: { slot: PANTS, unlockHint: 'Owned from the start' },
+  joggers: { slot: PANTS, unlockHint: '2 weeks snack-free' },
+  dungarees: { slot: PANTS, unlockHint: '1 week following the plan' },
+  sneakers: { slot: SHOES, unlockHint: '1 week snack-free' },
+  wellies: { slot: SHOES, unlockHint: 'Grow to Bushling' }
+}
+
+// Themed lines: each creature names the same item its own way (ids, slots and unlocks are shared).
+export const WARDROBE_ITEM_LABELS = {
+  [PIP_LINE.HERB]: {
+    beanie: 'Beanie', cap: 'Cap', 'chef-hat': 'Chef hat', 'straw-hat': 'Straw hat', 'top-hat': 'Top hat',
+    'round-specs': 'Round specs', 'heart-glasses': 'Heart glasses', sunglasses: 'Sunglasses',
+    'red-scarf': 'Red scarf', 'striped-scarf': 'Striped scarf', 'chef-whites': 'Chef whites', 'denim-jacket': 'Denim jacket', puffer: 'Puffer',
+    'leather-belt': 'Leather belt', 'champion-belt': 'Champion belt', jeans: 'Jeans', joggers: 'Joggers', dungarees: 'Dungarees',
+    sneakers: 'Sneakers', wellies: 'Wellies'
+  },
+  [PIP_LINE.DRAGON]: {
+    beanie: 'Horn cosy', cap: "Bard's cap", 'chef-hat': 'Singed toque', 'straw-hat': "Bird's nest", 'top-hat': 'Crown',
+    'round-specs': 'Battle scar', 'heart-glasses': 'Smitten', sunglasses: 'War paint',
+    'red-scarf': "Knight's cape", 'striped-scarf': 'Ivy garland', 'chef-whites': "Baker's apron", 'denim-jacket': 'Leather jerkin', puffer: 'Scale mail',
+    'leather-belt': 'Potion belt', 'champion-belt': 'Hoard belt', jeans: 'Patched breeches', joggers: 'Wool hose', dungarees: "Smith's overalls",
+    sneakers: 'Talon wraps', wellies: 'Iron sabatons'
+  },
+  [PIP_LINE.ROBOT]: {
+    beanie: 'Cooling fan', cap: 'Holo visor', 'chef-hat': 'Steam toque', 'straw-hat': 'Satellite dish', 'top-hat': 'Neon top hat',
+    'round-specs': 'Smiley.exe', 'heart-glasses': 'Heart eyes', sunglasses: 'Shades.gif',
+    'red-scarf': 'Cable coil', 'striped-scarf': 'Hazard tape', 'chef-whites': 'Oven door', 'denim-jacket': 'Hull plates', puffer: 'Battery vest',
+    'leather-belt': 'Tool belt', 'champion-belt': 'Marquee belt', jeans: 'Coolant casing', joggers: 'Servo sleeves', dungarees: 'Maintenance overalls',
+    sneakers: 'Hover pads', wellies: 'Mag boots'
+  }
 }
 
 // Suffixed with the user id, so two people on one browser keep their own list (MPP-33).

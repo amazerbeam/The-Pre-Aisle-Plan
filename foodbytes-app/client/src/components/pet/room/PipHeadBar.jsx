@@ -1,12 +1,12 @@
 import {
   HEAD_BAR_FLASH_MS, HEAD_BAR_GAIN_DELTA_MS, HEAD_BAR_GAIN_MS, HEAD_BAR_HEIGHT, HEAD_BAR_WIDTH, PIP_GROWTH_PHASES
 } from '../../../constants/pipGrowth'
-import { HERB_FOOT_X } from '../herb/herbForms'
-import { headBarY } from '../herb/headBar'
+import { headBarY } from '../pip/headBar'
+import { PIP_FOOT_X } from '../pip/pipSpace'
 import './PipHeadBar.css'
 
 // The new form's bar jumps to its starting edge without animating backwards (MPP-31 AC 5).
-const INSTANT_PHASES = [PIP_GROWTH_PHASES.EVOLVING, PIP_GROWTH_PHASES.SHRINKING]
+const INSTANT_PHASES = [PIP_GROWTH_PHASES.EVOLVING]
 
 /**
  * MPP-38: the small level bar over Pip's head, drawn inside RoomPip so it follows every pose
@@ -14,7 +14,7 @@ const INSTANT_PHASES = [PIP_GROWTH_PHASES.EVOLVING, PIP_GROWTH_PHASES.SHRINKING]
  * Decorative only — PipHeadBarStatus carries the progress for screen readers (AC 6).
  * `gain` (from usePipGrowth) floats "+3" up off the bar, then shows "3 / 15" and fades.
  */
-function PipHeadBar({ form, outfit, pct, phase, gain = null, poseScale }) {
+function PipHeadBar({ line, form, outfit, pct, phase, gain = null, poseScale }) {
   const w = HEAD_BAR_WIDTH / poseScale
   const h = HEAD_BAR_HEIGHT / poseScale
   const className = [
@@ -27,7 +27,7 @@ function PipHeadBar({ form, outfit, pct, phase, gain = null, poseScale }) {
     <g
       className={className}
       aria-hidden="true"
-      transform={`translate(${(HERB_FOOT_X - w / 2).toFixed(1)} ${(headBarY(form, outfit) - h).toFixed(1)})`}
+      transform={`translate(${(PIP_FOOT_X - w / 2).toFixed(1)} ${(headBarY(line, form, outfit) - h).toFixed(1)})`}
       style={{ '--pip-head-bar-flash': `${HEAD_BAR_FLASH_MS}ms` }}
     >
       <rect className="pip-head-bar-track" width={w} height={h} rx={h / 2} />

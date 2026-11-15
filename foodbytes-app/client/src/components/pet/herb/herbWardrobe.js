@@ -1,15 +1,17 @@
-import { HERB_FOOT_X, HERB_INK } from './herbForms.js'
+import { PIP_FOOT_X } from '../pip/pipSpace.js'
+import { arc, arcY, band, curveOf } from '../pip/wardrobeShapes.js'
+import { HERB_INK } from './herbForms.js'
 
 /**
- * MPP-32 AC 3: every clothing item, drawn once from a form's anchors and never per form. Ported
+ * MPP-32 AC 3 / themed lines: the herb's clothing; every item, drawn once from a form's anchors and never per form. Ported
  * from .claude/contract/MPP-15-epic-breakdown/mockups/pip-herb-wardrobe.html (HATS … SHOES,
- * drawPants … drawShoe). `f` is a herbForm(form) geometry; each function reads only the anchors
+ * drawPants … drawShoe). `f` is a pipForm(line, form) geometry; each function reads only the anchors
  * its slot uses (hat / eyes / neck + waist + side / feet) and returns shape descriptors —
- * { tag: 'path'|'circle'|'rect'|'ellipse', ...React SVG attributes } — that HerbOutfit.jsx
+ * { tag: 'path'|'circle'|'rect'|'ellipse', ...React SVG attributes } — that PipOutfit.jsx
  * renders, so wardrobe.check.mjs can run the geometry in node.
  */
 
-const CX = HERB_FOOT_X // every form is centred on x = 100
+const CX = PIP_FOOT_X // every form is centred on x = 100
 
 const fillPath = (d, fill, strokeWidth = 3.5) =>
   ({ tag: 'path', d, fill, stroke: HERB_INK, strokeWidth, strokeLinejoin: 'round' })
@@ -102,14 +104,6 @@ const GLASSES = {
 }
 
 // ---- torso bands between the neck and waist lines, curved like a smile, clipped to the body ----
-
-const curveOf = (f) => f.side * 0.32
-const arcY = (x, y0, c) => {
-  const t = x / 200
-  return y0 - c + 4 * c * t * (1 - t)
-}
-const arc = (y0, c) => `M0 ${y0 - c} Q${CX} ${y0 + c} 200 ${y0 - c}`
-const band = (y0, y1, c) => `M0 ${y0 - c} Q${CX} ${y0 + c} 200 ${y0 - c} L200 ${y1 - c} Q${CX} ${y1 + c} 0 ${y1 - c} Z`
 
 function pants({ color, seam, straps = false }, f) {
   const c = curveOf(f)
@@ -228,19 +222,11 @@ function shoe({ color, trim, tall }, root, tip) {
   ]
 }
 
-/** { top, straight?, shapes } on the head anchor, or null for an id that isn't a hat. */
-export const hatArt = (id, f) => HATS[id]?.(CX, f.hat.y, f.hat.w) ?? null
-
-/** Shapes on the two eye points, scaled with the face. */
-export const glassesArt = (id, f) => GLASSES[id]?.(CX - f.eyes.gap, CX + f.eyes.gap, f.eyes.y, f.eyes.s) ?? []
-
-/** { clip, extra }: clip = drawn inside the body outline, extra = outside it. */
-export const torsoArt = (id, f) => TORSO[id]?.(f) ?? { clip: [], extra: [] }
-
-/** Shapes for both feet. */
-export const shoeArt = (id, f) => (SHOES[id] ? f.feet.flatMap(([root, tip]) => shoe(SHOES[id], root, tip)) : [])
-
-// Every id this file can draw, for wardrobe.check.mjs.
-export const DRAWN_ITEM_IDS = [
-  ...Object.keys(HATS), ...Object.keys(GLASSES), ...Object.keys(TORSO), ...Object.keys(SHOES)
-]
+/** The herb's wardrobe in the shape every line shares (pip/wardrobeArt.js dispatches on it). */
+export const HERB_WARDROBE = {
+  HATS, // id → (x, y, w) → { top, shapes, straight? }
+  GLASSES, // id → (L, R, y, s) → shapes
+  TORSO, // id → (f) → { clip, extra, back? }
+  SHOES: Object.fromEntries(Object.entries(SHOES).map(([id, style]) => [id, (root, tip) => shoe(style, root, tip)])), // id → (root, tip) → shapes
+  REPLACES_FACE: [] // glasses ids that replace the face while worn
+}

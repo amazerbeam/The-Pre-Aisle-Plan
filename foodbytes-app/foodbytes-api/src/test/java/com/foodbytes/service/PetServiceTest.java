@@ -49,7 +49,8 @@ class PetServiceTest {
     private static final PetAwardsDTO AWARDS = new PetAwardsDTO(List.of(), List.of());
     private static final List<HabitStatusDTO> HABITS = List.of();
 
-    private static final PetGrowthDTO GROWTH = new PetGrowthDTO(21, 2, 6, 21, false, 3, null, 2);
+    private static final PetGrowthDTO GROWTH = PetGrowthPolicy.toDTO(
+            new PetGrowthPolicy.Replay(21, 21, 3, null), false);
     private static final WardrobeDTO WARDROBE = new WardrobeDTO(List.of(), Map.of(WardrobeSlot.HAT, "beanie"));
     private static final PetRoomDTO ROOM = new PetRoomDTO(
             Map.of("bed", 2, "fridge", 1, "cooker", 1, "cabinet", 1), Map.of(2, 300, 3, 600, 4, 1200),
