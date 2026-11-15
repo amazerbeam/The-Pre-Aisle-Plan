@@ -431,7 +431,17 @@
   font-style: italic;
 }
 
-/* Swipe actions: wax to remove, verdigris to replace or move */
+/* Swipe actions: wax to remove, verdigris to replace or move.
+   Parchment meal cards are transparent (ink on the page), so the sliding face carries the
+   page's own paper; otherwise the action buttons underneath show through the entry. */
+:root[data-theme="parchment"] .swipe-row {
+  border-radius: 2px;
+}
+
+:root[data-theme="parchment"] .swipe-row-face {
+  background: var(--parchment) var(--paper-noise);
+}
+
 :root[data-theme="parchment"] .swipe-row-action {
   font-family: var(--f-label);
   font-weight: 400;
