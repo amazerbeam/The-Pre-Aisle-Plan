@@ -1,0 +1,306 @@
+/* Default theme: the app's original look. Every colour token lives here on :root;
+   other themes reassign them under :root[data-theme="<id>"]. See CLAUDE.md -> Themes. */
+:root {
+  color-scheme: light;
+
+  /* Brand Colors */
+  --brand-primary: #4a3f80;
+  --brand-primary-dark: #3a3266;
+  --brand-primary-light: #6b5fa0;
+
+  /* Neutral Colors */
+  --text-primary: #2c3e50;
+  --text-secondary: #6c757d;
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --border-color: #e9ecef;
+
+  /* Semantic Colors */
+  --success: #28a745;
+  --warning: #ffc107;
+  --error: #dc3545;
+  --cheat-badge: #ff6b35;
+
+  /* FR-104: Macro traffic light. Colour encodes DIRECTION, not severity —
+     blue is always below the target band, red always above it. Aliased rather
+     than reusing --success/--warning/--error so these can be retuned for
+     contrast on the brand-purple header independently.
+
+     Each status declares all four of its surfaces here, so retuning a hue is a
+     one-place edit. Previously the badge tints and popup pill colours restated
+     the same RGB channels inline, which meant a retune recoloured the border and
+     dot while leaving every tint on the old hue — a half-recoloured badge.
+       (base)     border, traffic-light dot, legend dot
+       -tint      badge fill on the brand-purple header
+       -pill-bg   status pill fill inside the popup (lighter than -tint)
+       -pill-text status pill label (dark enough for AA on -pill-bg) */
+  --macro-under-target: #4aa3f0;
+  --macro-under-target-tint: rgba(74, 163, 240, 0.32);
+  --macro-under-target-pill-bg: rgba(74, 163, 240, 0.2);
+  --macro-under-target-pill-text: #10527f;
+
+  --macro-near-target: #ffc107;
+  --macro-near-target-tint: rgba(255, 193, 7, 0.26);
+  --macro-near-target-pill-bg: rgba(255, 193, 7, 0.22);
+  --macro-near-target-pill-text: #856404;
+
+  --macro-on-target: #28a745;
+  --macro-on-target-tint: rgba(40, 167, 69, 0.28);
+  --macro-on-target-pill-bg: rgba(40, 167, 69, 0.15);
+  --macro-on-target-pill-text: #1b6b2e;
+
+  --macro-over-target: #dc3545;
+  --macro-over-target-tint: rgba(220, 53, 69, 0.32);
+  --macro-over-target-pill-bg: rgba(220, 53, 69, 0.15);
+  --macro-over-target-pill-text: #a71d2a;
+
+  /* MPP-29: Pip's room — one focus ring and one overlay entrance for every room control.
+     The ring is purple on light surfaces (≥3:1 on #fff and the room's #ece5fb; the old
+     yellow was ~1.4:1 on the white sheets) and yellow on the cabinet's wood and the edit
+     bar. Buttons drawn over furniture art add the white halo so the ring reads on any colour. */
+  --pip-focus-ring: #7c5cd6;
+  --pip-focus-ring-on-dark: #ffd34d;
+  --pip-focus-halo: #fff;
+
+  /* Text on a brand-coloured fill (swept from global.css .btn-primary) */
+  --on-brand: #ffffff;
+
+  /* Keyboard focus ring (global.css input focus border was brand purple) */
+  --focus-ring-color: #4a3f80;
+
+  /* Account menu, theme picker and its controls (DefaultPortions, MealTimes, Header) */
+  --text-label: #555555;
+  --text-placeholder: #999999;
+  --danger-text: #c0392b;
+  --control-border: #dddddd;
+  --surface-input: #ffffff;
+  --surface-invalid: #fff5f5;
+  --surface-tint-brand: #eeebf7;
+  --control-hover-bg: #f3f3f3;
+  --control-active-bg: #e8e8e8;
+  --focus-ring-control: #4a7c59;
+  --scrim-bg: rgba(10, 12, 20, 0.55);
+  --menu-border-color: transparent;
+
+  /* Header: text and washes on the brand-coloured bar, guest nudge, avatar */
+  --on-brand-muted: #d9d4f5;
+  --on-brand-hover-bg: rgba(255, 255, 255, 0.1);
+  --on-brand-active-bg: rgba(255, 255, 255, 0.16);
+  --nav-message-bg: #2b2540;
+  --nav-message-text: #ffffff;
+  --avatar-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --avatar-text: #ffffff;
+  --avatar-ring: rgba(255, 255, 255, 0.3);
+
+  /* Footer, toasts and sign-in dialog (Footer.css, Toast.css, UndoToast.css, LoginModal.css) */
+  --toast-bg: #1f1a3a;
+  --toast-text: #ffffff;
+  --toast-action: #ffd34d;
+  --link-color: #2563eb;
+  --action-bg: #2563eb;
+  --input-border-subtle: #d1d5db;
+  --error-text-strong: #b91c1c;
+  --google-btn-bg: #ffffff;
+  --google-btn-border: #dadce0;
+  --google-btn-text: #3c4043;
+  --google-btn-hover-bg: #f7f8f8;
+  --google-btn-shadow: rgba(60, 64, 67, 0.3);
+  --google-btn-shadow-soft: rgba(60, 64, 67, 0.15);
+
+  /* Recipes: cards, toolbar, week strip, day buttons, macro chips, popups */
+  --surface-popover: #ffffff;
+  --surface-tint-soft: #efedf7;
+  --surface-tint-faint: #f7f6fc;
+  --plan-border: #cfc9ea;
+  --cheat-flag-bg: rgba(239, 68, 68, 0.9);
+  --on-cheat-flag: #ffffff;
+  --audited-bg: #e3f4e7;
+  --audited-text: #1b6b2e;
+  --notice-bg: #fff4e0;
+  --notice-text: #9a5b00;
+  --error-surface: #fee2e2;
+  --error-text: #dc2626;
+  --chip-dashed-border: #c9c3e6;
+  --success-hover: #1a7f37;
+  --dot-muted: #b8b2d6;
+  --week-empty-bg: #fffaf0;
+  --week-empty-accent: #e3b45c;
+  --on-brand-soft: #e0dcf5;
+  --on-brand-wash: rgba(255, 255, 255, 0.15);
+  --on-brand-hover-strong: rgba(255, 255, 255, 0.2);
+  --on-brand-active-strong: rgba(255, 255, 255, 0.3);
+  --on-brand-subtle: rgba(255, 255, 255, 0.9);
+  --on-text-primary: #ffffff;
+  --text-faint: #9aa1a8;
+  --divider-soft: #eeeeee;
+  --brand-tint-faint: rgba(74, 63, 128, 0.08);
+  --brand-tint-soft: rgba(74, 63, 128, 0.1);
+  --storebought-bg: rgba(255, 152, 0, 0.15);
+  --storebought-text: #e65100;
+  --macro-chip-solid-bg: #ffffff;
+
+  /* Meal plan: timetable, day view, cards, summary */
+  --on-brand-faint: rgba(255, 255, 255, 0.12);
+  --chip-selected-bg: #ffffff;
+  --chip-dot-filled: #9be29b;
+  --chip-dot-selected: #d8d4ea;
+  --today-ring: #ffd34d;
+  --slot-add-border: #cfcbe0;
+  --tick-border: #cfd4da;
+  --eaten-bg: #eef8f0;
+  --eaten-border: #cfe9d5;
+  --spinner-track: #f3f3f3;
+  --stale-bg: #fff7e6;
+  --stale-border: #f3d39a;
+  --brand-hover: #3d3469;
+
+  /* Meal plan: menus, sheets and modals */
+  --surface-tint-menu: #f3f0fa;
+  --surface-tint-menu-active: #e9e3f7;
+  --surface-tint-hint: #faf9fd;
+  --pill-neutral-bg: #f0f0f0;
+  --warn-bg: #fef3e2;
+  --surface-row: #fafafa;
+  --slot-pill-bg: #efeff3;
+  --serving-pill-bg: #e3e1ec;
+  --homemade-bg: #e8f5ec;
+  --control-hover-soft: #f6f6f8;
+  --control-active-soft: #f0f0f4;
+  --danger-hover-bg: #fdecea;
+  --warn-active-bg: #fdebd0;
+  --sheet-grab: #d0cde0;
+  --sheet-backdrop: rgba(20, 16, 40, 0.4);
+  --text-strong: #333333;
+  --text-mid: #666666;
+  --text-hint: var(--text-placeholder);
+  --text-meta: #777777;
+  --warn-text: #b15a09;
+  --warn-text-dark: #7a4a10;
+  --note-text: #8a6d3b;
+  --error-copy: #e53e3e;
+  --warn-accent: #e67e22;
+  --homemade-text: #2f7d4a;
+  --text-brand-muted: #5b5180;
+  --warn-border: #f0c28a;
+  --danger-border: #e6b8b1;
+  --control-border-brand: #d0cbe6;
+  --scope-border: #e4def6;
+  --divider-dashed: #e6e6ec;
+  --border-input: #e0e0e0;
+  --border-button: #d0d0d0;
+  --border-strong: #999999;
+  --brand-tint-whisper: rgba(74, 63, 128, 0.05);
+  --brand-focus-glow: rgba(74, 63, 128, 0.2);
+
+  /* Recipe view: header, full-screen ingredients, cook mode, eaten section */
+  --rv-head-text: var(--on-brand);
+  --rv-head-muted: var(--on-brand-muted);
+  --rv-head-wash: rgba(255, 255, 255, 0.18);
+  --rv-head-wash-soft: var(--on-brand-wash);
+  --rv-head-wash-hover: rgba(255, 255, 255, 0.25);
+  --rv-head-wash-strong: rgba(255, 255, 255, 0.3);
+  --rv-head-panel: rgba(255, 255, 255, 0.12);
+  --rv-head-press: rgba(255, 255, 255, 0.14);
+  --rv-head-field-focus: var(--on-brand-hover-strong);
+  --rv-head-border: rgba(255, 255, 255, 0.35);
+  --rv-head-solid: var(--on-brand);
+  --rv-head-on-solid: var(--brand-primary);
+  --rv-head-focus: #ffffff;
+  --rv-head-error: #ffd6d6;
+  --rv-head-crumb: rgba(255, 255, 255, 0.7);
+  --rv-head-crumb-sep: rgba(255, 255, 255, 0.5);
+  --rv-accent: #ffd34d;
+  --rv-on-accent: #1f1a3a;
+  --cook-bg: var(--toast-bg);
+  --cook-muted: #bdb6e6;
+  --cook-wash: var(--on-brand-wash);
+  --cook-chip: rgba(255, 255, 255, 0.12);
+  --cook-track: var(--on-brand-hover-strong);
+  --ilist-cb-border: #c9ced4;
+  --text-struck: #a0a6ad;
+  --sb-text: #8a4500;
+  --sb-bg: #ffe8d6;
+  --ifull-progress: #7cc36b;
+  --pill-on-border: #cfcbe3;
+  --all-out-text: #1e7b34;
+  --all-out-bg: #e8f6ec;
+  --eaten-hover-bg: rgba(40, 167, 69, 0.1);
+
+  /* Shopping list and its popups (ShoppingList.css, IngredientBreakdownPopup.css, GenerateShoppingListModal.css) */
+  --surface-tint-pressed: #e3dff2;
+  --progress-track: #e6e3f0;
+  --stale-text: #7a4b00;
+  --aisle-done-bg: #f3faf4;
+  --aisle-done-hover-bg: #e8f5ea;
+  --aisle-done-count-bg: #d8f0dd;
+  --item-divider: #f2f3f5;
+  --error-bg-soft: #ffeeee;
+  --on-brand-press-strong: rgba(255, 255, 255, 0.4);
+  --surface-tint-chip: #f0eef5;
+  --warning-banner-bg: #fff3cd;
+  --warning-banner-text: #856404;
+  --surface-quiet: #f5f5f5;
+  --surface-quiet-hover: #eeeeee;
+  --error-banner-bg: #f8d7da;
+  --error-banner-border: #f5c6cb;
+  --error-banner-text: #721c24;
+  --brand-hover-deep: #3a2f70;
+
+  /* Aisle color coding for shopping list (15 aisles) */
+  --aisle-produce: #4caf50;
+  --aisle-dairy: #2196f3;
+  --aisle-meat: #f44336;
+  --aisle-seafood: #00bcd4;
+  --aisle-bakery: #ff9800;
+  --aisle-grains: #795548;
+  --aisle-canned: #9e9e9e;
+  --aisle-condiments: #ffc107;
+  --aisle-snacks: #e91e63;
+  --aisle-beverages: #3f51b5;
+  --aisle-frozen: #03a9f4;
+  --aisle-spices: #8bc34a;
+  --aisle-oils: #ffeb3b;
+  --aisle-baking: #9c27b0;
+  --aisle-misc: #607d8b;
+
+  /* Shared dialogs and controls (DateRangePicker, PullToDismissUI, LockEmojiAnimation) */
+  --picker-pill-bg: #ffffff;
+  --picker-arrow-wash-strong: rgba(255, 255, 255, 0.26);
+  --dismiss-target-border: rgba(255, 255, 255, 0.5);
+  --dismiss-x-color: rgba(255, 255, 255, 0.8);
+  --dismiss-active-bg: #e53935;
+  --dismiss-circle-shadow: rgba(74, 63, 128, 0.4);
+  --lock-flash-glow: rgba(255, 255, 255, 0.9);
+
+  /* Admin forms */
+  --success-banner-bg: #d4edda;
+  --success-banner-text: #155724;
+  --info-surface: #e8f4f8;
+  --info-surface-soft: #e8f7fa;
+  --info-border: #bee5eb;
+  --info-text: #0c5460;
+  --info-accent: #17a2b8;
+
+  /* Landing animation (its container maps these onto the tokens it used to hard-code) */
+  --landing-brand: var(--brand-primary);
+  --landing-brand-dark: var(--brand-primary-dark);
+  --landing-dark-bg-start: #2c3e50;
+  --landing-dark-bg-end: #34495e;
+  --landing-dark-text: #ecf0f1;
+  --landing-dark-text-secondary: #bdc3c7;
+  --landing-light-bg-start: #f8f9fa;
+  --landing-light-bg-end: #e8eaf6;
+  --landing-light-text: var(--text-primary);
+  --landing-success: #27ae60;
+  --landing-glass: rgba(255, 255, 255, 0.15);
+  --landing-glass-border: rgba(255, 255, 255, 0.2);
+  --landing-glass-hover: rgba(255, 255, 255, 0.25);
+  --landing-glass-border-hover: rgba(255, 255, 255, 0.4);
+  --landing-brand-tint: var(--brand-tint-soft);
+  --landing-brand-border: rgba(74, 63, 128, 0.2);
+  --landing-brand-tint-hover: rgba(74, 63, 128, 0.15);
+  --landing-brand-border-hover: rgba(74, 63, 128, 0.3);
+  --landing-brand-tint-faint: var(--brand-tint-faint);
+  --landing-brand-glow: var(--brand-focus-glow);
+  --google-btn-active-bg: #f1f3f4;
+}

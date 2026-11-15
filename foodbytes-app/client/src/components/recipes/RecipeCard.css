@@ -6,7 +6,7 @@
   flex-direction: column;
   gap: 10px;
   padding: 14px;
-  background: #fff;
+  background: var(--bg-primary);
   border-radius: 14px;
   box-shadow: var(--shadow-sm);
   border: 1px solid var(--border-color);
@@ -14,7 +14,7 @@
 }
 
 .recipe-card.is-in-plan {
-  border-color: #cfc9ea;
+  border-color: var(--plan-border);
   box-shadow: inset 4px 0 0 var(--brand-primary);
 }
 
@@ -66,7 +66,7 @@
 }
 
 .recipe-card-name:focus-visible {
-  outline: 2px solid var(--brand-primary);
+  outline: 2px solid var(--focus-ring-color);
   outline-offset: 2px;
   border-radius: 4px;
 }
@@ -83,18 +83,18 @@
 }
 
 .recipe-card-top .cheat-badge {
-  background: rgba(239, 68, 68, 0.9);
-  color: #fff;
+  background: var(--cheat-flag-bg);
+  color: var(--on-cheat-flag);
 }
 
 /* Admin-only macro audit badge */
 .recipe-card-top .audited-badge {
-  background: #e3f4e7;
-  color: #1b6b2e;
+  background: var(--audited-bg);
+  color: var(--audited-text);
 }
 
 .recipe-card .in-plan-badge {
-  background: #eeebf7;
+  background: var(--surface-tint-brand);
   color: var(--brand-primary);
 }
 
@@ -131,7 +131,7 @@
 }
 
 .recipe-card-menu-trigger:focus-visible {
-  outline: 2px solid var(--brand-primary);
+  outline: 2px solid var(--focus-ring-color);
   outline-offset: 2px;
 }
 
@@ -144,7 +144,7 @@
   margin: 0;
   padding: 4px;
   list-style: none;
-  background: #fff;
+  background: var(--surface-popover);
   border: 1px solid var(--border-color);
   border-radius: 10px;
   box-shadow: var(--shadow-lg);
@@ -169,13 +169,13 @@
 
 @media (hover: hover) {
   .recipe-card-menu-list button:hover {
-    background: #eeebf7;
+    background: var(--surface-tint-brand);
   }
 }
 
 .recipe-card-menu-list button:active,
 .recipe-card-menu-list button:focus-visible {
-  background: #eeebf7;
+  background: var(--surface-tint-brand);
 }
 
 /* ========== VARIANT SEGMENT ========== */
@@ -212,7 +212,7 @@
 }
 
 .variant-seg button.on {
-  background: #fff;
+  background: var(--bg-primary);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
   color: var(--brand-primary);
 }
@@ -222,7 +222,7 @@
 }
 
 .variant-seg button:focus-visible {
-  outline: 2px solid var(--brand-primary);
+  outline: 2px solid var(--focus-ring-color);
   outline-offset: 1px;
 }
 
@@ -253,7 +253,7 @@
 .servings-chip-trigger {
   min-height: 44px;
   padding: 4px 10px;
-  background: #fff;
+  background: var(--bg-primary);
   border: 1px solid var(--border-color);
   border-radius: 999px;
   font: inherit;
@@ -277,7 +277,7 @@
 }
 
 .servings-chip-trigger:focus-visible {
-  outline: 2px solid var(--brand-primary);
+  outline: 2px solid var(--focus-ring-color);
   outline-offset: 2px;
 }
 
@@ -290,7 +290,7 @@
   align-items: center;
   gap: 6px;
   padding: 6px;
-  background: #fff;
+  background: var(--surface-popover);
   border: 1px solid var(--border-color);
   border-radius: 12px;
   box-shadow: var(--shadow-lg);
@@ -316,17 +316,17 @@
 @media (hover: hover) {
   .servings-chip-step:hover:not(:disabled) {
     background: var(--brand-primary);
-    color: #fff;
+    color: var(--on-brand);
   }
 }
 
 .servings-chip-step:active:not(:disabled) {
   background: var(--brand-primary);
-  color: #fff;
+  color: var(--on-brand);
 }
 
 .servings-chip-step:focus-visible {
-  outline: 2px solid var(--brand-primary);
+  outline: 2px solid var(--focus-ring-color);
   outline-offset: 2px;
 }
 
@@ -355,7 +355,7 @@
 }
 
 .servings-chip-input:focus-visible {
-  outline: 2px solid var(--brand-primary);
+  outline: 2px solid var(--focus-ring-color);
   outline-offset: 1px;
   border-radius: 4px;
 }
@@ -364,7 +364,7 @@
 .unhide-btn {
   min-height: 44px;
   background: var(--brand-primary);
-  color: #fff;
+  color: var(--on-brand);
   border: none;
   border-radius: 8px;
   padding: 8px 12px;
@@ -386,7 +386,7 @@
 }
 
 .unhide-btn:focus-visible {
-  outline: 2px solid var(--brand-primary);
+  outline: 2px solid var(--focus-ring-color);
   outline-offset: 2px;
 }
 

@@ -1,0 +1,104 @@
+/* Cyberpunk: shared dialogs and controls. Confirm dialog as a SYS://CONFIRM terminal window
+   and the week picker as a cyan HUD frame. Reference: mockup/app-mockup.html (.dlg, .bar-t, .wk).
+   Complements shell.css, which already restyles .header-week; this file loads after it. */
+
+/* ---------- Confirm dialog (mockup .dlg + .bar-t) ---------- */
+:root[data-theme="cyberpunk"] .confirm-dialog {
+  color: var(--ink);
+  background: var(--panel);
+  border: 2px solid var(--cyan);
+  border-radius: 0;
+  box-shadow: var(--box-cyan);
+  overflow: hidden;
+}
+
+:root[data-theme="cyberpunk"] .confirm-dialog::before {
+  content: 'SYS://CONFIRM';
+  display: flex;
+  align-items: center;
+  height: 40px;
+  margin: calc(-1 * var(--spacing-xl)) calc(-1 * var(--spacing-xl)) var(--spacing-lg);
+  padding: 0 14px;
+}
+
+:root[data-theme="cyberpunk"] .confirm-dialog-title {
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: 22px;
+  color: var(--pink);
+  text-shadow: var(--glow-pink);
+}
+
+:root[data-theme="cyberpunk"] .confirm-dialog-message {
+  font-family: var(--f-body);
+  font-size: 14px;
+  color: var(--muted);
+}
+
+:root[data-theme="cyberpunk"] .confirm-dialog-actions button {
+  min-height: 44px;
+  border-radius: 0;
+  font-family: var(--f-label);
+  font-size: 12px;
+  font-weight: 400;
+  text-transform: uppercase;
+}
+
+:root[data-theme="cyberpunk"] .confirm-dialog-actions .btn-secondary {
+  color: var(--cyan);
+  background: transparent;
+  border: 1px solid var(--cyan);
+}
+
+/* The confirm action is the destructive one (Delete, Discard, Uncheck All) */
+:root[data-theme="cyberpunk"] .confirm-dialog-actions .btn-primary {
+  color: var(--void);
+  background: var(--red);
+  border: 1px solid var(--red);
+  box-shadow: 4px 4px 0 var(--cyan);
+}
+
+:root[data-theme="cyberpunk"] .confirm-dialog-actions button:active:not(:disabled) {
+  background: var(--raised);
+  color: var(--cyan);
+}
+
+@media (hover: hover) {
+  :root[data-theme="cyberpunk"] .confirm-dialog-actions .btn-secondary:hover:not(:disabled) {
+    background: var(--raised);
+  }
+
+  :root[data-theme="cyberpunk"] .confirm-dialog-actions .btn-primary:hover:not(:disabled) {
+    background: var(--pink);
+    border-color: var(--pink);
+  }
+}
+
+:root[data-theme="cyberpunk"] .confirm-dialog-actions button:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: 2px;
+}
+
+@media (max-width: 768px) {
+  :root[data-theme="cyberpunk"] .confirm-dialog::before {
+    margin: calc(-1 * var(--spacing-lg)) calc(-1 * var(--spacing-lg)) var(--spacing-lg);
+  }
+}
+
+/* ---------- Week picker: cyan HUD frame, yellow VT323 dates ---------- */
+:root[data-theme="cyberpunk"] .header-week .date-range-picker {
+  border-color: var(--cyan);
+  box-shadow: var(--box-cyan);
+}
+
+:root[data-theme="cyberpunk"] .header-week .date-range-text {
+  font-family: var(--f-num);
+  color: var(--yellow);
+}
+
+/* Native calendar popover is drawn by the browser: ask for its dark scheme */
+:root[data-theme="cyberpunk"] .date-input {
+  color-scheme: dark;
+  color: var(--ink);
+  background: var(--raised);
+}

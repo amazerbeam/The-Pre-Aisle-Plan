@@ -1,0 +1,28 @@
+/* Layout of the Cyberpunk ticker strip. The component only renders under themes with a ticker,
+   so the colour and font tokens it reads are Cyberpunk tokens (cyberpunk.css). */
+.ticker {
+  position: relative;
+  z-index: 39;
+  height: 26px;
+  overflow: hidden;
+  background: var(--yellow);
+  border-bottom: 2px solid var(--black);
+  color: var(--void);
+  font-family: var(--f-num);
+  font-size: 19px;
+  line-height: 26px;
+  white-space: nowrap;
+}
+
+.ticker-track {
+  display: inline-flex;
+  animation: ticker-scroll 40s linear infinite;
+}
+
+.ticker-track span {
+  padding-right: 48px;
+}
+
+@keyframes ticker-scroll {
+  to { transform: translateX(-50%); }
+}

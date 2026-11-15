@@ -28,32 +28,32 @@
   justify-content: center;
   box-sizing: border-box;
   height: 40px;
-  background: #fff;
-  border: 1.5px solid var(--border-color, #dee2e6);
+  background: var(--bg-primary);
+  border: 1.5px solid var(--border-color);
   border-radius: 10px;
   font-size: 0.8rem;
   font-weight: 600;
-  color: var(--text-secondary, #6c757d);
+  color: var(--text-secondary);
 }
 
 @media (hover: hover) {
   .day-btn.unselected:hover .day-btn-face,
   .day-btn.already-selected:hover .day-btn-face {
-    border-color: var(--brand-primary-light, #6b5fa0);
-    color: var(--brand-primary, #4a3f80);
+    border-color: var(--brand-primary-light);
+    color: var(--brand-primary);
   }
 }
 
 .day-btn.unselected:active .day-btn-face,
 .day-btn.already-selected:active .day-btn-face {
-  border-color: var(--brand-primary-light, #6b5fa0);
-  color: var(--brand-primary, #4a3f80);
+  border-color: var(--brand-primary-light);
+  color: var(--brand-primary);
 }
 
 /* Another recipe holds this slot: muted, with a dot top-right */
 .day-btn.already-selected .day-btn-face {
-  background: var(--bg-secondary, #f8f9fa);
-  color: #9aa1a8;
+  background: var(--bg-secondary);
+  color: var(--text-faint);
 }
 
 .day-btn.already-selected .day-btn-face::after {
@@ -64,14 +64,14 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #b8b2d6;
+  background: var(--dot-muted);
 }
 
 /* THIS recipe is assigned */
 .day-btn.selected .day-btn-face {
-  background: var(--brand-primary, #4a3f80);
-  border-color: var(--brand-primary, #4a3f80);
-  color: #fff;
+  background: var(--brand-primary);
+  border-color: var(--brand-primary);
+  color: var(--on-brand);
 }
 
 .day-btn.selected .day-btn-face::before {
@@ -81,17 +81,17 @@
 
 @media (hover: hover) {
   .day-btn.selected:hover .day-btn-face {
-    background: var(--brand-primary-dark, #3a3266);
+    background: var(--brand-primary-dark);
   }
 }
 
 .day-btn.selected:active .day-btn-face {
-  background: var(--brand-primary-dark, #3a3266);
+  background: var(--brand-primary-dark);
 }
 
 .day-btn:focus-visible,
 .pick-btn:focus-visible {
-  outline: 2px solid var(--brand-primary, #4a3f80);
+  outline: 2px solid var(--focus-ring-color);
   outline-offset: 2px;
   border-radius: 10px;
 }
@@ -102,8 +102,8 @@
   min-height: 44px;
   border: none;
   border-radius: 10px;
-  background: var(--brand-primary, #4a3f80);
-  color: #fff;
+  background: var(--brand-primary);
+  color: var(--on-brand);
   font: inherit;
   font-weight: 700;
   font-size: 0.875rem;
@@ -113,26 +113,26 @@
 }
 
 .pick-btn.selected {
-  background: var(--success, #28a745);
+  background: var(--success);
 }
 
 @media (hover: hover) {
   .pick-btn:hover {
-    background: var(--brand-primary-dark, #3a3266);
+    background: var(--brand-primary-dark);
   }
 
   .pick-btn.selected:hover {
-    background: var(--success, #28a745);
+    background: var(--success);
     filter: brightness(0.92);
   }
 }
 
 .pick-btn:active {
-  background: var(--brand-primary-dark, #3a3266);
+  background: var(--brand-primary-dark);
 }
 
 .pick-btn.selected:active {
-  background: var(--success, #28a745);
+  background: var(--success);
   filter: brightness(0.92);
 }
 

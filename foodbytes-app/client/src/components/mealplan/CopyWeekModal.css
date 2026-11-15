@@ -21,7 +21,7 @@
 }
 
 .copy-modal {
-  background: #fff;
+  background: var(--surface-popover);
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
   min-width: 0;
@@ -40,8 +40,8 @@
 }
 
 .copy-modal-header {
-  background: #4a3f80;
-  color: #fff;
+  background: var(--brand-primary);
+  color: var(--on-brand);
   padding: 16px;
   border-radius: 12px 12px 0 0;
   display: flex;
@@ -70,7 +70,7 @@
 .copy-modal-close {
   background: transparent;
   border: none;
-  color: #fff;
+  color: var(--on-brand);
   font-size: 2rem;
   line-height: 1;
   cursor: pointer;
@@ -89,16 +89,16 @@
 
 @media (hover: hover) {
   .copy-modal-close:hover {
-    background-color: rgba(255, 255, 255, 0.2);
+    background-color: var(--on-brand-hover-strong);
   }
 }
 
 .copy-modal-close:active {
-  background-color: rgba(255, 255, 255, 0.3);
+  background-color: var(--on-brand-active-strong);
 }
 
 .copy-modal-close:focus-visible {
-  outline: 2px solid #fff;
+  outline: 2px solid var(--on-brand);
   outline-offset: 2px;
 }
 
@@ -118,7 +118,7 @@
 .copy-date-label {
   display: block;
   font-weight: 500;
-  color: #333;
+  color: var(--text-strong);
   margin-bottom: 8px;
   font-size: 0.95rem;
 }
@@ -126,7 +126,7 @@
 .copy-date-input {
   width: 100%;
   padding: 10px 12px;
-  border: 2px solid #e0e0e0;
+  border: 2px solid var(--border-input);
   border-radius: 8px;
   font-size: 1rem;
   box-sizing: border-box;
@@ -135,35 +135,35 @@
 
 .copy-date-input:focus {
   outline: none;
-  border-color: #4a3f80;
-  box-shadow: 0 0 0 3px rgba(74, 63, 128, 0.2);
+  border-color: var(--brand-primary);
+  box-shadow: 0 0 0 3px var(--brand-focus-glow);
 }
 
 .copy-validation-error {
-  color: #e53e3e;
+  color: var(--error-copy);
   font-size: 0.85rem;
   margin: 8px 0 0;
 }
 
 .copy-target-range {
-  color: #4a3f80;
+  color: var(--brand-primary);
   font-size: 0.85rem;
   font-weight: 500;
   margin: 8px 0 0;
 }
 
 .copy-overwrite-warning {
-  color: #e67e22;
+  color: var(--warn-accent);
   font-size: 0.85rem;
   margin: 12px 0 0;
   padding: 8px 12px;
-  background: #fef3e2;
+  background: var(--warn-bg);
   border-radius: 6px;
-  border-left: 3px solid #e67e22;
+  border-left: 3px solid var(--warn-accent);
 }
 
 .copy-error {
-  color: #e53e3e;
+  color: var(--error-copy);
   font-size: 0.85rem;
   margin: 8px 0 0;
 }
@@ -177,10 +177,10 @@
 .copy-cancel-button {
   flex: 1;
   padding: 10px;
-  border: 2px solid #e0e0e0;
+  border: 2px solid var(--border-input);
   border-radius: 8px;
-  background: #fff;
-  color: #666;
+  background: var(--bg-primary);
+  color: var(--text-mid);
   font-size: 0.95rem;
   font-weight: 500;
   cursor: pointer;
@@ -200,8 +200,8 @@
   padding: 10px;
   border: none;
   border-radius: 8px;
-  background: #4a3f80;
-  color: #fff;
+  background: var(--brand-primary);
+  color: var(--on-brand);
   font-size: 0.95rem;
   font-weight: 500;
   cursor: pointer;
@@ -213,22 +213,22 @@
 
 @media (hover: hover) {
   .copy-cancel-button:hover:not(:disabled) {
-    border-color: #999;
-    color: #333;
+    border-color: var(--border-strong);
+    color: var(--text-strong);
   }
 
   .copy-confirm-button:hover:not(:disabled) {
-    background: #3d3469;
+    background: var(--brand-hover);
   }
 }
 
 .copy-cancel-button:active:not(:disabled) {
-  border-color: #999;
-  color: #333;
+  border-color: var(--border-strong);
+  color: var(--text-strong);
 }
 
 .copy-confirm-button:active:not(:disabled) {
-  background: #3d3469;
+  background: var(--brand-hover);
 }
 
 .copy-confirm-button:disabled {
@@ -239,10 +239,10 @@
 .copy-modal-hint {
   text-align: center;
   font-size: 0.75rem;
-  color: #999;
+  color: var(--text-hint);
   padding: 8px;
   margin: 0;
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--divider-soft);
   flex-shrink: 0;
 }
 

@@ -1,7 +1,9 @@
-# Plan: Cyberpunk pixel restaurant reskin (FOODBYTES // Night Kitchen)
+# Plan: Theme system + user menu v2 + Cyberpunk theme (FOODBYTES // Night Kitchen)
 
 Plan folder: `.claude/contract/2026-11-14-cyberpunk-reskin/`
 Execution status: see `tasks.md` in this folder.
+
+> **Revision 2 (2026-11-15).** Revision 1 replaced the app's look with the cyberpunk reskin. A first `/fb-apply` ran Phases 1–3 of revision 1, then the developer asked for a rollback (all reskin files reverted; backup of that work in the session scratchpad, not in the repo). Revision 2 turns the reskin into **one selectable theme beside the current look**, adds a **theme picker** in a redesigned **user menu**, and makes the mockups live in the repo. Everything below supersedes revision 1.
 
 ---
 
@@ -12,142 +14,173 @@ Developer brief (2026-11-14, verbatim):
 
 > Cyberpunk pixel restaurant makeover of the whole client UI. Approved mockup: C:\Users\jossd\Downloads\cyberpunk-makeover-mockup.html (merged, includes pixel icon set + teal recipe-card panels). Mockup plan: .claude/contract/2026-11-14-cyberpunk-makeover/mockup-plan.md. Functions/UX unchanged; restyle only. Frontend only, no backend/DB. MINOR bump.
 
-Earlier in the same session the developer said: "the functions can all behave the same, the UX is fine", "You can change everything, logo colors the works", and "make sure everything works 100%, like no white text on white background, or popups don't work in mobile". They approved the mockup ("I love it"), asked for pixel nav icons, and asked for the teal recipe-card panels to be merged in. No Jira key, so there is no ticket to move.
+Developer, 2026-11-15 (verbatim):
 
-The design source of truth is the mockup file and the mockup plan. The token values, fonts, safety checklist and screen metaphors in `mockup-plan.md` §1–§3 apply here unchanged.
+> I want to update the plan and the mock up, I want to mock up a new user menu and this menu to contain a temeh option, for now we only concern with default and cyberpunk, but the claude.md needs to know we have many themes now
+
+Developer answers on the user-menu mockup, 2026-11-15: theme remembered **per device**; picker style **A (preview tiles)**; **yes** to a brand per theme (Default = *My Pantry Plan* + plate logo, Cyberpunk = *FOODBYTES · Night Kitchen* + pixel bowl); **keep icons on Default** (favicon, home-screen icons, manifest unchanged); "Looks good fold into plan". Also: the full mockup moves into the project and CLAUDE.md must require it to stay in step with the live app.
+
+Earlier developer constraints still apply: "the functions can all behave the same, the UX is fine"; "make sure everything works 100%, like no white text on white background, or popups don't work in mobile". No Jira key.
+
+### Design sources (in the repo)
+- `foodbytes-app/mockup/app-mockup.html` — full interactive prototype, Cyberpunk theme, including user menu v2. Reference for every Cyberpunk selector, the `ICO` pixel-icon grids + `pxi()`, the `LOGO` rects, ticker copy.
+- `foodbytes-app/mockup/user-menu-themes.html` — the user menu in **both** themes, web and mobile; picker style A is the chosen one. Reference for menu structure, the theme tiles and their preview art, and the semantic-token split.
+- `.claude/contract/2026-11-14-cyberpunk-makeover/mockup-plan.md` §1–§3 — Cyberpunk palette, fonts and safety checklist (contrast, mobile overlays, touch targets, reduced motion).
 
 ### Restated goal
-Reskin the whole FoodBytes client as the site of a pixel-art night-kitchen restaurant in a cyberpunk city, matching the approved mockup. That covers a dark city backdrop with rain and scanlines, a neon FOODBYTES sign, a yellow ticker, a teal menu-board look for recipe cards, an LED order board for the meal plan, a terminal look for the recipe view and dialogs, a paper receipt for shopping, and pixel icons. No behaviour, flow, route, API call or data shape changes. Every text and background pair must pass WCAG AA, every overlay must work on mobile, and a Low FX switch turns the effects off.
+Introduce a theme system to the client. **Default** is the app exactly as it looks today. **Cyberpunk** is the night-kitchen look from the approved mockup (city backdrop with rain and scanlines, neon FOODBYTES sign, ticker, teal menu-board recipe cards, LED order board, terminal recipe view and dialogs, paper-receipt shopping list, pixel icons, Low FX switch). The user picks a theme in a redesigned user menu; the choice is remembered on the device. No behaviour, route, API call or data shape changes outside the user menu. Every text/background pair passes WCAG AA in every theme, every overlay works on mobile, and adding a third theme later is one token file, one optional override folder and one registry entry.
 
 ### In scope
-- One global token sheet. It sets the mockup palette, the four fonts, glow, the z-index scale and the focus ring, and maps the existing legacy tokens (`--brand-primary`, `--bg-primary`, `--text-primary` and so on) onto the new palette.
-- Moving every hard-coded colour in the in-scope component CSS files onto tokens, with each screen restyled to its mockup metaphor: recipes, meal plan (desktop and mobile), recipe view with the full-screen ingredients view and cook mode, shopping, every dialog, sheet and popup, toasts, header, footer nav, sign-in, the landing animation, and admin forms (tokens only).
-- The app shell backdrop: a pixel skyline, rain and scanlines, all non-interactive and all off under Low FX and under reduced motion.
-- The brand: a pixel FOODBYTES logo, the neon wordmark with the "NIGHT KITCHEN · SECTOR 9" subtitle, favicon, PWA icons, manifest name and theme colour, `<meta name="theme-color">`, and the page title.
-- A pixel icon component, used for the Recipes, Meal Plan and Shopping nav icons and for the extras `CartIcon`.
-- A ticker strip under the header, decorative and hidden from screen readers.
-- A Low FX switch in the account menu, remembered per device, applied as `body.lowfx`.
-- A contrast regression check, `npm run check:contrast`, covering the token pairs.
-- A MINOR version bump and a CHANGELOG line.
+- **Theme architecture.** `src/styles/themes/default.css` holds today's colour tokens on `:root` (values unchanged). `src/styles/themes/cyberpunk.css` reassigns those tokens under `:root[data-theme="cyberpunk"]` and adds the cyberpunk palette, fonts and glow. Cyberpunk-only component treatments live in `src/styles/themes/cyberpunk/<area>.css`, every selector prefixed `:root[data-theme="cyberpunk"]`.
+- **Default-preserving literal sweep.** Every hard-coded colour in in-scope component CSS becomes a token whose Default value is that exact literal, so Default renders identically while Cyberpunk can remap it.
+- **Theme state.** A `THEMES` registry, `ThemeContext` (`themeId`, `theme`, `setTheme`, `lowFx`, `toggleLowFx`), `applyTheme` (sets `data-theme` on `<html>`, updates `<meta name="theme-color">`, loads the theme's web fonts on demand, writes localStorage), and an inline boot script in `index.html` so the right theme paints first.
+- **User menu v2** (from `user-menu-themes.html`, style A): grouped *Planning* (default servings, meal times) and *Appearance* (theme tiles; Low FX switch only for themes with effects), then Sign out and the version line. Desktop: anchored dropdown. Mobile (<768px): bottom sheet over a scrim, portalled to `body`, close button, Esc, body scroll lock, capped at `calc(100dvh - 24px)` with internal scroll.
+- **Brand per theme.** Default keeps the plate-P `BrandMark` and "My Pantry Plan"; Cyberpunk shows the pixel bowl and the neon FOODBYTES sign with "NIGHT KITCHEN · SECTOR 9". The header aria-label, the login modal heading and the tab title use the active theme's brand name.
+- **Cyberpunk shell:** skyline, scanlines, rain, ticker, neon sign, console footer nav, terminal toasts, `DOOR://SIGN IN` login, pixel nav icons and pixel `CartIcon` — all only under Cyberpunk.
+- **Cyberpunk screen treatments** per the mockup: recipes (teal cards, numbering, in-plan pink panels), meal plan (desktop + mobile), recipe view + full-screen ingredients + cook mode, shopping receipt, shared dialogs; landing and admin get tokens only.
+- **Low FX** switch (per device), applied as `body.lowfx`, effective only under themes with effects.
+- **`npm run check:themes`**: contrast pairs per theme, plus registry ↔ CSS file ↔ `index.html` boot list consistency.
+- **Docs and mockups:** CLAUDE.md *Themes* and *Mockups* sections finalised to match what shipped; mockups re-checked against the implementation.
+- MINOR version bump and CHANGELOG line.
 
 ### Explicitly out of scope
-- Pip's room art and every file under `components/pet/` (decision 4: shell only). The room keeps its current look through token containment.
-- Any behaviour, copy-meaning or flow change. Labels that do a job stay as they are; flavour copy is limited to subtitles, the ticker and the sign.
-- Backend, database and migrations.
-- Installing `vite-plugin-pwa` or a service worker. Neither is installed today; the skill's PWA bootstrap is separate work.
-- Self-hosting fonts (see Assumptions).
-- The residual items left open by the meal-plan redesign contract, including the ⓘ-inside-checkbox issue in `ShoppingListItem`.
-- Historical files: `Legacy/`, `mockups/`, `logo-options.html`, `mockup-copy-week.html`.
-
-### Pattern Reference
-- Visual: `C:\Users\jossd\Downloads\cyberpunk-makeover-mockup.html`. Its `<style>` block is the reference for every selector's look; its `ICO` grids and `pxi()` helper are the reference for the pixel icons; its `LOGO` `px()` rects are the reference for the logo.
-- Design system and safety rules: `.claude/contract/2026-11-14-cyberpunk-makeover/mockup-plan.md` §2–§3.
-- Code conventions: `.claude/skills/react-frontend/SKILL.md` and `references/engineering-standards.md`.
-- Existing patterns to follow: `components/common/BrandMark.jsx` (logo component shape), `components/common/ExtrasIcons.jsx` (icon exports), `scripts/check-version.mjs` (node check script shape), `constants/` (storage keys).
+- Favicon, PWA icons, `manifest.webmanifest`, `apple-mobile-web-app-*` meta and the `index.html` `<title>` default: they stay on the Default brand (developer decision). Only `theme-color` follows the theme at runtime.
+- Persisting the theme on the account (decided: per device). No backend, database or migration.
+- Pip's room art and every file under `components/pet/` except the containment block. The room keeps its palette in every theme.
+- The landing animation's copy and brand (first-run guests always see Default).
+- Any behaviour or flow change outside the user menu. Labels that do a job stay as they are.
+- Unifying the app's z-index values (revision 1 had a z-scale; dropped to avoid stacking regressions — themes don't change stacking).
+- Drawing Default screens in `app-mockup.html` (known gap, documented in `foodbytes-app/mockup/README.md`).
+- `vite-plugin-pwa`, service worker, self-hosted fonts.
+- Historical files: `Legacy/`, root `mockups/`, `logo-options.html`, `mockup-copy-week.html`.
 
 ### Constraints flagged on the brief
-- The UX and every function stay the same; this is a restyle only.
-- No white-on-white: text on a neon fill is always `--void`, glow never counts toward contrast, the receipt is the only light surface and sets its own ink, and placeholder, disabled and autofill states get explicit colours.
-- Popups must work on mobile: overlays render at the app root (portals), mobile dialogs are bottom sheets capped at `calc(100dvh - 24px)` with internal scroll, and there is one z-index scale (popover 40, nav 50, sheet 80, toast 90).
-- Touch targets stay at least 44×44px, the `:focus-visible` ring is visible on every surface, and `prefers-reduced-motion` is honoured.
+- **Default must look exactly as it does today.** Every swept literal keeps its exact value under Default; no Default token value changes.
+- No white-on-white in any theme: text on a neon fill is `--void`; glow never counts toward contrast; the receipt is the only light Cyberpunk surface and sets its own ink; placeholder, disabled and autofill states get explicit colours.
+- Popups work on mobile: the user menu is a portalled bottom sheet on mobile; Cyberpunk overrides never shrink tap targets or move overlays.
+- Touch targets ≥44×44px, a visible `:focus-visible` ring in every theme, `prefers-reduced-motion` honoured.
 - Frontend only. MINOR bump.
 
 ### Assumptions made
-- **Name: FOODBYTES // Night Kitchen** (decision 1). It's what the approved mockup shows. The manifest uses `name: "FOODBYTES"` and `short_name: "FOODBYTES"`, which follows the skill's manifest rule.
-- **Plain labels with flavour headings** (decision 2). Matches the mockup. Nav and button labels are unchanged; only subtitles and decoration are in-world.
-- **Pixel chrome with a smooth body font** (decision 3). Matches the mockup: Pixelify Sans, Silkscreen and VT323 for chrome, Space Grotesk for body.
-- **Pip: shell only** (decision 4). The Pip nav item keeps its live `PipHerb` mini rather than the mockup's sprout, because that item is a live mood indicator (MPP-31/32).
-- **Fonts load from Google Fonts**, replacing today's Inter `<link>`. The app already loads Inter this way and has no service worker, so self-hosting brings no offline gain yet. Self-hosting belongs with the PWA bootstrap.
-- **Token remap rather than a rename sweep.** About 150 existing `var(--brand-primary)` and 90 `var(--border-color)` uses flip automatically when the legacy names are pointed at the new palette. Only literal colours need editing.
-- **Pip containment:** `.pet-view` re-declares the legacy tokens at their current light values, so the room is visually unchanged. Room overlays portalled to `body` are covered by the same block on their own root class (see Risks).
-- **Recipe card numbering uses a CSS counter**, so `RecipeCard.jsx` needs no prop or markup change for "01, 02…".
-- **The skyline is a CSS `background-image` data-URI SVG** on `.app::before`. The rain is one decorative `<div className="city-rain" aria-hidden="true">` rendered in `App.jsx`.
-- **The Low FX switch lives in the Header account menu**, matching the mockup, with its state in a `useLowFx` hook (localStorage key `fb.display.lowFx` in `constants/display.js`). It's a per-device preference with no other consumer, so it doesn't need a Context.
-- **PNG icons are rendered from the new SVG with headless Chrome**, the method already used to screenshot the mockup, so no image dependency is needed.
-- **The contrast check covers token pairs, not live DOM.** There's no browser test runner. Per-screen DOM contrast is a manual check, using the mockup's audit approach.
+- **Default is the fallback.** No stored value, an unknown stored id or blocked storage all resolve to `default`.
+- **Theme id lives in `localStorage` key `fb.display.theme`**; Low FX in `fb.display.lowFx`. Both are per-device display preferences.
+- **ThemeContext, not a hook.** The theme is read by App (rain, ticker), Header (brand), AppNavItems and CartIcon (icon set), LoginModal (copy), UserMenu and `useDocumentTitle` — that is cross-cutting state, which the conventions put in a Context.
+- **Cyberpunk fonts load on demand.** Default keeps today's Inter `<link>`. `applyTheme` injects the theme's Google Fonts stylesheet once, when that theme is first applied, so Default users don't download ~120 KB of pixel fonts.
+- **Theme-switch is instant, no reload.** Swapping the attribute and the context value restyles everything.
+- **Override specificity.** Cyberpunk overrides use the `:root[data-theme="cyberpunk"]` prefix (0,2,0 before the component selector) and the override bundle is imported **after** `App` in `main.jsx`, so they win against component rules on both specificity and order.
+- **Tile previews are artwork.** Their fixed colours live in `src/styles/themes/previews.css` (one block per theme), which is inside the literal-colour exemption.
+- **The skyline is a data-URI SVG** on `.app::before` in `cyberpunk/shell.css`, colours URL-encoded as `%23rrggbb`.
+- **Recipe card numbering is a CSS counter** in `cyberpunk/recipes.css`; no JSX change.
+- **No browser test runner.** Visual checks (both themes, four widths, Low FX, reduced motion) are a manual checklist in the final phase.
 
 ### Cross-code alignment audit (FE ↔ BE ↔ DB)
-Skipped. No persistence, API or DTO is touched. The only stored state is a localStorage display preference.
+Skipped. No persistence, API or DTO is touched. The only stored state is two localStorage display preferences.
 
 ---
 
 ## Part 2 — Technical design
 
 ### Approach
-**Tokens first, then a sweep per area.** A new `src/styles/tokens.css`, imported before `global.css`, declares the mockup palette (`--void`, `--panel`, `--raised`, `--ink`, `--muted`, `--pink`, `--cyan`, `--yellow`, `--lime`, `--orange`, `--red`, `--line`, `--line-soft`, `--deep`, plus receipt paper and ink), the font stacks, the glow tokens, the z-index scale and the focus ring. It also redefines every legacy token in terms of those values, and retunes the FR-104 macro tokens so the pill text reads on a dark surface. Because most components already use `var(--brand-primary)` and the neutral tokens, that one file flips most of the app to the night palette. The remaining work is the roughly 1,000 literal `#hex`, `rgba()` and `white` values across about 50 component CSS files. Each in-scope file is swept to tokens and given its mockup treatment, one phase per screen area, so every phase ends with a coherent, buildable screen.
+**Semantic tokens, themes assign values.** Components already read `--brand-primary`, `--bg-primary`, `--text-primary` and friends (about 150 + 90 uses). Those names become the semantic layer. `themes/default.css` declares them on `:root` with today's values; `themes/cyberpunk.css` reassigns them under `:root[data-theme="cyberpunk"]`. The ~950 hard-coded colours across ~50 component files are moved onto tokens **without changing their Default value** — an existing token when the value and role already match, otherwise a new role-named token added to `default.css` with the exact literal, and given a Cyberpunk value in `cyberpunk.css`. After the sweep, Default looks identical and Cyberpunk inherits a coherent dark palette everywhere.
 
-**The shell holds the atmosphere; components stay functional.** The skyline (`.app::before`), scanlines (`.app::after`) and rain (`.city-rain`) all have `pointer-events: none`, sit behind content in the z-index scale, and are hidden under `body.lowfx` and `prefers-reduced-motion`. The neon sign, ticker and pixel icons are presentational components: `BrandMark` is rewritten as a pixel logo, `Ticker` is new and `aria-hidden`, and `PixelIcon` is new. The icon grids and colour maps live in `constants/pixelIcons.js`, so icons are data and the component is a small renderer. `AppNavItems` swaps its line icons for `PixelIcon` and `ExtrasIcons.CartIcon` delegates to it. No component gains state except the Header, which reads `useLowFx`.
+**Look that tokens can't express goes in an override folder.** Fonts per element, HUD corner brackets, glow, borders, the CSS counter, the receipt zigzag and similar are written once in `themes/cyberpunk/<area>.css`, scoped to `:root[data-theme="cyberpunk"]`. Component CSS stays theme-agnostic. A new theme repeats the pattern: a token file, an optional override folder, a registry entry, a preview block.
 
-**Roads not taken.** A full rename to new token names everywhere would touch every CSS file twice for no visual gain. CSS Modules or a CSS framework are against the skill, which says plain CSS only. A runtime theme Context isn't needed: there is one theme, and Low FX is a body class. Restyling Pip's room was declined by decision 4.
+**Theme-specific markup is driven by the registry.** Each `THEMES` entry carries `brand` (name, sign subtitle, login copy), `iconSet` (`'line'` | `'pixel'`), `effects` (rain, scanlines, glow → Low FX applies), `ticker`, `themeColor` and `fontsHref`. Components ask the context for the active entry and branch on these fields, never on a theme id string.
 
-**Pip containment.** `PetView.css` gains a `.pet-view { --brand-primary:#4a3f80; --bg-primary:#fff; … }` block restoring today's values, so the room's roughly 20 legacy-token uses render as they do now. The global `body` background change is masked by the room's own opaque background. If any room sheet is portalled to `body`, its root class joins the same selector list.
+**User menu v2 is extracted from Header.** `UserMenu` owns the dropdown/sheet, `ThemePicker` the radiogroup of tiles, `LowFxControl` the switch. Header shrinks to brand, nav, week pill and the avatar button.
+
+**Roads not taken.** One CSS file per theme per component (multiplies files with every theme). CSS-in-JS or a framework (skill: plain CSS only). Storing the theme on the user (developer chose per device). Swapping stylesheets at runtime (attribute scoping is simpler and instant). Revision 1's global replacement (developer wants Default kept).
 
 ### Skills to invoke during execution
-- `react-frontend`: owns every change under `client/src/`, including plain per-component CSS, ≥44px targets, `:focus-visible`, `@media (hover: hover)`, file order, the 400-line budget, constants in `src/constants/`, the hook-holds-logic rule, and the manifest rules.
-- Rules: no `.claude/rules/` file applies, because no recipe, ingredient, macro or migration data is touched. The UI must still render kcal as `calories / default_servings`, and no rendering logic changes.
+- `react-frontend`: owns every change under `client/src/` — plain per-component CSS, ≥44px targets, `:focus-visible`, `@media (hover: hover)`, file order, the 400-line budget, constants in `src/constants/`, cross-cutting state in a Context, portals for overlays, the manifest rules.
+- Rules: no `.claude/rules/` file applies (no recipe, ingredient, macro or migration data). kcal still renders as `calories / default_servings`; no rendering logic changes.
 
 ### Diagram
 ```mermaid
 flowchart TD
-  T[styles/tokens.css<br/>palette + fonts + z-scale + legacy remap] --> G[styles/global.css<br/>body, .app backdrop, scanlines, lowfx, reduced-motion]
-  T --> C[component CSS sweep<br/>literals → tokens, mockup metaphor per screen]
-  T -.contained by.-> P[.pet-view re-declares legacy light tokens]
-  H[useLowFx hook<br/>constants/display.js key] --> HD[Header account menu switch]
-  H --> B[body.lowfx class]
-  B --> G
-  I[constants/pixelIcons.js] --> PI[common/PixelIcon.jsx]
-  PI --> NAV[AppNavItems: recipes / mealplan / shopping]
-  PI --> EX[ExtrasIcons.CartIcon]
-  BM[common/BrandMark.jsx pixel logo] --> HD
-  BM --> PUB[public/favicon.svg, icons/*.svg → PNGs]
-  CC[scripts/check-contrast.mjs] -->|reads| T
+  REG[constants/themes.js<br/>THEMES registry] --> CTX[contexts/ThemeContext.jsx]
+  UT[utils/theme.js applyTheme] --> HTML[html data-theme + meta theme-color + fonts link + localStorage]
+  BOOT[index.html inline boot script] --> HTML
+  CTX --> UT
+  CTX --> UM[UserMenu → ThemePicker + LowFxControl]
+  CTX --> HB[HeaderBrand: BrandMark or PixelBrandMark]
+  CTX --> NAV[AppNavItems / CartIcon: line or pixel icons]
+  CTX --> APP[App: rain + Ticker when registry says]
+  CTX --> LM[LoginModal copy, useDocumentTitle]
+  D[themes/default.css :root tokens = today] --> CSS[component CSS reads tokens only]
+  C[themes/cyberpunk.css :root data-theme=cyberpunk] --> CSS
+  O[themes/cyberpunk/*.css overrides] -.after App import.-> CSS
+  P[.pet-view re-declares Default tokens] -.contains.-> CSS
+  CHK[scripts/check-themes.mjs] -->|reads| D & C & REG & BOOT
 ```
 
 ### Data shapes
 #### New files
-- `client/src/styles/tokens.css`: `:root` with these values.
-  - Palette: `--void:#05070b; --deep:#020305; --panel:#0b1119; --raised:#141d2b; --ink:#eaf6ff; --muted:#9db2c7; --pink:#ff2a6d; --cyan:#05d9e8; --yellow:#f9f002; --lime:#39ff88; --orange:#ff9f1c; --red:#ff4d5e; --line:#4a7d99; --line-soft:#22384a; --paper:#f4f1e8; --paper-ink:#16141c`.
-  - Recipe card panels: `--card-teal-top:#0a222a; --card-teal-bottom:#06171d; --card-plan-top:#22101a; --card-plan-bottom:#14080f`.
-  - Fonts: `--f-display:'Pixelify Sans',…; --f-label:'Silkscreen',…; --f-num:'VT323',…; --f-body:'Space Grotesk',…`.
-  - Glow: `--glow-pink`, `--glow-cyan` and `--glow-yellow` (text-shadow), plus `--box-pink` and `--box-cyan` (box-shadow), copied from the mockup's `:root`.
-  - Z-index: `--z-popover:40; --z-nav:50; --z-sheet:80; --z-toast:90`.
-  - Focus: `--focus-ring:2px solid var(--yellow)`.
-  - Legacy remap: `--brand-primary:var(--pink); --brand-primary-dark:#c41f55; --brand-primary-light:var(--cyan); --text-primary:var(--ink); --text-secondary:var(--muted); --bg-primary:var(--panel); --bg-secondary:var(--void); --border-color:var(--line-soft); --primary-color:var(--pink); --success:var(--lime); --warning:var(--yellow); --error:var(--red); --cheat-badge:var(--orange)`.
-  - Macro retune: base colours `--macro-under-target:var(--cyan)`, `--macro-near-target:var(--yellow)`, `--macro-on-target:var(--lime)` and `--macro-over-target:var(--red)`. `-tint` and `-pill-bg` become low-alpha versions of those colours, and every `-pill-text` becomes the base colour (it reads on `--raised`).
-  - `body.lowfx` overrides set every glow token to `none` and `--f-display` to `var(--f-body)`.
-- `client/src/constants/display.js`: `export const LOW_FX_STORAGE_KEY = 'fb.display.lowFx'` and `export const LOW_FX_BODY_CLASS = 'lowfx'`.
-- `client/src/utils/lowFx.js`: `readLowFx(): boolean` reads localStorage inside try/catch, defaulting to `false`. `applyLowFx(on: boolean): void` sets or removes `LOW_FX_BODY_CLASS` on `document.body` and writes storage inside try/catch. `main.jsx` calls `applyLowFx(readLowFx())` once before render, so the class is present on every screen from the first paint.
-- `client/src/hooks/useLowFx.js`: `useLowFx() → { lowFx: boolean, toggleLowFx: () => void }`. Its initial state is `document.body.classList.contains(LOW_FX_BODY_CLASS)`, and the toggle calls `applyLowFx(next)`. There is deliberately no cleanup that removes the class, because the switch unmounts when the account menu closes and the preference must persist. *(Revised while writing tasks.md, 2026-11-14.)*
-- `client/src/constants/pixelIcons.js`: `export const PIXEL_ICONS = { menu: { rows: string[], accents: { a: string, b: string } }, cal: {…}, cart: {…} }`. Rows are copied verbatim from the mockup's `ICO` grids. `#` means `currentColor`; each letter maps to a CSS `var(--token)` string.
-- `client/src/components/common/PixelIcon.jsx`: `PixelIcon({ name, size = 20, className })`. It renders `<svg className={\`pixel-icon ${className ?? ''}\`} viewBox="-0.5 -0.5 W+1 H+1" width={size} height={size} shapeRendering="crispEdges" aria-hidden="true" focusable="false">` with run-length `<rect>`s, the same algorithm as the mockup's `pxi()`. Accent rects use `style={{ fill: accent }}`.
-- `client/src/components/common/PixelIcon.css`: `.pixel-icon { display:inline-block; flex:none }` and the active-state drop-shadow, with `body.lowfx` removing it.
-- `client/src/components/layout/Ticker.jsx` and `Ticker.css`: a static `TICKER_ITEMS` array at module top, rendered twice in a `.ticker-track` for a seamless loop, inside `<div className="ticker" aria-hidden="true">`. The animation is off under `body.lowfx` and reduced motion.
-- `client/scripts/check-contrast.mjs`: parses the hex values out of `src/styles/tokens.css`, then checks a declared `PAIRS` array (`[fgToken, bgToken, minRatio]`) with WCAG relative-luminance math. It prints `Contrast OK: <n> pairs` and exits 0, or prints each failure and exits 1. The pairs are those in mockup-plan §2: ink, muted, pink, cyan, yellow, lime and red on panel and on raised, with 4.5 for text and 3 for UI. It also checks `--void` on each neon fill, `--paper-ink` on `--paper`, and ink, muted and pink on both teal card stops.
-- `package.json` script: `"check:contrast": "node scripts/check-contrast.mjs"`.
+- `client/src/styles/themes/default.css` — `:root { color-scheme: light; … }`: every colour token now in `global.css` (brand, neutral, semantic, macro FR-104 set, `--pip-focus-*`, `--aisle-*`) moved verbatim, plus tokens added by the sweep (exact literal values). Also `--focus-ring-color` (today's per-file focus colours are swept to tokens too).
+- `client/src/styles/themes/cyberpunk.css` — `:root[data-theme="cyberpunk"] { color-scheme: dark; … }`:
+  - Palette: `--void:#05070b; --deep:#020305; --panel:#0b1119; --raised:#141d2b; --ink:#eaf6ff; --muted:#9db2c7; --pink:#ff2a6d; --cyan:#05d9e8; --yellow:#f9f002; --lime:#39ff88; --orange:#ff9f1c; --red:#ff4d5e; --line:#4a7d99; --line-soft:#22384a; --paper:#f4f1e8; --paper-ink:#16141c; --paper-muted:#4f4a5a; --paper-struck:#5f5a6b; --paper-line:#cfc8b6; --black:#000`.
+  - Card stops: `--card-teal-top:#0a222a; --card-teal-bottom:#06171d; --card-plan-top:#22101a; --card-plan-bottom:#14080f`.
+  - Fonts: `--f-display:'Pixelify Sans',system-ui,sans-serif; --f-label:'Silkscreen',monospace; --f-num:'VT323',monospace; --f-body:'Space Grotesk',system-ui,sans-serif`.
+  - Glow: `--glow-pink`, `--glow-cyan`, `--glow-yellow`, `--box-pink`, `--box-cyan` copied from the mockup `:root`.
+  - Remap of every Default token: `--brand-primary:var(--pink); --brand-primary-dark:#c41f55; --brand-primary-light:var(--cyan); --text-primary:var(--ink); --text-secondary:var(--muted); --bg-primary:var(--panel); --bg-secondary:var(--void); --border-color:var(--line-soft); --success:var(--lime); --warning:var(--yellow); --error:var(--red); --cheat-badge:var(--orange); --focus-ring-color:var(--yellow)`; macro bases cyan/yellow/lime/red with low-alpha `-tint`/`-pill-bg` and `-pill-text` = base; `--aisle-*` retuned to pass 3:1 on `--paper`; every sweep-added token given a Cyberpunk value.
+  - `:root[data-theme="cyberpunk"] body.lowfx { --glow-*: none; --box-*: none; --f-display: var(--f-body) }`.
+- `client/src/styles/themes/cyberpunk/index.css` — `@import` of `shell.css`, `recipes.css`, `mealplan.css`, `recipe-view.css`, `shopping.css`, `dialogs.css` (each created by its phase; index created in Phase 1 importing only the files that exist, extended by each phase).
+- `client/src/styles/themes/previews.css` — `.theme-preview--default {…}` and `.theme-preview--cyberpunk {…}` tile art from `user-menu-themes.html` (`.pv-default`, `.pv-cyber`).
+- `client/src/constants/themes.js`:
+  ```js
+  export const THEME_STORAGE_KEY = 'fb.display.theme'
+  export const LOW_FX_STORAGE_KEY = 'fb.display.lowFx'
+  export const LOW_FX_BODY_CLASS = 'lowfx'
+  export const DEFAULT_THEME_ID = 'default'
+  export const THEMES = [
+    { id: 'default', label: 'Default', themeColor: '#4a3f80', fontsHref: null,
+      iconSet: 'line', effects: false, ticker: false,
+      brand: { name: 'My Pantry Plan', sub: null, loginTitle: 'Welcome to My Pantry Plan', loginSub: 'Sign in to unlock all features' } },
+    { id: 'cyberpunk', label: 'Cyberpunk', themeColor: '#05070b',
+      fontsHref: 'https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&family=Silkscreen:wght@400;700&family=Space+Grotesk:wght@400..700&family=VT323&display=swap',
+      iconSet: 'pixel', effects: true, ticker: true,
+      brand: { name: 'FOODBYTES', sub: 'NIGHT KITCHEN · SECTOR 9', loginTitle: 'FOODBYTES', loginSub: 'Night Kitchen · Sector 9. Sign in to plan your week and build your supply run.' } },
+  ]
+  export const themeById = (id) => THEMES.find((t) => t.id === id) ?? THEMES[0]
+  ```
+- `client/src/utils/theme.js` — `readThemeId(): string` (storage in try/catch, unknown → `DEFAULT_THEME_ID`); `applyTheme(id): void` (sets `document.documentElement.dataset.theme`, sets the `meta[name="theme-color"]` content, appends `<link rel="stylesheet" data-theme-fonts="<id>">` once if `fontsHref`, writes storage in try/catch).
+- `client/src/utils/lowFx.js` — `readLowFx(): boolean`, `applyLowFx(on): void` (toggles `LOW_FX_BODY_CLASS` on `body`, writes storage in try/catch).
+- `client/src/contexts/ThemeContext.jsx` — `ThemeProvider` + `useTheme() → { themeId, theme, setTheme(id), lowFx, toggleLowFx() }`. Initial state from `readThemeId()` / `readLowFx()`; setters call `applyTheme` / `applyLowFx`. No cleanup (preferences persist).
+- `client/src/components/layout/UserMenu.jsx` + `UserMenu.css` — props `{ user, onSignOut, onClose, anchorRef }`. Uses `useMediaQuery('(max-width: 767px)')`: desktop → absolutely positioned panel (`role="dialog"`, `aria-label="Account"`), closes on outside click and Esc; mobile → `createPortal` to `document.body` with scrim (click closes), grab bar, `[X]`/`✕` close button, Esc, `useBodyScrollLock(true)`, focus moves into the sheet and returns to the avatar on close. Sections in order: who (avatar, name, email, close button on mobile) · *Planning* (`DefaultPortionsControl`, `MealTimesControl`) · *Appearance* (`ThemePicker`, `LowFxControl` when `theme.effects`, "Saved on this device") · Sign out · `VersionInfo`.
+- `client/src/components/layout/ThemePicker.jsx` + `ThemePicker.css` — `role="radiogroup" aria-label="Theme"`; one `button role="radio"` tile per `THEMES` entry with `aria-checked`, roving `tabIndex`, ←/→/↑/↓ move and select, preview `<span className={\`theme-preview theme-preview--${id}\`} aria-hidden="true">` plus label and tick.
+- `client/src/components/layout/LowFxControl.jsx` — row with label "Low FX" / "No glow, rain or flicker" and `button role="switch" aria-checked` calling `toggleLowFx`.
+- `client/src/components/layout/HeaderBrand.jsx` — the brand button: `MARKS = { default: BrandMark, cyberpunk: PixelBrandMark }`; wordmark from `theme.brand` (Default: `My Pantry <span>Plan</span>` as today; Cyberpunk: `.brand-sign` with `FOOD<span className="brand-flicker">B</span>YTES` and `.brand-sub`); `aria-label={\`${theme.brand.name}, go to Recipes\`}`.
+- `client/src/components/common/PixelBrandMark.jsx` — props as `BrandMark`; 16×16 pixel bowl from the mockup `LOGO` in a module-level `LOGO_PIXELS` array.
+- `client/src/constants/pixelIcons.js` + `client/src/components/common/PixelIcon.jsx` + `PixelIcon.css` — as revision 1: `menu`, `cal`, `cart` grids verbatim, run-lengths precomputed at module load, `#` = `currentColor`, accents as `var(--token)`.
+- `client/src/components/layout/Ticker.jsx` + `Ticker.css` — `TICKER_ITEMS` verbatim from the mockup, rendered twice in `.ticker-track`, `aria-hidden="true"`.
+- `client/scripts/check-themes.mjs` + script `"check:themes": "node scripts/check-themes.mjs"` — per theme, resolve `--name: #hex` (and `var(--x)` one level) from that theme's file layered over Default; check `PAIRS[themeId]`; then assert every `THEMES` id has a `src/styles/themes/<id>.css` (except `default` which is the base), a `.theme-preview--<id>` block in `previews.css`, and appears in the `index.html` boot list, and that no extra ids exist. Prints `Themes OK: <n> themes, <m> contrast pairs` or each `FAIL …` / `MISSING …` and exits 1.
 
 #### Modified contracts
-- `BrandMark({ size = 40, title, className })`: the props are unchanged and the body becomes the 16×16 pixel logo from the mockup's `LOGO`.
-- `manifest.webmanifest`: `name` and `short_name` become `"FOODBYTES"`, and `background_color` and `theme_color` become `#05070b`.
-- `index.html`: the title becomes `FOODBYTES · Night Kitchen`, `theme-color` becomes `#05070b`, `apple-mobile-web-app-status-bar-style` becomes `black-translucent`, `apple-mobile-web-app-title` becomes `FOODBYTES`, and the Google Fonts link loads `Pixelify Sans:wght@400..700`, `Silkscreen:wght@400;700`, `VT323` and `Space Grotesk:wght@400..700` with `display=swap`.
-- No API, Context or DTO changes.
+- `index.html`: adds, before the module script, an inline boot script — `(function(){var ids=['default','cyberpunk'];try{var t=localStorage.getItem('fb.display.theme');if(ids.indexOf(t)>0){document.documentElement.dataset.theme=t;document.querySelector('meta[name="theme-color"]').content=t==='cyberpunk'?'#05070b':'#4a3f80'}}catch(e){}})()` — kept minimal; `check:themes` guards the id list. Nothing else in `index.html` changes.
+- `main.jsx`: imports `themes/default.css` then `global.css` first; wraps the tree in `ThemeProvider` (outermost); imports `themes/cyberpunk/index.css` **after** `import App`; calls `applyTheme(readThemeId())` and `applyLowFx(readLowFx())` before render.
+- `global.css`: loses its colour tokens (moved to `default.css`); its remaining literals become tokens; keeps spacing, radius, shadows, `--footer-clearance`, `--pip-sheet-*`.
+- `Header.jsx`: brand → `<HeaderBrand />`; dropdown → `<UserMenu />`; the avatar button keeps `aria-expanded` and becomes `aria-haspopup="dialog"`.
+- `AppNavItems.jsx`, `ExtrasIcons.CartIcon`: branch on `theme.iconSet`.
+- `App.jsx`: `{theme.effects && <div className="city-rain" aria-hidden="true" />}` first in `.app`; `{!pipMode && <><Header />{theme.ticker && <Ticker />}</>}`.
+- `LoginModal.jsx`: heading and subtitle from `theme.brand.loginTitle` / `loginSub`.
+- `constants/appRoutes.js` → `routeTitle(pathname, appName = APP_NAME)`; `useDocumentTitle` passes `theme.brand.name` and re-runs when the theme changes.
+- `PetView.css`: prepended `.pet-view { …Default token values… }` containment block.
+- No API, DTO or other Context changes.
 
 ### Runtime quality notes
-These dimensions are mapped onto the browser runtime.
-- **Resource cleanup:** nothing to clean up. `useLowFx` has no effect and no listener; the body class is a persistent preference, set at boot by `applyLowFx`. The ticker and rain are CSS animations with no timers or listeners.
-- **Concurrency / ordering:** none. localStorage is per device and the toggle is synchronous. Nothing touches shared meal-plan or shopping state.
-- **Allocation / cost behaviour:**
-  - Four web fonts add roughly 120 KB, loaded with `display=swap` so text paints immediately.
-  - The backdrop uses one data-URI SVG and two pseudo-elements. Rain is a `background-position` animation on one element, which is GPU-cheap; there are no per-drop DOM nodes.
-  - `PixelIcon` builds a few dozen `<rect>`s per icon and is rendered about four times per screen, which is trivial.
-  - Glow uses a single blur radius and is never stacked (mockup-plan §3). Low FX removes it for slow phones.
-- **Error paths:** localStorage access is wrapped in try/catch and falls back to `false`. A failure to load Google Fonts falls back to the system stacks declared in the token font lists, and pixel headings degrade to sans-serif with no broken layout.
+- **Resource cleanup:** the user menu's outside-click and Esc listeners are added on open and removed on close; the scroll lock releases on unmount. Theme/Low FX have no listeners.
+- **Concurrency / ordering:** none. Boot script → `applyTheme` in `main.jsx` → React render, all synchronous. Two tabs can hold different themes until reload; acceptable for a display preference.
+- **Allocation / cost:** Default users download nothing new (Cyberpunk fonts load only when picked). The backdrop is one data-URI SVG and two pseudo-elements; rain is one animated element. `PixelIcon` precomputes runs. Glow uses one blur radius; Low FX removes it.
+- **Error paths:** storage access wrapped in try/catch → Default / Low FX off. A font load failure falls back to the system stacks in the font tokens. An unknown stored id falls back to Default.
 
 ### Risks and judgement calls
-- **Contrast regressions from the remap.** Light-theme literals that weren't tokenised will sit on dark backgrounds after phase 1. The worst case is dark text on `--void`. Phase 1 leaves known stragglers. Each later phase sweeps its files, and a grep in the final phase confirms no literal light colours remain in in-scope files. Treat the build between phases as "coherent but not finished visually".
-- **Pip containment leaks.** Room sheets portalled to `document.body` are outside `.pet-view`. Phase 1 greps `createPortal` under `components/pet/` and adds each portal root class to the containment selector. Check this manually on `/pet`.
-- **Header.jsx growth.** Adding the Low FX switch and the ticker mount must keep it under 400 lines. The ticker mounts in `App.jsx` rather than in the Header to limit that growth.
-- **RecipeViewModal.jsx is at 393 lines.** This plan touches only its CSS. If the implementer finds a markup need there, it must go in a child component.
-- **Google Fonts versus offline.** Accepted for now (see Assumptions) and called out for the future PWA bootstrap.
-- **The landing animation and admin forms get a token sweep only**, not a bespoke metaphor. This judgement call keeps the scope bounded, since both are rarely seen.
-- **Visual verification is manual.** There's no browser test runner. The final phase lists the screens and widths to check (320, 390, 768 and 1280px), plus Low FX and reduced motion.
-- **Plan slug.** `2026-11-14-cyberpunk-makeover/` already exists, holding only `mockup-plan.md`. This plan uses a fresh slug instead of writing into it.
+- **Default drift during the sweep.** The biggest risk: a swept literal that changes value under Default. Mitigation: the sweep rule demands exact values; each phase greps its files; the final phase compares Default against production on every route at 390 and 1280px.
+- **Token sprawl.** Exact-value tokens for ~950 literals could add 100+ tokens. Reuse an existing token whenever value **and** role match; name new ones by role (`--surface-tint-brand`), not by colour; group them by area with comments in `default.css`.
+- **Override specificity.** A component rule with 3+ classes can still beat an override. The implementer raises the override's selector to match rather than adding `!important`.
+- **Pip containment leaks.** Room overlays portalled to `body` sit outside `.pet-view`. Phase 1 greps `createPortal` under `components/pet/` (currently zero hits) and adds any portal root to the containment selector.
+- **RecipeViewModal.jsx is ~393 lines** and the recipe-view files had uncommitted developer work on 2026-11-15. Phase 6 touches only the CSS listed; it builds on whatever is in the working tree and never reverts it.
+- **Two `THEMES` id lists** (registry and `index.html` boot script). `check:themes` fails if they disagree.
+- **Mockup gap.** `app-mockup.html` draws Cyberpunk only; Default's reference is the live app.
+
+### Plan slug
+Unchanged (`2026-11-14-cyberpunk-reskin`) so the history of revision 1 and its rollback stays with the work.

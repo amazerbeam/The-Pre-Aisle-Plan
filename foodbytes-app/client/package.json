@@ -1,6 +1,6 @@
 {
   "name": "foodbytes-client",
-  "version": "1.30.0",
+  "version": "1.31.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -19,7 +19,8 @@
     "check:wardrobe": "node src/components/pet/herb/wardrobe.check.mjs",
     "check:bubble": "node src/utils/pipBubble.check.mjs",
     "check:sprinkles": "node src/utils/sprinkleHistory.check.mjs",
-    "check:version": "node scripts/check-version.mjs"
+    "check:version": "node scripts/check-version.mjs",
+    "check:themes": "node scripts/check-themes.mjs"
   },
   "dependencies": {
     "axios": "^1.6.2",

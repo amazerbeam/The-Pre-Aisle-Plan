@@ -18,7 +18,7 @@
 }
 
 .tpl-modal {
-  background: #fff;
+  background: var(--surface-popover);
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
   min-width: 0;
@@ -41,8 +41,8 @@
 }
 
 .tpl-modal-header {
-  background: #4a3f80;
-  color: #fff;
+  background: var(--brand-primary);
+  color: var(--on-brand);
   padding: 16px;
   border-radius: 12px 12px 0 0;
   display: flex;
@@ -71,7 +71,7 @@
 .tpl-modal-close {
   background: transparent;
   border: none;
-  color: #fff;
+  color: var(--on-brand);
   font-size: 2rem;
   line-height: 1;
   cursor: pointer;
@@ -90,16 +90,16 @@
 
 @media (hover: hover) {
   .tpl-modal-close:hover {
-    background-color: rgba(255, 255, 255, 0.2);
+    background-color: var(--on-brand-hover-strong);
   }
 }
 
 .tpl-modal-close:active {
-  background-color: rgba(255, 255, 255, 0.3);
+  background-color: var(--on-brand-active-strong);
 }
 
 .tpl-modal-close:focus-visible {
-  outline: 2px solid #fff;
+  outline: 2px solid var(--on-brand);
   outline-offset: 2px;
 }
 
@@ -122,7 +122,7 @@
 .tpl-label {
   display: block;
   font-weight: 500;
-  color: #333;
+  color: var(--text-strong);
   margin-bottom: 4px;
   font-size: 0.95rem;
 }
@@ -130,38 +130,38 @@
 .tpl-input {
   width: 100%;
   padding: 10px 12px;
-  border: 2px solid #e0e0e0;
+  border: 2px solid var(--border-input);
   border-radius: 8px;
   font-size: 1rem;
   box-sizing: border-box;
   transition: border-color 0.2s ease;
-  background: #fff;
+  background: var(--bg-primary);
 }
 
 .tpl-input:focus {
   outline: none;
-  border-color: #4a3f80;
-  box-shadow: 0 0 0 3px rgba(74, 63, 128, 0.2);
+  border-color: var(--brand-primary);
+  box-shadow: 0 0 0 3px var(--brand-focus-glow);
 }
 
 .tpl-overwrite-warning {
-  color: #b15a09;
+  color: var(--warn-text);
   font-size: 0.85rem;
   margin: 12px 0 0;
   padding: 8px 12px;
-  background: #fef3e2;
+  background: var(--warn-bg);
   border-radius: 6px;
-  border-left: 3px solid #e67e22;
+  border-left: 3px solid var(--warn-accent);
 }
 
 .tpl-error {
-  color: #e53e3e;
+  color: var(--error-copy);
   font-size: 0.85rem;
   margin: 8px 0 0;
 }
 
 .tpl-empty {
-  color: #666;
+  color: var(--text-mid);
   font-size: 0.95rem;
   margin: 12px 0;
   text-align: center;
@@ -176,10 +176,10 @@
 .tpl-cancel-button {
   flex: 1;
   padding: 10px;
-  border: 2px solid #e0e0e0;
+  border: 2px solid var(--border-input);
   border-radius: 8px;
-  background: #fff;
-  color: #666;
+  background: var(--bg-primary);
+  color: var(--text-mid);
   font-size: 0.95rem;
   font-weight: 500;
   cursor: pointer;
@@ -199,8 +199,8 @@
   padding: 10px;
   border: none;
   border-radius: 8px;
-  background: #4a3f80;
-  color: #fff;
+  background: var(--brand-primary);
+  color: var(--on-brand);
   font-size: 0.95rem;
   font-weight: 500;
   cursor: pointer;
@@ -212,22 +212,22 @@
 
 @media (hover: hover) {
   .tpl-cancel-button:hover:not(:disabled) {
-    border-color: #999;
-    color: #333;
+    border-color: var(--border-strong);
+    color: var(--text-strong);
   }
 
   .tpl-confirm-button:hover:not(:disabled) {
-    background: #3d3469;
+    background: var(--brand-hover);
   }
 }
 
 .tpl-cancel-button:active:not(:disabled) {
-  border-color: #999;
-  color: #333;
+  border-color: var(--border-strong);
+  color: var(--text-strong);
 }
 
 .tpl-confirm-button:active:not(:disabled) {
-  background: #3d3469;
+  background: var(--brand-hover);
 }
 
 .tpl-confirm-button:disabled {
@@ -238,10 +238,10 @@
 .tpl-modal-hint {
   text-align: center;
   font-size: 0.75rem;
-  color: #999;
+  color: var(--text-hint);
   padding: 8px;
   margin: 0;
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--divider-soft);
   flex-shrink: 0;
 }
 
@@ -263,9 +263,9 @@
   justify-content: space-between;
   gap: 12px;
   padding: 10px 12px;
-  border: 1px solid #eee;
+  border: 1px solid var(--divider-soft);
   border-radius: 8px;
-  background: #fafafa;
+  background: var(--surface-row);
   flex-wrap: wrap;
 }
 
@@ -276,12 +276,12 @@
 
 .tpl-list-name {
   font-weight: 600;
-  color: #333;
+  color: var(--text-strong);
 }
 
 .tpl-list-meta {
   font-size: 0.8rem;
-  color: #777;
+  color: var(--text-meta);
 }
 
 .tpl-list-edit {
@@ -300,9 +300,9 @@
 .tpl-action-button {
   padding: 8px 12px;
   border-radius: 6px;
-  border: 1px solid #d0d0d0;
-  background: #fff;
-  color: #4a3f80;
+  border: 1px solid var(--border-button);
+  background: var(--bg-primary);
+  color: var(--brand-primary);
   font-size: 0.85rem;
   font-weight: 500;
   cursor: pointer;
@@ -318,30 +318,30 @@
 }
 
 .tpl-action-danger {
-  color: #c0392b;
-  border-color: #e6b8b1;
+  color: var(--danger-text);
+  border-color: var(--danger-border);
 }
 
 @media (hover: hover) {
   .tpl-action-button:hover:not(:disabled) {
-    background: #f3f0fa;
-    border-color: #4a3f80;
+    background: var(--surface-tint-menu);
+    border-color: var(--brand-primary);
   }
 
   .tpl-action-danger:hover:not(:disabled) {
-    background: #fdecea;
-    border-color: #c0392b;
+    background: var(--danger-hover-bg);
+    border-color: var(--danger-text);
   }
 }
 
 .tpl-action-button:active:not(:disabled) {
-  background: #f3f0fa;
-  border-color: #4a3f80;
+  background: var(--surface-tint-menu);
+  border-color: var(--brand-primary);
 }
 
 .tpl-action-danger:active:not(:disabled) {
-  background: #fdecea;
-  border-color: #c0392b;
+  background: var(--danger-hover-bg);
+  border-color: var(--danger-text);
 }
 
 .tpl-small {
@@ -383,7 +383,7 @@
 /* MPP-10: template extras entry point. Appended after the 480px block so the phone
    layout below wins over its `align-items: flex-start`. */
 .tpl-meta-sb {
-  color: #b15a09;
+  color: var(--warn-text);
   font-weight: 600;
 }
 
@@ -395,8 +395,8 @@
 }
 
 .tpl-extras-count {
-  background: #fef3e2;
-  color: #b15a09;
+  background: var(--warn-bg);
+  color: var(--warn-text);
   font-size: 0.72rem;
   font-weight: 700;
   border-radius: 999px;

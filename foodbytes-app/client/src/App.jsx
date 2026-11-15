@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Routes, Route, useLocation } from 'react-router-dom'
 import Header from './components/layout/Header.jsx'
 import Footer from './components/layout/Footer.jsx'
+import Ticker from './components/layout/Ticker.jsx'
 import RecipeList from './components/recipes/RecipeList.jsx'
 import MealPlanCalendar from './components/mealplan/MealPlanCalendar.jsx'
 import ShoppingList from './components/shopping/ShoppingList.jsx'
@@ -10,12 +11,14 @@ import LandingPageAnimation from './components/onboarding/LandingPageAnimation.j
 import Toast from './components/common/Toast.jsx'
 import { useAuth } from './contexts/AuthContext'
 import { useMealPlan } from './contexts/MealPlanContext'
+import { useTheme } from './contexts/ThemeContext'
 import { PET_ROUTE } from './constants/pet'
 import useDocumentTitle from './hooks/useDocumentTitle'
 import './styles/global.css'
 
 function App() {
   const { isAuthenticated, isGuest, loading } = useAuth()
+  const { theme } = useTheme()
   // MPP-37: the Pip tab is full screen — no top bar (date picker + account menu).
   const pipMode = useLocation().pathname.replace(/\/+$/, '') === PET_ROUTE
   useDocumentTitle()
@@ -48,7 +51,13 @@ function App() {
 
   return (
     <div className="app">
-      {!pipMode && <Header />}
+      {theme.effects && <div className="city-rain" aria-hidden="true" />}
+      {!pipMode && (
+        <>
+          <Header />
+          {theme.ticker && <Ticker />}
+        </>
+      )}
       <main className={pipMode ? 'main-content main-content--pip' : 'main-content'}>
         <Routes>
           <Route path="/" element={<RecipeList />} />

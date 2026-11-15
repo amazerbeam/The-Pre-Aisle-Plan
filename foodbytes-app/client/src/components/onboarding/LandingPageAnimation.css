@@ -8,21 +8,21 @@
    ============================================ */
 .landing-animation-container {
   /* Brand Colors */
-  --brand-primary: #4a3f80;
-  --brand-primary-dark: #3a3266;
+  --brand-primary: var(--landing-brand);
+  --brand-primary-dark: var(--landing-brand-dark);
 
   /* Phase Colors */
-  --phase-dark-bg-start: #2c3e50;
-  --phase-dark-bg-end: #34495e;
-  --phase-dark-text: #ecf0f1;
-  --phase-dark-text-secondary: #bdc3c7;
+  --phase-dark-bg-start: var(--landing-dark-bg-start);
+  --phase-dark-bg-end: var(--landing-dark-bg-end);
+  --phase-dark-text: var(--landing-dark-text);
+  --phase-dark-text-secondary: var(--landing-dark-text-secondary);
 
-  --phase-light-bg-start: #f8f9fa;
-  --phase-light-bg-end: #e8eaf6;
-  --phase-light-text: #2c3e50;
+  --phase-light-bg-start: var(--landing-light-bg-start);
+  --phase-light-bg-end: var(--landing-light-bg-end);
+  --phase-light-text: var(--landing-light-text);
 
   /* Accent Colors */
-  --success-green: #27ae60;
+  --success-green: var(--landing-success);
 
   /* Animation Timing */
   --animation-fast: 350ms;
@@ -119,10 +119,10 @@
   font-size: 14px;
   font-weight: 500;
 
-  background-color: rgba(255, 255, 255, 0.15);
+  background-color: var(--landing-glass);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid var(--landing-glass-border);
   border-radius: 24px;
 
   color: inherit;
@@ -132,8 +132,8 @@
 
 .skip-button:hover,
 .skip-button:focus {
-  background-color: rgba(255, 255, 255, 0.25);
-  border-color: rgba(255, 255, 255, 0.4);
+  background-color: var(--landing-glass-hover);
+  border-color: var(--landing-glass-border-hover);
   transform: translateY(-2px);
 }
 
@@ -148,15 +148,15 @@
 
 /* Skip button on light background */
 .phase-uplifting .skip-button {
-  background-color: rgba(74, 63, 128, 0.1);
-  border-color: rgba(74, 63, 128, 0.2);
+  background-color: var(--landing-brand-tint);
+  border-color: var(--landing-brand-border);
   color: var(--brand-primary);
 }
 
 .phase-uplifting .skip-button:hover,
 .phase-uplifting .skip-button:focus {
-  background-color: rgba(74, 63, 128, 0.15);
-  border-color: rgba(74, 63, 128, 0.3);
+  background-color: var(--landing-brand-tint-hover);
+  border-color: var(--landing-brand-border-hover);
 }
 
 @media (min-width: 768px) {
@@ -540,33 +540,33 @@
   width: 100%;
   max-width: 280px;
 
-  background-color: #ffffff;
-  border: 1px solid #dadce0;
+  background-color: var(--google-btn-bg);
+  border: 1px solid var(--google-btn-border);
   border-radius: 4px;
 
   font-family: 'Roboto', Arial, sans-serif;
   font-size: 16px;
   font-weight: 500;
-  color: #3c4043;
+  color: var(--google-btn-text);
 
   cursor: pointer;
   transition: all 200ms var(--ease-decelerate);
 }
 
 .google-signin-btn:hover {
-  background-color: #f7f8f8;
-  box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3),
-              0 1px 3px 1px rgba(60, 64, 67, 0.15);
+  background-color: var(--google-btn-hover-bg);
+  box-shadow: 0 1px 2px 0 var(--google-btn-shadow),
+              0 1px 3px 1px var(--google-btn-shadow-soft);
 }
 
 .google-signin-btn:focus-visible {
   outline: 3px solid var(--brand-primary);
   outline-offset: 3px;
-  box-shadow: 0 0 0 4px rgba(74, 63, 128, 0.2);
+  box-shadow: 0 0 0 4px var(--landing-brand-glow);
 }
 
 .google-signin-btn:active {
-  background-color: #f1f3f4;
+  background-color: var(--google-btn-active-bg);
   transform: scale(0.98);
 }
 
@@ -615,7 +615,7 @@
 }
 
 .continue-guest-btn:hover {
-  background-color: rgba(74, 63, 128, 0.08);
+  background-color: var(--landing-brand-tint-faint);
   border-color: var(--brand-primary-dark);
   color: var(--brand-primary-dark);
 }
@@ -623,11 +623,11 @@
 .continue-guest-btn:focus-visible {
   outline: 3px solid var(--brand-primary);
   outline-offset: 3px;
-  box-shadow: 0 0 0 4px rgba(74, 63, 128, 0.2);
+  box-shadow: 0 0 0 4px var(--landing-brand-glow);
 }
 
 .continue-guest-btn:active {
-  background-color: rgba(74, 63, 128, 0.15);
+  background-color: var(--landing-brand-tint-hover);
   transform: scale(0.98);
 }
 

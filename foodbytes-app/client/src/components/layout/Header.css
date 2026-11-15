@@ -1,10 +1,10 @@
 .header {
   background-color: var(--brand-primary);
-  color: white;
+  color: var(--on-brand);
   padding: 0 12px;
   /* position is load-bearing, not decoration: `z-index` is ignored on a static
      box, so the old `z-index: 50` here was inert and the header formed no
-     stacking context. That left .user-dropdown's z-index: 100 competing in the
+     stacking context. That left the account menu's z-index: 100 competing in the
      root context against RecipeList.css's `.meal-tabs` (position: sticky;
      z-index: 90), whose --bg-secondary background painted a grey band straight
      across the open account menu.
@@ -39,14 +39,14 @@
   padding: 0;
   background: none;
   border: none;
-  color: white;
+  color: var(--on-brand);
   cursor: pointer;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
 
 .brand-btn:focus-visible {
-  outline: 2px solid white;
+  outline: 2px solid var(--on-brand);
   outline-offset: 2px;
   border-radius: 8px;
 }
@@ -109,7 +109,7 @@
   background: none;
   border: none;
   border-radius: 10px;
-  color: #d9d4f5;
+  color: var(--on-brand-muted);
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
@@ -128,23 +128,23 @@
 }
 
 .header-btn:active {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--on-brand-hover-bg);
 }
 
 @media (hover: hover) {
   .header-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--on-brand-hover-bg);
   }
 }
 
 .header-btn:focus-visible {
-  outline: 2px solid white;
+  outline: 2px solid var(--on-brand);
   outline-offset: 2px;
 }
 
 .header-btn.active {
-  background: rgba(255, 255, 255, 0.16);
-  color: white;
+  background: var(--on-brand-active-bg);
+  color: var(--on-brand);
 }
 
 /* Guest sign-in nudge, anchored under the tabs */
@@ -154,8 +154,8 @@
   left: 0;
   z-index: 1;
   padding: 8px 12px;
-  background: #2b2540;
-  color: white;
+  background: var(--nav-message-bg);
+  color: var(--nav-message-text);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-md);
   font-size: 0.8rem;
@@ -183,7 +183,7 @@
 }
 
 .avatar-btn:focus-visible {
-  outline: 2px solid white;
+  outline: 2px solid var(--on-brand);
   outline-offset: 2px;
 }
 
@@ -192,25 +192,25 @@
   height: 36px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  border: 2px solid var(--avatar-ring);
 }
 
 .avatar-placeholder {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--avatar-bg);
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 600;
   font-size: 14px;
-  color: white;
+  color: var(--avatar-text);
 }
 
 /* Sign In Button for Pill Layout */
 .sign-in-btn-pill {
-  background: white;
+  background: var(--on-brand);
   color: var(--brand-primary);
   min-height: 44px;
   padding: 8px 16px;
@@ -229,119 +229,13 @@
 }
 
 .sign-in-btn-pill:focus-visible {
-  outline: 2px solid white;
+  outline: 2px solid var(--on-brand);
   outline-offset: 2px;
 }
 
-/* User Menu Container */
+/* Positioning anchor for UserMenu's desktop dropdown */
 .user-menu-container {
   position: relative;
-}
-
-/* User Dropdown */
-.user-dropdown {
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
-  background: white;
-  color: var(--text-primary);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-lg);
-  width: calc(100vw - 24px);
-  max-width: 300px;
-  overflow: hidden;
-  z-index: 100;
-  animation: dropdownFade 0.15s ease;
-}
-
-@keyframes dropdownFade {
-  from {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Who header: brand tint, avatar + name/email */
-.user-who {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 16px;
-  background: #eeebf7;
-}
-
-.user-who .avatar,
-.user-who .avatar-placeholder {
-  width: 40px;
-  height: 40px;
-  flex-shrink: 0;
-  border-color: rgba(0, 0, 0, 0.08);
-}
-
-.user-info {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-
-.user-name-full {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.user-email {
-  font-size: 0.8rem;
-  color: var(--text-secondary);
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* Section wrappers: DefaultPortionsControl / MealTimesControl render their own heading,
-   top border and padding, so the wrapper adds nothing but the landmark. */
-.user-section {
-  margin: 0;
-}
-
-.logout-btn {
-  display: block;
-  width: 100%;
-  min-height: 44px;
-  padding: 0 16px;
-  text-align: left;
-  background: none;
-  border: none;
-  border-top: 1px solid var(--border-color);
-  color: #c0392b;
-  font-weight: 600;
-  cursor: pointer;
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.logout-btn:active {
-  background: var(--bg-secondary);
-}
-
-@media (hover: hover) {
-  .logout-btn:hover {
-    background: var(--bg-secondary);
-  }
-}
-
-.logout-btn:focus-visible {
-  outline: 2px solid #c0392b;
-  outline-offset: -2px;
-}
-
-/* Version line sits last on a secondary strip (VersionInfo supplies its own background) */
-.user-dropdown > :last-child {
-  background: var(--bg-secondary);
 }
 
 /* Mobile: two rows, brand + account, then the full-width week pill */

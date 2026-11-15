@@ -1,7 +1,7 @@
 /* FR-013 / recipe view redesign: popup shell, sticky header, ingredients + steps columns.
  * Desktop (>=769px): wide modal, ingredients column beside the steps.
  * Mobile (<=768px): full screen, Ingredients | Steps tabs. Cook mode lives in CookMode.css.
- * Brand tint literal #eeebf7 (there is no --brand-tint variable). */
+ * Colours come from tokens in styles/themes/. */
 
 .recipe-view-overlay {
   position: fixed;
@@ -46,7 +46,7 @@
   flex: none;
   padding: 14px 20px 16px;
   background: var(--brand-primary);
-  color: #fff;
+  color: var(--rv-head-text);
 }
 
 .recipe-view-modal .rv-title {
@@ -61,12 +61,12 @@
   font-size: 24px;
   font-weight: 600;
   line-height: 1.2;
-  color: #fff;
+  color: var(--rv-head-text);
 }
 
 .recipe-view-modal .cheat-badge {
   background: var(--cheat-badge);
-  color: #fff;
+  color: var(--on-cheat-flag);
   font-size: 11px;
   font-weight: 700;
   border-radius: 6px;
@@ -80,8 +80,8 @@
   height: 44px;
   border: none;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.18);
-  color: #fff;
+  background: var(--rv-head-wash);
+  color: var(--rv-head-text);
   font-size: 22px;
   display: flex;
   align-items: center;
@@ -91,9 +91,9 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.recipe-view-modal .close-button:active { background: rgba(255, 255, 255, 0.3); }
+.recipe-view-modal .close-button:active { background: var(--rv-head-wash-strong); }
 @media (hover: hover) {
-  .recipe-view-modal .close-button:hover { background: rgba(255, 255, 255, 0.3); }
+  .recipe-view-modal .close-button:hover { background: var(--rv-head-wash-strong); }
 }
 
 .recipe-view-modal .recipe-view-header .linked-recipe-navigation .back-button {
@@ -109,7 +109,7 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 10px;
-  background: rgba(255, 255, 255, 0.12);
+  background: var(--rv-head-panel);
   border-radius: 12px;
   padding: 8px 10px;
   font-size: 14px;
@@ -122,8 +122,8 @@
   min-height: 44px;
   border: none;
   border-radius: 999px;
-  background: #fff;
-  color: var(--brand-primary);
+  background: var(--rv-head-solid);
+  color: var(--rv-head-on-solid);
   font: inherit;
   font-weight: 700;
   padding: 8px 14px;
@@ -133,9 +133,9 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.recipe-view-modal .rv-eat.on { background: var(--success); color: #fff; cursor: default; }
+.recipe-view-modal .rv-eat.on { background: var(--success); color: var(--on-brand); cursor: default; }
 .recipe-view-modal .rv-eat:disabled { opacity: 0.7; }
-.recipe-view-modal .rv-ctx-error { flex-basis: 100%; font-size: 13px; font-weight: 600; color: #ffd6d6; }
+.recipe-view-modal .rv-ctx-error { flex-basis: 100%; font-size: 13px; font-weight: 600; color: var(--rv-head-error); }
 
 /* Variant switch + servings stepper */
 .recipe-view-modal .rv-ctrl {
@@ -155,11 +155,11 @@
   gap: 3px;
 }
 
-.recipe-view-modal .rv-vseg .variant-seg button { color: #d9d4f5; border-radius: 9px; }
-.recipe-view-modal .rv-vseg .variant-seg button b { color: #fff; font-size: 15px; }
-.recipe-view-modal .rv-vseg .variant-seg button.on { background: #fff; color: var(--brand-primary); }
-.recipe-view-modal .rv-vseg .variant-seg button.on b { color: var(--brand-primary); }
-.recipe-view-modal .rv-vseg .variant-seg button:focus-visible { outline-color: #fff; }
+.recipe-view-modal .rv-vseg .variant-seg button { color: var(--rv-head-muted); border-radius: 9px; }
+.recipe-view-modal .rv-vseg .variant-seg button b { color: var(--rv-head-text); font-size: 15px; }
+.recipe-view-modal .rv-vseg .variant-seg button.on { background: var(--rv-head-solid); color: var(--rv-head-on-solid); }
+.recipe-view-modal .rv-vseg .variant-seg button.on b { color: var(--rv-head-on-solid); }
+.recipe-view-modal .rv-vseg .variant-seg button:focus-visible { outline-color: var(--rv-head-focus); }
 
 .recipe-view-modal .rv-vseg .variant-single {
   display: flex;
@@ -170,11 +170,11 @@
   padding: 0 12px;
   background: rgba(0, 0, 0, 0.2);
   border-radius: 12px;
-  color: #d9d4f5;
+  color: var(--rv-head-muted);
   font-size: 13px;
 }
 
-.recipe-view-modal .rv-vseg .variant-single b { color: #fff; font-size: 15px; }
+.recipe-view-modal .rv-vseg .variant-single b { color: var(--rv-head-text); font-size: 15px; }
 
 .recipe-view-modal .rv-srv {
   display: flex;
@@ -191,23 +191,23 @@
   border: none;
   border-radius: 9px;
   background: transparent;
-  color: #fff;
+  color: var(--rv-head-text);
   font-size: 20px;
   cursor: pointer;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
 
-.recipe-view-modal .rv-srv button:active { background: rgba(255, 255, 255, 0.14); }
+.recipe-view-modal .rv-srv button:active { background: var(--rv-head-press); }
 @media (hover: hover) {
-  .recipe-view-modal .rv-srv button:hover { background: rgba(255, 255, 255, 0.14); }
+  .recipe-view-modal .rv-srv button:hover { background: var(--rv-head-press); }
 }
 
 .recipe-view-modal .rv-srv span {
   min-width: 70px;
   text-align: center;
   font-size: 13px;
-  color: #d9d4f5;
+  color: var(--rv-head-muted);
 }
 
 .recipe-view-modal .servings-input {
@@ -221,14 +221,14 @@
   font: inherit;
   font-size: 17px;
   font-weight: 700;
-  color: #fff;
+  color: var(--rv-head-text);
   text-align: center;
   -moz-appearance: textfield;
 }
 
 .recipe-view-modal .servings-input::-webkit-outer-spin-button,
 .recipe-view-modal .servings-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-.recipe-view-modal .servings-input:focus { outline: none; background: rgba(255, 255, 255, 0.2); }
+.recipe-view-modal .servings-input:focus { outline: none; background: var(--rv-head-field-focus); }
 
 /* Macro chips + keep-screen-on */
 .recipe-view-modal .rv-macros {
@@ -238,10 +238,10 @@
   flex-wrap: wrap;
   gap: 6px;
   font-size: 12px;
-  color: #d9d4f5;
+  color: var(--rv-head-muted);
 }
 
-.recipe-view-modal .rv-macros-plain { font-size: 13px; font-weight: 700; color: #fff; }
+.recipe-view-modal .rv-macros-plain { font-size: 13px; font-weight: 700; color: var(--rv-head-text); }
 
 .recipe-view-modal .rv-awake {
   margin-left: auto;
@@ -249,10 +249,10 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.35);
+  border: 1px solid var(--rv-head-border);
   border-radius: 999px;
   background: transparent;
-  color: #fff;
+  color: var(--rv-head-text);
   font: inherit;
   font-size: 12px;
   padding: 6px 12px;
@@ -261,8 +261,8 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.recipe-view-modal .rv-awake.on { background: #ffd34d; border-color: #ffd34d; color: #1f1a3a; font-weight: 700; }
-.recipe-view-modal .recipe-view-header button:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.recipe-view-modal .rv-awake.on { background: var(--rv-accent); border-color: var(--rv-accent); color: var(--rv-on-accent); font-weight: 700; }
+.recipe-view-modal .recipe-view-header button:focus-visible { outline: 2px solid var(--rv-head-focus); outline-offset: 2px; }
 
 /* ---------- Body ---------- */
 .recipe-view-modal .rv-scroll { flex: 1; min-height: 0; overflow-y: auto; }
@@ -356,7 +356,7 @@
   width: 22px;
   height: 22px;
   border-radius: 6px;
-  border: 2px solid #c9ced4;
+  border: 2px solid var(--ilist-cb-border);
   display: grid;
   place-items: center;
   color: transparent;
@@ -365,15 +365,15 @@
 }
 
 .recipe-view-modal .ilist .q { font-weight: 700; color: var(--brand-primary); min-width: 78px; }
-.recipe-view-modal .ilist li.on .cb { background: var(--success); border-color: var(--success); color: #fff; }
+.recipe-view-modal .ilist li.on .cb { background: var(--success); border-color: var(--success); color: var(--on-brand); }
 .recipe-view-modal .ilist li.on .q,
-.recipe-view-modal .ilist li.on .n { color: #a0a6ad; text-decoration: line-through; }
+.recipe-view-modal .ilist li.on .n { color: var(--text-struck); text-decoration: line-through; }
 
 /* Extras */
 .recipe-view-modal .rv-extras { margin-top: 16px; }
 
 .recipe-view-modal .rv-extra {
-  background: #fff;
+  background: var(--surface-popover);
   border: 1px solid var(--border-color);
   border-radius: 12px;
   padding: 10px 12px;
@@ -411,7 +411,7 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.recipe-view-modal .rv-tog button.on { background: var(--brand-primary); color: #fff; font-weight: 600; }
+.recipe-view-modal .rv-tog button.on { background: var(--brand-primary); color: var(--on-brand); font-weight: 600; }
 .recipe-view-modal .rv-tog button:disabled { opacity: 0.6; cursor: default; }
 
 .recipe-view-modal .rv-extra-open {
@@ -455,7 +455,7 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: #eeebf7;
+  background: var(--surface-tint-brand);
   color: var(--brand-primary);
   font-weight: 800;
   display: grid;
@@ -463,9 +463,9 @@
 }
 
 .recipe-view-modal .step .txt { font-size: 16px; line-height: 1.6; color: var(--text-primary); }
-.recipe-view-modal .step.cur { background: #fffaf0; box-shadow: inset 3px 0 0 #e3b45c; }
-.recipe-view-modal .step.done .num { background: var(--success); color: #fff; }
-.recipe-view-modal .step.done .txt { color: #a0a6ad; }
+.recipe-view-modal .step.cur { background: var(--week-empty-bg); box-shadow: inset 3px 0 0 var(--week-empty-accent); }
+.recipe-view-modal .step.done .num { background: var(--success); color: var(--on-brand); }
+.recipe-view-modal .step.done .txt { color: var(--text-struck); }
 
 .recipe-view-modal .step-link {
   display: inline-flex;
@@ -474,7 +474,7 @@
   margin-top: 6px;
   border: 1px solid var(--brand-primary-light);
   border-radius: 999px;
-  background: #fff;
+  background: var(--surface-popover);
   color: var(--brand-primary);
   font: inherit;
   font-size: 13px;
@@ -489,8 +489,8 @@
   display: inline-block;
   margin-top: 6px;
   font-size: 12px;
-  color: #8a4500;
-  background: #ffe8d6;
+  color: var(--sb-text);
+  background: var(--sb-bg);
   border-radius: 6px;
   padding: 2px 8px;
 }
@@ -501,7 +501,7 @@
   border: none;
   border-radius: 999px;
   background: var(--brand-primary);
-  color: #fff;
+  color: var(--on-brand);
   font: inherit;
   font-weight: 700;
   font-size: 13px;
@@ -584,7 +584,7 @@
     position: sticky;
     top: 0;
     z-index: 5;
-    background: #fff;
+    background: var(--bg-primary);
     border-bottom: 1px solid var(--border-color);
   }
 

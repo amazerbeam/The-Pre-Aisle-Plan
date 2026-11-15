@@ -55,7 +55,7 @@
   margin: 0;
   padding: 4px;
   list-style: none;
-  background: #fff;
+  background: var(--surface-popover);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-lg);
@@ -80,13 +80,13 @@
 
 .entry-menu-list button:active,
 .entry-menu-list button:focus-visible {
-  background: #eeebf7;
+  background: var(--surface-tint-brand);
   outline: none;
 }
 
 @media (hover: hover) {
   .entry-menu-list button:hover {
-    background: #eeebf7;
+    background: var(--surface-tint-brand);
   }
 }
 

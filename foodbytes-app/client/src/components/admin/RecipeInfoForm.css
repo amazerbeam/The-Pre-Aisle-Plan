@@ -114,7 +114,7 @@
 
 .toggle-button.active {
   background: var(--brand-primary);
-  color: white;
+  color: var(--on-brand);
 }
 
 .toggle-button:disabled {
@@ -140,9 +140,9 @@
 
 /* Info Banner */
 .info-banner {
-  background: #e8f4f8;
-  border: 1px solid #bee5eb;
-  color: #0c5460;
+  background: var(--info-surface);
+  border: 1px solid var(--info-border);
+  color: var(--info-text);
   padding: var(--spacing-sm) var(--spacing-md);
   border-radius: var(--radius-sm);
   font-size: 0.875rem;

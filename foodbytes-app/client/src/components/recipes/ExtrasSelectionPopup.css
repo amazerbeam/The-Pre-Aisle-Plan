@@ -48,7 +48,7 @@
 .extras-popup-header {
   padding: var(--spacing-lg);
   background: var(--brand-primary);
-  color: #ffffff;
+  color: var(--on-brand);
   text-align: center;
 }
 
@@ -56,14 +56,14 @@
   margin: 0 0 var(--spacing-xs) 0;
   font-size: 0.9rem;
   font-weight: 400;
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--on-brand-subtle);
 }
 
 .extras-popup-recipe-name {
   margin: 0;
   font-size: 1.25rem;
   font-weight: 600;
-  color: #ffffff;
+  color: var(--on-brand);
 }
 
 /* Content */
@@ -76,7 +76,7 @@
 .extras-popup-instruction {
   margin: 0 0 var(--spacing-lg) 0;
   padding: var(--spacing-md);
-  background: rgba(74, 63, 128, 0.08);
+  background: var(--brand-tint-faint);
   border-radius: var(--radius-sm);
   color: var(--text-secondary);
   font-size: 0.85rem;
@@ -107,7 +107,7 @@
 }
 
 .extras-checkbox-label:hover:not(.disabled) {
-  background-color: rgba(74, 63, 128, 0.08);
+  background-color: var(--brand-tint-faint);
 }
 
 .extras-checkbox-label.disabled {
@@ -146,7 +146,7 @@
   top: 2px;
   width: 5px;
   height: 10px;
-  border: solid #ffffff;
+  border: solid var(--on-brand);
   border-width: 0 2px 2px 0;
   transform: rotate(45deg);
 }
@@ -171,13 +171,13 @@
   font-size: 0.8rem;
   color: var(--text-secondary);
   padding: 2px 8px;
-  background: rgba(74, 63, 128, 0.1);
+  background: var(--brand-tint-soft);
   border-radius: 10px;
 }
 
 .extras-checkbox:not(:checked) ~ .extras-label-text {
-  background: rgba(255, 152, 0, 0.15);
-  color: #e65100;
+  background: var(--storebought-bg);
+  color: var(--storebought-text);
 }
 
 .extras-checkbox:not(:checked) ~ .extras-label-text::before {
@@ -232,7 +232,7 @@
 
 .extras-popup-button.confirm {
   background: var(--brand-primary);
-  color: #ffffff;
+  color: var(--on-brand);
 }
 
 .extras-popup-button.confirm:hover {

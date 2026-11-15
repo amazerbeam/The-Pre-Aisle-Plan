@@ -63,13 +63,13 @@
 
 .ingredient-row.new-ingredient {
   border-color: var(--brand-primary);
-  background: #f8f9fa;
+  background: var(--bg-secondary);
 }
 
 /* FR-093: Linked Recipe Ingredient Row */
 .ingredient-row.linked-recipe {
-  border-color: #17a2b8;
-  background: #e8f7fa;
+  border-color: var(--info-accent);
+  background: var(--info-surface-soft);
 }
 
 .linked-recipe-container {
@@ -168,7 +168,7 @@
   right: var(--spacing-sm);
   transform: translateY(-50%);
   background: var(--brand-primary);
-  color: white;
+  color: var(--on-brand);
   font-size: 0.625rem;
   font-weight: 600;
   padding: 2px 6px;
@@ -254,7 +254,7 @@
   border-radius: var(--radius-sm);
   font-size: 0.875rem;
   text-align: center;
-  background: #f8f9fa;
+  background: var(--bg-secondary);
 }
 
 .grams-input:focus {
@@ -273,8 +273,8 @@
   width: 32px;
   height: 32px;
   padding: 0;
-  background: #fff5f5;
-  border: 1px solid #f5c6cb;
+  background: var(--surface-invalid);
+  border: 1px solid var(--error-banner-border);
   border-radius: var(--radius-sm);
   color: var(--error);
   font-size: 1.25rem;
@@ -287,7 +287,7 @@
 }
 
 .ingredient-row > .delete-button:hover {
-  background: #f8d7da;
+  background: var(--error-banner-bg);
   border-color: var(--error);
 }
 
@@ -361,10 +361,10 @@
   font-size: 0.75rem;
   color: var(--text-secondary);
   padding: var(--spacing-xs) var(--spacing-sm);
-  background: #e8f7fa;
+  background: var(--info-surface-soft);
   border-radius: var(--radius-sm);
   margin-top: var(--spacing-xs);
-  border-left: 3px solid #17a2b8;
+  border-left: 3px solid var(--info-accent);
 }
 
 .dialog-options {

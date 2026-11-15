@@ -100,9 +100,9 @@
   height: 100%;
   box-sizing: border-box;
   align-content: center;
-  background: #fff7e6;
-  border: 1px solid #f3d39a;
+  background: var(--stale-bg);
+  border: 1px solid var(--stale-border);
   border-radius: var(--radius-lg);
   padding: 12px 14px;
-  color: #9a5b00;
+  color: var(--notice-text);
 }

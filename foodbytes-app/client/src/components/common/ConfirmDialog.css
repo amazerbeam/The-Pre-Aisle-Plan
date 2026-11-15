@@ -26,7 +26,7 @@
 
 /* Dialog Box */
 .confirm-dialog {
-  background: white;
+  background: var(--surface-popover);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
   max-width: 500px;

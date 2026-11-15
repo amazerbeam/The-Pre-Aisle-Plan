@@ -1,0 +1,350 @@
+/* Cyberpunk theme (FOODBYTES · Night Kitchen). Reassigns the Default tokens from default.css
+   and adds the neon palette, fonts and glow. Look that tokens can't express lives in
+   cyberpunk/*.css. Reference: foodbytes-app/mockup/app-mockup.html. */
+:root[data-theme="cyberpunk"] {
+  color-scheme: dark;
+
+  /* Palette */
+  --void: #05070b;
+  --deep: #020305;
+  --panel: #0b1119;
+  --raised: #141d2b;
+  --ink: #eaf6ff;
+  --muted: #9db2c7;
+  --pink: #ff2a6d;
+  --cyan: #05d9e8;
+  --yellow: #f9f002;
+  --lime: #39ff88;
+  --orange: #ff9f1c;
+  --red: #ff4d5e;
+  --line: #4a7d99;
+  --line-soft: #22384a;
+  --paper: #f4f1e8;
+  --paper-ink: #16141c;
+  --paper-muted: #4f4a5a;
+  --paper-struck: #5f5a6b;
+  --paper-line: #cfc8b6;
+  --paper-done: #1a6b3a;
+  --black: #000;
+
+  /* Terminal title bars (hud.css), hazard stripe (stale banners) and the night-sky gradient */
+  --titlebar-bg: var(--cyan);
+  --titlebar-fg: var(--void);
+  --titlebar-font: var(--f-label);
+  --hazard-a: #1a1600;
+  --hazard-b: #0b0b00;
+  --sky-1: #03050a;
+  --sky-2: #06111b;
+  --sky-3: #0a1a26;
+  --sky-4: #2a0614;
+  --sky-header: #060b11;
+
+  /* Recipe card gradient stops: teal menu board, pink in-plan */
+  --card-teal-top: #0a222a;
+  --card-teal-bottom: #06171d;
+  --card-plan-top: #22101a;
+  --card-plan-bottom: #14080f;
+  --card-teal-border: rgba(5, 217, 232, 0.5);
+  --card-teal-rule: rgba(5, 217, 232, 0.45);
+
+  /* Fonts (loaded on demand by applyTheme) */
+  --f-display: 'Pixelify Sans', system-ui, sans-serif;
+  --f-label: 'Silkscreen', monospace;
+  --f-num: 'VT323', monospace;
+  --f-body: 'Space Grotesk', system-ui, sans-serif;
+
+  /* Glow */
+  --glow-pink: 0 0 6px rgba(255, 42, 109, 0.85), 0 0 18px rgba(255, 42, 109, 0.45);
+  --glow-cyan: 0 0 6px rgba(5, 217, 232, 0.8), 0 0 16px rgba(5, 217, 232, 0.35);
+  --glow-yellow: 0 0 6px rgba(249, 240, 2, 0.7);
+  --box-pink: 0 0 0 1px rgba(255, 42, 109, 0.4), 0 0 14px rgba(255, 42, 109, 0.35);
+  --box-cyan: 0 0 0 1px rgba(5, 217, 232, 0.35), 0 0 14px rgba(5, 217, 232, 0.3);
+
+  /* Remap of the Default tokens */
+  --brand-primary: var(--pink);
+  --brand-primary-dark: #c41f55;
+  --brand-primary-light: var(--cyan);
+  --text-primary: var(--ink);
+  --text-secondary: var(--muted);
+  --bg-primary: var(--panel);
+  --bg-secondary: var(--void);
+  --border-color: var(--line-soft);
+  --success: var(--lime);
+  --warning: var(--yellow);
+  --error: var(--red);
+  --cheat-badge: var(--orange);
+  --focus-ring-color: var(--yellow);
+
+  /* Sweep-added tokens */
+  --on-brand: var(--void);
+
+  /* Account menu, theme picker and controls */
+  --text-label: var(--cyan);
+  --text-placeholder: var(--muted);
+  --danger-text: var(--red);
+  --control-border: var(--line);
+  --surface-input: var(--deep);
+  --surface-invalid: rgba(255, 77, 94, 0.14);
+  --surface-tint-brand: var(--raised);
+  --control-hover-bg: var(--raised);
+  --control-active-bg: var(--line-soft);
+  --focus-ring-control: var(--yellow);
+  --scrim-bg: rgba(2, 3, 5, 0.75);
+  --menu-border-color: var(--cyan);
+
+  /* Header (interim until the Cyberpunk shell restyles it: text/washes sit on the pink bar) */
+  --on-brand-muted: var(--void);
+  --on-brand-hover-bg: rgba(5, 7, 11, 0.12);
+  --on-brand-active-bg: rgba(5, 7, 11, 0.2);
+  --nav-message-bg: var(--deep);
+  --nav-message-text: var(--ink);
+  --avatar-bg: var(--deep);
+  --avatar-text: var(--cyan);
+  --avatar-ring: var(--cyan);
+
+  /* Footer, toasts and sign-in dialog. The Google button follows Google's dark-theme spec. */
+  --toast-bg: var(--raised);
+  --toast-text: var(--ink);
+  --toast-action: var(--yellow);
+  --link-color: var(--cyan);
+  --action-bg: var(--pink);
+  --input-border-subtle: var(--line);
+  --error-text-strong: var(--red);
+  --google-btn-bg: #131314;
+  --google-btn-border: #8e918f;
+  --google-btn-text: #e3e3e3;
+  --google-btn-hover-bg: var(--raised);
+  --google-btn-shadow: rgba(5, 217, 232, 0.3);
+  --google-btn-shadow-soft: rgba(5, 217, 232, 0.15);
+
+  /* FR-104 macro traffic light, retuned for dark surfaces. Pill text equals the base hue. */
+  --macro-under-target: var(--cyan);
+  --macro-under-target-tint: rgba(5, 217, 232, 0.2);
+  --macro-under-target-pill-bg: rgba(5, 217, 232, 0.14);
+  --macro-under-target-pill-text: var(--cyan);
+
+  --macro-near-target: var(--yellow);
+  --macro-near-target-tint: rgba(249, 240, 2, 0.18);
+  --macro-near-target-pill-bg: rgba(249, 240, 2, 0.12);
+  --macro-near-target-pill-text: var(--yellow);
+
+  --macro-on-target: var(--lime);
+  --macro-on-target-tint: rgba(57, 255, 136, 0.18);
+  --macro-on-target-pill-bg: rgba(57, 255, 136, 0.12);
+  --macro-on-target-pill-text: var(--lime);
+
+  --macro-over-target: var(--red);
+  --macro-over-target-tint: rgba(255, 77, 94, 0.2);
+  --macro-over-target-pill-bg: rgba(255, 77, 94, 0.14);
+  --macro-over-target-pill-text: var(--red);
+
+  /* Recipes */
+  --surface-popover: var(--raised);
+  --surface-tint-soft: var(--raised);
+  --surface-tint-faint: var(--raised);
+  --plan-border: var(--pink);
+  --cheat-flag-bg: var(--red);
+  --on-cheat-flag: var(--void);
+  --audited-bg: rgba(57, 255, 136, 0.14);
+  --audited-text: var(--lime);
+  --notice-bg: rgba(255, 159, 28, 0.14);
+  --notice-text: var(--orange);
+  --error-surface: rgba(255, 77, 94, 0.14);
+  --error-text: var(--red);
+  --chip-dashed-border: var(--line);
+  --success-hover: #2bd978;
+  --dot-muted: var(--muted);
+  --week-empty-bg: var(--deep);
+  --week-empty-accent: var(--orange);
+  --on-brand-soft: var(--void);
+  --on-brand-wash: rgba(5, 7, 11, 0.15);
+  --on-brand-hover-strong: rgba(5, 7, 11, 0.2);
+  --on-brand-active-strong: rgba(5, 7, 11, 0.3);
+  --on-brand-subtle: rgba(5, 7, 11, 0.9);
+  --on-text-primary: var(--void);
+  --text-faint: var(--muted);
+  --divider-soft: var(--line-soft);
+  --brand-tint-faint: rgba(5, 217, 232, 0.08);
+  --brand-tint-soft: rgba(5, 217, 232, 0.1);
+  --storebought-bg: rgba(255, 159, 28, 0.15);
+  --storebought-text: var(--orange);
+  --macro-chip-solid-bg: var(--deep);
+
+  /* Meal plan: timetable, day view, cards, summary */
+  --on-brand-faint: rgba(5, 7, 11, 0.12);
+  --chip-selected-bg: var(--pink);
+  --chip-dot-filled: var(--lime);
+  --chip-dot-selected: rgba(5, 7, 11, 0.35);
+  --today-ring: var(--yellow);
+  --slot-add-border: var(--line);
+  --tick-border: var(--line);
+  --eaten-bg: #08150f;
+  --eaten-border: rgba(57, 255, 136, 0.4);
+  --spinner-track: var(--line-soft);
+  --stale-bg: rgba(255, 159, 28, 0.14);
+  --stale-border: var(--orange);
+  --brand-hover: var(--brand-primary-dark);
+
+  /* Meal plan: menus, sheets and modals */
+  --surface-tint-menu: var(--panel);
+  --surface-tint-menu-active: var(--line-soft);
+  --surface-tint-hint: var(--raised);
+  --pill-neutral-bg: var(--raised);
+  --warn-bg: rgba(255, 159, 28, 0.14);
+  --surface-row: var(--deep);
+  --slot-pill-bg: var(--raised);
+  --serving-pill-bg: var(--raised);
+  --homemade-bg: rgba(57, 255, 136, 0.14);
+  --control-hover-soft: var(--raised);
+  --control-active-soft: var(--line-soft);
+  --danger-hover-bg: rgba(255, 77, 94, 0.14);
+  --warn-active-bg: rgba(255, 159, 28, 0.25);
+  --sheet-grab: var(--line);
+  --sheet-backdrop: rgba(2, 3, 5, 0.75);
+  --text-strong: var(--ink);
+  --text-mid: var(--muted);
+  --text-hint: var(--muted);
+  --text-meta: var(--muted);
+  --warn-text: var(--orange);
+  --warn-text-dark: var(--orange);
+  --note-text: var(--orange);
+  --error-copy: var(--red);
+  --warn-accent: var(--orange);
+  --homemade-text: var(--lime);
+  --text-brand-muted: var(--cyan);
+  --warn-border: var(--orange);
+  --danger-border: rgba(255, 77, 94, 0.5);
+  --control-border-brand: var(--line);
+  --scope-border: var(--line-soft);
+  --divider-dashed: var(--line-soft);
+  --border-input: var(--line);
+  --border-button: var(--line);
+  --border-strong: var(--cyan);
+  --brand-tint-whisper: rgba(5, 217, 232, 0.05);
+  --brand-focus-glow: rgba(5, 217, 232, 0.2);
+
+  /* Recipe view: header, full-screen ingredients, cook mode, eaten section */
+  --rv-head-text: var(--ink);
+  --rv-head-muted: var(--muted);
+  --rv-head-wash: rgba(5, 217, 232, 0.12);
+  --rv-head-wash-soft: rgba(5, 217, 232, 0.1);
+  --rv-head-wash-hover: rgba(5, 217, 232, 0.2);
+  --rv-head-wash-strong: rgba(5, 217, 232, 0.25);
+  --rv-head-panel: rgba(5, 217, 232, 0.08);
+  --rv-head-press: rgba(5, 217, 232, 0.15);
+  --rv-head-field-focus: rgba(5, 217, 232, 0.2);
+  --rv-head-border: var(--line);
+  --rv-head-solid: var(--cyan);
+  --rv-head-on-solid: var(--void);
+  --rv-head-focus: var(--yellow);
+  --rv-head-error: var(--red);
+  --rv-head-crumb: var(--muted);
+  --rv-head-crumb-sep: var(--line);
+  --rv-accent: var(--yellow);
+  --rv-on-accent: var(--void);
+  --cook-bg: var(--void);
+  --cook-muted: var(--cyan);
+  --cook-wash: transparent;
+  --cook-chip: var(--raised);
+  --cook-track: #1b2836;
+  --ilist-cb-border: var(--muted);
+  --text-struck: #7d91a5;
+  --sb-text: var(--orange);
+  --sb-bg: rgba(255, 159, 28, 0.14);
+  --ifull-progress: var(--lime);
+  --pill-on-border: var(--cyan);
+  --all-out-text: var(--lime);
+  --all-out-bg: rgba(57, 255, 136, 0.14);
+  --eaten-hover-bg: rgba(57, 255, 136, 0.1);
+
+  /* --pip-* tokens are deliberately not remapped: Pip's room keeps its own palette. */
+
+  /* Shopping list and its popups. The aisle-done tokens only ever sit on the paper receipt. */
+  --surface-tint-pressed: var(--line-soft);
+  --progress-track: var(--black);
+  --stale-text: var(--yellow);
+  --aisle-done-bg: transparent;
+  --aisle-done-hover-bg: rgba(0, 0, 0, 0.06);
+  --aisle-done-count-bg: transparent;
+  --item-divider: var(--paper-line);
+  --error-bg-soft: var(--error-surface);
+  --on-brand-press-strong: rgba(5, 7, 11, 0.4);
+  --surface-tint-chip: var(--raised);
+  --warning-banner-bg: var(--black);
+  --warning-banner-text: var(--yellow);
+  --surface-quiet: var(--raised);
+  --surface-quiet-hover: var(--line-soft);
+  --error-banner-bg: rgba(255, 77, 94, 0.14);
+  --error-banner-border: var(--red);
+  --error-banner-text: var(--red);
+  --brand-hover-deep: var(--brand-primary-dark);
+
+  /* Aisle colours sit on the light paper receipt: each is >= 3:1 on --paper */
+  --aisle-produce: #2e7d32;
+  --aisle-dairy: #1565c0;
+  --aisle-meat: #c62828;
+  --aisle-seafood: #00838f;
+  --aisle-bakery: #b45309;
+  --aisle-grains: #795548;
+  --aisle-canned: #6b6b6b;
+  --aisle-condiments: #92400e;
+  --aisle-snacks: #c2185b;
+  --aisle-beverages: #3f51b5;
+  --aisle-frozen: #0277bd;
+  --aisle-spices: #558b2f;
+  --aisle-oils: #7a6a00;
+  --aisle-baking: #7b1fa2;
+  --aisle-misc: #546e7a;
+
+  /* Shared dialogs and controls */
+  --picker-pill-bg: var(--black);
+  --picker-arrow-wash-strong: rgba(5, 217, 232, 0.25);
+  --dismiss-target-border: var(--line);
+  --dismiss-x-color: var(--ink);
+  --dismiss-active-bg: var(--red);
+  --dismiss-circle-shadow: rgba(255, 42, 109, 0.4);
+  --lock-flash-glow: rgba(5, 217, 232, 0.9);
+
+  /* Admin forms */
+  --success-banner-bg: rgba(57, 255, 136, 0.14);
+  --success-banner-text: var(--lime);
+  --info-surface: rgba(5, 217, 232, 0.08);
+  --info-surface-soft: rgba(5, 217, 232, 0.08);
+  --info-border: var(--line);
+  --info-text: var(--cyan);
+  --info-accent: var(--cyan);
+
+  /* Landing animation: dark terminal in both phases, pink brand */
+  --landing-brand: var(--pink);
+  --landing-brand-dark: var(--cyan);
+  --landing-dark-bg-start: var(--panel);
+  --landing-dark-bg-end: var(--raised);
+  --landing-dark-text: var(--ink);
+  --landing-dark-text-secondary: var(--muted);
+  --landing-light-bg-start: var(--void);
+  --landing-light-bg-end: var(--panel);
+  --landing-light-text: var(--ink);
+  --landing-success: var(--lime);
+  --landing-glass: rgba(5, 217, 232, 0.12);
+  --landing-glass-border: var(--line);
+  --landing-glass-hover: rgba(5, 217, 232, 0.2);
+  --landing-glass-border-hover: var(--cyan);
+  --landing-brand-tint: rgba(255, 42, 109, 0.1);
+  --landing-brand-border: rgba(255, 42, 109, 0.4);
+  --landing-brand-tint-hover: rgba(255, 42, 109, 0.18);
+  --landing-brand-border-hover: var(--pink);
+  --landing-brand-tint-faint: rgba(255, 42, 109, 0.08);
+  --landing-brand-glow: rgba(255, 42, 109, 0.3);
+}
+
+/* Low FX: no glow, rain or flicker; display font falls back to the body font. The glow tokens
+   become a transparent no-op shadow, not "none": "none" inside a compound box-shadow list
+   (var(--box-cyan), 0 20px 40px ...) would invalidate the whole declaration and drop the drop shadow. */
+:root[data-theme="cyberpunk"] body.lowfx {
+  --glow-pink: 0 0 0 transparent;
+  --glow-cyan: 0 0 0 transparent;
+  --glow-yellow: 0 0 0 transparent;
+  --box-pink: 0 0 0 0 transparent;
+  --box-cyan: 0 0 0 0 transparent;
+  --f-display: var(--f-body);
+}

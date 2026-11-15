@@ -26,12 +26,12 @@
 
 .toast-error {
   background: var(--error);
-  color: white;
+  color: var(--on-brand);
 }
 
 .toast-success {
   background: var(--success);
-  color: white;
+  color: var(--on-brand);
 }
 
 .toast-message {

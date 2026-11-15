@@ -1,4 +1,6 @@
 import { usePet } from '../../contexts/PetContext'
+import { useTheme } from '../../contexts/ThemeContext'
+import PixelIcon from '../common/PixelIcon'
 import PipHerb from '../pet/herb/PipHerb'
 import { hatMiniViewBox, hatOnly } from '../pet/herb/wardrobeLayers'
 import { PIP_DEFAULT_FORM } from '../../constants/pipGrowth'
@@ -6,6 +8,9 @@ import { isWilted } from '../../utils/pipGrowth'
 import { PET_GUEST_TAB_LABEL } from '../../constants/pet'
 
 const ICON_PROPS = { viewBox: '0 0 24 24', width: 24, height: 24, fill: 'none', stroke: 'currentColor', strokeWidth: 2 }
+
+// Cyberpunk (iconSet 'pixel') draws the same three sections from the pixel grids.
+const NAV_ICON_NAMES = { recipes: 'menu', mealplan: 'cal', shopping: 'cart' }
 
 const NAV_ICONS = {
   recipes: (
@@ -40,6 +45,7 @@ const NAV_ICONS = {
  */
 function AppNavItems({ variant = 'footer', items, message }) {
   const { petName, mood, growth, wardrobe } = usePet()
+  const { theme } = useTheme()
   const tabForm = growth?.form ?? PIP_DEFAULT_FORM
   const tabOutfit = hatOnly(wardrobe?.outfit)
   const messageClass = variant === 'footer' ? 'footer-message' : 'header-nav-message'
@@ -70,7 +76,9 @@ function AppNavItems({ variant = 'footer', items, message }) {
               </>
             ) : (
               <>
-                {NAV_ICONS[item.key]}
+                {theme.iconSet === 'pixel'
+                  ? <PixelIcon name={NAV_ICON_NAMES[item.key]} size={24} />
+                  : NAV_ICONS[item.key]}
                 <span>{item.label}</span>
               </>
             )}

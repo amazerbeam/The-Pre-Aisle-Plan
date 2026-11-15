@@ -1,3 +1,24 @@
+/* Themes: Pip's room keeps its own palette in every theme (decision 4, CLAUDE.md → Themes). */
+.pet-view {
+  --brand-primary: #4a3f80; --brand-primary-dark: #3a3266; --brand-primary-light: #6b5fa0;
+  --text-primary: #2c3e50; --text-secondary: #6c757d;
+  --bg-primary: #ffffff; --bg-secondary: #f8f9fa; --border-color: #e9ecef;
+  --success: #28a745; --warning: #ffc107; --error: #dc3545;
+  --on-brand: #ffffff;
+  --focus-ring-color: #4a3f80;
+  color-scheme: light; /* a dark theme's root color-scheme must not reach the room's native controls */
+  color: var(--text-primary);
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+/* A non-default theme's base input defaults (dark surface, theme ink) stop at the room. Scoped under
+   [data-theme] because Default sets no data-theme and its inputs keep the browser's own colours. */
+:root[data-theme] .pet-view :where(input, select, textarea) {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  caret-color: auto;
+}
+
 /* MPP-14: Pet page (approved pet-mockup.html, first phone). */
 
 /* MPP-37: Pip mode — header on top, the room fills the rest (main is one screen tall). */

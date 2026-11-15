@@ -8,7 +8,7 @@
 /* ---------- Header ---------- */
 .m-head {
   padding: 8px 14px 12px;
-  color: #fff;
+  color: var(--on-brand);
   background: var(--brand-primary);
 }
 
@@ -23,9 +23,9 @@
   font-size: 22px;
 }
 
-/* The existing ⋯ trigger is brand-coloured; on the brand header it needs the translucent-white look */
+/* The existing ⋯ trigger is brand-coloured; on the brand header it needs the translucent wash look */
 .m-top .meal-plan-menu-trigger {
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--on-brand-wash);
 }
 
 /* ---------- Week bar ---------- */
@@ -40,8 +40,8 @@
   font: inherit;
   font-size: 13px;
   text-align: left;
-  color: #fff;
-  background: rgba(255, 255, 255, 0.12);
+  color: var(--on-brand);
+  background: var(--on-brand-faint);
   border: none;
   border-radius: 12px;
   cursor: pointer;
@@ -58,11 +58,11 @@
 }
 
 .m-weekbar:active {
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--on-brand-hover-strong);
 }
 
 .m-weekbar:focus-visible {
-  outline: 2px solid #fff;
+  outline: 2px solid var(--on-brand);
   outline-offset: 2px;
 }
 
@@ -88,8 +88,8 @@
   min-height: 56px;
   padding: 6px 0 7px;
   font: inherit;
-  color: #fff;
-  background: rgba(255, 255, 255, 0.12);
+  color: var(--on-brand);
+  background: var(--on-brand-faint);
   border: none;
   border-radius: 12px;
   cursor: pointer;
@@ -117,20 +117,20 @@
   width: 5px;
   height: 5px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--on-brand-active-strong);
 }
 
 .day-chip-dots i.is-filled {
-  background: #9be29b;
+  background: var(--chip-dot-filled);
 }
 
 .day-chip.is-selected {
   color: var(--brand-primary);
-  background: #fff;
+  background: var(--chip-selected-bg);
 }
 
 .day-chip.is-selected .day-chip-dots i {
-  background: #d8d4ea;
+  background: var(--chip-dot-selected);
 }
 
 .day-chip.is-selected .day-chip-dots i.is-filled {
@@ -138,16 +138,16 @@
 }
 
 .day-chip.is-today:not(.is-selected) {
-  box-shadow: inset 0 0 0 1.5px #ffd34d;
+  box-shadow: inset 0 0 0 1.5px var(--today-ring);
 }
 
 .day-chip:focus-visible {
-  outline: 2px solid #fff;
+  outline: 2px solid var(--on-brand);
   outline-offset: 2px;
 }
 
 .day-chip.is-selected:focus-visible {
-  outline-color: #ffd34d;
+  outline-color: var(--today-ring);
 }
 
 /* ---------- Body ---------- */
@@ -166,7 +166,7 @@
   font: inherit;
   text-align: left;
   color: inherit;
-  background: #fff;
+  background: var(--bg-primary);
   border: 1px solid var(--border-color);
   border-radius: 14px;
   cursor: pointer;
@@ -238,8 +238,8 @@
   font-size: 14px;
   font-weight: 600;
   color: var(--brand-primary-light);
-  background: #fff;
-  border: 1.5px dashed #cfcbe0;
+  background: var(--bg-primary);
+  border: 1.5px dashed var(--slot-add-border);
   border-radius: 14px;
   cursor: pointer;
   touch-action: manipulation;
@@ -248,7 +248,7 @@
 
 .m-add:active,
 .m-add:focus-visible {
-  background: #eeebf7;
+  background: var(--surface-tint-brand);
   border-color: var(--brand-primary-light);
 }
 
@@ -285,7 +285,7 @@
 }
 
 .m-entry-fallback .entry-menu-trigger {
-  background: #fff;
+  background: var(--bg-primary);
   border: 1px solid var(--border-color);
 }
 
@@ -351,7 +351,7 @@
   font: inherit;
   font-size: 13px;
   font-weight: 700;
-  color: #fff;
+  color: var(--on-brand);
   border: none;
   cursor: pointer;
   touch-action: manipulation;
@@ -371,7 +371,7 @@
 }
 
 .swipe-row-action:focus-visible {
-  outline: 2px solid #fff;
+  outline: 2px solid var(--on-brand);
   outline-offset: -4px;
 }
 
@@ -417,8 +417,8 @@
   line-height: 1.4;
   padding: 8px 12px;
   font-size: 13px;
-  color: #fff;
-  background: #1f1a3a;
+  color: var(--toast-text);
+  background: var(--toast-bg);
   border-radius: 10px;
 }
 
@@ -429,7 +429,7 @@
   bottom: -6px;
   border: 6px solid transparent;
   border-bottom: 0;
-  border-top-color: #1f1a3a;
+  border-top-color: var(--toast-bg);
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -23,7 +23,7 @@
 .ifull-head {
   flex: none;
   padding: 10px 12px 12px;
-  color: #fff;
+  color: var(--rv-head-text);
   background: var(--brand-primary);
 }
 
@@ -56,8 +56,8 @@
   font: inherit;
   font-size: 13px;
   font-weight: 600;
-  color: #fff;
-  background: rgba(255, 255, 255, 0.18);
+  color: var(--rv-head-text);
+  background: var(--rv-head-wash);
   border: none;
   border-radius: 999px;
   cursor: pointer;
@@ -65,7 +65,7 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.ifull-done:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.ifull-done:focus-visible { outline: 2px solid var(--rv-head-focus); outline-offset: 2px; }
 
 .ifull-bar { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
 
@@ -73,14 +73,14 @@
   flex: 1;
   height: 8px;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.18);
+  background: var(--rv-head-wash);
   border-radius: 99px;
 }
 
 .ifull-prog i {
   display: block;
   height: 100%;
-  background: #7cc36b;
+  background: var(--ifull-progress);
   border-radius: 99px;
   transition: width 0.2s;
 }
@@ -111,7 +111,7 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.ifull-pill.on { color: var(--brand-primary); background: #efedf7; border-color: #cfcbe3; }
+.ifull-pill.on { color: var(--brand-primary); background: var(--surface-tint-soft); border-color: var(--pill-on-border); }
 .ifull-wake { font-size: 11px; color: var(--text-secondary); white-space: nowrap; }
 
 .ifull-srv {
@@ -159,7 +159,7 @@
   padding: 14px;
   font-weight: 600;
   text-align: center;
-  color: #1e7b34;
-  background: #e8f6ec;
+  color: var(--all-out-text);
+  background: var(--all-out-bg);
   border-radius: 12px;
 }

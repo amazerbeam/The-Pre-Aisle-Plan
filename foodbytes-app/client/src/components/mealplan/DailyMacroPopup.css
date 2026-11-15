@@ -27,7 +27,7 @@
 }
 
 .macro-popup {
-  background: #fff;
+  background: var(--surface-popover);
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
   min-width: 0;
@@ -56,8 +56,8 @@
 }
 
 .macro-popup-header {
-  background: #4a3f80;
-  color: #fff;
+  background: var(--brand-primary);
+  color: var(--on-brand);
   padding: 16px;
   border-radius: 12px 12px 0 0;
   display: flex;
@@ -86,7 +86,7 @@
 .macro-popup-close {
   background: transparent;
   border: none;
-  color: #fff;
+  color: var(--on-brand);
   font-size: 2rem;
   line-height: 1;
   cursor: pointer;
@@ -105,16 +105,16 @@
 
 @media (hover: hover) {
   .macro-popup-close:hover {
-    background-color: rgba(255, 255, 255, 0.2);
+    background-color: var(--on-brand-hover-strong);
   }
 }
 
 .macro-popup-close:active {
-  background-color: rgba(255, 255, 255, 0.3);
+  background-color: var(--on-brand-active-strong);
 }
 
 .macro-popup-close:focus-visible {
-  outline: 2px solid #fff;
+  outline: 2px solid var(--on-brand);
   outline-offset: 2px;
 }
 
@@ -129,7 +129,7 @@
 .macro-total {
   text-align: center;
   padding: 16px;
-  background: #f8f9fa;
+  background: var(--bg-secondary);
   border-radius: 8px;
   margin-bottom: 20px;
 }
@@ -137,7 +137,7 @@
 .macro-total-label {
   display: block;
   font-size: 0.85rem;
-  color: #666;
+  color: var(--text-mid);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-bottom: 6px;
@@ -147,7 +147,7 @@
   display: block;
   font-size: 2rem;
   font-weight: 700;
-  color: #4a3f80;
+  color: var(--brand-primary);
 }
 
 .macro-grid {
@@ -157,8 +157,8 @@
 }
 
 .macro-item {
-  background: #fff;
-  border: 2px solid #e0e0e0;
+  background: var(--bg-primary);
+  border: 2px solid var(--border-input);
   border-radius: 8px;
   padding: 12px;
   text-align: center;
@@ -176,17 +176,17 @@
 
 @media (hover: hover) {
   .macro-item:hover {
-    border-color: #4a3f80;
+    border-color: var(--brand-primary);
   }
 }
 
 .macro-item:active {
-  border-color: #4a3f80;
-  background: #faf9fd;
+  border-color: var(--brand-primary);
+  background: var(--surface-tint-hint);
 }
 
 .macro-item:focus-visible {
-  outline: 2px solid #4a3f80;
+  outline: 2px solid var(--focus-ring-color);
   outline-offset: 2px;
 }
 
@@ -205,7 +205,7 @@
  * over (red). `--plain` is the no-usable-data case (disabled tile), kept
  * neutral like the pre-fix default. */
 .macro-item--plain {
-  border-color: #e0e0e0;
+  border-color: var(--border-input);
 }
 
 .macro-item--under {
@@ -238,7 +238,7 @@
 
 .macro-item-label {
   font-size: 0.75rem;
-  color: #666;
+  color: var(--text-mid);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   font-weight: 600;
@@ -255,30 +255,30 @@
 .macro-item-grams {
   font-size: 1.3rem;
   font-weight: 700;
-  color: #333;
+  color: var(--text-strong);
 }
 
 .macro-item-percent {
   font-size: 0.9rem;
   font-weight: 500;
-  color: #666;
-  background: #f0f0f0;
+  color: var(--text-mid);
+  background: var(--pill-neutral-bg);
   padding: 2px 6px;
   border-radius: 12px;
 }
 
 .macro-item-calories {
   font-size: 0.75rem;
-  color: #999;
+  color: var(--text-hint);
 }
 
 .macro-popup-hint {
   text-align: center;
   font-size: 0.75rem;
-  color: #999;
+  color: var(--text-hint);
   padding: 8px;
   margin: 0;
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--divider-soft);
   flex-shrink: 0;
 }
 

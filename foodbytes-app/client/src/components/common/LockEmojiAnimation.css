@@ -35,10 +35,10 @@
   transform: scale(0.9);
 }
 
-/* Phase 4: Flash white */
+/* Phase 4: Flash bright */
 .lock-emoji-container.flash .lock-emoji {
   transform: scale(0.9);
-  filter: brightness(2) drop-shadow(0 0 20px rgba(255, 255, 255, 0.9));
+  filter: brightness(2) drop-shadow(0 0 20px var(--lock-flash-glow));
 }
 
 /* Phase 5: Locked state */

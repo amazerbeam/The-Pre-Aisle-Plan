@@ -44,7 +44,7 @@
 .sl-kebab {
   min-height: 44px;
   border: 1px solid var(--border-color);
-  background: #fff;
+  background: var(--bg-primary);
   color: var(--text-primary);
   border-radius: 10px;
   padding: 0 13px;
@@ -59,7 +59,7 @@
 }
 
 .sl-btn[aria-pressed="true"] {
-  background: #eeebf7;
+  background: var(--surface-tint-brand);
   border-color: var(--brand-primary-light);
   color: var(--brand-primary);
   font-weight: 600;
@@ -73,19 +73,19 @@
 }
 
 .sl-kebab[aria-expanded="true"] {
-  background: #eeebf7;
+  background: var(--surface-tint-brand);
 }
 
 @media (hover: hover) {
   .sl-btn:hover,
   .sl-kebab:hover {
-    background: #eeebf7;
+    background: var(--surface-tint-brand);
   }
 }
 
 .sl-btn:active,
 .sl-kebab:active {
-  background: #e3dff2;
+  background: var(--surface-tint-pressed);
 }
 
 .sl-btn:focus-visible,
@@ -113,7 +113,7 @@
   margin: 0;
   padding: 4px;
   list-style: none;
-  background: #fff;
+  background: var(--surface-popover);
   border: 1px solid var(--border-color);
   border-radius: 12px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
@@ -136,18 +136,18 @@
 
 @media (hover: hover) {
   .sl-menu-list button:hover {
-    background: #eeebf7;
+    background: var(--surface-tint-brand);
   }
 }
 
 .sl-menu-list button:active {
-  background: #e3dff2;
+  background: var(--surface-tint-pressed);
 }
 
 /* Progress card */
 .sl-progress {
   margin-bottom: var(--spacing-md);
-  background: #fff;
+  background: var(--bg-primary);
   border: 1px solid var(--border-color);
   border-radius: 14px;
   padding: 12px 14px;
@@ -167,7 +167,7 @@
   flex: 1;
   height: 10px;
   border-radius: 5px;
-  background: #e6e3f0;
+  background: var(--progress-track);
   overflow: hidden;
 }
 
@@ -188,15 +188,15 @@
 /* Out-of-date banner */
 .sl-stale {
   margin-bottom: var(--spacing-md);
-  background: #fff7e6;
-  border: 1px solid #f3d39a;
+  background: var(--stale-bg);
+  border: 1px solid var(--stale-border);
   border-radius: 12px;
   padding: 10px 14px;
   display: flex;
   gap: 10px;
   align-items: center;
   font-size: 0.875rem;
-  color: #7a4b00;
+  color: var(--stale-text);
 }
 
 .sl-stale button {
@@ -204,7 +204,7 @@
   min-height: 44px;
   border: none;
   background: var(--brand-primary);
-  color: #fff;
+  color: var(--on-brand);
   border-radius: 8px;
   padding: 0 14px;
   font-weight: 600;
@@ -260,7 +260,7 @@
 /* Aisle Section */
 .shopping-aisle {
   break-inside: avoid;
-  background: white;
+  background: var(--bg-primary);
   border-radius: 14px;
   border: 1px solid var(--border-color);
   margin: 0 0 14px;
@@ -276,7 +276,7 @@
   padding: 11px 14px;
   border: none;
   border-bottom: 1px solid var(--border-color);
-  background: white;
+  background: var(--bg-primary);
   font: inherit;
   text-align: left;
   cursor: pointer;
@@ -287,7 +287,7 @@
 
 .shopping-aisle.is-done .aisle-header {
   border-bottom: none;
-  background: #f3faf4;
+  background: var(--aisle-done-bg);
 }
 
 @media (hover: hover) {
@@ -296,7 +296,7 @@
   }
 
   .shopping-aisle.is-done .aisle-header:hover {
-    background: #e8f5ea;
+    background: var(--aisle-done-hover-bg);
   }
 }
 
@@ -330,8 +330,8 @@
 }
 
 .shopping-aisle.is-done .aisle-count {
-  background: #d8f0dd;
-  color: #1b6b2e;
+  background: var(--aisle-done-count-bg);
+  color: var(--audited-text);
 }
 
 .expand-icon {
@@ -355,7 +355,7 @@
   gap: 12px;
   min-height: 52px;
   padding: 0 8px 0 14px;
-  border-bottom: 1px solid #f2f3f5;
+  border-bottom: 1px solid var(--item-divider);
   cursor: pointer;
   transition: opacity 0.3s ease, background-color 0.15s ease;
   user-select: none;
@@ -377,7 +377,7 @@
   width: 26px;
   height: 26px;
   border-radius: 50%;
-  border: 2px solid #c9ced4;
+  border: 2px solid var(--ilist-cb-border);
   flex: none;
   display: grid;
   place-items: center;
@@ -390,7 +390,7 @@
 .shopping-item.checked .tick-circle {
   background: var(--aisle-color);
   border-color: var(--aisle-color);
-  color: #fff;
+  color: var(--on-brand);
 }
 
 /* Item Text */
@@ -411,7 +411,7 @@
 .shopping-item.checked .item-name,
 .shopping-item.checked .item-quantity {
   text-decoration: line-through;
-  color: #a0a6ad;
+  color: var(--text-struck);
 }
 
 .info-btn {
@@ -430,12 +430,12 @@
 
 @media (hover: hover) {
   .info-btn:hover {
-    background: #eeebf7;
+    background: var(--surface-tint-brand);
   }
 }
 
 .info-btn:active {
-  background: #e3dff2;
+  background: var(--surface-tint-pressed);
 }
 
 /* FR-042: Long Press State */
@@ -458,7 +458,7 @@
   color: var(--brand-primary);
   font-weight: 500;
   animation: fadeIn 0.2s ease-out;
-  background: rgba(74, 63, 128, 0.1);
+  background: var(--brand-tint-soft);
   padding: 2px 8px;
   border-radius: 10px;
 }
@@ -502,7 +502,7 @@
 /* Error State */
 .error {
   padding: var(--spacing-lg);
-  background: #fee;
+  background: var(--error-bg-soft);
   border: 1px solid var(--error);
   border-radius: var(--radius-md);
   color: var(--error);
@@ -513,7 +513,7 @@
 .empty-state {
   padding: var(--spacing-xl);
   text-align: center;
-  background: white;
+  background: var(--bg-primary);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
   border: 1px solid var(--border-color);

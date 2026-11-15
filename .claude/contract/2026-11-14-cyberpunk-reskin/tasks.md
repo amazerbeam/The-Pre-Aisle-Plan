@@ -1,185 +1,145 @@
-# Tasks: Cyberpunk pixel restaurant reskin (FOODBYTES // Night Kitchen)
+# Tasks: Theme system + user menu v2 + Cyberpunk theme (FOODBYTES // Night Kitchen)
 
 > **For agentic workers:** Use `/fb-apply` to walk this contract phase by phase. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-Status: PLANNED
-Started: 2026-11-14
+Status: COMPLETE
+Started: 2026-11-14 (revision 2: 2026-11-15)
 
-**Goal:** Restyle the whole client to match the approved mockup: a cyberpunk pixel night-kitchen look with tokens, backdrop, neon brand, pixel icons, a teal menu board, an LED order board, a terminal recipe view and a receipt shopping list. Behaviour stays the same, every text pair passes AA, popups work on mobile, and there is a Low FX switch.
+**Goal:** Add a theme system. Default stays exactly as today; Cyberpunk is the approved night-kitchen look. Users pick a theme in a redesigned user menu (remembered per device). Every text pair passes AA in every theme, popups work on mobile, Low FX switch for Cyberpunk.
 
-**Spec:** `plan.md` in this folder. Visual reference: `C:\Users\jossd\Downloads\cyberpunk-makeover-mockup.html`. Design rules: `.claude/contract/2026-11-14-cyberpunk-makeover/mockup-plan.md` §2–§3.
+**Spec:** `plan.md` in this folder. Visual reference: `foodbytes-app/mockup/app-mockup.html` (Cyberpunk, full app) and `foodbytes-app/mockup/user-menu-themes.html` (user menu, both themes, style A). Cyberpunk design rules: `.claude/contract/2026-11-14-cyberpunk-makeover/mockup-plan.md` §2–§3.
 
 ---
 
 ## Sweep rules (apply in every CSS task)
 
-The phase 2–7 tasks restyle CSS files. These steps describe how to do that:
+Every CSS task in Phases 2–8 does two things to its files: a **Default-preserving sweep** and a **Cyberpunk treatment**.
 
-1. **Find the target look.** Open the mockup and find the selector that draws the same element. For example, the mockup's `.rcard` corresponds to `.recipe-card`, and its `.dlg` and `.bar-t` correspond to a modal and its header. Copy the look (border, background, font token, glow), translated to the app's class names. Never copy mockup class names into the app.
-2. **Replace every literal colour with a token from `src/styles/tokens.css`.** Use this table:
+1. **Default-preserving sweep (component CSS file).** Replace every literal colour — `#hex`, `white`, and any `rgb()/rgba()` that is not pure black — with a token:
+   - If `themes/default.css` already has a token with **exactly** that value **and** the same role, use it.
+   - Otherwise add a role-named token to `themes/default.css` with **exactly** the literal value (e.g. `--surface-tint-brand: #eeebf7;`, `--on-brand: #ffffff;`), grouped under an area comment, and give it a value in `themes/cyberpunk.css`.
+   - **Never change a Default value.** Under Default the computed colour of every element must be identical to before. Black `rgba(0,0,0,x)` shadows stay as they are.
+2. **Cyberpunk values.** Pick the Cyberpunk value for each new token from this table:
 
-| Old literal (typical) | Token |
+| Default literal (typical role) | Cyberpunk value |
 |---|---|
-| `#fff`, `white`, `#ffffff` (as a surface) | `var(--panel)`, or `var(--raised)` for popovers and inputs |
-| `#f8f9fa`, `#f5f5f5`, `#fafafa` | `var(--void)` (page) or `var(--deep)` (inset wells) |
-| `#fff`, `white` (as text on a brand fill) | `var(--void)`, because neon fills take dark text |
-| `#2c3e50`, `#333`, `#222`, `#111` (as text) | `var(--ink)` |
-| `#666`, `#6c757d`, `#888`, `#999` (as text) | `var(--muted)` |
-| `#e9ecef`, `#ddd`, `#eee`, `#ccc` (borders) | `var(--line-soft)`, or `var(--line)` for a visible edge |
-| `#4a3f80` and purples | `var(--pink)` for primary actions, `var(--cyan)` for selection and focus frames |
-| greens | `var(--lime)` |
-| reds | `var(--red)` |
-| ambers and yellows | `var(--yellow)`, or `var(--orange)` for cheat and store-bought |
-| `rgba(0,0,0,x)` shadows | keep them (black shadows are allowed) |
+| white / light surface | `var(--panel)`, or `var(--raised)` for popovers and inputs |
+| light grey page / well | `var(--void)` (page) or `var(--deep)` (inset well) |
+| white text on a brand fill | `var(--void)` (neon fills take dark text) |
+| dark text | `var(--ink)` |
+| grey text | `var(--muted)` |
+| light borders | `var(--line-soft)`, or `var(--line)` for a visible edge |
+| brand purple | `var(--pink)` for primary actions, `var(--cyan)` for selection and focus frames |
+| green / red | `var(--lime)` / `var(--red)` |
+| amber / yellow | `var(--yellow)`, or `var(--orange)` for cheat and store-bought |
+| purple-tinted rgba | the same alpha on `--pink` or `--cyan` |
 
-3. **Typography:** headings and section titles use `var(--f-display)`, badges, tags and tiny labels use `var(--f-label)`, numbers (kcal, macros, counts, dates) use `var(--f-num)`, and everything else inherits `var(--f-body)`.
-4. **Stacking:** use `z-index` only from `var(--z-popover)`, `var(--z-nav)`, `var(--z-sheet)` and `var(--z-toast)`.
-5. **Touch and focus:** keep or restore `min-height: 44px` and `min-width: 44px` on interactive elements. Wrap hover rules in `@media (hover: hover)`. Focus uses `:focus-visible { outline: var(--focus-ring); outline-offset: 2px }`.
+3. **Cyberpunk treatment (override file).** Anything tokens can't express — fonts per element, HUD brackets, glow, borders, counters, the receipt zigzag — goes in `src/styles/themes/cyberpunk/<area>.css`. Every selector starts with `:root[data-theme="cyberpunk"]`. Find the look by matching the mockup selector to the app element (e.g. mockup `.rcard` → `.recipe-card`); never copy mockup class names into the app. Raise selector specificity instead of using `!important` (the Low FX / reduced-motion animation kill-switch is the only `!important`).
+4. **Typography (Cyberpunk only, in override files):** headings `var(--f-display)`, badges/tags/tiny labels `var(--f-label)`, numbers (kcal, macros, counts, dates) `var(--f-num)`, everything else `var(--f-body)`.
+5. **Touch and focus (both themes):** keep `min-height/min-width: 44px` on interactive elements; hover rules inside `@media (hover: hover)`; focus via `:focus-visible { outline: 2px solid var(--focus-ring-color); outline-offset: 2px }`.
 6. **Don't touch JSX** unless the task's `**Files:**` block lists it.
-7. **Verify the file** with the task's `Select-String` step. The pattern `#[0-9a-fA-F]{3,8}\b|\bwhite\b` must return zero hits in that file. Any intentional literal goes into `tokens.css` instead.
+7. **Verify each component CSS file** with the task's grep. Pattern (PowerShell `Select-String`, .NET regex):
+   `#[0-9a-fA-F]{3,8}\b|\bwhite\b(?!-)|rgba?\((?!\s*0\s*,\s*0\s*,\s*0\s*[,)])`
+   Zero hits required. `src/styles/themes/**` is exempt (that is where colours live).
 
 ---
 
 ## File map
 
 **Created:**
-- `foodbytes-app/client/src/styles/tokens.css`: palette, fonts, glow, z-scale, focus, legacy remap and macro retune.
-- `foodbytes-app/client/src/constants/display.js`: Low FX storage key and body class.
-- `foodbytes-app/client/src/utils/lowFx.js`: `readLowFx` and `applyLowFx`.
-- `foodbytes-app/client/src/hooks/useLowFx.js`: the toggle hook for the account-menu switch.
-- `foodbytes-app/client/src/constants/pixelIcons.js`: icon grids and accents.
-- `foodbytes-app/client/src/components/common/PixelIcon.jsx` and `PixelIcon.css`: the pixel icon renderer.
-- `foodbytes-app/client/src/components/layout/Ticker.jsx` and `Ticker.css`: the decorative ticker.
-- `foodbytes-app/client/src/components/layout/LowFxControl.jsx`: the account-menu switch.
-- `foodbytes-app/client/scripts/check-contrast.mjs`: the token contrast check.
+- `foodbytes-app/client/src/styles/themes/default.css`, `cyberpunk.css`, `previews.css`, `cyberpunk/index.css`, `cyberpunk/shell.css`, `cyberpunk/recipes.css`, `cyberpunk/mealplan.css`, `cyberpunk/recipe-view.css`, `cyberpunk/shopping.css`, `cyberpunk/dialogs.css`
+- `foodbytes-app/client/src/constants/themes.js`, `constants/pixelIcons.js`
+- `foodbytes-app/client/src/utils/theme.js`, `utils/lowFx.js`
+- `foodbytes-app/client/src/contexts/ThemeContext.jsx`
+- `foodbytes-app/client/src/components/layout/UserMenu.jsx` + `.css`, `ThemePicker.jsx` + `.css`, `LowFxControl.jsx`, `HeaderBrand.jsx`, `Ticker.jsx` + `.css`
+- `foodbytes-app/client/src/components/common/PixelBrandMark.jsx`, `PixelIcon.jsx` + `.css`
+- `foodbytes-app/client/scripts/check-themes.mjs`
 
-**Modified:**
-- `foodbytes-app/client/index.html`: fonts, title, theme colour and Apple meta tags.
-- `foodbytes-app/client/public/manifest.webmanifest`: name and colours.
-- `foodbytes-app/client/public/favicon.svg`, `public/icons/brand-mark.svg`, `public/icons/brand-mark-maskable.svg`: the pixel logo.
-- `foodbytes-app/client/public/icons/icon-192.png`, `icon-512.png`, `icon-maskable-512.png`, `apple-touch-icon.png`: re-rendered from the new SVG.
-- `foodbytes-app/client/package.json`: the `check:contrast` script and the version.
-- `foodbytes-app/client/src/main.jsx`: imports `tokens.css` and applies Low FX at boot.
-- `foodbytes-app/client/src/App.jsx`: rain div and ticker mount.
-- `foodbytes-app/client/src/styles/global.css`: body, `.app` backdrop, scanlines, lowfx and reduced motion.
-- `foodbytes-app/client/src/components/pet/PetView.css`: containment block only.
-- `foodbytes-app/client/src/components/common/BrandMark.jsx`: the pixel logo.
-- `foodbytes-app/client/src/components/layout/Header.jsx` and `Header.css`, `Footer.css`, `AppNavItems.jsx`.
-- `foodbytes-app/client/src/components/common/ExtrasIcons.jsx`: `CartIcon` uses `PixelIcon`.
-- About 45 component CSS files, swept area by area. Each task lists them.
-- `foodbytes-app/foodbytes-api/pom.xml` and `CHANGELOG.md`: the version.
+**Modified:** `index.html` (boot script only), `package.json` (script + version), `src/main.jsx`, `src/App.jsx`, `src/styles/global.css`, `src/constants/appRoutes.js`, `src/hooks/useDocumentTitle.js`, `components/layout/Header.jsx` + `Header.css`, `Footer.css`, `AppNavItems.jsx`, `DefaultPortionsControl.css`, `MealTimesControl.css`, `VersionInfo.css`, `components/common/ExtrasIcons.jsx`, `components/auth/LoginModal.jsx` + `.css`, `components/pet/PetView.css` (containment only), ~45 component CSS files swept per area, `foodbytes-api/pom.xml`, `CHANGELOG.md`, `CLAUDE.md`, `foodbytes-app/mockup/*` (only if implementation diverged).
 
-**Deleted:** (none)
+**Unchanged by decision:** `public/favicon.svg`, `public/icons/*`, `public/manifest.webmanifest`, `components/common/BrandMark.jsx`, the `index.html` title, icons and Apple meta.
+
+**Deleted:** none.
 
 ---
 
-## Phase 1 — Foundations
+## Phase 1 — Theme foundations
 
-This phase adds the token sheet, fonts, backdrop, Low FX plumbing, Pip containment and the contrast check. The legacy remap flips most of the app dark immediately. Some literal-coloured spots will look wrong until their phase sweeps them, which is expected. The build stays green and no behaviour changes.
+Adds the token files, registry, context, boot path, Pip containment and the theme check. Default must look exactly as before at the end of this phase (only token locations moved). No Cyberpunk visuals yet beyond the token remap; the app can be switched to Cyberpunk by hand (`document.documentElement.dataset.theme='cyberpunk'`) and will look half-done, which is expected.
 
-### Task 1: Create the token sheet
-
-- Skill: `react-frontend`
-
-**Files:**
-- Create: `foodbytes-app/client/src/styles/tokens.css`
-- Modify: `foodbytes-app/client/src/main.jsx:10`
-
-- [ ] **Step 1: Write `tokens.css`** with exactly the values in plan.md → Data shapes → `tokens.css`:
-  - palette, card panel stops, fonts, glow, z-scale and `--focus-ring`
-  - the legacy remap
-  - the macro retune
-  - a `body.lowfx` block setting `--glow-pink`, `--glow-cyan`, `--glow-yellow`, `--box-pink` and `--box-cyan` to `none` and `--f-display: var(--f-body)`
-
-  Take the glow and box shadow values from the mockup's `:root`. Add `color-scheme: dark;` on `:root`.
-
-- [ ] **Step 2: Import it before global.css** in `main.jsx`:
-
-```js
-import './styles/tokens.css'
-import './styles/global.css'
-```
-
-- [ ] **Step 3: Build**
-
-Run: `cd foodbytes-app\client; npm run build`
-Expected: `built in <n>s`, no errors.
-
-### Task 2: Remove the old token block from global.css and restyle the shell base
+### Task 1: Default token file ✓
 
 - Skill: `react-frontend`
 
 **Files:**
-- Modify: `foodbytes-app/client/src/styles/global.css:1-104`
-
-- [ ] **Step 1: Remove the duplicated tokens from `global.css`.** Delete these `:root` declarations, which `tokens.css` now owns:
-  - brand, neutral, semantic and macro tokens
-  - the `--pip-focus-ring`, `--pip-focus-ring-on-dark` and `--pip-focus-halo` values
-
-  Move those three Pip values verbatim into `tokens.css`, because Pip needs them unchanged.
-
-  Move the 15 `--aisle-*` colours into `tokens.css` too, retuned to neon-safe hues that each pass 3:1 as a swatch on `--paper` (Task 7 asserts this). Moving them keeps `global.css` free of literal colours, which Task 23 greps for.
-
-Keep in `global.css`: spacing, radius, shadows (black rgba only), `--footer-clearance` and `--pip-sheet-*`. Update the header comment to `/* FOODBYTES // Night Kitchen — global styles. Colours live in tokens.css. */`.
-
-- [ ] **Step 2: Restyle the base rules.**
-  - `body`: `font-family: var(--f-body); color: var(--ink); background: var(--void);`
-  - `.app`: add `position: relative; isolation: isolate;`
-  - Add `.app::before` (skyline): `position: fixed; inset: auto 0 0 0; height: 46vh; z-index: -2; pointer-events: none; background: url("data:image/svg+xml,…") bottom/auto 100% repeat-x;`. Copy the skyline SVG from the mockup's `.app::before`, keeping its colours URL-encoded as `%23rrggbb`. The skyline is artwork, not UI colour, and the encoded form keeps it out of the literal-colour grep.
-  - Add `.app::after` (scanlines): copy the mockup's repeating-linear-gradient, with `position: fixed; inset: 0; z-index: -1; pointer-events: none;`.
-  - Add `.city-rain`: copy the mockup's `.rain` rule, with `position: fixed; inset: 0; z-index: -1; pointer-events: none;`.
-  - Add `:focus-visible { outline: var(--focus-ring); outline-offset: 2px; }`.
-  - Add `::placeholder { color: var(--muted); opacity: 1 }`.
-  - Add `input, select, textarea { background: var(--raised); color: var(--ink); caret-color: var(--yellow); }` and an autofill override using `-webkit-text-fill-color: var(--ink)` and `box-shadow: 0 0 0 100px var(--raised) inset`.
-  - Add `body.lowfx .app::before, body.lowfx .app::after, body.lowfx .city-rain { display: none }` and `body.lowfx * { animation: none !important }`.
-  - Add `@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important } }`.
-
-- [ ] **Step 3: Build**
-
-Run: `cd foodbytes-app\client; npm run build`
-Expected: no errors.
-
-### Task 3: Load the fonts and set the page meta tags
-
-- Skill: `react-frontend`
-
-**Files:**
-- Modify: `foodbytes-app/client/index.html`
-
-- [ ] **Step 1: Replace the Inter `<link>`** with:
-
-```html
-<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&family=Silkscreen:wght@400;700&family=Space+Grotesk:wght@400..700&family=VT323&display=swap" rel="stylesheet">
-```
-
-- [ ] **Step 2: Update the meta tags.** Set `theme-color` to `#05070b`, `apple-mobile-web-app-status-bar-style` to `black-translucent`, `apple-mobile-web-app-title` to `FOODBYTES`, `description` to `FOODBYTES Night Kitchen - recipes and meal planning`, and `<title>` to `FOODBYTES · Night Kitchen`.
-
-- [ ] **Step 3: Confirm Inter is gone**
-
-Run: `Select-String -Path foodbytes-app\client\index.html,foodbytes-app\client\src\styles\*.css -Pattern "Inter"`
-Expected: zero hits.
-
-### Task 4: Add the Low FX constants and helpers
-
-- Skill: `react-frontend`
-
-**Files:**
-- Create: `foodbytes-app/client/src/constants/display.js`
-- Create: `foodbytes-app/client/src/utils/lowFx.js`
-- Create: `foodbytes-app/client/src/hooks/useLowFx.js`
+- Create: `foodbytes-app/client/src/styles/themes/default.css`
+- Modify: `foodbytes-app/client/src/styles/global.css`
 - Modify: `foodbytes-app/client/src/main.jsx`
 
-- [ ] **Step 1: Write the constants**
+- [x] **Step 1: Move the colour tokens.** Cut every colour token from `global.css` `:root` (brand, neutral, semantic, the FR-104 macro set with its comments, `--pip-focus-ring`, `--pip-focus-ring-on-dark`, `--pip-focus-halo`, all `--aisle-*`) into `themes/default.css` under `:root { color-scheme: light; … }`, values and comments verbatim. Add `--focus-ring-color` with the value of the focus colour most used in `global.css` today.
+- [x] **Step 2: Sweep `global.css`** per the sweep rules (exact Default values; new tokens into `default.css`). Keep spacing, radius, black shadows, `--footer-clearance`, `--pip-sheet-*`. Header comment: `/* Global styles. Colours live in styles/themes/ — see CLAUDE.md → Themes. */`.
+- [x] **Step 3: Import order in `main.jsx`:** `import './styles/themes/default.css'` immediately before `import './styles/global.css'`.
+- [x] **Step 4: Verify.**
+  Run: `Select-String -Path foodbytes-app\client\src\styles\global.css -Pattern "#[0-9a-fA-F]{3,8}\b|\bwhite\b(?!-)|rgba?\((?!\s*0\s*,\s*0\s*,\s*0\s*[,)])"`
+  Expected: zero hits.
+  Run: `cd foodbytes-app\client; npm run build`
+  Expected: `built in <n>s`, no errors.
+
+### Task 2: Cyberpunk token file and override bundle ✓
+
+- Skill: `react-frontend`
+
+**Files:**
+- Create: `foodbytes-app/client/src/styles/themes/cyberpunk.css`
+- Create: `foodbytes-app/client/src/styles/themes/cyberpunk/index.css`
+- Create: `foodbytes-app/client/src/styles/themes/cyberpunk/shell.css` (empty scaffold with header comment)
+- Modify: `foodbytes-app/client/src/main.jsx`
+
+- [x] **Step 1: Write `cyberpunk.css`** with exactly the values in plan.md → Data shapes → `cyberpunk.css`: palette, card stops, fonts, glow (copied from `app-mockup.html` `:root`), the remap of every Default token (including `--pip-*` left unchanged — Pip is contained), macro retune, `--aisle-*` retuned to ≥3:1 on `--paper`, and the `body.lowfx` block. All under `:root[data-theme="cyberpunk"]`.
+- [x] **Step 2: Write `cyberpunk/index.css`** with `@import './shell.css';` (later phases append their files) and a comment explaining the `:root[data-theme="cyberpunk"]` prefix rule.
+- [x] **Step 3: Import in `main.jsx`:** `import './styles/themes/cyberpunk.css'` after `default.css`; `import './styles/themes/cyberpunk/index.css'` on the line **after** `import App from './App.jsx'`.
+- [x] **Step 4: Build.**
+  Run: `cd foodbytes-app\client; npm run build`
+  Expected: no errors.
+
+### Task 3: Theme registry and helpers ✓
+
+- Skill: `react-frontend`
+
+**Files:**
+- Create: `foodbytes-app/client/src/constants/themes.js`
+- Create: `foodbytes-app/client/src/utils/theme.js`
+- Create: `foodbytes-app/client/src/utils/lowFx.js`
+
+- [x] **Step 1: Write `constants/themes.js`** exactly as plan.md → Data shapes.
+- [x] **Step 2: Write `utils/theme.js`:**
 
 ```js
-export const LOW_FX_STORAGE_KEY = 'fb.display.lowFx'
-export const LOW_FX_BODY_CLASS = 'lowfx'
+import { THEME_STORAGE_KEY, DEFAULT_THEME_ID, themeById } from '../constants/themes'
+
+export function readThemeId() {
+  try { return themeById(localStorage.getItem(THEME_STORAGE_KEY) ?? DEFAULT_THEME_ID).id } catch { return DEFAULT_THEME_ID }
+}
+
+export function applyTheme(id) {
+  const theme = themeById(id)
+  const root = document.documentElement
+  if (theme.id === DEFAULT_THEME_ID) delete root.dataset.theme
+  else root.dataset.theme = theme.id
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme.themeColor)
+  if (theme.fontsHref && !document.querySelector(`link[data-theme-fonts="${theme.id}"]`)) {
+    const link = Object.assign(document.createElement('link'), { rel: 'stylesheet', href: theme.fontsHref })
+    link.dataset.themeFonts = theme.id
+    document.head.appendChild(link)
+  }
+  try { localStorage.setItem(THEME_STORAGE_KEY, theme.id) } catch { /* storage blocked: theme still applies this session */ }
+}
 ```
 
-- [ ] **Step 2: Write `utils/lowFx.js`**
+- [x] **Step 3: Write `utils/lowFx.js`:**
 
 ```js
-import { LOW_FX_STORAGE_KEY, LOW_FX_BODY_CLASS } from '../constants/display'
+import { LOW_FX_STORAGE_KEY, LOW_FX_BODY_CLASS } from '../constants/themes'
 
 export function readLowFx() {
   try { return localStorage.getItem(LOW_FX_STORAGE_KEY) === '1' } catch { return false }
@@ -187,306 +147,196 @@ export function readLowFx() {
 
 export function applyLowFx(on) {
   document.body.classList.toggle(LOW_FX_BODY_CLASS, on)
-  try { localStorage.setItem(LOW_FX_STORAGE_KEY, on ? '1' : '0') } catch { /* storage blocked: class still applies for this session */ }
+  try { localStorage.setItem(LOW_FX_STORAGE_KEY, on ? '1' : '0') } catch { /* storage blocked */ }
 }
 ```
 
-- [ ] **Step 3: Write `hooks/useLowFx.js`**
+- [x] **Step 4: Smoke-check the registry.**
+  Run: `cd foodbytes-app\client; node --input-type=module -e "import {THEMES,themeById} from './src/constants/themes.js'; console.log(THEMES.map(t=>t.id).join(','), themeById('nope').id)"`
+  Expected: `default,cyberpunk default`
 
-```js
-import { useState } from 'react'
-import { LOW_FX_BODY_CLASS } from '../constants/display'
-import { applyLowFx } from '../utils/lowFx'
-
-// No cleanup by design: the switch unmounts with the account menu, but the preference persists.
-export function useLowFx() {
-  const [lowFx, setLowFx] = useState(() => document.body.classList.contains(LOW_FX_BODY_CLASS))
-  const toggleLowFx = () => { const next = !lowFx; applyLowFx(next); setLowFx(next) }
-  return { lowFx, toggleLowFx }
-}
-```
-
-- [ ] **Step 4: Apply the stored preference at boot.** In `main.jsx`, after the imports and before `ReactDOM.createRoot`:
-
-```js
-import { applyLowFx, readLowFx } from './utils/lowFx'
-applyLowFx(readLowFx())
-```
-
-- [ ] **Step 5: Build**
-
-Run: `cd foodbytes-app\client; npm run build`
-Expected: no errors.
-
-### Task 5: Mount the rain layer
+### Task 4: ThemeContext and boot ✓
 
 - Skill: `react-frontend`
 
 **Files:**
-- Modify: `foodbytes-app/client/src/App.jsx:50-51`
+- Create: `foodbytes-app/client/src/contexts/ThemeContext.jsx`
+- Modify: `foodbytes-app/client/src/main.jsx`
+- Modify: `foodbytes-app/client/index.html` (boot script only)
 
-- [ ] **Step 1: Add the rain div** as the first child of `<div className="app">`:
+- [x] **Step 1: Write `ThemeContext.jsx`** following the existing context files' shape: `ThemeProvider` holds `themeId` (init `readThemeId()`) and `lowFx` (init `readLowFx()`); `setTheme(id)` calls `applyTheme(id)` then sets state; `toggleLowFx()` calls `applyLowFx(!lowFx)` then sets state; value memoised `{ themeId, theme: themeById(themeId), setTheme, lowFx, toggleLowFx }`; `useTheme()` throws outside the provider like the other contexts.
+- [x] **Step 2: Boot in `main.jsx`:** after the imports, before `ReactDOM.createRoot`: `applyTheme(readThemeId())` and `applyLowFx(readLowFx())`. Wrap `<BrowserRouter>` in `<ThemeProvider>` (outermost).
+- [x] **Step 3: Inline boot script in `index.html`**, in `<head>` after the `theme-color` meta, exactly the script in plan.md → Modified contracts. Change nothing else in `index.html`.
+- [x] **Step 4: Build.**
+  Run: `cd foodbytes-app\client; npm run build`
+  Expected: no errors.
 
-```jsx
-<div className="city-rain" aria-hidden="true" />
-```
-
-- [ ] **Step 2: Build**
-
-Run: `cd foodbytes-app\client; npm run build`
-Expected: no errors.
-
-### Task 6: Keep Pip's room on the old palette
+### Task 5: Keep Pip's room on the Default palette ✓
 
 - Skill: `react-frontend`
 
 **Files:**
 - Modify: `foodbytes-app/client/src/components/pet/PetView.css` (prepend only)
 
-- [ ] **Step 1: Prepend the containment block.** It restores today's legacy token values and the Inter-free body font for the room:
+- [x] **Step 1: Prepend the containment block:**
 
 ```css
-/* Cyberpunk reskin: Pip's room is out of scope (decision 4) and keeps its original palette. */
+/* Themes: Pip's room keeps its own palette in every theme (decision 4, CLAUDE.md → Themes). */
 .pet-view {
   --brand-primary: #4a3f80; --brand-primary-dark: #3a3266; --brand-primary-light: #6b5fa0;
   --text-primary: #2c3e50; --text-secondary: #6c757d;
   --bg-primary: #ffffff; --bg-secondary: #f8f9fa; --border-color: #e9ecef;
   --success: #28a745; --warning: #ffc107; --error: #dc3545;
+  --focus-ring-color: <the Default value from Task 1>;
   color: var(--text-primary);
-  font-family: var(--f-body);
+  font-family: 'Inter', system-ui, sans-serif;
 }
 ```
 
-- [ ] **Step 2: Confirm the room has no portals that escape the containment**
+  Use the exact Default values from `default.css`; if Task 1 changed none of these names, the list above is correct. `PetView.css` is exempt from the literal grep (it is Pip, out of scope).
+- [x] **Step 2: Confirm no room portal escapes the containment.**
+  Run: `Get-ChildItem foodbytes-app\client\src\components\pet -Recurse -Include *.jsx | Select-String -Pattern "createPortal"`
+  Expected: zero hits. If any, add each portal root class to the `.pet-view` selector list.
 
-Run: `Select-String -Path foodbytes-app\client\src\components\pet\*.jsx,foodbytes-app\client\src\components\pet\*\*.jsx -Pattern "createPortal"`
-Expected: zero hits. If there are any, add each portal root class to the `.pet-view` selector list.
-
-### Task 7: Add the contrast regression check
+### Task 6: Theme check script ✓
 
 - Skill: `react-frontend`
 
 **Files:**
-- Create: `foodbytes-app/client/scripts/check-contrast.mjs`
+- Create: `foodbytes-app/client/scripts/check-themes.mjs`
 - Modify: `foodbytes-app/client/package.json` (`scripts`)
 
-- [ ] **Step 1: Write the script.**
-  - Read `src/styles/tokens.css` with `fs`. It holds every colour, including the aisle colours.
-  - Collect `--name: #hex` declarations into a map with a regex (`/--([a-z0-9-]+):\s*(#[0-9a-fA-F]{3,8})\b/g`). Use the first occurrence, which is the `:root` value.
-  - Compute WCAG contrast (sRGB → linear, `L = .2126R + .7152G + .0722B`, ratio `(L1+.05)/(L2+.05)`).
-  - Check `PAIRS`:
-    - text 4.5 on `panel`: `ink`, `muted`, `pink`, `cyan`, `yellow`, `lime`, `red`
-    - text 4.5 on `raised`: `ink`, `muted`, `pink`, `cyan`, `yellow`, `lime`, `red`
-    - text 4.5 on `card-teal-top` and `card-teal-bottom`: `ink`, `muted`, `pink`, `yellow`
-    - text 4.5 on `card-plan-top` and `card-plan-bottom`: `ink`, `muted`, `yellow`
-    - text 4.5 on `pink`, `cyan`, `yellow`, `lime`, `orange` and `red`: `void`
-    - text 4.5 on `paper`: `paper-ink`
-    - UI 3.0 on `panel`: `line`
-    - UI 3.0 on `paper`: every `aisle-*` token
-  - Print each failure as `FAIL <fg> on <bg>: <ratio> < <min>`, and exit 1 if any fail. Otherwise print `Contrast OK: <n> pairs`.
-  - An unknown token name is a failure (`MISSING <name>`), so a renamed token can't silently pass.
-
-- [ ] **Step 2: Add the npm script** `"check:contrast": "node scripts/check-contrast.mjs"`.
-
-- [ ] **Step 3: Run it**
-
-Run: `cd foodbytes-app\client; npm run check:contrast`
-Expected: `Contrast OK: <n> pairs`. On a failure, retune the token in `tokens.css`, never the threshold.
+- [x] **Step 1: Write the script** (shape of `scripts/check-version.mjs`):
+  - Parse `src/styles/themes/default.css` into a token map (`--name: value`). For each non-default theme, parse `src/styles/themes/<id>.css` and layer it over the Default map. Resolve `var(--x)` one level deep; only `#hex` values are checked.
+  - WCAG contrast (sRGB → linear, `L = .2126R + .7152G + .0722B`, `(L1+.05)/(L2+.05)`).
+  - `PAIRS.default`: `text-primary` and `text-secondary` on `bg-primary` and `bg-secondary` (4.5); white-equivalent `--on-brand` on `brand-primary` (4.5). If a Default pair fails, **report it and stop** — Default values are not retuned in this contract; the developer decides.
+  - `PAIRS.cyberpunk`: ink, muted, pink, cyan, yellow, lime, red on `panel` and on `raised` (4.5); ink, muted, pink, yellow on both `card-teal-*` stops (4.5); ink, muted, yellow on both `card-plan-*` stops (4.5); `void` on pink, cyan, yellow, lime, orange, red (4.5); `paper-ink` on `paper` (4.5); `line` on `panel` (3.0); every `aisle-*` on `paper` (3.0).
+  - Consistency: every `THEMES` id (import `src/constants/themes.js`) other than `default` has `src/styles/themes/<id>.css`; every id has a `.theme-preview--<id>` rule in `src/styles/themes/previews.css` (skip this check until Task 10 creates the file — treat a missing file as `MISSING previews.css` only once Task 10 is ticked; simplest: check only if the file exists); the `ids=[…]` array in `index.html` equals the `THEMES` ids in order.
+  - An unknown token name in `PAIRS` is a failure (`MISSING --name in <theme>`).
+  - Output `Themes OK: <n> themes, <m> contrast pairs`, else each `FAIL <fg> on <bg> (<theme>): <ratio> < <min>` / `MISSING …`, exit 1.
+- [x] **Step 2: Add the npm script** `"check:themes": "node scripts/check-themes.mjs"`.
+- [x] **Step 3: Run it.**
+  Run: `cd foodbytes-app\client; npm run check:themes`
+  Expected: `Themes OK: 2 themes, <m> contrast pairs`. On a Cyberpunk failure retune the Cyberpunk token, never the threshold.
 
 ---
 
-## Phase 2 — Brand and shell
+## Phase 2 — User menu v2 and theme picker
 
-This phase covers the pixel logo, icons, header sign, ticker, footer console nav, account menu with the Low FX switch, toasts and sign-in. When it's done, the app frame looks like the mockup on every route, even while page bodies are still being swept.
+Builds the new menu from `user-menu-themes.html` (style A) and makes the theme switchable from the UI. At the end of this phase Default users see the new menu (in Default styling) and can switch to a still-unfinished Cyberpunk.
 
-### Task 8: Pixel BrandMark and public brand assets
+### Task 7: ThemePicker and tile previews ✓
 
 - Skill: `react-frontend`
 
 **Files:**
-- Modify: `foodbytes-app/client/src/components/common/BrandMark.jsx`
-- Modify: `foodbytes-app/client/public/favicon.svg`, `public/icons/brand-mark.svg`, `public/icons/brand-mark-maskable.svg`
-- Modify: `foodbytes-app/client/public/icons/icon-192.png`, `icon-512.png`, `icon-maskable-512.png`, `apple-touch-icon.png`
-- Modify: `foodbytes-app/client/public/manifest.webmanifest`
+- Create: `foodbytes-app/client/src/components/layout/ThemePicker.jsx`
+- Create: `foodbytes-app/client/src/components/layout/ThemePicker.css`
+- Create: `foodbytes-app/client/src/styles/themes/previews.css`
+- Modify: `foodbytes-app/client/src/main.jsx` (import `previews.css` after `cyberpunk.css`)
 
-- [ ] **Step 1: Rewrite `BrandMark`.** Keep the props (`size`, `title`, `className`) and the a11y behaviour. The body becomes `<svg viewBox="0 0 16 16" shapeRendering="crispEdges">` with a `#05070b` background rect plus the pixel rects from the mockup's `LOGO`: cyan steam, yellow chopsticks and a pink bowl with highlight `#ff8fb3` and shadow `#a3123f`. Put the rect list in a module-level `LOGO_PIXELS` array of `[color, x, y, w]`. Update the doc comment: the FOODBYTES night-kitchen logo, chosen 2026-11-14, with the same rects in `public/favicon.svg` and `public/icons/brand-mark*.svg`.
+- [x] **Step 1: Write `previews.css`** from `user-menu-themes.html` `.pv-default` and `.pv-cyber` rules, renamed `.theme-preview--default` / `.theme-preview--cyberpunk` (literal colours allowed: this file is artwork in the exempt folder). The preview markup is plain spans (`.theme-preview__bar`, `__dot`, `__line`, `__ticker`, `__cards`, `__card`).
+- [x] **Step 2: Write `ThemePicker`.** `useTheme()`; `role="radiogroup" aria-label="Theme"`; a `button type="button" role="radio"` tile per `THEMES` entry: `aria-checked`, roving `tabIndex` (0 on the selected tile), preview span `aria-hidden`, label, tick `aria-hidden`. Arrow keys (←/↑ previous, →/↓ next, wrapping) call `setTheme` and focus the new tile (refs array).
+- [x] **Step 3: Write `ThemePicker.css`** from the mockup `.tiles`/`.tile` rules using tokens only (2-column grid, selected tile border `var(--brand-primary)` in Default). Cyberpunk look of the tiles goes into `cyberpunk/shell.css` (cyan frame, square corners, `var(--box-cyan)`).
+- [x] **Step 4: Verify.**
+  Run: `Select-String -Path foodbytes-app\client\src\components\layout\ThemePicker.css -Pattern "#[0-9a-fA-F]{3,8}\b|\bwhite\b(?!-)|rgba?\((?!\s*0\s*,\s*0\s*,\s*0\s*[,)])"`
+  Expected: zero hits.
 
-- [ ] **Step 2: Write the same SVG** to `favicon.svg` and `brand-mark.svg`. Write `brand-mark-maskable.svg` with a 20% safe-zone padding: `viewBox="-3.2 -3.2 22.4 22.4"` with a full-bleed `#05070b` background rect.
+### Task 8: UserMenu and LowFxControl ✓
 
-- [ ] **Step 3: Render the PNGs with headless Chrome.**
+- Skill: `react-frontend`
 
-Run: `& "C:\Program Files\Google\Chrome\Application\chrome.exe" --headless=new --disable-gpu --hide-scrollbars --default-background-color=00000000 --window-size=512,512 --screenshot="<abs>\icon-512.png" "file:///<abs>/brand-mark.svg"`. Repeat for 192 and for the 180 Apple touch icon, and use `brand-mark-maskable.svg` for the maskable 512.
-Expected: each command prints `bytes written to file`.
+**Files:**
+- Create: `foodbytes-app/client/src/components/layout/UserMenu.jsx`
+- Create: `foodbytes-app/client/src/components/layout/UserMenu.css`
+- Create: `foodbytes-app/client/src/components/layout/LowFxControl.jsx`
 
-- [ ] **Step 4: Update the manifest.** Set `name` and `short_name` to `"FOODBYTES"`, and `background_color` and `theme_color` to `"#05070b"`. Leave the icon entries unchanged.
+- [x] **Step 1: Write `LowFxControl`** — row with `<span id="lowfx-label">Low FX<small>No glow, rain or flicker</small></span>` and `<button type="button" className="lowfx-switch" role="switch" aria-checked={lowFx} aria-labelledby="lowfx-label" onClick={toggleLowFx} />`.
+- [x] **Step 2: Write `UserMenu`** per plan.md → Data shapes → `UserMenu.jsx`: who block, *Planning* (`DefaultPortionsControl`, `MealTimesControl`), *Appearance* (`ThemePicker`; `LowFxControl` when `theme.effects`; "Saved on this device"), Sign out button calling `onSignOut`, `VersionInfo` last (still mounts only while open — MPP-9). Section headings are `<h3>` with `id`s and each `<section aria-labelledby>`. Desktop vs mobile via `useMediaQuery('(max-width: 767px)')`; mobile uses `createPortal(…, document.body)`, scrim click closes, close button (`aria-label="Close account menu"`), `useBodyScrollLock(true)`, focus first focusable on open, return focus to `anchorRef` on close. Esc closes in both modes; outside-click closes on desktop (ignore clicks on the anchor). Keep the file under 200 lines; split a `UserMenuPanel` child if needed.
+- [x] **Step 3: Write `UserMenu.css`** from `user-menu-themes.html` (`.umenu`, `.who`, `.sec`, `.row`, `.out`, `.ver`, `.scrim`, `.grab`, `.x`, `.lowfx-switch`), tokens only, Default look as in the mockup's Default theme. Desktop panel: `position:absolute; right:0; top:calc(100% + 8px); width:340px; max-width:calc(100vw - 24px); max-height:calc(100dvh - 88px); overflow:auto`. Mobile sheet: full width, `max-height:calc(100dvh - 24px)`, inner scroll with `overscroll-behavior: contain`, `padding-bottom: env(safe-area-inset-bottom)`. Keep today's dropdown z-index for the panel; the sheet and scrim use the existing modal band (≥1000) so they cover the footer.
+- [x] **Step 4: Verify.**
+  Run: `Select-String -Path foodbytes-app\client\src\components\layout\UserMenu.css -Pattern "#[0-9a-fA-F]{3,8}\b|\bwhite\b(?!-)|rgba?\((?!\s*0\s*,\s*0\s*,\s*0\s*[,)])"`
+  Expected: zero hits.
 
-- [ ] **Step 5: Build**
+### Task 9: Header uses UserMenu; sweep the menu controls ✓
 
-Run: `cd foodbytes-app\client; npm run build`
-Expected: no errors.
+- Skill: `react-frontend`
 
-### Task 9: PixelIcon component and icon data
+**Files:**
+- Modify: `foodbytes-app/client/src/components/layout/Header.jsx`
+- Modify: `foodbytes-app/client/src/components/layout/Header.css`
+- Modify: `foodbytes-app/client/src/components/layout/DefaultPortionsControl.css`, `MealTimesControl.css`, `VersionInfo.css`
+
+- [x] **Step 1: Header.jsx.** Replace the inline dropdown with `<UserMenu user={user} onSignOut={logout} onClose={() => setShowUserMenu(false)} anchorRef={avatarRef} />` rendered while `showUserMenu`. The avatar button gets `ref={avatarRef}`, keeps `aria-expanded`, `aria-haspopup="dialog"`, `aria-label="Account menu"`. Remove the now-unused `avatar` const and dropdown markup. The `.user-dropdown`-era CSS that UserMenu now owns is deleted from `Header.css`.
+- [x] **Step 2: Sweep `Header.css` and the three control CSS files** per the sweep rules (Default-preserving).
+- [x] **Step 3: Verify.**
+  Run: `Select-String -Path foodbytes-app\client\src\components\layout\*.css -Pattern "#[0-9a-fA-F]{3,8}\b|\bwhite\b(?!-)|rgba?\((?!\s*0\s*,\s*0\s*,\s*0\s*[,)])"`
+  Expected: zero hits except `Footer.css` (Task 13).
+  Run: `(Get-Content foodbytes-app\client\src\components\layout\Header.jsx | Measure-Object -Line).Lines`
+  Expected: below 120.
+  Run: `cd foodbytes-app\client; npm run build; npm run check:themes`
+  Expected: build OK; `Themes OK: 2 themes, …`.
+
+---
+
+## Phase 3 — Cyberpunk brand and shell
+
+Brand per theme, pixel icons, ticker and rain, and the Cyberpunk look of the app frame. Default is unchanged by this phase except for the swept files staying identical.
+
+### Task 10: Brand per theme ✓
+
+- Skill: `react-frontend`
+
+**Files:**
+- Create: `foodbytes-app/client/src/components/common/PixelBrandMark.jsx`
+- Create: `foodbytes-app/client/src/components/layout/HeaderBrand.jsx`
+- Modify: `foodbytes-app/client/src/components/layout/Header.jsx`
+- Modify: `foodbytes-app/client/src/components/auth/LoginModal.jsx` (copy source only)
+- Modify: `foodbytes-app/client/src/constants/appRoutes.js`, `foodbytes-app/client/src/hooks/useDocumentTitle.js`
+
+- [x] **Step 1: `PixelBrandMark`** — same props and a11y as `BrandMark`; `<svg viewBox="0 0 16 16" shapeRendering="crispEdges">` with a `#05070b` background rect and the mockup `LOGO` rects (cyan steam, yellow chopsticks, pink bowl, highlight `#ff8fb3`, shadow `#a3123f`) from a module-level `LOGO_PIXELS` array of `[color, x, y, w]`. Doc comment: Cyberpunk theme logo, approved 2026-11-14; the installed-app icons deliberately stay on the Default `BrandMark`.
+- [x] **Step 2: `HeaderBrand`** per plan.md → Data shapes. It keeps today's `brand-btn` / `brand-mark` / `brand-word` classes for Default so Default renders exactly as now; Cyberpunk renders `.brand-sign` > `.brand-word` (with `.brand-flicker`) + `.brand-sub`. `title="Go to Recipes"` unchanged. Header.jsx renders `<HeaderBrand />` in place of the brand button.
+- [x] **Step 3: LoginModal** heading and subtitle read `theme.brand.loginTitle` / `loginSub` via `useTheme()`. The Google button, its label and handler are unchanged.
+- [x] **Step 4: Tab title.** `routeTitle(pathname, appName = APP_NAME)`; `useDocumentTitle` passes `useTheme().theme.brand.name` and depends on it.
+- [x] **Step 5: Verify Default strings are intact.**
+  Run: `Select-String -Path foodbytes-app\client\src\constants\themes.js -Pattern "My Pantry Plan"`
+  Expected: at least one hit. And `npm run build` passes.
+
+### Task 11: Pixel icons ✓
 
 - Skill: `react-frontend`
 
 **Files:**
 - Create: `foodbytes-app/client/src/constants/pixelIcons.js`
-- Create: `foodbytes-app/client/src/components/common/PixelIcon.jsx`
-- Create: `foodbytes-app/client/src/components/common/PixelIcon.css`
-
-- [ ] **Step 1: Write `PIXEL_ICONS`.** Copy the `menu`, `cal` and `cart` grids verbatim from the mockup's `ICO` block as `{ rows: [...], accents: { a: 'var(--pink)', b: 'var(--yellow)' } }`. The cart's accents are `a: 'var(--cyan)', b: 'var(--pink)'`.
-
-- [ ] **Step 2: Write `PixelIcon`.** Follow the file order: imports, then a constant `toRuns(rows)` that returns `[{x, y, w, c}]` (run-length per row, skipping `.`, same algorithm as the mockup's `pxi()`), then the component, then the export.
-
-```jsx
-function PixelIcon({ name, size = 20, className }) {
-  const icon = PIXEL_ICONS[name]
-  if (!icon) return null
-  const w = Math.max(...icon.rows.map(r => r.length)), h = icon.rows.length
-  return (
-    <svg className={`pixel-icon ${className ?? ''}`} viewBox={`-0.5 -0.5 ${w + 1} ${h + 1}`}
-         width={size} height={size} shapeRendering="crispEdges" aria-hidden="true" focusable="false">
-      {toRuns(icon.rows).map(({ x, y, w: rw, c }) => (
-        <rect key={`${x}-${y}`} x={x} y={y} width={rw} height={1}
-              {...(c === '#' ? { fill: 'currentColor' } : { style: { fill: icon.accents[c] } })} />
-      ))}
-    </svg>
-  )
-}
-```
-
-Compute `toRuns` once per icon at module load (`const RUNS = Object.fromEntries(...)`) instead of on every render.
-
-- [ ] **Step 3: Write the CSS**
-
-```css
-.pixel-icon { display: inline-block; flex: none; overflow: visible; }
-.active > .pixel-icon, [aria-current="page"] > .pixel-icon { filter: drop-shadow(0 0 3px currentColor); }
-body.lowfx .pixel-icon { filter: none; }
-```
-
-Import `./PixelIcon.css` in `PixelIcon.jsx`.
-
-- [ ] **Step 4: Smoke-check the run-length logic**
-
-Run: `cd foodbytes-app\client; node --input-type=module -e "import {PIXEL_ICONS} from './src/constants/pixelIcons.js'; for (const [k,v] of Object.entries(PIXEL_ICONS)) console.log(k, v.rows.length, Math.max(...v.rows.map(r=>r.length)))"`
-Expected: `menu 13 15`, `cal 15 15`, `cart 13 15`.
-
-### Task 10: Use pixel icons in the nav and in CartIcon
-
-- Skill: `react-frontend`
-
-**Files:**
-- Modify: `foodbytes-app/client/src/components/layout/AppNavItems.jsx:8-33`
+- Create: `foodbytes-app/client/src/components/common/PixelIcon.jsx`, `PixelIcon.css`
+- Modify: `foodbytes-app/client/src/components/layout/AppNavItems.jsx`
 - Modify: `foodbytes-app/client/src/components/common/ExtrasIcons.jsx` (`CartIcon` only)
 
-- [ ] **Step 1: Swap the nav icons.** Replace `ICON_PROPS` and `NAV_ICONS` with:
+- [x] **Step 1: `PIXEL_ICONS`** — `menu`, `cal`, `cart` grids verbatim from the mockup `ICO` block, `{ rows, accents }`; menu/cal accents `a: 'var(--pink)', b: 'var(--yellow)'`, cart `a: 'var(--cyan)', b: 'var(--pink)'`.
+- [x] **Step 2: `PixelIcon({ name, size = 20, className })`** — run-lengths precomputed at module load (`RUNS`), same algorithm as the mockup `pxi()`; `<svg className={\`pixel-icon ${className ?? ''}\`} viewBox={\`-0.5 -0.5 ${w + 1} ${h + 1}\`} width={size} height={size} shapeRendering="crispEdges" aria-hidden="true" focusable="false">`; `#` cells `fill="currentColor"`, accents `style={{ fill }}`.
+- [x] **Step 3: `PixelIcon.css`** — `.pixel-icon { display:inline-block; flex:none; overflow:visible }`. The active-state drop-shadow goes in `cyberpunk/shell.css` (and off under `body.lowfx`).
+- [x] **Step 4: Branch on `theme.iconSet`.** `AppNavItems`: keep `NAV_ICONS` for `'line'`; for `'pixel'` render `<PixelIcon name={NAV_ICON_NAMES[item.key]} size={24} />` with `NAV_ICON_NAMES = { recipes: 'menu', mealplan: 'cal', shopping: 'cart' }`. Pip keeps `PipHerb` in every theme. `CartIcon`: `'pixel'` → `<PixelIcon name="cart" size={14} className={className} />`, else today's SVG.
+- [x] **Step 5: Smoke-check.**
+  Run: `cd foodbytes-app\client; node --input-type=module -e "import {PIXEL_ICONS} from './src/constants/pixelIcons.js'; for (const [k,v] of Object.entries(PIXEL_ICONS)) console.log(k, v.rows.length, Math.max(...v.rows.map(r=>r.length)))"`
+  Expected: `menu 13 15`, `cal 15 15`, `cart 13 15`.
 
-```jsx
-const NAV_ICON_NAMES = { recipes: 'menu', mealplan: 'cal', shopping: 'cart' }
-```
-
-Render `<PixelIcon name={NAV_ICON_NAMES[item.key]} size={24} />` in place of `{NAV_ICONS[item.key]}`. The Pip item is unchanged (it keeps `PipHerb`).
-
-- [ ] **Step 2: Make `CartIcon` delegate to the pixel cart**
-
-```jsx
-export const CartIcon = ({ className }) => <PixelIcon name="cart" size={14} className={className} />
-```
-
-Leave the other exports in `ExtrasIcons.jsx` unchanged.
-
-- [ ] **Step 3: Build**
-
-Run: `cd foodbytes-app\client; npm run build`
-Expected: no errors.
-
-### Task 11: Neon sign header and Low FX switch
+### Task 12: Ticker, rain and the Cyberpunk shell ✓
 
 - Skill: `react-frontend`
 
 **Files:**
-- Create: `foodbytes-app/client/src/components/layout/LowFxControl.jsx`
-- Modify: `foodbytes-app/client/src/components/layout/Header.jsx:30-33,66-68`
-- Modify: `foodbytes-app/client/src/components/layout/Header.css`
-- Modify: `foodbytes-app/client/src/components/layout/DefaultPortionsControl.css`, `MealTimesControl.css`, `VersionInfo.css`
+- Create: `foodbytes-app/client/src/components/layout/Ticker.jsx`, `Ticker.css`
+- Modify: `foodbytes-app/client/src/App.jsx`
+- Modify: `foodbytes-app/client/src/styles/themes/cyberpunk/shell.css`
 
-- [ ] **Step 1: Write `LowFxControl`**
+- [x] **Step 1: Ticker** — `TICKER_ITEMS` verbatim from the mockup (`'NIGHT KITCHEN OPEN 24/7'`, `'SYNTH-RAMEN BACK ON THE BOARD'`, `'PLAN YOUR WEEK, SKIP THE QUEUE'`, `'HOMEMADE BEATS VAT-GROWN'`, `'SECTOR 9 CURFEW 03:00'`, `'TIP YOUR DELIVERY DRONE'`), two identical spans in `.ticker-track`, wrapper `aria-hidden="true"`. `Ticker.css` holds layout only (overflow clip, track keyframes) with tokens; its colours (`var(--yellow)` background, `var(--void)` text, `var(--f-num)`) are Cyberpunk tokens — the component only renders under Cyberpunk.
+- [x] **Step 2: App.jsx** — `const { theme } = useTheme()`; `{theme.effects && <div className="city-rain" aria-hidden="true" />}` as the first child of `.app`; `{!pipMode && <><Header />{theme.ticker && <Ticker />}</>}`.
+- [x] **Step 3: `cyberpunk/shell.css`** — from the mockup: `body` background `var(--void)`, font `var(--f-body)`, colour `var(--ink)`; `.app` `position:relative; isolation:isolate`; `.app::before` skyline (data-URI SVG copied from the mockup, `%23rrggbb`, `position:fixed; inset:auto 0 0 0; height:46vh; z-index:-2; pointer-events:none`); `.app::after` scanlines (`position:fixed; inset:0; z-index:-1; pointer-events:none`); `.city-rain` (mockup `.rain`, fixed, `z-index:-1`, `pointer-events:none`); `::placeholder`, inputs/selects/textareas on `var(--raised)` with `caret-color: var(--yellow)` and autofill override; theme tile look (Task 7); `.pixel-icon` active drop-shadow; `body.lowfx` hides `.app::before`, `.app::after`, `.city-rain`, kills animation; `@media (prefers-reduced-motion: reduce)` kills animation and transition. All selectors prefixed `:root[data-theme="cyberpunk"]`.
+- [x] **Step 4: Build.**
+  Run: `cd foodbytes-app\client; npm run build`
+  Expected: no errors.
 
-```jsx
-import { useLowFx } from '../../hooks/useLowFx'
-
-function LowFxControl() {
-  const { lowFx, toggleLowFx } = useLowFx()
-  return (
-    <div className="lowfx-row">
-      <span id="lowfx-label">Low FX: no glow, rain or flicker</span>
-      <button type="button" className="lowfx-switch" role="switch" aria-checked={lowFx}
-              aria-labelledby="lowfx-label" onClick={toggleLowFx} />
-    </div>
-  )
-}
-
-export default LowFxControl
-```
-
-- [ ] **Step 2: Update the Header markup.**
-  - The brand button's `aria-label` becomes `"FOODBYTES, go to Recipes"` and its `title` becomes `"Go to the menu"`.
-  - The wordmark becomes:
-
-```jsx
-<span className="brand-sign" aria-hidden="true">
-  <span className="brand-word">FOOD<span className="brand-flicker">B</span>YTES</span>
-  <span className="brand-sub">NIGHT KITCHEN · SECTOR 9</span>
-</span>
-```
-
-  - Add `<section className="user-section" aria-label="Display"><LowFxControl /></section>` after the Meal times section.
-
-- [ ] **Step 3: Restyle `Header.css` and the three menu-control CSS files** per the sweep rules, translating these mockup selectors:
-
-| Mockup | App |
-|---|---|
-| `.hdr` | `.header` |
-| `.brand`, `.sign`, `.w`, `.fl`, `.sub` | `.brand-btn`, `.brand-sign`, `.brand-word`, `.brand-flicker`, `.brand-sub` |
-| `.hnav` buttons | `.header-nav` and `.header-btn` |
-| `.wk` | `.header-week` |
-| `.amenu` | the user dropdown |
-| `.switch` | `.lowfx-switch` (44×24 min hit area, `[aria-checked="true"]` lit lime) |
-
-  Remove the flicker animation under `body.lowfx`. Keep every existing breakpoint.
-
-- [ ] **Step 4: Verify there are no literal colours left**
-
-Run: `Select-String -Path foodbytes-app\client\src\components\layout\*.css -Pattern "#[0-9a-fA-F]{3,8}\b|\bwhite\b"`
-Expected: zero hits, apart from `Ticker.css`, which doesn't exist yet.
-
-- [ ] **Step 5: Measure Header.jsx**
-
-Run: `(Get-Content foodbytes-app\client\src\components\layout\Header.jsx | Measure-Object -Line).Lines`
-Expected: below 200.
-
-### Task 12: Ticker strip
-
-- Skill: `react-frontend`
-
-**Files:**
-- Create: `foodbytes-app/client/src/components/layout/Ticker.jsx`
-- Create: `foodbytes-app/client/src/components/layout/Ticker.css`
-- Modify: `foodbytes-app/client/src/App.jsx:51`
-
-- [ ] **Step 1: Write the component.** Put `TICKER_ITEMS` at module top, copied verbatim from the mockup: `'NIGHT KITCHEN OPEN 24/7'`, `'SYNTH-RAMEN BACK ON THE BOARD'`, `'PLAN YOUR WEEK, SKIP THE QUEUE'`, `'HOMEMADE BEATS VAT-GROWN'`, `'SECTOR 9 CURFEW 03:00'`, `'TIP YOUR DELIVERY DRONE'`. Render `<div className="ticker" aria-hidden="true"><div className="ticker-track">` containing two identical `<span>`s, each joining the items with a leading `▶ `.
-
-- [ ] **Step 2: Write the CSS** from the mockup's `.ticker` and `.track` rules: a yellow background, `var(--void)` text, `var(--f-num)`, and a translateX(-50%) loop. Under `body.lowfx` and reduced motion it stops (the global rules already cover this) and the overflow stays clipped.
-
-- [ ] **Step 3: Mount it in `App.jsx`:** `{!pipMode && <><Header /><Ticker /></>}`.
-
-- [ ] **Step 4: Build**
-
-Run: `cd foodbytes-app\client; npm run build`
-Expected: no errors.
-
-### Task 13: Footer console nav, toasts and sign-in
+### Task 13: Header, footer, toasts, login — sweep + Cyberpunk look ✓
 
 - Skill: `react-frontend`
 
@@ -494,212 +344,165 @@ Expected: no errors.
 - Modify: `foodbytes-app/client/src/components/layout/Footer.css`
 - Modify: `foodbytes-app/client/src/components/common/Toast.css`, `UndoToast.css`
 - Modify: `foodbytes-app/client/src/components/auth/LoginModal.css`
-- Modify: `foodbytes-app/client/src/components/auth/LoginModal.jsx` (heading copy only)
+- Modify: `foodbytes-app/client/src/components/layout/UserMenu.css` (none expected — only if sweep finds stragglers)
+- Modify: `foodbytes-app/client/src/styles/themes/cyberpunk/shell.css`
 
-- [ ] **Step 1: Restyle `Footer.css`** from the mockup's `.bnav`: a black bar with a 2px pink top border and glow, labels in `var(--f-label)` uppercase, and the active tab yellow with an inset top bar. Use `z-index: var(--z-nav)`. Keep the targets at least 48px tall and keep the safe-area padding.
+- [x] **Step 1: Sweep** `Footer.css`, `Toast.css`, `UndoToast.css`, `LoginModal.css` (Default-preserving).
+- [x] **Step 2: Cyberpunk look in `shell.css`**, translating these mockup selectors:
 
-- [ ] **Step 2: Restyle the toasts** as a terminal line: `var(--raised)` with a cyan left border, `var(--f-num)` text and `z-index: var(--z-toast)`. The Undo button is yellow with `var(--void)` text.
+| Mockup | App |
+|---|---|
+| `.hdr` | `.header` |
+| `.brand`, `.sign`, `.w`, `.fl`, `.sub` | `.brand-btn`, `.brand-sign`, `.brand-word`, `.brand-flicker`, `.brand-sub` (flicker off under `body.lowfx`) |
+| `.hnav` buttons | `.header-nav`, `.header-btn` |
+| `.wk` | `.header-week` and the date pill inside it (full picker restyle is Task 23) |
+| `.av` | `.avatar-btn`, `.avatar-placeholder` |
+| `.amenu`, `.who`, `.sec`, `h5`, `.switch`, `.out`, `.ver` | `UserMenu` classes, `.lowfx-switch` (lit lime when `aria-checked="true"`), mobile sheet (`[X]` close, 2px cyan top border) |
+| `.bnav` | footer nav: black bar, 2px pink top border + glow, `var(--f-label)` uppercase, active tab yellow with inset top bar, ≥48px targets, safe-area padding kept |
+| `.toast` | toasts: `var(--raised)`, cyan left border, `var(--f-num)`; Undo yellow with `var(--void)` |
+| login `.dlg` + `.bar-t` | `DOOR://SIGN IN` terminal (title bar via `::before`), bottom sheet on mobile, capped `calc(100dvh - 24px)` with internal scroll |
 
-- [ ] **Step 3: Restyle the login modal** as the `DOOR://SIGN IN` terminal from the mockup. Change the heading text in `LoginModal.jsx` from the old app name to `FOODBYTES`, and the subtitle to `Night Kitchen · Sector 9. Sign in to plan your week and build your supply run.`. The Google button keeps its label and handler.
-
-- [ ] **Step 4: Verify there are no literal colours left**
-
-Run: `Select-String -Path foodbytes-app\client\src\components\layout\Footer.css,foodbytes-app\client\src\components\common\Toast.css,foodbytes-app\client\src\components\common\UndoToast.css,foodbytes-app\client\src\components\auth\LoginModal.css -Pattern "#[0-9a-fA-F]{3,8}\b|\bwhite\b"`
-Expected: zero hits.
+- [x] **Step 3: Verify.**
+  Run: `Select-String -Path foodbytes-app\client\src\components\layout\*.css,foodbytes-app\client\src\components\common\Toast.css,foodbytes-app\client\src\components\common\UndoToast.css,foodbytes-app\client\src\components\auth\LoginModal.css -Pattern "#[0-9a-fA-F]{3,8}\b|\bwhite\b(?!-)|rgba?\((?!\s*0\s*,\s*0\s*,\s*0\s*[,)])"`
+  Expected: zero hits.
+  Run: `cd foodbytes-app\client; npm run build; npm run check:themes`
+  Expected: both pass.
 
 ---
 
-## Phase 3 — Recipes: the menu board
+## Phase 4 — Recipes: the menu board (Cyberpunk)
 
-When this phase is done, the Recipes route matches the mockup's menu board, including the teal panels and the pink in-plan panels. Only CSS changes (the numbering is a CSS counter), so behaviour can't regress.
-
-### Task 14: Teal recipe cards
+### Task 14: Recipe cards ✓
 
 - Skill: `react-frontend`
 
 **Files:**
-- Modify: `foodbytes-app/client/src/components/recipes/RecipeCard.css`
-- Modify: `foodbytes-app/client/src/components/recipes/RecipeList.css`
+- Modify: `foodbytes-app/client/src/components/recipes/RecipeCard.css`, `RecipeList.css`
+- Create: `foodbytes-app/client/src/styles/themes/cyberpunk/recipes.css` (+ `@import` line in `cyberpunk/index.css`)
 
-- [ ] **Step 1: Restyle `.recipe-card`** from the mockup's `.rcard` and the `v-cards` override block:
-  - `background: linear-gradient(180deg, var(--card-teal-top), var(--card-teal-bottom)); border: 1px solid rgba(5,217,232,.5); border-top: 3px solid var(--cyan);` plus the box-shadow set
-  - HUD corner brackets via `::before`, from the mockup's `.hud::before`
-  - `.recipe-card.is-in-plan` uses the plan stops with pink borders and `var(--box-pink)`
-  - `.recipe-card.is-hidden` uses `var(--deep)`
-  - `body.lowfx .recipe-card { box-shadow: 0 0 0 1px #000 }`. Move the `#000` into `tokens.css` as `--black: #000` and use the token.
+- [x] **Step 1: Sweep** `RecipeCard.css`, `RecipeList.css` (Default-preserving). `.meal-tabs` keeps its current z-index.
+- [x] **Step 2: Cyberpunk cards in `recipes.css`** from the mockup `.rcard` + `v-cards` block: teal gradient (`--card-teal-top/bottom`), `1px solid rgba(5,217,232,.5)` → token, 3px cyan top border, HUD brackets via `::before` (mockup `.hud::before`), `.is-in-plan` plan stops + pink borders + `var(--box-pink)`, `.is-hidden` `var(--deep)`, `body.lowfx` box-shadow `0 0 0 1px var(--black)`; numbering `.recipe-grid { counter-reset: menu-item }` + `.recipe-card-top::before { counter-increment: menu-item; content: counter(menu-item, decimal-leading-zero); font-family: var(--f-num); color: var(--pink) }`; name `var(--f-body)` 600 ink; kcal yellow VT323 "price"; variant segment from `.vseg` (active cyan, `var(--void)` text); dotted rule under `.recipe-card-top` cyan 45%.
+- [x] **Step 3: Verify.**
+  Run: `Select-String -Path foodbytes-app\client\src\components\recipes\RecipeCard.css,foodbytes-app\client\src\components\recipes\RecipeList.css -Pattern "#[0-9a-fA-F]{3,8}\b|\bwhite\b(?!-)|rgba?\((?!\s*0\s*,\s*0\s*,\s*0\s*[,)])"`
+  Expected: zero hits.
 
-- [ ] **Step 2: Number the cards with a CSS counter.** Add `.recipe-grid { counter-reset: menu-item }` to `RecipeList.css`. In `RecipeCard.css`, add `.recipe-card-top::before { counter-increment: menu-item; content: counter(menu-item, decimal-leading-zero); font-family: var(--f-num); color: var(--pink); }`.
-
-- [ ] **Step 3: Restyle the inner parts** per the sweep rules:
-  - `.recipe-card-name` uses `var(--f-body)` 600 in `var(--ink)`.
-  - The kcal figure is a yellow VT323 "price".
-  - The variant segment comes from the mockup's `.vseg`: the active option is cyan with `var(--void)` text.
-  - The dotted rule under `.recipe-card-top` is cyan at 45% opacity.
-
-- [ ] **Step 4: Verify there are no literal colours left**
-
-Run: `Select-String -Path foodbytes-app\client\src\components\recipes\RecipeCard.css,foodbytes-app\client\src\components\recipes\RecipeList.css -Pattern "#[0-9a-fA-F]{3,8}\b|\bwhite\b"`
-Expected: zero hits.
-
-### Task 15: Recipe toolbar, day buttons, macro chips and popups
+### Task 15: Toolbar, day buttons, macro chips, popups ✓
 
 - Skill: `react-frontend`
 
 **Files:**
 - Modify: `foodbytes-app/client/src/components/recipes/RecipeToolbar.css`, `DayAssignmentButtons.css`, `MacroTargetPopup.css`, `ExtrasSelectionPopup.css`
 - Modify: `foodbytes-app/client/src/components/common/MacroChips.css`
+- Modify: `foodbytes-app/client/src/styles/themes/cyberpunk/recipes.css`
 
-- [ ] **Step 1: Sweep the five files.** Translate these mockup selectors:
-
-| Mockup | App |
-|---|---|
-| `.rtool`, `.mtabs` | toolbar meal tabs (active tab pink with `var(--void)` text), search box, Hidden filter |
-| `.strip`, `.days` | day assignment buttons (hazard stripes for unplanned, lime check for planned) |
-| `.chip` | macro chips (bordered, `var(--f-num)`, colour from the macro tokens) |
-| `.pop` | both popups (`z-index: var(--z-popover)`, cyan frame) |
-
-- [ ] **Step 2: Verify there are no literal colours left**
-
-Run: `Select-String -Path foodbytes-app\client\src\components\recipes\RecipeToolbar.css,foodbytes-app\client\src\components\recipes\DayAssignmentButtons.css,foodbytes-app\client\src\components\recipes\MacroTargetPopup.css,foodbytes-app\client\src\components\recipes\ExtrasSelectionPopup.css,foodbytes-app\client\src\components\common\MacroChips.css -Pattern "#[0-9a-fA-F]{3,8}\b|\bwhite\b"`
-Expected: zero hits.
-
-- [ ] **Step 3: Build**
-
-Run: `cd foodbytes-app\client; npm run build`
-Expected: no errors.
+- [x] **Step 1: Sweep** the five files (Default-preserving).
+- [x] **Step 2: Cyberpunk look in `recipes.css`:** `.rtool`/`.mtabs` → meal tabs (active pink, `var(--void)` text), search, Hidden filter; `.strip`/`.days` → day buttons (hazard stripes unplanned, lime check planned); `.chip` → macro chips (bordered, `var(--f-num)`, macro token colours); `.pop` → both popups (cyan frame).
+- [x] **Step 3: Verify.**
+  Run: `Select-String -Path foodbytes-app\client\src\components\recipes\RecipeToolbar.css,foodbytes-app\client\src\components\recipes\DayAssignmentButtons.css,foodbytes-app\client\src\components\recipes\MacroTargetPopup.css,foodbytes-app\client\src\components\recipes\ExtrasSelectionPopup.css,foodbytes-app\client\src\components\common\MacroChips.css -Pattern "#[0-9a-fA-F]{3,8}\b|\bwhite\b(?!-)|rgba?\((?!\s*0\s*,\s*0\s*,\s*0\s*[,)])"`
+  Expected: zero hits.
+  Run: `cd foodbytes-app\client; npm run build`
+  Expected: no errors.
 
 ---
 
-## Phase 4 — Meal Plan: the order board
+## Phase 5 — Meal Plan: the order board (Cyberpunk)
 
-When this phase is done, both meal-plan layouts and their sheets and modals match the mockup's LED order board. Only CSS changes.
-
-### Task 16: Desktop timetable, mobile day view and meal cards
+### Task 16: Timetable, mobile day view, meal cards ✓
 
 - Skill: `react-frontend`
 
 **Files:**
 - Modify: `foodbytes-app/client/src/components/mealplan/MealPlanWeekDesktop.css`, `MealPlanWeekMobile.css`, `MealCard.css`, `WeekSummary.css`, `MealPlanCalendar.css`
+- Create: `foodbytes-app/client/src/styles/themes/cyberpunk/mealplan.css` (+ `@import` in `cyberpunk/index.css`)
 
-- [ ] **Step 1: Sweep the five files.** Translate these mockup selectors:
-  - Day headers: yellow `var(--f-num)` LED text, with today framed in cyan and glowing.
-  - Meal cards come from `.mcard`: `var(--panel)` with a 4px cyan left edge, `var(--f-num)` kcal, and an eaten tick in lime with the ✓ shape kept.
-  - Mobile day chips are pink when active.
-  - Swipe action panels come from `.sw-act`: cyan Replace, yellow Move and red Remove, each with `var(--void)` text.
-  - The swipe hint is a yellow hazard style.
-  - The week summary tile is `.hud`.
+- [x] **Step 1: Sweep** the five files (Default-preserving).
+- [x] **Step 2: Cyberpunk look in `mealplan.css`:** day headers yellow `var(--f-num)` LED, today framed cyan + glow; meal cards from `.mcard` (`var(--panel)`, 4px cyan left edge, `var(--f-num)` kcal, eaten tick lime with the ✓ kept); mobile day chips pink when active; swipe panels from `.sw-act` (Replace cyan, Move yellow, Remove red, `var(--void)` text); swipe hint yellow hazard; week summary tile `.hud`.
+- [x] **Step 3: Verify.**
+  Run: `Select-String -Path foodbytes-app\client\src\components\mealplan\MealPlanWeekDesktop.css,foodbytes-app\client\src\components\mealplan\MealPlanWeekMobile.css,foodbytes-app\client\src\components\mealplan\MealCard.css,foodbytes-app\client\src\components\mealplan\WeekSummary.css,foodbytes-app\client\src\components\mealplan\MealPlanCalendar.css -Pattern "#[0-9a-fA-F]{3,8}\b|\bwhite\b(?!-)|rgba?\((?!\s*0\s*,\s*0\s*,\s*0\s*[,)])"`
+  Expected: zero hits.
 
-- [ ] **Step 2: Verify there are no literal colours left**
-
-Run: `Select-String -Path foodbytes-app\client\src\components\mealplan\MealPlanWeekDesktop.css,foodbytes-app\client\src\components\mealplan\MealPlanWeekMobile.css,foodbytes-app\client\src\components\mealplan\MealCard.css,foodbytes-app\client\src\components\mealplan\WeekSummary.css,foodbytes-app\client\src\components\mealplan\MealPlanCalendar.css -Pattern "#[0-9a-fA-F]{3,8}\b|\bwhite\b"`
-Expected: zero hits.
-
-### Task 17: Meal-plan menus, sheets and modals
+### Task 17: Meal-plan menus, sheets and modals ✓
 
 - Skill: `react-frontend`
 
 **Files:**
 - Modify: `foodbytes-app/client/src/components/mealplan/MealPlanSheet.css`, `MealPlanMenu.css`, `MealEntryMenu.css`, `DailyMacroPopup.css`, `WeeklyMacroPopup.css`, `SwapDaysModal.css`, `CopyWeekModal.css`, `TemplateModals.css`, `ManageExtrasModal.css`
+- Modify: `foodbytes-app/client/src/styles/themes/cyberpunk/mealplan.css`
 
-- [ ] **Step 1: Sweep the nine files** as terminal windows, translating the mockup's `.dlg`:
-  - A 2px cyan frame and a `.bar-t`-style header strip in `var(--f-label)`.
-  - Menus use `.pop`.
-  - Sheets get `max-height: calc(100dvh - 24px); overflow: auto; overscroll-behavior: contain; padding-bottom: env(safe-area-inset-bottom)` on mobile, with `z-index: var(--z-sheet)` and the scrim at `rgba(2,3,5,.75)`.
-  - The macro pill text uses the retuned `-pill-text` tokens.
-
-- [ ] **Step 2: Verify there are no literal colours left**
-
-Run: `Select-String -Path foodbytes-app\client\src\components\mealplan\*.css -Pattern "#[0-9a-fA-F]{3,8}\b|\bwhite\b"`
-Expected: zero hits.
-
-- [ ] **Step 3: Build**
-
-Run: `cd foodbytes-app\client; npm run build`
-Expected: no errors.
+- [x] **Step 1: Sweep** the nine files (Default-preserving).
+- [x] **Step 2: Cyberpunk look in `mealplan.css`** as terminal windows (mockup `.dlg`): 2px cyan frame, `.bar-t`-style header strip in `var(--f-label)`; menus use `.pop`; scrims `rgba(2,3,5,.75)` (as a Cyberpunk token); macro pills use the retuned `-pill-*` tokens. Do not change sheet heights, scrolling or z-index — only colour, border, font and glow.
+- [x] **Step 3: Verify.**
+  Run: `Select-String -Path foodbytes-app\client\src\components\mealplan\*.css -Pattern "#[0-9a-fA-F]{3,8}\b|\bwhite\b(?!-)|rgba?\((?!\s*0\s*,\s*0\s*,\s*0\s*[,)])"`
+  Expected: zero hits.
+  Run: `cd foodbytes-app\client; npm run build`
+  Expected: no errors.
 
 ---
 
-## Phase 5 — Recipe view: the kitchen terminal
+## Phase 6 — Recipe view: the kitchen terminal (Cyberpunk)
 
-When this phase is done, the recipe modal, the full-screen ingredients view and cook mode match the mockup's KDS terminal. Only CSS changes, so `RecipeViewModal.jsx` (393 lines) isn't touched.
+CSS only. `RecipeViewModal.jsx` is not touched. Build on whatever the working tree holds in these files (the developer had uncommitted recipe-view work on 2026-11-15); never revert it.
 
-### Task 18: Recipe view, full-screen ingredients view and cook mode
+### Task 18: Recipe view, full-screen ingredients, cook mode ✓
 
 - Skill: `react-frontend`
 
 **Files:**
 - Modify: `foodbytes-app/client/src/components/recipes/RecipeViewModal.css`, `IngredientsFullscreen.css`, `CookMode.css`, `MealEatenSection.css`, `LinkedRecipeNavigation.css`
+- Create: `foodbytes-app/client/src/styles/themes/cyberpunk/recipe-view.css` (+ `@import` in `cyberpunk/index.css`)
 
-- [ ] **Step 1: Sweep the five files.** Translate these mockup selectors:
+- [x] **Step 1: Sweep** the five files (Default-preserving). Keep the `.recipe-view-modal` prefixes.
+- [x] **Step 2: Cyberpunk look in `recipe-view.css`:**
 
 | Mockup | App |
 |---|---|
-| `.dlg.rv`, `.rv-hd`, `.rv-ctl`, `.rv-tabs`, `.ilist`, `.steps`, `.cookbtn`, `.eatbtn` | modal frame, header gradient, variant segment and servings stepper, tabs (active tab cyan underline), ingredient rows with square tick boxes (ticked rows lime, struck through, still ≥4.5:1), numbered steps in `var(--f-num)`, cook button pink, eaten button lime |
-| `.ifull` | full-screen ingredients view (progress bar lime, "All out" in lime) |
-| `.cook` | cook mode: full-screen terminal, step text in `var(--f-body)` at least 22px, yellow Next button with `var(--void)` text |
+| `.dlg.rv`, `.rv-hd`, `.rv-ctl`, `.rv-tabs`, `.ilist`, `.steps`, `.cookbtn`, `.eatbtn` | modal frame, header gradient, variant segment + servings stepper, tabs (active cyan underline), ingredient rows with square tick boxes (ticked lime, struck, still ≥4.5:1), numbered steps `var(--f-num)`, cook button pink, eaten button lime |
+| `.ifull` | full-screen ingredients (progress bar lime, "All out" lime) |
+| `.cook` | cook mode: full-screen terminal, step text `var(--f-body)` ≥22px, Next yellow with `var(--void)` |
 
-  Keep the `.recipe-view-modal` selector prefixes that already raise specificity.
-
-- [ ] **Step 2: Verify there are no literal colours left**
-
-Run: `Select-String -Path foodbytes-app\client\src\components\recipes\RecipeViewModal.css,foodbytes-app\client\src\components\recipes\IngredientsFullscreen.css,foodbytes-app\client\src\components\recipes\CookMode.css,foodbytes-app\client\src\components\recipes\MealEatenSection.css,foodbytes-app\client\src\components\recipes\LinkedRecipeNavigation.css -Pattern "#[0-9a-fA-F]{3,8}\b|\bwhite\b"`
-Expected: zero hits.
-
-- [ ] **Step 3: Build**
-
-Run: `cd foodbytes-app\client; npm run build`
-Expected: no errors.
+- [x] **Step 3: Verify.**
+  Run: `Select-String -Path foodbytes-app\client\src\components\recipes\RecipeViewModal.css,foodbytes-app\client\src\components\recipes\IngredientsFullscreen.css,foodbytes-app\client\src\components\recipes\CookMode.css,foodbytes-app\client\src\components\recipes\MealEatenSection.css,foodbytes-app\client\src\components\recipes\LinkedRecipeNavigation.css -Pattern "#[0-9a-fA-F]{3,8}\b|\bwhite\b(?!-)|rgba?\((?!\s*0\s*,\s*0\s*,\s*0\s*[,)])"`
+  Expected: zero hits.
+  Run: `cd foodbytes-app\client; npm run build`
+  Expected: no errors.
 
 ---
 
-## Phase 6 — Shopping: the supply run receipt
+## Phase 7 — Shopping: the supply-run receipt (Cyberpunk)
 
-When this phase is done, the shopping list is a paper receipt on the dark city. It's the only light surface, so it sets its own ink. Only CSS changes.
-
-### Task 19: Receipt list and shopping popups
+### Task 19: Receipt and shopping popups ✓
 
 - Skill: `react-frontend`
 
 **Files:**
 - Modify: `foodbytes-app/client/src/components/shopping/ShoppingList.css`, `IngredientBreakdownPopup.css`, `GenerateShoppingListModal.css`
+- Create: `foodbytes-app/client/src/styles/themes/cyberpunk/shopping.css` (+ `@import` in `cyberpunk/index.css`)
 
-- [ ] **Step 1: Sweep the receipt.**
-  - Aisle groups use `background: var(--paper); color: var(--paper-ink);` with the mockup's zigzag `mask` edges.
-  - Every descendant text colour inside the receipt is set explicitly to `var(--paper-ink)` or a darker tone, never inherited from the dark theme.
-  - Ticked rows are struck through and must stay at least 4.5:1 (use `--paper-ink` at reduced weight, not opacity below 0.75).
-  - The aisle swatch uses `var(--aisle-*)`.
-  - The progress tile and stale banner come from the mockup's `.prog` and hazard `.stale` styles.
-
-- [ ] **Step 2: Sweep the two popups** as terminal windows (same treatment as Task 17).
-
-- [ ] **Step 3: Verify there are no literal colours left**
-
-Run: `Select-String -Path foodbytes-app\client\src\components\shopping\*.css -Pattern "#[0-9a-fA-F]{3,8}\b|\bwhite\b"`
-Expected: zero hits.
+- [x] **Step 1: Sweep** the three files (Default-preserving).
+- [x] **Step 2: Cyberpunk receipt in `shopping.css`:** aisle groups `background: var(--paper); color: var(--paper-ink)` with the mockup zigzag `mask` edges; every descendant text colour inside the receipt set explicitly to `--paper-ink` / `--paper-muted` / `--paper-struck`, never inherited; ticked rows struck, ≥4.5:1 (reduced weight, no opacity below 0.75); aisle swatches `var(--aisle-*)`; progress tile and stale banner from `.prog` and hazard `.stale`; the two popups as terminal windows (as Task 17).
+- [x] **Step 3: Verify.**
+  Run: `Select-String -Path foodbytes-app\client\src\components\shopping\*.css -Pattern "#[0-9a-fA-F]{3,8}\b|\bwhite\b(?!-)|rgba?\((?!\s*0\s*,\s*0\s*,\s*0\s*[,)])"`
+  Expected: zero hits.
 
 ---
 
-## Phase 7 — Common dialogs, landing and admin
+## Phase 8 — Shared dialogs, landing and admin
 
-This phase sweeps the remaining shared surfaces and the rarely seen screens to tokens. When it's done, every in-scope CSS file is free of literal colours.
-
-### Task 20: Shared dialogs and controls
+### Task 20: Shared dialogs and controls ✓
 
 - Skill: `react-frontend`
 
 **Files:**
 - Modify: `foodbytes-app/client/src/components/common/ConfirmDialog.css`, `DateRangePicker.css`, `PullToDismissUI.css`, `LockEmojiAnimation.css`
+- Create: `foodbytes-app/client/src/styles/themes/cyberpunk/dialogs.css` (+ `@import` in `cyberpunk/index.css`)
 
-- [ ] **Step 1: Sweep the four files.**
-  - The confirm dialog is a `SYS://CONFIRM` terminal, and its destructive button is red with `var(--void)` text.
-  - The date picker trigger is a cyan HUD frame with yellow `var(--f-num)` dates. Its calendar popover is `var(--raised)` with `z-index: var(--z-popover)`, and native date inputs inherit `color-scheme: dark`.
+- [x] **Step 1: Sweep** the four files (Default-preserving).
+- [x] **Step 2: Cyberpunk look in `dialogs.css`:** confirm dialog as a `SYS://CONFIRM` terminal, destructive button red with `var(--void)`; date-picker trigger as a cyan HUD frame with yellow `var(--f-num)` dates, calendar popover `var(--raised)`, native date inputs `color-scheme: dark`.
+- [x] **Step 3: Verify.**
+  Run: `Get-ChildItem foodbytes-app\client\src\components\common -Include *.css -Recurse | Select-String -Pattern "#[0-9a-fA-F]{3,8}\b|\bwhite\b(?!-)|rgba?\((?!\s*0\s*,\s*0\s*,\s*0\s*[,)])"`
+  Expected: zero hits.
 
-- [ ] **Step 2: Verify there are no literal colours left**
-
-Run: `Select-String -Path foodbytes-app\client\src\components\common\*.css -Pattern "#[0-9a-fA-F]{3,8}\b|\bwhite\b"`
-Expected: zero hits.
-
-### Task 21: Landing animation and admin forms (tokens only)
+### Task 21: Landing animation and admin forms (tokens only) ✓
 
 - Skill: `react-frontend`
 
@@ -707,25 +510,29 @@ Expected: zero hits.
 - Modify: `foodbytes-app/client/src/components/onboarding/LandingPageAnimation.css`
 - Modify: `foodbytes-app/client/src/components/admin/RecipeEditModal.css`, `RecipeIngredientsForm.css`, `RecipeStepsForm.css`, `RecipeInfoForm.css`
 
-- [ ] **Step 1: Replace every literal colour** with a token using the sweep table. Don't redesign the layout. The landing page's brand references take the pink and cyan neon, and its headline uses `var(--f-display)`.
-
-- [ ] **Step 2: Verify there are no literal colours left**
-
-Run: `Select-String -Path foodbytes-app\client\src\components\onboarding\*.css,foodbytes-app\client\src\components\admin\*.css -Pattern "#[0-9a-fA-F]{3,8}\b|\bwhite\b"`
-Expected: zero hits.
-
-- [ ] **Step 3: Build**
-
-Run: `cd foodbytes-app\client; npm run build`
-Expected: no errors.
+- [x] **Step 1: Sweep** (Default-preserving). No override file and no layout change; under Cyberpunk these screens simply pick up the remapped tokens.
+- [x] **Step 2: Verify.**
+  Run: `Get-ChildItem foodbytes-app\client\src\components\onboarding,foodbytes-app\client\src\components\admin -Include *.css -Recurse | Select-String -Pattern "#[0-9a-fA-F]{3,8}\b|\bwhite\b(?!-)|rgba?\((?!\s*0\s*,\s*0\s*,\s*0\s*[,)])"`
+  Expected: zero hits.
+  Run: `cd foodbytes-app\client; npm run build; npm run check:themes`
+  Expected: both pass.
 
 ---
 
-## Phase 8 — Final verification
+## Phase 9 — Docs, mockups and final verification
 
-No production changes beyond the version bump. This phase only sanity-checks the cumulative work.
+### Task 22: Finalise CLAUDE.md and the mockups ✓
 
-### Task 22: Bump version and CHANGELOG
+- Skill: none — documentation
+
+**Files:**
+- Modify: `CLAUDE.md` (*Themes* section)
+- Modify: `foodbytes-app/mockup/README.md`, `foodbytes-app/mockup/app-mockup.html`, `foodbytes-app/mockup/user-menu-themes.html` (only where the implementation diverged)
+
+- [x] **Step 1: Update CLAUDE.md → Themes** so it describes what shipped, not the plan: the file layout (`styles/themes/default.css`, `<id>.css`, `<id>/` overrides, `previews.css`), the registry fields, `ThemeContext`, storage keys, the boot script, the Default-preserving sweep rule, the `:root[data-theme="<id>"]` prefix rule, Pip containment, static assets staying on Default, `npm run check:themes`, and the **add-a-theme checklist**. Remove the "being built" status line.
+- [x] **Step 2: Mockup sync.** Compare the implemented user menu, header and each Cyberpunk screen against `app-mockup.html` / `user-menu-themes.html`. Where the app intentionally differs, update the mockup to match the app. Note any change in `foodbytes-app/mockup/README.md`.
+
+### Task 23: Bump version and CHANGELOG ✓
 
 - Skill: none — release bookkeeping per `CLAUDE.md` → Versioning & deploy verification
 
@@ -734,107 +541,82 @@ No production changes beyond the version bump. This phase only sanity-checks the
 - Modify: `foodbytes-app/foodbytes-api/pom.xml` (project `<version>`)
 - Modify: `CHANGELOG.md` (prepend one line)
 
-- [ ] **Step 1: Bump both manifests.** Read the current version from `foodbytes-app/client/package.json`. This is non-ticket feature work, so bump MINOR and reset PATCH. Write the same new version into `package.json` → `version` and into `pom.xml` → the `<version>` directly under `<artifactId>foodbytes-api</artifactId>`.
+- [x] **Step 1: Bump MINOR, reset PATCH** in both manifests (read the current version from `package.json`).
+- [x] **Step 2: Prepend** `<new version> — 2026-11-14-cyberpunk-reskin: theme system + user menu v2 with theme picker; Cyberpunk (FOODBYTES Night Kitchen) theme, Low FX switch`
+- [x] **Step 3: Verify.**
+  Run: `cd foodbytes-app\client; npm run check:version`
+  Expected: `Version OK: <new version>`
 
-- [ ] **Step 2: Prepend the CHANGELOG line** directly above the current top entry: `<new version> — 2026-11-14-cyberpunk-reskin: FOODBYTES Night Kitchen reskin — neon pixel theme, city backdrop, pixel icons, Low FX switch`
-
-- [ ] **Step 3: Verify the versions agree**
-
-Run: `cd foodbytes-app\client; npm run check:version`
-Expected: `Version OK: <new version>`
-
-### Task 23: Grep for leftover literals and old brand references
+### Task 24: Greps ✓
 
 - Skill: none — verification only
 
-- [ ] **Step 1: Check for literal colours outside the token sheet and Pip**
+- [x] **Step 1: No literal colours outside the theme folder and Pip.**
+  Run: `Get-ChildItem foodbytes-app\client\src -Recurse -Include *.css | Where-Object { $_.FullName -notmatch '\\components\\pet\\' -and $_.FullName -notmatch '\\styles\\themes\\' } | Select-String -Pattern "#[0-9a-fA-F]{3,8}\b|\bwhite\b(?!-)|rgba?\((?!\s*0\s*,\s*0\s*,\s*0\s*[,)])"`
+  Expected: zero hits.
+- [x] **Step 2: Every Cyberpunk override selector is scoped.**
+  Run: `Get-ChildItem foodbytes-app\client\src\styles\themes\cyberpunk -Include *.css -Recurse | Select-String -Pattern "^\s*[^\s@/*:}][^{]*\{" | Where-Object { $_.Line -notmatch ':root\[data-theme="cyberpunk"\]' -and $_.Line -notmatch '^\s*(from|to|\d+%)' }`
+  Expected: zero hits.
+- [x] **Step 3: Static brand assets untouched.**
+  Run: `git diff --stat -- foodbytes-app/client/public foodbytes-app/client/src/components/common/BrandMark.jsx`
+  Expected: no output.
+- [x] **Step 4: No console logging added.**
+  Run: `Get-ChildItem foodbytes-app\client\src -Recurse -Include *.js,*.jsx | Select-String -Pattern "console\.(log|debug)" | Measure-Object | Select-Object -ExpandProperty Count`
+  Expected: no higher than the 6 baseline.
 
-Run: `Get-ChildItem foodbytes-app\client\src -Recurse -Include *.css | Where-Object { $_.FullName -notmatch '\\components\\pet\\' -and $_.Name -ne 'tokens.css' } | Select-String -Pattern "#[0-9a-fA-F]{3,8}\b|\bwhite\b"`
-Expected: zero hits.
-
-- [ ] **Step 2: Check for leftover old brand strings in the shell**
-
-Run: `Select-String -Path foodbytes-app\client\index.html,foodbytes-app\client\public\manifest.webmanifest,foodbytes-app\client\src\components\layout\*.jsx,foodbytes-app\client\src\components\auth\*.jsx,foodbytes-app\client\src\components\common\BrandMark.jsx -Pattern "Pantry Plan|4a3f80"`
-Expected: zero hits.
-
-- [ ] **Step 3: Check that no console logging was added**
-
-Run: `Get-ChildItem foodbytes-app\client\src -Recurse -Include *.js,*.jsx | Select-String -Pattern "console\.(log|debug)" | Measure-Object | Select-Object -ExpandProperty Count`
-Expected: no higher than the 6 baseline.
-
-### Task 24: Contrast check, backend suite and production build
+### Task 25: Theme check, backend suite, production build ✓
 
 - Skill: none — verification only
 
-- [ ] **Step 1: Contrast check**
+- [x] **Step 1:** Run: `cd foodbytes-app\client; npm run check:themes` → Expected: `Themes OK: 2 themes, <m> contrast pairs`
+- [x] **Step 2:** Run: `cd foodbytes-app\foodbytes-api; mvn test` → Expected: `BUILD SUCCESS`, 0 failures, 0 errors (guards the version bump only).
+- [x] **Step 3:** Run: `cd foodbytes-app\client; npm run build` → Expected: `built in <n>s`, no errors.
 
-Run: `cd foodbytes-app\client; npm run check:contrast`
-Expected: `Contrast OK: <n> pairs`
-
-- [ ] **Step 2: Full backend suite.** There are no backend changes, so this guards the version bump only.
-
-Run: `cd foodbytes-app\foodbytes-api; mvn test`
-Expected: `BUILD SUCCESS`, 0 failures, 0 errors.
-
-- [ ] **Step 3: Client build**
-
-Run: `cd foodbytes-app\client; npm run build`
-Expected: `built in <n>s`, no errors.
-
-### Task 25: Manual visual checklist and PR description
+### Task 26: Manual visual checklist and PR description ✓
 
 - Skill: none — the developer verifies; the implementer writes the checklist
 
 **Files:**
 - Create: `.claude/contract/2026-11-14-cyberpunk-reskin/pr-description.md`
 
-- [ ] **Step 1: Write `pr-description.md`** with:
-  - A link to `plan.md`, a summary, the new version, and "no migrations, no backend changes".
-  - The suggested commit subject `cyberpunk-reskin: FOODBYTES Night Kitchen theme`.
-  - A note for future contributors: colours live only in `src/styles/tokens.css`, `npm run check:contrast` guards the pairs, and Pip's room is contained by `.pet-view`.
-  - This **MANUAL VERIFICATION** checklist for the developer, run with `npm run dev` at 320, 390, 768 and 1280px:
-    1. `/`: teal cards, pink in-plan cards, numbering 01…, yellow kcal, no unreadable text.
-    2. Open a recipe: the terminal modal opens on mobile as a sheet. Check the tabs, ticks, servings, ⤢ Expand (full-screen view) and cook mode.
-    3. `/mealplan`: on desktop, the LED headers and the ⋯ menus open above the cards. On mobile, check the day chips, swipe Replace / Move / Remove panels and every sheet. Each sheet must scroll internally and must not sit behind the keyboard.
-    4. `/shopping`: on the receipt, ticked items stay readable. Check the breakdown popup and Generate.
-    5. `/pet`: the room looks exactly as it did before the reskin.
-    6. Account menu: turn on Low FX. Glow, rain, scanlines, flicker and the ticker scroll stop. Reload and confirm it persists.
-    7. OS reduced-motion setting on: no animations.
-    8. Tab through the header, a card and a dialog: the yellow focus ring is visible everywhere.
-    9. Sign out and back in: the login modal is the `DOOR://SIGN IN` terminal and Google sign-in still works.
-    10. Install prompt / home screen: the pixel bowl icon appears and the status bar is dark.
+- [x] **Step 1: Write `pr-description.md`:** link to `plan.md`, summary, new version, "no migrations, no backend changes", suggested commit subject `themes: theme system, user menu v2, Cyberpunk theme`, a contributor note (colours live only in `src/styles/themes/`, `npm run check:themes` guards pairs and registry, mockups in `foodbytes-app/mockup/` must stay in step — CLAUDE.md), and this **MANUAL VERIFICATION** checklist (run with `npm run dev`, at 320, 390, 768 and 1280px):
+  1. **Default fidelity:** with Default selected, every route (`/`, `/mealplan`, a recipe, cook mode, `/shopping`, login, landing) looks identical to production. Only the user menu is new.
+  2. **User menu (both themes):** desktop dropdown opens under the avatar, closes on outside click and Esc; mobile opens as a bottom sheet over the footer, scrolls inside, closes via `[X]`/`✕`, scrim and Esc, focus returns to the avatar. Servings, meal times, sign out and version line still work.
+  3. **Theme picker:** tiles switch instantly; arrow keys move the selection; the choice survives a reload; the status-bar colour changes on a phone; a fresh browser starts on Default.
+  4. **Cyberpunk `/`:** teal cards, pink in-plan cards, numbering 01…, yellow kcal, pixel nav icons, ticker, neon sign, no unreadable text.
+  5. **Cyberpunk recipe view:** terminal modal (sheet on mobile), tabs, ticks, servings, ⤢ Expand, cook mode.
+  6. **Cyberpunk `/mealplan`:** desktop LED headers and ⋯ menus above cards; mobile day chips, swipe Replace / Move / Remove, every sheet scrolls internally and stays clear of the keyboard.
+  7. **Cyberpunk `/shopping`:** receipt readable, ticked items readable, breakdown popup, Generate.
+  8. **`/pet` in both themes:** the room looks exactly as before.
+  9. **Low FX** (Cyberpunk): glow, rain, scanlines, flicker and ticker scroll stop; persists on reload; the row is hidden under Default.
+  10. **Reduced motion** (OS setting): no animations in either theme.
+  11. **Focus ring** visible on header, a card, the menu tiles and a dialog in both themes.
+  12. **Login:** Default shows "Welcome to My Pantry Plan"; Cyberpunk shows the `DOOR://SIGN IN` terminal with FOODBYTES; Google sign-in works.
+  13. **Installed icon / favicon** still the Default plate-P in both themes.
 
 ---
 
 ## Self-review
 
 **Spec coverage:**
-- Token sheet, fonts, z-scale, focus, legacy remap — Tasks 1, 2, 3.
-- Backdrop (skyline, scanlines, rain) — Tasks 2, 5.
-- Brand (logo, favicon, PWA icons, manifest, meta, title) — Tasks 3, 8, 13.
-- Pixel icons for nav and CartIcon — Tasks 9, 10.
-- Ticker — Task 12.
-- Low FX switch — Tasks 1, 2, 4, 11.
-- Header, footer, toasts, sign-in — Tasks 11, 13.
-- Recipes menu board, including teal cards — Tasks 14, 15.
-- Meal plan order board, desktop and mobile — Tasks 16, 17.
-- Recipe view, full-screen ingredients view and cook mode — Task 18.
-- Shopping receipt — Task 19.
-- Dialogs, landing and admin — Tasks 20, 21.
-- Pip containment — Task 6.
-- Contrast regression check — Tasks 7, 24.
-- MINOR bump — Task 22.
+- Theme architecture (token files, override bundle, registry, context, boot) — Tasks 1–4.
+- Default-preserving sweep — every CSS task, rule 1; Task 24 Step 1.
+- User menu v2 + picker + Low FX row — Tasks 7–9, 13.
+- Brand per theme (header, login, tab title); static icons on Default — Tasks 10, 24 Step 3.
+- Pixel icons, ticker, rain, shell — Tasks 11–13.
+- Cyberpunk screens — Tasks 14–20; landing/admin tokens — Task 21.
+- Pip containment — Task 5.
+- `check:themes` — Tasks 6, 25.
+- CLAUDE.md + mockups in step — Task 22.
+- MINOR bump — Task 23.
 
-**Placeholder scan:** no `TBD`, `TODO` or "similar to Task N" references. Each sweep step names its files, its mockup source selectors and a zero-hit grep.
+**Placeholder scan:** none, except Task 5 Step 1's `--focus-ring-color` value, which is defined by Task 1 Step 1 and must be copied from there.
 
-**Type / name consistency:** these identifiers are used identically wherever they appear:
-- `LOW_FX_STORAGE_KEY`, `LOW_FX_BODY_CLASS`, `readLowFx`, `applyLowFx`, `useLowFx`, `toggleLowFx`, `LowFxControl`
-- `PIXEL_ICONS`, `PixelIcon`, `NAV_ICON_NAMES`, `TICKER_ITEMS`
-- the CSS classes `.city-rain`, `.ticker`, `.ticker-track`, `.pixel-icon`, `.lowfx-switch`, `.brand-sign`, `.brand-word`, `.brand-flicker`, `.brand-sub`
-- the tokens `--card-teal-top`, `--card-teal-bottom`, `--card-plan-top`, `--card-plan-bottom`, `--paper`, `--paper-ink`, `--z-*`, `--focus-ring`, `--black`
+**Name consistency:** `THEMES`, `themeById`, `THEME_STORAGE_KEY`, `LOW_FX_STORAGE_KEY`, `LOW_FX_BODY_CLASS`, `DEFAULT_THEME_ID`, `readThemeId`, `applyTheme`, `readLowFx`, `applyLowFx`, `ThemeProvider`, `useTheme`, `setTheme`, `toggleLowFx`, `UserMenu`, `ThemePicker`, `LowFxControl`, `HeaderBrand`, `PixelBrandMark`, `PIXEL_ICONS`, `PixelIcon`, `NAV_ICON_NAMES`, `TICKER_ITEMS`; classes `.theme-preview--<id>`, `.lowfx-switch`, `.city-rain`, `.ticker`, `.ticker-track`, `.pixel-icon`, `.brand-sign`, `.brand-word`, `.brand-flicker`, `.brand-sub`; tokens `--focus-ring-color`, `--card-teal-*`, `--card-plan-*`, `--paper*`, `--black`; script `check:themes`.
 
 **Phase boundary cleanliness:**
-- Phase 1 ends with a green build. It changes tokens and shell only, and literal-coloured spots are expected to look wrong until swept.
-- Phase 2 ends green with a complete frame and no half-wired components (Ticker and LowFxControl are mounted in the same tasks that create them).
-- Phases 3 to 7 are CSS-only per area, and each ends green with zero literals in its files.
-- Phase 8 makes no production changes beyond the bump.
+- Phase 1 ends green with Default unchanged (tokens moved, not changed).
+- Phase 2 ends green with the new menu working in Default and the theme switchable.
+- Phase 3 ends green with the Cyberpunk frame complete (Ticker, rain and icons mounted in the tasks that create them).
+- Phases 4–8 are CSS-only per area plus one override file each; each ends green with zero literals in its files.
+- Phase 9 changes docs, mockups (only if diverged) and the version.

@@ -1,0 +1,579 @@
+/* Cyberpunk: the kitchen terminal. Recipe view modal, full-screen ingredients and cook mode.
+   Mockup: .dlg.rv, .rv-hd, .rv-ctl, .rv-tabs, .ilist, .steps, .cookbtn, .eatbtn, .ifull, .cook.
+   Colours come from the --rv-*, --cook-* and sweep tokens in ../cyberpunk.css. Modal sizing,
+   scrolling, z-index and the mobile sheet behaviour are untouched. Glow tokens are "none"
+   under body.lowfx. */
+
+/* ---------- frame ---------- */
+:root[data-theme="cyberpunk"] .recipe-view-modal {
+  border: 2px solid var(--cyan);
+  border-radius: 0;
+  background: var(--panel);
+  color: var(--ink);
+  font-family: var(--f-body);
+  box-shadow: var(--box-cyan), 0 30px 60px rgba(0, 0, 0, 0.7);
+}
+
+@media (max-width: 768px) {
+  :root[data-theme="cyberpunk"] .recipe-view-modal {
+    border-width: 0;
+  }
+}
+
+/* ---------- header (mockup .rv-hd) ---------- */
+:root[data-theme="cyberpunk"] .recipe-view-modal .recipe-view-header {
+  background: linear-gradient(180deg, var(--black), var(--panel));
+  border-bottom: 1px solid var(--line-soft);
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .recipe-title {
+  font-family: var(--f-display);
+  font-weight: 700;
+  color: var(--pink);
+  text-shadow: var(--glow-pink);
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .cheat-badge {
+  border-radius: 0;
+  font-family: var(--f-label);
+  font-weight: 400;
+  text-transform: uppercase;
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .close-button {
+  border: 1px solid var(--line);
+  border-radius: 0;
+  font-family: var(--f-label);
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .recipe-view-header .linked-recipe-navigation .back-button {
+  border: 1px solid var(--line);
+  border-radius: 0;
+  font-family: var(--f-label);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+/* plan context bar + eaten pill */
+:root[data-theme="cyberpunk"] .recipe-view-modal .rv-ctx {
+  border: 1px solid var(--line-soft);
+  border-radius: 0;
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .rv-ctx-label {
+  font-family: var(--f-label);
+  font-size: 11px;
+  color: var(--yellow);
+  text-transform: uppercase;
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .rv-ctx-label b {
+  font-weight: 400;
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .rv-eat {
+  border: 1px solid var(--lime);
+  border-radius: 0;
+  background: transparent;
+  color: var(--lime);
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .rv-eat.on {
+  background: var(--lime);
+  color: var(--void);
+}
+
+/* variant segment + servings stepper (mockup .rv-ctl, .vseg, .rv-srv). The segment, its buttons and
+   the .on b colour share rules with the recipe cards in recipes.css. */
+:root[data-theme="cyberpunk"] .recipe-view-modal .rv-vseg .variant-seg button.on {
+  background: var(--cyan);
+  border-color: var(--cyan);
+  color: var(--void);
+}
+
+@media (hover: hover) {
+  :root[data-theme="cyberpunk"] .recipe-view-modal .rv-vseg .variant-seg button:not(.on):hover {
+    border-color: var(--cyan);
+  }
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .rv-vseg .variant-single {
+  border: 1px solid var(--line-soft);
+  border-radius: 0;
+  background: var(--black);
+  color: var(--muted);
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .rv-vseg .variant-single b {
+  font-family: var(--f-num);
+  font-weight: 400;
+  font-size: 22px;
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .rv-srv {
+  border: 1px solid var(--line);
+  border-radius: 0;
+  background: var(--black);
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .rv-srv button {
+  border-radius: 0;
+  color: var(--cyan);
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .rv-srv span {
+  font-family: var(--f-num);
+  font-size: 20px;
+  color: var(--ink);
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .servings-input {
+  border-radius: 0;
+  font-family: var(--f-num);
+  font-size: 22px;
+  font-weight: 400;
+  color: var(--yellow);
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .servings-input:focus {
+  outline: 2px solid var(--focus-ring-color);
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .rv-macros {
+  font-family: var(--f-label);
+  font-size: 11px;
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .rv-macros-plain {
+  font-family: var(--f-num);
+  font-size: 20px;
+  font-weight: 400;
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .rv-awake {
+  border-radius: 0;
+  font-family: var(--f-label);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .rv-awake.on {
+  font-weight: 400;
+}
+
+/* focus: one yellow ring across the modal (Default keeps its own colours) */
+:root[data-theme="cyberpunk"] .recipe-view-modal .recipe-view-header button:focus-visible,
+:root[data-theme="cyberpunk"] .recipe-view-modal .rv-vseg .variant-seg button:focus-visible,
+:root[data-theme="cyberpunk"] .recipe-view-modal .ilist li:focus-visible,
+:root[data-theme="cyberpunk"] .recipe-view-modal .step:focus-visible,
+:root[data-theme="cyberpunk"] .recipe-view-modal .ing-expand:focus-visible,
+:root[data-theme="cyberpunk"] .recipe-view-modal .eaten-btn:focus-visible,
+:root[data-theme="cyberpunk"] .recipe-view-modal .eaten-undo:focus-visible,
+:root[data-theme="cyberpunk"] .recipe-view-modal .ifull button:focus-visible,
+:root[data-theme="cyberpunk"] .recipe-view-modal .cook button:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: 2px;
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .ilist li:focus-visible,
+:root[data-theme="cyberpunk"] .recipe-view-modal .step:focus-visible {
+  outline-offset: -2px;
+}
+
+/* ---------- tabs (mobile; mockup .rv-tabs) ---------- */
+@media (max-width: 768px) {
+  :root[data-theme="cyberpunk"] .recipe-view-modal .rv-tabs {
+    background: var(--panel);
+    border-bottom: 1px solid var(--line-soft);
+  }
+
+  :root[data-theme="cyberpunk"] .recipe-view-modal .rv-tabs button {
+    min-height: 48px;
+    font-family: var(--f-label);
+    font-size: 12px;
+    font-weight: 400;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  :root[data-theme="cyberpunk"] .recipe-view-modal .rv-tabs button.on {
+    color: var(--cyan);
+    border-bottom-color: var(--cyan);
+    text-shadow: var(--glow-cyan);
+  }
+}
+
+/* ---------- columns ---------- */
+:root[data-theme="cyberpunk"] .recipe-view-modal .ingredients-panel {
+  background: var(--deep);
+  border-right-color: var(--line-soft);
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .rv-col h3,
+:root[data-theme="cyberpunk"] .recipe-view-modal .steps-section h3,
+:root[data-theme="cyberpunk"] .recipe-view-modal .rv-extras h3 {
+  font-family: var(--f-label);
+  font-size: 13px;
+  font-weight: 400;
+  text-transform: uppercase;
+  color: var(--cyan);
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .rv-col h3 small,
+:root[data-theme="cyberpunk"] .recipe-view-modal .steps-section h3 small {
+  font-family: var(--f-num);
+  font-size: 18px;
+  font-weight: 400;
+  text-transform: none;
+  color: var(--muted);
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .ing-expand {
+  border: 1px solid var(--line);
+  border-radius: 0;
+  background: var(--deep);
+  font-family: var(--f-label);
+  font-size: 11px;
+  font-weight: 400;
+  text-transform: uppercase;
+  color: var(--cyan);
+}
+
+/* ---------- ingredients (mockup .ilist) ---------- */
+:root[data-theme="cyberpunk"] .recipe-view-modal .ilist li {
+  min-height: 48px;
+  border-bottom: 1px dashed var(--line-soft);
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .ilist .cb {
+  border-radius: 0;
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .ilist .q {
+  font-family: var(--f-num);
+  font-size: 21px;
+  font-weight: 400;
+  color: var(--yellow);
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .ilist li.on .q,
+:root[data-theme="cyberpunk"] .recipe-view-modal .ilist li.on .n {
+  color: var(--text-struck);
+  text-decoration: line-through;
+}
+
+/* extras */
+:root[data-theme="cyberpunk"] .recipe-view-modal .rv-extra {
+  border-radius: 0;
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .rv-tog {
+  border: 1px solid var(--line-soft);
+  border-radius: 0;
+  background: var(--deep);
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .rv-tog button {
+  border-radius: 0;
+  font-family: var(--f-label);
+  font-size: 11px;
+  font-weight: 400;
+  text-transform: uppercase;
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .rv-tog button.on {
+  font-weight: 400;
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .rv-extra-open {
+  color: var(--cyan);
+}
+
+/* ---------- steps (mockup .steps) ---------- */
+:root[data-theme="cyberpunk"] .recipe-view-modal .step {
+  margin-bottom: 0;
+  border-bottom: 1px solid var(--line-soft);
+  border-radius: 0;
+}
+
+@media (hover: hover) {
+  :root[data-theme="cyberpunk"] .recipe-view-modal .step:hover {
+    background: var(--raised);
+  }
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .step .num {
+  width: auto;
+  min-width: 34px;
+  height: auto;
+  border-radius: 0;
+  background: transparent;
+  font-family: var(--f-num);
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 1;
+  color: var(--pink);
+  place-items: start;
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .step.done .num {
+  background: transparent;
+  color: var(--lime);
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .step.done .txt {
+  text-decoration: line-through;
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .step-link {
+  border: 1px solid var(--cyan);
+  border-radius: 0;
+  background: var(--deep);
+  font-family: var(--f-label);
+  font-size: 11px;
+  font-weight: 400;
+  text-transform: uppercase;
+  color: var(--cyan);
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .step .sb {
+  border: 1px solid var(--orange);
+  border-radius: 0;
+}
+
+/* cook button: pink with a cyan offset (mockup .cookbtn) */
+:root[data-theme="cyberpunk"] .recipe-view-modal .cookbtn {
+  border-radius: 0;
+  font-family: var(--f-label);
+  font-size: 12px;
+  font-weight: 400;
+  text-transform: uppercase;
+  box-shadow: 4px 4px 0 var(--cyan);
+}
+
+/* ---------- eaten section (mockup .eatbtn) ---------- */
+:root[data-theme="cyberpunk"] .recipe-view-modal .eaten-section {
+  border-top: 1px solid var(--line-soft);
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .eaten-slot {
+  font-family: var(--f-label);
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--cyan);
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .eaten-btn {
+  border: 1px solid var(--lime);
+  border-radius: 0;
+  background: transparent;
+  color: var(--lime);
+  font-weight: 700;
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .eaten-btn.on {
+  background: var(--lime);
+  color: var(--void);
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .eaten-tick {
+  border-radius: 0;
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .eaten-meta {
+  font-family: var(--f-num);
+  font-size: 18px;
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .eaten-undo {
+  color: var(--cyan);
+}
+
+/* ---------- full-screen ingredients (mockup .ifull) ---------- */
+:root[data-theme="cyberpunk"] .recipe-view-modal .ifull {
+  background: var(--void);
+  color: var(--ink);
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .ifull-head {
+  background: var(--black);
+  border-bottom: 2px solid var(--pink);
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .ifull-title small {
+  font-family: var(--f-label);
+  font-size: 10px;
+  letter-spacing: 0;
+  color: var(--cyan);
+  opacity: 1;
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .ifull-title b {
+  font-family: var(--f-display);
+  font-weight: 700;
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .ifull-done {
+  border: 1px solid var(--pink);
+  border-radius: 0;
+  background: transparent;
+  font-family: var(--f-label);
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--pink);
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .ifull-prog {
+  height: 16px;
+  border: 1px solid var(--line);
+  border-radius: 0;
+  background: var(--deep);
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .ifull-prog i {
+  border-radius: 0;
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .ifull-count {
+  min-width: 82px;
+  font-family: var(--f-num);
+  font-size: 20px;
+  font-weight: 400;
+  color: var(--lime);
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .ifull-tools {
+  background: var(--panel);
+  border-bottom-color: var(--line-soft);
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .ifull-pill {
+  min-height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 0;
+  background: var(--deep);
+  font-family: var(--f-label);
+  font-size: 11px;
+  font-weight: 400;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .ifull-pill.on {
+  color: var(--cyan);
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .ifull-wake {
+  font-family: var(--f-num);
+  font-size: 17px;
+  color: var(--yellow);
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .ifull-srv {
+  border: 1px solid var(--line);
+  border-radius: 0;
+  background: var(--black);
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .ifull-srv button {
+  min-width: 44px;
+  min-height: 44px;
+  color: var(--cyan);
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .ifull-srv span {
+  font-family: var(--f-num);
+  font-size: 20px;
+  color: var(--ink);
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .ifull .ilist li {
+  min-height: 62px;
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .ifull .ilist .cb {
+  width: 32px;
+  height: 32px;
+  font-size: 17px;
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .ifull .ilist .q {
+  min-width: 112px;
+  font-size: 28px;
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .ifull-note {
+  color: var(--muted);
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .ifull-all {
+  border: 1px solid var(--lime);
+  border-radius: 0;
+  font-family: var(--f-label);
+  font-size: 12px;
+  font-weight: 400;
+  text-transform: uppercase;
+}
+
+/* ---------- cook mode (mockup .cook): full-screen terminal ---------- */
+:root[data-theme="cyberpunk"] .recipe-view-modal .cook {
+  background: var(--void);
+  color: var(--ink);
+  font-family: var(--f-body);
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .cook-top {
+  background: var(--black);
+  border-bottom: 2px solid var(--yellow);
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .cook-top b {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .cook-top button {
+  border: 1px solid var(--yellow);
+  border-radius: 0;
+  background: transparent;
+  font-family: var(--f-label);
+  font-size: 11px;
+  color: var(--yellow);
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .cook-dots {
+  padding-top: 10px;
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .cook-dots i {
+  height: 8px;
+  border-radius: 0;
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .cook-k {
+  font-family: var(--f-label);
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .cook-s {
+  font-family: var(--f-body);
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .cook-uses span {
+  border: 1px solid var(--line-soft);
+  border-radius: 0;
+  font-family: var(--f-num);
+  font-size: 17px;
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .cook-nav button {
+  min-height: 58px;
+  border-radius: 0;
+}
+
+:root[data-theme="cyberpunk"] .recipe-view-modal .cook-next {
+  box-shadow: 4px 4px 0 var(--pink);
+}

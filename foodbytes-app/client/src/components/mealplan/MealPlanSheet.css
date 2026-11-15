@@ -14,7 +14,7 @@
   inset: 0;
   border: none;
   padding: 0;
-  background: rgba(20, 16, 40, 0.4);
+  background: var(--sheet-backdrop);
   cursor: default;
 }
 
@@ -26,7 +26,7 @@
   max-height: 85vh;
   max-height: 85dvh;
   padding: 8px 16px calc(20px + env(safe-area-inset-bottom, 0px));
-  background: #fff;
+  background: var(--surface-popover);
   border-radius: 20px 20px 0 0;
   animation: mealSheetUp 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
@@ -41,7 +41,7 @@
   height: 4px;
   margin: 4px auto 8px;
   border-radius: 2px;
-  background: #d0cde0;
+  background: var(--sheet-grab);
 }
 
 .meal-sheet-head {
@@ -93,7 +93,7 @@
   padding: 6px 12px;
   border: 1px solid var(--border-color);
   border-radius: 10px;
-  background: #fff;
+  background: var(--bg-primary);
   font-size: 14px;
   text-align: left;
   cursor: pointer;
@@ -108,7 +108,7 @@
 }
 
 .meal-sheet-slot:active:not(:disabled) {
-  background: var(--bg-secondary, #f4f2fa);
+  background: var(--bg-secondary);
   border-color: var(--brand-primary-light);
 }
 
@@ -138,7 +138,7 @@
   min-height: 44px;
   border: 1px solid var(--border-color);
   border-radius: 50%;
-  background: #fff;
+  background: var(--bg-primary);
   font-size: 22px;
   color: var(--brand-primary);
   cursor: pointer;
@@ -147,7 +147,7 @@
 }
 
 .servings-sheet-step:active:not(:disabled) {
-  background: var(--bg-secondary, #f4f2fa);
+  background: var(--bg-secondary);
 }
 
 .servings-sheet-input {
@@ -163,7 +163,7 @@
   margin: 0 0 8px;
   text-align: center;
   font-size: 13px;
-  color: var(--error, #dc3545);
+  color: var(--error);
 }
 
 .servings-sheet-save {
@@ -172,7 +172,7 @@
   border: none;
   border-radius: 10px;
   background: var(--brand-primary);
-  color: #fff;
+  color: var(--on-brand);
   font-weight: 600;
   font-size: 15px;
   cursor: pointer;
@@ -187,12 +187,12 @@
 
 @media (hover: hover) {
   .meal-sheet-slot:hover:not(:disabled) {
-    background: var(--bg-secondary, #f4f2fa);
+    background: var(--bg-secondary);
     border-color: var(--brand-primary-light);
   }
 
   .servings-sheet-step:hover:not(:disabled) {
-    background: var(--bg-secondary, #f4f2fa);
+    background: var(--bg-secondary);
   }
 }
 

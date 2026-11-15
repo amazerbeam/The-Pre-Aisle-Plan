@@ -1,0 +1,74 @@
+/* Theme picker tiles (style A). Preview artwork lives in styles/themes/previews.css. */
+.theme-picker {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.theme-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 44px;
+  padding: 6px;
+  background: var(--surface-input);
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  text-align: left;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.theme-tile[aria-checked="true"] {
+  border-color: var(--brand-primary);
+}
+
+.theme-tile:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: 2px;
+}
+
+.theme-tile__name {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2px 2px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.theme-tile__tick {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--brand-primary);
+  color: var(--on-brand);
+  font-size: 12px;
+  visibility: hidden;
+}
+
+.theme-tile[aria-checked="true"] .theme-tile__tick {
+  visibility: visible;
+}
+
+.theme-tile:active {
+  border-color: var(--control-border);
+}
+
+.theme-tile[aria-checked="true"]:active {
+  border-color: var(--brand-primary);
+}
+
+@media (hover: hover) {
+  .theme-tile:hover {
+    border-color: var(--control-border);
+  }
+
+  .theme-tile[aria-checked="true"]:hover {
+    border-color: var(--brand-primary);
+  }
+}

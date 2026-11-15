@@ -15,6 +15,7 @@ foodbytes-app/
   client/          React 18 + Vite frontend
   foodbytes-api/   Spring Boot 3.2 / Java 17 backend
   database/        MySQL schema + migrations (canonical SQL lives here, but is also tracked in the deployed Railway DB)
+  mockup/          Interactive HTML mockups of the client UI — must match the live app (see "Mockups")
   docker-compose.yml
 Claude/agents/     Per-domain agent prompts + context (Chef, React, Java, MySQL, UX, etc.)
 docker-compose.yml (root) — preferred compose file; mounts foodbytes-app/database/*.sql
@@ -85,6 +86,44 @@ What each failure looks like:
 - **Contexts** are the source of truth for cross-cutting state: `AuthContext`, `MealPlanContext`, `ShoppingListContext`, `HomemadeSelectionsContext`. Components subscribe rather than fetching directly.
 - **Services** (`services/api.js` + per-domain modules) wrap Axios. `api.js` sets `baseURL: '/api'` and `withCredentials: true`; Vite proxies `/api`, `/oauth2`, `/login` → `:8080` in dev.
 - Components are grouped by feature: `auth/`, `mealplan/`, `recipes/`, `shopping/`, `onboarding/`, `admin/`, plus `common/` and `layout/`.
+
+### Themes — the client has several
+
+The client is **multi-theme**. Treat every UI change as a change to *all* themes, not to one look. Themes today: **Default** (the original purple *My Pantry Plan* look, the fallback) and **Cyberpunk** (*FOODBYTES · Night Kitchen*, pixel/neon). More will be added. Shipped by contract `.claude/contract/2026-11-14-cyberpunk-reskin/` (v1.31.0).
+
+**File layout** (`client/src/styles/themes/`):
+- `default.css` — every token on `:root` (~190, grouped by area, including role tokens added by the sweep). The Default look and the fallback for every other theme.
+- `<id>.css` (`cyberpunk.css`) — reassigns tokens under `:root[data-theme="<id>"]`: palette, card stops, fonts, glow, remaps, the `body.lowfx` block.
+- `<id>/` (`cyberpunk/index.css` importing `shell.css`, `recipes.css`, `mealplan.css`, `recipe-view.css`, `shopping.css`, `dialogs.css`) — theme-only looks that tokens can't express. `main.jsx` imports it right after `App`, so it loads after the component CSS and wins ties.
+- `previews.css` — `.theme-preview--<id>` tile art for the picker.
+
+**Runtime pieces:**
+- `constants/themes.js` — the `THEMES` registry. Fields: `id`, `label`, `themeColor`, `fontsHref` (lazy web fonts, or `null`), `iconSet` (`line` | `pixel`), `effects`, `ticker`, `brand { name, wordmark { before, accent, after, accentClass }, sub, loginTitle, loginSub }`. Also `THEME_STORAGE_KEY` (`fb.display.theme`), `LOW_FX_STORAGE_KEY` (`fb.display.lowFx`), `LOW_FX_BODY_CLASS` (`lowfx`), `DEFAULT_THEME_ID`, `themeById`.
+- `contexts/ThemeContext.jsx` — `ThemeProvider` / `useTheme()` (`themeId`, `theme`, `setTheme`, `lowFx`, `toggleLowFx`); applies via `utils/theme.js` (`data-theme` on `<html>`, `theme-color` meta, font stylesheet) and `utils/lowFx.js` (`body.lowfx`).
+- `index.html` inline boot script sets `data-theme` and `theme-color` before first paint (no flash). Its `ids` list must match the registry.
+- UI: `layout/UserMenu` (avatar menu: servings, meal times, `ThemePicker`, `LowFxControl`, version, sign out), `HeaderBrand`, `Ticker`, `common/PixelIcon` + `constants/pixelIcons.js`, `PixelBrandMark`.
+
+**Rules (binding):**
+- **Colours live only in `client/src/styles/themes/`.** Component CSS reads tokens and never contains a literal colour (black shadows excepted). Pip's room (`components/pet/`) is the other exception, see below.
+- **Default must not drift.** A new token's Default value is the exact literal it replaced (the sweep moved values, it did not retune them). Changing the Default look is its own decision, never a side effect of theme work.
+- **Every selector in `styles/themes/<id>/` is prefixed `:root[data-theme="<id>"]`.** The one deliberate exception: base element defaults in `shell.css` use `:where(:root[data-theme="cyberpunk"])` (zero specificity) so component CSS can still override them. Component CSS stays theme-agnostic.
+- **Theme-specific markup** (brand, icon set, ticker, effects) branches on fields of the `THEMES` registry via `useTheme()`, never on a theme id string.
+- **Choice is per device** (`fb.display.theme`). **Low FX** (`fb.display.lowFx`, `body.lowfx`) only affects themes with `effects`: it stops theme animations (rain, flicker, ticker) and glow, not functional spinners. Reduced motion is honoured in every theme.
+- **Static brand assets stay on Default**: favicon, PWA icons, manifest name/colours, `index.html` title, and the login dialog's plate-P mark. Only `theme-color` follows the theme at runtime.
+- **Pip's room keeps its own palette in every theme**: `components/pet/PetView.css` re-declares the Default tokens on `.pet-view`.
+- **No `mask` on elements that contain fixed popups.** Cyberpunk's receipt zigzag uses conic-gradient backgrounds because a mask would clip the fixed breakdown popup.
+- **`npm run check:themes`** (`client/scripts/check-themes.mjs`) must pass: WCAG AA contrast for each theme's text/background pairs, plus registry ↔ theme CSS ↔ `index.html` boot list agreement. Known misses are listed in the `KNOWN_EXCEPTIONS` map and print WARN without failing; today there is exactly one, `default|text-secondary|bg-secondary` (4.45:1, pre-existing Default look, accepted 2026-11-15, to be fixed in its own ticket). Expected output: that WARN plus `Themes OK: 2 themes, 56 contrast pairs`. Never add an exception for a new theme; fix the token.
+- Every theme must work at 320–1280px with popups usable on mobile.
+
+**Adding a theme:** registry entry in `constants/themes.js` → `styles/themes/<id>.css` (reassign tokens under `:root[data-theme="<id>"]`) → optional `styles/themes/<id>/` overrides, imported from `<id>/index.css` and `main.jsx` → `.theme-preview--<id>` tile art in `previews.css` → id (and its `theme-color`) in the `index.html` boot script → update the mockup (`foodbytes-app/mockup/`) → `npm run check:themes` green.
+
+### Mockups — keep them in step with the live app
+
+`foodbytes-app/mockup/` holds the interactive HTML mockups (`app-mockup.html` = full app, Cyberpunk; `user-menu-themes.html` = user menu + theme picker in both themes; see its `README.md`). They are the starting point for every UI change, so they **must match what is live**:
+- New UI work starts by changing the mockup there (not in Downloads), getting it reviewed, then planning against it.
+- Any ticket that changes the client UI also updates the mockup in the same ticket; if the implementation diverged from the mockup for a good reason, update the mockup before the ticket closes. `/fb-plan` contracts that touch the UI include a mockup-sync task.
+- Known gap: `app-mockup.html` draws Cyberpunk screens only; for Default the live app is the reference until Default screens are added.
+- Root `mockups/` is a historical folder, not this one.
 
 ### Backend structure (`foodbytes-api/src/main/java/com/foodbytes/`)
 Standard layered Spring layout: `controller/` → `service/` → `repository/` → `model/` (JPA entities). `security/` holds the OAuth2 success/failure handlers, JWT filter/provider, and `UserPrincipal`. `config/SecurityConfig.java` wires everything.

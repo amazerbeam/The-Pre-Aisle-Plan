@@ -1,0 +1,310 @@
+/* Account menu (UserMenu.jsx). Desktop: anchored dropdown. Mobile: bottom sheet over a scrim.
+   Reference: foodbytes-app/mockup/user-menu-themes.html. Colours are tokens only. */
+.user-menu {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border: 1px solid var(--menu-border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  text-align: left;
+  overscroll-behavior: contain;
+}
+
+.user-menu :focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: 2px;
+}
+
+/* Desktop dropdown. z-index matches the old dropdown inside the header's stacking context. */
+.user-menu--dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 100;
+  width: 340px;
+  max-width: calc(100vw - 24px);
+  max-height: calc(100vh - 88px);
+  max-height: calc(100dvh - 88px);
+  overflow: auto;
+  animation: user-menu-fade 0.15s ease;
+}
+
+/* Mobile sheet: the scrim and sheet sit in the modal band (>= 1000) so they cover the footer. */
+.user-menu__scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: flex-end;
+  background: var(--scrim-bg);
+}
+
+.user-menu--sheet {
+  width: 100%;
+  max-height: calc(100vh - 24px);
+  max-height: calc(100dvh - 24px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  border-bottom: none;
+  border-left: none;
+  border-right: none;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  overflow: hidden;
+  animation: user-menu-rise 0.2s ease;
+}
+
+.user-menu--sheet .user-menu__scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+@keyframes user-menu-fade {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes user-menu-rise {
+  from { transform: translateY(24px); }
+  to { transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .user-menu--dropdown,
+  .user-menu--sheet {
+    animation: none;
+  }
+}
+
+.user-menu__grab {
+  flex: none;
+  width: 40px;
+  height: 4px;
+  margin: 8px auto 2px;
+  border-radius: 2px;
+  background: var(--control-border);
+}
+
+/* Who block: avatar, name/email, close button (mobile only) */
+.user-menu__who {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--surface-tint-brand);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.user-menu__avatar {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border: 2px solid rgba(0, 0, 0, 0.08);
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.user-menu__avatar--placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--avatar-bg);
+  color: var(--avatar-text);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.user-menu__who-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.user-menu__name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.user-menu__email {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.user-menu__close {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 44px;
+  min-height: 44px;
+  padding: 0;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 18px;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.user-menu__close:active {
+  background: var(--control-active-bg);
+}
+
+@media (hover: hover) {
+  .user-menu__close:hover {
+    background: var(--control-hover-bg);
+  }
+}
+
+/* Sections */
+.user-menu__section {
+  padding: 12px 16px;
+  border-top: 1px solid var(--border-color);
+}
+
+.user-menu__who + .user-menu__scroll > .user-menu__section:first-child {
+  border-top: none;
+}
+
+.user-menu__section h3 {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--text-label);
+}
+
+/* The two controls bring their own padding and divider; the section only adds the heading. */
+.user-menu__section--planning {
+  padding: 12px 0 0;
+}
+
+.user-menu__section--planning h3 {
+  padding: 0 16px;
+  margin-bottom: 0;
+}
+
+.user-menu__section--planning .default-portions {
+  border-top: none;
+}
+
+.user-menu__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 44px;
+  margin-top: 8px;
+  font-size: 14px;
+}
+
+.user-menu__row small {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.user-menu__saved {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* Low FX switch */
+.lowfx-switch {
+  position: relative;
+  flex: none;
+  width: 52px;
+  min-height: 44px;
+  height: 44px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Track and knob are drawn on pseudo-elements so the hit area stays 44px tall. */
+.lowfx-switch::before {
+  content: "";
+  position: absolute;
+  top: 7px;
+  left: 0;
+  width: 52px;
+  height: 30px;
+  box-sizing: border-box;
+  background: var(--surface-input);
+  border: 1px solid var(--control-border);
+  border-radius: 15px;
+}
+
+.lowfx-switch::after {
+  content: "";
+  position: absolute;
+  top: 11px;
+  left: 4px;
+  width: 20px;
+  height: 20px;
+  background: var(--text-secondary);
+  border-radius: 50%;
+  transition: left 0.15s ease;
+}
+
+.lowfx-switch[aria-checked="true"]::before {
+  border-color: var(--success);
+}
+
+.lowfx-switch[aria-checked="true"]::after {
+  left: 28px;
+  background: var(--success);
+}
+
+.lowfx-switch:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: 2px;
+}
+
+/* Sign out */
+.user-menu__signout {
+  display: block;
+  width: 100%;
+  min-height: 48px;
+  padding: 0 16px;
+  background: none;
+  border: none;
+  border-top: 1px solid var(--border-color);
+  border-radius: 0;
+  color: var(--danger-text);
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.user-menu__signout:active {
+  background: var(--bg-secondary);
+}
+
+@media (hover: hover) {
+  .user-menu__signout:hover {
+    background: var(--bg-secondary);
+  }
+}
+
+.user-menu__signout:focus-visible {
+  outline-offset: -2px;
+}

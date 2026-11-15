@@ -1,0 +1,584 @@
+/* Cyberpunk recipes screen: the menu board. Cards, toolbar, week strip, day buttons, macro chips
+   and the macro-target / extras popups. Reference: mockup/app-mockup.html (.rcard, .hud, .vseg,
+   .rtool, .mtabs, .strip, .dbtn, .chip, .pop). Selectors start with :root[data-theme="cyberpunk"]. */
+
+/* HUD brackets (::before, --hud) live in hud.css */
+:root[data-theme="cyberpunk"] .recipe-card,
+:root[data-theme="cyberpunk"] .week-strip {
+  border-radius: 0;
+}
+
+:root[data-theme="cyberpunk"] .week-strip {
+  position: relative;
+  background: var(--panel);
+  border: 1px solid var(--line-soft);
+}
+
+/* ---------- recipe cards ---------- */
+:root[data-theme="cyberpunk"] .recipe-grid {
+  counter-reset: menu-item;
+}
+
+:root[data-theme="cyberpunk"] .recipe-card {
+  background: linear-gradient(180deg, var(--card-teal-top) 0%, var(--card-teal-bottom) 100%);
+  border: 1px solid var(--card-teal-border);
+  border-top: 3px solid var(--cyan);
+  box-shadow:
+    0 0 0 1px var(--black),
+    0 10px 26px rgba(0, 0, 0, 0.65),
+    0 0 16px rgba(5, 217, 232, 0.18),
+    inset 0 0 28px rgba(5, 217, 232, 0.07);
+}
+
+@media (hover: hover) {
+  :root[data-theme="cyberpunk"] .recipe-card:hover {
+    border-color: var(--cyan);
+  }
+}
+
+:root[data-theme="cyberpunk"] .recipe-card.is-in-plan {
+  --hud: var(--pink);
+  border-color: var(--pink);
+  border-top-color: var(--pink);
+  background: linear-gradient(180deg, var(--card-plan-top) 0%, var(--card-plan-bottom) 100%);
+  box-shadow:
+    0 0 0 1px var(--black),
+    0 10px 26px rgba(0, 0, 0, 0.65),
+    var(--box-pink);
+}
+
+:root[data-theme="cyberpunk"] .recipe-card.is-hidden {
+  background: var(--deep);
+  border-top-color: var(--line);
+}
+
+:root[data-theme="cyberpunk"] .recipe-card.is-hidden .recipe-card-name {
+  color: var(--muted);
+}
+
+:root[data-theme="cyberpunk"] body.lowfx .recipe-card,
+:root[data-theme="cyberpunk"] body.lowfx .recipe-card.is-in-plan {
+  box-shadow: 0 0 0 1px var(--black);
+}
+
+/* Top row: numbered menu item, dotted rule */
+:root[data-theme="cyberpunk"] .recipe-card-top {
+  align-items: center;
+  padding-bottom: 9px;
+  border-bottom: 2px dotted var(--card-teal-rule);
+}
+
+:root[data-theme="cyberpunk"] .recipe-card-top::before {
+  counter-increment: menu-item;
+  content: counter(menu-item, decimal-leading-zero);
+  flex: none;
+  font-family: var(--f-num);
+  font-size: 20px;
+  line-height: 1.1;
+  color: var(--pink);
+}
+
+:root[data-theme="cyberpunk"] .recipe-card-name {
+  font-family: var(--f-body);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+@media (hover: hover) {
+  :root[data-theme="cyberpunk"] .recipe-card-name:hover {
+    color: var(--cyan);
+  }
+}
+
+:root[data-theme="cyberpunk"] .recipe-card-top .cheat-badge,
+:root[data-theme="cyberpunk"] .recipe-card-top .audited-badge,
+:root[data-theme="cyberpunk"] .recipe-card .in-plan-badge {
+  font-family: var(--f-label);
+  font-size: 10px;
+  font-weight: 400;
+  text-transform: uppercase;
+  border-radius: 0;
+}
+
+:root[data-theme="cyberpunk"] .recipe-card .in-plan-badge {
+  background: var(--pink);
+  color: var(--void);
+}
+
+:root[data-theme="cyberpunk"] .recipe-card-menu-trigger {
+  border-radius: 0;
+  color: var(--cyan);
+}
+
+:root[data-theme="cyberpunk"] .recipe-card-menu-list,
+:root[data-theme="cyberpunk"] .servings-chip-popover {
+  background: var(--raised);
+  border: 1px solid var(--cyan);
+  border-radius: 0;
+  box-shadow: var(--box-cyan), 0 12px 30px rgba(0, 0, 0, 0.6);
+}
+
+:root[data-theme="cyberpunk"] .recipe-card-menu-list button {
+  border-radius: 0;
+  font-family: var(--f-body);
+  color: var(--ink);
+}
+
+@media (hover: hover) {
+  :root[data-theme="cyberpunk"] .recipe-card-menu-list button:hover {
+    background: var(--panel);
+    color: var(--cyan);
+  }
+}
+
+/* Variant segment (mockup .vseg): kcal is the "price" */
+:root[data-theme="cyberpunk"] .variant-seg,
+:root[data-theme="cyberpunk"] .recipe-view-modal .rv-vseg .variant-seg {
+  gap: 4px;
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+}
+
+:root[data-theme="cyberpunk"] .variant-seg button,
+:root[data-theme="cyberpunk"] .recipe-view-modal .rv-vseg .variant-seg button {
+  border: 1px solid var(--line-soft);
+  border-radius: 0;
+  background: var(--deep);
+  font-family: var(--f-label);
+  font-size: 10px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+:root[data-theme="cyberpunk"] .variant-seg button b,
+:root[data-theme="cyberpunk"] .recipe-view-modal .rv-vseg .variant-seg button b {
+  font-family: var(--f-num);
+  font-weight: 400;
+  font-size: 21px;
+  line-height: 1;
+  color: var(--ink);
+}
+
+@media (hover: hover) {
+  :root[data-theme="cyberpunk"] .variant-seg button:hover {
+    border-color: var(--cyan);
+  }
+}
+
+:root[data-theme="cyberpunk"] .variant-seg button.on {
+  background: var(--cyan);
+  border-color: var(--cyan);
+  box-shadow: none;
+  color: var(--void);
+}
+
+:root[data-theme="cyberpunk"] .variant-seg button.on b,
+:root[data-theme="cyberpunk"] .recipe-view-modal .rv-vseg .variant-seg button.on b {
+  color: var(--void);
+}
+
+:root[data-theme="cyberpunk"] .variant-single {
+  font-family: var(--f-body);
+  color: var(--muted);
+}
+
+:root[data-theme="cyberpunk"] .variant-single b {
+  font-family: var(--f-num);
+  font-weight: 400;
+  font-size: 26px;
+  line-height: 0.9;
+  color: var(--yellow);
+  text-shadow: var(--glow-yellow);
+}
+
+/* Servings chip and unhide */
+:root[data-theme="cyberpunk"] .servings-chip-trigger {
+  border-radius: 0;
+  background: var(--deep);
+  border-color: var(--line-soft);
+  font-family: var(--f-num);
+  font-size: 17px;
+  font-weight: 400;
+  color: var(--cyan);
+}
+
+:root[data-theme="cyberpunk"] .servings-chip-step {
+  border-radius: 0;
+  background: var(--deep);
+  font-family: var(--f-num);
+}
+
+:root[data-theme="cyberpunk"] .servings-chip-input {
+  font-family: var(--f-num);
+  font-size: 20px;
+  font-weight: 400;
+}
+
+:root[data-theme="cyberpunk"] .unhide-btn {
+  border-radius: 0;
+  font-family: var(--f-label);
+  font-weight: 400;
+  text-transform: uppercase;
+}
+
+/* Notices on the list */
+:root[data-theme="cyberpunk"] .recipe-notice,
+:root[data-theme="cyberpunk"] .recipe-hidden-note,
+:root[data-theme="cyberpunk"] .error-message {
+  border-radius: 0;
+  font-family: var(--f-body);
+}
+
+:root[data-theme="cyberpunk"] .recipe-notice button,
+:root[data-theme="cyberpunk"] .recipe-retry-btn {
+  border-radius: 0;
+  font-family: var(--f-label);
+  font-weight: 400;
+  text-transform: uppercase;
+}
+
+/* ---------- toolbar (mockup .rtool / .tabs / .search / .fchip) ---------- */
+:root[data-theme="cyberpunk"] .recipe-toolbar {
+  background: var(--void);
+  border-bottom: 1px solid var(--line-soft);
+}
+
+:root[data-theme="cyberpunk"] .recipe-tab {
+  border: 1px solid var(--line);
+  border-radius: 0;
+  background: var(--deep);
+  font-family: var(--f-label);
+  font-size: 10px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+:root[data-theme="cyberpunk"] .recipe-tab .tab-count {
+  font-family: var(--f-num);
+  font-size: 18px;
+  opacity: 1;
+  color: var(--cyan);
+}
+
+:root[data-theme="cyberpunk"] .recipe-tab.on {
+  background: var(--pink);
+  border-color: var(--pink);
+  box-shadow: var(--box-pink);
+  font-weight: 400;
+  color: var(--void);
+}
+
+:root[data-theme="cyberpunk"] .recipe-tab.on .tab-count {
+  color: var(--void);
+}
+
+@media (hover: hover) {
+  :root[data-theme="cyberpunk"] .recipe-tab:hover:not(.on) {
+    background: var(--deep);
+    border-color: var(--cyan);
+  }
+}
+
+@media (min-width: 769px) {
+  :root[data-theme="cyberpunk"] .recipe-tab {
+    font-size: 12px;
+  }
+}
+
+:root[data-theme="cyberpunk"] .recipe-search {
+  border: 1px solid var(--line);
+  border-radius: 0;
+  background: var(--deep);
+  font-family: var(--f-body);
+  color: var(--ink);
+}
+
+:root[data-theme="cyberpunk"] .recipe-search:focus {
+  border-color: var(--cyan);
+  box-shadow: var(--box-cyan);
+}
+
+:root[data-theme="cyberpunk"] .recipe-search:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: 2px;
+}
+
+:root[data-theme="cyberpunk"] .recipe-chip {
+  border: 1px dashed var(--line);
+  border-radius: 0;
+  font-family: var(--f-body);
+  color: var(--muted);
+}
+
+:root[data-theme="cyberpunk"] .recipe-chip.on {
+  border-style: solid;
+  border-color: var(--yellow);
+  background: transparent;
+  color: var(--yellow);
+}
+
+:root[data-theme="cyberpunk"] .recipe-add-btn {
+  border-radius: 0;
+  font-family: var(--f-label);
+  font-weight: 400;
+  text-transform: uppercase;
+}
+
+/* ---------- week strip ---------- */
+:root[data-theme="cyberpunk"] .week-strip-head {
+  font-family: var(--f-label);
+  font-weight: 400;
+  color: var(--cyan);
+}
+
+:root[data-theme="cyberpunk"] .week-strip-gap {
+  font-family: var(--f-body);
+  font-weight: 600;
+}
+
+:root[data-theme="cyberpunk"] .week-tile {
+  border: 1px solid var(--line-soft);
+  border-radius: 0;
+  background: var(--deep);
+  font-family: var(--f-body);
+  color: var(--ink);
+}
+
+:root[data-theme="cyberpunk"] .week-tile-day {
+  font-family: var(--f-num);
+  font-size: 19px;
+  font-weight: 400;
+  line-height: 1;
+  color: var(--yellow);
+}
+
+:root[data-theme="cyberpunk"] .week-tile-dot {
+  border-radius: 0;
+  background: var(--lime);
+}
+
+:root[data-theme="cyberpunk"] .week-tile.is-empty {
+  border: 1px dashed var(--orange);
+}
+
+:root[data-theme="cyberpunk"] .week-tile.is-empty .week-tile-dot {
+  background: var(--orange);
+}
+
+:root[data-theme="cyberpunk"] .week-tile.is-today {
+  box-shadow: inset 0 0 0 2px var(--cyan);
+}
+
+:root[data-theme="cyberpunk"] .week-tile.is-picking {
+  background: var(--cyan);
+  border-color: var(--cyan);
+  color: var(--void);
+}
+
+:root[data-theme="cyberpunk"] .week-tile.is-picking .week-tile-day,
+:root[data-theme="cyberpunk"] .week-tile.is-picking .week-tile-name,
+:root[data-theme="cyberpunk"] .week-tile.is-picking .week-tile-day span {
+  color: var(--void);
+}
+
+:root[data-theme="cyberpunk"] .week-tile.is-picking .week-tile-dot {
+  background: var(--void);
+}
+
+/* Picking banner (mockup .pickbar) */
+:root[data-theme="cyberpunk"] .picking-banner {
+  border: 2px solid var(--black);
+  border-radius: 0;
+  background: var(--yellow);
+  box-shadow: 4px 4px 0 var(--pink);
+  color: var(--void);
+}
+
+:root[data-theme="cyberpunk"] .picking-banner button {
+  border-radius: 0;
+  background: var(--void);
+  font-family: var(--f-label);
+  font-size: 12px;
+  color: var(--yellow);
+}
+
+/* ---------- day buttons (mockup .dbtn) ---------- */
+:root[data-theme="cyberpunk"] .day-btn-face {
+  border: 1px solid var(--line-soft);
+  border-radius: 0;
+  background: var(--deep);
+  font-family: var(--f-num);
+  font-size: 18px;
+  font-weight: 400;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+@media (hover: hover) {
+  :root[data-theme="cyberpunk"] .day-btn.unselected:hover .day-btn-face,
+  :root[data-theme="cyberpunk"] .day-btn.already-selected:hover .day-btn-face {
+    border-color: var(--cyan);
+    color: var(--cyan);
+  }
+}
+
+/* Another recipe holds this slot: hazard stripes and an orange pip */
+:root[data-theme="cyberpunk"] .day-btn.already-selected .day-btn-face {
+  background: repeating-linear-gradient(135deg, var(--deep) 0 5px, var(--raised) 5px 10px);
+  color: var(--muted);
+}
+
+:root[data-theme="cyberpunk"] .day-btn.already-selected .day-btn-face::after {
+  border-radius: 0;
+  background: var(--orange);
+}
+
+/* This recipe is planned: lime fill with a check */
+:root[data-theme="cyberpunk"] .day-btn.selected .day-btn-face {
+  background: var(--lime);
+  border-color: var(--lime);
+  color: var(--void);
+}
+
+@media (hover: hover) {
+  :root[data-theme="cyberpunk"] .day-btn.selected:hover .day-btn-face {
+    background: var(--success-hover);
+  }
+}
+
+:root[data-theme="cyberpunk"] .day-btn:focus-visible,
+:root[data-theme="cyberpunk"] .pick-btn:focus-visible {
+  border-radius: 0;
+}
+
+:root[data-theme="cyberpunk"] .pick-btn {
+  border-radius: 0;
+  font-family: var(--f-label);
+  font-weight: 400;
+  text-transform: uppercase;
+}
+
+/* ---------- macro chips (mockup .chip): bordered, VT323, macro token colours ---------- */
+:root[data-theme="cyberpunk"] .macro-chip {
+  border: 1px solid currentColor;
+  border-radius: 0;
+  font-family: var(--f-num);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.1;
+}
+
+:root[data-theme="cyberpunk"] .macro-chips--large .macro-chip {
+  font-size: 20px;
+}
+
+:root[data-theme="cyberpunk"] .macro-chips--header .macro-chip {
+  font-size: 18px;
+  font-weight: 400;
+}
+
+/* ---------- popups (mockup .pop: raised panel, cyan frame) ---------- */
+:root[data-theme="cyberpunk"] .macro-target-popup,
+:root[data-theme="cyberpunk"] .extras-popup-modal {
+  background: var(--raised);
+  border: 1px solid var(--cyan);
+  border-radius: 0;
+  box-shadow: var(--box-cyan), 0 12px 30px rgba(0, 0, 0, 0.6);
+  font-family: var(--f-body);
+}
+
+:root[data-theme="cyberpunk"] .macro-target-header,
+:root[data-theme="cyberpunk"] .extras-popup-header {
+  border-radius: 0;
+  background: var(--deep);
+  border-bottom: 1px solid var(--cyan);
+  color: var(--ink);
+}
+
+:root[data-theme="cyberpunk"] .macro-target-heading h4,
+:root[data-theme="cyberpunk"] .extras-popup-recipe-name {
+  font-family: var(--f-display);
+  font-weight: 400;
+  color: var(--cyan);
+}
+
+:root[data-theme="cyberpunk"] .macro-target-subtitle,
+:root[data-theme="cyberpunk"] .extras-popup-title {
+  font-family: var(--f-label);
+  text-transform: uppercase;
+  color: var(--muted);
+  opacity: 1;
+}
+
+:root[data-theme="cyberpunk"] .macro-target-close {
+  border-radius: 0;
+  color: var(--cyan);
+}
+
+:root[data-theme="cyberpunk"] .macro-target-close:focus-visible {
+  outline-color: var(--focus-ring-color);
+}
+
+:root[data-theme="cyberpunk"] .macro-target-current,
+:root[data-theme="cyberpunk"] .macro-target-why,
+:root[data-theme="cyberpunk"] .macro-target-perfect,
+:root[data-theme="cyberpunk"] .macro-target-legend li,
+:root[data-theme="cyberpunk"] .macro-target-sources li,
+:root[data-theme="cyberpunk"] .extras-popup-instruction {
+  border-radius: 0;
+}
+
+:root[data-theme="cyberpunk"] .macro-target-value,
+:root[data-theme="cyberpunk"] .macro-target-legend-range {
+  font-family: var(--f-num);
+  font-weight: 400;
+}
+
+:root[data-theme="cyberpunk"] .macro-target-value {
+  font-size: 2.6rem;
+  line-height: 1;
+  color: var(--yellow);
+}
+
+:root[data-theme="cyberpunk"] .macro-target-pill,
+:root[data-theme="cyberpunk"] .macro-target-reject,
+:root[data-theme="cyberpunk"] .macro-target-legend-reject,
+:root[data-theme="cyberpunk"] .macro-target-here,
+:root[data-theme="cyberpunk"] .macro-target-section,
+:root[data-theme="cyberpunk"] .macro-target-perfect-label,
+:root[data-theme="cyberpunk"] .extras-label-text {
+  font-family: var(--f-label);
+  font-weight: 400;
+  border-radius: 0;
+}
+
+:root[data-theme="cyberpunk"] .macro-target-dot {
+  border-radius: 0;
+}
+
+:root[data-theme="cyberpunk"] .extras-popup-button {
+  border-radius: 0;
+  font-family: var(--f-label);
+  font-size: 0.8rem;
+  font-weight: 400;
+  text-transform: uppercase;
+}
+
+:root[data-theme="cyberpunk"] .extras-popup-button:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: 2px;
+}
+
+:root[data-theme="cyberpunk"] .extras-checkbox:focus-visible + .extras-checkbox-custom {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: 2px;
+}
+
+@media (max-width: 480px) {
+  :root[data-theme="cyberpunk"] .macro-target-popup,
+  :root[data-theme="cyberpunk"] .extras-popup-modal,
+  :root[data-theme="cyberpunk"] .macro-target-header {
+    border-radius: 0;
+  }
+}

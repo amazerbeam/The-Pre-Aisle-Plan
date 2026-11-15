@@ -1,0 +1,460 @@
+/* Cyberpunk shopping list: the supply-run receipt. Aisle groups are the only light surface in the
+   theme (paper); progress tile, stale banner and the two popups are dark terminal pieces.
+   Reference: mockup/app-mockup.html (.prog, .bar, .stale, .aisle, .ah, .it, .ck, .dlg, .bar-t).
+   Selectors start with :root[data-theme="cyberpunk"]. Colour, border, font and glow only: no
+   sizing, scrolling or z-index changes. Every text colour inside the receipt is set explicitly
+   (paper-ink / paper-muted / paper-struck): cyberpunk's dark-surface tokens are unreadable on paper.
+   The zigzag edges are drawn with background gradients, not mask/filter: the breakdown popup is
+   position:fixed inside an aisle, and a mask or filter there would clip and contain it. */
+
+/* ---------- Header ---------- */
+:root[data-theme="cyberpunk"] .shopping-list-header h1 {
+  font-family: var(--f-display);
+  font-weight: 400;
+  color: var(--pink);
+  text-shadow: var(--glow-pink);
+}
+
+:root[data-theme="cyberpunk"] .list-meta {
+  font-family: var(--f-body);
+  color: var(--muted);
+}
+
+:root[data-theme="cyberpunk"] .sl-btn,
+:root[data-theme="cyberpunk"] .sl-kebab {
+  font-family: var(--f-label);
+  font-size: 0.75rem;
+  color: var(--ink);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 0;
+}
+
+:root[data-theme="cyberpunk"] .sl-btn[aria-pressed="true"],
+:root[data-theme="cyberpunk"] .sl-kebab[aria-expanded="true"] {
+  color: var(--cyan);
+  background: var(--raised);
+  border-color: var(--cyan);
+  font-weight: 400;
+}
+
+@media (hover: hover) {
+  :root[data-theme="cyberpunk"] .sl-btn:hover,
+  :root[data-theme="cyberpunk"] .sl-kebab:hover {
+    background: var(--raised);
+    border-color: var(--cyan);
+  }
+}
+
+:root[data-theme="cyberpunk"] .sl-btn:active,
+:root[data-theme="cyberpunk"] .sl-kebab:active {
+  background: var(--line-soft);
+}
+
+:root[data-theme="cyberpunk"] .sl-menu-list {
+  background: var(--raised);
+  border: 2px solid var(--cyan);
+  border-radius: 0;
+  box-shadow: var(--box-cyan), 0 12px 30px rgba(0, 0, 0, 0.6);
+}
+
+:root[data-theme="cyberpunk"] .sl-menu-list button {
+  font-family: var(--f-body);
+  color: var(--ink);
+  border-radius: 0;
+}
+
+@media (hover: hover) {
+  :root[data-theme="cyberpunk"] .sl-menu-list button:hover {
+    background: var(--line-soft);
+  }
+}
+
+:root[data-theme="cyberpunk"] .sl-menu-list button:active {
+  background: var(--line-soft);
+}
+
+:root[data-theme="cyberpunk"] :is(.sl-btn, .sl-kebab, .sl-menu-list button, .sl-stale button):focus-visible {
+  outline-color: var(--focus-ring-color);
+}
+
+/* ---------- Progress tile (mockup .prog / .bar) ---------- */
+:root[data-theme="cyberpunk"] .sl-progress {
+  background: var(--panel);
+  border: 1px solid var(--line-soft);
+  border-radius: 0;
+}
+
+:root[data-theme="cyberpunk"] .sl-progress-count {
+  font-family: var(--f-num);
+  font-size: 2rem;
+  font-weight: 400;
+  line-height: 1;
+  color: var(--yellow);
+  text-shadow: var(--glow-yellow);
+}
+
+:root[data-theme="cyberpunk"] .sl-progress-bar {
+  border: 1px solid var(--line);
+  border-radius: 0;
+}
+
+:root[data-theme="cyberpunk"] .sl-progress-bar i {
+  border-radius: 0;
+  background: repeating-linear-gradient(90deg, var(--lime) 0 8px, transparent 8px 10px);
+}
+
+:root[data-theme="cyberpunk"] .sl-progress-note {
+  font-family: var(--f-num);
+  font-size: 1.1875rem;
+  color: var(--lime);
+}
+
+/* ---------- Stale banner (mockup hazard .stale / .sstale) ---------- */
+:root[data-theme="cyberpunk"] .sl-stale {
+  font-family: var(--f-body);
+  font-weight: 700;
+  color: var(--yellow);
+  background: repeating-linear-gradient(135deg, var(--hazard-a) 0 12px, var(--hazard-b) 12px 24px);
+  border: 2px solid var(--yellow);
+  border-left-width: 10px;
+  border-radius: 0;
+}
+
+:root[data-theme="cyberpunk"] .sl-stale button {
+  font-family: var(--f-label);
+  font-weight: 400;
+  color: var(--void);
+  background: var(--yellow);
+  border-radius: 0;
+}
+
+/* ---------- Receipt: aisle groups on paper ---------- */
+:root[data-theme="cyberpunk"] .shopping-aisle {
+  padding: 10px 0;
+  color: var(--paper-ink);
+  background:
+    conic-gradient(from -45deg at bottom, transparent, var(--paper) 1deg 89deg, transparent 90deg) bottom / 14px 51% repeat-x,
+    conic-gradient(from 135deg at top, transparent, var(--paper) 1deg 89deg, transparent 90deg) top / 14px 51% repeat-x;
+  border: none;
+  border-radius: 0;
+}
+
+:root[data-theme="cyberpunk"] .shopping-aisle .aisle-header {
+  color: var(--paper-ink);
+  background: transparent;
+  border-bottom: 2px dashed var(--paper-line);
+}
+
+:root[data-theme="cyberpunk"] .shopping-aisle.is-done .aisle-header {
+  border-bottom: none;
+}
+
+@media (hover: hover) {
+  :root[data-theme="cyberpunk"] .shopping-aisle .aisle-header:hover,
+  :root[data-theme="cyberpunk"] .shopping-aisle.is-done .aisle-header:hover {
+    background: var(--aisle-done-hover-bg);
+  }
+}
+
+:root[data-theme="cyberpunk"] .shopping-aisle .aisle-header:active {
+  background: var(--aisle-done-hover-bg);
+}
+
+:root[data-theme="cyberpunk"] .shopping-aisle :is(.aisle-header, .shopping-item, .info-btn):focus-visible {
+  outline: 2px solid var(--paper-ink);
+  outline-offset: -4px;
+}
+
+:root[data-theme="cyberpunk"] .shopping-aisle .aisle-dot {
+  border-radius: 0;
+}
+
+:root[data-theme="cyberpunk"] .shopping-aisle .aisle-name {
+  font-family: var(--f-label);
+  font-size: 0.8125rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  color: var(--paper-ink);
+}
+
+:root[data-theme="cyberpunk"] .shopping-aisle .aisle-count {
+  font-family: var(--f-num);
+  font-size: 1.25rem;
+  font-weight: 400;
+  color: var(--paper-ink);
+  background: transparent;
+  border-radius: 0;
+}
+
+:root[data-theme="cyberpunk"] .shopping-aisle.is-done .aisle-name,
+:root[data-theme="cyberpunk"] .shopping-aisle.is-done .aisle-count {
+  color: var(--paper-done);
+}
+
+:root[data-theme="cyberpunk"] .shopping-aisle .expand-icon {
+  color: var(--paper-muted);
+}
+
+:root[data-theme="cyberpunk"] .shopping-aisle .hidden-note {
+  font-family: var(--f-num);
+  font-size: 1.125rem;
+  text-align: center;
+  color: var(--paper-muted);
+  background: transparent;
+}
+
+/* Item rows */
+:root[data-theme="cyberpunk"] .shopping-aisle .shopping-item {
+  color: var(--paper-ink);
+  border-bottom: 1px dotted var(--paper-line);
+}
+
+:root[data-theme="cyberpunk"] .shopping-aisle .shopping-item:last-child {
+  border-bottom: none;
+}
+
+@media (hover: hover) {
+  :root[data-theme="cyberpunk"] .shopping-aisle .shopping-item:hover {
+    background: var(--aisle-done-hover-bg);
+  }
+}
+
+:root[data-theme="cyberpunk"] .shopping-aisle .shopping-item.long-pressing {
+  background: var(--aisle-done-hover-bg);
+}
+
+:root[data-theme="cyberpunk"] .shopping-aisle .tick-circle {
+  border: 2px solid var(--paper-ink);
+  border-radius: 0;
+}
+
+:root[data-theme="cyberpunk"] .shopping-aisle .shopping-item.checked .tick-circle {
+  color: var(--paper);
+  background: var(--aisle-color);
+  border-color: var(--aisle-color);
+}
+
+:root[data-theme="cyberpunk"] .shopping-aisle .item-quantity {
+  font-family: var(--f-num);
+  font-size: 1.375rem;
+  font-weight: 400;
+  color: var(--paper-ink);
+}
+
+:root[data-theme="cyberpunk"] .shopping-aisle .item-name {
+  font-family: var(--f-body);
+  font-weight: 500;
+  color: var(--paper-ink);
+}
+
+/* Ticked rows: struck through, lighter weight, paper-struck is 5.6:1 on paper (no opacity) */
+:root[data-theme="cyberpunk"] .shopping-aisle .shopping-item.checked .item-name,
+:root[data-theme="cyberpunk"] .shopping-aisle .shopping-item.checked .item-quantity {
+  font-weight: 400;
+  color: var(--paper-struck);
+}
+
+:root[data-theme="cyberpunk"] .shopping-aisle .info-btn {
+  color: var(--paper-ink);
+  border-radius: 0;
+}
+
+@media (hover: hover) {
+  :root[data-theme="cyberpunk"] .shopping-aisle .info-btn:hover {
+    background: var(--aisle-done-hover-bg);
+  }
+}
+
+:root[data-theme="cyberpunk"] .shopping-aisle .info-btn:active {
+  background: var(--aisle-done-hover-bg);
+}
+
+:root[data-theme="cyberpunk"] .shopping-aisle .long-press-indicator {
+  font-family: var(--f-label);
+  font-size: 0.625rem;
+  color: var(--paper-ink);
+  background: var(--aisle-done-hover-bg);
+  border: 1px dashed var(--paper-line);
+  border-radius: 0;
+}
+
+/* ---------- Page states (on the dark page, not on paper) ---------- */
+:root[data-theme="cyberpunk"] .shopping-list-page .empty-state {
+  background: var(--panel);
+  border: 1px dashed var(--line);
+  border-radius: 0;
+  box-shadow: none;
+}
+
+:root[data-theme="cyberpunk"] .shopping-list-page .empty-state p {
+  color: var(--muted);
+}
+
+:root[data-theme="cyberpunk"] .shopping-list-page .generating p {
+  font-family: var(--f-label);
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: var(--cyan);
+}
+
+:root[data-theme="cyberpunk"] .shopping-list-page .error {
+  border-radius: 0;
+}
+
+/* ---------- Terminal windows (as the meal-plan popups): breakdown + generate ---------- */
+:root[data-theme="cyberpunk"] .breakdown-popup-overlay,
+:root[data-theme="cyberpunk"] .generate-modal-overlay {
+  background: var(--scrim-bg);
+}
+
+:root[data-theme="cyberpunk"] .breakdown-popup,
+:root[data-theme="cyberpunk"] .generate-modal {
+  color: var(--ink);
+  background: var(--panel);
+  border: 2px solid var(--cyan);
+  border-radius: 0;
+  box-shadow: var(--box-cyan), 0 30px 60px rgba(0, 0, 0, 0.7);
+}
+
+:root[data-theme="cyberpunk"] .breakdown-header h4 {
+  font-family: var(--f-label);
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--void);
+}
+
+:root[data-theme="cyberpunk"] .breakdown-total {
+  font-family: var(--f-num);
+  font-size: 1.125rem;
+  font-weight: 400;
+  color: var(--yellow);
+  background: var(--void);
+  border-radius: 0;
+}
+
+:root[data-theme="cyberpunk"] .breakdown-close-btn {
+  font-family: var(--f-label);
+  color: var(--cyan);
+  background: var(--void);
+  border-radius: 0;
+}
+
+:root[data-theme="cyberpunk"] .breakdown-close-btn:hover,
+:root[data-theme="cyberpunk"] .breakdown-close-btn:active {
+  background: var(--raised);
+}
+
+/* Yellow would vanish on the cyan title bar: ring the close button in void */
+:root[data-theme="cyberpunk"] .breakdown-close-btn:focus-visible {
+  outline: 2px solid var(--void);
+  outline-offset: 2px;
+}
+
+:root[data-theme="cyberpunk"] .meal-name,
+:root[data-theme="cyberpunk"] .meal-context {
+  font-family: var(--f-body);
+}
+
+:root[data-theme="cyberpunk"] .meal-quantity {
+  font-family: var(--f-num);
+  font-size: 1.25rem;
+  font-weight: 400;
+  color: var(--yellow);
+  background: var(--raised);
+  border-radius: 0;
+}
+
+/* Generate modal */
+:root[data-theme="cyberpunk"] .generate-modal h2 {
+  font-family: var(--f-display);
+  font-weight: 400;
+  color: var(--pink);
+  text-shadow: var(--glow-pink);
+}
+
+:root[data-theme="cyberpunk"] .warning-message,
+:root[data-theme="cyberpunk"] .generate-modal .error-message {
+  font-family: var(--f-body);
+  border-radius: 0;
+}
+
+:root[data-theme="cyberpunk"] .warning-message {
+  border-left-width: 6px;
+}
+
+:root[data-theme="cyberpunk"] .date-field label {
+  font-family: var(--f-label);
+  font-size: 0.6875rem;
+  font-weight: 400;
+  color: var(--cyan);
+}
+
+:root[data-theme="cyberpunk"] .date-field input {
+  font-family: var(--f-num);
+  font-size: 1.25rem;
+  color: var(--ink);
+  background: var(--deep);
+  border: 1px solid var(--line);
+  border-radius: 0;
+}
+
+:root[data-theme="cyberpunk"] .date-field input:focus {
+  border-color: var(--cyan);
+}
+
+:root[data-theme="cyberpunk"] .date-field input:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: 2px;
+}
+
+:root[data-theme="cyberpunk"] .date-field input:disabled {
+  color: var(--muted);
+  background: var(--raised);
+}
+
+:root[data-theme="cyberpunk"] .generate-summary-row {
+  font-family: var(--f-body);
+  color: var(--ink);
+}
+
+:root[data-theme="cyberpunk"] .choose-dates-btn {
+  font-family: var(--f-label);
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--cyan);
+}
+
+:root[data-theme="cyberpunk"] .modal-actions button,
+:root[data-theme="cyberpunk"] .empty-state .generate-btn,
+:root[data-theme="cyberpunk"] .error .generate-btn {
+  min-height: 44px;
+  font-family: var(--f-label);
+  font-size: 0.75rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  border-radius: 0;
+}
+
+:root[data-theme="cyberpunk"] .cancel-btn {
+  color: var(--ink);
+  background: var(--raised);
+  border-color: var(--line);
+}
+
+:root[data-theme="cyberpunk"] .generate-btn {
+  color: var(--void);
+  background: var(--pink);
+  box-shadow: 4px 4px 0 var(--cyan);
+}
+
+:root[data-theme="cyberpunk"] .generate-btn:hover:not(:disabled),
+:root[data-theme="cyberpunk"] .generate-btn:active:not(:disabled) {
+  background: var(--pink);
+  filter: brightness(1.15);
+}
+
+:root[data-theme="cyberpunk"] :is(.generate-btn, .cancel-btn, .choose-dates-btn):focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: 2px;
+}

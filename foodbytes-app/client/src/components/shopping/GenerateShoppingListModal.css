@@ -13,7 +13,7 @@
 }
 
 .generate-modal {
-  background: white;
+  background: var(--surface-popover);
   border-radius: 12px;
   padding: 24px;
   width: 100%;
@@ -23,19 +23,19 @@
 
 .generate-modal h2 {
   margin: 0 0 16px 0;
-  color: #4a3f80;
+  color: var(--brand-primary);
   font-size: 1.25rem;
   text-align: center;
 }
 
 .warning-message {
-  background: #fff3cd;
-  border: 1px solid #ffc107;
+  background: var(--warning-banner-bg);
+  border: 1px solid var(--warning);
   border-radius: 8px;
   padding: 12px;
   margin-bottom: 16px;
   font-size: 0.9rem;
-  color: #856404;
+  color: var(--warning-banner-text);
 }
 
 .date-inputs {
@@ -54,12 +54,12 @@
   font-size: 0.85rem;
   font-weight: 500;
   margin-bottom: 6px;
-  color: #333;
+  color: var(--text-strong);
 }
 
 .date-field input {
   padding: 10px 12px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--control-border);
   border-radius: 8px;
   font-size: 1rem;
   transition: border-color 0.2s;
@@ -67,22 +67,22 @@
 
 .date-field input:focus {
   outline: none;
-  border-color: #4a3f80;
+  border-color: var(--brand-primary);
 }
 
 .date-field input:disabled {
-  background: #f5f5f5;
+  background: var(--surface-quiet);
   cursor: not-allowed;
 }
 
 .error-message {
-  background: #f8d7da;
-  border: 1px solid #f5c6cb;
+  background: var(--error-banner-bg);
+  border: 1px solid var(--error-banner-border);
   border-radius: 8px;
   padding: 10px 12px;
   margin-bottom: 16px;
   font-size: 0.9rem;
-  color: #721c24;
+  color: var(--error-banner-text);
 }
 
 .modal-actions {
@@ -101,23 +101,23 @@
 }
 
 .cancel-btn {
-  background: #f5f5f5;
-  border: 1px solid #ddd;
-  color: #666;
+  background: var(--surface-quiet);
+  border: 1px solid var(--control-border);
+  color: var(--text-mid);
 }
 
 .cancel-btn:hover:not(:disabled) {
-  background: #eee;
+  background: var(--surface-quiet-hover);
 }
 
 .generate-btn {
-  background: #4a3f80;
+  background: var(--brand-primary);
   border: none;
-  color: white;
+  color: var(--on-brand);
 }
 
 .generate-btn:hover:not(:disabled) {
-  background: #3a2f70;
+  background: var(--brand-hover-deep);
 }
 
 .generate-btn:disabled,

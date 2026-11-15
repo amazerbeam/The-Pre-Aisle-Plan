@@ -10,7 +10,7 @@
   font-size: 14px;
 }
 
-/* White range pill; the invisible native date input covers it */
+/* Light range pill; the invisible native date input covers it */
 .date-range-pill {
   position: relative;
   display: flex;
@@ -20,13 +20,13 @@
   min-height: 44px;
   padding: 0 14px;
   border-radius: 999px;
-  background: #fff;
+  background: var(--picker-pill-bg);
   color: var(--brand-primary);
   cursor: pointer;
 }
 
 .date-range-pill:focus-within {
-  outline: 2px solid #fff;
+  outline: 2px solid var(--rv-head-focus);
   outline-offset: 2px;
 }
 
@@ -54,7 +54,7 @@
   padding: 0;
   border: none;
   background: transparent;
-  color: #fff;
+  color: var(--rv-head-text);
   font-size: 20px;
   line-height: 1;
   cursor: pointer;
@@ -71,17 +71,17 @@
   height: 32px;
   margin: -16px 0 0 -16px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.14);
+  background: var(--rv-head-press);
   z-index: -1;
 }
 
 .week-arrow:active::before {
-  background: rgba(255, 255, 255, 0.26);
+  background: var(--picker-arrow-wash-strong);
 }
 
 .week-arrow:focus-visible,
 .this-week-btn:focus-visible {
-  outline: 2px solid #fff;
+  outline: 2px solid var(--rv-head-focus);
   outline-offset: 2px;
 }
 
@@ -91,7 +91,7 @@
   padding: 0 10px 0 4px;
   border: none;
   background: transparent;
-  color: #ffd34d;
+  color: var(--rv-accent);
   font-size: 12px;
   font-weight: 700;
   white-space: nowrap;
@@ -106,7 +106,7 @@
 
 @media (hover: hover) {
   .week-arrow:hover::before {
-    background: rgba(255, 255, 255, 0.26);
+    background: var(--picker-arrow-wash-strong);
   }
 
   .this-week-btn:hover {

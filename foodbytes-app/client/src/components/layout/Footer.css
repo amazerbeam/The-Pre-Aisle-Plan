@@ -3,7 +3,7 @@
   bottom: 0;
   left: 0;
   right: 0;
-  background: white;
+  background: var(--bg-primary);
   border-top: 1px solid var(--border-color);
   box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
   z-index: 100;
@@ -13,7 +13,7 @@
 
 .footer-message {
   background: var(--brand-primary);
-  color: white;
+  color: var(--on-brand);
   text-align: center;
   padding: var(--spacing-sm);
   font-size: 0.875rem;

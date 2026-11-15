@@ -1,0 +1,132 @@
+/* Theme picker tile artwork. Each block is drawn in THAT theme's palette regardless of the
+   active theme, so literal colours are intentional here (exempt folder). Source:
+   foodbytes-app/mockup/user-menu-themes.html (.pv-default, .pv-cyber). One block per theme:
+   check:themes asserts .theme-preview--<id> exists for every registry id. */
+.theme-preview {
+  display: flex;
+  flex-direction: column;
+  height: 64px;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.theme-preview__bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 16px;
+  padding: 0 5px;
+}
+
+.theme-preview__cards {
+  display: flex;
+}
+
+.theme-preview__card {
+  position: relative;
+  flex: 1;
+}
+
+.theme-preview__card::after {
+  content: "";
+  position: absolute;
+}
+
+/* Default */
+.theme-preview--default {
+  background: #f8f9fa;
+}
+
+.theme-preview--default .theme-preview__bar {
+  background: #4a3f80;
+}
+
+.theme-preview--default .theme-preview__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: #fff;
+}
+
+.theme-preview--default .theme-preview__line {
+  width: 26px;
+  height: 4px;
+  border-radius: 2px;
+  background: #fff;
+  opacity: 0.9;
+}
+
+.theme-preview--default .theme-preview__ticker {
+  display: none;
+}
+
+.theme-preview--default .theme-preview__cards {
+  gap: 4px;
+  padding: 6px 5px;
+}
+
+.theme-preview--default .theme-preview__card {
+  height: 30px;
+  background: #fff;
+  border: 1px solid #e9ecef;
+  border-radius: 4px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+.theme-preview--default .theme-preview__card::after {
+  left: 4px;
+  right: 8px;
+  top: 5px;
+  height: 3px;
+  background: #2c3e50;
+  opacity: 0.6;
+  border-radius: 2px;
+}
+
+/* Cyberpunk */
+.theme-preview--cyberpunk {
+  background: linear-gradient(180deg, #03050a, #0a1a26 70%, #2a0614);
+}
+
+.theme-preview--cyberpunk .theme-preview__bar {
+  background: #000;
+  border-bottom: 1px solid #ff2a6d;
+}
+
+.theme-preview--cyberpunk .theme-preview__dot {
+  width: 8px;
+  height: 8px;
+  background: #ff2a6d;
+}
+
+.theme-preview--cyberpunk .theme-preview__line {
+  width: 26px;
+  height: 4px;
+  background: #ff2a6d;
+  box-shadow: 0 0 4px #ff2a6d;
+}
+
+.theme-preview--cyberpunk .theme-preview__ticker {
+  height: 4px;
+  background: #f9f002;
+}
+
+.theme-preview--cyberpunk .theme-preview__cards {
+  gap: 4px;
+  padding: 5px;
+}
+
+.theme-preview--cyberpunk .theme-preview__card {
+  height: 28px;
+  background: #0a222a;
+  border: 1px solid rgba(5, 217, 232, 0.5);
+  border-top: 2px solid #05d9e8;
+}
+
+.theme-preview--cyberpunk .theme-preview__card::after {
+  left: 4px;
+  right: 8px;
+  top: 5px;
+  height: 3px;
+  background: #f9f002;
+}

@@ -1,0 +1,46 @@
+/* Cyberpunk shared chrome: HUD corner brackets and cyan terminal title bars. One rule each, so a
+   new host joins by adding its selector here instead of copying the block. Loaded first in
+   index.css; selectors start with :root[data-theme="cyberpunk"]. */
+
+/* ---------- HUD brackets (cards, week strip, week summary tile, day summary) ---------- */
+:root[data-theme="cyberpunk"] .recipe-card,
+:root[data-theme="cyberpunk"] .week-strip,
+:root[data-theme="cyberpunk"] .week-summary-tile,
+:root[data-theme="cyberpunk"] .day-summary {
+  --hud: var(--cyan);
+}
+
+:root[data-theme="cyberpunk"] .recipe-card::before,
+:root[data-theme="cyberpunk"] .week-strip::before,
+:root[data-theme="cyberpunk"] .week-summary-tile::before,
+:root[data-theme="cyberpunk"] .day-summary::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  pointer-events: none;
+  background:
+    linear-gradient(var(--hud), var(--hud)) top left / 14px 2px no-repeat,
+    linear-gradient(var(--hud), var(--hud)) top left / 2px 14px no-repeat,
+    linear-gradient(var(--hud), var(--hud)) bottom right / 14px 2px no-repeat,
+    linear-gradient(var(--hud), var(--hud)) bottom right / 2px 14px no-repeat;
+}
+
+/* ---------- Terminal title bars: modal headers ---------- */
+:root[data-theme="cyberpunk"] .swap-modal-header,
+:root[data-theme="cyberpunk"] .copy-modal-header,
+:root[data-theme="cyberpunk"] .tpl-modal-header,
+:root[data-theme="cyberpunk"] .macro-popup-header,
+:root[data-theme="cyberpunk"] .breakdown-header {
+  color: var(--titlebar-fg);
+  background: var(--titlebar-bg);
+  border-radius: 0;
+}
+
+/* ---------- Terminal title bars: dialog ::before bars (each dialog sets content + layout) ---------- */
+:root[data-theme="cyberpunk"] .confirm-dialog::before,
+:root[data-theme="cyberpunk"] .modal-content::before {
+  color: var(--titlebar-fg);
+  background: var(--titlebar-bg);
+  font-family: var(--titlebar-font);
+  font-size: 12px;
+}

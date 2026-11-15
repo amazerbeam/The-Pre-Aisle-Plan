@@ -1,5 +1,8 @@
 // MPP-10: icons for the homemade/store-bought extras UI (paths from the approved mockup).
 
+import { useTheme } from '../../contexts/ThemeContext'
+import PixelIcon from './PixelIcon'
+
 const svgProps = {
   viewBox: '0 0 24 24',
   width: '14',
@@ -13,13 +16,17 @@ const svgProps = {
   focusable: 'false'
 }
 
-export const CartIcon = ({ className }) => (
-  <svg className={className} {...svgProps}>
-    <circle cx="9" cy="20" r="1.4" />
-    <circle cx="18" cy="20" r="1.4" />
-    <path d="M2 3h3l2.6 12.2a1 1 0 0 0 1 .8h9.7a1 1 0 0 0 1-.8L21 7H6" />
-  </svg>
-)
+export const CartIcon = ({ className }) => {
+  const { theme } = useTheme()
+  if (theme.iconSet === 'pixel') return <PixelIcon name="cart" size={14} className={className} />
+  return (
+    <svg className={className} {...svgProps}>
+      <circle cx="9" cy="20" r="1.4" />
+      <circle cx="18" cy="20" r="1.4" />
+      <path d="M2 3h3l2.6 12.2a1 1 0 0 0 1 .8h9.7a1 1 0 0 0 1-.8L21 7H6" />
+    </svg>
+  )
+}
 
 export const HomeIcon = ({ className }) => (
   <svg className={className} {...svgProps}>

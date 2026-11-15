@@ -17,10 +17,10 @@
   align-items: center;
   gap: var(--spacing-xs);
   padding: var(--spacing-xs) var(--spacing-sm);
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--rv-head-wash-soft);
   border: none;
   border-radius: var(--radius-sm);
-  color: #ffffff;
+  color: var(--rv-head-text);
   font-size: 0.85rem;
   cursor: pointer;
   transition: background-color 0.2s ease;
@@ -28,7 +28,7 @@
 }
 
 .linked-recipe-navigation .back-button:hover {
-  background: rgba(255, 255, 255, 0.25);
+  background: var(--rv-head-wash-hover);
 }
 
 .linked-recipe-navigation .back-arrow {
@@ -47,7 +47,7 @@
   align-items: center;
   gap: var(--spacing-xs);
   font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--rv-head-crumb);
 }
 
 .linked-recipe-navigation .breadcrumb-item {
@@ -57,11 +57,11 @@
 }
 
 .linked-recipe-navigation .breadcrumb-separator {
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--rv-head-crumb-sep);
 }
 
 .linked-recipe-navigation .breadcrumb-item .current {
-  color: #ffffff;
+  color: var(--rv-head-text);
   font-weight: 500;
 }
 

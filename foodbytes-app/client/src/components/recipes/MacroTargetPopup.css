@@ -27,7 +27,7 @@
 }
 
 .macro-target-popup {
-  background: #fff;
+  background: var(--bg-primary);
   border-radius: var(--radius-lg);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
   max-width: 470px;
@@ -41,7 +41,7 @@
 
 .macro-target-header {
   background: var(--brand-primary);
-  color: #fff;
+  color: var(--on-brand);
   padding: 16px;
   border-radius: var(--radius-lg) var(--radius-lg) 0 0;
   display: flex;
@@ -70,7 +70,7 @@
 .macro-target-close {
   background: transparent;
   border: none;
-  color: #fff;
+  color: var(--on-brand);
   font-size: 2rem;
   line-height: 1;
   cursor: pointer;
@@ -88,13 +88,13 @@
 }
 
 @media (hover: hover) {
-  .macro-target-close:hover { background-color: rgba(255, 255, 255, 0.2); }
+  .macro-target-close:hover { background-color: var(--on-brand-hover-strong); }
 }
 
-.macro-target-close:active { background-color: rgba(255, 255, 255, 0.3); }
+.macro-target-close:active { background-color: var(--on-brand-active-strong); }
 
 .macro-target-close:focus-visible {
-  outline: 2px solid #fff;
+  outline: 2px solid var(--on-brand);
   outline-offset: 2px;
 }
 
@@ -167,7 +167,7 @@
 /* The must-fix signal, independent of the traffic light. */
 .macro-target-reject {
   background: var(--text-primary);
-  color: #fff;
+  color: var(--on-text-primary);
 }
 
 /* Perfect target callout */
@@ -179,7 +179,7 @@
   padding: 12px 14px;
   border-radius: var(--radius-md);
   margin-bottom: 18px;
-  background: #efedf7;
+  background: var(--surface-tint-soft);
   border-left: 4px solid var(--brand-primary);
 }
 
@@ -222,14 +222,14 @@
   gap: 8px;
   padding: 10px 12px;
   border-radius: var(--radius-md);
-  background: #fff;
+  background: var(--bg-primary);
   border: 2px solid var(--border-color);
   font-size: 0.85rem;
 }
 
 .macro-target-legend li.is-current {
   border-color: var(--brand-primary);
-  background: #f7f6fc;
+  background: var(--surface-tint-faint);
 }
 
 .macro-target-dot {
@@ -262,7 +262,7 @@
   text-transform: uppercase;
   letter-spacing: 0.4px;
   background: var(--text-primary);
-  color: #fff;
+  color: var(--on-text-primary);
   padding: 2px 6px;
   border-radius: 8px;
   margin-left: 6px;
@@ -280,7 +280,7 @@
   text-transform: uppercase;
   letter-spacing: 0.4px;
   color: var(--brand-primary);
-  background: #efedf7;
+  background: var(--surface-tint-soft);
   padding: 3px 8px;
   border-radius: 10px;
 }
@@ -318,7 +318,7 @@
   padding: 10px 12px;
   border-radius: var(--radius-md);
   border: 1px solid var(--border-color);
-  background: #fff;
+  background: var(--bg-primary);
 }
 
 .macro-target-source-claim {
@@ -346,10 +346,10 @@
 .macro-target-hint {
   text-align: center;
   font-size: 0.75rem;
-  color: #999;
+  color: var(--text-placeholder);
   padding: 8px;
   margin: 0;
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--divider-soft);
   flex-shrink: 0;
 }
 

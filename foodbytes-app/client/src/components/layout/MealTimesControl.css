@@ -10,7 +10,7 @@
 .meal-times-label {
   font-size: 0.8125rem;
   font-weight: 600;
-  color: #555;
+  color: var(--text-label);
 }
 
 .meal-times-row {
@@ -27,19 +27,18 @@
 
 .meal-times-input {
   /* Same trick as .default-portions-input: width 0 keeps the input out of
-     .user-dropdown's shrink-to-fit max-content width, so the time inputs never
-     widen the panel past its 220px min-width (the mockup's fixed 120px would
-     have pushed it to ~245px). flex-grow fills the panel, capped at 8rem. */
+     the account menu's shrink-to-fit max-content width (the panel was once sized
+     by content), so the time inputs never widen the panel. flex-grow fills the panel, capped at 8rem. */
   flex: 1 1 0;
   width: 0;
   min-width: 0;
   max-width: 8rem;
   min-height: 44px;
   padding: 0 0.5rem;
-  border: 1px solid #ddd;
+  border: 1px solid var(--control-border);
   border-radius: 8px;
   font-size: 1rem;
-  background: #fff;
+  background: var(--surface-input);
   color: var(--text-primary);
   touch-action: manipulation;
 }
@@ -51,18 +50,18 @@
 /* Not yet chosen: the times shown are the server's defaults. Subdued like
    MPP-3's .default-portions-input--unset. */
 .meal-times-input--default {
-  color: #999;
+  color: var(--text-placeholder);
   font-style: italic;
 }
 
 .meal-times-input--invalid {
   border-color: var(--error);
-  background: #fff5f5;
+  background: var(--surface-invalid);
 }
 
 .meal-times-error {
   font-size: 0.75rem;
-  color: #c0392b;
+  color: var(--danger-text);
 }
 
 .meal-times-reset {
@@ -97,6 +96,6 @@
 
 .meal-times-input:focus-visible,
 .meal-times-reset:focus-visible {
-  outline: 2px solid #4a7c59;
+  outline: 2px solid var(--focus-ring-control);
   outline-offset: 2px;
 }

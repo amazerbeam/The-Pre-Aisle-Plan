@@ -1,65 +1,6 @@
-/* My Pantry Plan - Global Styles */
-/* Brand Color: #4a3f80 (deep purple) */
+/* Global styles. Colours live in styles/themes/ — see CLAUDE.md → Themes. */
 
 :root {
-  /* Brand Colors */
-  --brand-primary: #4a3f80;
-  --brand-primary-dark: #3a3266;
-  --brand-primary-light: #6b5fa0;
-
-  /* Neutral Colors */
-  --text-primary: #2c3e50;
-  --text-secondary: #6c757d;
-  --bg-primary: #ffffff;
-  --bg-secondary: #f8f9fa;
-  --border-color: #e9ecef;
-
-  /* Semantic Colors */
-  --success: #28a745;
-  --warning: #ffc107;
-  --error: #dc3545;
-  --cheat-badge: #ff6b35;
-
-  /* FR-104: Macro traffic light. Colour encodes DIRECTION, not severity —
-     blue is always below the target band, red always above it. Aliased rather
-     than reusing --success/--warning/--error so these can be retuned for
-     contrast on the brand-purple header independently.
-
-     Each status declares all four of its surfaces here, so retuning a hue is a
-     one-place edit. Previously the badge tints and popup pill colours restated
-     the same RGB channels inline, which meant a retune recoloured the border and
-     dot while leaving every tint on the old hue — a half-recoloured badge.
-       (base)     border, traffic-light dot, legend dot
-       -tint      badge fill on the brand-purple header
-       -pill-bg   status pill fill inside the popup (lighter than -tint)
-       -pill-text status pill label (dark enough for AA on -pill-bg) */
-  --macro-under-target: #4aa3f0;
-  --macro-under-target-tint: rgba(74, 163, 240, 0.32);
-  --macro-under-target-pill-bg: rgba(74, 163, 240, 0.2);
-  --macro-under-target-pill-text: #10527f;
-
-  --macro-near-target: #ffc107;
-  --macro-near-target-tint: rgba(255, 193, 7, 0.26);
-  --macro-near-target-pill-bg: rgba(255, 193, 7, 0.22);
-  --macro-near-target-pill-text: #856404;
-
-  --macro-on-target: #28a745;
-  --macro-on-target-tint: rgba(40, 167, 69, 0.28);
-  --macro-on-target-pill-bg: rgba(40, 167, 69, 0.15);
-  --macro-on-target-pill-text: #1b6b2e;
-
-  --macro-over-target: #dc3545;
-  --macro-over-target-tint: rgba(220, 53, 69, 0.32);
-  --macro-over-target-pill-bg: rgba(220, 53, 69, 0.15);
-  --macro-over-target-pill-text: #a71d2a;
-
-  /* MPP-29: Pip's room — one focus ring and one overlay entrance for every room control.
-     The ring is purple on light surfaces (≥3:1 on #fff and the room's #ece5fb; the old
-     yellow was ~1.4:1 on the white sheets) and yellow on the cabinet's wood and the edit
-     bar. Buttons drawn over furniture art add the white halo so the ring reads on any colour. */
-  --pip-focus-ring: #7c5cd6;
-  --pip-focus-ring-on-dark: #ffd34d;
-  --pip-focus-halo: #fff;
   --pip-sheet-in: 0.28s;
   --pip-sheet-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
 
@@ -83,23 +24,6 @@
   /* Space kept clear for the fixed footer tab bar (Footer.css). Pip mode adds the
      bottom safe-area inset, which the footer pads itself by. */
   --footer-clearance: 80px;
-
-  /* Aisle color coding for shopping list (15 aisles) */
-  --aisle-produce: #4caf50;
-  --aisle-dairy: #2196f3;
-  --aisle-meat: #f44336;
-  --aisle-seafood: #00bcd4;
-  --aisle-bakery: #ff9800;
-  --aisle-grains: #795548;
-  --aisle-canned: #9e9e9e;
-  --aisle-condiments: #ffc107;
-  --aisle-snacks: #e91e63;
-  --aisle-beverages: #3f51b5;
-  --aisle-frozen: #03a9f4;
-  --aisle-spices: #8bc34a;
-  --aisle-oils: #ffeb3b;
-  --aisle-baking: #9c27b0;
-  --aisle-misc: #607d8b;
 }
 
 * {
@@ -170,7 +94,7 @@ button:disabled {
 /* Primary Button */
 .btn-primary {
   background-color: var(--brand-primary);
-  color: white;
+  color: var(--on-brand);
 }
 
 .btn-primary:hover:not(:disabled) {

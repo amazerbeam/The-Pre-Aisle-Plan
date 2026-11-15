@@ -98,7 +98,7 @@
   width: 32px;
   height: 32px;
   background: var(--brand-primary);
-  color: white;
+  color: var(--on-brand);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -204,8 +204,8 @@
   width: 32px;
   height: 32px;
   padding: 0;
-  background: #fff5f5;
-  border: 1px solid #f5c6cb;
+  background: var(--surface-invalid);
+  border: 1px solid var(--error-banner-border);
   border-radius: var(--radius-sm);
   color: var(--error);
   font-size: 1.25rem;
@@ -218,7 +218,7 @@
 }
 
 .step-row > .delete-button:hover {
-  background: #f8d7da;
+  background: var(--error-banner-bg);
   border-color: var(--error);
 }
 

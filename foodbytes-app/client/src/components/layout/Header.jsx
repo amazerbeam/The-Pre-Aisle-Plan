@@ -1,36 +1,24 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useCallback, useRef, useState } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import LoginModal from '../auth/LoginModal'
-import BrandMark from '../common/BrandMark'
 import DateRangePicker from '../common/DateRangePicker'
+import HeaderBrand from './HeaderBrand'
 import HeaderNav from './HeaderNav'
-import DefaultPortionsControl from './DefaultPortionsControl'
-import MealTimesControl from './MealTimesControl'
-import VersionInfo from './VersionInfo'
-import { RECIPES_PATH } from '../../constants/appRoutes'
+import UserMenu from './UserMenu'
 import './Header.css'
 
 function Header() {
   const { user, isAuthenticated, logout } = useAuth()
   const [showLoginModal, setShowLoginModal] = useState(false)
   const [showUserMenu, setShowUserMenu] = useState(false)
-  const navigate = useNavigate()
-
-  const avatar = user?.avatarUrl ? (
-    <img src={user.avatarUrl} alt="" className="avatar" />
-  ) : (
-    <div className="avatar-placeholder">{user?.name?.charAt(0).toUpperCase()}</div>
-  )
+  const avatarRef = useRef(null)
+  // Stable so UserMenu's document listeners are not torn down and re-added on every Header render.
+  const closeUserMenu = useCallback(() => setShowUserMenu(false), [])
 
   return (
     <header className="header">
       <div className="header-content">
-        {/* FR-039: the brand navigates to Recipes */}
-        <button className="brand-btn" onClick={() => navigate(RECIPES_PATH)} title="Go to Recipes" aria-label="My Pantry Plan, go to Recipes">
-          <BrandMark size={40} className="brand-mark" />
-          <span className="brand-word" aria-hidden="true">My Pantry <span>Plan</span></span>
-        </button>
+        <HeaderBrand />
 
         <HeaderNav />
 
@@ -41,11 +29,12 @@ function Header() {
           {isAuthenticated ? (
             <div className="user-menu-container">
               <button
+                ref={avatarRef}
                 className="avatar-btn"
                 onClick={() => setShowUserMenu(!showUserMenu)}
-                aria-label="User menu"
+                aria-label="Account menu"
                 aria-expanded={showUserMenu}
-                aria-haspopup="menu"
+                aria-haspopup="dialog"
               >
                 {user.avatarUrl ? (
                   <img src={user.avatarUrl} alt={user.name} className="avatar" />
@@ -55,20 +44,12 @@ function Header() {
               </button>
 
               {showUserMenu && (
-                <div className="user-dropdown" role="menu" aria-label="Account">
-                  <div className="user-who">
-                    {avatar}
-                    <div className="user-info">
-                      <span className="user-name-full">{user.name}</span>
-                      <span className="user-email">{user.email}</span>
-                    </div>
-                  </div>
-                  <section className="user-section" aria-label="Portions"><DefaultPortionsControl /></section>
-                  <section className="user-section" aria-label="Meal times"><MealTimesControl /></section>
-                  <button className="logout-btn" onClick={logout}>↩ Sign out</button>
-                  {/* MPP-9: mounts only while the menu is open, so /api/health is fetched lazily */}
-                  <VersionInfo />
-                </div>
+                <UserMenu
+                  user={user}
+                  onSignOut={logout}
+                  onClose={closeUserMenu}
+                  anchorRef={avatarRef}
+                />
               )}
             </div>
           ) : (

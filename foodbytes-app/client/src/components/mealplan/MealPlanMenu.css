@@ -22,8 +22,8 @@
   height: 44px;
   border-radius: 8px;
   border: none;
-  background-color: var(--primary-color, #4a3f80);
-  color: #fff;
+  background-color: var(--brand-primary);
+  color: var(--on-brand);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -36,23 +36,23 @@
 }
 
 .meal-plan-menu-trigger[aria-expanded="true"] {
-  background-color: #3d3469;
+  background-color: var(--brand-hover);
 }
 
 @media (hover: hover) {
   .meal-plan-menu-trigger:hover {
-    background-color: #3d3469;
+    background-color: var(--brand-hover);
     transform: scale(1.05);
   }
 }
 
 .meal-plan-menu-trigger:active {
-  background-color: #3d3469;
+  background-color: var(--brand-hover);
   transform: scale(0.95);
 }
 
 .meal-plan-menu-trigger:focus-visible {
-  outline: 2px solid var(--primary-color, #4a3f80);
+  outline: 2px solid var(--focus-ring-color);
   outline-offset: 2px;
 }
 
@@ -75,7 +75,7 @@
   margin: 0;
   padding: 6px 0;
   list-style: none;
-  background: #fff;
+  background: var(--surface-popover);
   border-radius: 10px;
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
 }
@@ -88,7 +88,7 @@
 .meal-plan-menu-list .meal-plan-menu-divider {
   height: 1px;
   margin: 4px 0;
-  background: #eee;
+  background: var(--divider-soft);
   list-style: none;
 }
 
@@ -99,7 +99,7 @@
   border: none;
   padding: 12px 16px;
   font-size: 0.95rem;
-  color: #333;
+  color: var(--text-strong);
   cursor: pointer;
   min-height: 44px;
   touch-action: manipulation;
@@ -108,21 +108,21 @@
 
 @media (hover: hover) {
   .meal-plan-menu-list button:hover {
-    background: #f3f0fa;
-    color: #4a3f80;
+    background: var(--surface-tint-menu);
+    color: var(--brand-primary);
   }
 }
 
 .meal-plan-menu-list button:focus-visible {
-  background: #f3f0fa;
-  color: #4a3f80;
-  outline: 2px solid var(--primary-color, #4a3f80);
+  background: var(--surface-tint-menu);
+  color: var(--brand-primary);
+  outline: 2px solid var(--focus-ring-color);
   outline-offset: -2px;
 }
 
 .meal-plan-menu-list button:active {
-  background: #e9e3f7;
-  color: #4a3f80;
+  background: var(--surface-tint-menu-active);
+  color: var(--brand-primary);
 }
 
 /* 600px, not the house 480px: this is where MealPlanCalendar.css:197 flips

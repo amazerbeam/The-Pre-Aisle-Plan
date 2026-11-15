@@ -1,0 +1,564 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Parchment Theme · Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=EB+Garamond:ital,wght@0,400..700;1,400..600&family=Homemade+Apple&family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* =========================================================
+   PARCHMENT THEME — exploration (2026-11-15, not yet approved)
+   Generic "old wizard's kitchen book" look: parchment, iron-gall
+   ink, quills, sealing wax, leather binding, gold tooling.
+   No franchise names, logos, crests, characters or fan fonts.
+   Token names below are the REAL app tokens from
+   client/src/styles/themes/default.css, so this block is what
+   styles/themes/parchment.css would declare under
+   :root[data-theme="parchment"]. In this file it sits on .app.
+   ========================================================= */
+.app[data-theme="parchment"]{
+  color-scheme:light;
+  --brand-primary:#7a1f14; --brand-primary-dark:#5a150d; --brand-primary-light:#9c3a2a;
+  --text-primary:#2b1d10; --text-secondary:#5e4a32;
+  --bg-primary:#f7eed6; --bg-secondary:#ead9b1; --border-color:#c9ad78;
+  --success:#3f6b3a; --warning:#9a6c0c; --error:#9b2318; --cheat-badge:#7a1f14;
+  --macro-under-target:#2f5d8a; --macro-near-target:#a8760e; --macro-on-target:#3f7a4a; --macro-over-target:#a3241a;
+  --on-brand:#f7eed6; --focus-ring-color:#1f3a5f;
+  --aisle-produce:#4f6b2c; --aisle-meat:#8a2a1c; --aisle-dairy:#3d5f86; --aisle-bakery:#9a6420;
+  --aisle-grains:#6b4a2a; --aisle-canned:#6d6457; --aisle-spices:#7a6a1a; --aisle-frozen:#2f6f7a;
+
+  /* theme-only (would live in styles/themes/parchment/*.css) */
+  --leather:#3b2415; --leather-dark:#22140a; --gold:#d8b25a; --gold-dim:#a88a45;
+  --ink-faded:#6b5236; --wax:#8c1c13; --rule:rgba(110,80,40,.25);
+  --f-body:'EB Garamond',Georgia,serif; --f-head:'IM Fell English',Georgia,serif;
+  --f-brand:'Cinzel Decorative',Georgia,serif; --f-label:'IM Fell English SC',Georgia,serif;
+  --f-hand:'Homemade Apple',cursive;
+  --noise:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='260' height='260'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .36  0 0 0 0 .24  0 0 0 0 .1  0 0 0 .16 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  --stains:radial-gradient(ellipse 40% 30% at 12% 18%,rgba(150,105,45,.14),transparent 70%),radial-gradient(ellipse 30% 40% at 88% 70%,rgba(140,95,40,.12),transparent 70%),radial-gradient(circle at 70% 12%,rgba(120,80,30,.08),transparent 25%);
+}
+
+/* ---------- prototype chrome (not part of the design) ---------- */
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:#1b1d22;font-family:Inter,system-ui,sans-serif;color:#e8e8ea}
+button,input{font:inherit;color:inherit}
+.proto{background:#000;display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:8px 14px;font-size:13px;border-bottom:1px solid #333;position:sticky;top:0;z-index:50}
+.proto b{letter-spacing:.04em}
+.seg2{display:flex;border:1px solid #555;border-radius:6px;overflow:hidden}
+.seg2 button{border:none;background:transparent;color:#bbb;padding:6px 11px;cursor:pointer}
+.seg2 button.on{background:#e8e8ea;color:#111;font-weight:700}
+.wrap{display:flex;gap:24px;align-items:flex-start;justify-content:center;padding:22px 16px 40px;flex-wrap:wrap}
+.frame-web{width:min(1180px,100%);height:760px;border:1px solid #333;border-radius:10px;overflow:hidden}
+.frame-mob{width:390px;max-width:100%;height:844px;border-radius:46px;background:#0a0a0a;padding:11px;box-shadow:0 0 0 2px #2a2d33,0 30px 60px rgba(0,0,0,.6);flex:none}
+.frame-mob .app{border-radius:36px}
+.notes{max-width:440px;background:#111317;border:1px solid #333;border-radius:10px;padding:16px 18px;font-size:14px;line-height:1.5}
+.notes h2{font-size:15px;margin:0 0 8px}
+.notes h3{font-size:13px;margin:16px 0 4px;color:#9ad}
+.notes ul{margin:0;padding-left:18px}
+.notes li{margin:2px 0}
+.notes code{background:#222;padding:1px 4px;border-radius:4px;font-size:12px}
+.sw{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:6px}
+.sw div{border-radius:6px;padding:26px 4px 4px;font-size:10px;color:#ddd;background:#222;position:relative}
+.sw div i{position:absolute;inset:0 0 18px;border-radius:6px 6px 0 0}
+.no{color:#e88}.yes{color:#8d8}
+
+/* ---------- app shell ---------- */
+.app{position:relative;width:100%;height:100%;overflow:hidden;display:flex;flex-direction:column;
+  color:var(--text-primary);font-family:var(--f-body);font-size:16px;
+  background-color:var(--bg-secondary);background-image:var(--noise),var(--stains)}
+.app :focus-visible{outline:2px solid var(--focus-ring-color);outline-offset:2px}
+.app button{cursor:pointer}
+.scroll{flex:1;overflow:auto;position:relative;z-index:1}
+.page{padding:22px 28px 40px;max-width:1180px;margin:0 auto}
+
+/* effects (Low FX + reduced-motion switch these off) */
+.fx{position:absolute;inset:0;pointer-events:none;z-index:3}
+.fx .vig{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 40%,transparent 55%,rgba(70,40,10,.28) 100%);animation:flicker 5s ease-in-out infinite}
+@keyframes flicker{0%,100%{opacity:1}22%{opacity:.82}25%{opacity:.95}61%{opacity:.86}64%{opacity:1}}
+.fx .mote{position:absolute;width:3px;height:3px;border-radius:50%;background:rgba(255,236,190,.8);box-shadow:0 0 6px rgba(255,220,150,.9);animation:mote 14s linear infinite;opacity:0}
+@keyframes mote{0%{transform:translate(0,0);opacity:0}15%{opacity:.8}85%{opacity:.6}100%{transform:translate(40px,-260px);opacity:0}}
+.app.lowfx .fx{display:none}
+.app.lowfx *{animation:none!important;transition:none!important}
+@media (prefers-reduced-motion:reduce){.app *{animation:none!important;transition:none!important}}
+
+/* ---------- header: leather binding with gold tooling ---------- */
+.hdr{flex:none;position:relative;z-index:5;color:var(--gold);
+  background:var(--noise),linear-gradient(180deg,#4a2d1a,var(--leather) 55%,var(--leather-dark));
+  border-bottom:3px double var(--gold-dim);box-shadow:0 6px 16px -6px rgba(40,20,5,.7)}
+.hdr::after{content:"";position:absolute;inset:5px 6px;border:1px dashed rgba(216,178,90,.35);border-radius:3px;pointer-events:none}
+.hdr-in{display:flex;align-items:center;gap:20px;padding:12px 24px;max-width:1180px;margin:0 auto;position:relative;z-index:1}
+.brand{display:flex;align-items:center;gap:10px;background:none;border:0;color:var(--gold);padding:0;text-align:left}
+.brand svg{width:30px;height:30px;flex:none}
+.brand .w{font-family:var(--f-brand);font-weight:700;font-size:21px;letter-spacing:.02em;line-height:1;text-shadow:0 1px 0 #000,0 0 10px rgba(216,178,90,.25);display:block}
+.brand .sub{font-family:var(--f-head);font-style:italic;font-size:12.5px;color:#cdb68a;display:block;margin-top:3px}
+.hnav{display:flex;gap:4px;margin-left:8px}
+.hnav button{position:relative;border:0;background:none;color:#e9d6ac;font-family:var(--f-label);font-size:16px;padding:8px 12px;display:flex;align-items:center;gap:7px}
+.hnav button svg{width:18px;height:18px}
+.hnav button:hover{color:#fff1cf}
+.hnav button.on{color:#fff6dd}
+.hnav button.on::after{content:"";position:absolute;left:50%;bottom:-25px;width:16px;height:22px;transform:translateX(-50%);
+  background:linear-gradient(90deg,#6e140c,#a3271a 50%,#6e140c);clip-path:polygon(0 0,100% 0,100% 100%,50% 76%,0 100%);filter:drop-shadow(0 2px 2px rgba(0,0,0,.4))}
+.wk{margin-left:auto;display:flex;align-items:center;gap:4px;font-family:var(--f-head);font-size:16px;color:#f0dfb8}
+.wk button{background:none;border:1px solid rgba(216,178,90,.45);color:var(--gold);border-radius:3px;padding:3px 9px}
+.wk .rng{border:0;padding:3px 8px;color:#f6e7c2}
+.seal{width:38px;height:38px;flex:none;border:0;display:grid;place-items:center;color:#f3d2a8;font-family:var(--f-brand);font-weight:700;font-size:16px;
+  border-radius:48% 52% 50% 46%/50% 45% 55% 50%;background:radial-gradient(circle at 38% 32%,#c0412f,var(--wax) 55%,#55100a);
+  box-shadow:inset 0 0 0 4px rgba(90,15,8,.55),inset 0 0 0 5px rgba(230,140,110,.25),0 2px 4px rgba(0,0,0,.45);text-shadow:0 -1px 0 rgba(0,0,0,.5)}
+.acct{position:relative}
+
+/* ---------- headings ---------- */
+.board-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:14px}
+.title{font-family:var(--f-head);font-weight:400;font-size:34px;margin:0;line-height:1.05}
+.title-sub{display:block;font-style:italic;color:var(--text-secondary);font-size:16px;margin-top:4px}
+.flour{display:block;height:12px;margin:6px 0 0;width:220px;max-width:100%;color:var(--ink-faded)}
+.lbl{font-family:var(--f-label);font-size:15px;color:var(--text-secondary);letter-spacing:.02em}
+
+/* ---------- tabs (meal filter) ---------- */
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--border-color);margin:6px 0 18px;overflow-x:auto}
+.tabs button{border:1px solid transparent;border-bottom:0;background:none;padding:7px 14px 6px;font-family:var(--f-label);font-size:16px;color:var(--text-secondary);border-radius:4px 4px 0 0;white-space:nowrap}
+.tabs button.on{background:var(--bg-primary);border-color:var(--border-color);color:var(--brand-primary);margin-bottom:-1px}
+.search{display:flex;align-items:center;gap:8px;border-bottom:1.5px solid var(--ink-faded);padding:4px 2px;min-width:230px}
+.search input{border:0;background:none;outline:none;font-family:var(--f-head);font-style:italic;font-size:17px;width:100%;color:var(--text-primary)}
+.search input::placeholder{color:var(--ink-faded)}
+.search svg{width:18px;height:18px;color:var(--ink-faded)}
+
+/* ---------- buttons ---------- */
+.btn{border:1px solid var(--border-color);background:var(--bg-primary);color:var(--text-primary);font-family:var(--f-label);font-size:15px;padding:6px 12px;border-radius:3px;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{border-color:var(--ink-faded)}
+.btn.primary{background:linear-gradient(180deg,var(--brand-primary-light),var(--brand-primary) 60%,var(--brand-primary-dark));color:var(--on-brand);border-color:var(--brand-primary-dark);box-shadow:inset 0 1px 0 rgba(255,220,190,.25),0 1px 2px rgba(40,10,0,.4)}
+.btn svg{width:16px;height:16px}
+
+/* ---------- recipe cards: pinned parchment slips ---------- */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:22px}
+.card{position:relative;background:var(--bg-primary) var(--noise);border:1px solid var(--border-color);padding:16px 16px 14px;
+  box-shadow:inset 0 0 22px rgba(160,120,60,.18),0 8px 14px -10px rgba(60,35,10,.55);border-radius:2px 3px 2px 4px;display:flex;flex-direction:column;gap:9px}
+.card:nth-child(3n+1){transform:rotate(-.35deg)}.card:nth-child(3n+2){transform:rotate(.3deg)}
+.card .pin{position:absolute;top:-7px;left:50%;width:12px;height:12px;border-radius:50%;transform:translateX(-50%);background:radial-gradient(circle at 35% 30%,#e0c27a,#8a6a2a 70%);box-shadow:0 2px 3px rgba(0,0,0,.4)}
+.card .top{display:flex;gap:12px;align-items:flex-start}
+.etch{width:54px;height:54px;flex:none;display:grid;place-items:center;font-size:30px;border-radius:50%;border:1.5px solid var(--ink-faded);box-shadow:inset 0 0 0 3px var(--bg-primary),inset 0 0 0 4px var(--rule);filter:sepia(.85) saturate(.7) contrast(1.05)}
+.card h3{font-family:var(--f-head);font-weight:400;font-size:20px;line-height:1.15;margin:2px 0 0}
+.card .kc{font-variant-numeric:oldstyle-nums;color:var(--text-secondary);font-style:italic}
+.vtabs{display:flex;gap:0;font-family:var(--f-label);font-size:14px}
+.vtabs button{flex:1;border:1px solid var(--border-color);background:none;padding:3px 4px;color:var(--text-secondary);margin-left:-1px}
+.vtabs button:first-child{margin-left:0}
+.vtabs button.on{background:var(--text-primary);color:var(--bg-primary);border-color:var(--text-primary)}
+.card .acts{display:flex;gap:8px;margin-top:2px}
+.card .acts .btn{flex:1;justify-content:center}
+.inplan{position:absolute;top:10px;right:-6px;font-family:var(--f-label);font-size:12px;color:var(--on-brand);background:var(--brand-primary);padding:2px 10px 2px 8px;clip-path:polygon(0 0,100% 0,92% 50%,100% 100%,0 100%)}
+.cheat{position:absolute;right:12px;bottom:58px;width:44px;height:44px;display:grid;place-items:center;text-align:center;font-family:var(--f-label);font-size:9.5px;line-height:1;color:#f3d2a8;transform:rotate(-12deg)}
+.cheat.seal{width:46px;height:46px}
+
+/* macro chips: ink dots */
+.chips{display:flex;gap:10px;flex-wrap:wrap;font-family:var(--f-label);font-size:14px;color:var(--text-secondary)}
+.chip{display:inline-flex;align-items:center;gap:4px;font-variant-numeric:oldstyle-nums}
+.chip i{width:9px;height:9px;border-radius:50% 45% 55% 50%;background:var(--c);box-shadow:0 0 0 1.5px rgba(255,255,255,.4)}
+.s-under{--c:var(--macro-under-target)}.s-near{--c:var(--macro-near-target)}.s-on{--c:var(--macro-on-target)}.s-over{--c:var(--macro-over-target)}
+
+/* ---------- meal plan: a ruled ledger ---------- */
+.ledger{background:var(--bg-primary) var(--noise);border:1px solid var(--border-color);box-shadow:inset 0 0 40px rgba(160,120,60,.2),0 10px 20px -14px rgba(60,35,10,.6);padding:6px 10px 10px;overflow-x:auto}
+.ledger table{width:100%;border-collapse:collapse;min-width:900px;table-layout:fixed}
+.ledger th,.ledger td{border-right:1px solid var(--rule);vertical-align:top;padding:8px 8px}
+.ledger tr>*:last-child{border-right:0}
+.ledger thead th{font-family:var(--f-label);font-weight:400;font-size:16px;color:var(--text-secondary);border-bottom:2px solid var(--ink-faded);text-align:left;padding-bottom:6px}
+.ledger thead th b{display:block;font-family:var(--f-head);font-weight:400;font-size:22px;color:var(--text-primary);font-variant-numeric:oldstyle-nums}
+.ledger th.today{color:var(--brand-primary)}
+.ledger th.today b::after{content:"today";font-family:var(--f-hand);font-size:11px;color:var(--brand-primary);margin-left:6px;position:relative;top:-3px}
+.ledger td.today{background:rgba(216,178,90,.14)}
+.ledger tbody th{width:104px;text-align:left;font-family:var(--f-label);font-weight:400;font-size:16px;color:var(--text-secondary)}
+.ledger tbody th small{display:block;font-family:var(--f-body);font-style:italic;font-size:13px}
+.ledger tbody tr{background:repeating-linear-gradient(180deg,transparent 0 27px,var(--rule) 27px 28px)}
+.ledger tbody tr+tr th,.ledger tbody tr+tr td{border-top:1px solid var(--rule)}
+.ent{display:block;width:100%;text-align:left;border:0;background:none;padding:0;color:inherit}
+.ent .nm{font-family:var(--f-head);font-style:italic;font-size:16.5px;line-height:1.2;display:block}
+.ent .mt{font-family:var(--f-label);font-size:13px;color:var(--text-secondary);font-variant-numeric:oldstyle-nums}
+.eaten{display:inline-block;font-family:var(--f-hand);font-size:11px;color:var(--success);transform:rotate(-5deg);margin-top:3px}
+.add{border:1px dashed var(--border-color);background:none;width:100%;min-height:52px;color:var(--ink-faded);font-style:italic;font-family:var(--f-head);display:flex;align-items:center;justify-content:center;gap:6px;border-radius:2px;opacity:.75}
+.add:hover{opacity:1;border-color:var(--ink-faded)}
+.add svg{width:16px;height:16px}
+.tot td,.tot th{border-top:2px solid var(--ink-faded)!important;background:rgba(216,178,90,.1)}
+.tot .k{font-family:var(--f-head);font-size:19px;font-variant-numeric:oldstyle-nums}
+.tot .chips{font-size:13px;gap:7px;margin-top:3px}
+.wkfoot{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:14px}
+
+/* ---------- open recipe: a leather-bound book ---------- */
+.ovl{position:absolute;inset:0;z-index:20;background:rgba(30,18,8,.55);backdrop-filter:blur(2px);display:flex;align-items:center;justify-content:center;padding:22px}
+.book{position:relative;width:min(980px,100%);max-height:100%;display:flex;flex-direction:column;padding:12px;border-radius:6px;
+  background:var(--noise),linear-gradient(135deg,#4a2d1a,var(--leather) 50%,var(--leather-dark));box-shadow:0 30px 60px rgba(0,0,0,.55),inset 0 0 0 2px var(--gold-dim)}
+.book.opening{animation:open .45s cubic-bezier(.2,.8,.3,1)}
+@keyframes open{from{transform:perspective(1400px) rotateY(-14deg) scale(.96);opacity:0}}
+.spread{display:grid;grid-template-columns:1fr 1fr;overflow:auto;border-radius:2px;flex:1;min-height:0}
+.leaf{padding:26px 30px 30px;background-color:var(--bg-primary);background-image:var(--noise);position:relative}
+.leaf.l{background-image:var(--noise),linear-gradient(90deg,transparent 80%,rgba(120,85,35,.28))}
+.leaf.r{background-image:var(--noise),linear-gradient(270deg,transparent 80%,rgba(120,85,35,.28))}
+.leaf h2{font-family:var(--f-head);font-weight:400;font-size:30px;line-height:1.1;margin:8px 0 4px}
+.leaf h4{font-family:var(--f-label);font-weight:400;font-size:19px;margin:18px 0 6px;display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid var(--ink-faded);padding-bottom:3px}
+.leaf h4 small{font-family:var(--f-body);font-style:italic;font-size:14px;color:var(--text-secondary)}
+.bx{position:absolute;top:8px;right:10px;border:0;background:none;font-family:var(--f-label);color:var(--text-secondary);font-size:15px}
+.etch.big{width:84px;height:84px;font-size:46px;margin:0 auto}
+.stepper{display:inline-flex;align-items:center;gap:8px;font-family:var(--f-label)}
+.stepper button{width:26px;height:26px;border:1px solid var(--ink-faded);background:none;border-radius:50%;line-height:1}
+.ing{list-style:none;margin:0;padding:0}
+.ing li{display:flex;align-items:baseline;gap:6px;padding:4px 0;font-size:17px}
+.ing li .dots{flex:1;border-bottom:1.5px dotted var(--ink-faded);transform:translateY(-4px)}
+.ing li .q{font-variant-numeric:oldstyle-nums;white-space:nowrap}
+.ing li a{color:var(--brand-primary);font-style:italic}
+.margin{font-family:var(--f-hand);font-size:11px;color:var(--ink-faded);transform:rotate(-3deg);display:block;margin:2px 0 0 18px}
+.steps{list-style:none;counter-reset:s;margin:0;padding:0}
+.steps li{counter-increment:s;display:grid;grid-template-columns:28px 1fr;gap:8px;padding:7px 0;border-bottom:1px solid var(--rule);cursor:pointer}
+.steps li::before{content:counter(s,upper-roman) ".";font-family:var(--f-label);color:var(--brand-primary);font-size:15px;padding-top:2px}
+.steps li p{margin:0;font-size:17px;line-height:1.45}
+.steps li:first-child p::first-letter{float:left;font-family:var(--f-brand);font-weight:700;font-size:46px;line-height:.85;color:var(--brand-primary);margin:4px 6px 0 0}
+.steps li.done p{color:var(--ink-faded);text-decoration:line-through;text-decoration-color:rgba(43,29,16,.55);text-decoration-thickness:1.5px}
+.steps li.done::after{content:"✓";grid-column:1;grid-row:1;font-family:var(--f-hand);color:var(--success);font-size:15px;margin:-2px 0 0 14px}
+.steps li.link p{font-style:italic}
+.steps li .alt{display:block;font-size:14px;color:var(--text-secondary);margin-top:3px}
+.just{animation:blot .4s ease-out}
+@keyframes blot{0%{transform:scale(1.25);filter:blur(1px)}100%{transform:none;filter:none}}
+
+/* ---------- shopping: a scroll ---------- */
+.scrollwrap{max-width:640px;margin:0 auto;position:relative;padding:18px 0}
+.rod{height:20px;margin:0 -22px;border-radius:10px;position:relative;z-index:2;
+  background:linear-gradient(180deg,#8a5d33,#c08a50 30%,#7a4e28 60%,#3e2412);box-shadow:0 4px 8px rgba(40,20,5,.45)}
+.rod::before,.rod::after{content:"";position:absolute;top:-4px;width:16px;height:28px;border-radius:7px;background:radial-gradient(circle at 40% 35%,#e8c77a,#9a7330 70%,#5e4316)}
+.rod::before{left:-6px}.rod::after{right:-6px}
+.paper{margin:-8px 0;padding:30px 34px 26px;background:var(--bg-primary) var(--noise);box-shadow:inset 0 14px 18px -12px rgba(90,60,20,.45),inset 0 -14px 18px -12px rgba(90,60,20,.45),inset 0 0 30px rgba(160,120,60,.2)}
+.paper .meta{font-style:italic;color:var(--text-secondary);text-align:center;margin:-2px 0 14px}
+.paper .title{text-align:center}
+.aisle{margin-top:16px}
+.aisle h5{display:flex;align-items:center;gap:8px;margin:0 0 4px;font-family:var(--f-label);font-weight:400;font-size:17px;color:var(--text-primary)}
+.aisle h5 i{width:10px;height:10px;border-radius:50% 40% 55% 45%;background:var(--c)}
+.aisle h5::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--ink-faded),transparent)}
+.aisle h5 small{font-family:var(--f-body);font-style:italic;font-size:13px;color:var(--text-secondary);order:3}
+.item{display:flex;align-items:center;gap:12px;padding:5px 2px;border:0;background:none;width:100%;text-align:left;font-size:17px;border-bottom:1px solid var(--rule)}
+.box{width:18px;height:18px;flex:none;border:1.5px solid var(--text-primary);border-radius:1px 3px 2px 2px;position:relative}
+.item.on .box::after{content:"✗";position:absolute;left:1px;top:-12px;font-family:var(--f-hand);font-size:18px;color:var(--brand-primary)}
+.item .q{margin-left:auto;font-variant-numeric:oldstyle-nums;color:var(--text-secondary);font-style:italic}
+.item.on .n{text-decoration:line-through;color:var(--ink-faded)}
+.sealrow{display:flex;justify-content:space-between;align-items:center;margin-top:22px;gap:12px}
+.sealrow .sig{font-family:var(--f-hand);font-size:13px;color:var(--ink-faded)}
+.sealrow .seal{width:56px;height:56px;font-size:11px;font-family:var(--f-label);line-height:1.05;text-align:center;transform:rotate(8deg)}
+
+/* ---------- Pip stays as-is ---------- */
+.pip{display:grid;place-items:center;text-align:center;padding:60px 20px;background:#ece5fb;color:#2c3e50;font-family:Inter,system-ui,sans-serif;min-height:100%}
+.pip p{max-width:440px;line-height:1.5}
+
+/* ---------- account menu ---------- */
+.amenu{position:absolute;right:0;top:48px;width:340px;z-index:30;background:var(--bg-primary) var(--noise);color:var(--text-primary);border:1px solid var(--border-color);
+  box-shadow:inset 0 0 26px rgba(160,120,60,.22),0 18px 36px rgba(30,15,0,.45);border-radius:3px;padding:14px 16px 10px}
+.amenu .who{display:flex;gap:10px;align-items:center;padding-bottom:10px;border-bottom:1px solid var(--ink-faded)}
+.amenu .who b{font-family:var(--f-head);font-weight:400;font-size:19px;display:block}
+.amenu .who small{font-style:italic;color:var(--text-secondary)}
+.amenu .x{margin-left:auto;border:0;background:none;font-family:var(--f-label);color:var(--text-secondary)}
+.amenu .sec{padding:10px 0;border-bottom:1px solid var(--rule)}
+.amenu h5{margin:0 0 6px;font-family:var(--f-label);font-weight:400;font-size:15px;color:var(--brand-primary)}
+.amenu .row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.amenu .row small{display:block;font-style:italic;color:var(--text-secondary);font-size:13px}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.tile{border:1px solid var(--border-color);background:none;padding:5px;border-radius:3px;text-align:left}
+.tile[aria-checked="true"]{border:2px solid var(--brand-primary);padding:4px}
+.tile .nm{display:flex;justify-content:space-between;font-family:var(--f-label);font-size:14px;margin-top:4px}
+.tile .tick{visibility:hidden;color:var(--brand-primary)}.tile[aria-checked="true"] .tick{visibility:visible}
+.pv{height:46px;border-radius:2px;overflow:hidden;display:flex;flex-direction:column}
+.pv .ph{height:12px;flex:none}.pv .pc{flex:1;display:flex;gap:4px;padding:5px}.pv .pc i{flex:1;border-radius:2px}
+.pv-default{background:#f8f9fa}.pv-default .ph{background:#4a3f80}.pv-default .pc i{background:#fff;box-shadow:0 0 0 1px #e1e4e8}
+.pv-cyber{background:#05070b}.pv-cyber .ph{background:#000;border-bottom:1px solid #ff2a6d}.pv-cyber .pc i{border:1px solid #05d9e8}
+.pv-parch{background:#ead9b1}.pv-parch .ph{background:#3b2415;border-bottom:1px solid #d8b25a;position:relative}.pv-parch .ph::after{content:"";position:absolute;left:22%;top:8px;width:5px;height:8px;background:#a3271a}.pv-parch .pc i{background:#f7eed6;box-shadow:0 0 0 1px #c9ad78}
+.switch{width:40px;height:22px;border-radius:11px;border:1.5px solid var(--ink-faded);background:var(--bg-secondary);position:relative}
+.switch::after{content:"";position:absolute;top:2px;left:2px;width:15px;height:15px;border-radius:50%;background:var(--ink-faded);transition:left .15s}
+.switch[aria-pressed="true"]{background:var(--brand-primary);border-color:var(--brand-primary)}.switch[aria-pressed="true"]::after{left:20px;background:var(--on-brand)}
+.amenu .saved{font-family:var(--f-hand);font-size:10.5px;color:var(--ink-faded);margin-top:8px}
+.amenu .out{border:0;background:none;padding:10px 0;font-family:var(--f-label);font-size:16px;color:var(--brand-primary)}
+.amenu .ver{font-size:12px;font-style:italic;color:var(--text-secondary);border-top:1px solid var(--rule);padding-top:6px}
+
+/* ---------- toast: a sealed note ---------- */
+.toast{position:absolute;left:50%;bottom:26px;transform:translateX(-50%);z-index:40;display:flex;align-items:center;gap:12px;background:var(--bg-primary) var(--noise);border:1px solid var(--border-color);padding:10px 16px 10px 10px;box-shadow:0 12px 26px rgba(30,15,0,.4);font-family:var(--f-head);font-style:italic;font-size:17px;animation:rise .3s ease-out}
+.toast .seal{width:30px;height:30px;font-size:12px}
+@keyframes rise{from{transform:translate(-50%,16px);opacity:0}}
+
+/* ---------- mobile ---------- */
+.mob .hdr-in{padding:10px 14px;gap:10px}
+.mob .brand .w{font-size:17px}.mob .brand .sub{font-size:11px}
+.mob .page{padding:16px 14px 24px}
+.mob .title{font-size:28px}
+.mob .grid{grid-template-columns:1fr;gap:16px}
+.bnav{flex:none;display:grid;grid-template-columns:repeat(4,1fr);position:relative;z-index:5;padding:6px 6px 14px;
+  background:var(--noise),linear-gradient(0deg,var(--leather-dark),var(--leather));border-top:3px double var(--gold-dim)}
+.bnav button{border:0;background:none;color:#e0cba0;font-family:var(--f-label);font-size:13px;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;position:relative}
+.bnav button svg{width:22px;height:22px}
+.bnav button.on{color:#fff6dd}
+.bnav button.on::before{content:"";position:absolute;top:-9px;width:14px;height:18px;background:linear-gradient(90deg,#6e140c,#a3271a 50%,#6e140c);clip-path:polygon(0 0,100% 0,100% 100%,50% 76%,0 100%)}
+.daytabs{display:flex;gap:5px;overflow-x:auto;margin:4px -14px 14px;padding:0 14px 4px}
+.daytabs button{flex:none;width:46px;border:1px solid var(--border-color);background:var(--bg-primary);border-radius:3px;padding:5px 0 4px;font-family:var(--f-label);font-size:13px;color:var(--text-secondary);line-height:1.1}
+.daytabs button b{display:block;font-family:var(--f-head);font-weight:400;font-size:19px;color:var(--text-primary);font-variant-numeric:oldstyle-nums}
+.daytabs button.on{background:var(--text-primary);border-color:var(--text-primary);color:var(--bg-secondary)}.daytabs button.on b{color:var(--bg-primary)}
+.daytabs button.td{box-shadow:inset 0 -3px 0 var(--brand-primary)}
+.slip{background:var(--bg-primary) var(--noise);border:1px solid var(--border-color);padding:10px 12px;margin-bottom:10px;box-shadow:inset 0 0 18px rgba(160,120,60,.16)}
+.slip .lbl{display:flex;justify-content:space-between}
+.mob .ovl{padding:0;align-items:stretch}
+.mob .book{border-radius:0;padding:6px}
+.mob .spread{grid-template-columns:1fr}
+.mob .leaf{padding:20px 18px}
+.mob .leaf.l,.mob .leaf.r{background-image:var(--noise)}
+.mob .amenu{position:absolute;left:0;right:0;top:auto;bottom:0;width:auto;border-radius:12px 12px 0 0;max-height:80%;overflow:auto}
+.mob .paper{padding:24px 18px 20px}
+.mob .rod{margin:0 -8px}
+.mob .scrollwrap{padding:4px 6px}
+</style>
+</head>
+<body>
+<div class="proto" id="proto"></div>
+<div class="wrap"><div id="frame"></div><aside class="notes" id="notes"></aside></div>
+
+<script>
+/* ================= data (same dishes as app-mockup.html) ================= */
+const TODAY='2026-11-15';
+const V=(l,k,p,c,f)=>({l,k,p,c,f});
+const R=(id,name,meal,emoji,vars,ing,o={})=>({id,name,meal,emoji,vars,ing,...o});
+const RECIPES=[
+ R('porr','Apple, Cinnamon & Walnut Porridge','breakfast','🥣',[V('Light',470,36,62,13),V('Moderate',565,40,72,16),V('Balanced',720,46,88,22)],[['Rolled oats',60,'g','grains'],['Apple',1,'','produce'],['Greek yogurt (0%)',150,'g','dairy'],['Walnuts',15,'g','grains'],['Ground cinnamon',.5,'tsp','spices']],
+   {steps:['Toast the walnuts in a dry pan until fragrant, then chop roughly.','Simmer the oats with water and a pinch of salt for five minutes, stirring often.','Grate in the apple and the cinnamon; cook two minutes more.','Spoon into bowls, top with the yogurt and the toasted walnuts.']}),
+ R('avo','Avocado Toast','breakfast','🥑',[V('Light',520,24,48,28),V('Moderate',600,26,54,32),V('Balanced',677,28,58,38)],[['Sourdough loaf',.25,'loaf','bakery'],['Avocado',1,'','produce'],['Egg',2,'','dairy']],{cheat:1}),
+ R('omel','Cheese & Ham Omelette with Toast','breakfast','🍳',[V('Light',510,42,48,16),V('Moderate',643,46,62,22),V('Balanced',760,52,76,26)],[['Egg',3,'','dairy'],['Ham',60,'g','meat'],['Cheddar',25,'g','dairy'],['Sourdough loaf',.15,'loaf','bakery']]),
+ R('oats','Frozen Berry Protein Oats','breakfast','🫐',[V('Light',494,36,62,11),V('Moderate',580,40,74,13),V('Balanced',710,44,92,17)],[['Rolled oats',60,'g','grains'],['Frozen berries',100,'g','frozen'],['Greek yogurt (0%)',150,'g','dairy']]),
+ R('yog','Greek Yogurt & Granola Bowl','breakfast','🥛',[V('Light',480,38,58,12),V('Moderate',581,42,70,15),V('Balanced',700,46,86,19)],[['Greek yogurt (0%)',250,'g','dairy'],['Granola',50,'g','grains'],['Banana',1,'','produce']]),
+ R('hash','Hash Browns & Diced Chicken','breakfast','🥔',[V('Light',455,36,44,15),V('Moderate',582,40,55,20),V('Balanced',700,44,70,24)],[['Potato',200,'g','produce'],['Chicken breast',120,'g','meat'],['Egg',1,'','dairy']]),
+ R('shaw','Chicken Shawarma Rice Bowl','lunch','🍗',[V('Light',470,40,52,12),V('Moderate',550,42,60,15),V('Balanced',720,48,80,21)],[['Chicken breast',150,'g','meat'],['Basmati rice',70,'g','grains'],['Cucumber',.5,'','produce'],['Smoked paprika',1,'tsp','spices']]),
+ R('caes','Chicken Caesar Wrap','lunch','🌯',[V('Light',480,40,50,14),V('Moderate',550,41,55,18),V('Balanced',710,46,70,24)],[['Chicken breast',130,'g','meat'],['Wholemeal wrap',1,'','bakery'],['Romaine lettuce',.5,'','produce'],['Parmesan',10,'g','dairy']]),
+ R('tikka','Chicken Tikka Wrap','lunch','🌯',[V('Light',470,41,50,13),V('Moderate',554,43,57,17),V('Balanced',700,48,74,22)],[['Chicken breast',140,'g','meat'],['Wholemeal wrap',1,'','bakery'],['Greek yogurt (0%)',60,'g','dairy'],['Ground cumin',1,'tsp','spices']]),
+ R('ramen','Ramen with Soy Egg','lunch','🍜',[V('Light',471,35,55,13),V('Moderate',560,38,66,16),V('Balanced',700,42,84,20)],[['Ramen noodles',80,'g','grains'],['Egg',1,'','dairy'],['Pak choi',1,'','produce'],['Chicken breast',100,'g','meat']]),
+ R('padt','Pad Thai with Chicken','dinner','🍜',[V('Light',470,38,56,12),V('Moderate',546,40,62,14),V('Balanced',720,46,84,20)],[['Rice noodles',75,'g','grains'],['Chicken breast',140,'g','meat'],['Beansprouts',80,'g','produce'],['Peanuts',10,'g','grains']]),
+ R('curry',"Furey's-Style Tomato Beef Curry",'dinner','🍛',[V('Light',560,44,62,18),V('Moderate',650,46,72,21),V('Balanced',743,48,80,24)],[['Beef mince (5% fat)',150,'g','meat'],['Chopped tomatoes',.5,'tin','canned'],['Basmati rice',75,'g','grains'],['Onion',1,'','produce']]),
+ R('bolo','Spaghetti Bolognese','dinner','🍝',[V('Light',600,46,70,15),V('Moderate',720,50,82,20),V('Balanced',851,52,95,26)],[['Beef mince (5% fat)',150,'g','meat'],['Spaghetti',90,'g','grains'],['Chopped tomatoes',.5,'tin','canned'],['Carrot',1,'','produce']]),
+ R('pican','Rosemary Picanha & Mash','dinner','🥩',[V('Light',540,44,52,18),V('Moderate',635,46,62,22),V('Balanced',760,50,78,26)],[['Picanha steak',160,'g','meat'],['Potato',250,'g','produce'],['Green beans',100,'g','produce']]),
+ R('pizza','Pizza Margherita','dinner','🍕',[V('Light',560,36,70,17),V('Moderate',650,38,78,20),V('Balanced',787,44,90,27)],[['Pizza dough',1,'base','bakery',1],['Mozzarella (light)',80,'g','dairy'],['Passata',100,'g','canned'],['Fresh basil',4,'leaves','produce']],
+   {steps:[{t:'Prepare the pizza dough according to the linked receipt. Use one base per person.',alt:'Or buy a ready-made base from the bakery aisle.'},'Heat the oven as hot as it goes, with a tray inside.','Stretch the dough thin, spread the passata, tear over the mozzarella.','Bake 8–10 minutes until blistered; finish with the basil.']}),
+ R('salm','Salmon & Veg Traybake','dinner','🐟',[V('Light',500,40,44,18),V('Moderate',600,42,56,22),V('Balanced',720,46,72,26)],[['Salmon fillet',1,'','meat'],['Baby potatoes',200,'g','produce'],['Broccoli',120,'g','produce']]),
+ R('popc','Protein Popcorn','snacks','🍿',[V('',210,12,24,7)],[['Popcorn kernels',40,'g','grains']]),
+ R('pita','Pita Bread','extras','🫓',[V('',180,6,34,3)],[]),
+];
+const RB=Object.fromEntries(RECIPES.map(r=>[r.id,r]));
+const MEALS=[{k:'breakfast',l:'Breakfast',t:'8 o’clock'},{k:'lunch',l:'Luncheon',t:'1 o’clock'},{k:'dinner',l:'Supper',t:'7 o’clock'}];
+const AISLE={produce:'Garden & Orchard',meat:'Butcher & Fishmonger',dairy:'Dairy & Eggs',bakery:'Baker',grains:'Grains & Pasta',canned:'Tins & Jars',spices:'Herbs & Spices',frozen:'Ice House'};
+const PLAN={
+ '2026-11-09':{breakfast:['porr',1],lunch:['shaw',1],dinner:['curry',1]},
+ '2026-11-10':{breakfast:['oats',1],lunch:['caes',0],dinner:['padt',1]},
+ '2026-11-11':{breakfast:['yog',1],lunch:['ramen',1],dinner:['bolo',0]},
+ '2026-11-12':{breakfast:['omel',1],lunch:['tikka',1],dinner:['salm',1]},
+ '2026-11-13':{breakfast:['porr',2],lunch:['shaw',1],dinner:['pizza',1]},
+ '2026-11-14':{breakfast:['hash',1],dinner:['pican',2]},
+ '2026-11-15':{breakfast:['oats',1],lunch:['caes',1],dinner:['salm',0]},
+};
+const DOW=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const DAYS=[...Array(7)].map((_,i)=>{const d=new Date(Date.UTC(2026,10,9+i));const iso=d.toISOString().slice(0,10);return{iso,dow:DOW[d.getUTCDay()],n:d.getUTCDate(),today:iso===TODAY,past:iso<TODAY}});
+const ord=n=>n+(n%10==1&&n!=11?'st':n%10==2&&n!=12?'nd':n%10==3&&n!=13?'rd':'th');
+
+/* engraved line icons (iconSet: 'engraved') */
+const I=p=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
+const ICO={
+ book:I('<path d="M3 5.5c3-1.2 6-1 9 1 3-2 6-2.2 9-1v13.5c-3-1-6-.8-9 1-3-1.8-6-2-9-1z"/><path d="M12 6.5v13.5"/>'),
+ ledger:I('<rect x="4" y="3" width="16" height="18" rx="1"/><path d="M8 3v18M11 8h6M11 12h6M11 16h4"/>'),
+ sprout:I('<path d="M12 21v-9"/><path d="M12 12C12 8 9 6 5 6c0 4 3 6 7 6zM12 10c0-3 2-5 6-5 0 3-2 5-6 5z"/>'),
+ basket:I('<path d="M3 10h18l-2 10H5z"/><path d="M7 10l4-6M17 10l-4-6M9 14v3M12 14v3M15 14v3"/>'),
+ quill:I('<path d="M20 3C13 4 8 9 6.5 16L5 21l3-3.2C15 16.5 19 11 20 3z"/><path d="M8 17.5l6-6.5"/>'),
+ glass:I('<circle cx="10" cy="10" r="6"/><path d="M14.5 14.5L20 20"/>'),
+ plus:I('<path d="M12 5v14M5 12h14"/>'),
+ cal:I('<rect x="3" y="5" width="18" height="16" rx="1"/><path d="M3 10h18M8 3v4M16 3v4"/>'),
+};
+const BRAND_MARK=`<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="14.5" fill="none" stroke="#d8b25a" stroke-width="1.2"/><circle cx="16" cy="16" r="12.3" fill="none" stroke="#d8b25a" stroke-width=".6" stroke-dasharray="1.2 1.6"/><path d="M23 7c-6 1-10 6-11.5 12L10 25l2.6-2.8C18.5 21 22.4 15.6 23 7z" fill="#d8b25a"/><path d="M12.4 21.6l5.2-6" stroke="#3b2415" stroke-width="1"/></svg>`;
+const FLOUR=`<svg class="flour" viewBox="0 0 220 12" aria-hidden="true"><path d="M2 6h88c6 0 8-4 12-4s4 4 8 4 6-4 10-4 4 4 8 4h90" fill="none" stroke="currentColor" stroke-width="1"/><circle cx="110" cy="6" r="1.6" fill="currentColor"/></svg>`;
+
+/* ================= state ================= */
+const H=location.hash;
+const U={view:/mobile/.test(H)?'mobile':'web',route:(H.match(/r=(\w+)/)||[])[1]||'recipes',meal:'dinner',q:'',
+  open:/dlg=recipe/.test(H)?'pizza':null,openVar:1,srv:2,acct:/acct/.test(H),lowfx:/lowfx/.test(H),day:6,
+  cardVar:{},steps:new Set(['pizza:0']),got:new Set(['Chicken breast|g','Rolled oats|g','Egg|']),just:null,opening:false,toast:null,theme:'parchment'};
+
+/* ================= helpers ================= */
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+const fq=q=>{const r=Math.round(q*100)/100;return r===.5?'½':r===.25?'¼':r===.75?'¾':String(r)};
+const inPlan=r=>Object.values(PLAN).some(d=>Object.values(d).some(e=>e&&e[0]===r.id));
+const v=(r,i)=>r.vars[i]??r.vars[0];
+function status(m){ // day scope: P ≥105 g; fat 25–35 %; carbs 40–50 %
+  const fp=m.f*9/m.k*100, cp=m.c*4/m.k*100;
+  return{p:m.p>=105?'on':m.p>=95?'near':'under',f:fp>35?'over':fp>=25?'on':'under',c:cp<38?'under':cp<40?'near':cp<=50?'on':'near',fp,cp}}
+function chips(m){const s=status(m);return `<span class="chips"><span class="chip s-${s.p}"><i></i>P ${m.p}g</span><span class="chip s-${s.c}"><i></i>C ${Math.round(s.cp)}%</span><span class="chip s-${s.f}"><i></i>F ${Math.round(s.fp)}%</span></span>`}
+function dayTot(iso){let k=0,p=0,c=0,f=0;Object.values(PLAN[iso]||{}).forEach(e=>{if(!e)return;const x=v(RB[e[0]],e[1]);k+=x.k;p+=x.p;c+=x.c;f+=x.f});return{k,p,c,f}}
+function toast(msg){U.toast=msg;const t=msg;setTimeout(()=>{if(U.toast===t){U.toast=null;render()}},2600)}
+
+/* ================= views ================= */
+const NAV=[{k:'recipes',i:ICO.book,l:'Receipts'},{k:'mealplan',i:ICO.ledger,l:'Ledger'},{k:'pet',i:ICO.sprout,l:'Pip'},{k:'shopping',i:ICO.basket,l:'Provisions'}];
+function header(mob){return `<header class="hdr"><div class="hdr-in">
+  <button class="brand" data-a="go" data-v="recipes">${BRAND_MARK}<span><span class="w">The Kitchen Grimoire</span>${mob?'':'<span class="sub">Receipts, provisions &amp; the weekly almanac</span>'}</span></button>
+  ${mob?'':`<nav class="hnav" aria-label="Main">${NAV.map(n=>`<button class="${U.route===n.k?'on':''}" data-a="go" data-v="${n.k}">${n.i}${n.l}</button>`).join('')}</nav>
+  <div class="wk"><button aria-label="Previous week">‹</button><span class="rng">9th – 15th November</span><button aria-label="Next week">›</button></div>`}
+  <div class="acct" style="${mob?'margin-left:auto':''}"><button class="seal" data-a="acct" aria-label="Account">J</button>${U.acct&&!mob?acctMenu():''}</div>
+</div></header>`}
+
+function recipesPage(mob){
+  const q=U.q.toLowerCase();
+  const list=RECIPES.filter(r=>r.meal===U.meal&&(!q||r.name.toLowerCase().includes(q)));
+  return `<div class="page"><div class="board-head"><div><h2 class="title">The Receipt Book</h2><span class="title-sub">Tried &amp; true dishes, set down in good ink</span>${FLOUR}</div>
+    <label class="search">${ICO.glass}<input data-a2="q" value="${esc(U.q)}" placeholder="Seek a receipt…" aria-label="Search recipes"></label></div>
+  <div class="tabs" role="tablist">${['breakfast','lunch','dinner','snacks','extras'].map(m=>`<button role="tab" aria-selected="${U.meal===m}" class="${U.meal===m?'on':''}" data-a="meal" data-v="${m}">${{breakfast:'Breakfast',lunch:'Luncheon',dinner:'Supper',snacks:'Morsels',extras:'Extras'}[m]}</button>`).join('')}</div>
+  <div class="grid">${list.map(card).join('')||'<p class="title-sub">No receipt by that name in this book.</p>'}</div></div>`}
+function card(r){
+  const vi=U.cardVar[r.id]??(r.vars.length>1?1:0),x=v(r,vi);
+  return `<article class="card"><span class="pin" aria-hidden="true"></span>${inPlan(r)?'<span class="inplan">In the ledger</span>':''}
+    <div class="top"><div class="etch" aria-hidden="true">${r.emoji}</div><div><h3>${esc(r.name)}</h3><span class="kc">${Math.round(x.k)} kcal per serving</span></div></div>
+    ${r.vars.length>1?`<div class="vtabs" role="radiogroup" aria-label="Variant">${r.vars.map((w,i)=>`<button role="radio" aria-checked="${i===vi}" class="${i===vi?'on':''}" data-a="cvar" data-v="${r.id}" data-i="${i}">${w.l}</button>`).join('')}</div>`:''}
+    <div class="chips"><span class="chip">${x.p} g protein</span><span class="chip">${x.c} g carbs</span><span class="chip">${x.f} g fat</span></div>
+    ${r.cheat?'<span class="cheat seal" aria-label="Cheat meal">Treat<br>day</span>':''}
+    <div class="acts"><button class="btn" data-a="open" data-v="${r.id}" data-i="${vi}">${ICO.book} Open</button><button class="btn primary" data-a="add" data-v="${r.id}">${ICO.quill} Add to week</button></div></article>`}
+
+function mealWeb(){
+  return `<div class="page"><div class="board-head"><div><h2 class="title">The Week’s Ledger</h2><span class="title-sub">Monday the 9th to Sunday the 15th of November</span>${FLOUR}</div>
+    <div style="display:flex;gap:8px"><button class="btn">Copy a week</button><button class="btn primary" data-a="go" data-v="shopping">${ICO.basket} Write provisions list</button></div></div>
+  <div class="ledger"><table><thead><tr><th></th>${DAYS.map(d=>`<th class="${d.today?'today':''}">${d.dow.slice(0,3)}<b>${ord(d.n)}</b></th>`).join('')}</tr></thead><tbody>
+  ${MEALS.map(m=>`<tr><th>${m.l}<small>${m.t}</small></th>${DAYS.map(d=>{const e=PLAN[d.iso]?.[m.k];return `<td class="${d.today?'today':''}">${e?entry(e,d):`<button class="add" aria-label="Add ${m.l} on ${d.dow}">${ICO.quill} add</button>`}</td>`}).join('')}</tr>`).join('')}
+  <tr class="tot"><th>Day’s sum</th>${DAYS.map(d=>{const t=dayTot(d.iso);return `<td class="${d.today?'today':''}"><span class="k">${t.k}</span> <span class="lbl">kcal</span>${t.k?chips(t):''}</td>`}).join('')}</tr>
+  </tbody></table></div>
+  <div class="wkfoot"><span class="title-sub" style="margin:0">Ink dots: <span class="chips" style="display:inline-flex"><span class="chip s-under"><i></i>under</span><span class="chip s-near"><i></i>near</span><span class="chip s-on"><i></i>on target</span><span class="chip s-over"><i></i>over</span></span></span>
+  <span class="lbl">Week: ${DAYS.reduce((a,d)=>a+dayTot(d.iso).k,0).toLocaleString()} kcal · 19 of 21 meals planned</span></div></div>`}
+function entry(e,d){const r=RB[e[0]],x=v(r,e[1]);return `<button class="ent" data-a="open" data-v="${r.id}" data-i="${e[1]}"><span class="nm">${esc(r.name)}</span><span class="mt">${x.l} · ${x.k} kcal</span></button>${d.past?'<span class="eaten">✓ eaten</span>':''}`}
+
+function mealMobile(){
+  const d=DAYS[U.day],t=dayTot(d.iso);
+  return `<div class="page"><h2 class="title">The Week’s Ledger</h2><span class="title-sub">${d.dow} the ${ord(d.n)} of November</span>
+  <div class="daytabs" style="margin-top:12px">${DAYS.map((x,i)=>`<button class="${i===U.day?'on':''} ${x.today?'td':''}" data-a="day" data-v="${i}">${x.dow.slice(0,3)}<b>${x.n}</b></button>`).join('')}</div>
+  ${MEALS.map(m=>{const e=PLAN[d.iso]?.[m.k];return `<div class="slip"><div class="lbl"><span>${m.l}</span><small><i>${m.t}</i></small></div>${e?entry(e,d):`<button class="add" style="margin-top:6px">${ICO.quill} add a dish</button>`}</div>`}).join('')}
+  <div class="slip" style="background-color:rgba(216,178,90,.18)"><div class="lbl"><span>Day’s sum</span><span class="k" style="font-family:var(--f-head);font-size:19px;color:var(--text-primary)">${t.k} kcal</span></div>${t.k?chips(t):''}</div>
+  <button class="btn primary" style="width:100%;justify-content:center;margin-top:6px" data-a="go" data-v="shopping">${ICO.basket} Write provisions list</button></div>`}
+
+function book(mob){
+  const r=RB[U.open],x=v(r,U.openVar),srv=U.srv;
+  const steps=r.steps||[`Gather and weigh the ingredients for ${srv}.`,'Prepare the vegetables and season the protein well.','Cook through, tasting as you go.','Plate up and serve while hot.'];
+  return `<div class="ovl" data-a="close"><div class="book ${U.opening?'opening':''}" role="dialog" aria-label="${esc(r.name)}" data-stop><div class="spread">
+  <section class="leaf l"><div class="etch big" aria-hidden="true">${r.emoji}</div><h2>${esc(r.name)}</h2>
+    ${r.vars.length>1?`<div class="vtabs" style="margin:10px 0 8px">${r.vars.map((w,i)=>`<button class="${i===U.openVar?'on':''}" data-a="ovar" data-i="${i}">${w.l}</button>`).join('')}</div>`:''}
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><span class="kc" style="font-style:italic;color:var(--text-secondary)">${x.k} kcal · ${x.p} g protein · per serving</span>
+    <span class="stepper"><button data-a="srv" data-v="-1" aria-label="Fewer servings">−</button>${srv} ${srv==1?'person':'people'}<button data-a="srv" data-v="1" aria-label="More servings">+</button></span></div>
+    <h4>Ingredients<small>for ${srv}</small></h4>
+    <ul class="ing">${r.ing.map(i=>`<li>${i[4]?`<a href="#" data-a="none">${esc(i[0])} ↗</a>`:esc(i[0])}<span class="dots"></span><span class="q">${fq(i[1]*srv)}${i[2]?' '+i[2]:''}</span></li>${i[4]?'<span class="margin">homemade — see its own receipt</span>':''}`).join('')}</ul></section>
+  <section class="leaf r"><button class="bx" data-a="close" aria-label="Close">✕ close</button>
+    <h4 style="margin-top:4px">Method<small>${[...U.steps].filter(s=>s.startsWith(r.id+':')).length} of ${steps.length} done</small></h4>
+    <ol class="steps">${steps.map((s,i)=>{const k=r.id+':'+i,o=typeof s==='object';return `<li class="${U.steps.has(k)?'done':''} ${o?'link':''} ${U.just===k?'just':''}" data-a="step" data-v="${k}"><p>${esc(o?s.t:s)}${o?`<span class="alt">${esc(s.alt)}</span>`:''}</p></li>`}).join('')}</ol>
+    <div style="display:flex;gap:8px;margin-top:18px"><button class="btn">Cook mode</button><button class="btn primary" data-a="add" data-v="${r.id}">${ICO.quill} Add to week</button></div>
+  </section></div></div></div>`}
+
+function shopping(mob){
+  const agg={};Object.values(PLAN).forEach(d=>Object.values(d).forEach(e=>{if(!e)return;RB[e[0]].ing.forEach(([n,q,u,a])=>{const k=n+'|'+u;(agg[k]=agg[k]||{n,u,a,q:0}).q+=q*2})}));
+  const groups={};Object.entries(agg).forEach(([k,i])=>(groups[i.a]=groups[i.a]||[]).push([k,i]));
+  const n=Object.keys(agg).length,got=[...U.got].filter(k=>agg[k]).length;
+  return `<div class="page"><div class="scrollwrap"><div class="rod"></div><div class="paper">
+   <h2 class="title">Provisions</h2><div class="meta">for the week of the 9th · written Sunday at 11 o’clock</div>
+   <div style="text-align:center;margin-bottom:6px" class="lbl">${got} of ${n} gathered</div>
+   ${Object.keys(AISLE).filter(a=>groups[a]).map(a=>`<section class="aisle" style="--c:var(--aisle-${a})"><h5><i></i>${AISLE[a]}<small>${groups[a].length}</small></h5>
+     ${groups[a].map(([k,i])=>`<button class="item ${U.got.has(k)?'on':''} ${U.just===k?'just':''}" data-a="got" data-v="${esc(k)}" role="checkbox" aria-checked="${U.got.has(k)}"><span class="box"></span><span class="n">${esc(i.n)}</span><span class="q">${fq(i.q)}${i.u?' '+i.u:''}</span></button>`).join('')}</section>`).join('')}
+   <div class="sealrow"><span class="sig">Asia Market &amp; Tesco · don’t forget the bags</span><span class="seal">ALL<br>GOT</span></div>
+  </div><div class="rod"></div></div></div>`}
+
+function pip(){return `<div class="pip"><div><div style="font-size:54px">🌱</div><h2>Pip’s room</h2><p>Pip’s room keeps its own palette in every theme (<code>.pet-view</code> re-declares the Default tokens), so it looks exactly as it does today. Only the leather header and bottom nav around it change.</p></div></div>`}
+
+function acctMenu(){return `<div class="amenu" role="dialog" aria-label="Account" data-stop>
+  <div class="who"><span class="seal">J</span><div><b>You</b><small>you@example.com</small></div><button class="x" data-a="acct" aria-label="Close">✕</button></div>
+  <div class="sec"><h5>Planning</h5><div class="row"><span>Default servings<small>Used when you add a meal</small></span><span class="stepper"><button aria-label="Fewer">−</button>2<button aria-label="More">+</button></span></div></div>
+  <div class="sec"><h5>Appearance</h5><div class="tiles" role="radiogroup" aria-label="Theme">
+    ${[['default','Default','pv-default'],['cyberpunk','Cyberpunk','pv-cyber'],['parchment','Parchment','pv-parch']].map(([id,l,c])=>`<button class="tile" role="radio" aria-checked="${U.theme===id}" data-a="theme" data-v="${id}"><div class="pv ${c}"><div class="ph"></div><div class="pc"><i></i><i></i></div></div><span class="nm">${l}<span class="tick">✓</span></span></button>`).join('')}</div>
+    <div class="row" style="margin-top:10px"><span>Low FX<small>No candle flicker or drifting motes</small></span><button class="switch" data-a="lowfx" aria-pressed="${U.lowfx}" aria-label="Low FX"></button></div>
+    <div class="saved">saved on this device</div></div>
+  <button class="out">↩ Sign out</button>
+  <div class="ver">v1.32.0 · web 15 Nov 11:40 · api 15 Nov 11:38</div></div>`}
+
+function fx(){return `<div class="fx" aria-hidden="true"><div class="vig"></div>${[[12,80,0],[30,92,4],[55,85,8],[72,95,2],[88,78,10],[44,70,6]].map(([l,t,d])=>`<span class="mote" style="left:${l}%;top:${t}%;animation-delay:${d}s"></span>`).join('')}</div>`}
+
+/* ================= render ================= */
+function render(){
+  const mob=U.view==='mobile';
+  document.getElementById('proto').innerHTML=`<b>PARCHMENT · mockup</b>
+   <div class="seg2">${['web','mobile'].map(x=>`<button class="${U.view===x?'on':''}" data-p="view" data-v="${x}">${x==='web'?'Web':'Mobile'}</button>`).join('')}</div>
+   <div class="seg2">${NAV.map(n=>`<button class="${U.route===n.k?'on':''}" data-p="route" data-v="${n.k}">${n.l}</button>`).join('')}</div>
+   <div class="seg2"><button class="${U.open?'on':''}" data-p="book">Open receipt</button><button class="${U.acct?'on':''}" data-p="acct">Account menu</button><button class="${U.lowfx?'on':''}" data-p="lowfx">Low FX</button></div>
+   <span style="color:#999">Open straight in a browser. Deep links: #mobile #r=mealplan|shopping|pet #dlg=recipe #acct #lowfx</span>`;
+  const body={recipes:recipesPage,mealplan:mob?mealMobile:mealWeb,shopping,pet:pip}[U.route](mob);
+  const f=document.getElementById('frame');f.className=mob?'frame-mob':'frame-web';
+  f.innerHTML=`<div class="app ${mob?'mob':''} ${U.lowfx?'lowfx':''}" data-theme="parchment">${header(mob)}<div class="scroll">${body}</div>
+    ${mob?`<nav class="bnav">${NAV.map(n=>`<button class="${U.route===n.k?'on':''}" data-a="go" data-v="${n.k}">${n.i}${n.l}</button>`).join('')}</nav>`:''}
+    ${U.open?book(mob):''}${U.acct&&mob?`<div class="ovl" data-a="acct" style="align-items:flex-end;padding:0">${acctMenu()}</div>`:''}
+    ${U.toast?`<div class="toast"><span class="seal">✓</span>${esc(U.toast)}</div>`:''}${fx()}</div>`;
+  U.just=null;U.opening=false;
+}
+document.addEventListener('click',ev=>{
+  const p=ev.target.closest('[data-p]');
+  if(p){const k=p.dataset.p;if(k==='view')U.view=p.dataset.v;if(k==='route'){U.route=p.dataset.v;U.open=null}if(k==='book'){U.open=U.open?null:'pizza';U.openVar=1;U.opening=true}if(k==='acct')U.acct=!U.acct;if(k==='lowfx')U.lowfx=!U.lowfx;render();return}
+  const a=ev.target.closest('[data-a]');if(!a)return;
+  if(a.dataset.a==='close'&&ev.target.closest('[data-stop]')&&!ev.target.closest('.bx'))return;
+  if(a.dataset.a==='acct'&&a.classList.contains('ovl')&&ev.target.closest('[data-stop]'))return;
+  ev.preventDefault();
+  const A=a.dataset.a,val=a.dataset.v;
+  switch(A){
+    case 'go':U.route=val;U.open=null;U.acct=false;break;
+    case 'meal':U.meal=val;break;
+    case 'cvar':U.cardVar[val]=+a.dataset.i;break;
+    case 'open':U.open=val;U.openVar=+(a.dataset.i||1);U.opening=true;break;
+    case 'close':U.open=null;break;
+    case 'ovar':U.openVar=+a.dataset.i;break;
+    case 'srv':U.srv=Math.max(1,Math.min(8,U.srv+ +val));break;
+    case 'step':U.steps.has(val)?U.steps.delete(val):(U.steps.add(val),U.just=val);break;
+    case 'got':U.got.has(val)?U.got.delete(val):(U.got.add(val),U.just=val);break;
+    case 'add':toast(`${RB[val].name} written into the ledger`);break;
+    case 'day':U.day=+val;break;
+    case 'acct':U.acct=!U.acct;break;
+    case 'lowfx':U.lowfx=!U.lowfx;break;
+    case 'theme':U.theme=val;if(val!=='parchment')toast('This file only draws Parchment. See app-mockup.html / user-menu-themes.html');break;
+    default:return;
+  }
+  render();
+});
+document.addEventListener('input',ev=>{if(ev.target.dataset.a2==='q'){U.q=ev.target.value;const pos=ev.target.selectionStart;render();const i=document.querySelector('[data-a2="q"]');i.focus();i.setSelectionRange(pos,pos)}});
+
+/* ================= design notes ================= */
+document.getElementById('notes').innerHTML=`
+<h2>Parchment theme: the wizard’s kitchen book</h2>
+<p>A third theme beside Default and Cyberpunk. The app becomes an old handwritten receipt book: aged parchment, iron-gall ink, a leather binding with gold tooling, red ribbon bookmarks and sealing wax. It borrows the <i>feel</i> of a school-of-magic story, but uses none of its property.</p>
+<h3>What changes on each screen</h3>
+<ul>
+<li><b>Header</b>: leather binding with stitched, gold-tooled edges. The active tab gets a red ribbon bookmark.</li>
+<li><b>Recipes</b> → “The Receipt Book” (<i>receipt</i> is the old word for recipe). Cards are pinned parchment slips with sepia-toned emoji in an etched roundel. Cheat meals get a wax seal.</li>
+<li><b>Meal plan</b> → “The Week’s Ledger”: a ruled account book, with “today” in handwriting and “✓ eaten” inked on past days. Macro status shows as coloured ink dots.</li>
+<li><b>Recipe view</b> → an open leather-bound book: ingredients on the left page with dotted leaders, the method on the right with a red drop cap and Roman numerals. Ticked steps are struck through in ink. Linked homemade extras get a margin note.</li>
+<li><b>Shopping</b> → “Provisions”: a scroll on wooden rods, aisles renamed (Garden &amp; Orchard, Butcher &amp; Fishmonger…). Ticked items get a hand-drawn ✗.</li>
+<li><b>Pip</b>: unchanged (it keeps its own palette in every theme).</li>
+</ul>
+<h3>Type (all Google Fonts, SIL OFL / Apache)</h3>
+<ul><li><b>Cinzel Decorative</b>: brand and drop caps only</li><li><b>IM Fell English</b>: headings (digitised 17th-century Fell types)</li><li><b>IM Fell English SC</b>: labels, tabs, buttons</li><li><b>EB Garamond</b>: body text, with old-style numerals</li><li><b>Homemade Apple</b>: handwritten marginalia (a few words at most)</li></ul>
+<h3>Palette</h3>
+<div class="sw">${[['#f7eed6','page'],['#ead9b1','parchment'],['#2b1d10','ink'],['#5e4a32','faded ink'],['#7a1f14','wax red'],['#3b2415','leather'],['#d8b25a','gold'],['#1f3a5f','focus ink']].map(([c,l])=>`<div><i style="background:${c}"></i>${l}</div>`).join('')}</div>
+<p style="margin:8px 0 0">Ink-on-page contrast is ~14:1, faded ink ~7:1, wax red ~9:1 and gold on leather ~7:1, so it should pass <code>check:themes</code> (AA). That still needs running.</p>
+<h3>Effects (Low FX switches them off)</h3>
+<ul><li>Candlelight vignette that flickers slowly</li><li>A few drifting dust motes</li><li>Book opens with a slight page-turn</li><li>An ink-blot settle when you tick a step or an item</li></ul>
+<h3>Licence-safe: the guardrails</h3>
+<ul>
+<li class="yes">✓ Generic period motifs: parchment, quills, wax seals, leather, candlelight, drop caps, Roman numerals</li>
+<li class="yes">✓ Open-licence fonts only</li>
+<li class="no">✗ No franchise names, places, houses, crests, characters or spells, and no lightning bolts, owls-as-post or wands</li>
+<li class="no">✗ No fan-made lookalike fonts (“Harry P”, “Lumos”): the franchise’s lettering is a protected trademark</li>
+<li class="no">✗ The theme label is never the franchise name</li>
+</ul>
+<h3>Registry entry (constants/themes.js)</h3>
+<code style="display:block;white-space:pre-wrap;padding:6px">{ id:'parchment', label:'Parchment',
+  themeColor:'#3b2415', iconSet:'engraved',
+  effects:true, ticker:false,
+  brand:{ name:'The Kitchen Grimoire',
+    sub:'Receipts, provisions & the weekly almanac' } }</code>
+<h3>Open questions</h3>
+<ul>
+<li>Theme name: “Parchment”, “Grimoire” or “Apothecary”?</li>
+<li>Do we want the renamed copy (Receipts / Ledger / Provisions / Supper)? It’s fun, but less plain. Cyberpunk kept the nav labels plain and put the flavour in subtitles only.</li>
+<li>Sepia-filtered emoji, or a hand-drawn engraved icon set for dishes?</li>
+<li>Brand in Cinzel Decorative, or blackletter (UnifrakturMaguntia) for a darker, more gothic feel?</li>
+</ul>`;
+render();
+</script>
+</body>
+</html>

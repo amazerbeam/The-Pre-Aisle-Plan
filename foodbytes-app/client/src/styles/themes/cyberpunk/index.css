@@ -1,0 +1,11 @@
+/* Cyberpunk override bundle. Specificity, not source order, is what makes these win: every
+   selector in every file here MUST start with :root[data-theme="cyberpunk"] (adds 0,2,0 over the
+   component selector), which also keeps Default untouched. Colours come from tokens in
+   ../cyberpunk.css; avoid !important (only the Low FX animation kill-switch). */
+@import './hud.css';
+@import './shell.css';
+@import './recipes.css';
+@import './mealplan.css';
+@import './recipe-view.css';
+@import './shopping.css';
+@import './dialogs.css';

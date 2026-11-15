@@ -24,7 +24,7 @@
 }
 
 .swap-modal {
-  background: #fff;
+  background: var(--surface-popover);
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
   min-width: 320px;
@@ -47,8 +47,8 @@
 }
 
 .swap-modal-header {
-  background: #4a3f80;
-  color: #fff;
+  background: var(--brand-primary);
+  color: var(--on-brand);
   padding: 16px;
   border-radius: 12px 12px 0 0;
   display: flex;
@@ -76,7 +76,7 @@
 .swap-modal-close {
   background: transparent;
   border: none;
-  color: #fff;
+  color: var(--on-brand);
   font-size: 2rem;
   line-height: 1;
   cursor: pointer;
@@ -91,7 +91,7 @@
 }
 
 .swap-modal-close:hover {
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: var(--on-brand-hover-strong);
 }
 
 .swap-modal-content {
@@ -110,22 +110,22 @@
   flex-direction: column;
   align-items: center;
   padding: 14px 12px;
-  background: #f8f9fa;
-  border: 2px solid #e0e0e0;
+  background: var(--bg-secondary);
+  border: 2px solid var(--border-input);
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .swap-day-button:hover {
-  border-color: #4a3f80;
-  background: rgba(74, 63, 128, 0.05);
+  border-color: var(--brand-primary);
+  background: var(--brand-tint-whisper);
 }
 
 .swap-day-button:focus {
   outline: none;
-  border-color: #4a3f80;
-  box-shadow: 0 0 0 3px rgba(74, 63, 128, 0.2);
+  border-color: var(--brand-primary);
+  box-shadow: 0 0 0 3px var(--brand-focus-glow);
 }
 
 .swap-day-button:active {
@@ -133,24 +133,24 @@
 }
 
 .swap-day-button.today {
-  border-color: #4a3f80;
-  background: rgba(74, 63, 128, 0.08);
+  border-color: var(--brand-primary);
+  background: var(--brand-tint-faint);
 }
 
 .swap-day-name {
   font-weight: 600;
-  color: #333;
+  color: var(--text-strong);
   font-size: 1rem;
 }
 
 .swap-day-date {
-  color: #666;
+  color: var(--text-mid);
   font-size: 0.85rem;
   margin-top: 2px;
 }
 
 .swap-day-meals {
-  color: #999;
+  color: var(--text-hint);
   font-size: 0.75rem;
   margin-top: 6px;
 }
@@ -160,8 +160,8 @@
   top: 6px;
   right: 6px;
   padding: 2px 6px;
-  background-color: #4a3f80;
-  color: white;
+  background-color: var(--brand-primary);
+  color: var(--on-brand);
   border-radius: 10px;
   font-size: 9px;
   font-weight: 500;
@@ -171,10 +171,10 @@
 .swap-modal-hint {
   text-align: center;
   font-size: 0.75rem;
-  color: #999;
+  color: var(--text-hint);
   padding: 8px;
   margin: 0;
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--divider-soft);
 }
 
 /* Mobile responsiveness */

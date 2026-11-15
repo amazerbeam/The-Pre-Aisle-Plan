@@ -5,7 +5,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  background: #fff;
+  background: var(--bg-primary);
   border: 1px solid var(--border-color);
   border-left: 4px solid var(--brand-primary-light);
   border-radius: 8px;
@@ -22,7 +22,7 @@
 }
 
 .meal-card.is-eaten {
-  background: #eef8f0;
+  background: var(--eaten-bg);
   border-left-color: var(--success);
 }
 
@@ -52,7 +52,7 @@
 }
 
 .meal-card-servings {
-  background: var(--brand-tint, #eeebf7);
+  background: var(--surface-tint-brand);
   color: var(--brand-primary);
   border-radius: 999px;
   padding: 1px 7px;
@@ -92,8 +92,8 @@
   margin: -12px 0 0 -12px;
   box-sizing: border-box;
   border-radius: 50%;
-  border: 2px solid #cfd4da;
-  background: #fff;
+  border: 2px solid var(--tick-border);
+  background: var(--bg-primary);
   z-index: -1;
 }
 
@@ -112,7 +112,7 @@
 }
 
 .is-eaten .meal-card-tick {
-  color: #fff;
+  color: var(--on-brand);
   cursor: default;
 }
 
@@ -130,7 +130,7 @@
 }
 
 .meal-card--large.is-eaten {
-  border-color: #cfe9d5;
+  border-color: var(--eaten-border);
 }
 
 .meal-card--large .meal-card-name {
@@ -150,7 +150,7 @@
   width: 48px;
   height: 48px;
   border-radius: 12px;
-  background: var(--brand-tint, #eeebf7);
+  background: var(--surface-tint-brand);
   font-size: 26px;
 }
 

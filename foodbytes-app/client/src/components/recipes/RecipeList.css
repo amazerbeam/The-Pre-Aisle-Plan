@@ -27,8 +27,8 @@
   margin-top: 12px;
   padding: 10px 14px;
   border-radius: 12px;
-  background: #fff4e0;
-  color: #9a5b00;
+  background: var(--notice-bg);
+  color: var(--notice-text);
 }
 
 .recipe-notice button,
@@ -52,14 +52,14 @@
   padding: 10px 14px;
   border: 1px dashed var(--brand-primary);
   border-radius: 12px;
-  background: #eeebf7;
+  background: var(--surface-tint-brand);
   color: var(--brand-primary);
   font-size: 14px;
 }
 
 .error-message {
-  background: #fee2e2;
-  color: #dc2626;
+  background: var(--error-surface);
+  color: var(--error-text);
   padding: var(--spacing-md);
   border-radius: var(--radius-md);
   text-align: center;

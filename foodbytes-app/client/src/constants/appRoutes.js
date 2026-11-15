@@ -17,9 +17,9 @@ export const APP_ROUTES = [
     guestMessage: 'Sign in to access shopping list!' }
 ]
 
-/** "Meal Plan · My Pantry Plan"; trailing slashes ignored; unknown paths get the bare app name. */
-export function routeTitle(pathname) {
+/** "Meal Plan · My Pantry Plan"; trailing slashes ignored; unknown paths get the bare app name. `appName` is the active theme's brand name. */
+export function routeTitle(pathname, appName = APP_NAME) {
   const clean = (pathname || '/').replace(/\/+$/, '') || '/'
   const route = APP_ROUTES.find(r => r.path === clean)
-  return route ? `${route.title} · ${APP_NAME}` : APP_NAME
+  return route ? `${route.title} · ${appName}` : appName
 }

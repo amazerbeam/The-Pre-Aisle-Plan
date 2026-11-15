@@ -1,0 +1,751 @@
+/* Cyberpunk meal plan: the order board. Timetable, mobile day view, meal cards, swipe panels,
+   week summary, and the menus / sheets / terminal-window modals. Reference: mockup/app-mockup.html
+   (.dh, .tt, .cell, .mcard, .add, .chip, .dsum, .sw-acts, .bubble, .hud, .pop, .scrim, .dlg, .bar-t).
+   Selectors start with :root[data-theme="cyberpunk"]. Colour, border, font and glow only: no
+   sizing, scrolling or z-index changes. Glow tokens are a transparent no-op under body.lowfx. */
+
+/* ---------- Week summary tile, day summary (HUD brackets live in hud.css) ---------- */
+:root[data-theme="cyberpunk"] .week-summary-tile,
+:root[data-theme="cyberpunk"] .day-summary {
+  position: relative;
+  background: var(--panel);
+  border: 1px solid var(--line-soft);
+  border-radius: 0;
+}
+
+:root[data-theme="cyberpunk"] .week-summary-label,
+:root[data-theme="cyberpunk"] .day-summary-label {
+  font-family: var(--f-label);
+  font-size: 11px;
+  color: var(--cyan);
+}
+
+:root[data-theme="cyberpunk"] .week-summary-value,
+:root[data-theme="cyberpunk"] .day-summary-kcal {
+  font-family: var(--f-num);
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 1;
+  color: var(--yellow);
+  text-shadow: var(--glow-yellow);
+}
+
+:root[data-theme="cyberpunk"] .week-summary-sub {
+  font-family: var(--f-num);
+  font-size: 17px;
+  color: var(--muted);
+}
+
+:root[data-theme="cyberpunk"] .week-summary-more,
+:root[data-theme="cyberpunk"] .day-summary-go {
+  color: var(--cyan);
+}
+
+/* Stale shopping-list card: yellow hazard (mockup .stale) */
+:root[data-theme="cyberpunk"] .week-summary-stale .mx-stale {
+  background: repeating-linear-gradient(135deg, var(--hazard-a) 0 12px, var(--hazard-b) 12px 24px);
+  border: 2px solid var(--yellow);
+  border-radius: 0;
+  color: var(--yellow);
+}
+
+:root[data-theme="cyberpunk"] .week-summary-stale .mx-stale-button {
+  background: var(--yellow);
+  border: none;
+  border-radius: 0;
+  color: var(--void);
+  font-weight: 700;
+}
+
+/* ---------- Desktop title row + toolbar ---------- */
+:root[data-theme="cyberpunk"] .week-desktop-title h2,
+:root[data-theme="cyberpunk"] .m-top h2 {
+  font-family: var(--f-display);
+  font-weight: 700;
+  color: var(--pink);
+  text-shadow: var(--glow-pink);
+}
+
+:root[data-theme="cyberpunk"] .toolbar-btn {
+  font-family: var(--f-label);
+  font-size: 11px;
+  color: var(--cyan);
+  background: var(--black);
+  border: 1px solid var(--line);
+  border-radius: 0;
+}
+
+:root[data-theme="cyberpunk"] .toolbar-btn:active,
+:root[data-theme="cyberpunk"] .toolbar-btn[aria-expanded='true'] {
+  background: var(--raised);
+  border-color: var(--cyan);
+}
+
+:root[data-theme="cyberpunk"] .toolbar-btn--primary,
+:root[data-theme="cyberpunk"] .toolbar-btn--primary:active {
+  color: var(--void);
+  background: var(--pink);
+  border-color: var(--pink);
+  box-shadow: var(--box-pink);
+}
+
+@media (hover: hover) {
+  :root[data-theme="cyberpunk"] .toolbar-btn:hover {
+    background: var(--raised);
+    border-color: var(--cyan);
+  }
+
+  :root[data-theme="cyberpunk"] .toolbar-btn--primary:hover {
+    color: var(--void);
+    background: var(--pink);
+    border-color: var(--pink);
+    filter: brightness(1.15);
+  }
+}
+
+/* ---------- Day header (mockup .dh): LED date, today framed cyan ---------- */
+:root[data-theme="cyberpunk"] .day-header {
+  color: var(--ink);
+  background: var(--black);
+  border: 1px solid var(--line-soft);
+  border-top: 3px solid var(--line);
+  border-radius: 0;
+}
+
+:root[data-theme="cyberpunk"] .day-header.is-today {
+  color: var(--ink);
+  background: var(--black);
+  border-color: var(--cyan);
+  border-top-color: var(--cyan);
+  box-shadow: var(--box-cyan);
+}
+
+:root[data-theme="cyberpunk"] .day-header-name {
+  font-family: var(--f-num);
+  font-size: 28px;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--yellow);
+  text-shadow: var(--glow-yellow);
+}
+
+:root[data-theme="cyberpunk"] .day-header-date {
+  font-family: var(--f-num);
+  font-size: 18px;
+  opacity: 1;
+  color: var(--muted);
+}
+
+:root[data-theme="cyberpunk"] .day-header.is-today .day-header-date {
+  color: var(--cyan);
+}
+
+:root[data-theme="cyberpunk"] .day-header-kcal {
+  font-family: var(--f-num);
+  font-size: 19px;
+  font-weight: 400;
+  color: var(--ink);
+}
+
+:root[data-theme="cyberpunk"] .day-header-swap {
+  color: var(--muted);
+  opacity: 1;
+  border: 1px solid transparent;
+  border-radius: 0;
+}
+
+@media (hover: hover) {
+  :root[data-theme="cyberpunk"] .day-header-swap:hover {
+    color: var(--cyan);
+    border-color: var(--cyan);
+  }
+}
+
+/* ---------- Timetable labels and cells ---------- */
+:root[data-theme="cyberpunk"] .timetable-rowlabel {
+  font-family: var(--f-label);
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--cyan);
+}
+
+:root[data-theme="cyberpunk"] .timetable-rowtime {
+  font-family: var(--f-num);
+  font-size: 18px;
+  color: var(--muted);
+}
+
+:root[data-theme="cyberpunk"] .slot-cell.is-today-col {
+  background: rgba(5, 217, 232, 0.06);
+  outline: 1px solid rgba(5, 217, 232, 0.25);
+  border-radius: 0;
+}
+
+:root[data-theme="cyberpunk"] .slot-cell.is-drop-target {
+  outline: 2px dashed var(--yellow);
+  border-radius: 0;
+}
+
+:root[data-theme="cyberpunk"] .slot-add,
+:root[data-theme="cyberpunk"] .m-add {
+  color: var(--cyan);
+  background: rgba(5, 217, 232, 0.04);
+  border: 1px dashed var(--line);
+  border-radius: 0;
+}
+
+:root[data-theme="cyberpunk"] .slot-add:active,
+:root[data-theme="cyberpunk"] .slot-add:focus-visible,
+:root[data-theme="cyberpunk"] .m-add:active,
+:root[data-theme="cyberpunk"] .m-add:focus-visible {
+  background: rgba(5, 217, 232, 0.08);
+  border-color: var(--cyan);
+}
+
+@media (hover: hover) {
+  :root[data-theme="cyberpunk"] .slot-add:hover {
+    background: rgba(5, 217, 232, 0.08);
+    border-color: var(--cyan);
+  }
+}
+
+/* ---------- Meal card (mockup .mcard): cyan left edge, LED kcal, lime when eaten ---------- */
+:root[data-theme="cyberpunk"] .meal-card {
+  background: var(--panel);
+  border: 1px solid var(--line-soft);
+  border-left: 4px solid var(--cyan);
+  border-radius: 0;
+}
+
+:root[data-theme="cyberpunk"] .meal-card::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -1px;
+  border-top: 2px dashed rgba(157, 178, 199, 0.25);
+  pointer-events: none;
+}
+
+:root[data-theme="cyberpunk"] .meal-card.is-eaten {
+  background: var(--eaten-bg);
+  border-left-color: var(--lime);
+}
+
+:root[data-theme="cyberpunk"] .meal-card--large {
+  border-left-width: 4px;
+}
+
+:root[data-theme="cyberpunk"] .meal-card--large.is-eaten {
+  border-color: var(--line-soft);
+  border-left-color: var(--lime);
+}
+
+:root[data-theme="cyberpunk"] .meal-card-name {
+  font-family: var(--f-body);
+}
+
+:root[data-theme="cyberpunk"] .meal-card-meta {
+  font-family: var(--f-num);
+  font-size: 17px;
+  color: var(--yellow);
+}
+
+:root[data-theme="cyberpunk"] .meal-card--large .meal-card-meta {
+  font-size: 18px;
+}
+
+:root[data-theme="cyberpunk"] .meal-card-servings {
+  font-family: var(--f-num);
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--cyan);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 0;
+}
+
+:root[data-theme="cyberpunk"] .meal-card-thumb {
+  background: var(--black);
+  border: 1px solid var(--line);
+  border-radius: 0;
+}
+
+:root[data-theme="cyberpunk"] .meal-card-tick::before {
+  border-radius: 0;
+}
+
+:root[data-theme="cyberpunk"] .meal-card-tick:focus-visible {
+  border-radius: 0;
+}
+
+@media (hover: hover) {
+  :root[data-theme="cyberpunk"] .meal-card:hover,
+  :root[data-theme="cyberpunk"] .meal-card-desktop .meal-card:hover {
+    border-color: var(--line);
+    border-left-color: var(--cyan);
+    box-shadow: none;
+    transform: none;
+  }
+
+  :root[data-theme="cyberpunk"] .meal-card.is-eaten:hover {
+    border-left-color: var(--lime);
+  }
+}
+
+/* ---------- Mobile day view ---------- */
+:root[data-theme="cyberpunk"] .m-head {
+  color: var(--ink);
+  background: var(--void);
+  border-bottom: 1px solid var(--line-soft);
+}
+
+:root[data-theme="cyberpunk"] .m-top .meal-plan-menu-trigger {
+  color: var(--cyan);
+  background: var(--black);
+  border: 1px solid var(--line);
+}
+
+:root[data-theme="cyberpunk"] .m-weekbar {
+  color: var(--yellow);
+  background: var(--black);
+  border: 1px solid var(--line);
+  border-radius: 0;
+}
+
+:root[data-theme="cyberpunk"] .m-weekbar b {
+  font-family: var(--f-num);
+  font-size: 20px;
+  font-weight: 400;
+}
+
+:root[data-theme="cyberpunk"] .m-weekbar:active {
+  background: var(--raised);
+}
+
+:root[data-theme="cyberpunk"] .m-weekbar-go {
+  opacity: 1;
+  color: var(--cyan);
+}
+
+:root[data-theme="cyberpunk"] .day-chip {
+  color: var(--ink);
+  background: var(--black);
+  border: 1px solid var(--line-soft);
+  border-radius: 0;
+}
+
+:root[data-theme="cyberpunk"] .day-chip-name {
+  font-family: var(--f-label);
+  font-size: 9px;
+  opacity: 1;
+  color: var(--muted);
+}
+
+:root[data-theme="cyberpunk"] .day-chip-num {
+  font-family: var(--f-num);
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 1;
+  color: var(--ink);
+}
+
+:root[data-theme="cyberpunk"] .day-chip-dots i {
+  border-radius: 0;
+  background: var(--line-soft);
+}
+
+:root[data-theme="cyberpunk"] .day-chip-dots i.is-filled {
+  background: var(--lime);
+}
+
+:root[data-theme="cyberpunk"] .day-chip.is-selected {
+  color: var(--void);
+  background: var(--chip-selected-bg);
+  border-color: var(--pink);
+  box-shadow: var(--box-pink);
+}
+
+:root[data-theme="cyberpunk"] .day-chip.is-selected .day-chip-name,
+:root[data-theme="cyberpunk"] .day-chip.is-selected .day-chip-num {
+  color: var(--void);
+}
+
+:root[data-theme="cyberpunk"] .day-chip.is-selected .day-chip-dots i {
+  background: var(--chip-dot-selected);
+}
+
+:root[data-theme="cyberpunk"] .day-chip.is-selected .day-chip-dots i.is-filled {
+  background: var(--void);
+}
+
+:root[data-theme="cyberpunk"] .day-chip.is-today:not(.is-selected) {
+  box-shadow: inset 0 0 0 2px var(--cyan);
+}
+
+:root[data-theme="cyberpunk"] .m-slot-head {
+  font-family: var(--f-label);
+  font-weight: 400;
+  color: var(--cyan);
+}
+
+:root[data-theme="cyberpunk"] .m-empty {
+  font-family: var(--f-body);
+}
+
+:root[data-theme="cyberpunk"] .m-entry-fallback .entry-menu-trigger {
+  background: var(--black);
+  border-radius: 0;
+}
+
+/* ---------- Swipe panels (mockup .sw-acts) and hint bubble ---------- */
+:root[data-theme="cyberpunk"] .swipe-row {
+  border-radius: 0;
+}
+
+:root[data-theme="cyberpunk"] .swipe-row-action {
+  font-family: var(--f-label);
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--void);
+}
+
+:root[data-theme="cyberpunk"] .swipe-row-action--replace {
+  background: var(--cyan);
+}
+
+:root[data-theme="cyberpunk"] .swipe-row-action--move {
+  background: var(--yellow);
+}
+
+:root[data-theme="cyberpunk"] .swipe-row-action--remove {
+  background: var(--red);
+}
+
+:root[data-theme="cyberpunk"] .swipe-hint-bubble {
+  color: var(--void);
+  background: var(--yellow);
+  border: 2px solid var(--black);
+  border-radius: 0;
+}
+
+:root[data-theme="cyberpunk"] .swipe-hint-bubble::after {
+  bottom: -8px;
+  border-width: 7px;
+  border-bottom-width: 0;
+  border-top-color: var(--yellow);
+}
+
+/* ---------- Menus (mockup .pop) ---------- */
+:root[data-theme="cyberpunk"] .meal-plan-menu-list,
+:root[data-theme="cyberpunk"] .entry-menu-list,
+:root[data-theme="cyberpunk"] .toolbar-dd-menu {
+  background: var(--raised);
+  border: 1px solid var(--cyan);
+  border-radius: 0;
+  box-shadow: var(--box-cyan), 0 12px 30px rgba(0, 0, 0, 0.6);
+}
+
+:root[data-theme="cyberpunk"] .meal-plan-menu-list button,
+:root[data-theme="cyberpunk"] .entry-menu-list button,
+:root[data-theme="cyberpunk"] .toolbar-dd-menu button {
+  font-family: var(--f-body);
+  color: var(--ink);
+  border-radius: 0;
+}
+
+:root[data-theme="cyberpunk"] .entry-menu-list .is-danger {
+  color: var(--red);
+}
+
+:root[data-theme="cyberpunk"] .meal-plan-menu-list button:active,
+:root[data-theme="cyberpunk"] .meal-plan-menu-list button:focus-visible,
+:root[data-theme="cyberpunk"] .entry-menu-list button:focus-visible,
+:root[data-theme="cyberpunk"] .toolbar-dd-menu button:active,
+:root[data-theme="cyberpunk"] .toolbar-dd-menu button:focus-visible {
+  color: var(--cyan);
+  background: var(--panel);
+}
+
+@media (hover: hover) {
+  :root[data-theme="cyberpunk"] .meal-plan-menu-list button:hover,
+  :root[data-theme="cyberpunk"] .entry-menu-list button:hover,
+  :root[data-theme="cyberpunk"] .toolbar-dd-menu button:hover {
+    color: var(--cyan);
+    background: var(--panel);
+  }
+}
+
+/* ---------- Scrims ---------- */
+:root[data-theme="cyberpunk"] .swap-modal-overlay,
+:root[data-theme="cyberpunk"] .copy-modal-overlay,
+:root[data-theme="cyberpunk"] .tpl-modal-overlay,
+:root[data-theme="cyberpunk"] .macro-popup-overlay {
+  background: var(--scrim-bg);
+}
+
+/* ---------- Terminal windows (mockup .dlg + .bar-t) ---------- */
+:root[data-theme="cyberpunk"] .swap-modal,
+:root[data-theme="cyberpunk"] .copy-modal,
+:root[data-theme="cyberpunk"] .tpl-modal,
+:root[data-theme="cyberpunk"] .macro-popup,
+:root[data-theme="cyberpunk"] .meal-sheet {
+  color: var(--ink);
+  background: var(--panel);
+  border: 2px solid var(--cyan);
+  border-radius: 0;
+  box-shadow: var(--box-cyan), 0 30px 60px rgba(0, 0, 0, 0.7);
+}
+
+:root[data-theme="cyberpunk"] .meal-sheet {
+  background: var(--raised);
+}
+
+/* Modal title bars (.swap-/.copy-/.tpl-modal-header, .macro-popup-header): see hud.css */
+:root[data-theme="cyberpunk"] .swap-modal-title h4,
+:root[data-theme="cyberpunk"] .copy-modal-title h4,
+:root[data-theme="cyberpunk"] .tpl-modal-title h4,
+:root[data-theme="cyberpunk"] .macro-popup-title h4 {
+  font-family: var(--f-label);
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--void);
+}
+
+:root[data-theme="cyberpunk"] .swap-modal-subtitle,
+:root[data-theme="cyberpunk"] .copy-modal-subtitle,
+:root[data-theme="cyberpunk"] .tpl-modal-subtitle,
+:root[data-theme="cyberpunk"] .macro-popup-date {
+  font-family: var(--f-num);
+  font-size: 17px;
+  opacity: 1;
+  color: var(--void);
+}
+
+:root[data-theme="cyberpunk"] .swap-modal-close,
+:root[data-theme="cyberpunk"] .copy-modal-close,
+:root[data-theme="cyberpunk"] .tpl-modal-close,
+:root[data-theme="cyberpunk"] .macro-popup-close {
+  font-family: var(--f-label);
+  color: var(--cyan);
+  background: var(--void);
+  border-radius: 0;
+}
+
+:root[data-theme="cyberpunk"] .swap-modal-close:active,
+:root[data-theme="cyberpunk"] .copy-modal-close:active,
+:root[data-theme="cyberpunk"] .tpl-modal-close:active,
+:root[data-theme="cyberpunk"] .macro-popup-close:active {
+  background: var(--raised);
+}
+
+@media (hover: hover) {
+  :root[data-theme="cyberpunk"] .swap-modal-close:hover,
+  :root[data-theme="cyberpunk"] .copy-modal-close:hover,
+  :root[data-theme="cyberpunk"] .tpl-modal-close:hover,
+  :root[data-theme="cyberpunk"] .macro-popup-close:hover {
+    background: var(--raised);
+  }
+}
+
+:root[data-theme="cyberpunk"] .swap-modal-close:focus-visible,
+:root[data-theme="cyberpunk"] .copy-modal-close:focus-visible,
+:root[data-theme="cyberpunk"] .tpl-modal-close:focus-visible,
+:root[data-theme="cyberpunk"] .macro-popup-close:focus-visible {
+  outline-color: var(--focus-ring-color);
+}
+
+/* Sheet title, grab handle, slots, servings stepper */
+:root[data-theme="cyberpunk"] .meal-sheet-title {
+  font-family: var(--f-display);
+  color: var(--pink);
+  text-shadow: var(--glow-pink);
+}
+
+:root[data-theme="cyberpunk"] .meal-sheet-close {
+  color: var(--cyan);
+}
+
+:root[data-theme="cyberpunk"] .meal-sheet-grab {
+  border-radius: 0;
+}
+
+:root[data-theme="cyberpunk"] .meal-sheet-section {
+  font-family: var(--f-label);
+  color: var(--cyan);
+}
+
+:root[data-theme="cyberpunk"] .meal-sheet-slot,
+:root[data-theme="cyberpunk"] .servings-sheet-step,
+:root[data-theme="cyberpunk"] .servings-sheet-input {
+  color: var(--ink);
+  border-radius: 0;
+}
+
+:root[data-theme="cyberpunk"] .servings-sheet-input {
+  font-family: var(--f-num);
+  background: var(--deep);
+}
+
+:root[data-theme="cyberpunk"] .servings-sheet-save,
+:root[data-theme="cyberpunk"] .copy-confirm-button,
+:root[data-theme="cyberpunk"] .tpl-confirm-button {
+  font-weight: 700;
+  color: var(--void);
+  background: var(--pink);
+  border-radius: 0;
+  box-shadow: 4px 4px 0 var(--cyan);
+}
+
+@media (hover: hover) {
+  :root[data-theme="cyberpunk"] .copy-confirm-button:hover:not(:disabled),
+  :root[data-theme="cyberpunk"] .tpl-confirm-button:hover:not(:disabled) {
+    background: var(--pink);
+    filter: brightness(1.15);
+  }
+}
+
+:root[data-theme="cyberpunk"] .copy-confirm-button:active:not(:disabled),
+:root[data-theme="cyberpunk"] .tpl-confirm-button:active:not(:disabled) {
+  background: var(--pink);
+  filter: brightness(1.15);
+}
+
+/* Forms, warnings and buttons inside the windows */
+:root[data-theme="cyberpunk"] .copy-date-input,
+:root[data-theme="cyberpunk"] .tpl-input {
+  color: var(--ink);
+  background: var(--deep);
+  border: 1px solid var(--line);
+  border-radius: 0;
+}
+
+:root[data-theme="cyberpunk"] .copy-date-input:focus,
+:root[data-theme="cyberpunk"] .tpl-input:focus {
+  border-color: var(--cyan);
+}
+
+:root[data-theme="cyberpunk"] .copy-date-label,
+:root[data-theme="cyberpunk"] .tpl-label {
+  font-family: var(--f-label);
+  font-size: 11px;
+  color: var(--cyan);
+}
+
+:root[data-theme="cyberpunk"] .copy-target-range {
+  font-family: var(--f-num);
+  font-size: 18px;
+  color: var(--yellow);
+}
+
+:root[data-theme="cyberpunk"] .copy-overwrite-warning,
+:root[data-theme="cyberpunk"] .tpl-overwrite-warning {
+  color: var(--yellow);
+  background: var(--black);
+  border: 1px solid var(--yellow);
+  border-left-width: 6px;
+  border-radius: 0;
+}
+
+:root[data-theme="cyberpunk"] .copy-cancel-button,
+:root[data-theme="cyberpunk"] .tpl-cancel-button,
+:root[data-theme="cyberpunk"] .tpl-action-button,
+:root[data-theme="cyberpunk"] .tpl-action-extras,
+:root[data-theme="cyberpunk"] .mx-bulk button,
+:root[data-theme="cyberpunk"] .mx-stale-button {
+  border-radius: 0;
+}
+
+:root[data-theme="cyberpunk"] .tpl-action-button {
+  color: var(--cyan);
+}
+
+:root[data-theme="cyberpunk"] .tpl-action-danger {
+  color: var(--red);
+}
+
+:root[data-theme="cyberpunk"] .tpl-list-item,
+:root[data-theme="cyberpunk"] .mx-toolbar,
+:root[data-theme="cyberpunk"] .mx-meal,
+:root[data-theme="cyberpunk"] .mx-scope,
+:root[data-theme="cyberpunk"] .mx-seg {
+  border-radius: 0;
+}
+
+:root[data-theme="cyberpunk"] .mx-toolbar {
+  background: var(--deep);
+  border: 1px solid var(--line-soft);
+}
+
+:root[data-theme="cyberpunk"] .tpl-list-name {
+  font-family: var(--f-display);
+  color: var(--pink);
+}
+
+:root[data-theme="cyberpunk"] .tpl-list-meta,
+:root[data-theme="cyberpunk"] .mx-day-date,
+:root[data-theme="cyberpunk"] .mx-serv {
+  font-family: var(--f-num);
+  font-size: 17px;
+}
+
+:root[data-theme="cyberpunk"] .mx-slot,
+:root[data-theme="cyberpunk"] .mx-variant,
+:root[data-theme="cyberpunk"] .tpl-extras-count,
+:root[data-theme="cyberpunk"] .mx-serv {
+  border-radius: 0;
+}
+
+:root[data-theme="cyberpunk"] .mx-slot {
+  font-family: var(--f-label);
+}
+
+:root[data-theme="cyberpunk"] .mx-serv {
+  color: var(--cyan);
+}
+
+/* Macro popups: LED numbers, square tiles */
+:root[data-theme="cyberpunk"] .macro-total,
+:root[data-theme="cyberpunk"] .macro-item,
+:root[data-theme="cyberpunk"] .macro-summary-item,
+:root[data-theme="cyberpunk"] .macro-item-percent {
+  border-radius: 0;
+}
+
+:root[data-theme="cyberpunk"] .macro-total-label,
+:root[data-theme="cyberpunk"] .macro-item-label,
+:root[data-theme="cyberpunk"] .macro-summary-label,
+:root[data-theme="cyberpunk"] .macro-section-title {
+  font-family: var(--f-label);
+  color: var(--cyan);
+}
+
+:root[data-theme="cyberpunk"] .macro-total-value {
+  font-family: var(--f-num);
+  color: var(--yellow);
+  text-shadow: var(--glow-yellow);
+}
+
+:root[data-theme="cyberpunk"] .macro-item-grams,
+:root[data-theme="cyberpunk"] .macro-item-percent,
+:root[data-theme="cyberpunk"] .macro-item-calories,
+:root[data-theme="cyberpunk"] .macro-summary-value,
+:root[data-theme="cyberpunk"] .macro-summary-calories {
+  font-family: var(--f-num);
+}
+
+:root[data-theme="cyberpunk"] .macro-item-grams,
+:root[data-theme="cyberpunk"] .macro-summary-value {
+  color: var(--yellow);
+}
+
+/* ---------- Focus: the Cyberpunk ring colour on every meal-plan control ---------- */
+:root[data-theme="cyberpunk"] :is(
+  .meal-card, .meal-card-tick, .toolbar-btn, .slot-add, .m-add, .week-summary-tile,
+  .day-summary, .day-chip, .m-weekbar, .macro-item, .macro-summary-item,
+  .tpl-action-button, .meal-plan-menu-trigger, .entry-menu-trigger, .mx-stale-button
+):focus-visible {
+  outline-color: var(--focus-ring-color);
+}

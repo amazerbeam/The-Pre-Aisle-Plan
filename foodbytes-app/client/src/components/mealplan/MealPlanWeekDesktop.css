@@ -37,7 +37,7 @@
   font: inherit;
   font-size: 13px;
   color: var(--text-primary);
-  background: #fff;
+  background: var(--bg-primary);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   cursor: pointer;
@@ -48,7 +48,7 @@
 .toolbar-btn:active,
 .toolbar-btn[aria-expanded='true'] {
   border-color: var(--brand-primary-light);
-  background: #eeebf7;
+  background: var(--surface-tint-brand);
 }
 
 .toolbar-btn:focus-visible {
@@ -59,20 +59,20 @@
 @media (hover: hover) {
   .toolbar-btn:hover {
     border-color: var(--brand-primary-light);
-    background: #eeebf7;
+    background: var(--surface-tint-brand);
   }
 }
 
 .toolbar-btn--primary,
 .toolbar-btn--primary:active {
-  color: #fff;
+  color: var(--on-brand);
   background: var(--brand-primary);
   border-color: var(--brand-primary);
 }
 
 @media (hover: hover) {
   .toolbar-btn--primary:hover {
-    color: #fff;
+    color: var(--on-brand);
     background: var(--brand-primary-dark);
     border-color: var(--brand-primary-dark);
   }
@@ -91,7 +91,7 @@
   margin: 0;
   padding: 6px;
   list-style: none;
-  background: #fff;
+  background: var(--surface-popover);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-lg);
@@ -116,13 +116,13 @@
 
 .toolbar-dd-menu button:active,
 .toolbar-dd-menu button:focus-visible {
-  background: #eeebf7;
+  background: var(--surface-tint-brand);
   outline: none;
 }
 
 @media (hover: hover) {
   .toolbar-dd-menu button:hover {
-    background: #eeebf7;
+    background: var(--surface-tint-brand);
   }
 }
 
@@ -169,7 +169,7 @@
 }
 
 .day-header.is-today {
-  color: #fff;
+  color: var(--on-brand);
   background: var(--brand-primary);
   border-color: var(--brand-primary);
 }
@@ -267,7 +267,7 @@
 .slot-cell.is-today-col {
   padding: 4px;
   margin: -4px;
-  background: #efedf7;
+  background: var(--surface-tint-soft);
   border-radius: 8px;
 }
 
@@ -301,7 +301,7 @@
   text-align: center;
   color: var(--brand-primary-light);
   background: transparent;
-  border: 1.5px dashed #cfcbe0;
+  border: 1.5px dashed var(--slot-add-border);
   border-radius: var(--radius-md);
   cursor: pointer;
   touch-action: manipulation;
@@ -310,7 +310,7 @@
 
 .slot-add:active,
 .slot-add:focus-visible {
-  background: #eeebf7;
+  background: var(--surface-tint-brand);
   border-color: var(--brand-primary-light);
 }
 
@@ -321,7 +321,7 @@
 
 @media (hover: hover) {
   .slot-add:hover {
-    background: #eeebf7;
+    background: var(--surface-tint-brand);
     border-color: var(--brand-primary-light);
   }
 

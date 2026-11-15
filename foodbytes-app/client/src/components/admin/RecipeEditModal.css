@@ -99,13 +99,13 @@
 }
 
 .save-message.success {
-  background-color: #d4edda;
-  color: #155724;
+  background-color: var(--success-banner-bg);
+  color: var(--success-banner-text);
 }
 
 .save-message.error {
-  background-color: #f8d7da;
-  color: #721c24;
+  background-color: var(--error-banner-bg);
+  color: var(--error-banner-text);
 }
 
 .loading-message,
@@ -163,13 +163,13 @@
 /* Delete button - red and separated */
 .menu-button.delete-button {
   margin-top: var(--spacing-lg);
-  background: #fff5f5;
-  border-color: #f5c6cb;
+  background: var(--surface-invalid);
+  border-color: var(--error-banner-border);
   color: var(--error);
 }
 
 .menu-button.delete-button:hover {
-  background: #f8d7da;
+  background: var(--error-banner-bg);
   border-color: var(--error);
 }
 

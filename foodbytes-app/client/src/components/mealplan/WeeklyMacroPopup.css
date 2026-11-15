@@ -12,11 +12,11 @@
 .macro-section-title {
   margin: 0 0 12px 0;
   font-size: 0.9rem;
-  color: #666;
+  color: var(--text-mid);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   font-weight: 600;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--border-input);
   padding-bottom: 6px;
 }
 
@@ -32,7 +32,7 @@
   flex-direction: column;
   align-items: center;
   padding: 12px;
-  background: #f8f9fa;
+  background: var(--bg-secondary);
   border-radius: 8px;
   gap: 6px;
   /* MPP-2: .macro-summary-item is now a <button>, not a presentational <div>. */
@@ -49,17 +49,17 @@
 
 @media (hover: hover) {
   .macro-summary-item:hover {
-    border-color: #4a3f80;
+    border-color: var(--brand-primary);
   }
 }
 
 .macro-summary-item:active {
-  border-color: #4a3f80;
-  background: #efedf7;
+  border-color: var(--brand-primary);
+  background: var(--surface-tint-soft);
 }
 
 .macro-summary-item:focus-visible {
-  outline: 2px solid #4a3f80;
+  outline: 2px solid var(--focus-ring-color);
   outline-offset: 2px;
 }
 
@@ -99,7 +99,7 @@
 
 .macro-summary-label {
   font-size: 0.75rem;
-  color: #666;
+  color: var(--text-mid);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   font-weight: 600;
@@ -108,12 +108,12 @@
 .macro-summary-value {
   font-size: 1.2rem;
   font-weight: 700;
-  color: #333;
+  color: var(--text-strong);
 }
 
 .macro-summary-calories {
   font-size: 0.75rem;
-  color: #999;
+  color: var(--text-hint);
 }
 
 /* Mobile responsiveness */

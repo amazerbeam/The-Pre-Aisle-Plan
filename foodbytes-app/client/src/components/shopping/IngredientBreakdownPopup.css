@@ -24,7 +24,7 @@
 }
 
 .breakdown-popup {
-  background: #fff;
+  background: var(--surface-popover);
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
   /* FR-042 FIX: Increased size for desktop, min-width ensures readability */
@@ -48,8 +48,8 @@
 }
 
 .breakdown-header {
-  background: #4a3f80;
-  color: #fff;
+  background: var(--brand-primary);
+  color: var(--on-brand);
   padding: 12px 16px;
   border-radius: 12px 12px 0 0;
   display: flex;
@@ -76,9 +76,9 @@
 }
 
 .breakdown-close-btn {
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--on-brand-hover-strong);
   border: none;
-  color: #fff;
+  color: var(--on-brand);
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -93,15 +93,15 @@
 }
 
 .breakdown-close-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--on-brand-active-strong);
 }
 
 .breakdown-close-btn:active {
-  background: rgba(255, 255, 255, 0.4);
+  background: var(--on-brand-press-strong);
 }
 
 .breakdown-total {
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--on-brand-hover-strong);
   padding: 4px 10px;
   border-radius: 20px;
   font-size: 0.9rem;
@@ -118,7 +118,7 @@
   display: flex;
   align-items: center;
   padding: 12px 16px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--divider-soft);
   gap: 10px;
 }
 
@@ -141,7 +141,7 @@
 
 .meal-name {
   font-size: 0.95rem;
-  color: #333;
+  color: var(--text-strong);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -149,10 +149,9 @@
 
 .meal-context {
   font-size: 0.75rem;
-  /* #666 (5.74:1 on #fff), not #777 — at 12px this is normal-size text, so it needs the
-     full WCAG AA 4.5:1 and #777 only reaches 4.48:1. #666 is also the codebase default
-     for secondary text. */
-  color: #666;
+  /* --text-mid (5.74:1 on the Default popup surface): at 12px this is normal-size text, so it needs the
+     full WCAG AA 4.5:1, which the lighter grey misses. */
+  color: var(--text-mid);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -162,8 +161,8 @@
   flex-shrink: 0;
   font-size: 0.9rem;
   font-weight: 500;
-  color: #4a3f80;
-  background: #f0eef5;
+  color: var(--brand-primary);
+  background: var(--surface-tint-chip);
   padding: 4px 8px;
   border-radius: 4px;
 }

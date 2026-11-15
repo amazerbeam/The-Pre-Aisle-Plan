@@ -36,7 +36,7 @@
 
 .eaten-btn.on {
   background: var(--success);
-  color: #fff;
+  color: var(--on-brand);
   cursor: default;
 }
 
@@ -45,12 +45,12 @@
 }
 
 .eaten-btn:active:not(.on):not(:disabled) {
-  background: rgba(40, 167, 69, 0.1);
+  background: var(--eaten-hover-bg);
 }
 
 @media (hover: hover) {
   .eaten-btn:hover:not(.on):not(:disabled) {
-    background: rgba(40, 167, 69, 0.1);
+    background: var(--eaten-hover-bg);
   }
 }
 
@@ -105,7 +105,7 @@
 }
 
 .eaten-error {
-  color: var(--error, #dc3545);
+  color: var(--error);
   font-weight: 600;
 }
 
