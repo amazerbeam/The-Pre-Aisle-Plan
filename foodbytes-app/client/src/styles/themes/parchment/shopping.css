@@ -8,7 +8,7 @@
 /* ---------- the scroll ---------- */
 :root[data-theme="parchment"] .shopping-list-page {
   --sl-pad-x: 18px;
-  --sl-overhang: 0px;
+  --sl-overhang: 8px;
   max-width: 640px;
   margin: 0 auto;
   padding: 26px var(--sl-pad-x) 22px;
@@ -350,15 +350,16 @@
   border-color: var(--ink);
 }
 
+/* The cross is a drawn shape, not a glyph: the hand font's tall line box pushed a text ✗ out of
+   the square. A mask on this empty pseudo-element is safe (it contains no popup). */
 :root[data-theme="parchment"] .shopping-aisle .shopping-item.checked .tick-circle::after {
-  content: "✗";
+  content: "";
   position: absolute;
-  left: 1px;
-  top: -12px;
-  font-family: var(--f-hand);
-  font-size: 18px;
-  line-height: 1.4;
-  color: var(--wax);
+  inset: 2px;
+  background: var(--wax);
+  -webkit-mask: var(--hand-cross) center / contain no-repeat;
+  mask: var(--hand-cross) center / contain no-repeat;
+  rotate: -4deg;
 }
 
 :root[data-theme="parchment"] .shopping-aisle .shopping-item.checked .item-name,

@@ -2,6 +2,7 @@
 
 One line per ticket, newest first: `<version> — <ticket key>: <summary>`. Bump rules and how
 to check what is deployed: `CLAUDE.md` → Versioning & deploy verification.
+1.32.2 — parchment-tick-cross: Parchment Provisions ticked-item ✗ drawn inside its box instead of spilling out of it
 1.32.1 — parchment-swipe-showthrough: Parchment mobile day view no longer shows Replace/Move/Remove through the meal entries
 1.32.0 — 2026-11-15-parchment-theme: Parchment theme (The Kitchen Grimoire), a third selectable theme
 1.31.0 — 2026-11-14-cyberpunk-reskin: theme system + user menu v2 with theme picker; Cyberpunk (FOODBYTES Night Kitchen) theme, Low FX switch

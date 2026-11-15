@@ -232,7 +232,7 @@ button,input{font:inherit;color:inherit}
 .aisle h5 small{font-family:var(--f-body);font-style:italic;font-size:13px;color:var(--text-secondary);order:3}
 .item{display:flex;align-items:center;gap:12px;padding:5px 2px;border:0;background:none;width:100%;text-align:left;font-size:17px;border-bottom:1px solid var(--rule)}
 .box{width:18px;height:18px;flex:none;border:1.5px solid var(--text-primary);border-radius:1px 3px 2px 2px;position:relative}
-.item.on .box::after{content:"✗";position:absolute;left:1px;top:-12px;font-family:var(--f-hand);font-size:18px;color:var(--brand-primary)}
+.item.on .box::after{content:"";position:absolute;inset:2px;background:var(--brand-primary);-webkit-mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path d='M3.5 3.2C7 7.4 11.6 12.6 16.8 17' fill='none' stroke='black' stroke-width='2.6' stroke-linecap='round'/><path d='M16.4 3C12.5 7.2 8.4 11.8 3.2 16.6' fill='none' stroke='black' stroke-width='2.3' stroke-linecap='round'/></svg>") center/contain no-repeat;mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path d='M3.5 3.2C7 7.4 11.6 12.6 16.8 17' fill='none' stroke='black' stroke-width='2.6' stroke-linecap='round'/><path d='M16.4 3C12.5 7.2 8.4 11.8 3.2 16.6' fill='none' stroke='black' stroke-width='2.3' stroke-linecap='round'/></svg>") center/contain no-repeat;rotate:-4deg}
 .item .q{margin-left:auto;font-variant-numeric:oldstyle-nums;color:var(--text-secondary);font-style:italic}
 .item.on .n{text-decoration:line-through;color:var(--ink-faded)}
 .sealrow{display:flex;justify-content:space-between;align-items:center;margin-top:22px;gap:12px}
@@ -302,7 +302,7 @@ button,input{font:inherit;color:inherit}
 .mob .leaf.l,.mob .leaf.r{background-image:var(--noise)}
 .mob .amenu{position:absolute;left:0;right:0;top:auto;bottom:0;width:auto;border-radius:12px 12px 0 0;max-height:80%;overflow:auto}
 .mob .paper{padding:24px 18px 20px}
-.mob .rod{margin:0}.mob .rod::before{left:0}.mob .rod::after{right:0}
+.mob .rod{margin:0 -8px}
 .mob .scrollwrap{padding:4px 6px}
 </style>
 </head>
