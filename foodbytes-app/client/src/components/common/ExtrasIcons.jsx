@@ -2,6 +2,7 @@
 
 import { useTheme } from '../../contexts/ThemeContext'
 import PixelIcon from './PixelIcon'
+import EngravedIcon from './EngravedIcon'
 
 const svgProps = {
   viewBox: '0 0 24 24',
@@ -19,6 +20,7 @@ const svgProps = {
 export const CartIcon = ({ className }) => {
   const { theme } = useTheme()
   if (theme.iconSet === 'pixel') return <PixelIcon name="cart" size={14} className={className} />
+  if (theme.iconSet === 'engraved') return <EngravedIcon name="basket" size={14} className={className} />
   return (
     <svg className={className} {...svgProps}>
       <circle cx="9" cy="20" r="1.4" />

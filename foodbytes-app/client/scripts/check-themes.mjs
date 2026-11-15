@@ -54,6 +54,13 @@ const PAIRS = {
     ['line', 'panel', 3.0],
     ...AISLES.map((a) => [`aisle-${a}`, 'paper', 3.0]),
   ],
+  parchment: [
+    ...on(['text-primary', 'text-secondary', 'brand-primary'], ['bg-primary', 'bg-secondary'], 4.5),
+    ['on-brand', 'brand-primary', 4.5],
+    ...on(['leather-ink', 'gold'], ['leather'], 4.5),
+    ['focus-ink', 'page', 3.0],
+    ...AISLES.map((a) => [`aisle-${a}`, 'page', 3.0]),
+  ],
 }
 
 // Explicit, per-pair exceptions. Key: `<theme>|<fg>|<bg>`. Never add a Cyberpunk pair without a decision.
@@ -111,15 +118,17 @@ if (!bootIds || bootIds.join() !== registryIds.join()) {
   failures.push(`index.html boot list [${bootIds ?? 'not found'}] does not match THEMES [${registryIds}]`)
 }
 
-// The boot script's theme-color literals (t==='<id>'?'#hex':'#default') and the static meta tag must match the registry.
+// The boot script's theme-color map (var c={<id>:'#hex'} plus the ||'#default' fallback) and the static meta tag must match the registry.
 const defaultTheme = THEMES.find((t) => t.id === DEFAULT_THEME_ID)
 const metaColor = indexHtml.match(/name="theme-color" content="(#[0-9a-fA-F]+)"/)?.[1]
 if (metaColor !== defaultTheme.themeColor) failures.push(`index.html <meta theme-color> ${metaColor} does not match Default themeColor ${defaultTheme.themeColor}`)
-const bootFallback = indexHtml.match(/\.content=t===[^:]*:'(#[0-9a-fA-F]+)'/)?.[1]
+const bootMap = Object.fromEntries(
+  [...(indexHtml.match(/var c=\{([^}]*)\}/)?.[1] ?? '').matchAll(/(\w+):'(#[0-9a-fA-F]+)'/g)].map((m) => [m[1], m[2]])
+)
+const bootFallback = indexHtml.match(/c\[t\]\|\|'(#[0-9a-fA-F]+)'/)?.[1]
 if (bootFallback !== defaultTheme.themeColor) failures.push(`index.html boot script fallback colour ${bootFallback} does not match Default themeColor ${defaultTheme.themeColor}`)
 for (const theme of THEMES.filter((t) => t.id !== DEFAULT_THEME_ID)) {
-  const bootColor = indexHtml.match(new RegExp(`t==='${theme.id}'\\?'(#[0-9a-fA-F]+)'`))?.[1]
-  if (bootColor !== theme.themeColor) failures.push(`index.html boot script colour for ${theme.id} (${bootColor}) does not match its themeColor ${theme.themeColor}`)
+  if (bootMap[theme.id] !== theme.themeColor) failures.push(`index.html boot script colour for ${theme.id} (${bootMap[theme.id]}) does not match its themeColor ${theme.themeColor}`)
 }
 
 notes.forEach((message) => console.log(message))

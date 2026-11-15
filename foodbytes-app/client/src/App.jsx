@@ -51,7 +51,7 @@ function App() {
 
   return (
     <div className="app">
-      {theme.effects && <div className="city-rain" aria-hidden="true" />}
+      {theme.ambient && <div className={theme.ambient} aria-hidden="true" />}
       {!pipMode && (
         <>
           <Header />

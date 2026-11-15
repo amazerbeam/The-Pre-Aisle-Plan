@@ -2,9 +2,10 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import App from './App.jsx'
-// Theme CSS: order below is deliberate (global.css must stay after App's component CSS). Cyberpunk
-// overrides win on specificity (:root[data-theme] adds 0,2,0), not on import order.
+// Theme CSS: order below is deliberate (global.css must stay after App's component CSS). Cyberpunk and
+// Parchment overrides win on specificity (:root[data-theme] adds 0,2,0), not on import order.
 import './styles/themes/cyberpunk/index.css'
+import './styles/themes/parchment/index.css'
 import { AuthProvider } from './contexts/AuthContext.jsx'
 import { MealPlanProvider } from './contexts/MealPlanContext.jsx'
 import { PetProvider } from './contexts/PetContext.jsx'
@@ -16,6 +17,7 @@ import { applyLowFx, readLowFx } from './utils/lowFx'
 import './styles/themes/default.css'
 import './styles/global.css'
 import './styles/themes/cyberpunk.css'
+import './styles/themes/parchment.css'
 import './styles/themes/previews.css'
 
 applyTheme(readThemeId())

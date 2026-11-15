@@ -1,6 +1,8 @@
 import { usePet } from '../../contexts/PetContext'
 import { useTheme } from '../../contexts/ThemeContext'
 import PixelIcon from '../common/PixelIcon'
+import EngravedIcon from '../common/EngravedIcon'
+import { navLabel } from '../../utils/themeCopy'
 import PipHerb from '../pet/herb/PipHerb'
 import { hatMiniViewBox, hatOnly } from '../pet/herb/wardrobeLayers'
 import { PIP_DEFAULT_FORM } from '../../constants/pipGrowth'
@@ -11,6 +13,15 @@ const ICON_PROPS = { viewBox: '0 0 24 24', width: 24, height: 24, fill: 'none', 
 
 // Cyberpunk (iconSet 'pixel') draws the same three sections from the pixel grids.
 const NAV_ICON_NAMES = { recipes: 'menu', mealplan: 'cal', shopping: 'cart' }
+
+// Parchment (iconSet 'engraved') draws the same three sections as engraved glyphs.
+const NAV_ENGRAVED_NAMES = { recipes: 'book', mealplan: 'ledger', shopping: 'basket' }
+
+// One renderer per icon set; anything else falls back to the Default line icons.
+const NAV_ICON_RENDERERS = {
+  pixel: (key) => <PixelIcon name={NAV_ICON_NAMES[key]} size={24} />,
+  engraved: (key) => <EngravedIcon name={NAV_ENGRAVED_NAMES[key]} size={24} />,
+}
 
 const NAV_ICONS = {
   recipes: (
@@ -76,10 +87,8 @@ function AppNavItems({ variant = 'footer', items, message }) {
               </>
             ) : (
               <>
-                {theme.iconSet === 'pixel'
-                  ? <PixelIcon name={NAV_ICON_NAMES[item.key]} size={24} />
-                  : NAV_ICONS[item.key]}
-                <span>{item.label}</span>
+                {NAV_ICON_RENDERERS[theme.iconSet]?.(item.key) ?? NAV_ICONS[item.key]}
+                <span>{navLabel(theme, item.key, item.label)}</span>
               </>
             )}
           </button>

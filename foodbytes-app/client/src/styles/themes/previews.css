@@ -130,3 +130,62 @@
   height: 3px;
   background: #f9f002;
 }
+
+/* Parchment */
+.theme-preview--parchment {
+  background: #ead9b1;
+}
+
+.theme-preview--parchment .theme-preview__bar {
+  position: relative;
+  background: #3b2415;
+  border-bottom: 1px solid #d8b25a;
+}
+
+.theme-preview--parchment .theme-preview__bar::after {
+  content: "";
+  position: absolute;
+  left: 22%;
+  top: 100%;
+  width: 6px;
+  height: 9px;
+  background: #a3271a;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 72%, 0 100%);
+}
+
+.theme-preview--parchment .theme-preview__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #d8b25a;
+}
+
+.theme-preview--parchment .theme-preview__line {
+  width: 26px;
+  height: 3px;
+  background: #e9d6ac;
+  opacity: 0.85;
+}
+
+.theme-preview--parchment .theme-preview__ticker {
+  display: none;
+}
+
+.theme-preview--parchment .theme-preview__cards {
+  gap: 4px;
+  padding: 8px 5px 5px;
+}
+
+.theme-preview--parchment .theme-preview__card {
+  height: 28px;
+  background: #f7eed6;
+  box-shadow: 0 0 0 1px #c9ad78;
+}
+
+.theme-preview--parchment .theme-preview__card::after {
+  left: 4px;
+  right: 8px;
+  top: 5px;
+  height: 2px;
+  background: #5e4a32;
+}

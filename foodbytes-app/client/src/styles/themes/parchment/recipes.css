@@ -1,0 +1,521 @@
+/* Parchment recipes: pinned parchment slips, folder tabs, ink-dot macro chips, wax buttons, popovers.
+   Reference: foodbytes-app/mockup/parchment-theme.html (.card .vtabs .chips .tabs .search .inplan .cheat).
+   Selectors start with :root[data-theme="parchment"]. Popup header bars live in dialogs.css. */
+
+/* ---------- page heading (rendered only when the theme supplies copy.pages) ---------- */
+:root[data-theme="parchment"] .page-heading-title {
+  font-family: var(--f-display);
+  font-weight: 400;
+  font-size: 28px;
+  line-height: 1.05;
+  color: var(--text-primary);
+}
+
+:root[data-theme="parchment"] .page-sub {
+  font-family: var(--f-body);
+  font-style: italic;
+  font-size: 16px;
+  color: var(--ink-faded);
+}
+
+/* Flourish rule under the subtitle (decorative) */
+:root[data-theme="parchment"] .page-heading .page-sub::after {
+  content: "";
+  display: block;
+  width: 220px;
+  max-width: 100%;
+  height: 1px;
+  margin-top: 8px;
+  background: linear-gradient(90deg, var(--ink-light), transparent);
+}
+
+@media (min-width: 480px) {
+  :root[data-theme="parchment"] .page-heading-title {
+    font-size: 34px;
+  }
+}
+
+/* ---------- toolbar: folder tabs, quill-ink search ---------- */
+:root[data-theme="parchment"] .recipe-toolbar {
+  background: var(--page) var(--paper-noise);
+  border-bottom: 1px solid var(--border-color);
+  box-shadow: 0 6px 10px -10px rgba(60, 35, 10, 0.6);
+}
+
+:root[data-theme="parchment"] .recipe-tab {
+  background: transparent;
+  border: 1px solid transparent;
+  border-bottom: 0;
+  border-radius: 4px 4px 0 0;
+  color: var(--ink-faded);
+  font-family: var(--f-label);
+  font-size: 16px;
+}
+
+:root[data-theme="parchment"] .recipe-tab.on {
+  background: var(--page);
+  border-color: var(--border-color);
+  color: var(--wax);
+  font-weight: 400;
+  box-shadow: 0 1px 0 var(--page);
+}
+
+@media (hover: hover) {
+  :root[data-theme="parchment"] .recipe-tab:hover:not(.on) {
+    background: var(--surface-tint-soft);
+    color: var(--ink);
+  }
+}
+
+:root[data-theme="parchment"] .recipe-tab:active:not(.on) {
+  background: var(--surface-tint-pressed);
+}
+
+:root[data-theme="parchment"] .recipe-search {
+  background: transparent;
+  border: 0;
+  border-bottom: 1.5px solid var(--ink-faded);
+  border-radius: 0;
+  font-family: var(--f-display);
+  font-style: italic;
+  font-size: 17px;
+  color: var(--ink);
+}
+
+:root[data-theme="parchment"] .recipe-search:focus,
+:root[data-theme="parchment"] .recipe-search:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: 2px;
+  border-bottom-color: var(--wax);
+}
+
+:root[data-theme="parchment"] .recipe-chip {
+  border: 1px dashed var(--chip-dashed-border);
+  border-radius: 3px;
+  color: var(--wax);
+  font-family: var(--f-label);
+  font-size: 15px;
+}
+
+:root[data-theme="parchment"] .recipe-chip.on {
+  background: var(--brand-tint-soft);
+  border-style: solid;
+  border-color: var(--wax);
+  color: var(--wax);
+  font-weight: 400;
+}
+
+/* Primary buttons: sealing-wax gradient */
+:root[data-theme="parchment"] .recipe-add-btn,
+:root[data-theme="parchment"] .pick-btn,
+:root[data-theme="parchment"] .day-btn.selected .day-btn-face,
+:root[data-theme="parchment"] .extras-popup-button.confirm {
+  background: linear-gradient(180deg, var(--brand-primary-light), var(--brand-primary) 60%, var(--brand-primary-dark));
+  border: 1px solid var(--brand-primary-dark);
+  border-radius: 3px;
+  box-shadow: var(--wax-highlight);
+  color: var(--on-brand);
+  font-family: var(--f-label);
+  font-weight: 400;
+}
+
+@media (hover: hover) {
+  :root[data-theme="parchment"] .recipe-add-btn:hover,
+  :root[data-theme="parchment"] .pick-btn:hover,
+  :root[data-theme="parchment"] .extras-popup-button.confirm:hover {
+    background: linear-gradient(180deg, var(--brand-primary), var(--brand-primary-dark));
+    color: var(--on-brand);
+  }
+}
+
+:root[data-theme="parchment"] .recipe-add-btn:active,
+:root[data-theme="parchment"] .pick-btn:active {
+  background: var(--brand-primary-dark);
+}
+
+:root[data-theme="parchment"] .extras-popup-button.cancel {
+  background: transparent;
+  border: 1px solid var(--ink-light);
+  border-radius: 3px;
+  color: var(--ink);
+  font-family: var(--f-label);
+}
+
+:root[data-theme="parchment"] .recipe-add-btn:focus-visible,
+:root[data-theme="parchment"] .recipe-tab:focus-visible,
+:root[data-theme="parchment"] .recipe-chip:focus-visible,
+:root[data-theme="parchment"] .pick-btn:focus-visible,
+:root[data-theme="parchment"] .day-btn:focus-visible,
+:root[data-theme="parchment"] .week-tile:focus-visible,
+:root[data-theme="parchment"] .extras-popup-button:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: 2px;
+}
+
+/* ---------- messages ---------- */
+:root[data-theme="parchment"] .recipe-notice,
+:root[data-theme="parchment"] .recipe-hidden-note,
+:root[data-theme="parchment"] .picking-banner {
+  border-radius: 2px;
+  font-style: italic;
+}
+
+:root[data-theme="parchment"] .recipe-hidden-note {
+  border-color: var(--ink-light);
+  color: var(--ink-faded);
+}
+
+:root[data-theme="parchment"] .picking-banner button {
+  border-radius: 3px;
+  font-family: var(--f-label);
+}
+
+:root[data-theme="parchment"] .error-message {
+  border-radius: 2px;
+}
+
+:root[data-theme="parchment"] .recipe-notice button,
+:root[data-theme="parchment"] .recipe-retry-btn {
+  border-radius: 3px;
+  font-family: var(--f-label);
+  font-weight: 400;
+}
+
+/* ---------- week strip (pick-a-day): ledger strip ---------- */
+:root[data-theme="parchment"] .week-strip {
+  background: var(--page) var(--paper-noise);
+  border: 1px solid var(--border-color);
+  border-radius: 2px;
+  box-shadow: var(--page-shadow);
+}
+
+:root[data-theme="parchment"] .week-strip-head {
+  font-family: var(--f-label);
+  color: var(--ink-faded);
+}
+
+:root[data-theme="parchment"] .week-strip-gap {
+  font-style: italic;
+}
+
+:root[data-theme="parchment"] .week-tile {
+  border-radius: 3px;
+  font-family: var(--f-label);
+}
+
+:root[data-theme="parchment"] .week-tile-day {
+  font-weight: 400;
+  font-size: 14px;
+}
+
+:root[data-theme="parchment"] .week-tile-name {
+  font-family: var(--f-display);
+  font-style: italic;
+}
+
+:root[data-theme="parchment"] .week-tile-dot {
+  border-radius: 50% 45% 55% 50%;
+}
+
+:root[data-theme="parchment"] .week-tile.is-empty {
+  border-color: var(--gold-dim);
+}
+
+:root[data-theme="parchment"] .week-tile.is-picking {
+  background: linear-gradient(180deg, var(--brand-primary-light), var(--brand-primary-dark));
+  border-color: var(--brand-primary-dark);
+}
+
+/* ---------- recipe cards: pinned slips ---------- */
+:root[data-theme="parchment"] .recipe-card {
+  background: var(--page) var(--paper-noise);
+  border: 1px solid var(--border-color);
+  border-radius: 2px 3px 2px 4px;
+  box-shadow: var(--page-shadow);
+}
+
+/* A brass pin holds each slip to the board */
+:root[data-theme="parchment"] .recipe-card::before {
+  content: "";
+  position: absolute;
+  top: -7px;
+  left: 50%;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  transform: translateX(-50%);
+  background: radial-gradient(circle at 35% 30%, var(--gold), var(--gold-dim) 70%);
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+}
+
+/* Alternate tilt. Skipped while a card hosts its fixed extras popup, because a transform would
+   make the card the popup's containing block. */
+:root[data-theme="parchment"] body:not(.lowfx) .recipe-card:nth-child(3n+1):not(:has(.extras-popup-overlay)) {
+  rotate: -0.35deg;
+}
+
+:root[data-theme="parchment"] body:not(.lowfx) .recipe-card:nth-child(3n+2):not(:has(.extras-popup-overlay)) {
+  rotate: 0.3deg;
+}
+
+:root[data-theme="parchment"] .recipe-card.is-in-plan {
+  border-color: var(--plan-border);
+  box-shadow: var(--page-shadow);
+}
+
+:root[data-theme="parchment"] .recipe-card.is-hidden {
+  background: var(--parchment);
+}
+
+:root[data-theme="parchment"] .recipe-card-name {
+  font-family: var(--f-display);
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1.15;
+}
+
+:root[data-theme="parchment"] .recipe-card-top .audited-badge {
+  border-radius: 2px;
+  font-family: var(--f-label);
+  font-weight: 400;
+}
+
+/* In plan: a wax ribbon tag on the slip's edge */
+:root[data-theme="parchment"] .recipe-card .in-plan-badge {
+  position: absolute;
+  top: 12px;
+  right: -6px;
+  padding: 2px 12px 2px 8px;
+  background: var(--brand-primary);
+  border-radius: 0;
+  clip-path: polygon(0 0, 100% 0, 92% 50%, 100% 100%, 0 100%);
+  color: var(--on-brand);
+  font-family: var(--f-label);
+  font-size: 12px;
+  font-weight: 400;
+}
+
+/* Cheat badge: a small wax seal, tilted */
+:root[data-theme="parchment"] .recipe-card-top .cheat-badge {
+  display: inline-grid;
+  place-items: center;
+  min-width: 40px;
+  min-height: 40px;
+  padding: 4px;
+  border-radius: 48% 52% 50% 46% / 50% 45% 55% 50%;
+  background: var(--seal-grad);
+  box-shadow: inset 0 0 0 3px rgba(90, 15, 8, 0.55), 0 2px 3px rgba(0, 0, 0, 0.4);
+  color: #f3d2a8;
+  font-family: var(--f-label);
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 1;
+  text-align: center;
+  transform: rotate(-12deg);
+}
+
+:root[data-theme="parchment"] .recipe-card-menu-trigger {
+  color: var(--ink-faded);
+}
+
+:root[data-theme="parchment"] .recipe-card-menu-list {
+  background: var(--page) var(--paper-noise);
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  box-shadow: var(--page-shadow), 0 12px 24px rgba(30, 15, 0, 0.35);
+}
+
+:root[data-theme="parchment"] .recipe-card-menu-list button {
+  font-family: var(--f-display);
+  font-size: 16px;
+}
+
+/* ---------- variant tabs: small-caps, joined ---------- */
+:root[data-theme="parchment"] .variant-seg {
+  gap: 0;
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+}
+
+:root[data-theme="parchment"] .variant-seg button {
+  margin-left: -1px;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: 0;
+  color: var(--ink-faded);
+  font-family: var(--f-label);
+  font-size: 14px;
+}
+
+:root[data-theme="parchment"] .variant-seg button:first-child {
+  margin-left: 0;
+}
+
+:root[data-theme="parchment"] .variant-seg button b {
+  font-family: var(--f-body);
+  font-weight: 400;
+  color: var(--ink);
+}
+
+:root[data-theme="parchment"] .variant-seg button.on {
+  background: var(--ink);
+  border-color: var(--ink);
+  box-shadow: none;
+  color: var(--page);
+}
+
+:root[data-theme="parchment"] .variant-seg button.on b {
+  color: var(--page);
+}
+
+:root[data-theme="parchment"] .variant-single {
+  font-family: var(--f-label);
+  font-size: 14px;
+}
+
+:root[data-theme="parchment"] .variant-single b {
+  font-family: var(--f-body);
+  font-weight: 400;
+}
+
+/* ---------- macro chips: ink dots. The dot keeps the blue-under / red-over direction colours. ---------- */
+:root[data-theme="parchment"] .macro-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 3px;
+  background: transparent;
+  border-radius: 0;
+  font-family: var(--f-label);
+  font-size: 14px;
+  font-weight: 400;
+  font-variant-numeric: oldstyle-nums;
+}
+
+:root[data-theme="parchment"] .macro-chip::before {
+  content: "";
+  flex: none;
+  width: 9px;
+  height: 9px;
+  border-radius: 50% 45% 55% 50%;
+  background: var(--chip-dot, var(--ink-light));
+  box-shadow: 0 0 0 1.5px rgba(255, 255, 255, 0.4);
+}
+
+:root[data-theme="parchment"] .macro-chip--under { --chip-dot: var(--macro-under-target); }
+:root[data-theme="parchment"] .macro-chip--near { --chip-dot: var(--macro-near-target); }
+:root[data-theme="parchment"] .macro-chip--on { --chip-dot: var(--macro-on-target); }
+:root[data-theme="parchment"] .macro-chip--over { --chip-dot: var(--macro-over-target); }
+
+/* On the leather recipe header the chip sits on a page-coloured plate so its ink text stays legible */
+:root[data-theme="parchment"] .macro-chips--onDark .macro-chip,
+:root[data-theme="parchment"] .macro-chips--header .macro-chip {
+  padding: 2px 8px;
+  background: var(--macro-chip-solid-bg);
+  border-radius: 3px;
+}
+
+:root[data-theme="parchment"] .macro-chips--large .macro-chip {
+  font-size: 16px;
+}
+
+/* ---------- servings chip ---------- */
+:root[data-theme="parchment"] .servings-chip-trigger {
+  border-radius: 3px;
+  font-family: var(--f-label);
+  font-weight: 400;
+}
+
+:root[data-theme="parchment"] .servings-chip-popover {
+  background: var(--page) var(--paper-noise);
+  border: 1px solid var(--border-color);
+  border-top: 6px solid var(--leather);
+  border-radius: 3px;
+  box-shadow: var(--page-shadow), 0 10px 20px rgba(30, 15, 0, 0.35);
+}
+
+:root[data-theme="parchment"] .servings-chip-step {
+  border: 1px solid var(--ink-faded);
+  border-radius: 50%;
+  color: var(--ink);
+}
+
+:root[data-theme="parchment"] .servings-chip-input {
+  border-radius: 3px;
+  font-family: var(--f-body);
+}
+
+:root[data-theme="parchment"] .unhide-btn {
+  border-radius: 3px;
+  font-family: var(--f-label);
+  font-weight: 400;
+}
+
+/* ---------- day-assignment buttons (add to plan) ---------- */
+:root[data-theme="parchment"] .day-btn-face {
+  border-radius: 3px;
+  font-family: var(--f-label);
+}
+
+:root[data-theme="parchment"] .day-btn.already-selected .day-btn-face {
+  border-style: dashed;
+}
+
+/* ---------- popovers and popups: parchment card, leather header (see dialogs.css) ---------- */
+:root[data-theme="parchment"] .extras-popup-modal,
+:root[data-theme="parchment"] .macro-target-popup {
+  background: var(--page) var(--paper-noise);
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  box-shadow: var(--popup-shadow);
+}
+
+:root[data-theme="parchment"] .extras-popup-instruction {
+  border-radius: 2px;
+  font-style: italic;
+}
+
+:root[data-theme="parchment"] .extras-label-text {
+  font-family: var(--f-display);
+}
+
+:root[data-theme="parchment"] .extras-checkbox:focus-visible + .extras-checkbox-custom {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: 2px;
+}
+
+:root[data-theme="parchment"] .macro-target-heading h4 {
+  font-family: var(--f-brand);
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+:root[data-theme="parchment"] .macro-target-subtitle {
+  font-style: italic;
+}
+
+:root[data-theme="parchment"] .macro-target-close:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+:root[data-theme="parchment"] .macro-target-section {
+  border-color: var(--rule);
+}
+
+:root[data-theme="parchment"] .macro-target-pill {
+  border-radius: 3px;
+  font-family: var(--f-label);
+}
+
+:root[data-theme="parchment"] .macro-target-value {
+  font-family: var(--f-display);
+  font-variant-numeric: oldstyle-nums;
+}
+
+:root[data-theme="parchment"] .macro-target-why,
+:root[data-theme="parchment"] .macro-target-sources li {
+  font-style: italic;
+}

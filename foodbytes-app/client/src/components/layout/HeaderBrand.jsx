@@ -2,10 +2,11 @@ import { useNavigate } from 'react-router-dom'
 import { useTheme } from '../../contexts/ThemeContext'
 import BrandMark from '../common/BrandMark'
 import PixelBrandMark from '../common/PixelBrandMark'
+import EngravedBrandMark from '../common/EngravedBrandMark'
 import { RECIPES_PATH } from '../../constants/appRoutes'
 
 // Keyed by the registry's iconSet field, never by theme id.
-const MARKS = { line: BrandMark, pixel: PixelBrandMark }
+const MARKS = { line: BrandMark, pixel: PixelBrandMark, engraved: EngravedBrandMark }
 
 /**
  * FR-039: the header brand navigates to Recipes. The mark and wordmark follow the active theme:

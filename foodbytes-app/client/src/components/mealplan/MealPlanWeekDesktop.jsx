@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
+import { useTheme } from '../../contexts/ThemeContext'
 import useMealEntryActions from '../../hooks/useMealEntryActions'
 import UndoToast from '../common/UndoToast'
 import WeekSummary from './WeekSummary'
@@ -10,11 +11,14 @@ import ServingsSheet from './ServingsSheet'
 import MoveMealSheet from './MoveMealSheet'
 import { slotsForWeek } from '../../utils/mealPlanDayUtils'
 import { getEmojiForMeal } from '../../utils/emojiUtils'
+import { pageCopy } from '../../utils/themeCopy'
 import './MealPlanWeekDesktop.css'
 
 /** Desktop week view: summary tiles, then a timetable of rows (meals) x columns (days). */
 function MealPlanWeekDesktop({ weekPlan, onSwap, onOpenDayMacros, onOpenWeekMacros, toolbarHandlers }) {
   const { mealTimes } = useAuth()
+  const { theme } = useTheme()
+  const heading = pageCopy(theme, 'mealplan')
   const actions = useMealEntryActions()
   const [servingsEntry, setServingsEntry] = useState(null)
   const [moveEntry, setMoveEntry] = useState(null)
@@ -26,7 +30,8 @@ function MealPlanWeekDesktop({ weekPlan, onSwap, onOpenDayMacros, onOpenWeekMacr
   return (
     <div className="week-desktop">
       <div className="week-desktop-title">
-        <h2>Meal Plan</h2>
+        <h2>{heading?.title ?? 'Meal Plan'}</h2>
+        {heading?.sub && <span className="page-sub">{heading.sub}</span>}
         <MealPlanToolbar {...toolbarHandlers} />
       </div>
 

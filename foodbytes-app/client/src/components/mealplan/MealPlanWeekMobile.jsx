@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTheme } from '../../contexts/ThemeContext'
 import useMealEntryActions from '../../hooks/useMealEntryActions'
 import useSwipeHint from '../../hooks/useSwipeHint'
 import UndoToast from '../common/UndoToast'
@@ -15,6 +16,7 @@ import MoveMealSheet from './MoveMealSheet'
 import ServingsSheet from './ServingsSheet'
 import { getTodayISO } from '../../utils/dateUtils'
 import { getEmojiForMeal } from '../../utils/emojiUtils'
+import { pageCopy } from '../../utils/themeCopy'
 import { isDayTickable, slotsForWeek, todayOrFirstDay } from '../../utils/mealPlanDayUtils'
 import { recipesForMealPath } from '../../constants/mealPlanUi'
 import './MealPlanWeekMobile.css'
@@ -24,6 +26,8 @@ const initialDate = (weekPlan) => todayOrFirstDay(weekPlan)?.date
 /** Mobile week view: header (menu, week bar, day chips) over one selected day's meals with swipe actions. */
 function MealPlanWeekMobile({ weekPlan, onOpenDayMacros, onOpenWeekMacros, menuHandlers }) {
   const navigate = useNavigate()
+  const { theme } = useTheme()
+  const heading = pageCopy(theme, 'mealplan')
   const actions = useMealEntryActions()
   const { showHint, markSeen } = useSwipeHint()
   const days = weekPlan.days || []
@@ -61,7 +65,8 @@ function MealPlanWeekMobile({ weekPlan, onOpenDayMacros, onOpenWeekMacros, menuH
     <div className="week-mobile">
       <div className="m-head">
         <div className="m-top">
-          <h2>Meal Plan</h2>
+          <h2>{heading?.title ?? 'Meal Plan'}</h2>
+          {heading?.sub && <span className="page-sub">{heading.sub}</span>}
           <MealPlanMenu {...menuHandlers} />
         </div>
         <MobileWeekBar weekPlan={weekPlan} onOpen={onOpenWeekMacros} />

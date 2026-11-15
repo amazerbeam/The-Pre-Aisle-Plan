@@ -1,0 +1,666 @@
+/* Parchment shell: page surface, leather header and footer with ribbon markers, wax-seal avatar,
+   account menu, sealed-note toasts, sign-in dialog, candlelight layer.
+   Reference: foodbytes-app/mockup/parchment-theme.html (.hdr .hnav .seal .bnav .amenu .toast).
+   Selectors start with :root[data-theme="parchment"]; the only exception is the base element
+   defaults, written as :where(...) so every component class still wins over them.
+   Low FX is body.lowfx: it hides the candlelight layer and stops the theme's animations. */
+
+/* ---------- base element defaults ---------- */
+:where(:root[data-theme="parchment"]) body {
+  font-family: var(--f-body);
+  font-size: 17px;
+  color: var(--text-primary);
+  background-color: var(--parchment);
+  background-image: var(--paper-noise), var(--paper-stains);
+  font-variant-numeric: oldstyle-nums;
+}
+
+:where(:root[data-theme="parchment"]) h1,
+:where(:root[data-theme="parchment"]) h2,
+:where(:root[data-theme="parchment"]) h3 {
+  font-family: var(--f-display);
+  font-weight: 400;
+}
+
+:where(:root[data-theme="parchment"]) button {
+  color: inherit;
+  font-family: inherit;
+}
+
+:where(:root[data-theme="parchment"]) input:where(:not([type="checkbox"], [type="radio"], [type="range"], [type="color"], [type="file"])),
+:where(:root[data-theme="parchment"]) select,
+:where(:root[data-theme="parchment"]) textarea {
+  background: var(--surface-input);
+  color: var(--ink);
+  border-color: var(--border-color);
+  font-family: var(--f-body);
+  caret-color: var(--wax);
+}
+
+:root[data-theme="parchment"] ::placeholder {
+  color: var(--text-placeholder);
+  opacity: 1;
+}
+
+:root[data-theme="parchment"] input:-webkit-autofill,
+:root[data-theme="parchment"] input:-webkit-autofill:focus,
+:root[data-theme="parchment"] select:-webkit-autofill,
+:root[data-theme="parchment"] textarea:-webkit-autofill {
+  -webkit-text-fill-color: var(--ink);
+  caret-color: var(--wax);
+  -webkit-box-shadow: 0 0 0 1000px var(--page) inset;
+  box-shadow: 0 0 0 1000px var(--page) inset;
+}
+
+/* ---------- candlelight: vignette that breathes + rising motes (opacity / transform only) ----------
+   The mockup draws this layer over the content (.fx z-index 3 above .scroll), so it stays above it
+   here; the edge alpha is cut from 0.28 to 0.16 so text at the screen edge stays readable. It is a
+   fixed, pointer-events:none layer and .main-content is not made a stacking context, so popups are not trapped. */
+:root[data-theme="parchment"] .candlelight {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+:root[data-theme="parchment"] .candlelight::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 40%, transparent 55%, rgba(70, 40, 10, 0.16) 100%);
+  animation: candle-flicker 5s ease-in-out infinite;
+}
+
+:root[data-theme="parchment"] .candlelight::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 100%;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  box-shadow: 12vw -8vh 4px rgba(255, 228, 170, 0.8), 30vw -20vh 4px rgba(255, 228, 170, 0.7),
+    55vw -12vh 4px rgba(255, 228, 170, 0.75), 72vw -26vh 4px rgba(255, 228, 170, 0.6),
+    88vw -6vh 4px rgba(255, 228, 170, 0.7), 44vw -34vh 4px rgba(255, 228, 170, 0.55);
+  animation: candle-motes 16s linear infinite;
+}
+
+@keyframes candle-flicker {
+  0%, 100% { opacity: 1; }
+  22% { opacity: 0.82; }
+  25% { opacity: 0.95; }
+  61% { opacity: 0.86; }
+  64% { opacity: 1; }
+}
+
+@keyframes candle-motes {
+  from { transform: translateY(0); opacity: 0; }
+  15% { opacity: 1; }
+  to { transform: translateY(-70vh); opacity: 0; }
+}
+
+/* Low FX: no candlelight and no theme animation. Only the animations Parchment itself defines are
+   stopped (book-open, ink-blot); functional spinners and component transitions are left alone. */
+:root[data-theme="parchment"] body.lowfx .candlelight {
+  display: none;
+}
+
+:root[data-theme="parchment"] body.lowfx .recipe-view-modal,
+:root[data-theme="parchment"] body.lowfx .recipe-view-modal .step.done .num::before {
+  animation: none !important;
+}
+
+/* Reduced motion: the layer goes away and the theme's own animations stop */
+@media (prefers-reduced-motion: reduce) {
+  :root[data-theme="parchment"] .candlelight {
+    display: none;
+  }
+
+  :root[data-theme="parchment"] .recipe-view-modal,
+  :root[data-theme="parchment"] .recipe-view-modal .step.done .num::before {
+    animation: none !important;
+  }
+}
+
+/* ---------- header: leather binding, gold tooling ---------- */
+:root[data-theme="parchment"] .header {
+  background: var(--paper-noise), var(--leather-grad);
+  color: var(--gold);
+  border-bottom: 3px double var(--gold-dim);
+  box-shadow: 0 6px 16px -6px rgba(40, 20, 5, 0.7);
+}
+
+/* Dashed stitching inset from the edge */
+:root[data-theme="parchment"] .header::after {
+  content: "";
+  position: absolute;
+  inset: 5px 6px;
+  border: 1px dashed rgba(216, 178, 90, 0.35);
+  border-radius: 3px;
+  pointer-events: none;
+}
+
+:root[data-theme="parchment"] .header-content {
+  position: relative;
+  z-index: 1;
+  gap: 14px;
+}
+
+@media (min-width: 768px) {
+  :root[data-theme="parchment"] .header-content {
+    min-height: 72px;
+    padding: 0 16px;
+  }
+}
+
+:root[data-theme="parchment"] .brand-btn:focus-visible,
+:root[data-theme="parchment"] .header-btn:focus-visible,
+:root[data-theme="parchment"] .avatar-btn:focus-visible,
+:root[data-theme="parchment"] .sign-in-btn-pill:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Brand: quill crest + engraved name */
+:root[data-theme="parchment"] .brand-btn {
+  min-width: 0;
+  color: var(--gold);
+  text-align: left;
+}
+
+:root[data-theme="parchment"] .brand-btn .brand-mark {
+  width: 36px;
+  height: 36px;
+  color: var(--gold);
+  filter: none;
+}
+
+:root[data-theme="parchment"] .brand-sign {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1;
+}
+
+:root[data-theme="parchment"] .brand-sign .brand-word {
+  display: block;
+  font-family: var(--f-brand);
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.02em;
+  color: var(--gold);
+  text-shadow: 0 1px 0 #000, 0 0 10px rgba(216, 178, 90, 0.25);
+  white-space: nowrap;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (min-width: 400px) {
+  :root[data-theme="parchment"] .brand-sign .brand-word {
+    font-size: 17px;
+  }
+}
+
+:root[data-theme="parchment"] .brand-sub {
+  display: none;
+  margin-top: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: var(--f-display);
+  font-style: italic;
+  font-size: 12.5px;
+  color: var(--leather-ink);
+  white-space: nowrap;
+}
+
+@media (min-width: 768px) {
+  :root[data-theme="parchment"] .brand-sign .brand-word {
+    font-size: 21px;
+  }
+
+  :root[data-theme="parchment"] .brand-sub {
+    display: block;
+  }
+}
+
+@media (max-width: 359px) {
+  :root[data-theme="parchment"] .brand-sign .brand-word {
+    font-size: 13px;
+  }
+}
+
+/* Header nav (desktop): small-caps labels; the active tab hangs a wax ribbon below the binding */
+:root[data-theme="parchment"] .header-btn {
+  position: relative;
+  gap: 7px;
+  padding: 8px 12px;
+  background: transparent;
+  border-radius: 4px;
+  color: var(--leather-ink);
+  font-family: var(--f-label);
+  font-size: 16px;
+  font-weight: 400;
+}
+
+:root[data-theme="parchment"] .header-btn:active {
+  background: var(--on-brand-hover-bg);
+  color: #fff1cf;
+}
+
+@media (hover: hover) {
+  :root[data-theme="parchment"] .header-btn:hover {
+    background: transparent;
+    color: #fff1cf;
+  }
+}
+
+:root[data-theme="parchment"] .header-btn.active,
+:root[data-theme="parchment"] .header-btn.active:active {
+  background: transparent;
+  color: #fff6dd;
+}
+
+:root[data-theme="parchment"] .header-btn.active::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -25px;
+  width: 16px;
+  height: 22px;
+  transform: translateX(-50%);
+  background: var(--ribbon-grad);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 76%, 0 100%);
+  pointer-events: none;
+}
+
+:root[data-theme="parchment"] .header-nav-message {
+  border: 1px solid var(--gold-dim);
+  border-radius: 3px;
+  font-family: var(--f-display);
+  font-style: italic;
+}
+
+/* Avatar: a wax seal pressed into the binding */
+:root[data-theme="parchment"] .avatar-btn {
+  border-radius: 48% 52% 50% 46% / 50% 45% 55% 50%;
+}
+
+:root[data-theme="parchment"] .avatar-btn .avatar,
+:root[data-theme="parchment"] .avatar-btn .avatar-placeholder,
+:root[data-theme="parchment"] .user-menu__avatar {
+  border: 0;
+  border-radius: 48% 52% 50% 46% / 50% 45% 55% 50%;
+  box-shadow: inset 0 0 0 4px rgba(90, 15, 8, 0.55), inset 0 0 0 5px rgba(230, 140, 110, 0.25), 0 2px 4px rgba(0, 0, 0, 0.45);
+}
+
+:root[data-theme="parchment"] .avatar-btn .avatar-placeholder,
+:root[data-theme="parchment"] .user-menu__avatar--placeholder {
+  background: var(--seal-grad);
+  color: var(--avatar-text);
+  font-family: var(--f-brand);
+  font-weight: 700;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.5);
+}
+
+/* Photo avatars keep the photo, ringed like a seal */
+:root[data-theme="parchment"] .avatar-btn img.avatar,
+:root[data-theme="parchment"] img.user-menu__avatar {
+  border: 2px solid var(--avatar-ring);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.45);
+}
+
+:root[data-theme="parchment"] .sign-in-btn-pill {
+  background: var(--ribbon-grad);
+  border: 1px solid var(--wax-deep);
+  border-radius: 3px;
+  color: var(--on-brand);
+  font-family: var(--f-label);
+  font-size: 15px;
+  font-weight: 400;
+}
+
+@media (hover: hover) {
+  :root[data-theme="parchment"] .sign-in-btn-pill:hover {
+    background: var(--ribbon-grad);
+    color: #fff;
+    transform: none;
+  }
+}
+
+:root[data-theme="parchment"] .sign-in-btn-pill:active {
+  background: var(--wax-deep);
+  color: var(--on-brand);
+}
+
+/* ---------- account menu: a parchment card ---------- */
+:root[data-theme="parchment"] .user-menu {
+  background: var(--page) var(--paper-noise);
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  box-shadow: var(--page-shadow), 0 18px 36px rgba(30, 15, 0, 0.45);
+  font-family: var(--f-body);
+}
+
+:root[data-theme="parchment"] .user-menu--sheet {
+  border-width: 1px 0 0;
+  border-radius: 12px 12px 0 0;
+}
+
+:root[data-theme="parchment"] .user-menu__grab {
+  background: var(--ink-light);
+}
+
+:root[data-theme="parchment"] .user-menu__who {
+  background: transparent;
+  border-bottom: 1px solid var(--ink-light);
+}
+
+:root[data-theme="parchment"] .user-menu__name {
+  font-family: var(--f-display);
+  font-size: 1.15rem;
+  font-weight: 400;
+}
+
+:root[data-theme="parchment"] .user-menu__email {
+  font-style: italic;
+}
+
+:root[data-theme="parchment"] .user-menu__close {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  color: var(--ink-faded);
+  font-family: var(--f-label);
+}
+
+:root[data-theme="parchment"] .user-menu__section {
+  border-top: 1px solid var(--rule);
+}
+
+:root[data-theme="parchment"] .user-menu__section h3 {
+  font-family: var(--f-label);
+  font-size: 15px;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--wax);
+}
+
+:root[data-theme="parchment"] .user-menu__row small,
+:root[data-theme="parchment"] .user-menu__saved {
+  font-style: italic;
+}
+
+:root[data-theme="parchment"] .user-menu .default-portions-btn,
+:root[data-theme="parchment"] .user-menu .meal-times-input,
+:root[data-theme="parchment"] .user-menu .default-portions-input {
+  border-radius: 3px;
+}
+
+:root[data-theme="parchment"] .user-menu .default-portions-btn {
+  color: var(--wax);
+}
+
+/* Theme picker tiles: the chosen one is circled in wax */
+:root[data-theme="parchment"] .theme-tile {
+  border-radius: 3px;
+  font-family: var(--f-label);
+}
+
+:root[data-theme="parchment"] .theme-tile[aria-checked="true"] {
+  border-color: var(--wax);
+  box-shadow: inset 0 0 0 1px var(--wax);
+}
+
+:root[data-theme="parchment"] .theme-tile .theme-preview {
+  border-radius: 2px;
+}
+
+:root[data-theme="parchment"] .theme-tile__tick {
+  border-radius: 50%;
+  background: var(--wax);
+  color: var(--on-brand);
+}
+
+/* Low FX switch: ink track, wax when on */
+:root[data-theme="parchment"] .lowfx-switch::before {
+  border: 1.5px solid var(--ink-faded);
+  background: var(--parchment);
+}
+
+:root[data-theme="parchment"] .lowfx-switch::after {
+  background: var(--ink-faded);
+}
+
+:root[data-theme="parchment"] .lowfx-switch[aria-checked="true"]::before {
+  background: var(--wax);
+  border-color: var(--wax);
+}
+
+:root[data-theme="parchment"] .lowfx-switch[aria-checked="true"]::after {
+  background: var(--on-brand);
+}
+
+:root[data-theme="parchment"] .user-menu__signout {
+  border-top: 1px solid var(--rule);
+  color: var(--wax);
+  font-family: var(--f-label);
+  font-size: 16px;
+}
+
+:root[data-theme="parchment"] .version-info {
+  font-style: italic;
+  font-size: 13px;
+  color: var(--ink-faded);
+  border-top: 1px solid var(--rule);
+}
+
+/* ---------- footer nav (mobile / tablet): leather, the active tab hangs a ribbon above ---------- */
+:root[data-theme="parchment"] .footer {
+  background: var(--paper-noise), linear-gradient(0deg, var(--leather-dark), var(--leather));
+  border-top: 3px double var(--gold-dim);
+  box-shadow: 0 -6px 16px -6px rgba(40, 20, 5, 0.6);
+}
+
+:root[data-theme="parchment"] .footer-message {
+  background: var(--leather-dark);
+  color: var(--leather-ink);
+  font-family: var(--f-display);
+  font-style: italic;
+}
+
+:root[data-theme="parchment"] .footer-nav {
+  padding: 6px 0;
+}
+
+:root[data-theme="parchment"] .footer-btn {
+  min-width: 68px;
+  min-height: 48px;
+  background: transparent;
+  border-radius: 4px;
+  color: var(--leather-ink);
+}
+
+:root[data-theme="parchment"] .footer-btn span {
+  font-family: var(--f-label);
+  font-size: 13px;
+  font-weight: 400;
+}
+
+:root[data-theme="parchment"] .footer-btn:active {
+  background: var(--on-brand-hover-bg);
+  color: #fff1cf;
+}
+
+@media (hover: hover) {
+  :root[data-theme="parchment"] .footer-btn:hover {
+    background: var(--on-brand-hover-bg);
+    color: #fff1cf;
+  }
+}
+
+:root[data-theme="parchment"] .footer-btn:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: -2px;
+}
+
+:root[data-theme="parchment"] .footer-btn.active,
+:root[data-theme="parchment"] .footer-btn.active:active {
+  background: transparent;
+  color: #fff6dd;
+}
+
+/* The ribbon replaces Default's underline bar */
+:root[data-theme="parchment"] .footer-btn.active::after {
+  top: -9px;
+  bottom: auto;
+  width: 14px;
+  height: 18px;
+  background: var(--ribbon-grad);
+  border-radius: 0;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 76%, 0 100%);
+}
+
+/* ---------- toasts: a sealed note ---------- */
+:root[data-theme="parchment"] .toast,
+:root[data-theme="parchment"] .meal-toast {
+  max-width: calc(100vw - 24px);
+  background: var(--page) var(--paper-noise);
+  border: 1px solid var(--border-color);
+  border-radius: 2px;
+  box-shadow: 0 12px 26px rgba(30, 15, 0, 0.4);
+  color: var(--ink);
+  font-family: var(--f-display);
+  font-style: italic;
+}
+
+:root[data-theme="parchment"] .toast::before,
+:root[data-theme="parchment"] .meal-toast::before {
+  content: "";
+  flex: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 48% 52% 50% 46% / 50% 45% 55% 50%;
+  background: var(--seal-grad);
+  box-shadow: inset 0 0 0 3px rgba(90, 15, 8, 0.55), 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+:root[data-theme="parchment"] .toast.toast-success::before {
+  background: radial-gradient(circle at 38% 32%, #6a9a5e, var(--verdigris) 55%, #284a25);
+}
+
+:root[data-theme="parchment"] .toast .toast-message {
+  font-size: 1.05rem;
+  font-weight: 400;
+}
+
+:root[data-theme="parchment"] .toast .toast-close {
+  width: 44px;
+  height: 44px;
+  font-size: 1.4rem;
+}
+
+:root[data-theme="parchment"] .meal-toast .meal-toast-undo {
+  padding: 0 12px;
+  background: var(--wax);
+  border-radius: 3px;
+  color: var(--on-brand);
+  font-family: var(--f-label);
+}
+
+/* ---------- sign-in dialog: parchment sheet, leather top bar ---------- */
+:root[data-theme="parchment"] .modal-overlay {
+  background: var(--scrim-bg);
+}
+
+:root[data-theme="parchment"] .modal-overlay > .modal-content {
+  max-height: calc(100vh - 24px);
+  max-height: calc(100dvh - 24px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--page) var(--paper-noise);
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  box-shadow: var(--page-shadow), 0 30px 60px rgba(0, 0, 0, 0.5);
+  color: var(--ink);
+}
+
+:root[data-theme="parchment"] .modal-overlay > .modal-content::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 10px;
+  background: var(--paper-noise), var(--leather-grad);
+  border-bottom: 2px solid var(--gold-dim);
+  pointer-events: none;
+}
+
+:root[data-theme="parchment"] .modal-close {
+  min-width: 44px;
+  min-height: 44px;
+  color: var(--ink-faded);
+}
+
+:root[data-theme="parchment"] .modal-header h2 {
+  font-family: var(--f-brand);
+  font-weight: 700;
+  font-size: 1.35rem;
+  color: var(--wax);
+}
+
+:root[data-theme="parchment"] .modal-header p {
+  font-style: italic;
+}
+
+:root[data-theme="parchment"] .benefits {
+  background: var(--surface-tint-faint);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+}
+
+:root[data-theme="parchment"] .benefits h3 {
+  font-family: var(--f-label);
+  font-size: 1rem;
+  color: var(--wax);
+}
+
+:root[data-theme="parchment"] .google-signin-btn,
+:root[data-theme="parchment"] .guest-btn {
+  border-radius: 3px;
+}
+
+:root[data-theme="parchment"] .guest-btn {
+  border-color: var(--border-color);
+  font-family: var(--f-label);
+}
+
+:root[data-theme="parchment"] .password-form input {
+  border-radius: 3px;
+}
+
+:root[data-theme="parchment"] .password-submit-btn {
+  min-height: 48px;
+  background: linear-gradient(180deg, var(--brand-primary-light), var(--brand-primary) 60%, var(--brand-primary-dark));
+  border-radius: 3px;
+  color: var(--on-brand);
+  font-family: var(--f-label);
+}
+
+/* Mobile: bottom sheet, capped to the viewport, scrolls inside */
+@media (max-width: 767px) {
+  :root[data-theme="parchment"] .modal-overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  :root[data-theme="parchment"] .modal-overlay > .modal-content {
+    max-width: none;
+    border-width: 1px 0 0;
+    border-radius: 12px 12px 0 0;
+    padding-bottom: calc(var(--spacing-xl) + env(safe-area-inset-bottom, 0px));
+  }
+}

@@ -338,8 +338,8 @@ const RECIPES=[
  R('pita','Pita Bread','extras','🫓',[V('',180,6,34,3)],[]),
 ];
 const RB=Object.fromEntries(RECIPES.map(r=>[r.id,r]));
-const MEALS=[{k:'breakfast',l:'Breakfast',t:'8 o’clock'},{k:'lunch',l:'Luncheon',t:'1 o’clock'},{k:'dinner',l:'Supper',t:'7 o’clock'}];
-const AISLE={produce:'Garden & Orchard',meat:'Butcher & Fishmonger',dairy:'Dairy & Eggs',bakery:'Baker',grains:'Grains & Pasta',canned:'Tins & Jars',spices:'Herbs & Spices',frozen:'Ice House'};
+const MEALS=[{k:'breakfast',l:'Breakfast',t:'8 o’clock'},{k:'lunch',l:'Lunch',t:'1 o’clock'},{k:'dinner',l:'Dinner',t:'7 o’clock'}];
+const AISLE={produce:'Produce',meat:'Meat & Fish',dairy:'Dairy & Eggs',bakery:'Bakery',grains:'Grains & Pasta',canned:'Tins & Jars',spices:'Herbs & Spices',frozen:'Frozen'};
 const PLAN={
  '2026-11-09':{breakfast:['porr',1],lunch:['shaw',1],dinner:['curry',1]},
  '2026-11-10':{breakfast:['oats',1],lunch:['caes',0],dinner:['padt',1]},
@@ -400,7 +400,7 @@ function recipesPage(mob){
   const list=RECIPES.filter(r=>r.meal===U.meal&&(!q||r.name.toLowerCase().includes(q)));
   return `<div class="page"><div class="board-head"><div><h2 class="title">The Receipt Book</h2><span class="title-sub">Tried &amp; true dishes, set down in good ink</span>${FLOUR}</div>
     <label class="search">${ICO.glass}<input data-a2="q" value="${esc(U.q)}" placeholder="Seek a receipt…" aria-label="Search recipes"></label></div>
-  <div class="tabs" role="tablist">${['breakfast','lunch','dinner','snacks','extras'].map(m=>`<button role="tab" aria-selected="${U.meal===m}" class="${U.meal===m?'on':''}" data-a="meal" data-v="${m}">${{breakfast:'Breakfast',lunch:'Luncheon',dinner:'Supper',snacks:'Morsels',extras:'Extras'}[m]}</button>`).join('')}</div>
+  <div class="tabs" role="tablist">${['breakfast','lunch','dinner','snacks','extras'].map(m=>`<button role="tab" aria-selected="${U.meal===m}" class="${U.meal===m?'on':''}" data-a="meal" data-v="${m}">${{breakfast:'Breakfast',lunch:'Lunch',dinner:'Dinner',snacks:'Snacks',extras:'Extras'}[m]}</button>`).join('')}</div>
   <div class="grid">${list.map(card).join('')||'<p class="title-sub">No receipt by that name in this book.</p>'}</div></div>`}
 function card(r){
   const vi=U.cardVar[r.id]??(r.vars.length>1?1:0),x=v(r,vi);
@@ -527,7 +527,7 @@ document.getElementById('notes').innerHTML=`
 <li><b>Recipes</b> → “The Receipt Book” (<i>receipt</i> is the old word for recipe). Cards are pinned parchment slips with sepia-toned emoji in an etched roundel. Cheat meals get a wax seal.</li>
 <li><b>Meal plan</b> → “The Week’s Ledger”: a ruled account book, with “today” in handwriting and “✓ eaten” inked on past days. Macro status shows as coloured ink dots.</li>
 <li><b>Recipe view</b> → an open leather-bound book: ingredients on the left page with dotted leaders, the method on the right with a red drop cap and Roman numerals. Ticked steps are struck through in ink. Linked homemade extras get a margin note.</li>
-<li><b>Shopping</b> → “Provisions”: a scroll on wooden rods, aisles renamed (Garden &amp; Orchard, Butcher &amp; Fishmonger…). Ticked items get a hand-drawn ✗.</li>
+<li><b>Shopping</b> → “Provisions”: a scroll on wooden rods, aisles keep their plain names. Ticked items get a hand-drawn ✗.</li>
 <li><b>Pip</b>: unchanged (it keeps its own palette in every theme).</li>
 </ul>
 <h3>Type (all Google Fonts, SIL OFL / Apache)</h3>
@@ -542,7 +542,7 @@ document.getElementById('notes').innerHTML=`
 <li class="yes">✓ Generic period motifs: parchment, quills, wax seals, leather, candlelight, drop caps, Roman numerals</li>
 <li class="yes">✓ Open-licence fonts only</li>
 <li class="no">✗ No franchise names, places, houses, crests, characters or spells, and no lightning bolts, owls-as-post or wands</li>
-<li class="no">✗ No fan-made lookalike fonts (“Harry P”, “Lumos”): the franchise’s lettering is a protected trademark</li>
+<li class="no">✗ No fan-made lookalike fonts: a franchise’s lettering is a protected trademark</li>
 <li class="no">✗ The theme label is never the franchise name</li>
 </ul>
 <h3>Registry entry (constants/themes.js)</h3>
@@ -551,10 +551,12 @@ document.getElementById('notes').innerHTML=`
   effects:true, ticker:false,
   brand:{ name:'The Kitchen Grimoire',
     sub:'Receipts, provisions & the weekly almanac' } }</code>
+<h3>Synced with the implementation (2026-11-15)</h3>
+<ul><li>Meal labels (Breakfast / Lunch / Dinner / Snacks) and aisle names are the app’s plain names; themed meal and aisle renames were deferred.</li><li>Registry also carries <code>ambient:'candlelight'</code> and <code>copy</code> (nav + page headings), read through <code>utils/themeCopy.js</code>.</li></ul>
 <h3>Open questions</h3>
 <ul>
 <li>Theme name: “Parchment”, “Grimoire” or “Apothecary”?</li>
-<li>Do we want the renamed copy (Receipts / Ledger / Provisions / Supper)? It’s fun, but less plain. Cyberpunk kept the nav labels plain and put the flavour in subtitles only.</li>
+<li>Meal and aisle renames (Luncheon / Supper / Morsels, Garden &amp; Orchard…) were deferred: the live theme renames only the nav (Receipts / Ledger / Provisions) and the page headings.</li>
 <li>Sepia-filtered emoji, or a hand-drawn engraved icon set for dishes?</li>
 <li>Brand in Cinzel Decorative, or blackletter (UnifrakturMaguntia) for a darker, more gothic feel?</li>
 </ul>`;

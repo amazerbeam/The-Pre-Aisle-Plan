@@ -1,0 +1,681 @@
+/* Parchment recipe view: the open book. A leather cover with gold tooling around two parchment
+   leaves (ingredients left, steps right), dotted-leader ingredient rows, Roman-numeral steps with
+   a drop cap, plain parchment for full-screen ingredients and cook mode.
+   Reference: foodbytes-app/mockup/parchment-theme.html (.book .leaf .ing .steps .margin).
+   Selectors start with :root[data-theme="parchment"]. Layout breakpoint matches RecipeViewModal.css
+   (two columns from 769px, one column and tabs at 768px and below).
+   Both animations (book-open, ink-blot) are killed by Low FX and reduced motion in shell.css. */
+
+/* ---------- the cover ---------- */
+:root[data-theme="parchment"] .recipe-view-overlay {
+  background: rgba(30, 18, 8, 0.6);
+}
+
+:root[data-theme="parchment"] .recipe-view-modal {
+  padding: 0 12px 12px;
+  background: var(--paper-noise), linear-gradient(135deg, #4a2d1a, var(--leather) 50%, var(--leather-dark));
+  border-radius: 6px;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.55), inset 0 0 0 2px var(--gold-dim);
+  color: var(--ink);
+  font-family: var(--f-body);
+  animation: book-open 0.45s cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+
+@keyframes book-open {
+  from { transform: perspective(1400px) rotateY(-14deg) scale(0.96); opacity: 0; }
+}
+
+@keyframes ink-blot {
+  0% { transform: scale(1.25); filter: blur(1px); }
+  100% { transform: none; filter: none; }
+}
+
+/* ---------- header: gold-tooled leather ---------- */
+:root[data-theme="parchment"] .recipe-view-modal .recipe-view-header {
+  margin: 0 -12px;
+  padding: 14px 24px 14px;
+  background: transparent;
+  border-bottom: 3px double var(--gold-dim);
+  color: var(--rv-head-text);
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .recipe-title {
+  font-family: var(--f-display);
+  font-weight: 400;
+  font-size: 28px;
+  line-height: 1.1;
+  color: var(--gold);
+  text-shadow: 0 1px 0 #000;
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .cheat-badge {
+  border-radius: 48% 52% 50% 46% / 50% 45% 55% 50%;
+  background: var(--seal-grad);
+  box-shadow: inset 0 0 0 2px rgba(90, 15, 8, 0.55);
+  font-family: var(--f-label);
+  font-weight: 400;
+  transform: rotate(-8deg);
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .close-button {
+  border: 1px solid var(--rv-head-border);
+  font-family: var(--f-label);
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .rv-ctx {
+  border: 1px solid var(--rv-head-border);
+  border-radius: 3px;
+  font-family: var(--f-display);
+  font-style: italic;
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .rv-eat {
+  border: 1px solid var(--gold-dim);
+  border-radius: 3px;
+  font-family: var(--f-label);
+  font-weight: 400;
+  font-style: normal;
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .rv-eat.on {
+  background: var(--success);
+  border-color: var(--success);
+}
+
+/* Variant tabs on the leather: selected tab is gold */
+:root[data-theme="parchment"] .recipe-view-modal .rv-vseg .variant-seg {
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 3px;
+  padding: 3px;
+  gap: 3px;
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .rv-vseg .variant-seg button {
+  margin-left: 0;
+  border: 1px solid var(--rv-head-border);
+  border-radius: 2px;
+  font-family: var(--f-label);
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .rv-vseg .variant-seg button b {
+  font-family: var(--f-body);
+  font-weight: 400;
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .rv-vseg .variant-seg button.on {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--leather-dark);
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .rv-vseg .variant-seg button.on b {
+  color: var(--leather-dark);
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .rv-vseg .variant-single {
+  border-radius: 3px;
+  font-family: var(--f-label);
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .rv-vseg .variant-single b {
+  font-family: var(--f-body);
+  font-weight: 400;
+}
+
+/* Servings stepper: 26px round ink buttons inside a 44px hit area */
+:root[data-theme="parchment"] .recipe-view-modal .rv-srv {
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.25);
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .rv-srv button {
+  position: relative;
+  background: transparent;
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .rv-srv button::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 26px;
+  height: 26px;
+  margin: -13px 0 0 -13px;
+  border: 1px solid var(--rv-head-border);
+  border-radius: 50%;
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .rv-srv span {
+  font-family: var(--f-label);
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .servings-input {
+  font-family: var(--f-display);
+  font-weight: 400;
+  font-variant-numeric: oldstyle-nums;
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .rv-macros {
+  font-family: var(--f-label);
+  font-size: 14px;
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .rv-awake {
+  border-radius: 3px;
+  font-family: var(--f-label);
+  font-size: 14px;
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .rv-awake.on {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--leather-dark);
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .recipe-view-header .linked-recipe-navigation .back-button {
+  border-radius: 3px;
+  font-family: var(--f-label);
+}
+
+/* ---------- the open pages ---------- */
+:root[data-theme="parchment"] .recipe-view-modal .rv-scroll {
+  background: var(--page);
+  border-radius: 2px;
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .rv-tabs {
+  background: var(--page);
+  border-bottom: 1px solid var(--border-color);
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .rv-tabs button {
+  font-family: var(--f-label);
+  font-size: 17px;
+  font-weight: 400;
+}
+
+/* Left leaf (ingredients): gutter shade on its inner edge. Right leaf (steps): mirrored. */
+:root[data-theme="parchment"] .recipe-view-modal .ingredients-panel,
+:root[data-theme="parchment"] .recipe-view-modal .rv-steps {
+  background-color: var(--page);
+  border-right: 0;
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .rv-col,
+:root[data-theme="parchment"] .recipe-view-modal .rv-steps {
+  padding: 22px 24px 26px;
+}
+
+@media (min-width: 769px) {
+  :root[data-theme="parchment"] .recipe-view-modal .rv-body {
+    grid-template-columns: minmax(300px, 1fr) 1fr;
+  }
+
+  :root[data-theme="parchment"] .recipe-view-modal .ingredients-panel {
+    background-image: var(--paper-noise), linear-gradient(90deg, transparent 80%, rgba(120, 85, 35, 0.28));
+  }
+
+  :root[data-theme="parchment"] .recipe-view-modal .rv-steps {
+    background-image: var(--paper-noise), linear-gradient(270deg, transparent 80%, rgba(120, 85, 35, 0.28));
+  }
+}
+
+/* One column below the breakpoint: no gutter */
+@media (max-width: 768px) {
+  :root[data-theme="parchment"] .recipe-view-modal {
+    padding: 0 6px 6px;
+    border-radius: 0;
+    animation: none;
+  }
+
+  :root[data-theme="parchment"] .recipe-view-modal .recipe-view-header {
+    margin: 0 -6px;
+    padding: 10px 14px 12px;
+  }
+
+  :root[data-theme="parchment"] .recipe-view-modal .recipe-title {
+    font-size: 22px;
+  }
+
+  :root[data-theme="parchment"] .recipe-view-modal .ingredients-panel,
+  :root[data-theme="parchment"] .recipe-view-modal .rv-steps {
+    background-image: var(--paper-noise);
+  }
+
+  :root[data-theme="parchment"] .recipe-view-modal .rv-col,
+  :root[data-theme="parchment"] .recipe-view-modal .rv-steps {
+    padding: 18px 16px;
+  }
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .rv-col h3,
+:root[data-theme="parchment"] .recipe-view-modal .steps-section h3,
+:root[data-theme="parchment"] .recipe-view-modal .rv-extras h3 {
+  padding-bottom: 3px;
+  border-bottom: 1px solid var(--ink-faded);
+  font-family: var(--f-label);
+  font-size: 19px;
+  font-weight: 400;
+  color: var(--ink);
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .rv-col h3 small,
+:root[data-theme="parchment"] .recipe-view-modal .steps-section h3 small {
+  font-family: var(--f-body);
+  font-style: italic;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--ink-faded);
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .ing-expand {
+  border-radius: 3px;
+  font-family: var(--f-label);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--wax);
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .ing-expand:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+}
+
+/* ---------- ingredients: dotted leader between name and quantity ---------- */
+:root[data-theme="parchment"] .recipe-view-modal .ilist li {
+  gap: 8px;
+  border-bottom: 1px solid var(--rule);
+  font-size: 17px;
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .ilist li:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .ilist .n {
+  order: 1;
+  display: flex;
+  flex: 1;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .ilist .n::after {
+  content: "";
+  flex: 1;
+  min-width: 12px;
+  border-bottom: 1.5px dotted var(--ink-light);
+  transform: translateY(-4px);
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .ilist .q {
+  order: 2;
+  min-width: 0;
+  font-weight: 400;
+  font-variant-numeric: oldstyle-nums;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+/* The tick: a drawn ink square */
+:root[data-theme="parchment"] .recipe-view-modal .ilist .cb {
+  width: 20px;
+  height: 20px;
+  border: 1.5px solid var(--ink);
+  border-radius: 1px 3px 2px 2px;
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .ilist li.on .cb {
+  background: transparent;
+  border-color: var(--ink);
+  color: var(--wax);
+  font-family: var(--f-hand);
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .ilist li.on .n,
+:root[data-theme="parchment"] .recipe-view-modal .ilist li.on .q {
+  color: var(--ink-light);
+  text-decoration-color: rgba(43, 29, 16, 0.55);
+  text-decoration-thickness: 1.5px;
+}
+
+/* ---------- extras (linked homemade recipes) ---------- */
+:root[data-theme="parchment"] .recipe-view-modal .rv-extra {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: 2px;
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .rv-extra-title {
+  font-family: var(--f-display);
+  font-style: italic;
+  font-size: 17px;
+  font-weight: 400;
+  color: var(--wax);
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .rv-tog {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  padding: 0;
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .rv-tog button {
+  border-radius: 2px;
+  font-family: var(--f-label);
+  font-size: 14px;
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .rv-tog button.on {
+  background: var(--ink);
+  color: var(--page);
+  font-weight: 400;
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .rv-extra-open {
+  color: var(--wax);
+  font-family: var(--f-display);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 16px;
+}
+
+/* Handwritten margin note beside the open-recipe link (the link only shows for the homemade path) */
+:root[data-theme="parchment"] .recipe-view-modal .rv-extra-open::after {
+  content: "homemade";
+  display: inline-block;
+  margin-left: 10px;
+  font-family: var(--f-hand);
+  font-style: normal;
+  font-size: 11px;
+  color: var(--ink-faded);
+  rotate: -3deg;
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .rv-extras-note {
+  font-style: italic;
+}
+
+/* ---------- steps: Roman numerals, drop cap, struck-through when done ---------- */
+:root[data-theme="parchment"] .recipe-view-modal .rv-step-list {
+  counter-reset: rvstep;
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .step {
+  counter-increment: rvstep;
+  gap: 8px;
+  margin-bottom: 0;
+  padding: 8px 6px;
+  border-bottom: 1px solid var(--rule);
+  border-radius: 0;
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .step:active {
+  background: var(--surface-tint-soft);
+}
+
+@media (hover: hover) {
+  :root[data-theme="parchment"] .recipe-view-modal .step:hover {
+    background: var(--surface-tint-soft);
+  }
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .step:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .step.cur {
+  background: var(--gold-wash);
+  box-shadow: inset 3px 0 0 var(--gold-dim);
+}
+
+/* The existing number element is hidden by size; its ::before draws the numeral */
+:root[data-theme="parchment"] .recipe-view-modal .step .num {
+  width: 34px;
+  height: auto;
+  border-radius: 0;
+  background: transparent;
+  color: var(--wax);
+  font-size: 0;
+  place-items: start;
+  padding-top: 2px;
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .step .num::before {
+  content: counter(rvstep, upper-roman) ".";
+  font-family: var(--f-label);
+  font-size: 16px;
+  font-weight: 400;
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .step.done .num {
+  background: transparent;
+  color: var(--success);
+}
+
+/* Ink-blot settle on the tick mark when a step is checked */
+:root[data-theme="parchment"] .recipe-view-modal .step.done .num::before {
+  content: "✓";
+  font-family: var(--f-hand);
+  font-size: 17px;
+  animation: ink-blot 0.4s ease-out;
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .step .txt {
+  font-size: 17px;
+  line-height: 1.45;
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .rv-step-list > .step:first-child .txt::first-letter {
+  float: left;
+  margin: 4px 6px 0 0;
+  font-family: var(--f-brand);
+  font-weight: 700;
+  font-size: 46px;
+  line-height: 0.85;
+  color: var(--brand-primary);
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .step.done .txt {
+  color: var(--ink-light);
+  text-decoration: line-through;
+  text-decoration-color: rgba(43, 29, 16, 0.55);
+  text-decoration-thickness: 1.5px;
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .step-link {
+  border-color: var(--wax);
+  border-radius: 3px;
+  background: transparent;
+  color: var(--wax);
+  font-family: var(--f-display);
+  font-style: italic;
+  font-size: 15px;
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .step .sb {
+  border-radius: 2px;
+  font-family: var(--f-body);
+  font-style: italic;
+  font-size: 14px;
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .cookbtn {
+  border: 1px solid var(--brand-primary-dark);
+  border-radius: 3px;
+  background: linear-gradient(180deg, var(--brand-primary-light), var(--brand-primary) 60%, var(--brand-primary-dark));
+  box-shadow: var(--wax-highlight);
+  color: var(--on-brand);
+  font-family: var(--f-label);
+  font-size: 15px;
+  font-weight: 400;
+}
+
+/* ---------- eaten section ---------- */
+:root[data-theme="parchment"] .recipe-view-modal .eaten-section {
+  font-family: var(--f-display);
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .eaten-btn,
+:root[data-theme="parchment"] .recipe-view-modal .eaten-slot,
+:root[data-theme="parchment"] .recipe-view-modal .eaten-undo {
+  border-radius: 3px;
+  font-family: var(--f-label);
+  font-weight: 400;
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .eaten-meta {
+  font-style: italic;
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .eaten-btn:focus-visible,
+:root[data-theme="parchment"] .recipe-view-modal .eaten-undo:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+}
+
+/* ---------- full-screen ingredients: plain parchment, big type, no texture behind the text ---------- */
+:root[data-theme="parchment"] .recipe-view-modal .ifull {
+  background: var(--page);
+  font-family: var(--f-body);
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .ifull-head {
+  background: var(--leather-grad);
+  border-bottom: 3px double var(--gold-dim);
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .ifull-title b {
+  font-family: var(--f-display);
+  font-weight: 400;
+  color: var(--gold);
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .ifull-title small,
+:root[data-theme="parchment"] .recipe-view-modal .ifull-count {
+  font-family: var(--f-label);
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .ifull-prog {
+  border-radius: 1px;
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .ifull-prog i {
+  background: var(--gold);
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .ifull-done,
+:root[data-theme="parchment"] .recipe-view-modal .ifull-pill,
+:root[data-theme="parchment"] .recipe-view-modal .ifull-srv button {
+  border-radius: 3px;
+  font-family: var(--f-label);
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .ifull-srv span {
+  font-family: var(--f-label);
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .ifull-pill.on {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--page);
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .ifull .ilist li {
+  min-height: 56px;
+  font-size: 20px;
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .ifull .ilist .cb {
+  width: 26px;
+  height: 26px;
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .ifull-note,
+:root[data-theme="parchment"] .recipe-view-modal .ifull-all {
+  font-family: var(--f-display);
+  font-style: italic;
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .ifull button:focus-visible {
+  outline: 2px solid var(--gold);
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .ifull-body button:focus-visible,
+:root[data-theme="parchment"] .recipe-view-modal .ifull-tools button:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+}
+
+/* ---------- cook mode: plain parchment, large type ---------- */
+:root[data-theme="parchment"] .recipe-view-modal .cook {
+  background: var(--page);
+  color: var(--ink);
+  font-family: var(--f-body);
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .cook-top {
+  border-bottom: 1px solid var(--rule);
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .cook-top b {
+  font-family: var(--f-display);
+  font-weight: 400;
+  font-size: 20px;
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .cook-top button {
+  background: transparent;
+  border: 1px solid var(--ink-light);
+  border-radius: 3px;
+  color: var(--ink);
+  font-family: var(--f-label);
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .cook-dots i {
+  border-radius: 1px;
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .cook-dots i.f {
+  background: var(--wax);
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .cook-k {
+  font-family: var(--f-label);
+  font-size: 16px;
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .cook-s {
+  font-size: 26px;
+  line-height: 1.45;
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .cook-uses span {
+  border-radius: 2px;
+  font-family: var(--f-body);
+  font-style: italic;
+  font-size: 15px;
+  color: var(--ink);
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .cook-nav button {
+  border-radius: 3px;
+  font-family: var(--f-label);
+  font-weight: 400;
+  font-size: 18px;
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .cook-prev {
+  background: transparent;
+  border: 1px solid var(--ink-light);
+  color: var(--ink);
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .cook-next {
+  background: linear-gradient(180deg, var(--brand-primary-light), var(--brand-primary) 60%, var(--brand-primary-dark));
+  border: 1px solid var(--brand-primary-dark);
+  color: var(--on-brand);
+}
+
+:root[data-theme="parchment"] .recipe-view-modal .cook button:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+}

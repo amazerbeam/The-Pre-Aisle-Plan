@@ -1,0 +1,10 @@
+/* Parchment override bundle. Every selector in every file here MUST start with
+   :root[data-theme="parchment"] (the base element defaults in shell.css may use
+   :where(:root[data-theme="parchment"])). Colours come from tokens in ../parchment.css;
+   no !important except the Low FX animation kill-switch. */
+@import './shell.css';
+@import './recipes.css';
+@import './mealplan.css';
+@import './recipe-view.css';
+@import './shopping.css';
+@import './dialogs.css';

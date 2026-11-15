@@ -1,0 +1,490 @@
+/* Parchment shopping: the provisions scroll. One centred sheet of parchment between two wooden
+   rods, aisles with an ink-dot and a flourish rule, items ticked with a hand-drawn cross.
+   Reference: foodbytes-app/mockup/parchment-theme.html (.scrollwrap .rod .paper .aisle .item .box).
+   Selectors start with :root[data-theme="parchment"].
+   No mask, filter or transform anywhere in this tree: the ingredient breakdown popup is
+   position:fixed inside it and would be clipped or re-anchored. Rods are plain gradients. */
+
+/* ---------- the scroll ---------- */
+:root[data-theme="parchment"] .shopping-list-page {
+  --sl-pad-x: 18px;
+  --sl-overhang: 8px;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 26px var(--sl-pad-x) 22px;
+  background: var(--page) var(--paper-noise);
+  box-shadow: inset 0 14px 18px -12px rgba(90, 60, 20, 0.45), inset 0 -14px 18px -12px rgba(90, 60, 20, 0.45), inset 0 0 30px rgba(160, 120, 60, 0.2);
+}
+
+@media (min-width: 640px) {
+  :root[data-theme="parchment"] .shopping-list-page {
+    --sl-pad-x: 34px;
+    --sl-overhang: 22px;
+    padding: 30px var(--sl-pad-x) 26px;
+  }
+}
+
+/* Rods: wood bar with gold finials, reaching past the paper */
+:root[data-theme="parchment"] .shopping-list-page::before,
+:root[data-theme="parchment"] .shopping-list-page::after {
+  content: "";
+  display: block;
+  height: 28px;
+  background:
+    radial-gradient(ellipse at 40% 35%, var(--gold), var(--gold-dim) 70%, var(--leather)) left center / 16px 28px no-repeat,
+    radial-gradient(ellipse at 40% 35%, var(--gold), var(--gold-dim) 70%, var(--leather)) right center / 16px 28px no-repeat,
+    linear-gradient(180deg, var(--gold-dim), var(--leather) 40%, var(--leather-dark)) center / calc(100% - 20px) 20px no-repeat;
+}
+
+:root[data-theme="parchment"] .shopping-list-page::before {
+  margin: -26px calc(-1 * (var(--sl-pad-x) + var(--sl-overhang))) 16px;
+}
+
+:root[data-theme="parchment"] .shopping-list-page::after {
+  margin: 18px calc(-1 * (var(--sl-pad-x) + var(--sl-overhang))) -22px;
+}
+
+@media (min-width: 640px) {
+  :root[data-theme="parchment"] .shopping-list-page::before {
+    margin-top: -30px;
+  }
+
+  :root[data-theme="parchment"] .shopping-list-page::after {
+    margin-bottom: -26px;
+  }
+}
+
+/* ---------- header: centred title, italic meta ---------- */
+:root[data-theme="parchment"] .shopping-list-page > h1,
+:root[data-theme="parchment"] .shopping-list-header h1 {
+  font-family: var(--f-display);
+  font-weight: 400;
+  font-size: 1.9rem;
+  line-height: 1.05;
+  text-align: center;
+  color: var(--ink);
+}
+
+:root[data-theme="parchment"] .shopping-list-header {
+  justify-content: center;
+  gap: 10px;
+}
+
+:root[data-theme="parchment"] .shopping-list-header .header-left {
+  flex-basis: 100%;
+}
+
+:root[data-theme="parchment"] .list-meta {
+  margin-top: 4px;
+  text-align: center;
+  font-style: italic;
+  font-size: 1rem;
+  color: var(--ink-faded);
+}
+
+:root[data-theme="parchment"] .shopping-list-header .header-actions {
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* ---------- buttons: wax primary, ink secondary ---------- */
+:root[data-theme="parchment"] .sl-btn,
+:root[data-theme="parchment"] .sl-kebab {
+  background: var(--page);
+  border: 1px solid var(--ink-light);
+  border-radius: 3px;
+  color: var(--ink);
+  font-family: var(--f-label);
+  font-size: 1rem;
+}
+
+:root[data-theme="parchment"] .sl-btn[aria-pressed="true"],
+:root[data-theme="parchment"] .sl-kebab[aria-expanded="true"] {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--page);
+  font-weight: 400;
+}
+
+@media (hover: hover) {
+  :root[data-theme="parchment"] .sl-btn:hover:not([aria-pressed="true"]),
+  :root[data-theme="parchment"] .sl-kebab:hover:not([aria-expanded="true"]) {
+    background: var(--surface-tint-soft);
+  }
+}
+
+:root[data-theme="parchment"] .sl-btn:focus-visible,
+:root[data-theme="parchment"] .sl-kebab:focus-visible,
+:root[data-theme="parchment"] .sl-menu-list button:focus-visible,
+:root[data-theme="parchment"] .sl-stale button:focus-visible,
+:root[data-theme="parchment"] .aisle-header:focus-visible,
+:root[data-theme="parchment"] .shopping-item:focus-visible,
+:root[data-theme="parchment"] .info-btn:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: 2px;
+}
+
+:root[data-theme="parchment"] .generate-btn,
+:root[data-theme="parchment"] .btn-primary.generate-btn {
+  background: linear-gradient(180deg, var(--brand-primary-light), var(--brand-primary) 60%, var(--brand-primary-dark));
+  border: 1px solid var(--brand-primary-dark);
+  border-radius: 3px;
+  box-shadow: var(--wax-highlight);
+  color: var(--on-brand);
+  font-family: var(--f-label);
+  font-weight: 400;
+}
+
+@media (hover: hover) {
+  :root[data-theme="parchment"] .generate-btn:hover:not(:disabled) {
+    background: linear-gradient(180deg, var(--brand-primary), var(--brand-primary-dark));
+    color: var(--on-brand);
+  }
+}
+
+:root[data-theme="parchment"] .generate-btn:active:not(:disabled) {
+  background: var(--brand-primary-dark);
+}
+
+:root[data-theme="parchment"] .choose-dates-btn {
+  color: var(--wax);
+  font-family: var(--f-display);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 1rem;
+}
+
+:root[data-theme="parchment"] .sl-menu-list {
+  background: var(--page) var(--paper-noise);
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  box-shadow: var(--page-shadow), 0 12px 24px rgba(30, 15, 0, 0.35);
+}
+
+:root[data-theme="parchment"] .sl-menu-list button {
+  border-radius: 2px;
+  font-family: var(--f-display);
+  font-size: 1rem;
+}
+
+/* ---------- progress: a thin ink bar ---------- */
+:root[data-theme="parchment"] .sl-progress {
+  padding: 8px 0;
+  background: transparent;
+  border: 0;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  border-radius: 0;
+}
+
+:root[data-theme="parchment"] .sl-progress-count {
+  font-family: var(--f-display);
+  font-weight: 400;
+  font-variant-numeric: oldstyle-nums;
+  color: var(--wax);
+}
+
+:root[data-theme="parchment"] .sl-progress-bar {
+  height: 4px;
+  border-radius: 0;
+}
+
+:root[data-theme="parchment"] .sl-progress-bar i {
+  border-radius: 0;
+  background: var(--ink);
+}
+
+:root[data-theme="parchment"] .sl-progress-note {
+  font-style: italic;
+  font-size: 0.9rem;
+}
+
+/* Out-of-date note: an ochre slip */
+:root[data-theme="parchment"] .sl-stale,
+:root[data-theme="parchment"] .warning-message {
+  border-radius: 2px;
+  font-style: italic;
+}
+
+:root[data-theme="parchment"] .sl-stale button {
+  border-radius: 3px;
+  background: var(--wax);
+  font-family: var(--f-label);
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* ---------- aisles ---------- */
+:root[data-theme="parchment"] .shopping-list-content {
+  columns: 1;
+}
+
+:root[data-theme="parchment"] .shopping-aisle {
+  margin: 16px 0 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+}
+
+:root[data-theme="parchment"] .shopping-aisle .aisle-header {
+  position: relative;
+  gap: 8px;
+  padding: 8px 2px 10px;
+  background: transparent;
+  border: 0;
+}
+
+@media (hover: hover) {
+  :root[data-theme="parchment"] .shopping-aisle .aisle-header:hover {
+    background: rgba(216, 178, 90, 0.1);
+  }
+}
+
+:root[data-theme="parchment"] .shopping-aisle .aisle-header:active {
+  background: rgba(216, 178, 90, 0.16);
+}
+
+/* Flourish rule under the aisle heading */
+:root[data-theme="parchment"] .shopping-aisle .aisle-header::after {
+  content: "";
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  bottom: 4px;
+  height: 1px;
+  background: linear-gradient(90deg, var(--ink-light), transparent);
+  pointer-events: none;
+}
+
+:root[data-theme="parchment"] .shopping-aisle .aisle-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50% 40% 55% 45%;
+}
+
+:root[data-theme="parchment"] .shopping-aisle .aisle-name {
+  font-family: var(--f-label);
+  font-size: 1.1rem;
+  font-weight: 400;
+}
+
+:root[data-theme="parchment"] .shopping-aisle .aisle-count {
+  background: transparent;
+  padding: 0;
+  font-family: var(--f-body);
+  font-style: italic;
+  font-size: 0.9rem;
+  font-weight: 400;
+  font-variant-numeric: oldstyle-nums;
+}
+
+:root[data-theme="parchment"] .shopping-aisle .expand-icon {
+  color: var(--ink-faded);
+}
+
+:root[data-theme="parchment"] .shopping-aisle.is-done .aisle-header {
+  background: var(--aisle-done-bg);
+}
+
+:root[data-theme="parchment"] .shopping-aisle.is-done .aisle-count {
+  background: transparent;
+  color: var(--audited-text);
+}
+
+:root[data-theme="parchment"] .shopping-aisle .hidden-note {
+  background: transparent;
+  font-style: italic;
+}
+
+/* ---------- items ---------- */
+:root[data-theme="parchment"] .shopping-aisle .shopping-item {
+  gap: 12px;
+  padding: 0 2px;
+  border-bottom: 1px solid var(--rule);
+  font-size: 1.05rem;
+}
+
+@media (hover: hover) {
+  :root[data-theme="parchment"] .shopping-aisle .shopping-item:hover {
+    background: rgba(216, 178, 90, 0.1);
+  }
+}
+
+:root[data-theme="parchment"] .shopping-aisle .shopping-item:last-child {
+  border-bottom: 1px solid var(--rule);
+}
+
+/* Name left, quantity right: the DOM order is quantity then name, so reorder */
+:root[data-theme="parchment"] .shopping-aisle .item-name {
+  order: 1;
+  font-size: 1.05rem;
+}
+
+:root[data-theme="parchment"] .shopping-aisle .item-quantity {
+  order: 2;
+  min-width: 0;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 1rem;
+  font-variant-numeric: oldstyle-nums;
+  color: var(--ink-faded);
+}
+
+:root[data-theme="parchment"] .shopping-aisle .info-btn {
+  order: 3;
+}
+
+/* The tick: a drawn ink square; checked adds a hand-drawn cross (decorative, state stays on the row) */
+:root[data-theme="parchment"] .shopping-aisle .tick-circle {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  border: 1.5px solid var(--ink);
+  border-radius: 1px 3px 2px 2px;
+  background: transparent;
+  font-size: 0;
+}
+
+:root[data-theme="parchment"] .shopping-aisle .shopping-item.checked .tick-circle {
+  background: transparent;
+  border-color: var(--ink);
+}
+
+:root[data-theme="parchment"] .shopping-aisle .shopping-item.checked .tick-circle::after {
+  content: "✗";
+  position: absolute;
+  left: 1px;
+  top: -12px;
+  font-family: var(--f-hand);
+  font-size: 18px;
+  line-height: 1.4;
+  color: var(--wax);
+}
+
+:root[data-theme="parchment"] .shopping-aisle .shopping-item.checked .item-name,
+:root[data-theme="parchment"] .shopping-aisle .shopping-item.checked .item-quantity {
+  color: var(--ink-light);
+  text-decoration-color: rgba(43, 29, 16, 0.55);
+  text-decoration-thickness: 1.5px;
+}
+
+:root[data-theme="parchment"] .shopping-aisle .shopping-item.long-pressing {
+  background: rgba(216, 178, 90, 0.2);
+}
+
+:root[data-theme="parchment"] .shopping-aisle .info-btn {
+  color: var(--wax);
+}
+
+/* ---------- states ---------- */
+:root[data-theme="parchment"] .shopping-list-page .empty-state {
+  background: transparent;
+  border: 1px dashed var(--border-color);
+  border-radius: 2px;
+  box-shadow: none;
+}
+
+:root[data-theme="parchment"] .shopping-list-page .empty-state p,
+:root[data-theme="parchment"] .shopping-list-page .generating p {
+  font-family: var(--f-display);
+  font-style: italic;
+}
+
+:root[data-theme="parchment"] .shopping-list-page .error {
+  border-radius: 2px;
+  font-style: italic;
+}
+
+/* ---------- generate dialog and ingredient breakdown popup: parchment cards ---------- */
+:root[data-theme="parchment"] .generate-modal,
+:root[data-theme="parchment"] .breakdown-popup {
+  background: var(--page) var(--paper-noise);
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  box-shadow: var(--popup-shadow);
+  color: var(--ink);
+}
+
+:root[data-theme="parchment"] .generate-modal h2 {
+  font-family: var(--f-brand);
+  font-weight: 700;
+  font-size: 1.3rem;
+  color: var(--wax);
+}
+
+:root[data-theme="parchment"] .generate-modal .error-message {
+  border-radius: 2px;
+}
+
+:root[data-theme="parchment"] .generate-summary-row {
+  border-bottom: 1px solid var(--rule);
+  font-size: 1rem;
+}
+
+:root[data-theme="parchment"] .date-field label {
+  font-family: var(--f-label);
+  font-size: 1rem;
+}
+
+:root[data-theme="parchment"] .date-field input {
+  background: transparent;
+  border: 0;
+  border-bottom: 1.5px solid var(--ink-faded);
+  border-radius: 0;
+  font-family: var(--f-display);
+  font-style: italic;
+  color: var(--ink);
+}
+
+:root[data-theme="parchment"] .date-field input:focus,
+:root[data-theme="parchment"] .date-field input:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: 2px;
+  border-bottom-color: var(--wax);
+}
+
+:root[data-theme="parchment"] .date-field input:disabled {
+  opacity: 0.6;
+}
+
+:root[data-theme="parchment"] .modal-actions button {
+  border-radius: 3px;
+  font-family: var(--f-label);
+  font-weight: 400;
+}
+
+:root[data-theme="parchment"] .cancel-btn {
+  background: transparent;
+  border: 1px solid var(--ink-light);
+  color: var(--ink);
+}
+
+:root[data-theme="parchment"] .breakdown-header h4 {
+  font-family: var(--f-brand);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+:root[data-theme="parchment"] .breakdown-total {
+  font-family: var(--f-display);
+  font-variant-numeric: oldstyle-nums;
+}
+
+:root[data-theme="parchment"] .meal-name {
+  font-family: var(--f-display);
+  font-style: italic;
+}
+
+:root[data-theme="parchment"] .meal-context {
+  font-family: var(--f-label);
+}
+
+:root[data-theme="parchment"] .meal-quantity {
+  font-style: italic;
+  font-variant-numeric: oldstyle-nums;
+}
+
+:root[data-theme="parchment"] .breakdown-close-btn:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}

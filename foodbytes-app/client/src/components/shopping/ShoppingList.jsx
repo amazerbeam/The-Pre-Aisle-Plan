@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { useShoppingList } from '../../contexts/ShoppingListContext'
+import { useTheme } from '../../contexts/ThemeContext'
+import { pageCopy } from '../../utils/themeCopy'
 import useHideTicked from '../../hooks/useHideTicked'
 import useWakeLock from '../../hooks/useWakeLock'
 import ShoppingListHeader from './ShoppingListHeader'
@@ -20,6 +22,7 @@ const ShoppingList = () => {
   const [generateMode, setGenerateMode] = useState('week')
   const [hideTicked, setHideTicked] = useHideTicked()
   const wakeLock = useWakeLock(false)
+  const heading = pageCopy(useTheme().theme, 'shopping')
 
   const openGenerate = (mode = 'week') => {
     setGenerateMode(mode)
@@ -89,7 +92,7 @@ const ShoppingList = () => {
   if (!listExists) {
     return (
       <div className="shopping-list-page">
-        <h1>Shopping List</h1>
+        <h1>{heading?.title ?? 'Shopping List'}</h1>
         <div className="empty-state no-list">
           <p>You don't have a shopping list yet.</p>
           <p>Generate one based on your meal plan!</p>

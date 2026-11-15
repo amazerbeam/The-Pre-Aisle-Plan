@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { useShoppingList } from '../../contexts/ShoppingListContext'
+import { useTheme } from '../../contexts/ThemeContext'
 import { formatWeekRange } from '../../utils/dateUtils'
+import { pageCopy } from '../../utils/themeCopy'
 import ConfirmDialog from '../common/ConfirmDialog'
 
 const MADE_AT_FORMAT = { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }
@@ -14,6 +16,7 @@ const MADE_AT_FORMAT = { weekday: 'short', day: 'numeric', month: 'short', hour:
  */
 const ShoppingListHeader = ({ onGenerateClick, hideTicked, onToggleHideTicked, wakeLock }) => {
   const { shoppingList, uncheckAll } = useShoppingList()
+  const heading = pageCopy(useTheme().theme, 'shopping')
   const [showUncheckDialog, setShowUncheckDialog] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef(null)
@@ -59,7 +62,7 @@ const ShoppingListHeader = ({ onGenerateClick, hideTicked, onToggleHideTicked, w
     <>
       <div className="shopping-list-header">
         <div className="header-left">
-          <h1>Shopping list</h1>
+          <h1>{heading?.title ?? 'Shopping list'}</h1>
           {shoppingList && (
             <p className="list-meta">
               For <b>{range}</b>{madeAt && <> · made {madeAt}</>}

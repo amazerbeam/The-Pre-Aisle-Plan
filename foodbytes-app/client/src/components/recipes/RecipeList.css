@@ -72,3 +72,21 @@
   color: var(--text-secondary);
   padding: var(--spacing-xl);
 }
+
+/* Optional themed page heading (only rendered when the active theme has copy.pages.recipes) */
+.page-heading {
+  margin: 0 0 12px;
+}
+
+.page-heading-title {
+  margin: 0;
+  font-size: 1.75rem;
+  color: var(--text-primary);
+}
+
+.page-sub {
+  display: block;
+  margin: 2px 0 0;
+  font-style: italic;
+  color: var(--text-secondary);
+}

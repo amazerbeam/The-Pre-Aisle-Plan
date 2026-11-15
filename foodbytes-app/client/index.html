@@ -6,7 +6,7 @@
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <meta name="theme-color" content="#4a3f80" />
-    <script>(function(){var ids=['default','cyberpunk'];try{var t=localStorage.getItem('fb.display.theme');if(ids.indexOf(t)>0){document.documentElement.dataset.theme=t;document.querySelector('meta[name="theme-color"]').content=t==='cyberpunk'?'#05070b':'#4a3f80'}}catch(e){}})()</script>
+    <script>(function(){var ids=['default','cyberpunk','parchment'];var c={cyberpunk:'#05070b',parchment:'#3b2415'};try{var t=localStorage.getItem('fb.display.theme');if(ids.indexOf(t)>0){document.documentElement.dataset.theme=t;document.querySelector('meta[name="theme-color"]').content=c[t]||'#4a3f80'}}catch(e){}})()</script>
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="Pantry Plan" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />

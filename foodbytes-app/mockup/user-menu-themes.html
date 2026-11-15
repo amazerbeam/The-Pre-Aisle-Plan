@@ -191,6 +191,11 @@ button,input{font:inherit;color:inherit}
 .pv-default .pc{display:flex;gap:4px;padding:6px 5px}
 .pv-default .pc i{flex:1;height:30px;background:#fff;border:1px solid #e9ecef;border-radius:4px;box-shadow:0 1px 2px rgba(0,0,0,.08);position:relative}
 .pv-default .pc i::after{content:"";position:absolute;left:4px;right:8px;top:5px;height:3px;background:#2c3e50;opacity:.6;border-radius:2px}
+.pv-parch{background:#ead9b1}
+.pv-parch .ph{height:16px;background:#3b2415;border-bottom:1px solid #d8b25a;position:relative}
+.pv-parch .ph::after{content:"";position:absolute;left:22%;top:8px;width:5px;height:8px;background:#a3271a}
+.pv-parch .pc{display:flex;gap:4px;padding:6px 5px}
+.pv-parch .pc i{flex:1;height:30px;background:#f7eed6;box-shadow:0 0 0 1px #c9ad78}
 .pv-cyber{background:linear-gradient(180deg,#03050a,#0a1a26 70%,#2a0614)}
 .pv-cyber .ph{height:16px;background:#000;border-bottom:1px solid #ff2a6d;display:flex;align-items:center;gap:4px;padding:0 5px}
 .pv-cyber .ph i{width:8px;height:8px;background:#ff2a6d}
@@ -250,7 +255,8 @@ button,input{font:inherit;color:inherit}
       <li><b>New user menu</b>, grouped: <i>Planning</i> (servings, meal times), <i>Appearance</i> (theme, Low FX), then Sign out and the version line.</li>
       <li><b>Mobile:</b> the menu becomes a bottom sheet over a scrim, with a close button, capped at the screen height and scrolling inside. Desktop keeps the anchored dropdown.</li>
       <li><b>Theme</b> applies instantly, is remembered <b>on this device</b> (<code>fb.display.theme</code>), defaults to <b>Default</b>.</li>
-      <li><b>Low FX</b> row only appears while Cyberpunk is active.</li>
+      <li><b>Low FX</b> row only appears while a theme with effects is active (Cyberpunk, Parchment).</li>
+      <li><b>Parchment</b> is a third tile; this file draws Default and Cyberpunk only, so picking it shows a note pointing to <code>parchment-theme.html</code>.</li>
       <li>The picker is a proper <code>radiogroup</code>: arrow keys move, 44px targets, focus ring in every theme.</li>
     </ul>
     <h3>Architecture (drives the plan rewrite)</h3>
@@ -269,7 +275,7 @@ button,input{font:inherit;color:inherit}
 </div>
 
 <script>
-const THEMES=[{id:'default',label:'Default'},{id:'cyberpunk',label:'Cyberpunk'}];
+const THEMES=[{id:'default',label:'Default'},{id:'cyberpunk',label:'Cyberpunk'},{id:'parchment',label:'Parchment'}];
 const U={mode:'web',pick:'tiles',open:true,sub:false,portions:2,times:['08:00','13:00','19:00'],lowfx:false,theme:'default'};
 try{const t=localStorage.getItem('fb.mock.theme');if(THEMES.some(x=>x.id===t))U.theme=t;U.lowfx=localStorage.getItem('fb.mock.lowfx')==='1'}catch{}
 {const q=new URLSearchParams(location.search);if(THEMES.some(x=>x.id===q.get('theme')))U.theme=q.get('theme');if(q.get('mode'))U.mode=q.get('mode');if(q.get('pick'))U.pick=q.get('pick')}
@@ -279,7 +285,8 @@ const LOGO_CYBER=`<svg viewBox="0 0 16 16" shape-rendering="crispEdges" aria-hid
 const LOGO_DEFAULT=`<svg viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" rx="24" fill="#4a3f80"/><circle cx="50" cy="52" r="33" fill="#fff"/><circle cx="50" cy="52" r="24" fill="none" stroke="#e3dff2" stroke-width="3"/><path d="M42 70V36h12a10 10 0 0 1 0 20H42" fill="none" stroke="#4a3f80" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"/><path d="M66 30c-8-1-14 4-14 11 8 1 14-4 14-11z" fill="#7cc36b"/></svg>`;
 const PREVIEW={
   default:`<div class="pv pv-default" aria-hidden="true"><div class="ph"><i></i><em></em></div><div class="pc"><i></i><i></i></div></div>`,
-  cyberpunk:`<div class="pv pv-cyber" aria-hidden="true"><div class="ph"><i></i><em></em></div><div class="tk"></div><div class="pc"><i></i><i></i></div></div>`};
+  cyberpunk:`<div class="pv pv-cyber" aria-hidden="true"><div class="ph"><i></i><em></em></div><div class="tk"></div><div class="pc"><i></i><i></i></div></div>`,
+  parchment:`<div class="pv pv-parch" aria-hidden="true"><div class="ph"></div><div class="pc"><i></i><i></i></div></div>`};
 const CARDS=[['Chicken Shawarma Rice Bowl',550],['Pad Thai with Chicken',546],['Rosemary Picanha & Mash',635],['Ramen with Soy Egg',560],['Pizza Margherita',650],['Salmon & Veg Traybake',600]];
 
 function brand(){return U.theme==='cyberpunk'
@@ -308,6 +315,7 @@ function menu(){
       </section>
       <section class="sec" aria-labelledby="s-look"><h3 id="s-look">Appearance</h3>
         ${picker()}
+        ${U.note?`<p class="pnote" role="status" style="margin:6px 2px 0;font-size:12px;color:var(--muted)">${U.note}</p>`:''}
         ${cp?`<div class="row" style="margin-top:8px"><span id="fx-l">Low FX<small>No glow, rain or flicker</small></span><button type="button" class="switch" role="switch" aria-checked="${U.lowfx}" aria-labelledby="fx-l" data-a="lowfx"></button></div>`:''}
         <div class="saved">Saved on this device</div>
       </section>
@@ -342,7 +350,7 @@ function render(){
 const ACT={
   toggle:()=>{U.open=!U.open;U.sub=false},
   close:()=>{U.open=false;U.sub=false},
-  theme:v=>{U.theme=v;try{localStorage.setItem('fb.mock.theme',v)}catch{}},
+  theme:v=>{if(v==='parchment'){U.note='This file draws Default and Cyberpunk only. See parchment-theme.html for Parchment.';return}U.note=null;U.theme=v;try{localStorage.setItem('fb.mock.theme',v)}catch{}},
   lowfx:()=>{U.lowfx=!U.lowfx;try{localStorage.setItem('fb.mock.lowfx',U.lowfx?'1':'0')}catch{}},
   portions:v=>{U.portions=Math.min(12,Math.max(1,U.portions+ +v))},
   sub:()=>{U.sub=true},unsub:()=>{U.sub=false},

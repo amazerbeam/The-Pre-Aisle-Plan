@@ -1,0 +1,185 @@
+/* Parchment shared dialogs and controls: the confirm dialog as a parchment card, the header week
+   picker in gold on leather, and one rule giving every dialog header bar its leather strip.
+   Reference: foodbytes-app/mockup/parchment-theme.html (.wk .amenu). Selectors start with
+   :root[data-theme="parchment"]; this file loads after shell.css. */
+
+/* ---------- confirm dialog ---------- */
+:root[data-theme="parchment"] .confirm-dialog {
+  background: var(--page) var(--paper-noise);
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  box-shadow: var(--popup-shadow);
+  color: var(--ink);
+}
+
+:root[data-theme="parchment"] .confirm-dialog-title {
+  font-family: var(--f-display);
+  font-weight: 400;
+  font-size: 1.6rem;
+  color: var(--ink);
+}
+
+:root[data-theme="parchment"] .confirm-dialog-message {
+  font-family: var(--f-body);
+  font-size: 1.05rem;
+  color: var(--ink-faded);
+}
+
+:root[data-theme="parchment"] .confirm-dialog-actions button {
+  min-height: 44px;
+  border-radius: 3px;
+  font-family: var(--f-label);
+  font-size: 1.05rem;
+  font-weight: 400;
+}
+
+/* Cancel is an ink outline */
+:root[data-theme="parchment"] .confirm-dialog-actions .btn-secondary {
+  background: transparent;
+  border: 1px solid var(--ink-light);
+  color: var(--ink);
+}
+
+/* Confirm is wax: it is the destructive action (Delete, Discard, Uncheck All) */
+:root[data-theme="parchment"] .confirm-dialog-actions .btn-primary {
+  background: linear-gradient(180deg, var(--brand-primary-light), var(--brand-primary) 60%, var(--brand-primary-dark));
+  border: 1px solid var(--brand-primary-dark);
+  box-shadow: var(--wax-highlight);
+  color: var(--on-brand);
+}
+
+:root[data-theme="parchment"] .confirm-dialog-actions button:active:not(:disabled) {
+  background: var(--brand-primary-dark);
+  color: var(--on-brand);
+}
+
+:root[data-theme="parchment"] .confirm-dialog-actions .btn-secondary:active:not(:disabled) {
+  background: var(--surface-tint-pressed);
+  color: var(--ink);
+}
+
+@media (hover: hover) {
+  :root[data-theme="parchment"] .confirm-dialog-actions .btn-secondary:hover:not(:disabled) {
+    background: var(--surface-tint-soft);
+  }
+
+  :root[data-theme="parchment"] .confirm-dialog-actions .btn-primary:hover:not(:disabled) {
+    background: linear-gradient(180deg, var(--brand-primary), var(--brand-primary-dark));
+  }
+}
+
+:root[data-theme="parchment"] .confirm-dialog-actions button:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: 2px;
+}
+
+/* ---------- week picker (header): gold-outlined arrows, italic range ---------- */
+:root[data-theme="parchment"] .header-week .date-range-picker {
+  gap: 4px;
+  padding: 3px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(216, 178, 90, 0.45);
+  border-radius: 3px;
+}
+
+:root[data-theme="parchment"] .header-week .week-arrow {
+  border-radius: 3px;
+  color: var(--gold);
+  font-family: var(--f-display);
+  font-size: 22px;
+}
+
+:root[data-theme="parchment"] .header-week .week-arrow::before {
+  display: none;
+}
+
+:root[data-theme="parchment"] .header-week .week-arrow:active {
+  background: var(--picker-arrow-wash-strong);
+}
+
+@media (hover: hover) {
+  :root[data-theme="parchment"] .header-week .week-arrow:hover {
+    background: var(--on-brand-hover-bg);
+  }
+}
+
+:root[data-theme="parchment"] .header-week .date-range-pill {
+  background: transparent;
+  border-radius: 3px;
+  color: #f6e7c2;
+}
+
+:root[data-theme="parchment"] .header-week .date-range-text {
+  font-family: var(--f-display);
+  font-size: 16px;
+  font-weight: 400;
+  font-variant-numeric: oldstyle-nums;
+  color: #f0dfb8;
+}
+
+:root[data-theme="parchment"] .header-week .this-week-btn {
+  border: 1px solid rgba(216, 178, 90, 0.45);
+  border-radius: 3px;
+  color: var(--gold);
+  font-family: var(--f-label);
+  font-size: 14px;
+  font-weight: 400;
+}
+
+:root[data-theme="parchment"] .header-week .week-arrow:focus-visible,
+:root[data-theme="parchment"] .header-week .this-week-btn:focus-visible,
+:root[data-theme="parchment"] .header-week .date-range-pill:focus-within {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* The native date input is invisible; the browser's calendar popover follows the light scheme */
+:root[data-theme="parchment"] .date-input {
+  color-scheme: light;
+  font-family: var(--f-body);
+}
+
+/* ---------- dialog header bars: leather strip, gold small-caps title, pale close ---------- */
+:root[data-theme="parchment"] .swap-modal-header,
+:root[data-theme="parchment"] .copy-modal-header,
+:root[data-theme="parchment"] .tpl-modal-header,
+:root[data-theme="parchment"] .macro-popup-header,
+:root[data-theme="parchment"] .macro-target-header,
+:root[data-theme="parchment"] .breakdown-header,
+:root[data-theme="parchment"] .extras-popup-header {
+  background: var(--paper-noise), var(--leather-grad);
+  border-bottom: 2px solid var(--gold-dim);
+  border-radius: 2px 2px 0 0;
+  color: var(--gold);
+}
+
+:root[data-theme="parchment"] .swap-modal-header h4,
+:root[data-theme="parchment"] .copy-modal-header h4,
+:root[data-theme="parchment"] .tpl-modal-header h4,
+:root[data-theme="parchment"] .macro-popup-header h4,
+:root[data-theme="parchment"] .macro-target-header h4,
+:root[data-theme="parchment"] .breakdown-header h4,
+:root[data-theme="parchment"] .extras-popup-recipe-name {
+  font-family: var(--f-label);
+  font-weight: 400;
+  color: var(--gold);
+}
+
+:root[data-theme="parchment"] .swap-modal-subtitle,
+:root[data-theme="parchment"] .copy-modal-subtitle,
+:root[data-theme="parchment"] .tpl-modal-subtitle,
+:root[data-theme="parchment"] .macro-popup-date,
+:root[data-theme="parchment"] .macro-target-subtitle,
+:root[data-theme="parchment"] .extras-popup-title {
+  color: var(--leather-ink);
+  opacity: 1;
+}
+
+:root[data-theme="parchment"] .swap-modal-close,
+:root[data-theme="parchment"] .copy-modal-close,
+:root[data-theme="parchment"] .tpl-modal-close,
+:root[data-theme="parchment"] .macro-popup-close,
+:root[data-theme="parchment"] .macro-target-close,
+:root[data-theme="parchment"] .breakdown-close-btn {
+  color: var(--leather-ink);
+}

@@ -1,0 +1,320 @@
+/* Parchment theme (The Kitchen Grimoire): an old handwritten kitchen book. Reassigns the Default
+   tokens from default.css and adds the parchment / ink / wax / leather / gold palette and fonts.
+   Looks that tokens can't express live in parchment/*.css.
+   Reference: foodbytes-app/mockup/parchment-theme.html. Generic period motifs only. */
+:root[data-theme="parchment"] {
+  color-scheme: light;
+
+  /* Palette */
+  --page: #f7eed6;
+  --parchment: #ead9b1;
+  --ink: #2b1d10;
+  --ink-faded: #5e4a32;
+  --ink-light: #6b5236;
+  --wax: #7a1f14;
+  --wax-deep: #5a150d;
+  --wax-bright: #9c3a2a;
+  --leather: #3b2415;
+  --leather-dark: #22140a;
+  --leather-ink: #e9d6ac;
+  --gold: #d8b25a;
+  --gold-dim: #a88a45;
+  --focus-ink: #1f3a5f;
+  --verdigris: #3f6b3a;
+  --ochre: #9a6c0c;
+  --rule: rgba(110, 80, 40, 0.25);
+
+  /* Texture: fractal-noise grain + faint stains (put on page / card surfaces only, never per row) */
+  --paper-noise: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='260' height='260'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .36  0 0 0 0 .24  0 0 0 0 .1  0 0 0 .16 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  --paper-stains: radial-gradient(ellipse 40% 30% at 12% 18%, rgba(150, 105, 45, 0.14), transparent 70%), radial-gradient(ellipse 30% 40% at 88% 70%, rgba(140, 95, 40, 0.12), transparent 70%);
+  --page-shadow: inset 0 0 22px rgba(160, 120, 60, 0.18), 0 8px 14px -10px rgba(60, 35, 10, 0.55);
+  --gold-wash: rgba(216, 178, 90, 0.14);
+  --wax-highlight: inset 0 1px 0 rgba(255, 220, 190, 0.25), 0 1px 2px rgba(40, 10, 0, 0.4);
+  --popup-shadow: var(--page-shadow), 0 20px 44px rgba(30, 15, 0, 0.5);
+  --leather-grad: linear-gradient(180deg, #4a2d1a, var(--leather) 55%, var(--leather-dark));
+  --ribbon-grad: linear-gradient(90deg, #6e140c, #a3271a 50%, #6e140c);
+  --seal-grad: radial-gradient(circle at 38% 32%, #c0412f, #8c1c13 55%, #55100a);
+
+  /* Fonts (loaded on demand by applyTheme) */
+  --f-brand: 'Cinzel Decorative', Georgia, serif;
+  --f-display: 'IM Fell English', Georgia, serif;
+  --f-label: 'IM Fell English SC', Georgia, serif;
+  --f-body: 'EB Garamond', Georgia, serif;
+  --f-num: var(--f-body);
+  --f-hand: 'Homemade Apple', cursive;
+
+  /* Remap of the Default tokens */
+  --brand-primary: var(--wax);
+  --brand-primary-dark: var(--wax-deep);
+  --brand-primary-light: var(--wax-bright);
+  --text-primary: var(--ink);
+  --text-secondary: var(--ink-faded);
+  --bg-primary: var(--page);
+  --bg-secondary: var(--parchment);
+  --border-color: #c9ad78;
+  --success: var(--verdigris);
+  --warning: var(--ochre);
+  --error: #9b2318;
+  --cheat-badge: var(--wax);
+  --on-brand: var(--page);
+  --focus-ring-color: var(--focus-ink);
+
+  /* FR-104 macro traffic light: ink colours. Direction encoding unchanged (blue under, red over). */
+  --macro-under-target: #2f5d8a;
+  --macro-under-target-tint: rgba(47, 93, 138, 0.22);
+  --macro-under-target-pill-bg: rgba(47, 93, 138, 0.14);
+  --macro-under-target-pill-text: #234a70;
+  --macro-near-target: #a8760e;
+  --macro-near-target-tint: rgba(168, 118, 14, 0.22);
+  --macro-near-target-pill-bg: rgba(168, 118, 14, 0.16);
+  --macro-near-target-pill-text: #6f4d05;
+  --macro-on-target: #3f7a4a;
+  --macro-on-target-tint: rgba(63, 122, 74, 0.22);
+  --macro-on-target-pill-bg: rgba(63, 122, 74, 0.15);
+  --macro-on-target-pill-text: #2a5733;
+  --macro-over-target: #a3241a;
+  --macro-over-target-tint: rgba(163, 36, 26, 0.22);
+  --macro-over-target-pill-bg: rgba(163, 36, 26, 0.13);
+  --macro-over-target-pill-text: #7a1a12;
+
+  /* Aisle inks: each >= 3:1 on --page */
+  --aisle-produce: #4f6b2c;
+  --aisle-dairy: #3d5f86;
+  --aisle-meat: #8a2a1c;
+  --aisle-seafood: #2f6f7a;
+  --aisle-bakery: #8a5a1c;
+  --aisle-grains: #6b4a2a;
+  --aisle-canned: #6d6457;
+  --aisle-condiments: #8a6a12;
+  --aisle-snacks: #8a3050;
+  --aisle-beverages: #3f4a86;
+  --aisle-frozen: #2f6f7a;
+  --aisle-spices: #6e6418;
+  --aisle-oils: #7a6a1a;
+  --aisle-baking: #6a3a6e;
+  --aisle-misc: #55626a;
+
+  /* Account menu, theme picker and controls */
+  --text-label: var(--ink-faded);
+  --text-placeholder: var(--ink-light);
+  --danger-text: #9b2318;
+  --control-border: #c9ad78;
+  --surface-input: var(--page);
+  --surface-invalid: rgba(155, 35, 24, 0.1);
+  --surface-tint-brand: #efe2c2;
+  --control-hover-bg: #efe2c2;
+  --control-active-bg: #e3d2a8;
+  --focus-ring-control: var(--focus-ink);
+  --scrim-bg: rgba(34, 20, 10, 0.6);
+  --menu-border-color: var(--gold-dim);
+
+  /* Header: text and washes on the leather bar, guest nudge, avatar (wax seal) */
+  --on-brand-muted: var(--leather-ink);
+  --on-brand-hover-bg: rgba(233, 214, 172, 0.1);
+  --on-brand-active-bg: rgba(233, 214, 172, 0.16);
+  --nav-message-bg: var(--leather-dark);
+  --nav-message-text: var(--leather-ink);
+  --avatar-bg: var(--wax);
+  --avatar-text: #f3d2a8;
+  --avatar-ring: var(--gold-dim);
+
+  /* Footer, toasts and sign-in dialog. The Google button keeps Google's light spec. */
+  --toast-bg: var(--page);
+  --toast-text: var(--ink);
+  --toast-action: var(--wax);
+  --link-color: var(--focus-ink);
+  --action-bg: var(--wax);
+  --input-border-subtle: #c9ad78;
+  --error-text-strong: #8a1f15;
+  --google-btn-bg: #ffffff;
+  --google-btn-border: #dadce0;
+  --google-btn-text: #3c4043;
+  --google-btn-hover-bg: #f7f8f8;
+  --google-btn-shadow: rgba(60, 64, 67, 0.3);
+  --google-btn-shadow-soft: rgba(60, 64, 67, 0.15);
+
+  /* Recipes: cards, toolbar, week strip, day buttons, macro chips, popups */
+  --surface-popover: var(--page);
+  --surface-tint-soft: #efe2c2;
+  --surface-tint-faint: #f3e7c9;
+  --plan-border: #c9ad78;
+  --cheat-flag-bg: var(--wax);
+  --on-cheat-flag: var(--page);
+  --audited-bg: rgba(63, 107, 58, 0.14);
+  --audited-text: #2a5733;
+  --notice-bg: rgba(154, 108, 12, 0.14);
+  --notice-text: #6f4d05;
+  --error-surface: rgba(155, 35, 24, 0.12);
+  --error-text: #9b2318;
+  --chip-dashed-border: #b89a64;
+  --success-hover: #335a2f;
+  --dot-muted: #b89a64;
+  --week-empty-bg: #f3e7c9;
+  --week-empty-accent: var(--gold-dim);
+  --on-brand-soft: var(--leather-ink);
+  --on-brand-wash: rgba(247, 238, 214, 0.15);
+  --on-brand-hover-strong: rgba(247, 238, 214, 0.2);
+  --on-brand-active-strong: rgba(247, 238, 214, 0.3);
+  --on-brand-subtle: rgba(247, 238, 214, 0.9);
+  --on-text-primary: var(--page);
+  --text-faint: var(--ink-light);
+  --divider-soft: rgba(110, 80, 40, 0.18);
+  --brand-tint-faint: rgba(122, 31, 20, 0.06);
+  --brand-tint-soft: rgba(122, 31, 20, 0.1);
+  --storebought-bg: rgba(154, 108, 12, 0.16);
+  --storebought-text: #6f4d05;
+  --macro-chip-solid-bg: var(--page);
+
+  /* Meal plan: timetable, day view, cards, summary */
+  --on-brand-faint: rgba(247, 238, 214, 0.12);
+  --chip-selected-bg: var(--ink);
+  --chip-dot-filled: var(--verdigris);
+  --chip-dot-selected: rgba(247, 238, 214, 0.45);
+  --today-ring: var(--wax);
+  --slot-add-border: #b89a64;
+  --tick-border: #b89a64;
+  --eaten-bg: rgba(63, 107, 58, 0.12);
+  --eaten-border: rgba(63, 107, 58, 0.4);
+  --spinner-track: rgba(110, 80, 40, 0.18);
+  --stale-bg: rgba(154, 108, 12, 0.14);
+  --stale-border: var(--gold-dim);
+  --brand-hover: var(--wax-deep);
+
+  /* Meal plan: menus, sheets and modals */
+  --surface-tint-menu: #f3e7c9;
+  --surface-tint-menu-active: #e8d8ae;
+  --surface-tint-hint: #f3e7c9;
+  --pill-neutral-bg: #e8d8ae;
+  --warn-bg: rgba(154, 108, 12, 0.14);
+  --surface-row: #f3e7c9;
+  --slot-pill-bg: #e8d8ae;
+  --serving-pill-bg: #e3d2a8;
+  --homemade-bg: rgba(63, 107, 58, 0.14);
+  --control-hover-soft: #efe2c2;
+  --control-active-soft: #e8d8ae;
+  --danger-hover-bg: rgba(155, 35, 24, 0.1);
+  --warn-active-bg: rgba(154, 108, 12, 0.22);
+  --sheet-grab: var(--ink-light);
+  --sheet-backdrop: rgba(34, 20, 10, 0.55);
+  --text-strong: var(--ink);
+  --text-mid: var(--ink-faded);
+  --text-hint: var(--text-placeholder);
+  --text-meta: var(--ink-faded);
+  --warn-text: #7a4d05;
+  --warn-text-dark: #5e3a04;
+  --note-text: #6f4d05;
+  --error-copy: #9b2318;
+  --warn-accent: var(--ochre);
+  --homemade-text: #2a5733;
+  --text-brand-muted: var(--wax);
+  --warn-border: #c9a45c;
+  --danger-border: rgba(155, 35, 24, 0.45);
+  --control-border-brand: #c9ad78;
+  --scope-border: #d6bc86;
+  --divider-dashed: rgba(110, 80, 40, 0.3);
+  --border-input: #c9ad78;
+  --border-button: #b89a64;
+  --border-strong: var(--ink-light);
+  --brand-tint-whisper: rgba(122, 31, 20, 0.04);
+  --brand-focus-glow: rgba(31, 58, 95, 0.25);
+
+  /* Recipe view: header (leather), full-screen ingredients, cook mode, eaten section */
+  --rv-head-text: var(--leather-ink);
+  --rv-head-muted: rgba(233, 214, 172, 0.8);
+  --rv-head-wash: rgba(233, 214, 172, 0.14);
+  --rv-head-wash-soft: rgba(233, 214, 172, 0.1);
+  --rv-head-wash-hover: rgba(233, 214, 172, 0.2);
+  --rv-head-wash-strong: rgba(233, 214, 172, 0.28);
+  --rv-head-panel: rgba(233, 214, 172, 0.1);
+  --rv-head-press: rgba(233, 214, 172, 0.16);
+  --rv-head-field-focus: rgba(233, 214, 172, 0.2);
+  --rv-head-border: rgba(216, 178, 90, 0.5);
+  --rv-head-solid: var(--leather);
+  --rv-head-on-solid: var(--leather-ink);
+  --rv-head-focus: var(--gold);
+  --rv-head-error: #ffd0c4;
+  --rv-head-crumb: rgba(233, 214, 172, 0.75);
+  --rv-head-crumb-sep: rgba(233, 214, 172, 0.5);
+  --rv-accent: var(--gold);
+  --rv-on-accent: var(--leather-dark);
+  --cook-bg: var(--parchment);
+  --cook-muted: var(--ink-faded);
+  --cook-wash: rgba(110, 80, 40, 0.1);
+  --cook-chip: rgba(110, 80, 40, 0.14);
+  --cook-track: rgba(110, 80, 40, 0.2);
+  --ilist-cb-border: var(--ink-light);
+  --text-struck: var(--ink-light);
+  --sb-text: #6f4d05;
+  --sb-bg: rgba(154, 108, 12, 0.16);
+  --ifull-progress: var(--verdigris);
+  --pill-on-border: var(--ink-light);
+  --all-out-text: #2a5733;
+  --all-out-bg: rgba(63, 107, 58, 0.14);
+  --eaten-hover-bg: rgba(63, 107, 58, 0.1);
+
+  /* --pip-* tokens are deliberately not remapped: Pip's room keeps its own palette. */
+
+  /* Shopping list and its popups */
+  --surface-tint-pressed: #e3d2a8;
+  --progress-track: rgba(110, 80, 40, 0.2);
+  --stale-text: #6f4d05;
+  --aisle-done-bg: rgba(63, 107, 58, 0.08);
+  --aisle-done-hover-bg: rgba(63, 107, 58, 0.14);
+  --aisle-done-count-bg: rgba(63, 107, 58, 0.2);
+  --item-divider: rgba(110, 80, 40, 0.18);
+  --error-bg-soft: rgba(155, 35, 24, 0.1);
+  --on-brand-press-strong: rgba(247, 238, 214, 0.4);
+  --surface-tint-chip: #e8d8ae;
+  --warning-banner-bg: rgba(154, 108, 12, 0.16);
+  --warning-banner-text: #5e3a04;
+  --surface-quiet: #efe2c2;
+  --surface-quiet-hover: #e8d8ae;
+  --error-banner-bg: rgba(155, 35, 24, 0.12);
+  --error-banner-border: rgba(155, 35, 24, 0.5);
+  --error-banner-text: #7a1a12;
+  --brand-hover-deep: var(--wax-deep);
+
+  /* Shared dialogs and controls */
+  --picker-pill-bg: var(--page);
+  --picker-arrow-wash-strong: rgba(233, 214, 172, 0.26);
+  --dismiss-target-border: rgba(233, 214, 172, 0.55);
+  --dismiss-x-color: rgba(233, 214, 172, 0.85);
+  --dismiss-active-bg: var(--wax-bright);
+  --dismiss-circle-shadow: rgba(34, 20, 10, 0.5);
+  --lock-flash-glow: rgba(255, 228, 170, 0.9);
+
+  /* Admin forms */
+  --success-banner-bg: rgba(63, 107, 58, 0.16);
+  --success-banner-text: #2a5733;
+  --info-surface: rgba(47, 93, 138, 0.1);
+  --info-surface-soft: rgba(47, 93, 138, 0.08);
+  --info-border: rgba(47, 93, 138, 0.35);
+  --info-text: #234a70;
+  --info-accent: #2f5d8a;
+
+  /* Landing animation: leather in the dark phase, parchment in the light phase */
+  --landing-brand: var(--wax);
+  --landing-brand-dark: var(--wax-deep);
+  --landing-dark-bg-start: var(--leather-dark);
+  --landing-dark-bg-end: var(--leather);
+  --landing-dark-text: var(--leather-ink);
+  --landing-dark-text-secondary: rgba(233, 214, 172, 0.75);
+  --landing-light-bg-start: var(--page);
+  --landing-light-bg-end: var(--parchment);
+  --landing-light-text: var(--ink);
+  --landing-success: var(--verdigris);
+  --landing-glass: rgba(247, 238, 214, 0.08);
+  --landing-glass-border: rgba(247, 238, 214, 0.16);
+  --landing-glass-hover: rgba(247, 238, 214, 0.16);
+  --landing-glass-border-hover: rgba(247, 238, 214, 0.32);
+  --landing-brand-tint: var(--brand-tint-soft);
+  --landing-brand-border: rgba(122, 31, 20, 0.25);
+  --landing-brand-tint-hover: rgba(122, 31, 20, 0.16);
+  --landing-brand-border-hover: rgba(122, 31, 20, 0.4);
+  --landing-brand-tint-faint: var(--brand-tint-faint);
+  --landing-brand-glow: rgba(122, 31, 20, 0.25);
+  --google-btn-active-bg: #f1f3f4;
+}
+
+/* Low FX for Parchment is handled in parchment/shell.css (ambient layer, page-turn, ink-blot).
+   No token changes: the period fonts neither glow nor animate. */

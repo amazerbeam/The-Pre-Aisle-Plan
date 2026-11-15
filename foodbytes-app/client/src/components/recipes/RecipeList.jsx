@@ -1,12 +1,14 @@
 import { useState } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import { useMealPlan } from '../../contexts/MealPlanContext'
+import { useTheme } from '../../contexts/ThemeContext'
 import usePickingMode from '../../hooks/usePickingMode'
 import useRecipeCatalogue from '../../hooks/useRecipeCatalogue'
 import useHiddenRecipes from '../../hooks/useHiddenRecipes'
 import recipeService from '../../services/recipeService'
 import { RECIPE_TAB_LABELS } from '../../constants/recipesUi'
 import { hideKeyOf, recipeIdsInWeek } from '../../utils/recipeCatalogueUtils'
+import { pageCopy } from '../../utils/themeCopy'
 import RecipeCard from './RecipeCard'
 import RecipeToolbar from './RecipeToolbar'
 import WeekSlotStrip from './WeekSlotStrip'
@@ -19,6 +21,8 @@ import './RecipeList.css'
 function RecipeList() {
   const { isAdmin, isAuthenticated } = useAuth()
   const { weekPlan } = useMealPlan()
+  const { theme } = useTheme()
+  const heading = pageCopy(theme, 'recipes')
   const { activeMeal, setActiveMeal, pickDate, startPicking, finishPicking } = usePickingMode()
   const { recipesByMeal, loading, error, reload } = useRecipeCatalogue({ isAdmin })
   const hidden = useHiddenRecipes({ isAuthenticated })
@@ -76,6 +80,12 @@ function RecipeList() {
 
   return (
     <div className="recipe-list-container">
+      {heading && (
+        <header className="page-heading">
+          <h1 className="page-heading-title">{heading.title}</h1>
+          {heading.sub && <p className="page-sub">{heading.sub}</p>}
+        </header>
+      )}
       <RecipeToolbar
         activeMeal={activeMeal}
         counts={visibleCounts}
