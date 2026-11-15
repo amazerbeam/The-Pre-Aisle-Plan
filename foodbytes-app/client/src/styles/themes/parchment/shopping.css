@@ -8,7 +8,7 @@
 /* ---------- the scroll ---------- */
 :root[data-theme="parchment"] .shopping-list-page {
   --sl-pad-x: 18px;
-  --sl-overhang: 8px;
+  --sl-overhang: 0px;
   max-width: 640px;
   margin: 0 auto;
   padding: 26px var(--sl-pad-x) 22px;
