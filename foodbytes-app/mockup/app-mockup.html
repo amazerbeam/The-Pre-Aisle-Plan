@@ -250,6 +250,85 @@ body.lowfx .board-head .open{text-shadow:none}
 .pickbar button{margin-left:auto;background:var(--void);border:none;color:var(--yellow);padding:8px 12px;min-height:44px;font-family:var(--f-label);font-size:12px}
 .rgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:16px;margin-top:16px}
 .m .rgrid{grid-template-columns:1fr;gap:12px;margin-top:12px}
+/* ---------- RECIPE FOLDERS (proposal 2026-11-16) ---------- */
+.rlayout{display:grid;grid-template-columns:250px minmax(0,1fr);gap:20px;align-items:start}
+.rmain{min-width:0}
+.fside{position:sticky;top:0;padding:10px 8px 12px}
+.fside-h{display:flex;align-items:center;gap:6px;font-family:var(--f-label);font-size:12px;color:var(--cyan);padding:2px 4px 8px;border-bottom:1px solid var(--line-soft);margin-bottom:6px}
+.fside-h small{color:var(--muted);font-family:var(--f-body);font-size:11px;margin-left:auto}
+.ftree{display:flex;flex-direction:column;gap:2px}
+.frow{position:relative;display:flex;align-items:center;padding-left:calc(var(--d,0) * 16px);border:1px solid transparent}
+.frow.on{background:var(--raised);border-color:var(--yellow)}
+.frow.on .fname{color:var(--yellow);font-weight:700}
+.frow.drop{border:1px dashed var(--lime);background:var(--deep)}
+.frow.drop .fname{color:var(--lime)}
+.ftog{width:26px;min-height:40px;border:none;background:none;color:var(--muted);font-size:12px;flex:none;padding:0}
+.ftog.none{visibility:hidden}
+.fname{flex:1;min-width:0;display:flex;align-items:center;gap:7px;border:none;background:none;color:var(--ink);text-align:left;padding:9px 4px;font-size:14px;min-height:40px}
+.fname .t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fname .ico{color:var(--cyan)}
+.frow.on .fname .ico{color:var(--yellow)}
+.fname .n{margin-left:auto;font-family:var(--f-num);font-size:17px;color:var(--muted)}
+.fname:hover{color:var(--cyan)}
+.fk{width:34px;min-height:40px;border:none;background:none;color:var(--muted);font-size:16px;flex:none;opacity:0}
+.frow:hover .fk,.frow.on .fk,.fk:focus-visible,.m .fk,.dlg .fk{opacity:1}
+.fk:hover{color:var(--ink)}
+.frow .pop{top:38px;right:0}
+.fnew{width:100%;margin-top:8px;border:1px dashed var(--line);background:transparent;color:var(--cyan);font-family:var(--f-label);font-size:11px;min-height:44px;text-transform:uppercase}
+.fnew:hover{border-style:solid;border-color:var(--cyan)}
+.fhint{font-size:12px;color:var(--muted);padding:10px 4px 0;line-height:1.4}
+.fbar{display:flex;align-items:center;gap:8px;flex-basis:100%}
+.fpick{flex:1;min-width:0;display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--deep);color:var(--ink);padding:0 12px;min-height:44px;font-size:14px;text-align:left}
+.fpick .ico{color:var(--yellow)}
+.fpick .t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fpick .c{margin-left:auto;color:var(--cyan);font-family:var(--f-label);font-size:10px}
+.fhead{display:flex;align-items:flex-start;gap:10px;margin:14px 0 0;padding:12px 14px}
+.m .fhead{margin-top:10px;padding:10px 12px}
+.crumbs{display:flex;flex-wrap:wrap;align-items:center;gap:2px;font-family:var(--f-label);font-size:11px;color:var(--muted)}
+.crumbs button{border:none;background:none;color:var(--cyan);font-family:inherit;font-size:inherit;padding:6px 4px;min-height:32px}
+.crumbs button:hover{text-decoration:underline}
+.crumbs .sep{color:var(--line)}
+.fhead h3{margin:2px 0 0;font-family:var(--f-display);font-size:22px;color:var(--yellow);text-shadow:var(--glow-yellow);display:flex;align-items:center;gap:8px}
+.m .fhead h3{font-size:19px}
+.fhead .meta{font-size:13px;color:var(--muted);margin-top:3px}
+.fhead .acts{margin-left:auto;display:flex;gap:6px;position:relative;flex:none}
+.fhead .pop{top:46px}
+.ftiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-top:12px}
+.m .ftiles{grid-template-columns:1fr 1fr;gap:8px}
+.ftile{display:flex;align-items:center;gap:9px;border:1px solid var(--line-soft);border-left:4px solid var(--yellow);background:var(--deep);color:var(--ink);padding:10px 12px;min-height:52px;text-align:left;font-size:14px}
+.ftile:hover{border-color:var(--yellow);color:var(--yellow)}
+.ftile .ico{color:var(--yellow);font-size:18px}
+.ftile .t{display:flex;flex-direction:column;min-width:0}
+.ftile .t b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ftile .t small{color:var(--muted);font-size:11px;font-family:var(--f-label)}
+.ftile.add{border:1px dashed var(--line);border-left-width:1px;color:var(--cyan);justify-content:center;font-family:var(--f-label);font-size:11px}
+.ftags{display:flex;flex-wrap:wrap;gap:4px;margin-top:-3px}
+.ftag{border:1px solid var(--line-soft);background:var(--deep);color:var(--muted);font-size:11px;padding:3px 7px;display:inline-flex;gap:4px;align-items:center;min-height:24px}
+.ftag .ico{color:var(--yellow)}
+.rcard[draggable="true"]{cursor:grab}
+.rcard.dragging{opacity:.45}
+.dlg .ftree{margin:4px 0 8px}
+.dlg .frow{border-bottom:1px solid var(--line-soft)}
+.dlg .cbx{width:22px;height:22px;border:2px solid var(--line);display:grid;place-items:center;font-size:13px;color:transparent;flex:none;margin-right:2px}
+.dlg .cbx.on{background:var(--lime);border-color:var(--lime);color:var(--void)}
+.dlg .fname[aria-checked="true"]{color:var(--lime)}
+.dlg .finput{display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--muted);font-family:var(--f-label)}
+.dlg .finput input{border:1px solid var(--line);background:var(--deep);padding:11px 12px;font-size:16px;font-family:var(--f-body);color:var(--ink);min-height:46px}
+.dlg .finput input:focus{outline:none;border-color:var(--cyan);box-shadow:var(--box-cyan)}
+.dlg .opt.sel{color:var(--yellow);background:var(--raised)}
+.dlg .opt .ico{color:var(--yellow)}
+.vtog{display:inline-flex;border:1px solid var(--line);background:var(--deep);margin-left:auto}
+.board-head .open+.vtog{margin-left:12px}
+.vtog button{border:none;background:none;color:var(--muted);font-family:var(--f-label);font-size:11px;padding:0 12px;min-height:44px;display:inline-flex;align-items:center;gap:6px;text-transform:uppercase;white-space:nowrap}
+.vtog button[aria-checked="true"]{background:var(--yellow);color:var(--void)}
+.vtog button[aria-checked="true"] .ico{color:var(--void)}
+.vtog button .ico{color:var(--yellow)}
+.m .vtog{margin-left:auto;align-self:center}
+.m .vtog button{padding:0 9px;font-size:10px}
+.m .board-head{flex-wrap:nowrap;align-items:center}
+.fsec{font-family:var(--f-label);font-size:12px;color:var(--cyan);margin:18px 0 -4px;display:flex;gap:8px;align-items:center}
+.fsec small{font-family:var(--f-body);font-size:12px;color:var(--muted)}
+.note .lk{border:none;background:none;color:var(--cyan);font-weight:600;padding:0 2px;font-size:inherit;text-decoration:underline}
 .rcard{padding:14px;display:flex;flex-direction:column;gap:11px}
 .m .rcard{padding:12px;gap:10px}
 .rcard:hover{border-color:var(--line)}
@@ -598,6 +677,7 @@ const ICO={
  menu:pxi([".#############.",".#...........#.",".#.aaaaaaaaa.#.",".#...........#.",".#.####...bb.#.",".#...........#.",".#.#####..bb.#.",".#...........#.",".#.###....bb.#.",".#...........#.",".#.####...bb.#.",".#...........#.",".#############."],{a:'var(--pink)',b:'var(--yellow)'}),
  cal:pxi(["...#.......#...","...#.......#...","aaa#aaaaaaa#aaa","aaaaaaaaaaaaaaa","aaaaaaaaaaaaaaa","#.............#","#.###.###.###.#","#.###.###.###.#","#.............#","#.###.bbb.###.#","#.###.bbb.###.#","#.............#","#.###.###.....#","#.###.###.....#","###############"],{a:'var(--pink)',b:'var(--yellow)'}),
  cart:pxi(["##.............",".##............","..#############","..#a.a.a.a.a.#.","...#a.a.a.a.#..","...#.a.a.a.a#..","....#########..","....#..........",".....#.........",".....#########.","...............","......bb...bb..","......bb...bb.."],{a:'var(--cyan)',b:'var(--pink)'}),
+ folder:pxi(["#####..........","#...#########..","#############.#","#aaaaaaaaaaaa##","#aaaaaaaaaaaa##","#aaaaaaaaaaaa##","#aaaaaaaaaaaa##","#aaaaaaaaaaaa#.","##############."],{a:'var(--deep)'}),
  sprout:pxi(["...............",".aaaa.....aaaa.","aaaaaa...aaaaaa",".aaaaa.a.aaaaa.","..aaaa.a.aaaa..","....aa.a.aa....",".......a.......",".......a.......","...#########...","...bbbbbbbbb...","....bbbbbbb....","....bbbbbbb....",".....bbbbb....."],{a:'var(--lime)',b:'var(--orange)'})};
 document.head.insertAdjacentHTML('beforeend',`<link rel="icon" href="data:image/svg+xml,${encodeURIComponent(LOGO)}">`);
 
@@ -642,6 +722,13 @@ function fresh(){
   S={plan:{},hidden:new Set(),changes:[],version:0,shopping:null,portions:2,times:['08:00','13:00','19:00'],signedIn:true,shoppingChecks:{}};
   U={mode:'web',route:'recipes',weekOff:0,meal:'breakfast',query:'',showHidden:false,pick:null,cardVar:{},cardSrv:{},menu:null,acct:false,
      mobDay:5,swipeOpen:null,dlg:null,toast:null,hideTicked:false,wake:false,aisleOpen:{},stepper:null};
+  // custom recipe folders: personal, nest up to 3 deep, a recipe can sit in several folders
+  S.folders=[{id:'f1',name:'Batch cook',parent:null},{id:'f2',name:'Freezer friendly',parent:'f1'},{id:'f3',name:'Date night',parent:null},
+    {id:'f4',name:'Quick (under 20 min)',parent:null},{id:'f5',name:'Gym days',parent:null},{id:'f6',name:'Post-workout',parent:'f5'}];
+  S.fmem={f1:new Set(['curry','bolo','shaw','padt']),f2:new Set(['curry','bolo']),f3:new Set(['pican','pizza','avo','salm']),
+    f4:new Set(['yog','oats','caes','tikka','berr','popc']),f5:new Set(['hash','omel','shaw','tikka','curry']),f6:new Set(['berr','oats','bar'])};
+  Object.assign(U,{folder:null,fopen:{f1:true,f5:true},fseq:7});
+  try{U.view=localStorage.getItem('fb.recipes.view')==='folders'?'folders':'menu'}catch{U.view='menu'}
   const E=(rid,v,srv,eaten)=>({id:seq++,rid,v,srv,eaten:!!eaten});
   const D=(d)=>`2026-11-${String(d).padStart(2,'0')}`;
   const P0={9:['oats','shaw','padt'],10:['hash','caes','pican'],11:['yog','shaw','pizza'],12:['omel','tikka','curry'],13:['oats','ramen','pizza'],14:['hash','bar','curry'],15:['hash',null,'bolo']};
@@ -764,25 +851,78 @@ function page(mob){
   if(!S.signedIn&&U.route!=='recipes')return `<div class="page"><div class="empty">Sign in to use ${U.route==='pet'?'Pip':U.route==='mealplan'?'meal planning':'the shopping list'}.<br><br><button class="btn primary" data-a="signin">Sign in</button></div></div>`;
   return {recipes:recipesPage,mealplan:mob?mealMobile:mealWeb,shopping:shoppingPage,pet:pipPage}[U.route](mob)}
 
+/* ---------------- RECIPE FOLDERS ---------------- */
+const FMAX_DEPTH=3;
+const FB=id=>S.folders.find(f=>f.id===id);
+const fKids=pid=>S.folders.filter(f=>f.parent===pid).sort((a,b)=>a.name.localeCompare(b.name));
+function fPath(id){const p=[];let f=FB(id);while(f){p.unshift(f);f=FB(f.parent)}return p}
+const fDepth=id=>id?fPath(id).length:0;
+function fDesc(id){return fKids(id).flatMap(k=>[k.id,...fDesc(k.id)])}
+function fHeight(id){const k=fKids(id);return k.length?1+Math.max(...k.map(x=>fHeight(x.id))):1}
+const inF=(fid,rid)=>!!S.fmem[fid]?.has(rid);
+const fCount=fid=>[...(S.fmem[fid]||[])].filter(rid=>!S.hidden.has(rid)).length;
+const rFolders=rid=>S.folders.filter(f=>inF(f.id,rid));
+const unfiledN=()=>RECIPES.filter(r=>!S.hidden.has(r.id)&&!rFolders(r.id).length).length;
+const vTog=()=>`<div class="vtog" role="radiogroup" aria-label="Recipe view"><button role="radio" aria-checked="${U.view!=='folders'}" data-a="vset" data-v="menu">☰ Menu</button><button role="radio" aria-checked="${U.view==='folders'}" data-a="vset" data-v="folders">${ICO.folder} Folders</button></div>`;
+// one tree for the sidebar, the mobile sheet and the "Add to folder" picker
+function ftree(mode,rid){ // mode: 'nav' | 'pick'
+  const row=(f,d)=>{const kids=fKids(f.id),open=mode==='pick'||U.fopen[f.id],on=mode==='nav'&&U.folder===f.id,chk=mode==='pick'&&inF(f.id,rid);
+    return `<div class="frow ${on?'on':''}" style="--d:${d}" ${mode==='nav'?`data-fdrop="${f.id}"`:''}>
+      <button class="ftog ${kids.length&&mode==='nav'?'':'none'}" data-a="ftog" data-v="${f.id}" aria-label="${open?'Collapse':'Expand'} ${esc(f.name)}" aria-expanded="${!!open}">${open?'▾':'▸'}</button>
+      ${mode==='pick'?`<button class="fname" role="checkbox" aria-checked="${chk}" data-a="fmemTog" data-v="${f.id}" data-r="${rid}"><span class="cbx ${chk?'on':''}" aria-hidden="true">✓</span>${ICO.folder}<span class="t">${esc(f.name)}</span><span class="n">${fCount(f.id)}</span></button>`
+        :`<button class="fname" data-a="fopen" data-v="${f.id}" aria-current="${on?'true':'false'}">${ICO.folder}<span class="t">${esc(f.name)}</span><span class="n">${fCount(f.id)}</span></button>
+      <button class="fk" data-a="menu" data-v="f-${f.id}" aria-label="Folder actions for ${esc(f.name)}">⋯</button>${U.menu==='f-'+f.id?fMenu(f):''}`}
+    </div>${open?kids.map(k=>row(k,d+1)).join(''):''}`};
+  return `<div class="ftree">${mode==='nav'?`<div class="frow ${U.folder?'':'on'}"><span class="ftog none"></span><button class="fname" data-a="fopen" data-v="" aria-current="${!U.folder}">☰ <span class="t">All folders</span><span class="n">${unfiledN()}</span></button></div>`:''}
+    ${fKids(null).map(f=>row(f,0)).join('')}</div>`}
+function fMenu(f){const deep=fDepth(f.id)>=FMAX_DEPTH;return `<div class="pop" data-stop>
+  ${U.folder===f.id?`<button data-a="faddHere">＋ Add recipes…</button>`:`<button data-a="fopen" data-v="${f.id}">📂 Open</button>`}
+  <button data-a="fnewDlg" data-v="${f.id}" ${deep?'disabled title="Folders go 3 levels deep"':''}>＋ New subfolder${deep?' <small>(max depth)</small>':''}</button>
+  <button data-a="frenameDlg" data-v="${f.id}">✎ Rename</button>
+  <button data-a="fmoveDlg" data-v="${f.id}">↳ Move to…</button><hr>
+  <button class="danger" data-a="fdelDlg" data-v="${f.id}">🗑 Delete folder</button></div>`}
+function fSide(){return `<aside class="fside hud" aria-label="Recipe folders"><div class="fside-h">${ICO.folder} MY FOLDERS<small>drag a card onto one</small></div>
+  ${ftree('nav')}<button class="fnew" data-a="fnewDlg" data-v="">＋ New folder</button></aside>`}
+function fHead(mob){const f=FB(U.folder);if(!f)return '';const p=fPath(f.id),kids=fKids(f.id),n=fCount(f.id),deep=fDepth(f.id)>=FMAX_DEPTH;
+  return `<div class="fhead hud"><div style="min-width:0;flex:1">
+    <nav class="crumbs" aria-label="Folder path"><button data-a="fopen" data-v="">All folders</button>${p.slice(0,-1).map(x=>`<span class="sep">›</span><button data-a="fopen" data-v="${x.id}">${esc(x.name)}</button>`).join('')}<span class="sep">›</span></nav>
+    <h3>${ICO.folder} ${esc(f.name)}</h3><div class="meta">${n} recipe${n===1?'':'s'}${kids.length?` · ${kids.length} subfolder${kids.length===1?'':'s'}`:''}</div></div>
+    <div class="acts">${mob?'':`<button class="btn" data-a="faddHere">＋ Add recipes</button>`}<button class="btn" data-a="menu" data-v="fh-${f.id}" aria-label="Folder actions">⋯</button>${U.menu==='fh-'+f.id?fMenu(f):''}</div></div>
+    ${kids.length||!deep?`<div class="ftiles">${kids.map(k=>{const kn=fCount(k.id),kk=fKids(k.id).length;return `<button class="ftile" data-a="fopen" data-v="${k.id}" data-fdrop="${k.id}">${ICO.folder}<span class="t"><b>${esc(k.name)}</b><small>${kn} RECIPE${kn===1?'':'S'}${kk?` · ${kk} FOLDER${kk===1?'':'S'}`:''}</small></span></button>`}).join('')}
+      ${deep?'':`<button class="ftile add" data-a="fnewDlg" data-v="${f.id}">＋ NEW SUBFOLDER</button>`}</div>`:''}`}
+
+function fRoot(){const top=fKids(null);return `<div class="fsec">${ICO.folder} YOUR FOLDERS <small>${top.length}</small></div><div class="ftiles">${top.map(k=>{const kn=fCount(k.id),kk=fKids(k.id).length;return `<button class="ftile" data-a="fopen" data-v="${k.id}" data-fdrop="${k.id}">${ICO.folder}<span class="t"><b>${esc(k.name)}</b><small>${kn} RECIPE${kn===1?'':'S'}${kk?` · ${kk} FOLDER${kk===1?'':'S'}`:''}</small></span></button>`}).join('')}<button class="ftile add" data-a="fnewDlg" data-v="">＋ NEW FOLDER</button></div>
+  <div class="fsec">NOT IN A FOLDER YET <small>${unfiledN()} recipes · file them from ⋯${U.mode==='mobile'?'':' or drag onto a folder'}</small></div>`}
+
 /* ---------------- RECIPES ---------------- */
 function recipesPage(mob){
-  const meal=U.meal,q=U.query.trim().toLowerCase();
+  const meal=U.meal,q=U.query.trim().toLowerCase(),fv=S.signedIn&&U.view==='folders',fld=fv?FB(U.folder):null;
   const isHid=r=>S.hidden.has(r.id);
-  const counts=Object.fromEntries(TABS.map(t=>[t,RECIPES.filter(r=>r.meal===t&&!isHid(r)).length]));
+  const inScope=r=>fld?inF(fld.id,r.id):fv?!rFolders(r.id).length:true;
+  const counts=Object.fromEntries(TABS.map(t=>[t,RECIPES.filter(r=>r.meal===t&&!isHid(r)&&inScope(r)).length]));
   const hiddenN=RECIPES.filter(isHid).length;
-  const list=RECIPES.filter(r=>r.meal===meal&&(U.showHidden?isHid(r):!isHid(r))&&r.name.toLowerCase().includes(q));
-  let h=`<div class="page"><div class="board-head"><div class="titlebox"><h2 class="title">Tonight's menu</h2><span class="title-sub">// SERVED HOT 24/7 · SECTOR 9</span></div><span class="open">● OPEN NOW</span></div><div class="rtool">
+  const list=RECIPES.filter(r=>r.meal===meal&&inScope(r)&&(U.showHidden?isHid(r):!isHid(r))&&r.name.toLowerCase().includes(q));
+  let h=`<div class="page"><div class="board-head"><div class="titlebox"><h2 class="title">Tonight's menu</h2><span class="title-sub">// SERVED HOT 24/7 · SECTOR 9</span></div><span class="open">● OPEN NOW</span>${S.signedIn?vTog():''}</div>`;
+  const side=fv&&!mob;
+  if(side)h+=`<div class="rlayout">${fSide()}<div class="rmain">`;
+  h+=`<div class="rtool">
+    ${fv&&mob?`<div class="fbar"><button class="fpick" data-a="fsheet" aria-haspopup="dialog">${fld?ICO.folder:'☰'}<span class="t">${fld?fPath(fld.id).map(x=>esc(x.name)).join(' › '):'All folders'}</span><span class="c">FOLDERS ▾</span></button></div>`:''}
     <div class="tabs" role="tablist">${TABS.map(t=>`<button class="tab ${t===meal?'on':''}" data-a="tab" data-v="${t}">${TABL[t]}<span class="n">${counts[t]}</span></button>`).join('')}</div>
-    <div class="search">🔍<input data-keep="search" data-a2="search" placeholder="Search ${TABL[meal].toLowerCase()} recipes" value="${esc(U.query)}"></div>
+    <div class="search">🔍<input data-keep="search" data-a2="search" placeholder="Search ${fld?'in '+esc(fld.name):fv?'unfiled '+TABL[meal].toLowerCase():TABL[meal].toLowerCase()+' recipes'}" value="${esc(U.query)}"></div>
     ${S.signedIn?`<button class="fchip ${U.showHidden?'on':''}" data-a="showHidden">🙈 Hidden (${hiddenN})</button>`:''}
   </div>`;
-  if(!U.showHidden&&S.signedIn&&meal!=='extras')h+=weekStrip(meal);
+  if(fld&&!U.showHidden)h+=fHead(mob);
+  if(fv&&!fld&&!U.showHidden)h+=fRoot();
+  if(!U.showHidden&&S.signedIn&&meal!=='extras'&&!fv)h+=weekStrip(meal);
   if(U.pick&&!U.showHidden){const d=weekDays().find(x=>x.iso===U.pick.date);h+=`<div class="pickbar">Picking <b>${TABL[meal].toLowerCase()}</b> for <b>${d.dow} ${d.n}</b>. Tap “Add to ${d.dow}” on any recipe.<button data-a="cancelPick">Cancel</button></div>`}
   h+=`<div class="rgrid">`;
   if(U.showHidden)h+=`<div class="note">🙈 <b>Hidden recipes.</b> These don't show in your lists. Meals already in your plan stay put.${list.length?'':'<br>Nothing hidden in '+TABL[meal]+'.'}</div>`;
   list.forEach(r=>h+=recipeCard(r,mob));
-  if(!list.length&&!U.showHidden)h+=`<div class="note">No ${TABL[meal].toLowerCase()} recipes match “${esc(U.query)}”.</div>`;
-  return h+`</div></div>`}
+  if(!list.length&&!U.showHidden){
+    if(fld&&!q){const other=TABS.filter(t=>counts[t]);h+=`<div class="note">No ${TABL[meal].toLowerCase()} recipes in <b>${esc(fld.name)}</b>.${other.length?` It has ${other.map(t=>`<button class="lk" data-a="tab" data-v="${t}">${counts[t]} ${TABL[t].toLowerCase()}</button>`).join(', ')}.`:''}<br>Use <b>⋯ → Add to folder</b> on any recipe${mob?'':', or drag a card onto a folder'}.</div>`}
+    else if(fv&&!fld&&!q)h+=`<div class="note">Every ${TABL[meal].toLowerCase()} recipe is in a folder ✓</div>`;
+    else h+=`<div class="note">No ${TABL[meal].toLowerCase()} recipes ${fld?'in '+esc(fld.name)+' ':''}match “${esc(U.query)}”.</div>`}
+  return h+`</div>${side?'</div></div>':''}</div>`}
 function weekStrip(meal){
   const days=weekDays(),empt=days.filter(d=>!slot(d.iso,meal)).length;
   return `<div class="strip hud"><div class="strip-h">This week's ${TABL[meal].toLowerCase()}<span class="gap ${empt?'':'full'}">${empt?`${empt} day${empt>1?'s':''} still empty`:'All 7 days planned ✓'}</span></div>
@@ -802,10 +942,13 @@ function recipeCard(r){
   else days=`<div class="dlabel">Add to a day</div><div class="dbtns">${weekDays().map(d=>{const e=slot(d.iso,meal),cls=e?(e.rid===r.id?'mine':'other'):'';
       const t=e?(e.rid===r.id?`Remove from ${d.dow}`:`Replace ${RB[e.rid].name} on ${d.dow}`):`Add to ${d.dow}`;
       return `<button class="dbtn ${cls}" title="${esc(t)}" aria-label="${esc(t)}" data-a="assign" data-r="${r.id}" data-d="${d.iso}">${d.dow}</button>`}).join('')}</div>`;
-  return `<article class="rcard hud ${ip?'inplan':''} ${hid?'ishidden':''}">
+  const fv=S.signedIn&&U.view==='folders',fl=fv?rFolders(r.id).filter(f=>f.id!==U.folder):[],fld=fv?FB(U.folder):null;
+  const dragOk=fv&&U.mode!=='mobile'&&!hid;
+  return `<article class="rcard hud ${ip?'inplan':''} ${hid?'ishidden':''}" ${dragOk?`draggable="true" data-rdrag="${r.id}"`:''}>
     <div class="rtop"><span class="rno">${String(RECIPES.indexOf(r)+1).padStart(2,'0')}</span><button class="rname" data-a="viewRecipe" data-r="${r.id}">${esc(r.name)}</button><span class="lead" aria-hidden="true"></span>${r.vars.length>1?'':`<span class="price">${v.k}<small>KCAL</small></span>`}${r.cheat?'<span class="badge b-cheat">Cheat</span>':''}
       <button class="kebab" data-a="menu" data-v="r-${r.id}" aria-label="More actions">⋯</button></div>
-    ${U.menu==='r-'+r.id?`<div class="pop" data-stop><button data-a="viewRecipe" data-r="${r.id}">📖 View recipe</button>${S.signedIn?(hid?`<button data-a="unhide" data-r="${r.id}">👁 Unhide</button>`:`<button data-a="hide" data-r="${r.id}">🙈 Hide from my recipes</button>`):''}</div>`:''}
+    ${U.menu==='r-'+r.id?`<div class="pop" data-stop><button data-a="viewRecipe" data-r="${r.id}">📖 View recipe</button>${S.signedIn?`<button data-a="faddDlg" data-r="${r.id}">${ICO.folder} Add to folder…</button>${fld&&inF(fld.id,r.id)?`<button data-a="fremove" data-r="${r.id}">↩ Remove from ${esc(fld.name)}</button>`:''}`:''}${S.signedIn?(hid?`<button data-a="unhide" data-r="${r.id}">👁 Unhide</button>`:`<button data-a="hide" data-r="${r.id}">🙈 Hide from my recipes</button>`):''}</div>`:''}
+    ${fl.length?`<div class="ftags" aria-label="In folders">${fl.slice(0,3).map(f=>`<button class="ftag" data-a="fopen" data-v="${f.id}">${ICO.folder} ${esc(f.name)}</button>`).join('')}${fl.length>3?`<span class="ftag">+${fl.length-3}</span>`:''}</div>`:''}
     ${seg}
     <div class="rrow">${chips(v,'meal')}<button class="ppl" data-a="stepper" data-r="${r.id}">👥 ${srv} ▾</button>${ip?'<span class="badge b-plan">In plan</span>':''}</div>
     ${U.stepper===r.id?`<div class="stepper" data-stop><button data-a="srv" data-r="${r.id}" data-v="-1">−</button><b>${srv}</b><button data-a="srv" data-r="${r.id}" data-v="1">+</button></div>`:''}
@@ -943,7 +1086,29 @@ function dialog(mob){
   else if(D.t==='breakdown'){const i=S.shopping.items.find(y=>y.key===D.v);b=`${x}<h3>${esc(i.n)}</h3><p>Used in these meals (existing breakdown popup):</p>${i.uses.map(u=>{const d=dayOf(u.d);return `<div class="row"><span>${d.dow} · ${esc(u.name)}</span><b>${fq(u.q)} ${i.u}</b></div>`}).join('')}<div class="row"><span><b>Total</b></span><b>${fq(i.q)} ${i.u}</b></div>`}
   else if(D.t==='login'){b=`${x}<div class="login">${LOGIN_MARK}<h3>FOODBYTES</h3><p>Night Kitchen · Sector 9. Sign in to plan your week and build your supply run.</p><button class="gbtn" data-a="doSignin">G&nbsp; Sign in with Google</button></div>`}
   else if(D.t==='date'){b=`${x}<h3>Pick a week</h3><p>The native date picker opens here. Choose any date and the week starts there.</p>${[-2,-1,0,1,2].map(o=>`<button class="opt" data-a="week" data-v="${o}" data-abs="1">${rangeLabel(addD('2026-11-09',o*7),addD('2026-11-15',o*7))}${o===0?'<small>this week</small>':''}</button>`).join('')}`}
-  const T={recipe:'KDS://RECIPE',dayMacros:'SYS://DAY MACROS',weekMacros:'SYS://WEEK MACROS',swap:'SYS://SWAP DAYS',move:'SYS://MOVE ORDER',servings:'SYS://SERVINGS',weekSheet:'SYS://THIS WEEK',info:'SYS://TOOLS',gen:'SYS://SUPPLY RUN',uncheck:'SYS://CONFIRM',breakdown:'SYS://USED IN',login:'DOOR://SIGN IN',date:'SYS://PICK A WEEK'};
+  else if(D.t==='fsheet'){b=`<h3>Folders</h3><p>Open a folder to see just its recipes. Tap ⋯ to rename, move or delete.</p>${ftree('nav')}<button class="big" data-a="fnewDlg" data-v="">＋ New folder</button>`}
+  else if(D.t==='fnew'){const par=FB(D.parent);b=`<h3>${par?'New subfolder':'New folder'}</h3><p>${par?`Inside <b>${esc(fPath(par.id).map(x=>x.name).join(' › '))}</b>.`:'At the top level.'}${D.r?` <b>${esc(RB[D.r].name)}</b> goes straight in.`:''}</p>
+     <label class="finput">NAME<input data-keep="fname" data-a2="fname" maxlength="40" placeholder="e.g. Batch cook" value="${esc(D.name||'')}"></label>
+     ${D.err?`<div class="warn">${D.err}</div>`:''}
+     <button class="big" data-a="fcreate">Create folder</button><button class="link" data-a="${D.back?'fback':'close'}">Cancel</button>`}
+  else if(D.t==='frename'){const f=FB(D.v);b=`<h3>Rename folder</h3><label class="finput">NAME<input data-keep="fname" data-a2="fname" maxlength="40" value="${esc(D.name??f.name)}"></label>${D.err?`<div class="warn">${D.err}</div>`:''}<button class="big" data-a="fdoRename">Save</button><button class="link" data-a="close">Cancel</button>`}
+  else if(D.t==='fmove'){const f=FB(D.v),bad=new Set([f.id,...fDesc(f.id)]),h=fHeight(f.id);
+    const ok=t=>!bad.has(t.id)&&fDepth(t.id)+h<=FMAX_DEPTH;
+    const opts=(pid,d)=>fKids(pid).flatMap(t=>[`<button class="opt ${f.parent===t.id?'sel':''}" style="padding-left:${4+d*18}px" ${ok(t)&&f.parent!==t.id?'':'disabled'} data-a="fdoMove" data-v="${t.id}">${ICO.folder} ${esc(t.name)}<small>${f.parent===t.id?'current':bad.has(t.id)?'':ok(t)?'':'too deep'}</small></button>`,...(bad.has(t.id)?[]:opts(t.id,d+1))]);
+    b=`<h3>Move “${esc(f.name)}”</h3><p>Its recipes and subfolders come with it. Folders go up to ${FMAX_DEPTH} levels deep.</p>
+     <button class="opt ${f.parent?'':'sel'}" ${f.parent?'':'disabled'} data-a="fdoMove" data-v="">☰ Top level<small>${f.parent?'':'current'}</small></button>${opts(null,0).join('')}`}
+  else if(D.t==='fdel'){const f=FB(D.v),sub=fKids(f.id),n=fCount(f.id),par=FB(f.parent);
+    b=`<h3>Delete “${esc(f.name)}”?</h3><p>Only the folder goes. <b>No recipes are deleted</b>: they stay in All recipes and in any other folder they're in.</p>
+     <div class="row"><span>Recipes filed here</span><b>${n}</b></div>${sub.length?`<div class="row"><span>Subfolders</span><b>${sub.length}</b></div><div class="warn">Its subfolders move up to ${par?esc(par.name):'the top level'}.</div>`:''}
+     <button class="big" data-a="fdoDel">Delete folder</button><button class="link" data-a="close">Cancel</button>`}
+  else if(D.t==='fadd'){const r=RB[D.r],n=rFolders(r.id).length;b=`<h3>Add to folder</h3><p><b>${esc(r.name)}</b> can sit in as many folders as you like. ${n?`In ${n} now.`:'Not in any yet.'}</p>${ftree('pick',r.id)}
+     <button class="link" style="text-align:left" data-a="fnewDlg" data-v="" data-r="${r.id}">＋ New folder…</button><button class="big" data-a="close">Done</button>`}
+  else if(D.t==='faddHere'){const f=FB(U.folder),q=(D.q||'').toLowerCase(),list=RECIPES.filter(r=>!S.hidden.has(r.id)&&r.name.toLowerCase().includes(q));
+    b=`<h3>Add to ${esc(f.name)}</h3><p>Tick recipes from any meal. ${fCount(f.id)} in this folder.</p>
+     <div class="search" style="margin-bottom:6px">🔍<input data-keep="fq" data-a2="fq" placeholder="Search all recipes" value="${esc(D.q||'')}"></div>
+     ${TABS.map(t=>{const rs=list.filter(r=>r.meal===t);return rs.length?`<div class="grp">${TABL[t].toUpperCase()}</div>${rs.map(r=>{const on=inF(f.id,r.id);return `<div class="frow"><button class="fname" role="checkbox" aria-checked="${on}" data-a="fmemTog" data-v="${f.id}" data-r="${r.id}"><span class="cbx ${on?'on':''}" aria-hidden="true">✓</span>${r.emoji} <span class="t">${esc(r.name)}</span></button></div>`}).join('')}`:''}).join('')}
+     <button class="big" data-a="close">Done</button>`}
+  const T={recipe:'KDS://RECIPE',dayMacros:'SYS://DAY MACROS',weekMacros:'SYS://WEEK MACROS',swap:'SYS://SWAP DAYS',move:'SYS://MOVE ORDER',servings:'SYS://SERVINGS',weekSheet:'SYS://THIS WEEK',info:'SYS://TOOLS',gen:'SYS://SUPPLY RUN',uncheck:'SYS://CONFIRM',breakdown:'SYS://USED IN',login:'DOOR://SIGN IN',date:'SYS://PICK A WEEK',fsheet:'DIR://FOLDERS',fnew:'DIR://NEW FOLDER',frename:'DIR://RENAME',fmove:'DIR://MOVE FOLDER',fdel:'DIR://CONFIRM',fadd:'DIR://FILE RECIPE',faddHere:'DIR://FILE RECIPES'};
   return `<div class="scrim" data-a="scrim"><div class="dlg ${D.t==='recipe'?'rv':''}" role="dialog" aria-modal="true" data-stop><div class="bar-t"><span>${T[D.t]||'SYS://'}</span><button class="x" data-a="close" aria-label="Close">[X]</button></div>${b}</div></div>`}
 function stepsFor(r){const n=r.ing.map(i=>i[0].toLowerCase());return r.ing.length?[`Weigh out everything: ${n.slice(0,3).join(', ')}${n.length>3?' and the rest':''}.`,`Prep the ${n[0]}${n[1]?' and the '+n[1]:''}.`,'Heat a pan over a medium-high heat and cook the main ingredient through.','Combine everything, season to taste and plate up.']:['Follow the recipe card.']}
 function rvSrv(srv){return `<div class="rv-srv"><button data-a="rvSrv" data-v="-1" aria-label="Fewer servings">−</button><span><b>${srv}</b> ${srv==1?'person':'people'}</span><button data-a="rvSrv" data-v="1" aria-label="More servings">+</button></div>`}
@@ -997,6 +1162,35 @@ const A={
   info:d=>{U.menu=null;U.dlg={t:'info',v:d.v}},
   // recipes
   tab:d=>{U.meal=d.v;U.pick=null;U.menu=null},
+  // recipe folders
+  vset:d=>{U.view=d.v;U.query='';U.showHidden=false;U._resetScroll=true;try{localStorage.setItem('fb.recipes.view',d.v)}catch{}},
+  fopen:d=>{U.menu=null;U.view='folders';U.folder=d.v||null;U.query='';U.showHidden=false;if(U.dlg?.t==='fsheet')U.dlg=null;U._resetScroll=true;
+    if(U.folder){fPath(U.folder).forEach(x=>U.fopen[x.id]=true);const f=FB(U.folder);
+      if(!RECIPES.some(r=>r.meal===U.meal&&inF(f.id,r.id)&&!S.hidden.has(r.id))){const t=TABS.find(t=>RECIPES.some(r=>r.meal===t&&inF(f.id,r.id)&&!S.hidden.has(r.id)));if(t)U.meal=t}}},
+  ftog:d=>{U.fopen[d.v]=!U.fopen[d.v]},
+  fsheet:()=>{U.dlg={t:'fsheet'}},
+  fnewDlg:d=>{U.menu=null;U.dlg={t:'fnew',parent:d.v||null,r:d.r||null,name:'',back:U.dlg?.t==='fadd'||U.dlg?.t==='fsheet'?U.dlg:null}},
+  fback:()=>{U.dlg=U.dlg.back},
+  fcreate:()=>{const D=U.dlg,name=(D.name||'').trim();
+    if(!name){D.err='Give the folder a name.';return}
+    if(fKids(D.parent).some(f=>f.name.toLowerCase()===name.toLowerCase())){D.err=`There's already a “${esc(name)}” here.`;return}
+    const id='f'+(U.fseq++);S.folders.push({id,name,parent:D.parent});S.fmem[id]=new Set(D.r?[D.r]:[]);if(D.parent)U.fopen[D.parent]=true;
+    if(D.back&&D.back.t==='fadd'){U.dlg=D.back;toast(`Added to ${esc(name)}`)}else{U.dlg=null;if(!D.r)A.fopen({v:id});toast(`Folder “${esc(name)}” made`)}},
+  frenameDlg:d=>{U.menu=null;U.dlg={t:'frename',v:d.v}},
+  fdoRename:()=>{const D=U.dlg,f=FB(D.v),name=(D.name??f.name).trim();if(!name){D.err='Give the folder a name.';return}
+    if(fKids(f.parent).some(x=>x.id!==f.id&&x.name.toLowerCase()===name.toLowerCase())){D.err=`There's already a “${esc(name)}” here.`;return}
+    f.name=name;U.dlg=null;toast('Folder renamed')},
+  fmoveDlg:d=>{U.menu=null;U.dlg={t:'fmove',v:d.v}},
+  fdoMove:d=>{const f=FB(U.dlg.v);f.parent=d.v||null;if(f.parent)U.fopen[f.parent]=true;U.dlg=null;toast(`Moved to ${f.parent?esc(FB(f.parent).name):'the top level'}`)},
+  fdelDlg:d=>{U.menu=null;U.dlg={t:'fdel',v:d.v}},
+  fdoDel:()=>{const f=FB(U.dlg.v),snap={folders:S.folders.map(x=>({...x})),mem:S.fmem[f.id],cur:U.folder};
+    fKids(f.id).forEach(k=>k.parent=f.parent);S.folders=S.folders.filter(x=>x.id!==f.id);delete S.fmem[f.id];
+    if(U.folder===f.id)U.folder=f.parent;U.dlg=null;
+    toast(`Deleted “${esc(f.name)}”. Recipes kept.`,()=>{S.folders=snap.folders;S.fmem[f.id]=snap.mem;U.folder=snap.cur})},
+  faddDlg:d=>{U.menu=null;U.dlg={t:'fadd',r:d.r}},
+  faddHere:()=>{U.dlg={t:'faddHere',q:''}},
+  fmemTog:d=>{const m=S.fmem[d.v]=S.fmem[d.v]||new Set();m.has(d.r)?m.delete(d.r):m.add(d.r)},
+  fremove:d=>{const f=FB(U.folder),r=RB[d.r];S.fmem[f.id].delete(r.id);U.menu=null;toast(`Removed from ${esc(f.name)}`,()=>{S.fmem[f.id].add(r.id)})},
   showHidden:()=>{U.showHidden=!U.showHidden;U.pick=null},
   var:d=>{U.cardVar[d.r]=+d.v},
   stepper:d=>{U.stepper=U.stepper===d.r?null:d.r;U.menu=null},
@@ -1066,12 +1260,13 @@ document.addEventListener('click',e=>{
   const inStop=e.target.closest('[data-stop]');
   if(!el){if(!inStop){U.menu=null;U.acct=false;U.stepper=null;if(U.swipeOpen&&!e.target.closest('.sw-row')){U.swipeOpen=null}render()}return}
   const a=el.dataset.a;
-  if(!['menu','acct','portions','stepper','srv','lowfx','theme'].includes(a)){if(!inStop){U.menu=null;U.acct=false}U.stepper=a==='srv'?U.stepper:null}
+  if(!['menu','acct','portions','stepper','srv','lowfx','theme','ftog'].includes(a)){if(!inStop){U.menu=null;U.acct=false}U.stepper=a==='srv'?U.stepper:null}
   if(A[a]){A[a](el.dataset,e);render()}
 });
-document.addEventListener('input',e=>{const t=e.target;if(t.dataset.a2==='search'){U.query=t.value;render()}if(t.dataset.a2==='time'){S.times[+t.dataset.i]=t.value}});
+document.addEventListener('input',e=>{const t=e.target;if(t.dataset.a2==='search'){U.query=t.value;render()}if(t.dataset.a2==='time'){S.times[+t.dataset.i]=t.value}if(t.dataset.a2==='fname'&&U.dlg){U.dlg.name=t.value;if(U.dlg.err){U.dlg.err=null;render()}}if(t.dataset.a2==='fq'&&U.dlg){U.dlg.q=t.value;render()}});
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){if(U.dlg?.cook!=null){A.cookExit();render();return}if(U.dlg?.max){U.dlg.max=false;render();return}U.dlg=null;U.menu=null;U.acct=false;U.stepper=null;render();return}
+  if(e.key==='Enter'&&e.target.dataset.a2==='fname'){A[U.dlg.t==='frename'?'fdoRename':'fcreate']();render();return}
   if((e.key==='Enter'||e.key===' ')&&e.target.matches('[role="checkbox"][data-a]')){e.preventDefault();e.target.click()}});
 document.fonts&&document.fonts.ready.then(()=>{if(U.audit)runAudit()});
 // drag & drop (web meal plan)
@@ -1079,6 +1274,13 @@ let drag=null;
 document.addEventListener('dragstart',e=>{const c=e.target.closest('[data-drag]');if(!c)return;drag=c.dataset.drag;e.dataTransfer.setData('text/plain',drag)});
 document.addEventListener('dragover',e=>{const c=e.target.closest('[data-drop]');if(!c||!drag)return;e.preventDefault();document.querySelectorAll('.cell.drop').forEach(x=>x!==c&&x.classList.remove('drop'));c.classList.add('drop')});
 document.addEventListener('drop',e=>{const c=e.target.closest('[data-drop]');if(!c||!drag)return;e.preventDefault();const [fd,fm]=drag.split('|'),[td,tm]=c.dataset.drop.split('|');drag=null;moveEntry(fd,fm,td,tm);render()});
+// drag a recipe card onto a folder (web recipes)
+let rdrag=null;
+document.addEventListener('dragstart',e=>{const c=e.target.closest('[data-rdrag]');if(!c)return;rdrag=c.dataset.rdrag;c.classList.add('dragging');e.dataTransfer.setData('text/plain',rdrag);e.dataTransfer.effectAllowed='copy'});
+document.addEventListener('dragover',e=>{if(!rdrag)return;const c=e.target.closest('[data-fdrop]');document.querySelectorAll('[data-fdrop].drop').forEach(x=>x!==c&&x.classList.remove('drop'));if(!c)return;e.preventDefault();c.classList.add('drop')});
+document.addEventListener('drop',e=>{if(!rdrag)return;const c=e.target.closest('[data-fdrop]');if(!c)return;e.preventDefault();const f=FB(c.dataset.fdrop),r=RB[rdrag];rdrag=null;
+  if(inF(f.id,r.id))toast(`Already in ${esc(f.name)}`);else{S.fmem[f.id].add(r.id);toast(`Filed ${esc(r.name)} in ${esc(f.name)}`,()=>{S.fmem[f.id].delete(r.id)})}render()});
+document.addEventListener('dragend',()=>{rdrag=null;document.querySelectorAll('.dragging,[data-fdrop].drop').forEach(x=>x.classList.remove('dragging','drop'))});
 document.addEventListener('dragend',()=>{drag=null;document.querySelectorAll('.cell.drop').forEach(x=>x.classList.remove('drop'))});
 // swipe (mobile meal plan)
 let sw=null;
@@ -1093,10 +1295,10 @@ document.addEventListener('pointerup',()=>{if(!sw)return;const {f,moved,base,dx}
 document.addEventListener('pointercancel',()=>{if(sw){sw.f.style.transform='';sw=null}});
 
 fresh();
-// prototype deep links: #mobile, #audit, #r=mealplan|shopping|pet, #dlg=recipe, #max, #cook
+// prototype deep links: #view=folders, #fold=f1, #fdlg=new|add|sheet, #mobile, #audit, #r=mealplan|shopping|pet, #dlg=recipe, #max, #cook
 (()=>{const H=location.hash;if(H.includes('mobile'))U.mode='mobile';if(H.includes('audit'))U.audit=true;const m=H.match(/r=(\w+)/);if(m)U.route=m[1];
   if(H.includes('dlg=recipe'))U.dlg={t:'recipe',r:'curry',entry:{d:'2026-11-14',m:'dinner'},ticked:[0,2]};if(H.includes('max')&&U.dlg)U.dlg.max=true;if(H.includes('cook')&&U.dlg)U.dlg.cook=1;
-  if(H.includes('acct'))U.acct=true;if(H.includes('lowfx'))U.lowfx=true})();
+  if(H.includes('acct'))U.acct=true;const fm=H.match(/fold=(f\d+)/);if(fm){A.fopen({v:fm[1]})}if(H.includes('view=folders'))U.view='folders';if(H.includes('fdlg=new'))U.dlg={t:'fnew',parent:null,name:''};if(H.includes('fdlg=add'))U.dlg={t:'fadd',r:'curry'};if(H.includes('fdlg=sheet'))U.dlg={t:'fsheet'};if(H.includes('lowfx'))U.lowfx=true})();
 render();
 </script>
 </body>

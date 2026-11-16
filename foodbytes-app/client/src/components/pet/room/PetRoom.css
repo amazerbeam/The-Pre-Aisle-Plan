@@ -70,7 +70,7 @@
   padding: 0;
   border: 0;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.92);
+  background: var(--pet-float-bg);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
   font-size: 1.2rem;
   cursor: pointer;
@@ -78,10 +78,10 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.pip-room-recentre:active { background: #fff3c4; }
+.pip-room-recentre:active { background: var(--pet-float-active-bg); }
 
 @media (hover: hover) {
-  .pip-room-recentre:hover { background: #fff; }
+  .pip-room-recentre:hover { background: var(--bg-primary); }
 }
 
 .pip-room-recentre:focus-visible {
@@ -152,12 +152,12 @@
 }
 
 .pip-station-btn:active {
-  background: rgba(255, 211, 77, 0.25);
+  background: var(--pet-hit-active-bg);
 }
 
 @media (hover: hover) {
   .pip-station-btn:hover {
-    background: rgba(255, 211, 77, 0.18);
+    background: var(--pet-hit-hover-bg);
   }
 }
 
@@ -176,8 +176,8 @@
   margin: 0;
   padding: 5px 9px;
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.92);
-  color: #5c5670;
+  background: var(--pet-float-bg);
+  color: var(--pet-soft-text);
   font-size: 0.72rem;
   pointer-events: none;
   z-index: 1;
@@ -192,8 +192,8 @@
   grid-auto-columns: minmax(0, 1fr);
   gap: 6px;
   padding: 8px 10px;
-  background: #fff;
-  border-top: 1px solid #ddd6ee;
+  background: var(--bg-primary);
+  border-top: 1px solid var(--pet-divider-strong-border);
 }
 
 .pip-room-action {
@@ -217,10 +217,10 @@
   place-items: center;
   width: 16px;
   height: 16px;
-  border: 2px solid #fff;
+  border: 2px solid var(--bg-primary);
   border-radius: 50%;
-  background: #e8574a;
-  color: #fff;
+  background: var(--pet-badge-bg);
+  color: var(--on-brand);
   font-size: 0.62rem;
   font-weight: 800;
   animation: pip-badge-pulse 1.4s ease-in-out infinite;
@@ -237,29 +237,29 @@
 /* MPP-27: edit mode — the dashed spots (mockup .slot), their buttons, the bar and the style chips.
    While editing, the bubble and the hint step aside so they can't cover the right-wall and floor spots. */
 .pip-decor-spot polygon {
-  fill: rgba(255, 255, 255, 0.35);
-  stroke: #7c5cd6;
+  fill: var(--pet-spot-fill);
+  stroke: var(--pet-accent-color);
   stroke-width: 2;
   stroke-dasharray: 6 4;
 }
 
-.pip-decor-spot.is-filled polygon { fill: rgba(124, 92, 214, 0.08); }
+.pip-decor-spot.is-filled polygon { fill: var(--pet-spot-filled-fill); }
 
 .pip-decor-spot.is-selected polygon {
-  stroke: #e0a400;
+  stroke: var(--pet-spot-selected-stroke);
   stroke-width: 3;
-  fill: rgba(255, 211, 77, 0.25);
+  fill: var(--pet-spot-selected-fill);
 }
 
 .pip-decor-spot text {
-  fill: #7c5cd6;
+  fill: var(--pet-accent-color);
   font-size: 18px;
   font-weight: 800;
 }
 
 /* MPP-40 AC 8: each spot's name, drawn with its outline in edit mode. */
-.pip-decor-spot-tag rect { fill: #fff; stroke: #7c5cd6; stroke-width: 0.8; }
-.pip-decor-spot-tag text { font: 600 7px system-ui, sans-serif; fill: #3b2f5c; pointer-events: none; }
+.pip-decor-spot-tag rect { fill: var(--bg-primary); stroke: var(--pet-accent-color); stroke-width: 0.8; }
+.pip-decor-spot-tag text { font: 600 7px system-ui, sans-serif; fill: var(--pet-label-text); pointer-events: none; }
 .pip-decor-spot-tag { pointer-events: none; }
 
 .pip-room-stage.is-editing .pet-bubble,
@@ -278,10 +278,10 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.pip-decor-spot-btn:active { background: rgba(255, 211, 77, 0.25); }
+.pip-decor-spot-btn:active { background: var(--pet-hit-active-bg); }
 
 @media (hover: hover) {
-  .pip-decor-spot-btn:hover { background: rgba(255, 211, 77, 0.18); }
+  .pip-decor-spot-btn:hover { background: var(--pet-hit-hover-bg); }
 }
 
 .pip-decor-spot-btn:focus-visible {
@@ -300,8 +300,8 @@
   margin: 8px 12px 0;
   padding: 6px 6px 6px 12px;
   border-radius: 12px;
-  background: rgba(46, 38, 69, 0.88);
-  color: #fff;
+  background: var(--pet-scrim-bg);
+  color: var(--pet-scrim-text);
   font-size: 0.8rem;
   font-weight: 600;
 }
@@ -311,8 +311,8 @@
   padding: 0 14px;
   border: 0;
   border-radius: 999px;
-  background: #ffd34d;
-  color: #3f2716;
+  background: var(--pet-gold-bg);
+  color: var(--pet-gold-text);
   font: inherit;
   font-weight: 800;
   cursor: pointer;
@@ -334,13 +334,13 @@
 .pip-room-editbar-error {
   order: 3;
   flex-basis: 100%;
-  color: #ffd0cc;
+  color: var(--pet-scrim-error-text);
 }
 
 .pip-room-action.is-on {
-  border-color: #7c5cd6;
-  background: #7c5cd6;
-  color: #fff;
+  border-color: var(--pet-accent-color);
+  background: var(--pet-accent-color);
+  color: var(--on-brand);
 }
 
 .pip-room-styles {
@@ -350,7 +350,7 @@
 
 .pip-room-styles-label {
   margin: 4px 0;
-  color: #6f6789;
+  color: var(--pet-muted-text);
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -370,9 +370,9 @@
   gap: 6px;
   min-height: 44px;
   padding: 0 10px;
-  border: 2px solid #e3dcf3;
+  border: 2px solid var(--pet-divider-border);
   border-radius: 999px;
-  background: #fff;
+  background: var(--bg-primary);
   font: inherit;
   font-size: 0.78rem;
   font-weight: 600;
@@ -382,14 +382,14 @@
 }
 
 .pip-style-chip[aria-pressed='true'] {
-  border-color: #7c5cd6;
-  background: #f1ecff;
+  border-color: var(--pet-accent-color);
+  background: var(--pet-selected-bg);
 }
 
 .pip-style-chip:active { filter: brightness(0.94); }
 
 @media (hover: hover) {
-  .pip-style-chip:not([aria-pressed='true']):hover { border-color: #c9bdf0; }
+  .pip-style-chip:not([aria-pressed='true']):hover { border-color: var(--pet-divider-hover-border); }
 }
 
 .pip-style-chip:focus-visible {

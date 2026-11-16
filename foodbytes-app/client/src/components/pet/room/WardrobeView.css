@@ -9,9 +9,9 @@
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  background: #fff;
-  color: #2c3e50;
-  box-shadow: 0 0 40px rgba(30, 40, 20, 0.25);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  box-shadow: 0 0 40px var(--pet-sheet-shadow);
   animation: pip-wardrobe-up var(--pip-sheet-in) var(--pip-sheet-ease);
 }
 
@@ -27,14 +27,14 @@
   align-items: center;
   gap: 8px;
   padding: 8px 10px;
-  border-bottom: 1px solid #e3e9dc;
+  border-bottom: 1px solid var(--pet-wardrobe-border);
 }
 
 .pip-wardrobe-head h3 {
   flex: 1;
   margin: 0;
   font-size: 1.05rem;
-  color: #4a3f80;
+  color: var(--brand-primary);
   text-align: center;
 }
 
@@ -64,12 +64,12 @@
   border: 0;
   border-radius: 999px;
   background: none;
-  color: #4a3f80;
+  color: var(--brand-primary);
   font-size: 0.85rem;
   font-weight: 600;
 }
 
-.pip-wardrobe-text-btn:disabled { color: #9aa0a6; cursor: default; }
+.pip-wardrobe-text-btn:disabled { color: var(--pet-disabled-neutral-text); cursor: default; }
 
 .pip-wardrobe-preview {
   flex: none;
@@ -100,8 +100,8 @@
   margin: 8px 12px 0;
   padding: 8px 12px;
   border-radius: 10px;
-  background: #fdecea;
-  color: #8a1c12;
+  background: var(--danger-hover-bg);
+  color: var(--pet-wardrobe-error-text);
   font-size: 0.84rem;
 }
 
@@ -112,7 +112,7 @@
   padding: 10px 12px;
   overflow-x: auto;
   scrollbar-width: none;
-  border-bottom: 1px solid #e3e9dc;
+  border-bottom: 1px solid var(--pet-wardrobe-border);
 }
 
 .pip-wardrobe-tabs::-webkit-scrollbar { display: none; }
@@ -125,18 +125,18 @@
   gap: 6px;
   min-height: 44px;
   padding: 0 14px;
-  border: 1px solid #e3e9dc;
+  border: 1px solid var(--pet-wardrobe-border);
   border-radius: 999px;
-  background: #fff;
+  background: var(--bg-primary);
   color: inherit;
   font: inherit;
   font-size: 0.86rem;
   font-weight: 600;
 }
 
-.pip-wardrobe-tab.is-selected { background: #4a3f80; border-color: #4a3f80; color: #fff; }
-.pip-wardrobe-tab-worn { width: 7px; height: 7px; border-radius: 50%; background: #5fae3e; }
-.pip-wardrobe-tab.is-selected .pip-wardrobe-tab-worn { background: #c8eea2; }
+.pip-wardrobe-tab.is-selected { background: var(--brand-primary); border-color: var(--brand-primary); color: var(--on-brand); }
+.pip-wardrobe-tab-worn { width: 7px; height: 7px; border-radius: 50%; background: var(--pet-wardrobe-worn-fill); }
+.pip-wardrobe-tab.is-selected .pip-wardrobe-tab-worn { background: var(--pet-wardrobe-worn-on-brand-fill); }
 
 .pip-wardrobe-tab-new {
   position: absolute;
@@ -145,8 +145,8 @@
   width: 11px;
   height: 11px;
   border-radius: 50%;
-  background: #e8574a;
-  border: 2px solid #fff;
+  background: var(--pet-badge-bg);
+  border: 2px solid var(--bg-primary);
 }
 
 .pip-wardrobe-body {
@@ -171,9 +171,9 @@
   width: 100%;
   min-height: 44px;
   padding: 4px 4px 8px;
-  border: 2px solid #e3e9dc;
+  border: 2px solid var(--pet-wardrobe-border);
   border-radius: 14px;
-  background: #fff;
+  background: var(--bg-primary);
   color: inherit;
   font: inherit;
   text-align: center;
@@ -187,7 +187,7 @@
   background: #f6fbef;
 }
 
-.pip-wardrobe-item.is-worn { border-color: #4a3f80; box-shadow: 0 0 0 2px rgba(74, 63, 128, 0.15); }
+.pip-wardrobe-item.is-worn { border-color: var(--brand-primary); box-shadow: 0 0 0 2px var(--pet-wardrobe-worn-shadow); }
 
 .pip-wardrobe-item.is-worn::before {
   content: "✓";
@@ -200,13 +200,13 @@
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: #4a3f80;
-  color: #fff;
+  background: var(--brand-primary);
+  color: var(--on-brand);
   font-size: 0.72rem;
 }
 
 .pip-wardrobe-item.is-locked .pip-herb { filter: grayscale(1) opacity(0.45); }
-.pip-wardrobe-item.is-locked .pip-wardrobe-item-label { color: #6c757d; }
+.pip-wardrobe-item.is-locked .pip-wardrobe-item-label { color: var(--text-secondary); }
 
 .pip-wardrobe-item-label {
   display: block;
@@ -230,8 +230,8 @@
   right: 6px;
   padding: 1px 6px;
   border-radius: 999px;
-  background: #e8574a;
-  color: #fff;
+  background: var(--pet-badge-bg);
+  color: var(--on-brand);
   font-size: 0.62rem;
   font-weight: 800;
   letter-spacing: 0.04em;
@@ -240,9 +240,9 @@
 .pip-wardrobe-lock-note {
   margin: 12px 0 0;
   padding: 9px 12px;
-  border: 1px solid #f0d78a;
+  border: 1px solid var(--pet-lock-note-border);
   border-radius: 12px;
-  background: #fff7e0;
+  background: var(--pet-lock-note-bg);
   font-size: 0.84rem;
 }
 
@@ -250,8 +250,8 @@
 
 .pip-wardrobe-lineup {
   flex: none;
-  border-top: 1px solid #e3e9dc;
-  background: #fbfdf8;
+  border-top: 1px solid var(--pet-wardrobe-border);
+  background: var(--pet-wardrobe-lineup-bg);
 }
 
 .pip-wardrobe-lineup summary {
@@ -263,11 +263,11 @@
   list-style: none;
   font-size: 0.86rem;
   font-weight: 600;
-  color: #2f4a22;
+  color: var(--pet-wardrobe-text);
 }
 
 .pip-wardrobe-lineup summary::-webkit-details-marker { display: none; }
-.pip-wardrobe-lineup summary::after { content: "▴"; color: #6c757d; }
+.pip-wardrobe-lineup summary::after { content: "▴"; color: var(--text-secondary); }
 .pip-wardrobe-lineup[open] summary::after { content: "▾"; }
 
 .pip-wardrobe-forms {
@@ -279,8 +279,8 @@
   list-style: none;
 }
 
-.pip-wardrobe-form { text-align: center; font-size: 0.62rem; color: #6c757d; }
-.pip-wardrobe-form.is-current { color: #2f4a22; font-weight: 700; }
+.pip-wardrobe-form { text-align: center; font-size: 0.62rem; color: var(--text-secondary); }
+.pip-wardrobe-form.is-current { color: var(--pet-wardrobe-text); font-weight: 700; }
 .pip-wardrobe-form .pip-herb { display: block; width: 100%; height: auto; aspect-ratio: 1; }
 .pip-wardrobe-form.is-unreached .pip-herb { filter: brightness(0) opacity(0.18); }
 
@@ -298,7 +298,7 @@
 .pip-wardrobe-lineup summary:active { filter: brightness(0.94); }
 
 .pip-wardrobe-icon-btn:active,
-.pip-wardrobe-text-btn:not(:disabled):active { background: #ece5fb; }
+.pip-wardrobe-text-btn:not(:disabled):active { background: var(--pet-press-bg); }
 
 @media (hover: hover) {
   .pip-wardrobe-item:hover,
@@ -306,7 +306,7 @@
   .pip-wardrobe-lineup summary:hover { filter: brightness(0.97); }
 
   .pip-wardrobe-icon-btn:hover,
-  .pip-wardrobe-text-btn:not(:disabled):hover { background: #f6f3ff; }
+  .pip-wardrobe-text-btn:not(:disabled):hover { background: var(--pet-hover-bg); }
 }
 
 @media (prefers-reduced-motion: reduce) {

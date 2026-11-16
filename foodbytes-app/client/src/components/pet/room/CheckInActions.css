@@ -13,9 +13,9 @@
   min-width: 44px;
   min-height: 44px;
   padding: 0 12px;
-  border: 1px solid #ddd6ee;
+  border: 1px solid var(--pet-divider-strong-border);
   border-radius: 999px;
-  background: #fff;
+  background: var(--bg-primary);
   color: inherit;
   font: inherit;
   font-size: 0.78rem;
@@ -26,16 +26,16 @@
 }
 
 .pip-checkin-btn--primary {
-  border-color: #7c5cd6;
-  background: #7c5cd6;
-  color: #fff;
+  border-color: var(--pet-accent-color);
+  background: var(--pet-accent-color);
+  color: var(--on-brand);
 }
 
 .pip-checkin-btn--link {
   padding: 0 6px;
   border-color: transparent;
   background: none;
-  color: #5c5670;
+  color: var(--pet-soft-text);
   font-weight: 500;
   text-decoration: underline;
 }
@@ -60,7 +60,7 @@
 .pip-checkin-date {
   min-height: 44px;
   padding: 0 6px;
-  border: 1px solid #ddd6ee;
+  border: 1px solid var(--pet-divider-strong-border);
   border-radius: 8px;
   font: inherit;
   font-size: 0.78rem;
@@ -95,8 +95,8 @@
   min-width: 0;
   padding: 4px 10px;
   border-radius: 999px;
-  background: #fff1c9;
-  color: #7a5800;
+  background: var(--pet-notice-bg);
+  color: var(--pet-notice-text);
   font-size: 0.78rem;
   font-weight: 600;
   white-space: nowrap;

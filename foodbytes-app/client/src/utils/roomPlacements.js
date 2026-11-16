@@ -1,4 +1,6 @@
 import { DECOR_ITEMS, DECOR_SPOT_LABELS, DEFAULT_PLACEMENTS, ROOM_STYLES } from '../constants/petDecor.js'
+import { PIP_DEFAULT_LINE } from '../constants/pipLines.js'
+import { decorLabel, styleLabel } from '../constants/petRoomLabels.js'
 
 /**
  * MPP-27 / MPP-40: pure helpers over PetRoomDTO's decor ([{ id, kind, price, owned }]) and placements — the 14 keys
@@ -31,13 +33,14 @@ export function ownedFor(decor, spot) {
   return catalogueFor(decor, spot).filter(item => item.owned)
 }
 
-/** The shop's status line after buying itemId; room is the write's room (did it land on its spot?). */
-export function decorBoughtLine(itemId, room) {
+/** The shop's status line after buying itemId in the given Pip line's room; room is the write's room (did it land on its spot?). */
+export function decorBoughtLine(itemId, room, line = PIP_DEFAULT_LINE) {
   const entry = decorEntry(itemId)
   if (!entry) return null
-  if (hasDefault(entry.spot)) return `${entry.label} bought and applied.`
+  const label = DECOR_ITEMS[itemId] ? decorLabel(line, itemId) : styleLabel(line, itemId)
+  if (hasDefault(entry.spot)) return `${label} bought and applied.`
   if (room?.placements?.[entry.spot] === itemId) {
-    return `${entry.label} bought and put in the "${DECOR_SPOT_LABELS[entry.spot]}" spot.`
+    return `${label} bought and put in the "${DECOR_SPOT_LABELS[entry.spot]}" spot.`
   }
-  return `${entry.label} bought. Swap it in with ✏️ Edit room.`
+  return `${label} bought. Swap it in with ✏️ Edit room.`
 }

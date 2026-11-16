@@ -1,7 +1,8 @@
 import { DECOR_LAYERS, DECOR_SPOT_LABELS, DECOR_SPOT_SHAPES } from '../../../constants/petDecor'
-import { decorArt } from './decorArt'
 import { P, pts } from './iso'
 import { Bill } from './isoShapes'
+import { useRoomPack } from './roomPackContext'
+import { packDecorArt } from './roomPacks'
 
 // The edit-mode name tag: a pill sized from the label's length (SVG text has no auto-width).
 const TAG_CHAR_WIDTH = 3.75
@@ -15,17 +16,19 @@ const TAG_RADIUS = 5.5
  * PetRoom puts each layer at its depth among the stations. `selectedSpot` is the spot whose picker is open.
  */
 export function DecorLayer({ layer, placements, editing, selectedSpot }) {
+  const pack = useRoomPack()
   return DECOR_LAYERS[layer].map(spot => (
     <g key={spot}>
-      {decorArt(placements?.[spot])}
+      {packDecorArt(pack, placements?.[spot])}
       {editing && <SpotOutline spot={spot} placements={placements} selectedSpot={selectedSpot} />}
     </g>
   ))
 }
 
 function SpotOutline({ spot, placements, selectedSpot }) {
+  const pack = useRoomPack()
   const { corners, plus, tag } = DECOR_SPOT_SHAPES[spot]
-  const filled = decorArt(placements?.[spot]) != null
+  const filled = packDecorArt(pack, placements?.[spot]) != null
   const className = ['pip-decor-spot', filled && 'is-filled', selectedSpot === spot && 'is-selected'].filter(Boolean).join(' ')
   const label = DECOR_SPOT_LABELS[spot]
   const tagWidth = label.length * TAG_CHAR_WIDTH + TAG_PAD

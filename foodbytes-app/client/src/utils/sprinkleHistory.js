@@ -1,6 +1,7 @@
 import { DECOR_ITEMS, ROOM_STYLES, ROOM_SPOTS } from '../constants/petDecor.js'
+import { PIP_DEFAULT_LINE } from '../constants/pipLines.js'
 import { MEAL_TYPE_LABELS } from '../constants/mealTypes.js'
-import { STATION_LEVEL_NAMES } from '../constants/petShop.js'
+import { decorLabel, stationLevelName, styleLabel } from '../constants/petRoomLabels.js'
 import {
   COUNT_UP_MAX_MS, COUNT_UP_MIN_MS, COUNT_UP_MS_PER_SPRINKLE, EARNED_FALLBACK_LINE,
   RECENT_TEXT, RELATIVE_DAY, SHORT_MONTHS, SHORT_WEEKDAYS
@@ -26,7 +27,7 @@ export function goodWeek(rates) {
 }
 
 /** AC 5: one line per row, except one meal's MEAL_EATEN + MEAL_ON_TIME + HOMEMADE_EXTRA, which share a line. */
-export function groupRecent(entries) {
+export function groupRecent(entries, line = PIP_DEFAULT_LINE) {
   const lines = []
   const byMeal = new Map()
   entries.forEach((entry, index) => {
@@ -45,10 +46,10 @@ export function groupRecent(entries) {
     }
     lines.push({ key: `${entry.sourceType}-${index}`, amount: entry.amount, createdAt: entry.createdAt, sources: new Set([entry.sourceType]), entry })
   })
-  return lines.map(({ key, amount, createdAt, sources, entry }) => ({ key, amount, createdAt, text: describe(entry, sources) }))
+  return lines.map(({ key, amount, createdAt, sources, entry }) => ({ key, amount, createdAt, text: describe(entry, sources, line) }))
 }
 
-function describe(entry, sources) {
+function describe(entry, sources, line) {
   if (MEAL_SOURCES.includes(entry.sourceType)) {
     const label = MEAL_TYPE_LABELS[entry.mealKey]
     const parts = [label ? RECENT_TEXT.eaten(label) : RECENT_TEXT.mealFallback]
@@ -61,14 +62,14 @@ function describe(entry, sources) {
     case 'SHOPPING_LIST_GENERATED': return RECENT_TEXT.listMade
     case 'SHOPPING_LIST_COMPLETED': return RECENT_TEXT.listDone
     case 'STATION_UPGRADE': {
-      const name = STATION_LEVEL_NAMES[entry.station]?.[entry.level - 1]
+      const name = stationLevelName(line, entry.station, entry.level)
       return name ? RECENT_TEXT.bought(name) : RECENT_TEXT.spendFallback
     }
     case 'DECOR_PURCHASE': {
       const item = DECOR_ITEMS[entry.decorItem]
-      if (item) return RECENT_TEXT.bought(item.label)
+      if (item) return RECENT_TEXT.bought(decorLabel(line, entry.decorItem))
       const style = ROOM_STYLES[entry.decorItem]
-      if (style) return RECENT_TEXT.boughtStyle(style.label, style.spot === ROOM_SPOTS.WALL_STYLE)
+      if (style) return RECENT_TEXT.boughtStyle(styleLabel(line, entry.decorItem), style.spot === ROOM_SPOTS.WALL_STYLE)
       return RECENT_TEXT.spendFallback
     }
     default: return entry.amount < 0 ? RECENT_TEXT.spendFallback : RECENT_TEXT.earnFallback

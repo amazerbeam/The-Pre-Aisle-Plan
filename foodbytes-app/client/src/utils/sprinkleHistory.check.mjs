@@ -71,4 +71,10 @@ assert.equal(earnedLine([
 ], 30), '+30! Full week + a meal ✨')
 assert.equal(earnedLine([], 12), '+12 sprinkles! ✨')
 
+// MPP-46: a decor purchase reads in the room's line.
+assert.equal(groupRecent([{ sourceType: 'DECOR_PURCHASE', amount: -120, decorItem: 'herb-shelf', createdAt: at('2026-10-13') }], 'dragon')[0].text, 'Bought the Potion shelf')
+
+// MPP-47: and in the workshop.
+assert.equal(groupRecent([{ sourceType: 'DECOR_PURCHASE', amount: -120, decorItem: 'herb-shelf', createdAt: at('2026-10-13') }], 'robot')[0].text, 'Bought the Sample rack')
+
 console.log('sprinkleHistory: all checks passed')

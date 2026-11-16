@@ -16,18 +16,28 @@ const parseTokens = (css) => {
 
 const resolve = (tokens, name) => {
   let value = tokens[`--${name}`]
-  const ref = value?.match(/^var\((--[\w-]+)\)$/)
-  if (ref) value = tokens[ref[1]]
+  for (let hops = 0; hops < 5; hops += 1) {
+    const ref = value?.match(/^var\((--[\w-]+)\)$/)
+    if (!ref) break
+    value = tokens[ref[1]]
+  }
   return value
 }
 
-const toRgb = (hex) => {
-  let h = hex.slice(1)
-  if (h.length === 3) h = [...h].map((c) => c + c).join('')
-  return [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16) / 255)
+// '#rgb' | '#rrggbb' | 'rgb(r, g, b)' | 'rgba(r, g, b, a)' → { rgb: [0-1 × 3], a }; anything else (a gradient) → null
+const parseColour = (value) => {
+  if (value?.startsWith('#')) {
+    let h = value.slice(1)
+    if (h.length === 3) h = [...h].map((c) => c + c).join('')
+    return { rgb: [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16) / 255), a: 1 }
+  }
+  const m = value?.match(/^rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*(?:,\s*([\d.]+)\s*)?\)$/)
+  return m ? { rgb: [m[1], m[2], m[3]].map((n) => Number(n) / 255), a: m[4] === undefined ? 1 : Number(m[4]) } : null
 }
-const luminance = (hex) => {
-  const [r, g, b] = toRgb(hex).map((c) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4))
+// Alpha-composite `top` onto an opaque `under` (sRGB, as browsers paint).
+const flatten = (top, under) => ({ rgb: top.rgb.map((c, i) => c * top.a + under.rgb[i] * (1 - top.a)), a: 1 })
+const luminance = ({ rgb }) => {
+  const [r, g, b] = rgb.map((c) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4))
   return 0.2126 * r + 0.7152 * g + 0.0722 * b
 }
 const contrast = (a, b) => {
@@ -41,10 +51,52 @@ const AISLES = ['produce', 'dairy', 'meat', 'seafood', 'bakery', 'grains', 'cann
 const CARD_TEAL = ['card-teal-top', 'card-teal-bottom']
 const CARD_PLAN = ['card-plan-top', 'card-plan-bottom']
 
+// Pip's room UI (MPP-45), from pip-room-chrome.html pairs[]: [fg, bg, min, over?]. `over` is the opaque token a
+// translucent bg is flattened onto before the contrast maths. The same pairs run in every theme.
+const PET_PAIRS = [
+  ['text-primary', 'bg-primary', 4.5],
+  ['text-primary', 'pet-balance-bg', 4.5],
+  ['text-primary', 'pet-card-bg', 4.5],
+  ['brand-primary', 'bg-primary', 4.5],
+  ['brand-primary', 'pet-hover-bg', 4.5],
+  ['brand-primary', 'pet-press-bg', 4.5],
+  ['brand-primary', 'pet-chip-content-bg', 4.5, 'bg-primary'],
+  ['text-secondary', 'bg-primary', 4.5],
+  ['text-secondary', 'pet-wardrobe-lineup-bg', 4.5],
+  ['pet-muted-text', 'bg-primary', 4.5],
+  ['pet-muted-text', 'pet-card-bg', 4.5],
+  ['pet-soft-text', 'bg-primary', 4.5],
+  ['pet-soft-text', 'pet-float-bg', 4.5, 'bg-primary'],
+  ['pet-label-text', 'bg-primary', 4.5],
+  ['pet-accent-color', 'bg-primary', 4.5],
+  ['pet-accent-color', 'pet-card-bg', 3],
+  ['pip-focus-ring', 'bg-primary', 3],
+  ['pip-focus-ring', 'pet-card-bg', 3],
+  ['on-brand', 'pet-accent-color', 4.5],
+  ['on-brand', 'brand-primary', 4.5],
+  ['pet-scrim-text', 'pet-scrim-bg', 4.5, 'bg-primary'],
+  ['pet-scrim-text', 'pet-tag-bg', 4.5, 'bg-primary'],
+  ['pet-scrim-error-text', 'pet-scrim-bg', 4.5, 'bg-primary'],
+  ['pet-gold-text', 'pet-gold-bg', 4.5],
+  ['pet-notice-text', 'pet-notice-bg', 4.5],
+  ['pet-success-text', 'pet-success-bg', 4.5],
+  ['pet-success-text', 'pet-card-bg', 4.5],
+  ['pet-error-text', 'pet-card-bg', 4.5],
+  ['pet-error-text', 'danger-hover-bg', 4.5, 'bg-primary'],
+  ['pet-wardrobe-error-text', 'danger-hover-bg', 4.5, 'bg-primary'],
+  ['pet-warn-text', 'pet-card-bg', 4.5],
+  ['pet-wardrobe-text', 'pet-wardrobe-lineup-bg', 4.5],
+  ['macro-on-target-pill-text', 'macro-on-target-pill-bg', 4.5, 'bg-primary'],
+  ['macro-near-target-pill-text', 'macro-near-target-pill-bg', 4.5, 'bg-primary'],
+  ['pet-chip-mischievous-text', 'pet-chip-mischievous-bg', 4.5, 'bg-primary'],
+  ['macro-over-target-pill-text', 'bg-primary', 4.5],
+]
+
 const PAIRS = {
   default: [
     ...on(['text-primary', 'text-secondary'], ['bg-primary', 'bg-secondary'], 4.5),
     ['on-brand', 'brand-primary', 4.5],
+    ...PET_PAIRS,
   ],
   cyberpunk: [
     ...on(['ink', 'muted', 'pink', 'cyan', 'yellow', 'lime', 'red'], ['panel', 'raised'], 4.5),
@@ -54,6 +106,7 @@ const PAIRS = {
     ['paper-ink', 'paper', 4.5],
     ['line', 'panel', 3.0],
     ...AISLES.map((a) => [`aisle-${a}`, 'paper', 3.0]),
+    ...PET_PAIRS,
   ],
   parchment: [
     ...on(['text-primary', 'text-secondary', 'brand-primary'], ['bg-primary', 'bg-secondary'], 4.5),
@@ -61,6 +114,7 @@ const PAIRS = {
     ...on(['leather-ink', 'gold'], ['leather'], 4.5),
     ['focus-ink', 'page', 3.0],
     ...AISLES.map((a) => [`aisle-${a}`, 'page', 3.0]),
+    ...PET_PAIRS,
   ],
 }
 
@@ -78,16 +132,26 @@ for (const theme of THEMES) {
   const tokens = theme.id === DEFAULT_THEME_ID
     ? defaultTokens
     : { ...defaultTokens, ...parseTokens(read(`${THEMES_DIR}${theme.id}.css`)) }
-  for (const [fg, bg, min] of PAIRS[theme.id] ?? []) {
-    const fgValue = resolve(tokens, fg)
-    const bgValue = resolve(tokens, bg)
-    const missing = [[fg, fgValue], [bg, bgValue]].filter(([, v]) => !v || !v.startsWith('#'))
+  for (const [fg, bg, min, over] of PAIRS[theme.id] ?? []) {
+    const raw = { fg: resolve(tokens, fg), bg: resolve(tokens, bg), ...(over ? { over: resolve(tokens, over) } : {}) }
+    const parsed = Object.fromEntries(Object.entries(raw).map(([key, value]) => [key, parseColour(value)]))
+    const names = { fg, bg, over }
+    const missing = Object.keys(raw).filter((key) => !parsed[key])
     if (missing.length > 0) {
-      missing.forEach(([name]) => failures.push(`MISSING --${name} in ${theme.id}`))
+      missing.forEach((key) => failures.push(`MISSING --${names[key]} in ${theme.id}`))
       continue
     }
+    let bgColour = parsed.bg
+    if (bgColour.a < 1) {
+      if (!parsed.over) {
+        failures.push(`MISSING over for translucent --${bg} in ${theme.id}`)
+        continue
+      }
+      bgColour = flatten(bgColour, parsed.over)
+    }
+    const fgColour = parsed.fg.a < 1 ? flatten(parsed.fg, bgColour) : parsed.fg
     pairCount += 1
-    const ratio = contrast(fgValue, bgValue)
+    const ratio = contrast(fgColour, bgColour)
     const exception = KNOWN_EXCEPTIONS[`${theme.id}|${fg}|${bg}`]
     if (ratio < min) {
       if (exception) notes.push(`WARN ${fg} on ${bg} (${theme.id}): ${ratio.toFixed(2)} < ${min} — known exception`)

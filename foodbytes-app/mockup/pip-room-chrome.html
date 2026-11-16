@@ -1,0 +1,2878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pip room chrome: role-token workbench (mockup)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&family=Silkscreen:wght@400;700&family=Space+Grotesk:wght@400..700&family=VT323&family=Cinzel+Decorative:wght@400;700&family=EB+Garamond:ital,wght@0,400..700;1,400..600&family=Homemade+Apple&family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* ===== Token blocks: the proposed --pet-* role tokens and the global tokens the room CSS reads ===== */
+.frame[data-theme="default"] {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --border-color: #e9ecef;
+  --brand-primary: #4a3f80;
+  --brand-primary-dark: #3a3266;
+  --brand-primary-light: #6b5fa0;
+  --danger-hover-bg: #fdecea;
+  --error: #dc3545;
+  --focus-ring-color: #4a3f80;
+  --macro-near-target-pill-bg: rgba(255, 193, 7, 0.22);
+  --macro-near-target-pill-text: #856404;
+  --macro-on-target-pill-bg: rgba(40, 167, 69, 0.15);
+  --macro-on-target-pill-text: #1b6b2e;
+  --macro-over-target-pill-text: #a71d2a;
+  --on-brand: #ffffff;
+  --pip-focus-ring: #7c5cd6;
+  --success: #28a745;
+  --text-primary: #2c3e50;
+  --text-secondary: #6c757d;
+  --warning: #ffc107;
+  --pet-accent-color: #7c5cd6;
+  --pet-badge-bg: #e8574a;
+  --pet-balance-bg: #fff7d6;
+  --pet-divider-hover-border: #c9bdf0;
+  --pet-disabled-bg: #eee9f7;
+  --pet-card-bg: #fcfbff;
+  --pet-chip-content-bg: rgba(74, 63, 128, 0.12);
+  --pet-chip-mischievous-bg: rgba(255, 107, 53, 0.18);
+  --pet-chip-mischievous-text: #a8431a;
+  --pet-error-text: #a4281d;
+  --pet-float-bg: rgba(255, 255, 255, 0.92);
+  --pet-float-active-bg: #fff3c4;
+  --pet-gold-bg: #ffd34d;
+  --pet-gold-border: #e0b52c;
+  --pet-gold-text: #3f2716;
+  --pet-hit-active-bg: rgba(255, 211, 77, 0.25);
+  --pet-hit-hover-bg: rgba(255, 211, 77, 0.18);
+  --pet-hover-bg: #f6f3ff;
+  --pet-divider-border: #e3dcf3;
+  --pet-divider-faint-border: #f0ecf8;
+  --pet-divider-mid-border: #d6c9f0;
+  --pet-divider-strong-border: #ddd6ee;
+  --pet-lock-note-bg: #fff7e0;
+  --pet-lock-note-border: #f0d78a;
+  --pet-notice-bg: #fff1c9;
+  --pet-notice-text: #7a5800;
+  --pet-picker-shadow: rgba(60, 40, 120, 0.18);
+  --pet-press-bg: #ece5fb;
+  --pet-scrim-bg: rgba(46, 38, 69, 0.88);
+  --pet-scrim-error-text: #ffd0cc;
+  --pet-scrim-text: #fff;
+  --pet-selected-bg: #f1ecff;
+  --pet-sheet-shadow: rgba(30, 40, 20, 0.25);
+  --pet-spot-fill: rgba(255, 255, 255, 0.35);
+  --pet-spot-filled-fill: rgba(124, 92, 214, 0.08);
+  --pet-spot-selected-fill: rgba(255, 211, 77, 0.25);
+  --pet-spot-selected-stroke: #e0a400;
+  --pet-success-bg: #e8f6e8;
+  --pet-success-text: #2f7a3a;
+  --pet-tag-bg: rgba(46, 38, 69, 0.8);
+  --pet-disabled-text: #8d86a3;
+  --pet-disabled-neutral-text: #9aa0a6;
+  --pet-label-text: #3b2f5c;
+  --pet-muted-text: #6f6789;
+  --pet-soft-text: #5c5670;
+  --pet-thumb-bg: linear-gradient(#ece5fb, #d6c9f0);
+  --pet-tint-bg: #f3effc;
+  --pet-wardrobe-error-text: #8a1c12;
+  --pet-wardrobe-text: #2f4a22;
+  --pet-wardrobe-border: #e3e9dc;
+  --pet-wardrobe-lineup-bg: #fbfdf8;
+  --pet-wardrobe-worn-fill: #5fae3e;
+  --pet-wardrobe-worn-on-brand-fill: #c8eea2;
+  --pet-wardrobe-worn-shadow: rgba(74, 63, 128, 0.15);
+  --pet-warn-text: #b4531b;
+  --spacing-xs: 0.25rem; --spacing-sm: 0.5rem; --spacing-md: 1rem; --spacing-lg: 1.5rem; --spacing-xl: 2rem; --radius-md: 8px;
+  --pip-sheet-in: 0.28s; --pip-sheet-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --pip-focus-ring-on-dark: #ffd34d; --pip-focus-halo: #fff;
+  --f-body: 'Inter', system-ui, sans-serif;
+  --demo-room: #cfc4ea; --demo-room-text: #3b2f5c;
+  color-scheme: light;
+}
+
+.frame[data-theme="parchment"] {
+  --bg-primary: #f7eed6;
+  --bg-secondary: #ead9b1;
+  --border-color: #c9ad78;
+  --brand-primary: #7a1f14;
+  --brand-primary-dark: #5a150d;
+  --brand-primary-light: #9c3a2a;
+  --danger-hover-bg: rgba(155, 35, 24, 0.1);
+  --error: #9b2318;
+  --focus-ring-color: #1f3a5f;
+  --macro-near-target-pill-bg: rgba(168, 118, 14, 0.16);
+  --macro-near-target-pill-text: #6f4d05;
+  --macro-on-target-pill-bg: rgba(63, 122, 74, 0.15);
+  --macro-on-target-pill-text: #2a5733;
+  --macro-over-target-pill-text: #7a1a12;
+  --on-brand: #f7eed6;
+  --pip-focus-ring: #1f3a5f;
+  --success: #3f6b3a;
+  --text-primary: #2b1d10;
+  --text-secondary: #5e4a32;
+  --warning: #9a6c0c;
+  --pet-accent-color: #7a1f14;
+  --pet-badge-bg: #9c3a2a;
+  --pet-balance-bg: #f1e0a8;
+  --pet-divider-hover-border: #a88a45;
+  --pet-disabled-bg: #e3d2a8;
+  --pet-card-bg: #fbf4df;
+  --pet-chip-content-bg: rgba(122, 31, 20, 0.12);
+  --pet-chip-mischievous-bg: rgba(154, 108, 12, 0.18);
+  --pet-chip-mischievous-text: #7a3a12;
+  --pet-error-text: #9b2318;
+  --pet-float-bg: rgba(247, 238, 214, 0.92);
+  --pet-float-active-bg: #ecd89a;
+  --pet-gold-bg: #d8b25a;
+  --pet-gold-border: #a88a45;
+  --pet-gold-text: #3b2415;
+  --pet-hit-active-bg: rgba(216, 178, 90, 0.3);
+  --pet-hit-hover-bg: rgba(216, 178, 90, 0.2);
+  --pet-hover-bg: #efe2c2;
+  --pet-divider-border: #c9ad78;
+  --pet-divider-faint-border: #e3d2a8;
+  --pet-divider-mid-border: #c9ad78;
+  --pet-divider-strong-border: #c9ad78;
+  --pet-lock-note-bg: #f3e6c0;
+  --pet-lock-note-border: #c9ad78;
+  --pet-notice-bg: #ecd89a;
+  --pet-notice-text: #5e4a10;
+  --pet-picker-shadow: rgba(60, 35, 10, 0.3);
+  --pet-press-bg: #e3d2a8;
+  --pet-scrim-bg: rgba(34, 20, 10, 0.88);
+  --pet-scrim-error-text: #f2b8a8;
+  --pet-scrim-text: #f7eed6;
+  --pet-selected-bg: #efe2c2;
+  --pet-sheet-shadow: rgba(60, 35, 10, 0.45);
+  --pet-spot-fill: rgba(247, 238, 214, 0.4);
+  --pet-spot-filled-fill: rgba(122, 31, 20, 0.1);
+  --pet-spot-selected-fill: rgba(216, 178, 90, 0.3);
+  --pet-spot-selected-stroke: #a88a45;
+  --pet-success-bg: #dfe8c8;
+  --pet-success-text: #2f5530;
+  --pet-tag-bg: rgba(34, 20, 10, 0.8);
+  --pet-disabled-text: #8a7a5e;
+  --pet-disabled-neutral-text: #8a7a5e;
+  --pet-label-text: #2b1d10;
+  --pet-muted-text: #5e4a32;
+  --pet-soft-text: #5e4a32;
+  --pet-thumb-bg: linear-gradient(#efe2c2, #ead9b1);
+  --pet-tint-bg: #efe2c2;
+  --pet-wardrobe-error-text: #7a1a12;
+  --pet-wardrobe-text: #2b1d10;
+  --pet-wardrobe-border: #c9ad78;
+  --pet-wardrobe-lineup-bg: #f1e6c8;
+  --pet-wardrobe-worn-fill: #3f6b3a;
+  --pet-wardrobe-worn-on-brand-fill: #f7eed6;
+  --pet-wardrobe-worn-shadow: rgba(122, 31, 20, 0.2);
+  --pet-warn-text: #8a4a12;
+  --spacing-xs: 0.25rem; --spacing-sm: 0.5rem; --spacing-md: 1rem; --spacing-lg: 1.5rem; --spacing-xl: 2rem; --radius-md: 8px;
+  --pip-sheet-in: 0.28s; --pip-sheet-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --pip-focus-ring-on-dark: #ffd34d; --pip-focus-halo: #fff;
+  --f-body: 'EB Garamond', Georgia, serif;
+  --demo-room: #9b9283; --demo-room-text: #1d1409;
+  color-scheme: light;
+}
+
+.frame[data-theme="cyberpunk"] {
+  --bg-primary: #0b1119;
+  --bg-secondary: #05070b;
+  --border-color: #22384a;
+  --brand-primary: #ff2a6d;
+  --brand-primary-dark: #c41f55;
+  --brand-primary-light: #05d9e8;
+  --danger-hover-bg: rgba(255, 77, 94, 0.14);
+  --error: #ff4d5e;
+  --focus-ring-color: #f9f002;
+  --macro-near-target-pill-bg: rgba(249, 240, 2, 0.12);
+  --macro-near-target-pill-text: #f9f002;
+  --macro-on-target-pill-bg: rgba(57, 255, 136, 0.12);
+  --macro-on-target-pill-text: #39ff88;
+  --macro-over-target-pill-text: #ff4d5e;
+  --on-brand: #05070b;
+  --pip-focus-ring: #f9f002;
+  --success: #39ff88;
+  --text-primary: #eaf6ff;
+  --text-secondary: #9db2c7;
+  --warning: #f9f002;
+  --pet-accent-color: #ff2a6d;
+  --pet-badge-bg: #ff4d5e;
+  --pet-balance-bg: #2a2606;
+  --pet-divider-hover-border: #4a7d99;
+  --pet-disabled-bg: #141d2b;
+  --pet-card-bg: #0f1620;
+  --pet-chip-content-bg: rgba(255, 42, 109, 0.14);
+  --pet-chip-mischievous-bg: rgba(255, 159, 28, 0.16);
+  --pet-chip-mischievous-text: #ff9f1c;
+  --pet-error-text: #ff4d5e;
+  --pet-float-bg: rgba(11, 17, 25, 0.92);
+  --pet-float-active-bg: #2a2606;
+  --pet-gold-bg: #f9f002;
+  --pet-gold-border: #f9f002;
+  --pet-gold-text: #05070b;
+  --pet-hit-active-bg: rgba(249, 240, 2, 0.25);
+  --pet-hit-hover-bg: rgba(249, 240, 2, 0.16);
+  --pet-hover-bg: #141d2b;
+  --pet-divider-border: #22384a;
+  --pet-divider-faint-border: #141d2b;
+  --pet-divider-mid-border: #22384a;
+  --pet-divider-strong-border: #4a7d99;
+  --pet-lock-note-bg: #1f1a08;
+  --pet-lock-note-border: #7a6a1a;
+  --pet-notice-bg: #2a1f05;
+  --pet-notice-text: #f9f002;
+  --pet-picker-shadow: rgba(5, 217, 232, 0.25);
+  --pet-press-bg: #101a28;
+  --pet-scrim-bg: rgba(2, 3, 5, 0.88);
+  --pet-scrim-error-text: #ff8a96;
+  --pet-scrim-text: #eaf6ff;
+  --pet-selected-bg: #141d2b;
+  --pet-sheet-shadow: rgba(0, 0, 0, 0.6);
+  --pet-spot-fill: rgba(11, 17, 25, 0.4);
+  --pet-spot-filled-fill: rgba(255, 42, 109, 0.1);
+  --pet-spot-selected-fill: rgba(249, 240, 2, 0.2);
+  --pet-spot-selected-stroke: #f9f002;
+  --pet-success-bg: #08150f;
+  --pet-success-text: #39ff88;
+  --pet-tag-bg: rgba(2, 3, 5, 0.8);
+  --pet-disabled-text: #5f7488;
+  --pet-disabled-neutral-text: #5f7488;
+  --pet-label-text: #eaf6ff;
+  --pet-muted-text: #9db2c7;
+  --pet-soft-text: #9db2c7;
+  --pet-thumb-bg: linear-gradient(#141d2b, #0b1119);
+  --pet-tint-bg: #141d2b;
+  --pet-wardrobe-error-text: #ff4d5e;
+  --pet-wardrobe-text: #eaf6ff;
+  --pet-wardrobe-border: #22384a;
+  --pet-wardrobe-lineup-bg: #0f1620;
+  --pet-wardrobe-worn-fill: #39ff88;
+  --pet-wardrobe-worn-on-brand-fill: #05070b;
+  --pet-wardrobe-worn-shadow: rgba(255, 42, 109, 0.35);
+  --pet-warn-text: #ff9f1c;
+  --spacing-xs: 0.25rem; --spacing-sm: 0.5rem; --spacing-md: 1rem; --spacing-lg: 1.5rem; --spacing-xl: 2rem; --radius-md: 8px;
+  --pip-sheet-in: 0.28s; --pip-sheet-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --pip-focus-ring-on-dark: #ffd34d; --pip-focus-halo: #fff;
+  --f-body: 'Space Grotesk', system-ui, sans-serif;
+  --demo-room: #1c2631; --demo-room-text: #b8c7d6;
+  color-scheme: dark;
+}
+
+  /* ===== Page shell (mockup only: neutral literals are fine here, the app chrome below reads tokens) ===== */
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 16px; font: 16px/1.5 system-ui, sans-serif; color: #2c3e50; background: #f4f2fa; }
+  .page-head { max-width: 76rem; margin: 0 auto 16px; }
+  .page-head h1 { font-size: 1.3rem; margin: 0 0 8px; }
+  .page-head p { margin: 0 0 8px; max-width: 70rem; }
+  .ctl-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; padding: 10px 0; position: sticky; top: 0; z-index: 50; background: #f4f2fa; }
+  .ctl-bar .lbl { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: #5c5670; }
+  .seg { display: inline-flex; gap: 4px; }
+  .seg.is-off { opacity: 0.45; }
+  .ctl-bar button { min-width: 44px; min-height: 44px; padding: 0 14px; border: 2px solid #c9bdf0; border-radius: 999px; background: #fff; color: #2c3e50; font: inherit; font-weight: 600; cursor: pointer; touch-action: manipulation; }
+  .ctl-bar button[aria-pressed="true"] { background: #4a3f80; border-color: #4a3f80; color: #fff; }
+  .ctl-bar button:focus-visible, a:focus-visible, summary:focus-visible { outline: 3px solid #7c5cd6; outline-offset: 2px; }
+  main#stage, section.doc { max-width: 82rem; margin: 0 auto; }
+  .screen { margin: 0 0 28px; }
+  .screen h2 { font-size: 1.05rem; margin: 0 0 2px; }
+  .screen .note { margin: 0 0 8px; font-size: 0.86rem; color: #5c5670; max-width: 60rem; }
+  .row { display: flex; gap: 16px; align-items: flex-start; padding-bottom: 6px; }
+  .row.is-side { overflow-x: auto; }
+  .cell { margin: 0; flex: 0 1 auto; min-width: 0; max-width: 100%; }
+  .row.is-side .cell { flex: 0 0 auto; }
+  .cell figcaption { font-size: 0.74rem; font-weight: 700; color: #5c5670; margin: 0 0 4px; }
+
+  /* ===== The frame: one theme's token scope, a phone / desktop viewport ===== */
+  .frame { position: relative; display: flex; flex-direction: column; height: 680px; margin: 0 auto; overflow: hidden; border: 1px solid #b9b3c9; border-radius: 6px; background: var(--bg-secondary); color: var(--text-primary); font-family: var(--f-body); font-size: 16px; line-height: 1.5; }
+  .frame *, .frame *::before, .frame *::after { animation: none !important; }
+  .frame .pet-view { flex: 1; min-height: 0; }
+  .frame .pip-room { min-height: 120px; }
+  .frame .pip-shop, .frame .pip-wardrobe { position: absolute; }
+  .frame button, .frame input { font-family: inherit; }
+  /* Room art placeholder: a flat band in the room's colour (mockup only, not a role token). */
+  .demo-band { position: absolute; inset: 0; display: grid; place-items: end start; padding: 8px 10px; background: var(--demo-room); color: var(--demo-room-text); font-size: 0.72rem; font-style: italic; }
+  .demo-spots { position: absolute; left: 6px; top: 6px; width: 70%; max-width: 280px; }
+  .demo-chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 12px; background: var(--bg-primary); }
+  .demo-headbars { display: flex; gap: 4px; padding: 0 8px; background: var(--demo-room); }
+  .demo-headbar { flex: 1; min-width: 0; max-height: 110px; }
+  .demo-bubbles { position: absolute; inset: 8px 8px auto 8px; display: grid; gap: 12px; }
+  .demo-bubbles .pet-bubble { position: relative; top: auto; right: auto; max-width: none; }
+  .demo-bubbles .pet-bubble::after { display: none; }
+  .pip-herb { display: block; margin: 0 auto; }
+  .pip-wardrobe-preview .pip-herb { max-height: 150px; }
+
+  /* ===== Docs: contrast + token tables ===== */
+  section.doc h2 { font-size: 1.1rem; margin: 28px 0 6px; }
+  section.doc p, section.doc li { font-size: 0.9rem; }
+  .tbl-wrap { overflow-x: auto; border: 1px solid #d6d0e6; border-radius: 6px; background: #fff; }
+  table.doc-table { border-collapse: collapse; width: 100%; font-size: 0.8rem; }
+  .doc-table th, .doc-table td { text-align: left; vertical-align: top; padding: 6px 8px; border-bottom: 1px solid #ece8f5; }
+  .doc-table thead th { position: sticky; top: 0; background: #ece8f5; }
+  .doc-table small { color: #5c5670; word-break: break-word; }
+  .doc-table details summary { cursor: pointer; font-size: 0.72rem; color: #4a3f80; min-height: 24px; }
+  .sw { display: inline-block; width: 14px; height: 14px; margin-right: 6px; vertical-align: -2px; border: 1px solid #8a84a0; border-radius: 3px; }
+  td.ok { background: #e3f4e6; color: #1b5e2b; font-weight: 600; }
+  td.bad { background: #fbe2e0; color: #8a1c12; font-weight: 700; }
+  .ok-text { color: #1b5e2b; } .bad-text { color: #8a1c12; }
+  .probe { position: absolute; left: -9999px; top: 0; width: 1px; height: 1px; border: 0; overflow: hidden; }
+  .probe i { display: block; width: 1px; height: 1px; }
+
+/* ===== Chrome CSS: PetView.css + room/*.css from the live app, every audited literal replaced by its token ===== */
+/* ==== PetView.css ==== */
+/* Themes: Pip's room keeps its own palette in every theme (decision 4, CLAUDE.md → Themes). */
+.pet-view {
+  color: var(--text-primary);
+  font-family: var(--f-body);
+}
+
+/* A non-default theme's base input defaults (dark surface, theme ink) stop at the room. Scoped under
+   [data-theme] because Default sets no data-theme and its inputs keep the browser's own colours. */
+.frame:not([data-theme="default"]) .pet-view :where(input, select, textarea) {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  caret-color: auto;
+}
+
+/* MPP-14: Pet page (approved pet-mockup.html, first phone). */
+
+/* MPP-37: Pip mode — header on top, the room fills the rest (main is one screen tall). */
+.pet-view {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+  overflow-y: auto; /* only scrolls when the content outgrows a short screen */
+}
+
+/* ---- Speech bubble (MPP-16: top-right inside Pip's room) ---- */
+.pet-bubble {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  max-width: min(190px, 55%);
+  margin: 0;
+  padding: 7px 10px;
+  background: var(--bg-primary);
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  line-height: 1.3;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1;
+}
+
+/* Tail on the left, pointing down towards Pip on the rug. */
+.pet-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 20px;
+  border: 8px solid transparent;
+  border-top-color: var(--bg-primary);
+  border-bottom: 0;
+}
+
+/* MPP-21: the bubble holds a text line and, while Pip asks, the check-in controls. */
+.pet-bubble-text {
+  margin: 0;
+}
+
+.pet-bubble.is-asking {
+  max-width: min(230px, 62%);
+}
+
+/* Focus lands here only programmatically (SpeechBubble), never by Tab. */
+.pet-bubble:focus {
+  outline: none;
+}
+
+/* ---- MPP-37: Pip's slim header ---- */
+.pip-header {
+  position: relative; /* MPP-42: the "+N ✨" pill hangs below the header, over the room */
+  z-index: 3;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+  padding: 2px 8px 2px 14px;
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.pip-header-name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.pip-header-form {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+}
+
+.pip-header-right {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pip-header-sprinkles {
+  padding: 3px 9px;
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.pet-name-block {
+  min-width: 0;
+}
+
+.pet-name {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.pet-name-edit-btn,
+.pet-view-state-btn {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pet-name-edit-btn {
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-size: 1rem;
+}
+
+.pet-name-edit-btn:active {
+  background: var(--bg-secondary);
+}
+
+@media (hover: hover) {
+  .pet-name-edit-btn:hover {
+    color: var(--brand-primary);
+    background: var(--bg-secondary);
+  }
+}
+
+.pet-name-input {
+  min-height: 44px;
+  width: 100%;
+  max-width: 12rem;
+  padding: 0 10px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  font: inherit;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.pet-name-error {
+  margin: 4px 0 0;
+  font-size: 0.75rem;
+  color: var(--macro-over-target-pill-text);
+}
+
+.pet-chip {
+  flex-shrink: 0;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.pet-chip--content { background: var(--pet-chip-content-bg); color: var(--brand-primary); }
+.pet-chip--happy { background: var(--macro-on-target-pill-bg); color: var(--macro-on-target-pill-text); }
+.pet-chip--bored { background: var(--macro-near-target-pill-bg); color: var(--macro-near-target-pill-text); }
+.pet-chip--mischievous { background: var(--pet-chip-mischievous-bg); color: var(--pet-chip-mischievous-text); }
+
+.pet-name-edit-btn:focus-visible,
+.pet-view-state-btn:focus-visible {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: 2px;
+}
+
+/* ---- Guest / loading / error ---- */
+.pet-view-state {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto; /* main is overflow:hidden in Pip mode */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-xl) var(--spacing-md);
+  text-align: center;
+}
+
+.pet-view-state-btn {
+  min-height: 44px;
+  padding: 0 var(--spacing-lg);
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--brand-primary);
+  color: var(--on-brand);
+  font-weight: 600;
+}
+
+
+/* ==== room/CheckInActions.css ==== */
+/* MPP-21: check-in controls inside Pip's speech bubble (mockup v5 .bubble .bb).
+   Every control is at least 44 px tall; hover only where hover exists. */
+
+.pip-checkin-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 7px;
+}
+
+.pip-checkin-btn {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--pet-divider-strong-border);
+  border-radius: 999px;
+  background: var(--bg-primary);
+  color: inherit;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pip-checkin-btn--primary {
+  border-color: var(--pet-accent-color);
+  background: var(--pet-accent-color);
+  color: var(--on-brand);
+}
+
+.pip-checkin-btn--link {
+  padding: 0 6px;
+  border-color: transparent;
+  background: none;
+  color: var(--pet-soft-text);
+  font-weight: 500;
+  text-decoration: underline;
+}
+
+.pip-checkin-btn:active { filter: brightness(0.92); }
+
+@media (hover: hover) {
+  .pip-checkin-btn:hover { filter: brightness(0.96); }
+}
+
+.pip-checkin-btn:focus-visible,
+.pip-checkin-date:focus-visible {
+  outline: 3px solid var(--pip-focus-ring);
+  outline-offset: 2px;
+}
+
+.pip-checkin-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.pip-checkin-date {
+  min-height: 44px;
+  padding: 0 6px;
+  border: 1px solid var(--pet-divider-strong-border);
+  border-radius: 8px;
+  font: inherit;
+  font-size: 0.78rem;
+}
+
+/* The bubble already shows "When did you have it?"; this label is for screen readers (AC 5). */
+.pip-checkin-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* MPP-35: the one-time question's note that the earliest day stands for "longer ago" */
+.pip-checkin-hint {
+  flex-basis: 100%;
+  margin: 0;
+  font-size: 0.8rem;
+  opacity: 0.8;
+}
+
+/* MPP-40: the 🧪 badge in the room's action strip while free mode is on — informational, not a control. */
+.pip-free-mode-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--pet-notice-bg);
+  color: var(--pet-notice-text);
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+
+/* ==== room/DecorPicker.css ==== */
+/* MPP-27: the per-spot decor picker — a short sheet over the bottom of the room card. */
+
+.pip-decor-picker {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 5; /* above the scene's station and spot buttons */
+  max-height: 62%;
+  overflow-y: auto;
+  padding: 10px 12px 16px;
+  border-radius: 20px 20px 0 0;
+  background: var(--bg-primary);
+  box-shadow: 0 -6px 24px var(--pet-picker-shadow);
+  animation: pip-decor-picker-up var(--pip-sheet-in) var(--pip-sheet-ease);
+}
+
+.pip-decor-picker:focus { outline: none; }
+
+@keyframes pip-decor-picker-up {
+  from { transform: translateY(105%); }
+  to { transform: none; }
+}
+
+.pip-decor-picker-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.pip-decor-picker-head h4 {
+  margin: 4px 0 8px;
+  font-size: 0.95rem;
+}
+
+.pip-decor-picker-close,
+.pip-decor-option,
+.pip-decor-picker-more button {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+}
+
+.pip-decor-picker-close {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  font-size: 1.3rem;
+}
+
+.pip-decor-picker-error {
+  margin: 0 0 8px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: var(--danger-hover-bg);
+  color: var(--pet-error-text);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.pip-decor-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+  gap: 8px;
+}
+
+.pip-decor-option {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  min-height: 44px;
+  padding: 6px 4px;
+  border: 2px solid var(--pet-divider-border);
+  border-radius: 12px;
+  background: var(--pet-card-bg);
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.pip-decor-option[aria-pressed='true'] {
+  border-color: var(--pet-accent-color);
+  background: var(--pet-selected-bg);
+}
+
+.pip-decor-option:active,
+.pip-decor-picker-more button:active { filter: brightness(0.94); }
+
+.pip-decor-picker-close:active { background: var(--pet-press-bg); }
+
+@media (hover: hover) {
+  .pip-decor-option:not([aria-pressed='true']):hover { border-color: var(--pet-divider-hover-border); }
+  .pip-decor-picker-close:hover { background: var(--pet-hover-bg); }
+  .pip-decor-picker-more button:hover { color: var(--brand-primary); }
+}
+
+.pip-decor-option .pip-decor-thumb,
+.pip-decor-option-none {
+  width: 56px;
+  height: 56px;
+}
+
+.pip-decor-option-none {
+  display: grid;
+  place-items: center;
+  color: var(--pet-muted-text);
+  font-size: 1.4rem;
+}
+
+.pip-decor-picker-more {
+  margin: 10px 0 0;
+  color: var(--pet-muted-text);
+  font-size: 0.8rem;
+}
+
+.pip-decor-picker-more button {
+  min-height: 44px;
+  border: 0;
+  background: none;
+  color: var(--pet-accent-color);
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.pip-decor-picker-close:focus-visible,
+.pip-decor-option:focus-visible,
+.pip-decor-picker-more button:focus-visible {
+  outline: 3px solid var(--pip-focus-ring);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pip-decor-picker { animation: none; }
+}
+
+
+/* ==== room/FridgeView.css ==== */
+/* MPP-19: Pip's fridge view (mockup v5 .overlay.fridge / .fmeter / .fbody / .fshelf / .food).
+   Fills the room card and scrolls inside it (spec: mobile-first, no page scroll at 320 px). */
+
+.pip-fridge-view {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: linear-gradient(#eef6fb, #d9ebf5);
+  animation: pip-overlay-in var(--pip-sheet-in) var(--pip-sheet-ease);
+}
+
+.pip-fridge-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.pip-fridge-head h3 {
+  margin: 0;
+  font-size: 1rem;
+  overflow-wrap: anywhere;
+}
+
+.pip-fridge-btn-text {
+  flex-shrink: 0;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.08);
+  color: inherit;
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pip-fridge-btn-text:active {
+  background: rgba(0, 0, 0, 0.16);
+}
+
+@media (hover: hover) {
+  .pip-fridge-btn-text:hover {
+    background: rgba(0, 0, 0, 0.12);
+  }
+}
+
+.pip-fridge-btn-text:focus-visible {
+  outline: 3px solid var(--pip-focus-ring);
+  outline-offset: 2px;
+}
+
+.pip-fridge-meter {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 8px;
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: #fff;
+  font-size: 0.8rem;
+}
+
+.pip-fridge-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px;
+  border: 3px solid #b7cfdd;
+  border-radius: 12px;
+  background: #f8fcff;
+}
+
+.pip-fridge-shelf {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  padding-bottom: 6px;
+  border-bottom: 4px solid #b7cfdd;
+}
+
+.pip-fridge-food {
+  display: grid;
+  place-items: center;
+  height: 40px;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 1.5rem;
+}
+
+.pip-fridge-food.is-gone {
+  border: 2px dashed #c9dbe6;
+  background: transparent;
+}
+
+.pip-fridge-footnote {
+  margin: 0;
+  font-size: 0.76rem;
+  line-height: 1.4;
+  color: #5c5670;
+}
+
+.pip-fridge-state {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+}
+
+.pip-fridge-view:focus { outline: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .pip-fridge-view { animation: none; }
+}
+
+
+/* ==== room/PetRoom.css ==== */
+/* MPP-16 / MPP-37 / MPP-39: Pip's room — angled-corner SVG from pip-room-mockup-v5.html. Full screen:
+   the stage takes every pixel the header and the rows under it leave. MPP-39: the stage is a camera
+   viewport over a bigger world layer (usePipCamera). */
+.pip-room {
+  position: relative;
+  flex: 1;
+  /* Floor for short screens: .pet-view scrolls instead of squeezing the room to nothing. */
+  min-height: 40vh;
+  display: flex;
+  flex-direction: column;
+  background: #f3f1f8; /* MPP-39: the area outside the room */
+}
+
+.pip-room-stage {
+  /* Zero basis + height 0: see MPP-37 — the stage takes the height flex gives it. */
+  flex: 1 1 0;
+  height: 0;
+  min-height: 30vh;
+  position: relative;
+  overflow: hidden;
+  /* MPP-39: drag and pinch belong to the camera, not page scroll or browser zoom. */
+  touch-action: none;
+  cursor: grab;
+  outline: none;
+}
+
+.pip-room-stage.is-dragging { cursor: grabbing; }
+
+.pip-room-stage:focus-visible {
+  box-shadow: inset 0 0 0 3px var(--pip-focus-ring);
+}
+
+/* MPP-39: the world layer — sized in px at ROOM_PX_PER_UNIT inline, moved by the camera's transform. */
+.pip-room-world {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  z-index: 0;
+}
+
+/* Only promote the layer while it moves, so at rest it re-rasterises sharp at any zoom. */
+.pip-room-stage.is-moving .pip-room-world { will-change: transform; }
+
+.pip-room-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* MPP-44: the night dim covers the whole stage wherever the camera is; after the world in the DOM so it
+   paints over it at the same z-index, under the bubble, hint and 🎯 (z 1). Never takes a drag or tap. */
+.pip-room-night-dim {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* MPP-39 AC 18: 🎯 bottom right, fixed to the screen. */
+.pip-room-recentre {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  z-index: 1;
+  min-width: 44px;
+  min-height: 44px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--pet-float-bg);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  font-size: 1.2rem;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pip-room-recentre:active { background: var(--pet-float-active-bg); }
+
+@media (hover: hover) {
+  .pip-room-recentre:hover { background: var(--bg-primary); }
+}
+
+.pip-room-recentre:focus-visible {
+  outline: 3px solid var(--pip-focus-ring);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px var(--pip-focus-halo);
+}
+
+/* MPP-17: cooker steam (mockup v5 .steam) and the sleeping z's.
+   AC 6: reduced motion stops both. */
+.pip-steam,
+.pip-zzz {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.pip-steam { animation: pip-steam 1.2s ease-in-out infinite; }
+.pip-zzz { animation: pip-zzz 2.4s ease-in-out infinite; }
+
+@keyframes pip-steam {
+  0% { opacity: 0.2; transform: translateY(2px); }
+  50% { opacity: 1; }
+  100% { opacity: 0.2; transform: translateY(-6px); }
+}
+
+@keyframes pip-zzz {
+  0%, 100% { opacity: 0.55; transform: translateY(0); }
+  50% { opacity: 1; transform: translateY(-5px); }
+}
+
+/* MPP-18: the cook-and-serve walk (mockup v5 #pipg + .hop). The walker's inline
+   transform changes between rug (none) and cooker; the transition is the walk.
+   MPP-29: its duration is set inline per phase from pipWalkMs (walking out, returning back). */
+.pip-walker {
+  transition-property: transform;
+  transition-timing-function: ease-in-out;
+}
+.pip-walker.is-walking .pip-hop { animation: pip-hop 0.32s ease-in-out infinite alternate; }
+
+@keyframes pip-hop {
+  to { transform: translateY(-6px); }
+}
+
+/* AC 6 (MPP-17) / AC 5 (MPP-18): reduced motion stops steam, z's, the hop and the walk. */
+@media (prefers-reduced-motion: reduce) {
+  .pip-steam,
+  .pip-zzz,
+  .pip-hop {
+    animation: none !important;
+  }
+
+  .pip-walker {
+    transition: none !important;
+  }
+}
+
+/* MPP-19 / MPP-23: a station button over its art (fridgeHitBox / cabinetHitBox, % of the
+   viewBox); on the world layer, scaled with the art (MPP-39: no min size — it would outgrow the art when zoomed out). */
+.pip-station-btn {
+  position: absolute;
+  padding: 0;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pip-station-btn:active {
+  background: var(--pet-hit-active-bg);
+}
+
+@media (hover: hover) {
+  .pip-station-btn:hover {
+    background: var(--pet-hit-hover-bg);
+  }
+}
+
+.pip-station-btn:focus-visible {
+  outline: 3px solid var(--pip-focus-ring);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px var(--pip-focus-halo);
+}
+
+/* Spec: the "tap the fridge" hint, bottom-left (mockup v5 .hint). Decorative for touch, so
+   it never takes a tap. */
+.pip-room-hint {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  margin: 0;
+  padding: 5px 9px;
+  border-radius: 10px;
+  background: var(--pet-float-bg);
+  color: var(--pet-soft-text);
+  font-size: 0.72rem;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* MPP-26 / MPP-27 / MPP-32 / MPP-37: 🛍 Shop, ✏️ Edit room and 👕 Wardrobe — one row of equal
+   columns directly above the tab bar, however many have loaded; never wraps at 360px. */
+.pip-room-actions {
+  flex: none;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 6px;
+  padding: 8px 10px;
+  background: var(--bg-primary);
+  border-top: 1px solid var(--pet-divider-strong-border);
+}
+
+.pip-room-action {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-width: 0;
+  padding-inline: 6px;
+  white-space: nowrap;
+}
+
+.pip-room-action:active { filter: brightness(0.92); }
+
+.pip-room-action-badge {
+  position: absolute;
+  top: -4px;
+  right: -3px;
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--bg-primary);
+  border-radius: 50%;
+  background: var(--pet-badge-bg);
+  color: var(--on-brand);
+  font-size: 0.62rem;
+  font-weight: 800;
+  animation: pip-badge-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes pip-badge-pulse {
+  50% { transform: scale(1.25); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pip-room-action-badge { animation: none; }
+}
+
+/* MPP-27: edit mode — the dashed spots (mockup .slot), their buttons, the bar and the style chips.
+   While editing, the bubble and the hint step aside so they can't cover the right-wall and floor spots. */
+.pip-decor-spot polygon {
+  fill: var(--pet-spot-fill);
+  stroke: var(--pet-accent-color);
+  stroke-width: 2;
+  stroke-dasharray: 6 4;
+}
+
+.pip-decor-spot.is-filled polygon { fill: var(--pet-spot-filled-fill); }
+
+.pip-decor-spot.is-selected polygon {
+  stroke: var(--pet-spot-selected-stroke);
+  stroke-width: 3;
+  fill: var(--pet-spot-selected-fill);
+}
+
+.pip-decor-spot text {
+  fill: var(--pet-accent-color);
+  font-size: 18px;
+  font-weight: 800;
+}
+
+/* MPP-40 AC 8: each spot's name, drawn with its outline in edit mode. */
+.pip-decor-spot-tag rect { fill: var(--bg-primary); stroke: var(--pet-accent-color); stroke-width: 0.8; }
+.pip-decor-spot-tag text { font: 600 7px system-ui, sans-serif; fill: var(--pet-label-text); pointer-events: none; }
+.pip-decor-spot-tag { pointer-events: none; }
+
+.pip-room-stage.is-editing .pet-bubble,
+.pip-room-stage.is-editing .pip-room-hint {
+  visibility: hidden;
+}
+
+.pip-decor-spot-btn {
+  position: absolute;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pip-decor-spot-btn:active { background: var(--pet-hit-active-bg); }
+
+@media (hover: hover) {
+  .pip-decor-spot-btn:hover { background: var(--pet-hit-hover-bg); }
+}
+
+.pip-decor-spot-btn:focus-visible {
+  outline: 3px solid var(--pip-focus-ring);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px var(--pip-focus-halo);
+}
+
+.pip-room-editbar {
+  flex: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin: 8px 12px 0;
+  padding: 6px 6px 6px 12px;
+  border-radius: 12px;
+  background: var(--pet-scrim-bg);
+  color: var(--pet-scrim-text);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.pip-room-editbar button {
+  min-height: 44px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--pet-gold-bg);
+  color: var(--pet-gold-text);
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pip-room-editbar button:active { filter: brightness(0.92); }
+
+@media (hover: hover) {
+  .pip-room-editbar button:hover { filter: brightness(0.96); }
+}
+
+.pip-room-editbar button:focus-visible {
+  outline: 3px solid var(--pip-focus-ring-on-dark);
+  outline-offset: 2px;
+}
+
+.pip-room-editbar-error {
+  order: 3;
+  flex-basis: 100%;
+  color: var(--pet-scrim-error-text);
+}
+
+.pip-room-action.is-on {
+  border-color: var(--pet-accent-color);
+  background: var(--pet-accent-color);
+  color: var(--on-brand);
+}
+
+.pip-room-styles {
+  flex: none;
+  padding: 0 16px 12px;
+}
+
+.pip-room-styles-label {
+  margin: 4px 0;
+  color: var(--pet-muted-text);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.pip-room-styles-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.pip-style-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 10px;
+  border: 2px solid var(--pet-divider-border);
+  border-radius: 999px;
+  background: var(--bg-primary);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pip-style-chip[aria-pressed='true'] {
+  border-color: var(--pet-accent-color);
+  background: var(--pet-selected-bg);
+}
+
+.pip-style-chip:active { filter: brightness(0.94); }
+
+@media (hover: hover) {
+  .pip-style-chip:not([aria-pressed='true']):hover { border-color: var(--pet-divider-hover-border); }
+}
+
+.pip-style-chip:focus-visible {
+  outline: 3px solid var(--pip-focus-ring);
+  outline-offset: 2px;
+}
+
+.pip-style-swatch {
+  width: 18px;
+  height: 18px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 50%;
+}
+
+/* MPP-29 AC 2: the fridge and cabinet overlays fade in on the sheets' beat (--pip-sheet-in);
+   each overlay's stylesheet applies it and turns it off under reduced motion. */
+@keyframes pip-overlay-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+
+/* ==== room/PipHeadBar.css ==== */
+/* MPP-38: Pip's level bar over his head (colours from MPP-31's strip). */
+
+.pip-head-bar-track { fill: #e3f1d8; }
+.pip-head-bar-outline { fill: none; stroke: #2f4a22; }
+
+.pip-head-bar-fill {
+  fill: #5fae3e;
+  transform-box: fill-box;
+  transform-origin: 0 50%;
+  transition: transform 0.9s ease-in-out;
+}
+
+.pip-head-bar.is-instant .pip-head-bar-fill { transition: none; }
+
+/* AC 4: fill in the first half of FILLING, then flash yellow before Pip evolves. */
+.pip-head-bar.is-full .pip-head-bar-fill {
+  transition-duration: var(--pip-head-bar-flash);
+  animation: pip-head-bar-flash var(--pip-head-bar-flash) ease-in-out var(--pip-head-bar-flash) 1;
+}
+
+@keyframes pip-head-bar-flash {
+  50% { fill: #ffd34d; }
+}
+
+/* The points pop: "+3" floats up and fades, then "3 / 15" takes its place and fades.
+   Durations come from HEAD_BAR_GAIN_DELTA_MS / HEAD_BAR_GAIN_MS via PipHeadBar; the count
+   also waits out any evolve (--pip-gain-delay). */
+.pip-head-bar-gain text {
+  text-anchor: middle;
+  font-weight: 800;
+  paint-order: stroke;
+  stroke: #fff;
+  stroke-linejoin: round;
+  opacity: 0;
+}
+
+.pip-head-bar-delta { animation: pip-gain-delta var(--pip-gain-delta-ms) ease-out 1 both; }
+.pip-head-bar-delta.is-up { fill: #3f8f27; }
+.pip-head-bar-delta.is-down { fill: #b5563a; }
+
+.pip-head-bar-count {
+  fill: #2f4a22;
+  animation: pip-gain-count var(--pip-gain-ms) ease-in-out var(--pip-gain-delay, 0ms) 1 both;
+}
+
+@keyframes pip-gain-delta {
+  0% { opacity: 0; transform: translateY(0); }
+  20% { opacity: 1; }
+  70% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(var(--pip-gain-rise)); }
+}
+
+/* Holds back until the +3 has gone (HEAD_BAR_GAIN_DELTA_MS is half of HEAD_BAR_GAIN_MS), then shows and fades. */
+@keyframes pip-gain-count {
+  0%, 45% { opacity: 0; }
+  55%, 85% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* AC 6: the screen-reader progressbar is present but not painted. */
+.pip-head-bar-status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pip-head-bar-fill {
+    transition: none !important;
+    animation: none !important;
+  }
+
+  /* Still shown, just without the rise — the count's opacity fade is not motion. The landing
+     page's global reduced-motion rule shortens every animation to 0.01ms, which would end
+     these at opacity 0 before they are seen. */
+  .pip-head-bar-delta { animation-name: pip-gain-delta-still; animation-duration: var(--pip-gain-delta-ms) !important; }
+  .pip-head-bar-count { animation-duration: var(--pip-gain-ms) !important; }
+}
+
+@keyframes pip-gain-delta-still {
+  0%, 70% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+
+/* ==== room/ShopEarnTab.css ==== */
+/* MPP-42: the Shop's ✨ Earn tab (pip-sprinkles-earn-mockup.html, Version B). Tokens as ShopView.css. */
+.pip-earn-ways { margin: 0; padding: 0; list-style: none; }
+
+.pip-earn-way {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 8px;
+  padding: 10px;
+  border: 1px solid var(--pet-divider-border);
+  border-radius: 14px;
+  background: var(--pet-card-bg);
+}
+
+.pip-earn-icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: var(--pet-thumb-bg);
+  font-size: 1.25rem;
+}
+
+.pip-earn-way h4 { margin: 0; font-size: 0.9rem; }
+.pip-earn-way p { margin: 1px 0 0; font-size: 0.74rem; color: var(--pet-muted-text); line-height: 1.35; }
+
+.pip-earn-new {
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--pet-accent-color);
+  color: var(--on-brand);
+  font-size: 0.62rem;
+  font-weight: 800;
+  vertical-align: middle;
+}
+
+.pip-earn-amount {
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: var(--pet-balance-bg);
+  font-weight: 800;
+  font-size: 0.82rem;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.pip-earn-week { margin: 4px 0 10px; padding: 10px 12px; border-radius: 14px; background: var(--pet-tint-bg); font-size: 0.82rem; }
+.pip-earn-week b { color: var(--brand-primary); }
+.pip-earn-week table { width: 100%; border-collapse: collapse; margin-top: 6px; font-variant-numeric: tabular-nums; }
+.pip-earn-week td { padding: 2px 0; }
+.pip-earn-week td:last-child { text-align: right; font-weight: 700; }
+.pip-earn-week-total td { border-top: 1px solid var(--pet-divider-mid-border); padding-top: 5px; font-weight: 800; }
+
+.pip-earn-recent { margin: 0; padding: 0; list-style: none; font-size: 0.82rem; }
+.pip-earn-recent li { display: flex; justify-content: space-between; gap: 8px; padding: 7px 2px; border-bottom: 1px solid var(--pet-divider-faint-border); }
+.pip-earn-recent small { display: block; color: var(--pet-muted-text); font-size: 0.7rem; }
+.pip-earn-plus { color: var(--pet-success-text); font-weight: 800; white-space: nowrap; }
+.pip-earn-minus { color: var(--pet-error-text); font-weight: 800; white-space: nowrap; }
+
+.pip-earn-rules { margin: 0; padding-left: 18px; font-size: 0.78rem; color: var(--pet-muted-text); }
+.pip-earn-rules li { margin-bottom: 4px; }
+
+.pip-earn-loading, .pip-earn-empty { margin: 8px 0; font-size: 0.82rem; color: var(--pet-muted-text); }
+
+.pip-earn-error { margin: 8px 0; font-size: 0.82rem; color: var(--pet-error-text); }
+.pip-earn-error p { margin: 0 0 6px; }
+
+.pip-earn-retry {
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid var(--pet-divider-border);
+  border-radius: 999px;
+  background: var(--bg-primary);
+  font-weight: 700;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pip-earn-retry:active { background: var(--pet-tint-bg); }
+.pip-earn-retry:focus-visible { outline: 2px solid var(--pip-focus-ring); outline-offset: 2px; }
+
+@media (hover: hover) {
+  .pip-earn-retry:hover { background: var(--pet-tint-bg); }
+}
+
+
+/* ==== room/ShopView.css ==== */
+/* MPP-26: the Shop sheet (mpp-26-shop-sheet-mockup.html). Same shell as the Dress Pip sheet:
+   full screen on a phone, a centred 480 px column on wider screens; scrolls inside, never the page. */
+
+.pip-shop {
+  position: fixed;
+  inset: 0;
+  z-index: 200; /* above the fixed footer (z-index 100) */
+  max-width: 480px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  box-shadow: 0 0 40px var(--pet-sheet-shadow);
+  animation: pip-shop-up var(--pip-sheet-in) var(--pip-sheet-ease);
+}
+
+.pip-shop:focus { outline: none; }
+
+@keyframes pip-shop-up {
+  from { transform: translateY(100%); }
+  to { transform: none; }
+}
+
+.pip-shop-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--pet-divider-border);
+}
+
+.pip-shop-head h3 {
+  flex: 1;
+  margin: 0;
+  font-size: 1.05rem;
+  color: var(--brand-primary);
+  text-align: center;
+}
+
+.pip-shop-icon-btn,
+.pip-shop-btn {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+}
+
+.pip-shop-icon-btn {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  font-size: 1.3rem;
+}
+
+.pip-shop-icon-btn:active { background: var(--pet-press-bg); }
+
+@media (hover: hover) {
+  .pip-shop-icon-btn:hover { background: var(--pet-hover-bg); }
+}
+
+.pip-shop-balance {
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: var(--pet-balance-bg);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.pip-shop-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px 12px 16px;
+}
+
+.pip-shop-intro,
+.pip-shop-foot {
+  margin: 0 0 10px;
+  font-size: 0.82rem;
+  color: var(--pet-muted-text);
+  line-height: 1.4;
+}
+
+.pip-shop-foot { margin: 6px 0 0; font-size: 0.72rem; }
+
+.pip-shop-status,
+.pip-shop-error {
+  margin: 0 0 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.pip-shop-status { background: var(--pet-success-bg); color: var(--pet-success-text); }
+.pip-shop-error { background: var(--danger-hover-bg); color: var(--pet-error-text); }
+
+.pip-shop-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pip-shop-card {
+  display: grid;
+  grid-template-columns: 84px minmax(0, 1fr);
+  gap: 10px;
+  margin-bottom: 10px;
+  padding: 10px;
+  border: 1px solid var(--pet-divider-border);
+  border-radius: 14px;
+  background: var(--pet-card-bg);
+}
+
+.pip-shop-thumb {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 84px;
+  height: 84px;
+  border-radius: 10px;
+  background: var(--pet-thumb-bg);
+}
+
+.pip-shop-thumb-svg { width: 76px; height: 76px; }
+
+.pip-shop-thumb-tag {
+  position: absolute;
+  bottom: 3px;
+  left: 3px;
+  padding: 1px 5px;
+  border-radius: 6px;
+  background: var(--pet-tag-bg);
+  color: var(--pet-scrim-text);
+  font-size: 0.6rem;
+  font-weight: 700;
+}
+
+.pip-shop-card-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.pip-shop-dots { display: inline-flex; gap: 3px; margin-left: auto; }
+.pip-shop-dots b { width: 9px; height: 9px; border-radius: 50%; background: var(--pet-divider-strong-border); }
+.pip-shop-dots b.is-on { background: var(--pet-accent-color); }
+
+.pip-shop-now { margin: 2px 0 6px; font-size: 0.78rem; color: var(--pet-muted-text); }
+.pip-shop-next { margin: 0 0 8px; font-size: 0.82rem; }
+
+.pip-shop-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+
+.pip-shop-btn {
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--pet-accent-color);
+  border-radius: 999px;
+  background: var(--pet-accent-color);
+  color: var(--on-brand);
+  font: inherit;
+  font-weight: 700;
+}
+
+.pip-shop-btn.is-confirm { border-color: var(--pet-gold-border); background: var(--pet-gold-bg); color: var(--pet-gold-text); }
+.pip-shop-btn:active { filter: brightness(0.92); }
+
+@media (hover: hover) {
+  .pip-shop-btn:not(:disabled):hover { filter: brightness(0.96); }
+}
+
+.pip-shop-icon-btn:focus-visible,
+.pip-shop-btn:focus-visible {
+  outline: 3px solid var(--pip-focus-ring);
+  outline-offset: 2px;
+}
+
+.pip-shop-btn:disabled {
+  border-color: var(--pet-divider-strong-border);
+  background: var(--pet-disabled-bg);
+  color: var(--pet-disabled-text);
+  cursor: default;
+}
+
+.pip-shop-short { font-size: 0.76rem; font-weight: 600; color: var(--pet-warn-text); }
+.pip-shop-max { font-size: 0.82rem; font-weight: 700; color: var(--pet-success-text); }
+
+@media (prefers-reduced-motion: reduce) {
+  .pip-shop { animation: none; }
+}
+
+/* MPP-27: the shop's tabs and the decor / style grids. */
+.pip-shop-tabs {
+  display: flex;
+  padding: 0 8px;
+  border-bottom: 1px solid var(--pet-divider-border);
+}
+
+.pip-shop-tab {
+  flex: 1;
+  min-height: 44px;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  background: none;
+  color: var(--pet-muted-text);
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 700;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pip-shop-tab[aria-selected='true'] {
+  border-bottom-color: var(--pet-accent-color);
+  color: var(--pet-accent-color);
+}
+
+.pip-shop-tab:active { background: var(--pet-hover-bg); }
+
+@media (hover: hover) {
+  .pip-shop-tab:not([aria-selected='true']):hover { color: var(--brand-primary); }
+}
+
+.pip-shop-tab:focus-visible {
+  outline: 3px solid var(--pip-focus-ring);
+  outline-offset: -3px;
+}
+
+.pip-shop-group {
+  margin: 4px 0 6px;
+  color: var(--pet-muted-text);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.pip-shop-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 8px;
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+}
+
+.pip-shop-item {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  padding: 8px 6px;
+  border: 1px solid var(--pet-divider-border);
+  border-radius: 12px;
+  background: var(--pet-card-bg);
+  text-align: center;
+}
+
+.pip-shop-item-art {
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 64px;
+  border-radius: 8px;
+  background: var(--pet-thumb-bg);
+}
+
+.pip-shop-item-art .pip-decor-thumb,
+.pip-shop-item-art .pip-style-swatch-svg {
+  width: 64px;
+  height: 60px;
+}
+
+.pip-shop-item-name {
+  min-height: 2.4em;
+  margin: 0;
+  font-size: 0.74rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.pip-shop-item .pip-shop-btn {
+  width: 100%;
+  padding: 0 8px;
+  font-size: 0.78rem;
+}
+
+.pip-shop-owned {
+  display: grid;
+  place-items: center;
+  min-height: 44px;
+  color: var(--pet-success-text);
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.pip-shop-item .pip-shop-short { font-size: 0.68rem; }
+
+/* MPP-40: free mode (testing) — the shop note and the level chips that replace the upgrade button. */
+.pip-shop-free {
+  margin: 0 0 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: var(--pet-notice-bg);
+  color: var(--pet-notice-text);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.pip-shop-levels { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.pip-shop-level-chip {
+  min-width: 44px;
+  min-height: 44px;
+  border: 1px solid var(--pet-divider-strong-border);
+  border-radius: 999px;
+  background: var(--bg-primary);
+  color: var(--pet-label-text);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pip-shop-level-chip[aria-pressed="true"] {
+  border-color: var(--pet-accent-color);
+  background: var(--pet-accent-color);
+  color: var(--on-brand);
+}
+
+.pip-shop-level-chip:active { filter: brightness(0.92); }
+.pip-shop-level-chip:disabled { cursor: default; opacity: 0.6; }
+
+.pip-shop-level-chip:focus-visible {
+  outline: 3px solid var(--pip-focus-ring);
+  outline-offset: 2px;
+}
+
+@media (hover: hover) {
+  .pip-shop-level-chip:not(:disabled):not([aria-pressed="true"]):hover { background: var(--pet-tint-bg); }
+}
+
+/* MPP-42 AC 7: "See Earn →" — link-styled, with a 44px hit area. */
+.pip-shop-foot-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 4px;
+  border: 0;
+  background: none;
+  color: var(--pet-accent-color);
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pip-shop-foot-link:active { color: var(--brand-primary); }
+.pip-shop-foot-link:focus-visible { outline: 2px solid var(--pip-focus-ring); outline-offset: 2px; border-radius: 4px; }
+
+@media (hover: hover) {
+  .pip-shop-foot-link:hover { color: var(--brand-primary); }
+}
+
+
+/* ==== room/TrophyCabinetView.css ==== */
+/* MPP-23: Pip's trophy cabinet (mockup v5 .overlay / .shelf / .award / .times / .streak / .todo / .cnote).
+   Fills the room card and scrolls inside it, like the fridge (no page scroll at 320 px). */
+
+.pip-cabinet-view {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: linear-gradient(#5b3a22, #3f2716);
+  color: #fff7e8;
+  animation: pip-overlay-in var(--pip-sheet-in) var(--pip-sheet-ease);
+}
+
+.pip-cabinet-view:focus { outline: none; }
+
+.pip-cabinet-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.pip-cabinet-head h3 {
+  margin: 0;
+  font-size: 1rem;
+  overflow-wrap: anywhere;
+}
+
+.pip-cabinet-btn-text {
+  flex-shrink: 0;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pip-cabinet-btn-text:active { background: rgba(255, 255, 255, 0.3); }
+
+@media (hover: hover) {
+  .pip-cabinet-btn-text:hover { background: rgba(255, 255, 255, 0.22); }
+}
+
+.pip-cabinet-btn-text:focus-visible {
+  outline: 3px solid var(--pip-focus-ring-on-dark);
+  outline-offset: 2px;
+}
+
+.pip-cabinet-shelf {
+  padding: 8px;
+  border-bottom: 5px solid #a0703f;
+  border-radius: 8px 8px 2px 2px;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.pip-cabinet-shelf h4 {
+  margin: 0 0 6px;
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #f3d9a8;
+}
+
+.pip-cabinet-streak {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 2px 8px;
+  margin: 0 0 6px;
+  padding: 7px 9px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  font-size: 0.78rem;
+}
+
+.pip-cabinet-awards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pip-award {
+  position: relative;
+  text-align: center;
+  font-size: 0.6rem;
+  line-height: 1.2;
+}
+
+.pip-award.is-locked { opacity: 0.33; }
+
+.pip-award-icon {
+  display: block;
+  width: 38px;
+  height: 38px;
+  margin: 0 auto 2px;
+}
+
+.pip-award-times {
+  position: absolute;
+  top: -2px;
+  right: 0;
+  padding: 1px 5px;
+  border-radius: 999px;
+  background: #ffd34d;
+  color: #3f2716;
+  font-size: 0.6rem;
+  font-weight: 800;
+}
+
+.pip-cabinet-note {
+  margin: 0;
+  font-size: 0.7rem;
+  line-height: 1.35;
+  color: #f3d9a8;
+}
+
+.pip-cabinet-firsts {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pip-cabinet-first {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 2px;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.15);
+  font-size: 0.76rem;
+}
+
+.pip-cabinet-first span:last-child {
+  flex-shrink: 0;
+  color: #f3d9a8;
+}
+
+.pip-cabinet-first.is-earned span:last-child { color: #ffd34d; }
+
+.pip-cabinet-state {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pip-cabinet-view { animation: none; }
+}
+
+
+/* ==== room/WardrobeView.css ==== */
+/* MPP-32: the Dress Pip sheet (mpp-32-wardrobe-phone-mockup.html .sheet …). Full screen on a
+   phone, a centred 480 px column on wider screens; scrolls inside, never the page. */
+
+.pip-wardrobe {
+  position: fixed;
+  inset: 0;
+  z-index: 200; /* above the fixed footer (z-index 100) */
+  max-width: 480px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  box-shadow: 0 0 40px var(--pet-sheet-shadow);
+  animation: pip-wardrobe-up var(--pip-sheet-in) var(--pip-sheet-ease);
+}
+
+.pip-wardrobe:focus { outline: none; }
+
+@keyframes pip-wardrobe-up {
+  from { transform: translateY(100%); }
+  to { transform: none; }
+}
+
+.pip-wardrobe-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--pet-wardrobe-border);
+}
+
+.pip-wardrobe-head h3 {
+  flex: 1;
+  margin: 0;
+  font-size: 1.05rem;
+  color: var(--brand-primary);
+  text-align: center;
+}
+
+.pip-wardrobe-icon-btn,
+.pip-wardrobe-text-btn,
+.pip-wardrobe-tab,
+.pip-wardrobe-item,
+.pip-wardrobe-lineup summary {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+}
+
+.pip-wardrobe-icon-btn {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  font-size: 1.3rem;
+}
+
+.pip-wardrobe-text-btn {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 6px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--brand-primary);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.pip-wardrobe-text-btn:disabled { color: var(--pet-disabled-neutral-text); cursor: default; }
+
+.pip-wardrobe-preview {
+  flex: none;
+  height: 228px;
+  position: relative;
+  background: radial-gradient(circle at 50% 70%, #f6fbef, #e3efd6);
+}
+
+.pip-wardrobe-preview .pip-herb {
+  display: block;
+  width: 100%;
+  height: calc(100% - 24px);
+}
+
+.pip-wardrobe-caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 6px;
+  margin: 0;
+  text-align: center;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #2f4a22;
+}
+
+.pip-wardrobe-error {
+  margin: 8px 12px 0;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: var(--danger-hover-bg);
+  color: var(--pet-wardrobe-error-text);
+  font-size: 0.84rem;
+}
+
+.pip-wardrobe-tabs {
+  flex: none;
+  display: flex;
+  gap: 6px;
+  padding: 10px 12px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  border-bottom: 1px solid var(--pet-wardrobe-border);
+}
+
+.pip-wardrobe-tabs::-webkit-scrollbar { display: none; }
+
+.pip-wardrobe-tab {
+  position: relative;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--pet-wardrobe-border);
+  border-radius: 999px;
+  background: var(--bg-primary);
+  color: inherit;
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+.pip-wardrobe-tab.is-selected { background: var(--brand-primary); border-color: var(--brand-primary); color: var(--on-brand); }
+.pip-wardrobe-tab-worn { width: 7px; height: 7px; border-radius: 50%; background: var(--pet-wardrobe-worn-fill); }
+.pip-wardrobe-tab.is-selected .pip-wardrobe-tab-worn { background: var(--pet-wardrobe-worn-on-brand-fill); }
+
+.pip-wardrobe-tab-new {
+  position: absolute;
+  top: -3px;
+  right: -2px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--pet-badge-bg);
+  border: 2px solid var(--bg-primary);
+}
+
+.pip-wardrobe-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 12px;
+}
+
+.pip-wardrobe-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pip-wardrobe-item {
+  position: relative;
+  width: 100%;
+  min-height: 44px;
+  padding: 4px 4px 8px;
+  border: 2px solid var(--pet-wardrobe-border);
+  border-radius: 14px;
+  background: var(--bg-primary);
+  color: inherit;
+  font: inherit;
+  text-align: center;
+}
+
+.pip-wardrobe-item .pip-herb {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 10px;
+  background: #f6fbef;
+}
+
+.pip-wardrobe-item.is-worn { border-color: var(--brand-primary); box-shadow: 0 0 0 2px var(--pet-wardrobe-worn-shadow); }
+
+.pip-wardrobe-item.is-worn::before {
+  content: "✓";
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--brand-primary);
+  color: var(--on-brand);
+  font-size: 0.72rem;
+}
+
+.pip-wardrobe-item.is-locked .pip-herb { filter: grayscale(1) opacity(0.45); }
+.pip-wardrobe-item.is-locked .pip-wardrobe-item-label { color: var(--text-secondary); }
+
+.pip-wardrobe-item-label {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.pip-wardrobe-lock {
+  position: absolute;
+  top: 34%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.3rem;
+}
+
+.pip-wardrobe-new {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--pet-badge-bg);
+  color: var(--on-brand);
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.pip-wardrobe-lock-note {
+  margin: 12px 0 0;
+  padding: 9px 12px;
+  border: 1px solid var(--pet-lock-note-border);
+  border-radius: 12px;
+  background: var(--pet-lock-note-bg);
+  font-size: 0.84rem;
+}
+
+.pip-wardrobe-lock-note b { display: block; }
+
+.pip-wardrobe-lineup {
+  flex: none;
+  border-top: 1px solid var(--pet-wardrobe-border);
+  background: var(--pet-wardrobe-lineup-bg);
+}
+
+.pip-wardrobe-lineup summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 46px;
+  padding: 0 16px;
+  list-style: none;
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--pet-wardrobe-text);
+}
+
+.pip-wardrobe-lineup summary::-webkit-details-marker { display: none; }
+.pip-wardrobe-lineup summary::after { content: "▴"; color: var(--text-secondary); }
+.pip-wardrobe-lineup[open] summary::after { content: "▾"; }
+
+.pip-wardrobe-forms {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 4px;
+  margin: 0;
+  padding: 0 8px 10px;
+  list-style: none;
+}
+
+.pip-wardrobe-form { text-align: center; font-size: 0.62rem; color: var(--text-secondary); }
+.pip-wardrobe-form.is-current { color: var(--pet-wardrobe-text); font-weight: 700; }
+.pip-wardrobe-form .pip-herb { display: block; width: 100%; height: auto; aspect-ratio: 1; }
+.pip-wardrobe-form.is-unreached .pip-herb { filter: brightness(0) opacity(0.18); }
+
+.pip-wardrobe-icon-btn:focus-visible,
+.pip-wardrobe-text-btn:focus-visible,
+.pip-wardrobe-tab:focus-visible,
+.pip-wardrobe-item:focus-visible,
+.pip-wardrobe-lineup summary:focus-visible {
+  outline: 3px solid var(--pip-focus-ring);
+  outline-offset: 2px;
+}
+
+.pip-wardrobe-item:active,
+.pip-wardrobe-tab:active,
+.pip-wardrobe-lineup summary:active { filter: brightness(0.94); }
+
+.pip-wardrobe-icon-btn:active,
+.pip-wardrobe-text-btn:not(:disabled):active { background: var(--pet-press-bg); }
+
+@media (hover: hover) {
+  .pip-wardrobe-item:hover,
+  .pip-wardrobe-tab:hover,
+  .pip-wardrobe-lineup summary:hover { filter: brightness(0.97); }
+
+  .pip-wardrobe-icon-btn:hover,
+  .pip-wardrobe-text-btn:not(:disabled):hover { background: var(--pet-hover-bg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pip-wardrobe { animation: none; }
+}
+
+</style>
+</head>
+<body>
+<!-- approved 2026-11-16 -->
+<header class="page-head">
+  <h1>Pip room chrome: role-token workbench</h1>
+  <p>Every room UI surface (Shop with its four tabs, decor picker, Fridge, Trophy cabinet, Dress Pip, edit bar, head bar, check-in actions) in <b>Default</b>, <b>Parchment</b> and <b>Cyberpunk</b>, at 375 px and 1280 px, drawn with the live class names and the live room CSS. In this file every colour in that CSS reads a <code>--pet-*</code> role token (or an existing global token); the three <code>.frame[data-theme]</code> blocks set the proposed values. Contract 2 ports the table below.</p>
+  <p><b>What is a placeholder.</b> The room art behind the sheets is a flat band: the room itself lives in <code>pip-room-dragon.html</code> and <code>pip-room-robot.html</code>. Shop and picker thumbnails and the Pip crops in Dress Pip are placeholder glyphs for the same reason. Station and decor names are the live herb names in Default, the lair names in Parchment and the workshop names in Cyberpunk, copied from the two room files' <code>labels</code> blocks.</p>
+  <p><b>Room art classification (up for review).</b> The Fridge scene and the Trophy cabinet scene are classified as room art (Task 13): their surrounding sheet, head, buttons and text follow the tokens, while their painted interiors (the blue fridge, the wood cabinet, the gold awards) keep literal colours in every theme. If you would rather they follow the theme, say so at review and they move to tokens. No bespoke chrome looks are drawn (no parchment scroll sheets, no CRT panels): chrome is tokens only.</p>
+  <p><b>Not in the audit.</b> The header chip's earning state (<code>SprinklesChip.css</code>) is not drawn here; its four reused tokens and <code>--pet-gold-ring-shadow</code> are in the token table (live in MPP-45, v1.35.0). The theme font families are not part of this audit.</p>
+  <div class="ctl-bar" role="group" aria-label="View controls">
+    <span class="lbl" id="lbl-theme">Theme</span><div class="seg" id="ctl-theme" role="group" aria-labelledby="lbl-theme"></div>
+    <span class="lbl" id="lbl-width">Width</span><div class="seg" id="ctl-width" role="group" aria-labelledby="lbl-width"></div>
+    <button type="button" id="ctl-side" aria-pressed="false">Side by side (375)</button>
+    <a href="#contrast">Contrast</a> <a href="#tokens">Token table</a>
+  </div>
+</header>
+<main id="stage"></main>
+<section class="doc" id="contrast">
+  <h2>Contrast</h2>
+  <p id="contrast-summary"></p>
+  <p>Computed in this page from the rendered tokens with the WCAG formula <code>check-themes.mjs</code> uses (translucent backgrounds are flattened onto the token named in the pair, white where none is named). Green = at least the minimum, red = below it. Contract 2 adds these pairs to <code>PAIRS.&lt;id&gt;</code> in <code>check-themes.mjs</code>.</p>
+  <div class="tbl-wrap"><table class="doc-table"><thead><tr><th scope="col">Pair (text on background)</th><th scope="col">Min</th><th scope="col">Default</th><th scope="col">Parchment</th><th scope="col">Cyberpunk</th></tr></thead><tbody id="contrast-rows"></tbody></table></div>
+</section>
+<section class="doc" id="tokens">
+  <h2>Token table</h2>
+  <p id="token-count"></p>
+  <div class="tbl-wrap"><table class="doc-table"><thead><tr><th scope="col">Token</th><th scope="col">Area</th><th scope="col">Default (today's literal) and source</th><th scope="col">Parchment</th><th scope="col">Cyberpunk</th><th scope="col">Kind</th></tr></thead><tbody id="token-rows"></tbody></table></div>
+  <h2>Left as room art (literal in every theme)</h2>
+  <div class="tbl-wrap"><table class="doc-table"><thead><tr><th scope="col">Value</th><th scope="col">Source lines</th><th scope="col">Why</th></tr></thead><tbody id="art-rows"></tbody></table></div>
+  <h2>Notes</h2>
+  <ul id="token-notes"></ul>
+</section>
+<div class="frame probe" id="probe" data-theme="default" aria-hidden="true"><i></i></div>
+
+<script id="token-table" type="application/json">
+{
+  "tokens": [
+    {"token":"--bg-primary","area":"Global surface","defaultValue":"#ffffff","sources":["PetView.css:5","PetView.css:44","PetView.css:60","PetView.css:88","room/CheckInActions.css:18","room/DecorPicker.css:13","room/PetRoom.css:84","room/PetRoom.css:195","room/PetRoom.css:220","room/PetRoom.css:261","room/PetRoom.css:375","room/ShopEarnTab.css:76","room/ShopView.css:12","room/ShopView.css:321","room/WardrobeView.css:12","room/WardrobeView.css:130","room/WardrobeView.css:149","room/WardrobeView.css:176"],"parchment":"#f7eed6","cyberpunk":"#0b1119","kind":"existing:--bg-primary"},
+    {"token":"--bg-secondary","area":"Global (pin)","defaultValue":"#f8f9fa","sources":["PetView.css:5"],"parchment":"#ead9b1","cyberpunk":"#05070b","kind":"existing:--bg-secondary"},
+    {"token":"--border-color","area":"Global (pin)","defaultValue":"#e9ecef","sources":["PetView.css:5"],"parchment":"#c9ad78","cyberpunk":"#22384a","kind":"existing:--border-color"},
+    {"token":"--brand-primary","area":"Global (pin + text)","defaultValue":"#4a3f80","sources":["PetView.css:3","room/DecorPicker.css:96","room/ShopEarnTab.css:51","room/ShopView.css:37","room/ShopView.css:226","room/ShopView.css:364","room/ShopView.css:368","room/WardrobeView.css:37","room/WardrobeView.css:67","room/WardrobeView.css:137","room/WardrobeView.css:137","room/WardrobeView.css:190","room/WardrobeView.css:203"],"parchment":"#7a1f14","cyberpunk":"#ff2a6d","kind":"existing:--brand-primary"},
+    {"token":"--brand-primary-dark","area":"Global (pin)","defaultValue":"#3a3266","sources":["PetView.css:3"],"parchment":"#5a150d","cyberpunk":"#c41f55","kind":"existing:--brand-primary-dark"},
+    {"token":"--brand-primary-light","area":"Global (pin)","defaultValue":"#6b5fa0","sources":["PetView.css:3"],"parchment":"#9c3a2a","cyberpunk":"#05d9e8","kind":"existing:--brand-primary-light"},
+    {"token":"--danger-hover-bg","area":"Status","defaultValue":"#fdecea","sources":["room/DecorPicker.css:57","room/ShopView.css:98","room/WardrobeView.css:103"],"parchment":"rgba(155, 35, 24, 0.1)","cyberpunk":"rgba(255, 77, 94, 0.14)","kind":"existing:--danger-hover-bg"},
+    {"token":"--error","area":"Global (pin)","defaultValue":"#dc3545","sources":["PetView.css:6"],"parchment":"#9b2318","cyberpunk":"#ff4d5e","kind":"existing:--error"},
+    {"token":"--focus-ring-color","area":"Global (pin)","defaultValue":"#4a3f80","sources":["PetView.css:8"],"parchment":"#1f3a5f","cyberpunk":"#f9f002","kind":"existing:--focus-ring-color"},
+    {"token":"--macro-near-target-pill-bg","area":"Mood chips","defaultValue":"rgba(255, 193, 7, 0.22)","sources":["PetView.css:197"],"parchment":"rgba(168, 118, 14, 0.16)","cyberpunk":"rgba(249, 240, 2, 0.12)","kind":"existing:--macro-near-target-pill-bg"},
+    {"token":"--macro-near-target-pill-text","area":"Mood chips","defaultValue":"#856404","sources":["PetView.css:197"],"parchment":"#6f4d05","cyberpunk":"#f9f002","kind":"existing:--macro-near-target-pill-text"},
+    {"token":"--macro-on-target-pill-bg","area":"Mood chips","defaultValue":"rgba(40, 167, 69, 0.15)","sources":["PetView.css:196"],"parchment":"rgba(63, 122, 74, 0.15)","cyberpunk":"rgba(57, 255, 136, 0.12)","kind":"existing:--macro-on-target-pill-bg"},
+    {"token":"--macro-on-target-pill-text","area":"Mood chips","defaultValue":"#1b6b2e","sources":["PetView.css:196"],"parchment":"#2a5733","cyberpunk":"#39ff88","kind":"existing:--macro-on-target-pill-text"},
+    {"token":"--macro-over-target-pill-text","area":"Status","defaultValue":"#a71d2a","sources":["PetView.css:184"],"parchment":"#7a1a12","cyberpunk":"#ff4d5e","kind":"existing:--macro-over-target-pill-text"},
+    {"token":"--on-brand","area":"Global text on fills","defaultValue":"#ffffff","sources":["PetView.css:7","PetView.css:225","room/CheckInActions.css:31","room/PetRoom.css:223","room/PetRoom.css:343","room/ShopEarnTab.css:34","room/ShopView.css:164","room/ShopView.css:333","room/WardrobeView.css:137","room/WardrobeView.css:204","room/WardrobeView.css:234"],"parchment":"#f7eed6","cyberpunk":"#05070b","kind":"existing:--on-brand"},
+    {"token":"--pip-focus-ring","area":"Focus ring","defaultValue":"#7c5cd6","sources":["room/ShopEarnTab.css:83","room/ShopView.css:365"],"parchment":"#1f3a5f","cyberpunk":"#f9f002","kind":"existing:--pip-focus-ring"},
+    {"token":"--success","area":"Global (pin)","defaultValue":"#28a745","sources":["PetView.css:6"],"parchment":"#3f6b3a","cyberpunk":"#39ff88","kind":"existing:--success"},
+    {"token":"--text-primary","area":"Global (pin + text)","defaultValue":"#2c3e50","sources":["PetView.css:4","room/ShopView.css:13","room/WardrobeView.css:13"],"parchment":"#2b1d10","cyberpunk":"#eaf6ff","kind":"existing:--text-primary"},
+    {"token":"--text-secondary","area":"Global (pin + text)","defaultValue":"#6c757d","sources":["PetView.css:4","room/WardrobeView.css:209","room/WardrobeView.css:270","room/WardrobeView.css:282"],"parchment":"#5e4a32","cyberpunk":"#9db2c7","kind":"existing:--text-secondary"},
+    {"token":"--warning","area":"Global (pin)","defaultValue":"#ffc107","sources":["PetView.css:6"],"parchment":"#9a6c0c","cyberpunk":"#f9f002","kind":"existing:--warning"},
+    {"token":"--pet-accent-color","area":"Accent","defaultValue":"#7c5cd6","sources":["room/CheckInActions.css:29","room/CheckInActions.css:30","room/DecorPicker.css:84","room/DecorPicker.css:122","room/PetRoom.css:241","room/PetRoom.css:255","room/PetRoom.css:261","room/PetRoom.css:341","room/PetRoom.css:342","room/PetRoom.css:385","room/ShopEarnTab.css:33","room/ShopView.css:151","room/ShopView.css:161","room/ShopView.css:163","room/ShopView.css:219","room/ShopView.css:220","room/ShopView.css:331","room/ShopView.css:332","room/ShopView.css:356"],"parchment":"#7a1f14","cyberpunk":"#ff2a6d","kind":"new"},
+    {"token":"--pet-badge-bg","area":"Status","defaultValue":"#e8574a","sources":["room/PetRoom.css:222","room/WardrobeView.css:148","room/WardrobeView.css:233"],"parchment":"#9c3a2a","cyberpunk":"#ff4d5e","kind":"new"},
+    {"token":"--pet-balance-bg","area":"Shop","defaultValue":"#fff7d6","sources":["room/ShopEarnTab.css:43","room/ShopView.css:66","SprinklesChip.css:8"],"parchment":"#f1e0a8","cyberpunk":"#2a2606","kind":"new"},
+    {"token":"--pet-divider-hover-border","area":"Lines","defaultValue":"#c9bdf0","sources":["room/DecorPicker.css:94","room/PetRoom.css:392"],"parchment":"#a88a45","cyberpunk":"#4a7d99","kind":"new"},
+    {"token":"--pet-disabled-bg","area":"Surfaces","defaultValue":"#eee9f7","sources":["room/ShopView.css:184"],"parchment":"#e3d2a8","cyberpunk":"#141d2b","kind":"new"},
+    {"token":"--pet-card-bg","area":"Surfaces","defaultValue":"#fcfbff","sources":["room/DecorPicker.css:77","room/ShopEarnTab.css:13","room/ShopView.css:114","room/ShopView.css:259"],"parchment":"#fbf4df","cyberpunk":"#0f1620","kind":"new"},
+    {"token":"--pet-chip-content-bg","area":"Mood chips","defaultValue":"rgba(74, 63, 128, 0.12)","sources":["PetView.css:195"],"parchment":"rgba(122, 31, 20, 0.12)","cyberpunk":"rgba(255, 42, 109, 0.14)","kind":"new"},
+    {"token":"--pet-chip-mischievous-bg","area":"Mood chips","defaultValue":"rgba(255, 107, 53, 0.18)","sources":["PetView.css:198"],"parchment":"rgba(154, 108, 12, 0.18)","cyberpunk":"rgba(255, 159, 28, 0.16)","kind":"new"},
+    {"token":"--pet-chip-mischievous-text","area":"Mood chips","defaultValue":"#a8431a","sources":["PetView.css:198"],"parchment":"#7a3a12","cyberpunk":"#ff9f1c","kind":"new"},
+    {"token":"--pet-error-text","area":"Status","defaultValue":"#a4281d","sources":["room/DecorPicker.css:58","room/ShopEarnTab.css:61","room/ShopEarnTab.css:68","room/ShopView.css:98"],"parchment":"#9b2318","cyberpunk":"#ff4d5e","kind":"new"},
+    {"token":"--pet-float-bg","area":"Room overlays","defaultValue":"rgba(255, 255, 255, 0.92)","sources":["room/PetRoom.css:73","room/PetRoom.css:179"],"parchment":"rgba(247, 238, 214, 0.92)","cyberpunk":"rgba(11, 17, 25, 0.92)","kind":"new"},
+    {"token":"--pet-float-active-bg","area":"Room overlays","defaultValue":"#fff3c4","sources":["room/PetRoom.css:81"],"parchment":"#ecd89a","cyberpunk":"#2a2606","kind":"new"},
+    {"token":"--pet-gold-bg","area":"Accent","defaultValue":"#ffd34d","sources":["room/PetRoom.css:314","room/ShopView.css:169","SprinklesChip.css:23"],"parchment":"#d8b25a","cyberpunk":"#f9f002","kind":"new"},
+    {"token":"--pet-gold-border","area":"Accent","defaultValue":"#e0b52c","sources":["room/ShopView.css:169","SprinklesChip.css:9"],"parchment":"#a88a45","cyberpunk":"#f9f002","kind":"new"},
+    {"token":"--pet-gold-text","area":"Accent","defaultValue":"#3f2716","sources":["room/PetRoom.css:315","room/ShopView.css:169","SprinklesChip.css:24"],"parchment":"#3b2415","cyberpunk":"#05070b","kind":"new"},
+    {"token":"--pet-gold-ring-shadow","area":"Accent","defaultValue":"rgba(255, 211, 77, 0.35)","sources":["SprinklesChip.css:10"],"parchment":"rgba(216, 178, 90, 0.35)","cyberpunk":"rgba(249, 240, 2, 0.35)","kind":"new"},
+    {"token":"--pet-hit-active-bg","area":"Room overlays","defaultValue":"rgba(255, 211, 77, 0.25)","sources":["room/PetRoom.css:155","room/PetRoom.css:281"],"parchment":"rgba(216, 178, 90, 0.3)","cyberpunk":"rgba(249, 240, 2, 0.25)","kind":"new"},
+    {"token":"--pet-hit-hover-bg","area":"Room overlays","defaultValue":"rgba(255, 211, 77, 0.18)","sources":["room/PetRoom.css:160","room/PetRoom.css:284"],"parchment":"rgba(216, 178, 90, 0.2)","cyberpunk":"rgba(249, 240, 2, 0.16)","kind":"new"},
+    {"token":"--pet-hover-bg","area":"Surfaces","defaultValue":"#f6f3ff","sources":["room/DecorPicker.css:95","room/ShopView.css:60","room/ShopView.css:223","room/WardrobeView.css:309"],"parchment":"#efe2c2","cyberpunk":"#141d2b","kind":"new"},
+    {"token":"--pet-divider-border","area":"Lines","defaultValue":"#e3dcf3","sources":["room/DecorPicker.css:75","room/PetRoom.css:373","room/ShopEarnTab.css:11","room/ShopEarnTab.css:74","room/ShopView.css:30","room/ShopView.css:112","room/ShopView.css:200","room/ShopView.css:257"],"parchment":"#c9ad78","cyberpunk":"#22384a","kind":"new"},
+    {"token":"--pet-divider-faint-border","area":"Lines","defaultValue":"#f0ecf8","sources":["room/ShopEarnTab.css:58"],"parchment":"#e3d2a8","cyberpunk":"#141d2b","kind":"new"},
+    {"token":"--pet-divider-mid-border","area":"Lines","defaultValue":"#d6c9f0","sources":["room/ShopEarnTab.css:55"],"parchment":"#c9ad78","cyberpunk":"#22384a","kind":"new"},
+    {"token":"--pet-divider-strong-border","area":"Lines","defaultValue":"#ddd6ee","sources":["room/CheckInActions.css:16","room/CheckInActions.css:63","room/PetRoom.css:196","room/ShopView.css:150","room/ShopView.css:183","room/ShopView.css:319"],"parchment":"#c9ad78","cyberpunk":"#4a7d99","kind":"new"},
+    {"token":"--pet-lock-note-bg","area":"Dress Pip","defaultValue":"#fff7e0","sources":["room/WardrobeView.css:245"],"parchment":"#f3e6c0","cyberpunk":"#1f1a08","kind":"new"},
+    {"token":"--pet-lock-note-border","area":"Dress Pip","defaultValue":"#f0d78a","sources":["room/WardrobeView.css:243"],"parchment":"#c9ad78","cyberpunk":"#7a6a1a","kind":"new"},
+    {"token":"--pet-notice-bg","area":"Status","defaultValue":"#fff1c9","sources":["room/CheckInActions.css:98","room/ShopView.css:308"],"parchment":"#ecd89a","cyberpunk":"#2a1f05","kind":"new"},
+    {"token":"--pet-notice-text","area":"Status","defaultValue":"#7a5800","sources":["room/CheckInActions.css:99","room/ShopView.css:309"],"parchment":"#5e4a10","cyberpunk":"#f9f002","kind":"new"},
+    {"token":"--pet-picker-shadow","area":"Shadows","defaultValue":"rgba(60, 40, 120, 0.18)","sources":["room/DecorPicker.css:14"],"parchment":"rgba(60, 35, 10, 0.3)","cyberpunk":"rgba(5, 217, 232, 0.25)","kind":"new"},
+    {"token":"--pet-press-bg","area":"Surfaces","defaultValue":"#ece5fb","sources":["room/DecorPicker.css:91","room/ShopView.css:57","room/WardrobeView.css:301"],"parchment":"#e3d2a8","cyberpunk":"#101a28","kind":"new"},
+    {"token":"--pet-scrim-bg","area":"Edit bar","defaultValue":"rgba(46, 38, 69, 0.88)","sources":["room/PetRoom.css:303"],"parchment":"rgba(34, 20, 10, 0.88)","cyberpunk":"rgba(2, 3, 5, 0.88)","kind":"new"},
+    {"token":"--pet-scrim-error-text","area":"Edit bar","defaultValue":"#ffd0cc","sources":["room/PetRoom.css:337"],"parchment":"#f2b8a8","cyberpunk":"#ff8a96","kind":"new"},
+    {"token":"--pet-scrim-text","area":"Edit bar","defaultValue":"#fff","sources":["room/PetRoom.css:304","room/ShopView.css:136"],"parchment":"#f7eed6","cyberpunk":"#eaf6ff","kind":"new"},
+    {"token":"--pet-selected-bg","area":"Surfaces","defaultValue":"#f1ecff","sources":["room/DecorPicker.css:85","room/PetRoom.css:386"],"parchment":"#efe2c2","cyberpunk":"#141d2b","kind":"new"},
+    {"token":"--pet-sheet-shadow","area":"Shadows","defaultValue":"rgba(30, 40, 20, 0.25)","sources":["room/ShopView.css:14","room/WardrobeView.css:14"],"parchment":"rgba(60, 35, 10, 0.45)","cyberpunk":"rgba(0, 0, 0, 0.6)","kind":"new"},
+    {"token":"--pet-spot-fill","area":"Decor spots","defaultValue":"rgba(255, 255, 255, 0.35)","sources":["room/PetRoom.css:240"],"parchment":"rgba(247, 238, 214, 0.4)","cyberpunk":"rgba(11, 17, 25, 0.4)","kind":"new"},
+    {"token":"--pet-spot-filled-fill","area":"Decor spots","defaultValue":"rgba(124, 92, 214, 0.08)","sources":["room/PetRoom.css:246"],"parchment":"rgba(122, 31, 20, 0.1)","cyberpunk":"rgba(255, 42, 109, 0.1)","kind":"new"},
+    {"token":"--pet-spot-selected-fill","area":"Decor spots","defaultValue":"rgba(255, 211, 77, 0.25)","sources":["room/PetRoom.css:251"],"parchment":"rgba(216, 178, 90, 0.3)","cyberpunk":"rgba(249, 240, 2, 0.2)","kind":"new"},
+    {"token":"--pet-spot-selected-stroke","area":"Decor spots","defaultValue":"#e0a400","sources":["room/PetRoom.css:249"],"parchment":"#a88a45","cyberpunk":"#f9f002","kind":"new"},
+    {"token":"--pet-success-bg","area":"Status","defaultValue":"#e8f6e8","sources":["room/ShopView.css:97"],"parchment":"#dfe8c8","cyberpunk":"#08150f","kind":"new"},
+    {"token":"--pet-success-text","area":"Status","defaultValue":"#2f7a3a","sources":["room/ShopEarnTab.css:60","room/ShopView.css:97","room/ShopView.css:190","room/ShopView.css:296"],"parchment":"#2f5530","cyberpunk":"#39ff88","kind":"new"},
+    {"token":"--pet-tag-bg","area":"Shop","defaultValue":"rgba(46, 38, 69, 0.8)","sources":["room/ShopView.css:135"],"parchment":"rgba(34, 20, 10, 0.8)","cyberpunk":"rgba(2, 3, 5, 0.8)","kind":"new"},
+    {"token":"--pet-disabled-text","area":"Text","defaultValue":"#8d86a3","sources":["room/ShopView.css:185"],"parchment":"#8a7a5e","cyberpunk":"#5f7488","kind":"new"},
+    {"token":"--pet-disabled-neutral-text","area":"Text","defaultValue":"#9aa0a6","sources":["room/WardrobeView.css:72"],"parchment":"#8a7a5e","cyberpunk":"#5f7488","kind":"new"},
+    {"token":"--pet-label-text","area":"Text","defaultValue":"#3b2f5c","sources":["room/PetRoom.css:262","room/ShopView.css:322"],"parchment":"#2b1d10","cyberpunk":"#eaf6ff","kind":"new"},
+    {"token":"--pet-muted-text","area":"Text","defaultValue":"#6f6789","sources":["room/DecorPicker.css:108","room/DecorPicker.css:114","room/PetRoom.css:353","room/ShopEarnTab.css:27","room/ShopEarnTab.css:59","room/ShopEarnTab.css:63","room/ShopEarnTab.css:66","room/ShopView.css:82","room/ShopView.css:153","room/ShopView.css:209","room/ShopView.css:236"],"parchment":"#5e4a32","cyberpunk":"#9db2c7","kind":"new"},
+    {"token":"--pet-soft-text","area":"Text","defaultValue":"#5c5670","sources":["room/CheckInActions.css:38","room/PetRoom.css:180"],"parchment":"#5e4a32","cyberpunk":"#9db2c7","kind":"new"},
+    {"token":"--pet-thumb-bg","area":"Shop","defaultValue":"linear-gradient(#ece5fb, #d6c9f0)","sources":["room/ShopEarnTab.css:22","room/ShopView.css:124","room/ShopView.css:269"],"parchment":"linear-gradient(#efe2c2, #ead9b1)","cyberpunk":"linear-gradient(#141d2b, #0b1119)","kind":"new"},
+    {"token":"--pet-tint-bg","area":"Surfaces","defaultValue":"#f3effc","sources":["room/ShopEarnTab.css:50","room/ShopEarnTab.css:82","room/ShopEarnTab.css:86","room/ShopView.css:345"],"parchment":"#efe2c2","cyberpunk":"#141d2b","kind":"new"},
+    {"token":"--pet-wardrobe-error-text","area":"Dress Pip","defaultValue":"#8a1c12","sources":["room/WardrobeView.css:104"],"parchment":"#7a1a12","cyberpunk":"#ff4d5e","kind":"new"},
+    {"token":"--pet-wardrobe-text","area":"Dress Pip","defaultValue":"#2f4a22","sources":["room/WardrobeView.css:266","room/WardrobeView.css:283"],"parchment":"#2b1d10","cyberpunk":"#eaf6ff","kind":"new"},
+    {"token":"--pet-wardrobe-border","area":"Dress Pip","defaultValue":"#e3e9dc","sources":["room/WardrobeView.css:30","room/WardrobeView.css:115","room/WardrobeView.css:128","room/WardrobeView.css:174","room/WardrobeView.css:253"],"parchment":"#c9ad78","cyberpunk":"#22384a","kind":"new"},
+    {"token":"--pet-wardrobe-lineup-bg","area":"Dress Pip","defaultValue":"#fbfdf8","sources":["room/WardrobeView.css:254"],"parchment":"#f1e6c8","cyberpunk":"#0f1620","kind":"new"},
+    {"token":"--pet-wardrobe-worn-fill","area":"Dress Pip","defaultValue":"#5fae3e","sources":["room/WardrobeView.css:138"],"parchment":"#3f6b3a","cyberpunk":"#39ff88","kind":"new"},
+    {"token":"--pet-wardrobe-worn-on-brand-fill","area":"Dress Pip","defaultValue":"#c8eea2","sources":["room/WardrobeView.css:139"],"parchment":"#f7eed6","cyberpunk":"#05070b","kind":"new"},
+    {"token":"--pet-wardrobe-worn-shadow","area":"Dress Pip","defaultValue":"rgba(74, 63, 128, 0.15)","sources":["room/WardrobeView.css:190"],"parchment":"rgba(122, 31, 20, 0.2)","cyberpunk":"rgba(255, 42, 109, 0.35)","kind":"new"},
+    {"token":"--pet-warn-text","area":"Status","defaultValue":"#b4531b","sources":["room/ShopView.css:189"],"parchment":"#8a4a12","cyberpunk":"#ff9f1c","kind":"new"}
+  ],
+  "roomArt": [
+    {"value":"rgba(0, 0, 0, 0.1)","sources":["PetView.css:49"],"reason":"black shadow or black outline: CLAUDE.md exempts black shadows from the token rule, so it stays literal"},
+    {"value":"#eef6fb","sources":["room/FridgeView.css:14"],"reason":"fridge-interior scene (view backdrop, drawn appliance, shelves, food slots, buttons over it): a painted station interior with its own palette; each creature draws its own cold store in contracts 3-4. Review call: reclassify to tokens if the developer wants this screen themed"},
+    {"value":"#d9ebf5","sources":["room/FridgeView.css:14"],"reason":"fridge-interior scene (view backdrop, drawn appliance, shelves, food slots, buttons over it): a painted station interior with its own palette; each creature draws its own cold store in contracts 3-4. Review call: reclassify to tokens if the developer wants this screen themed"},
+    {"value":"rgba(0, 0, 0, 0.08)","sources":["room/FridgeView.css:38"],"reason":"fridge-interior scene (view backdrop, drawn appliance, shelves, food slots, buttons over it): a painted station interior with its own palette; each creature draws its own cold store in contracts 3-4. Review call: reclassify to tokens if the developer wants this screen themed"},
+    {"value":"rgba(0, 0, 0, 0.16)","sources":["room/FridgeView.css:48"],"reason":"fridge-interior scene (view backdrop, drawn appliance, shelves, food slots, buttons over it): a painted station interior with its own palette; each creature draws its own cold store in contracts 3-4. Review call: reclassify to tokens if the developer wants this screen themed"},
+    {"value":"rgba(0, 0, 0, 0.12)","sources":["room/FridgeView.css:53"],"reason":"fridge-interior scene (view backdrop, drawn appliance, shelves, food slots, buttons over it): a painted station interior with its own palette; each creature draws its own cold store in contracts 3-4. Review call: reclassify to tokens if the developer wants this screen themed"},
+    {"value":"#fff","sources":["room/FridgeView.css:70","room/FridgeView.css:97"],"reason":"fridge-interior scene (view backdrop, drawn appliance, shelves, food slots, buttons over it): a painted station interior with its own palette; each creature draws its own cold store in contracts 3-4. Review call: reclassify to tokens if the developer wants this screen themed"},
+    {"value":"#b7cfdd","sources":["room/FridgeView.css:79","room/FridgeView.css:89"],"reason":"fridge-interior scene (view backdrop, drawn appliance, shelves, food slots, buttons over it): a painted station interior with its own palette; each creature draws its own cold store in contracts 3-4. Review call: reclassify to tokens if the developer wants this screen themed"},
+    {"value":"#f8fcff","sources":["room/FridgeView.css:81"],"reason":"fridge-interior scene (view backdrop, drawn appliance, shelves, food slots, buttons over it): a painted station interior with its own palette; each creature draws its own cold store in contracts 3-4. Review call: reclassify to tokens if the developer wants this screen themed"},
+    {"value":"#c9dbe6","sources":["room/FridgeView.css:102"],"reason":"fridge-interior scene (view backdrop, drawn appliance, shelves, food slots, buttons over it): a painted station interior with its own palette; each creature draws its own cold store in contracts 3-4. Review call: reclassify to tokens if the developer wants this screen themed"},
+    {"value":"#5c5670","sources":["room/FridgeView.css:110"],"reason":"fridge-interior scene (view backdrop, drawn appliance, shelves, food slots, buttons over it): a painted station interior with its own palette; each creature draws its own cold store in contracts 3-4. Review call: reclassify to tokens if the developer wants this screen themed"},
+    {"value":"#f3f1f8","sources":["room/PetRoom.css:11"],"reason":"the area outside the room at the pan edges: part of the room scene, each creature pack supplies its own surround in contract 2"},
+    {"value":"rgba(0, 0, 0, 0.12)","sources":["room/PetRoom.css:74"],"reason":"black shadow or black outline: CLAUDE.md exempts black shadows from the token rule, so it stays literal"},
+    {"value":"rgba(0, 0, 0, 0.15)","sources":["room/PetRoom.css:403"],"reason":"black shadow or black outline: CLAUDE.md exempts black shadows from the token rule, so it stays literal"},
+    {"value":"#e3f1d8","sources":["room/PipHeadBar.css:3"],"reason":"Pip level bar drawn over his head in the room (herb-green strip from MPP-31): follows Pip's line palette, not the app theme"},
+    {"value":"#2f4a22","sources":["room/PipHeadBar.css:4","room/PipHeadBar.css:42"],"reason":"Pip level bar drawn over his head in the room (herb-green strip from MPP-31): follows Pip's line palette, not the app theme"},
+    {"value":"#5fae3e","sources":["room/PipHeadBar.css:7"],"reason":"Pip level bar drawn over his head in the room (herb-green strip from MPP-31): follows Pip's line palette, not the app theme"},
+    {"value":"#ffd34d","sources":["room/PipHeadBar.css:22"],"reason":"Pip level bar drawn over his head in the room (herb-green strip from MPP-31): follows Pip's line palette, not the app theme"},
+    {"value":"#fff","sources":["room/PipHeadBar.css:32"],"reason":"Pip level bar drawn over his head in the room (herb-green strip from MPP-31): follows Pip's line palette, not the app theme"},
+    {"value":"#3f8f27","sources":["room/PipHeadBar.css:38"],"reason":"Pip level bar drawn over his head in the room (herb-green strip from MPP-31): follows Pip's line palette, not the app theme"},
+    {"value":"#b5563a","sources":["room/PipHeadBar.css:39"],"reason":"Pip level bar drawn over his head in the room (herb-green strip from MPP-31): follows Pip's line palette, not the app theme"},
+    {"value":"#5b3a22","sources":["room/TrophyCabinetView.css:14"],"reason":"trophy-cabinet scene (wood cabinet, shelves, gold awards and the text on them): a painted station interior with its own palette; each creature draws its own display case in contracts 3-4. Review call: reclassify to tokens if the developer wants this screen themed"},
+    {"value":"#3f2716","sources":["room/TrophyCabinetView.css:14","room/TrophyCabinetView.css:120"],"reason":"trophy-cabinet scene (wood cabinet, shelves, gold awards and the text on them): a painted station interior with its own palette; each creature draws its own display case in contracts 3-4. Review call: reclassify to tokens if the developer wants this screen themed"},
+    {"value":"#fff7e8","sources":["room/TrophyCabinetView.css:15"],"reason":"trophy-cabinet scene (wood cabinet, shelves, gold awards and the text on them): a painted station interior with its own palette; each creature draws its own display case in contracts 3-4. Review call: reclassify to tokens if the developer wants this screen themed"},
+    {"value":"rgba(255, 255, 255, 0.15)","sources":["room/TrophyCabinetView.css:41","room/TrophyCabinetView.css:143"],"reason":"trophy-cabinet scene (wood cabinet, shelves, gold awards and the text on them): a painted station interior with its own palette; each creature draws its own display case in contracts 3-4. Review call: reclassify to tokens if the developer wants this screen themed"},
+    {"value":"#fff","sources":["room/TrophyCabinetView.css:42"],"reason":"trophy-cabinet scene (wood cabinet, shelves, gold awards and the text on them): a painted station interior with its own palette; each creature draws its own display case in contracts 3-4. Review call: reclassify to tokens if the developer wants this screen themed"},
+    {"value":"rgba(255, 255, 255, 0.3)","sources":["room/TrophyCabinetView.css:50"],"reason":"trophy-cabinet scene (wood cabinet, shelves, gold awards and the text on them): a painted station interior with its own palette; each creature draws its own display case in contracts 3-4. Review call: reclassify to tokens if the developer wants this screen themed"},
+    {"value":"rgba(255, 255, 255, 0.22)","sources":["room/TrophyCabinetView.css:53"],"reason":"trophy-cabinet scene (wood cabinet, shelves, gold awards and the text on them): a painted station interior with its own palette; each creature draws its own display case in contracts 3-4. Review call: reclassify to tokens if the developer wants this screen themed"},
+    {"value":"#a0703f","sources":["room/TrophyCabinetView.css:63"],"reason":"trophy-cabinet scene (wood cabinet, shelves, gold awards and the text on them): a painted station interior with its own palette; each creature draws its own display case in contracts 3-4. Review call: reclassify to tokens if the developer wants this screen themed"},
+    {"value":"rgba(255, 255, 255, 0.07)","sources":["room/TrophyCabinetView.css:65"],"reason":"trophy-cabinet scene (wood cabinet, shelves, gold awards and the text on them): a painted station interior with its own palette; each creature draws its own display case in contracts 3-4. Review call: reclassify to tokens if the developer wants this screen themed"},
+    {"value":"#f3d9a8","sources":["room/TrophyCabinetView.css:73","room/TrophyCabinetView.css:129","room/TrophyCabinetView.css:149"],"reason":"trophy-cabinet scene (wood cabinet, shelves, gold awards and the text on them): a painted station interior with its own palette; each creature draws its own display case in contracts 3-4. Review call: reclassify to tokens if the developer wants this screen themed"},
+    {"value":"rgba(255, 255, 255, 0.1)","sources":["room/TrophyCabinetView.css:84"],"reason":"trophy-cabinet scene (wood cabinet, shelves, gold awards and the text on them): a painted station interior with its own palette; each creature draws its own display case in contracts 3-4. Review call: reclassify to tokens if the developer wants this screen themed"},
+    {"value":"#ffd34d","sources":["room/TrophyCabinetView.css:119","room/TrophyCabinetView.css:152"],"reason":"trophy-cabinet scene (wood cabinet, shelves, gold awards and the text on them): a painted station interior with its own palette; each creature draws its own display case in contracts 3-4. Review call: reclassify to tokens if the developer wants this screen themed"},
+    {"value":"#f6fbef","sources":["room/WardrobeView.css:78","room/WardrobeView.css:187"],"reason":"stage behind Pip in Dress Pip (preview backdrop, thumbnail backdrop, caption on it): Pip art keeps its own palette"},
+    {"value":"#e3efd6","sources":["room/WardrobeView.css:78"],"reason":"stage behind Pip in Dress Pip (preview backdrop, thumbnail backdrop, caption on it): Pip art keeps its own palette"},
+    {"value":"#2f4a22","sources":["room/WardrobeView.css:96"],"reason":"stage behind Pip in Dress Pip (preview backdrop, thumbnail backdrop, caption on it): Pip art keeps its own palette"}
+  ],
+  "pairs": [
+    {"fg":"--text-primary","bg":"--bg-primary","min":4.5},
+    {"fg":"--text-primary","bg":"--pet-balance-bg","min":4.5},
+    {"fg":"--text-primary","bg":"--pet-card-bg","min":4.5},
+    {"fg":"--brand-primary","bg":"--bg-primary","min":4.5},
+    {"fg":"--brand-primary","bg":"--pet-hover-bg","min":4.5},
+    {"fg":"--brand-primary","bg":"--pet-press-bg","min":4.5},
+    {"fg":"--brand-primary","bg":"--pet-chip-content-bg","min":4.5,"over":"--bg-primary"},
+    {"fg":"--text-secondary","bg":"--bg-primary","min":4.5},
+    {"fg":"--text-secondary","bg":"--pet-wardrobe-lineup-bg","min":4.5},
+    {"fg":"--pet-muted-text","bg":"--bg-primary","min":4.5},
+    {"fg":"--pet-muted-text","bg":"--pet-card-bg","min":4.5},
+    {"fg":"--pet-soft-text","bg":"--bg-primary","min":4.5},
+    {"fg":"--pet-soft-text","bg":"--pet-float-bg","min":4.5,"over":"--bg-primary"},
+    {"fg":"--pet-label-text","bg":"--bg-primary","min":4.5},
+    {"fg":"--pet-accent-color","bg":"--bg-primary","min":4.5},
+    {"fg":"--pet-accent-color","bg":"--pet-card-bg","min":3},
+    {"fg":"--pip-focus-ring","bg":"--bg-primary","min":3},
+    {"fg":"--pip-focus-ring","bg":"--pet-card-bg","min":3},
+    {"fg":"--on-brand","bg":"--pet-accent-color","min":4.5},
+    {"fg":"--on-brand","bg":"--brand-primary","min":4.5},
+    {"fg":"--pet-scrim-text","bg":"--pet-scrim-bg","min":4.5,"over":"--bg-primary"},
+    {"fg":"--pet-scrim-text","bg":"--pet-tag-bg","min":4.5,"over":"--bg-primary"},
+    {"fg":"--pet-scrim-error-text","bg":"--pet-scrim-bg","min":4.5,"over":"--bg-primary"},
+    {"fg":"--pet-gold-text","bg":"--pet-gold-bg","min":4.5},
+    {"fg":"--pet-notice-text","bg":"--pet-notice-bg","min":4.5},
+    {"fg":"--pet-success-text","bg":"--pet-success-bg","min":4.5},
+    {"fg":"--pet-success-text","bg":"--pet-card-bg","min":4.5},
+    {"fg":"--pet-error-text","bg":"--pet-card-bg","min":4.5},
+    {"fg":"--pet-error-text","bg":"--danger-hover-bg","min":4.5,"over":"--bg-primary"},
+    {"fg":"--pet-wardrobe-error-text","bg":"--danger-hover-bg","min":4.5,"over":"--bg-primary"},
+    {"fg":"--pet-warn-text","bg":"--pet-card-bg","min":4.5},
+    {"fg":"--pet-wardrobe-text","bg":"--pet-wardrobe-lineup-bg","min":4.5},
+    {"fg":"--macro-on-target-pill-text","bg":"--macro-on-target-pill-bg","min":4.5,"over":"--bg-primary"},
+    {"fg":"--macro-near-target-pill-text","bg":"--macro-near-target-pill-bg","min":4.5,"over":"--bg-primary"},
+    {"fg":"--pet-chip-mischievous-text","bg":"--pet-chip-mischievous-bg","min":4.5,"over":"--bg-primary"},
+    {"fg":"--macro-over-target-pill-text","bg":"--bg-primary","min":4.5}
+  ],
+  "notes": [
+      "Coverage is per literal occurrence: a line with several literals appears once per literal across the rows (tokens, roomArt). A gradient token covers every literal inside it.",
+      "kind existing: parchment/cyberpunk hold the value that theme resolves to today (a --pip-* token resolves to its Default literal because themes do not remap it). The smoke recomputes these.",
+      "MPP-45 (v1.35.0): the pin no longer sits on .pet-view. It now sits on .pip-fridge-view, .pip-cabinet-view and .pip-wardrobe-preview (the Fridge interior, cabinet scene and Dress Pip stage keep the Default palette in every theme); the pin block also sets --pip-focus-ring: #7c5cd6 and color: var(--text-primary). The head bar and room SVG are drawn from literals and need no pin.",
+      "--pip-focus-ring and --danger-hover-bg are reused because their Default literal equals the source literal. MPP-45 remaps --pip-focus-ring per theme (Default #7c5cd6, Parchment focus-ink #1f3a5f, Cyberpunk yellow #f9f002); the pinned scenes keep #7c5cd6.",
+      "A pair with 'over' composites a translucent background onto that token before the contrast maths (check-themes.mjs has no alpha support yet; contract 2 adds a small flatten step when it ports the pairs).",
+      "Not paired, Default already below AA, so pairs would need an exception (Default is not retuned): --on-brand on --pet-badge-bg (3.56:1 white on #e8574a, 11px bold count), --pet-wardrobe-worn-fill on --bg-primary (non-text, #5fae3e on white 2.8:1), delta up/down text in the head bar (room art, not a chrome pair). Surfaced for a follow-up, not fixed here.",
+      "Not paired by design: disabled text (--pet-disabled-text, --pet-disabled-neutral-text) is exempt from WCAG 1.4.3; hairline borders (--pet-divider-border*, --pet-wardrobe-border) are decorative dividers, not the only cue for a control.",
+      "FRIDGE_GAUGE_COLOURS (high #5cb85c, mid #f0ad4e, low #e5534b) live in constants/petRoom.js and are drawn into the room SVG: room art by decision, outside the audited CSS files, so they have no source line here."
+  ]
+}
+</script>
+<script id="chrome-names" type="application/json">{"catalogue":[["basil-print","overWardrobe",120],["recipe-board","overWardrobe",180],["herb-shelf","overWardrobe",250],["fairy-lights","overWardrobe",300],["pip-portrait","overWardrobe",250],["growth-chart","bedsideWall",120],["meal-calendar","bedsideWall",180],["wall-sconce","bedsideWall",250],["photo-strip","bedsideWall",180],["wall-clock","frontRightWall",120],["bunting","frontRightWall",180],["pan-rail","frontRightWall",200],["mirror","frontRightWall",250],["coat-hooks","frontRightWall",180],["curtains-gingham","windowDressing",180],["curtains-linen","windowDressing",120],["roller-blind","windowDressing",120],["window-lights","windowDressing",250],["plant-hanger","windowDressing",300],["sill-basil","windowsill",120],["sill-succulents","windowsill",180],["sill-cactus","windowsill",180],["sill-radio","windowsill",250],["sill-cat","windowsill",300],["rug-pink","rug",0],["rug-braided","rug",180],["rug-leaf","rug",250],["rug-stripe","rug",250],["rug-picnic","rug",150],["rug-sheepskin","rug",300],["snake-plant","backCorner",180],["cactus","backCorner",120],["umbrella-stand","backCorner",120],["broom","backCorner",120],["side-table-lamp","bedsideNook",180],["record-player","bedsideNook",300],["plant-stand","bedsideNook",250],["stool-books","bedsideNook",120],["toy-chest","footOfBed",180],["bench","footOfBed",250],["laundry-basket","footOfBed",120],["slippers","footOfBed",120],["watering-can","byFridge",120],["cookbook-stack","byFridge",180],["bean-bag","byFridge",250],["lemon-tree","byFridge",300],["veg-basket","byFridge",180],["monstera","cornerByDoor",250],["coat-stand","cornerByDoor",180],["arc-lamp","cornerByDoor",300],["guitar","cornerByDoor",250],["pouffe","frontOfRoom",120],["tea-table","frontOfRoom",250],["pip-ball","frontOfRoom",120],["picnic-basket","frontOfRoom",180],["wall-white","wallStyle",0],["wall-lavender","wallStyle",0],["wall-mint","wallStyle",250],["wall-peach","wallStyle",250],["wall-sky","wallStyle",250],["wall-sprig","wallStyle",500],["floor-lilac","floorStyle",0],["floor-oak","floorStyle",300],["floor-terracotta","floorStyle",400],["floor-checker","floorStyle",500]],"default":{"stations":{"bed":"Bed","fridge":"Fridge","cooker":"Cooker","cabinet":"Trophy cabinet","wardrobe":"Wardrobe"},"levels":{"bed":["Blanket on the floor","Camp cot","Wooden bed","Canopy bed"],"fridge":["Cool box","Mini fridge","Full fridge","Double-door fridge"],"cooker":["Camping stove","Counter and hob","Range cooker","Chef's kitchen"],"cabinet":["Planks on bricks","Wall shelves","Wooden cabinet","Glass display cabinet"],"wardrobe":["Clothes rail","Chest of drawers","Wooden wardrobe","Mirrored wardrobe"]},"decor":{"basil-print":"Basil print","recipe-board":"Recipe chalkboard","herb-shelf":"Herb shelf","fairy-lights":"Fairy lights","pip-portrait":"Pip portrait","growth-chart":"Growth chart","meal-calendar":"Meal-plan calendar","wall-sconce":"Wall lamp","photo-strip":"Photo frames","wall-clock":"Wall clock","bunting":"Bunting","pan-rail":"Copper pan rail","mirror":"Round mirror","coat-hooks":"Coat hooks","curtains-gingham":"Gingham curtains","curtains-linen":"Linen curtains","roller-blind":"Roller blind","window-lights":"Window fairy lights","plant-hanger":"Hanging plant","sill-basil":"Basil pots","sill-succulents":"Succulents","sill-cactus":"Cactus pair","sill-radio":"Retro radio","sill-cat":"Lucky cat","rug-pink":"Pink rug","rug-braided":"Braided rug","rug-leaf":"Basil-leaf rug","rug-stripe":"Rainbow stripes","rug-picnic":"Picnic blanket","rug-sheepskin":"Sheepskin","snake-plant":"Snake plant","cactus":"Tall cactus","umbrella-stand":"Umbrella stand","broom":"Broom + dustpan","side-table-lamp":"Side table + lamp","record-player":"Record player","plant-stand":"Plant stand","stool-books":"Stool + books","toy-chest":"Toy chest","bench":"Bed bench","laundry-basket":"Laundry basket","slippers":"Mat + slippers","watering-can":"Watering can","cookbook-stack":"Cookbook stack","bean-bag":"Bean bag","lemon-tree":"Potted lemon tree","veg-basket":"Veg basket","monstera":"Monstera","coat-stand":"Coat stand","arc-lamp":"Arc floor lamp","guitar":"Guitar","pouffe":"Pouffe","tea-table":"Tea table","pip-ball":"Pip's ball","picnic-basket":"Picnic basket"},"styles":{"wall-white":"White","wall-lavender":"Lavender","wall-mint":"Mint","wall-peach":"Peach","wall-sky":"Sky","wall-sprig":"Sprig wallpaper","floor-lilac":"Lilac","floor-oak":"Oak boards","floor-terracotta":"Terracotta tiles","floor-checker":"Checkerboard"},"swatch":{"wall-white":{"left":"#eceef2","right":"#ffffff"},"wall-lavender":{"left":"#ece5fb","right":"#e3daf8"},"wall-mint":{"left":"#dff3e8","right":"#d2ecdd"},"wall-peach":{"left":"#fde6d8","right":"#f8d9c6"},"wall-sky":{"left":"#dcecfb","right":"#cfe2f6"},"wall-sprig":{"left":"#eef6e4","right":"#e4efd8"},"floor-lilac":{"base":"#d6c9f0"},"floor-oak":{"base":"#d9b48a"},"floor-terracotta":{"base":"#d98b6a"},"floor-checker":{"base":"#f3efe6"}},"ink":"#3b2f5c"},"parchment":{"stations":{"bed":"Nest","fridge":"Ice chest","cooker":"Forge hearth","cabinet":"Hoard","wardrobe":"Armour rack"},"levels":{"bed":["Straw nest","Fur nest","Coin nest","Gold-pile nest"],"fridge":["Ice chest","Iron frost locker","Cold-cellar door","Frost vault"],"cooker":["Campfire pot","Stone hearth","Forge hearth","Great forge"],"cabinet":["Hoard chest","Shelf hoard","Hoard niche","Treasure alcove"],"wardrobe":["Peg frame","Armour stand","Armour rack","Armoury wall"]},"decor":{"basil-print":"Mounted dragon scale","recipe-board":"Rune slate","herb-shelf":"Potion shelf","fairy-lights":"Crystal string","pip-portrait":"Hatchling portrait","growth-chart":"Claw-mark height post","meal-calendar":"Carved tally stone","wall-sconce":"Wall torch","photo-strip":"Gem frames","wall-clock":"Wall hourglass","bunting":"Tattered pennants","pan-rail":"Iron cauldron rail","mirror":"Polished buckler","coat-hooks":"Cloak hooks","curtains-gingham":"Patchwork hide curtains","curtains-linen":"Crimson drapes","roller-blind":"Iron portcullis","window-lights":"Glowworm strings","plant-hanger":"Hanging brazier","sill-basil":"Glowcap pots","sill-succulents":"Gem clusters","sill-cactus":"Stalagmite pair","sill-radio":"Echo horn","sill-cat":"Golden dragon idol","rug-pink":"Crimson rug","rug-braided":"Braided hide rug","rug-leaf":"Scale rug","rug-stripe":"Banner-stripe rug","rug-picnic":"Feast blanket","rug-sheepskin":"Cave-bear pelt","snake-plant":"Cave fern urn","cactus":"Thorn tree","umbrella-stand":"Weapon barrel","broom":"Hearth rake and shovel","side-table-lamp":"Table and lantern","record-player":"Table and war drum","plant-stand":"Egg stand","stool-books":"Stool and tomes","toy-chest":"Treasure chest","bench":"Stone bench","laundry-basket":"Loot basket","slippers":"Hide mat and claw boots","watering-can":"Copper ewer","cookbook-stack":"Spellbook stack","bean-bag":"Hide cushion","lemon-tree":"Ember-fruit tree","veg-basket":"Forage basket","monstera":"Glowvein plant","coat-stand":"Cloak and helm stand","arc-lamp":"Standing brazier","guitar":"Dragon-hide lute","pouffe":"Stump seat","tea-table":"Feast table","pip-ball":"Pip's glow-orb","picnic-basket":"Provision crate"},"styles":{"wall-white":"Grey stone","wall-lavender":"Cold slate","wall-mint":"Mossy stone","wall-peach":"Ember stone","wall-sky":"Sandstone","wall-sprig":"Ivy-hung stone","floor-lilac":"Cave earth","floor-oak":"Flagstones","floor-terracotta":"Slate tiles","floor-checker":"Rune tiles"},"swatch":{"wall-white":{"left":"#9a9aa4","right":"#aeaeb8"},"wall-lavender":{"left":"#7d8aa3","right":"#8f9cb5"},"wall-mint":{"left":"#7f9a92","right":"#92aca4"},"wall-peach":{"left":"#a8827a","right":"#bc9a90"},"wall-sky":{"left":"#bfa77f","right":"#d1ba92"},"wall-sprig":{"left":"#939f8a","right":"#a6b29c"},"floor-lilac":{"base":"#8b7a68"},"floor-oak":{"base":"#8e8c93"},"floor-terracotta":{"base":"#555d6e"},"floor-checker":{"base":"#3a3c52"}},"ink":"#2b2630"},"cyberpunk":{"stations":{"bed":"Charging pod","fridge":"Cryo unit","cooker":"Fab oven","cabinet":"Display case","wardrobe":"Gear locker"},"levels":{"bed":["Charging mat","Charging cradle","Charging pod","Canopy pod"],"fridge":["Cooler box","Mini cryo unit","Cryo fridge","Twin cryo bank"],"cooker":["Hot plate","Countertop fab oven","Fab oven with arm","Full fab line"],"cabinet":["Shelf crate","Display case","Lit display case","Holo plinth case"],"wardrobe":["Hook rail","Gear locker","Double locker","Locker bay"]},"decor":{"basil-print":"Circuit poster","recipe-board":"Schematic slate","herb-shelf":"Sample rack","fairy-lights":"LED strip","pip-portrait":"Pip scan portrait","growth-chart":"Height gauge","meal-calendar":"Schedule panel","wall-sconce":"Work lamp","photo-strip":"Monitor stack","wall-clock":"Digital clock","bunting":"Pennant lights","pan-rail":"Tool rail","mirror":"Round monitor","coat-hooks":"Gear hooks","curtains-gingham":"Strip curtain","curtains-linen":"Blackout shutters","roller-blind":"Security shutter","window-lights":"Window LED border","plant-hanger":"Hanging grow pod","sill-basil":"Grow-light seedlings","sill-succulents":"Memory chips","sill-cactus":"Antenna pair","sill-radio":"Comms radio","sill-cat":"Robo-cat","rug-pink":"Rubber mat","rug-braided":"Anti-static mat","rug-leaf":"Circuit mat","rug-stripe":"Hazard mat","rug-picnic":"Tool-outline mat","rug-sheepskin":"Foam pad","snake-plant":"Fibre-optic plant","cactus":"Spark coil","umbrella-stand":"Probe drum","broom":"Sweeper pole","side-table-lamp":"Tool cart and work lamp","record-player":"Turntable deck","plant-stand":"Power-cell stand","stool-books":"Stool and manuals","toy-chest":"Parts bin","bench":"Steel workbench","laundry-basket":"Scrap bin","slippers":"Boot mat","watering-can":"Coolant can","cookbook-stack":"Tablet stack","bean-bag":"Crash cushion","lemon-tree":"Hydroponic tube","veg-basket":"Battery crate","monstera":"Dish stand","coat-stand":"Hard-hat stand","arc-lamp":"Work-light tripod","guitar":"Synth keyboard","pouffe":"Swivel stool","tea-table":"Holo table","pip-ball":"Drone ball","picnic-basket":"Cargo case"},"styles":{"wall-white":"Gunmetal","wall-lavender":"Olive drab","wall-mint":"Teal panel","wall-peach":"Rust orange","wall-sky":"Steel blue","wall-sprig":"Circuit board","floor-lilac":"Rubber mat","floor-oak":"Diamond plate","floor-terracotta":"Floor grate","floor-checker":"Hazard checker"},"swatch":{"wall-white":{"left":"#56626e","right":"#667380"},"wall-lavender":{"left":"#69704f","right":"#7a8260"},"wall-mint":{"left":"#3f7479","right":"#4f868b"},"wall-peach":{"left":"#9a5f3d","right":"#ad6f4b"},"wall-sky":{"left":"#516e8e","right":"#617f9f"},"wall-sprig":{"left":"#2d5f4f","right":"#386f5c"},"floor-lilac":{"base":"#363d46"},"floor-oak":{"base":"#6b7682"},"floor-terracotta":{"base":"#1d232a"},"floor-checker":{"base":"#2a2f36"}},"ink":"#141b24"}}</script>
+<script id="chrome-ui">
+/* ===== chrome UI: renders every room UI surface from the token table + names. DOM wiring only. ===== */
+(function () {
+  'use strict';
+  const TABLE = JSON.parse(document.getElementById('token-table').textContent);
+  const NAMES = JSON.parse(document.getElementById('chrome-names').textContent);
+  const THEMES = [
+    { id: 'default', label: 'Default', line: 'herb', pip: '\u{1F33F}', form: 'Sprig', creature: 'Herb room' },
+    { id: 'parchment', label: 'Parchment', line: 'dragon', pip: '\u{1F409}', form: 'Drake', creature: 'Dragon lair' },
+    { id: 'cyberpunk', label: 'Cyberpunk', line: 'robot', pip: '\u{1F916}', form: 'Android', creature: 'Robot workshop' }
+  ];
+  const THEME_BY_ID = Object.fromEntries(THEMES.map(t => [t.id, t]));
+  const WIDTHS = [375, 1280];
+  const SP = '✨';
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const state = { theme: 'default', width: 375, side: false };
+
+  /* ---- copy: constants/petDecor.js, petShop.js, petRoom.js, petSprinkles.js, petAwards.js, pipWardrobe.js (verbatim) ---- */
+  const SPOT_LABELS = { overWardrobe: 'Over the wardrobe', bedsideWall: 'Bedside wall', frontRightWall: 'Front right wall', windowDressing: 'Window dressing', windowsill: 'Windowsill', rug: 'Rug', backCorner: 'Back corner', bedsideNook: 'Bedside nook', footOfBed: 'Foot of the bed', byFridge: 'By the fridge', cornerByDoor: 'Corner by the door', frontOfRoom: 'Front of the room', wallStyle: 'Walls', floorStyle: 'Floor' };
+  const SPOT_ICON = { overWardrobe: '\u{1F4DC}', bedsideWall: '\u{1F4C5}', frontRightWall: '\u{1FA9E}', windowDressing: '\u{1FA9F}', windowsill: '\u{1FAB4}', rug: '\u{1F7EB}', backCorner: '\u{1F335}', bedsideNook: '\u{1F4A1}', footOfBed: '\u{1F9FA}', byFridge: '\u{1F34B}', cornerByDoor: '\u{1F3B8}', frontOfRoom: '\u{1F9F6}' };
+  const STATIONS = [
+    { key: 'bed', label: 'Bed', icon: '\u{1F6CF}' }, { key: 'fridge', label: 'Fridge', icon: '\u{1F9CA}' },
+    { key: 'cooker', label: 'Cooker', icon: '\u{1F373}' }, { key: 'cabinet', label: 'Trophy cabinet', icon: '\u{1F3C6}' },
+    { key: 'wardrobe', label: 'Wardrobe', icon: '\u{1F455}' }
+  ];
+  const UPGRADE_COST = { 2: 300, 3: 600, 4: 1200 }; // server: StationPolicy.UPGRADE_COSTS
+  const SHOP_TABS = [['upgrades', 'Upgrades'], ['decor', 'Decor'], ['styles', 'Walls & floors'], ['earn', SP + ' Earn']];
+  const SHOP_INTRO = "Spend sprinkles to upgrade Pip's room. Upgrades are yours forever.";
+  const DECOR_SHOP_INTRO = "Buy decor and colours for Pip's room. They're yours forever. Move them around with ✏️ Edit room.";
+  const EARN_FOOT_TEXT = 'How do I earn sprinkles?';
+  const EARN_FOOT_LINK = 'See Earn →';
+  const EARN_INTRO = 'Pip pays sprinkles for keeping your plan going. Spend them in the other tabs.';
+  const EARN_WAYS = [
+    ['\u{1F37D}', 'Eat a planned meal', 'Tick breakfast, lunch or dinner as eaten, on its day or any day after. Late still counts.', 10, false],
+    ['⏰', 'Eat it on time', 'Bonus when it’s ticked on its day, by its meal time.', 5, false],
+    ['\u{1F956}', 'Make the extra homemade', 'The meal’s extra (bread, sauce…) is set to homemade.', 5, false],
+    ['\u{1F4C5}', 'Plan a full week', 'Every day Mon–Sun has breakfast, lunch and dinner. Pays both of you on a shared plan.', 20, false],
+    ['\u{1F9FE}', 'Make a shopping list', 'Generate the week’s list. Once a week, pays both of you.', 10, true],
+    ['\u{1F6D2}', 'Finish the shopping', 'Tick off every item on the list. Once a week, pays both of you.', 15, true]
+  ];
+  const GOOD_WEEK = [['21 meals eaten', 210], ['…all on time', 105], ['Full week planned', 20], ['Shopping list made + finished', 25]];
+  const GOOD_TO_KNOW = ['Snacks and extras on their own don’t pay.', 'Forgot to tick? A meal ticked later still pays, just not the on-time bonus.', 'Ticking a meal before its day doesn’t pay.', 'Each meal pays once. Un-ticking doesn’t take sprinkles back.', 'Your meals pay you. A full week and the shopping pay you both.', 'The shopping rewards pay once per Mon–Sun week, however many lists you make.'];
+  const FRIDGE_FOOD = ['\u{1F95A}', '\u{1F95B}', '\u{1F9C0}', '\u{1F357}', '\u{1F41F}', '\u{1F969}', '\u{1F966}', '\u{1F955}', '\u{1F345}', '\u{1FAD1}', '\u{1F96C}', '\u{1F9C5}', '\u{1F34B}', '\u{1FAD0}', '\u{1F360}'];
+  const FRIDGE_NOTES = { low: 'Running low, shopping day soon?', plenty: 'Plenty left for the week', full: 'Fully stocked for the week ✨' };
+  const FRIDGE_FOOTNOTE = "Always 15 slots. How full it is = planned meals you haven't eaten yet ÷ meals planned this week. It restocks when you plan your week.";
+  const CABINET_NOTE = "The ladder starts again after a month, so every award can be won again. ×N is how many times you've earned it.";
+  const MILESTONES = ['1 day', '3 days', '5 days', '1 week', '2 weeks', '3 weeks', '1 month'];
+  const SHELVES = [
+    { icon: '\u{1F4C5}', title: 'Followed the plan', kind: 'trophy', line: '9-day streak · best 21', next: 'Next: 2 weeks in 5 days', counts: [3, 2, 2, 1, 0, 0, 0] },
+    { icon: '\u{1F36A}', title: 'No snacks', kind: 'ribbon', line: '4-day streak · best 6', next: 'Next: 5 days in 1 day', counts: [2, 1, 0, 0, 0, 0, 0] },
+    { icon: '\u{1F377}', title: 'No alcohol', kind: 'ribbon', line: '0-day streak · best 3', next: '', counts: [0, 0, 0, 0, 0, 0, 0] }
+  ];
+  const FIRSTS = [['Make a template', true], ['Generate a shopping list', true], ['Plan a full week', false], ['Cook a homemade extra', false]];
+  const WARDROBE_SLOTS = ['Hat', 'Glasses', 'Scarf', 'Jacket', 'Belt', 'Pants', 'Shoes']; // WARDROBE_SLOTS
+  const HAT_LABELS = { // WARDROBE_ITEM_LABELS[line], Hat slot, in catalogue order
+    herb: ['Beanie', 'Cap', 'Chef hat', 'Straw hat', 'Top hat'],
+    dragon: ['Horn cosy', "Bard's cap", 'Singed toque', "Bird's nest", 'Crown'],
+    robot: ['Cooling fan', 'Holo visor', 'Steam toque', 'Satellite dish', 'Neon top hat']
+  };
+  const HAT_HINTS = ['Owned from the start', '5 days alcohol-free', 'Your first homemade extra', 'Grow to Sprig', 'Any 1-month streak'];
+
+  /* ---- small builders ---- */
+  const names = t => NAMES[t.id];
+  const decorLabel = (t, id) => names(t).decor[id];
+  const styleLabel = (t, id) => names(t).styles[id];
+  const priceOf = Object.fromEntries(NAMES.catalogue.map(([id, , price]) => [id, price]));
+  const spotOf = Object.fromEntries(NAMES.catalogue.map(([id, spot]) => [id, spot]));
+  const stationThumb = icon => `<svg class="pip-shop-thumb-svg" viewBox="0 0 76 76" aria-hidden="true" focusable="false"><text x="38" y="52" font-size="40" text-anchor="middle">${icon}</text></svg>`;
+  const decorThumb = id => `<svg class="pip-decor-thumb" viewBox="0 0 64 60" aria-hidden="true" focusable="false"><text x="32" y="42" font-size="34" text-anchor="middle">${SPOT_ICON[spotOf[id]] || '□'}</text></svg>`;
+  const creature = (t, size) => `<svg class="pip-herb" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><text x="50" y="${size === 'crop' ? 66 : 72}" font-size="${size === 'crop' ? 56 : 64}" text-anchor="middle">${t.pip}</text></svg>`;
+
+  /* ---- room scaffolding ---- */
+  const petHeader = (t, moodKey, moodLabel) => `<header class="pip-header"><div class="pip-header-name"><div class="pet-name-block"><h2 class="pet-name">Basil <button type="button" class="pet-name-edit-btn" aria-label="Rename Pip">✏️</button></h2></div><span class="pip-header-form">${t.form}</span></div><div class="pip-header-right"><span class="pip-header-sprinkles">${SP} 640</span><span class="pet-chip pet-chip--${moodKey}">${moodLabel}</span></div></header>`;
+  const pill = (cls, icon, label, extra = '') => `<button type="button" class="pip-checkin-btn pip-room-action${cls ? ' ' + cls : ''}"${extra}><span aria-hidden="true">${icon}</span> ${label}</button>`;
+  const strip = (opts = {}) => `<div class="pip-room-actions">${pill('', '\u{1F6CD}', 'Shop', ' aria-haspopup="dialog"')}${pill(opts.editing ? 'is-on' : '', '✏️', 'Edit room', ` aria-pressed="${!!opts.editing}"`)}<button type="button" class="pip-checkin-btn pip-room-action" aria-haspopup="dialog"><span aria-hidden="true">\u{1F455}</span> Wardrobe${opts.badge ? '<span class="pip-room-action-badge" aria-hidden="true">!</span>' : ''}</button>${opts.free ? '<span class="pip-free-mode-badge" role="status">\u{1F9EA} Free mode</span>' : ''}</div>`;
+  const band = (t, text = 'Room art (see ' + (t.id === 'parchment' ? 'pip-room-dragon' : t.id === 'cyberpunk' ? 'pip-room-robot' : 'live /pet on Default') + ')') => `<div class="demo-band" aria-hidden="true"><span>${esc(text)}</span></div>`;
+  const petScene = (t, { overlay = '', inner = '', head = ['content', 'Content'], stripOpts = {}, below = '' } = {}) =>
+    `<div class="pet-view">${petHeader(t, head[0], head[1])}<div class="pip-room">${band(t)}${inner}${overlay}</div>${below}${strip(stripOpts)}</div>`;
+  const frame = (t, inner, w, tall) => `<div class="frame${tall ? ' frame--tall' : ''}" data-theme="${t.id}" style="width:${w}px;max-width:100%">${inner}</div>`;
+
+  /* ---- Shop ---- */
+  const shopHead = bal => `<div class="pip-shop-head"><button type="button" class="pip-shop-icon-btn" aria-label="Close the shop">✕</button><h3>Shop</h3><span class="pip-shop-balance" aria-label="${bal} sprinkles"><span aria-hidden="true">${SP} ${bal}</span></span></div>`;
+  const shopTabs = tab => `<div class="pip-shop-tabs" role="tablist">${SHOP_TABS.map(([k, label]) => `<button type="button" role="tab" class="pip-shop-tab" aria-selected="${k === tab}" tabindex="${k === tab ? 0 : -1}">${label}</button>`).join('')}</div>`;
+  const shopFoot = tab => tab === 'earn' ? '' : `<p class="pip-shop-foot">${EARN_FOOT_TEXT} <button type="button" class="pip-shop-foot-link">${EARN_FOOT_LINK}</button></p>`;
+  const sheetShop = (t, tab, bal, body, notices = '') => `<div class="pip-shop" role="dialog" aria-modal="true" aria-label="Shop">${shopHead(bal)}${shopTabs(tab)}<div class="pip-shop-body" role="tabpanel">${notices}${body}${shopFoot(tab)}</div></div>`;
+  const dots = level => `<span class="pip-shop-dots" role="img" aria-label="Level ${level} of 4">${[1, 2, 3, 4].map(i => `<b${i <= level ? ' class="is-on"' : ''}></b>`).join('')}</span>`;
+  function stationCard(t, key, level, bal, mode) {
+    const st = STATIONS.find(s => s.key === key);
+    const lv = names(t).levels[key];
+    const maxed = level >= 4;
+    const cost = UPGRADE_COST[level + 1];
+    const label = names(t).stations[key];
+    let action;
+    if (maxed) action = '<span class="pip-shop-max">✓ Max level</span>';
+    else if (mode === 'busy') action = '<button type="button" class="pip-shop-btn" disabled aria-busy="true">Upgrading…</button>';
+    else if (bal < cost) action = `<button type="button" class="pip-shop-btn" disabled>${SP} ${cost}</button><span class="pip-shop-short">Need ${SP} ${cost - bal} more</span>`;
+    else if (mode === 'armed') action = `<button type="button" class="pip-shop-btn is-confirm" aria-label="Confirm: upgrade ${esc(label)} to level ${level + 1} for ${cost} sprinkles">Confirm ${SP} ${cost}</button>`;
+    else action = `<button type="button" class="pip-shop-btn" aria-label="Upgrade ${esc(label)} to level ${level + 1} for ${cost} sprinkles">Upgrade · ${SP} ${cost}</button>`;
+    return `<li class="pip-shop-card"><div class="pip-shop-thumb">${stationThumb(st.icon)}<span class="pip-shop-thumb-tag" aria-hidden="true">L${maxed ? level : level + 1}</span></div><div class="pip-shop-card-body"><h4 class="pip-shop-card-title"><span aria-hidden="true">${st.icon}</span> ${esc(label)}${dots(level)}</h4><p class="pip-shop-now">Now: ${esc(lv[level - 1])}</p><p class="pip-shop-next">${maxed ? 'Fully upgraded.' : `Next: <b>${esc(lv[level])}</b>`}</p><div class="pip-shop-row">${action}</div></div></li>`;
+  }
+  function shopUpgrades(t) {
+    const bal = 640;
+    const cards = [['bed', 1, 'idle'], ['fridge', 2, 'armed'], ['cooker', 3, 'idle'], ['cabinet', 4, 'idle'], ['wardrobe', 1, 'busy']].map(([k, l, m]) => stationCard(t, k, l, bal, m)).join('');
+    return sheetShop(t, 'upgrades', bal, `<p class="pip-shop-intro">${SHOP_INTRO}</p><ul class="pip-shop-list">${cards}</ul>`, `<p class="pip-shop-status" role="status">${esc(names(t).stations.cabinet)} upgraded to level 4: ${esc(names(t).levels.cabinet[3])}!</p>`);
+  }
+  function itemCard(label, art, price, owned, bal, mode) {
+    let action;
+    if (owned) action = '<span class="pip-shop-owned">✓ Owned</span>';
+    else if (bal < price) action = `<button type="button" class="pip-shop-btn" disabled>${SP} ${price}</button><span class="pip-shop-short">Need ${SP} ${price - bal} more</span>`;
+    else if (mode === 'armed') action = `<button type="button" class="pip-shop-btn is-confirm" aria-label="Confirm: buy ${esc(label)} for ${price} sprinkles">Confirm ${SP} ${price}</button>`;
+    else action = `<button type="button" class="pip-shop-btn" aria-label="Buy ${esc(label)} for ${price} sprinkles">${SP} ${price}</button>`;
+    return `<li class="pip-shop-item"><div class="pip-shop-item-art">${art}</div><p class="pip-shop-item-name">${esc(label)}</p>${action}</li>`;
+  }
+  function shopDecor(t) {
+    const bal = 140, owned = new Set(['basil-print', 'rug-pink', 'rug-braided']);
+    const spots = ['overWardrobe', 'windowsill', 'rug'];
+    const body = spots.map(spot => `<section><h4 class="pip-shop-group">${SPOT_LABELS[spot]}</h4><ul class="pip-shop-grid">${NAMES.catalogue.filter(c => c[1] === spot).map(([id, , price]) => itemCard(decorLabel(t, id), decorThumb(id), price, owned.has(id), bal, id === 'sill-basil' ? 'armed' : 'idle')).join('')}</ul></section>`).join('');
+    return sheetShop(t, 'decor', bal, `<p class="pip-shop-intro">${DECOR_SHOP_INTRO}</p>${body}`, `<p class="pip-shop-status" role="status">${esc(decorLabel(t, 'rug-braided'))} bought and put in the &quot;Rug&quot; spot.</p>`);
+  }
+  const swatch = (t, id) => {
+    const s = names(t).swatch[id];
+    const ink = names(t).ink;
+    if (s.left) return `<svg class="pip-style-swatch-svg" viewBox="0 0 60 56" aria-hidden="true" focusable="false"><rect x="2" y="4" width="28" height="48" fill="${s.left}" stroke="${ink}"/><rect x="30" y="4" width="28" height="48" fill="${s.right}" stroke="${ink}"/></svg>`;
+    return `<svg class="pip-style-swatch-svg" viewBox="0 0 60 56" aria-hidden="true" focusable="false"><rect x="4" y="8" width="52" height="40" fill="${s.base}" stroke="${ink}"/></svg>`;
+  };
+  function shopStyles(t) {
+    const bal = 420, owned = new Set(['wall-mint']);
+    const mk = spot => `<section><h4 class="pip-shop-group">${SPOT_LABELS[spot]}</h4><ul class="pip-shop-grid">${NAMES.catalogue.filter(c => c[1] === spot && c[2] > 0).map(([id, , price]) => itemCard(styleLabel(t, id), swatch(t, id), price, owned.has(id), bal, id === 'wall-peach' ? 'armed' : 'idle')).join('')}</ul></section>`;
+    return sheetShop(t, 'styles', bal, `<p class="pip-shop-intro">${DECOR_SHOP_INTRO}</p>${mk('wallStyle')}${mk('floorStyle')}`);
+  }
+  function shopEarn(t) {
+    const ways = EARN_WAYS.map(([icon, title, detail, amt, isNew]) => `<li class="pip-earn-way"><span class="pip-earn-icon" aria-hidden="true">${icon}</span><div><h4>${title}${isNew ? '<span class="pip-earn-new">New</span>' : ''}</h4><p>${detail}</p></div><span class="pip-earn-amount">+${amt} ${SP}</span></li>`).join('');
+    const week = GOOD_WEEK.map(([l, v]) => `<tr><td>${l}</td><td>${v}</td></tr>`).join('') + `<tr class="pip-earn-week-total"><td>About</td><td>360 ${SP}</td></tr>`;
+    const recent = [['Dinner eaten · on time · homemade', 'Today', '+20'], ['Lunch eaten', 'Today', '+10'], ['Shopping list made', 'Yesterday', '+10'], [`Bought the ${decorLabel(t, 'rug-braided')}`, 'Mon', '−180']];
+    const rl = recent.map(([text, day, amt]) => `<li><span>${esc(text)}<small>${day}</small></span><span class="${amt.startsWith('+') ? 'pip-earn-plus' : 'pip-earn-minus'}">${amt}</span></li>`).join('');
+    const body = `<div class="pip-earn"><p class="pip-shop-intro">${EARN_INTRO}</p><ul class="pip-earn-ways">${ways}</ul><div class="pip-earn-week"><b>A good week</b><table><tbody>${week}</tbody></table></div><section><h4 class="pip-shop-group">Your recent sprinkles</h4><ul class="pip-earn-recent">${rl}</ul></section><h4 class="pip-shop-group">Good to know</h4><ul class="pip-earn-rules">${GOOD_TO_KNOW.map(r => `<li>${r}</li>`).join('')}</ul></div>`;
+    return sheetShop(t, 'earn', 640, body);
+  }
+
+  /* ---- Decor picker, edit bar, style chips ---- */
+  const pickerOption = (label, art, pressed) => `<button type="button" class="pip-decor-option" aria-pressed="${pressed}">${art}${esc(label)}</button>`;
+  function picker(t, mode) {
+    const spot = mode === 'empty' ? 'windowsill' : 'overWardrobe';
+    const ids = mode === 'empty' ? [] : ['basil-print', 'herb-shelf'];
+    const none = `<button type="button" class="pip-decor-option" aria-pressed="${mode === 'empty'}"><span class="pip-decor-option-none" aria-hidden="true">∅</span>Empty</button>`;
+    const opts = none + ids.map((id, i) => pickerOption(decorLabel(t, id), decorThumb(id), i === 0)).join('');
+    const more = mode === 'all' ? 'You own everything for this spot ✨' : '<button type="button">\u{1F6CD} Buy more for this spot</button>';
+    const err = mode === 'error' ? '<p class="pip-decor-picker-error" role="alert">Couldn\'t change the room. Check your connection and try again.</p>' : '';
+    return `<div class="pip-decor-picker" role="dialog" aria-modal="true" aria-label="${SPOT_LABELS[spot]}"><div class="pip-decor-picker-head"><h4>${SPOT_LABELS[spot]}</h4><button type="button" class="pip-decor-picker-close" aria-label="Close">✕</button></div>${err}<div class="pip-decor-options">${opts}</div><p class="pip-decor-picker-more">${more}</p></div>`;
+  }
+  const editBar = err => `<div class="pip-room-editbar"><span>Editing: tap a dashed spot</span>${err ? `<span class="pip-room-editbar-error" role="alert">${err}</span>` : ''}<button type="button">Done</button></div>`;
+  function styleChips(t) {
+    const row = (spot, ids, pressed) => `<div role="group" aria-label="${SPOT_LABELS[spot]} styles"><p class="pip-room-styles-label" aria-hidden="true">${SPOT_LABELS[spot]}</p><div class="pip-room-styles-row">${ids.map(id => { const s = names(t).swatch[id]; return `<button type="button" class="pip-style-chip" aria-pressed="${id === pressed}"><span class="pip-style-swatch" style="background:${s.left || s.base}" aria-hidden="true"></span>${esc(styleLabel(t, id))}</button>`; }).join('')}</div></div>`;
+    return `<div class="pip-room-styles">${row('wallStyle', ['wall-white', 'wall-lavender', 'wall-mint'], 'wall-mint')}${row('floorStyle', ['floor-lilac', 'floor-oak'], 'floor-oak')}</div>`;
+  }
+  /* decor spots as the edit mode draws them: a dashed outline with a tag; filled and selected states */
+  const spotsDemo = () => `<svg class="demo-spots" viewBox="0 0 300 120" aria-hidden="true" focusable="false"><g class="pip-decor-spot"><polygon points="20,70 110,70 110,110 20,110"/><text x="65" y="94" text-anchor="middle">+</text></g><g class="pip-decor-spot is-filled"><polygon points="130,70 200,70 200,110 130,110"/></g><g class="pip-decor-spot is-selected"><polygon points="215,70 285,70 285,110 215,110"/></g><g class="pip-decor-spot-tag"><rect x="30" y="52" width="70" height="12" rx="6"/><text x="65" y="61" text-anchor="middle">Back corner</text></g></svg>`;
+
+  /* ---- Fridge, Trophy cabinet ---- */
+  function fridge(t, band) {
+    const cfg = { low: [4, '27% full · 4 of 15 planned meals left', 'low'], plenty: [9, '60% full · 9 of 15 planned meals left', 'plenty'], full: [15, '100% full · 15 of 15 planned meals left', 'full'] }[band];
+    const [filled, meter, note] = cfg;
+    const shelves = [0, 1, 2].map(s => `<div class="pip-fridge-shelf">${FRIDGE_FOOD.slice(s * 5, s * 5 + 5).map((f, i) => { const on = s * 5 + i < filled; return `<span class="pip-fridge-food${on ? '' : ' is-gone'}">${on ? f : ''}</span>`; }).join('')}</div>`).join('');
+    return `<div class="pip-fridge-view" role="dialog" aria-modal="true" aria-label="Basil's fridge"><div class="pip-fridge-head"><h3>\u{1F9CA} Basil&apos;s fridge</h3><button type="button" class="pip-fridge-btn-text">Back to room</button></div><p class="pip-fridge-meter"><b>${meter}</b><span>${FRIDGE_NOTES[note]}</span></p><div class="pip-fridge-body" role="img" aria-label="${filled} of 15 fridge slots stocked">${shelves}</div><p class="pip-fridge-footnote">${FRIDGE_FOOTNOTE}</p></div>`;
+  }
+  const trophy = '<g transform="translate(4,38)"><rect x="6" y="-6" width="20" height="6" fill="#8a5a2b" stroke="#2f2a3a" stroke-width="2"/><rect x="13" y="-14" width="6" height="8" fill="#ffc83d" stroke="#2f2a3a" stroke-width="2"/><path d="M4 -34 h24 q0 20 -12 20 q-12 0 -12 -20z" fill="#ffd34d" stroke="#2f2a3a" stroke-width="2"/></g>';
+  const ribbon = '<g transform="translate(6,34)"><path d="M8 -10 l-4 14 l6 -3 l4 5 l2 -16 M20 -10 l4 14 l-6 -3 l-4 5 l-2 -16" fill="#e63946" stroke="#2f2a3a" stroke-width="2"/><circle cx="14" cy="-18" r="10" fill="#4dabf7" stroke="#2f2a3a" stroke-width="2"/><circle cx="14" cy="-18" r="5" fill="#ffd34d"/></g>';
+  function cabinet() {
+    const shelves = SHELVES.map((s, si) => `<section class="pip-cabinet-shelf" aria-labelledby="demo-shelf-${si}"><h4 id="demo-shelf-${si}"><span aria-hidden="true">${s.icon}</span> ${s.title}</h4><p class="pip-cabinet-streak"><span>${s.line}</span>${s.next ? `<span>${s.next}</span>` : ''}</p><ul class="pip-cabinet-awards">${MILESTONES.map((m, i) => `<li class="pip-award${s.counts[i] ? '' : ' is-locked'}"><svg class="pip-award-icon" viewBox="0 0 40 40" aria-hidden="true" focusable="false">${s.kind === 'trophy' ? trophy : ribbon}</svg><span aria-hidden="true">${m}</span>${s.counts[i] ? `<span class="pip-award-times" aria-hidden="true">×${s.counts[i]}</span>` : ''}</li>`).join('')}</ul></section>`).join('');
+    const firsts = FIRSTS.map(([l, e]) => `<li class="pip-cabinet-first${e ? ' is-earned' : ''}"><span>${l}</span><span>${e ? '✓ earned' : 'to do'}</span></li>`).join('');
+    return `<div class="pip-cabinet-view" role="dialog" aria-modal="true" aria-label="Basil's trophy cabinet"><div class="pip-cabinet-head"><h3>\u{1F3C6} Basil&apos;s trophy cabinet</h3><button type="button" class="pip-cabinet-btn-text">Back to room</button></div>${shelves}<p class="pip-cabinet-note">${CABINET_NOTE}</p><section class="pip-cabinet-shelf" aria-labelledby="demo-shelf-firsts"><h4 id="demo-shelf-firsts">Firsts — things to try</h4><ul class="pip-cabinet-firsts">${firsts}</ul></section></div>`;
+  }
+
+  /* ---- Dress Pip ---- */
+  function wardrobe(t, mode) {
+    const hats = HAT_LABELS[t.line];
+    const worn = 1; // index into hats
+    const slotTabs = WARDROBE_SLOTS.map((s, i) => `<button type="button" role="tab" aria-selected="${i === 0}" class="pip-wardrobe-tab${i === 0 ? ' is-selected' : ''}">${i === 0 || i === 3 ? '<span class="pip-wardrobe-tab-worn" aria-hidden="true"></span>' : ''}${s}${i === 2 ? '<span class="pip-wardrobe-tab-new" aria-hidden="true"></span>' : ''}</button>`).join('');
+    const card = (label, cls, extra = '') => `<li><button type="button" class="pip-wardrobe-item${cls}">${creature(t, 'crop')}${extra}<span class="pip-wardrobe-item-label" aria-hidden="true">${esc(label)}</span></button></li>`;
+    const grid = card('None', '') + hats.map((h, i) => card(h, i === worn ? ' is-worn' : i >= 3 ? ' is-locked' : '', i >= 3 ? '<span class="pip-wardrobe-lock" aria-hidden="true">\u{1F512}</span>' : i === 2 ? '<span class="pip-wardrobe-new" aria-hidden="true">NEW</span>' : '')).join('');
+    const lock = mode === 'locked' ? `<p class="pip-wardrobe-lock-note" role="status"><b>\u{1F512} ${esc(hats[4])}</b>Unlock: ${HAT_HINTS[4]}</p>` : '';
+    const err = mode === 'error' ? '<p class="pip-wardrobe-error" role="alert">Couldn\'t save the outfit. Try again.</p>' : '';
+    const forms = [1, 2, 3].map(f => `<li class="pip-wardrobe-form${f === 3 ? ' is-current' : ''}${f === 3 ? '' : ''}">${creature(t, 'crop')}<span>${f === 1 ? 'Form 1' : f === 2 ? 'Form 2' : t.form}</span></li>`).join('');
+    return `<div class="pip-wardrobe" role="dialog" aria-modal="true" aria-label="Dress Pip"><div class="pip-wardrobe-head"><button type="button" class="pip-wardrobe-icon-btn" aria-label="Close and go back to the room">✕</button><h3>Dress Pip</h3><button type="button" class="pip-wardrobe-text-btn">Undress</button></div><div class="pip-wardrobe-preview">${creature(t)}<p class="pip-wardrobe-caption">${t.form} · wearing 2 of 7</p></div>${err}<div class="pip-wardrobe-tabs" role="tablist" aria-label="Clothing slots">${slotTabs}</div><div class="pip-wardrobe-body"><ul class="pip-wardrobe-grid">${grid}</ul>${lock}</div><details class="pip-wardrobe-lineup"${mode === 'open' ? ' open' : ''}><summary>Same outfit, every evolution</summary>${mode === 'open' ? `<ol class="pip-wardrobe-forms">${forms}</ol>` : ''}</details></div>`;
+  }
+
+  /* ---- head bar, check-in ---- */
+  function headBarDemo(t) {
+    const w = 64, h = 9, pct = 0.6;
+    const bar = (y, gain) => `<g class="pip-head-bar" transform="translate(48 ${y})"><rect class="pip-head-bar-track" width="${w}" height="${h}" rx="4.5"/><rect class="pip-head-bar-fill" width="${w}" height="${h}" rx="4.5" style="transform:scaleX(${pct})"/><rect class="pip-head-bar-outline" width="${w}" height="${h}" rx="4.5" stroke-width="1.4"/>${gain}</g>`;
+    const up = `<g class="pip-head-bar-gain"><text class="pip-head-bar-delta is-up" x="${w / 2}" y="-3" font-size="9" stroke-width="2.4" style="opacity:1">+3</text></g>`;
+    const down = `<g class="pip-head-bar-gain"><text class="pip-head-bar-delta is-down" x="${w / 2}" y="-3" font-size="9" stroke-width="2.4" style="opacity:1">−3</text></g>`;
+    const count = `<g class="pip-head-bar-gain"><text class="pip-head-bar-count" x="${w / 2}" y="-3" font-size="8" stroke-width="2.4" style="opacity:1">9 / 15</text></g>`;
+    const one = (label, y0, g) => `<svg class="demo-headbar" viewBox="0 0 160 110" role="img" aria-label="${label}"><text x="80" y="92" font-size="52" text-anchor="middle">${t.pip}</text>${bar(24, g)}</svg>`;
+    return `<div class="demo-headbars">${one('Level bar with a +3 gain', 24, up)}${one('Level bar with a -3 loss', 24, down)}${one('Level bar with its count', 24, count)}</div>`;
+  }
+  const bubble = (inner, asking = true) => `<div class="pet-bubble${asking ? ' is-asking' : ''}"><p class="pet-bubble-text">${inner.text}</p>${inner.actions}</div>`;
+  const checkInAsk = () => bubble({ text: 'Did you have any snacks today?', actions: '<div class="pip-checkin-actions" role="group" aria-label="Did you have any snacks?"><button type="button" class="pip-checkin-btn pip-checkin-btn--primary">No \u{1F64C}</button><button type="button" class="pip-checkin-btn">Yes</button><button type="button" class="pip-checkin-btn pip-checkin-btn--link">Not now</button></div>' });
+  const checkInWhen = () => bubble({ text: "That's ok! When did you have it?", actions: '<form class="pip-checkin-actions"><label class="pip-checkin-sr" for="demo-date-w">Day you had snacks</label><input id="demo-date-w" class="pip-checkin-date" type="date" value="2026-11-16"><button type="submit" class="pip-checkin-btn pip-checkin-btn--primary">Save</button><button type="button" class="pip-checkin-btn pip-checkin-btn--link">Back</button></form>' });
+  const checkInFirst = () => bubble({ text: 'When did you last have a snack?', actions: '<form class="pip-checkin-actions"><label class="pip-checkin-sr" for="demo-date-f">Day you last had snacks</label><input id="demo-date-f" class="pip-checkin-date" type="date" value="2026-11-16"><button type="submit" class="pip-checkin-btn pip-checkin-btn--primary">Save</button><button type="button" class="pip-checkin-btn">Today</button><button type="button" class="pip-checkin-btn">Can\'t remember</button><button type="button" class="pip-checkin-btn pip-checkin-btn--link">Not now</button><p class="pip-checkin-hint">Longer ago? Pick the earliest day.</p></form>' });
+  const moodChips = () => [['content', 'Content'], ['happy', 'Happy'], ['bored', 'Bored'], ['mischievous', 'Mischievous']].map(([k, l]) => `<span class="pet-chip pet-chip--${k}">${l}</span>`).join(' ');
+
+  /* ---- the screen list ---- */
+  const SCREENS = [
+    { id: 'shop-upgrades', title: 'Shop: Upgrades tab', note: 'Cards in five states: upgrade, confirm (armed), short, max level, busy. Thumbnails are placeholders: the real station art is in the room mockups.', sheet: true, build: t => frame0(t, '', shopUpgrades(t)) },
+    { id: 'shop-decor', title: 'Shop: Decor tab', note: 'Three of the twelve spots shown (over the wardrobe, windowsill, rug): owned, affordable, armed and short.', sheet: true, build: t => frame0(t, '', shopDecor(t)) },
+    { id: 'shop-styles', title: 'Shop: Walls & floors tab', note: 'The paid styles with their swatch colours, from the creature’s room pack.', sheet: true, build: t => frame0(t, '', shopStyles(t)) },
+    { id: 'shop-earn', title: 'Shop: Earn tab', note: 'The static rules and a worked good week; amounts are the server rates.', sheet: true, build: t => frame0(t, '', shopEarn(t)) },
+    { id: 'picker-owned', title: 'Decor picker: owned items + "Buy more"', note: 'Over the wardrobe: Empty, the pressed item, another owned item, and the Buy more link.', build: t => frame1(t, petScene(t, { overlay: picker(t, 'owned'), stripOpts: { editing: true } })) },
+    { id: 'picker-empty', title: 'Decor picker: nothing owned for the spot (Empty pressed)', note: 'Windowsill with nothing bought yet: only Empty, and the Buy more link.', build: t => frame1(t, petScene(t, { overlay: picker(t, 'empty'), stripOpts: { editing: true } })) },
+    { id: 'picker-all', title: 'Decor picker: everything owned, with a save error', note: 'The "You own everything" line replaces Buy more; the error is shown above the options.', build: t => frame1(t, petScene(t, { overlay: picker(t, 'all').replace('<div class="pip-decor-options">', '<p class="pip-decor-picker-error" role="alert">Couldn\'t change the room. Check your connection and try again.</p><div class="pip-decor-options">'), stripOpts: { editing: true } })) },
+    { id: 'fridge-low', title: 'Fridge: low (27%, 4 of 15 slots)', note: 'The fridge scene is classified room art (Task 13): its painted interior keeps literal colours; the head and button follow the sheet.', build: t => frame1(t, petScene(t, { overlay: fridge(t, 'low') })) },
+    { id: 'fridge-medium', title: 'Fridge: medium (60%, 9 of 15 slots)', note: 'Same scene, more slots stocked.', build: t => frame1(t, petScene(t, { overlay: fridge(t, 'plenty') })) },
+    { id: 'fridge-plenty', title: 'Fridge: plenty (full, 15 of 15 slots)', note: 'Fully stocked, with the footnote.', build: t => frame1(t, petScene(t, { overlay: fridge(t, 'full') })) },
+    { id: 'cabinet', title: 'Trophy cabinet', note: 'Three streak shelves, the note and the firsts list. Classified room art: the wood scene stays literal.', build: t => frame1(t, petScene(t, { overlay: cabinet() })) },
+    { id: 'wardrobe', title: 'Dress Pip: worn item, new item, locked items', note: 'Pip crops are placeholders (the creature art is in pip-themed-lines.html). Item names are the live per-creature labels.', sheet: true, build: t => frame0(t, '', wardrobe(t, 'plain')) },
+    { id: 'wardrobe-locked', title: 'Dress Pip: locked item note, save error, open lineup', note: 'Tapping a locked card shows the unlock hint; the lineup opens to every form.', sheet: true, build: t => frame0(t, '', wardrobe(t, 'locked').replace('<div class="pip-wardrobe-tabs"', '<p class="pip-wardrobe-error" role="alert">Couldn\'t save the outfit. Try again.</p><div class="pip-wardrobe-tabs"').replace('<details class="pip-wardrobe-lineup">', '<details class="pip-wardrobe-lineup" open>').replace('</summary></details>', `</summary><ol class="pip-wardrobe-forms">${[1, 2, 3].map(f => `<li class="pip-wardrobe-form${f === 3 ? ' is-current' : f === 1 ? '' : ''}${f === 3 ? '' : ''}">${creature(t, 'crop')}<span>${f === 3 ? t.form : 'Form ' + f}</span></li>`).join('')}</ol></details>`)) },
+    { id: 'room-controls', title: 'Room controls: strip, free-mode badge, edit bar, style chips, recentre, spots', note: 'The strip with the Wardrobe "!" badge and Free mode badge, then editing: Edit room pressed, the edit bar with an error, the style chips and the dashed spot states.', build: t => frame1(t, `<div class="pet-view">${petHeader(t, 'happy', 'Happy')}<div class="pip-room">${band(t)}${spotsDemo()}<button type="button" class="pip-room-recentre" aria-label="Centre on Pip"><span aria-hidden="true">\u{1F3AF}</span></button></div>${editBar("Couldn't change the room. Check your connection and try again.")}${styleChips(t)}${strip({ editing: true, badge: true, free: true })}</div>`) },
+    { id: 'head-bar', title: 'Header strip, mood chips and Pip’s level bar', note: 'The header, all four mood chips, and the level bar over Pip’s head with a +3, a loss and the count. The bar is drawn inside the room SVG; only its track, fill and outline take chrome colours (see the token table notes).', build: t => frame1(t, `<div class="pet-view">${petHeader(t, 'mischievous', 'Mischievous')}<div class="pip-room">${band(t)}</div><div class="demo-chips">${moodChips()}</div>${headBarDemo(t)}${strip()}</div>`) },
+    { id: 'checkin', title: 'Check-in actions in Pip’s bubble: ask, when, first answer', note: 'The three steps of the daily question, as they sit in the speech bubble.', build: t => frame1(t, `<div class="pet-view">${petHeader(t, 'content', 'Content')}<div class="pip-room">${band(t)}<div class="demo-bubbles">${checkInAsk()}${checkInWhen()}${checkInFirst()}</div></div>${strip()}</div>`) }
+  ];
+  function frame0(t, _a, sheetHtml) { // sheet screens: a dimmed room behind a full-height sheet
+    return `<div class="pet-view" aria-hidden="true">${petHeader(t, 'content', 'Content')}<div class="pip-room">${band(t)}</div>${strip()}</div>${sheetHtml}`;
+  }
+  const frame1 = (t, html) => html;
+
+  /* ---- page ---- */
+  const stage = document.getElementById('stage');
+  function drawStage() {
+    const themes = state.side ? THEMES : [THEME_BY_ID[state.theme]];
+    const w = state.side ? 375 : state.width;
+    stage.innerHTML = SCREENS.map(s => `<section class="screen" id="screen-${s.id}"><h2>${esc(s.title)}</h2><p class="note">${esc(s.note)}</p><div class="row">${themes.map(t => `<figure class="cell"><figcaption>${t.label} · ${t.creature} · ${w}px</figcaption>${frame(t, s.build(t), w, true)}</figure>`).join('')}</div></section>`).join('');
+  }
+  function pressed(group, value) { group.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === String(value)))); }
+  function wireControls() {
+    const themeGroup = document.getElementById('ctl-theme'), widthGroup = document.getElementById('ctl-width'), sideBtn = document.getElementById('ctl-side');
+    themeGroup.innerHTML = THEMES.map(t => `<button type="button" data-v="${t.id}" aria-pressed="false">${t.label}</button>`).join('');
+    widthGroup.innerHTML = WIDTHS.map(w => `<button type="button" data-v="${w}" aria-pressed="false">${w}</button>`).join('');
+    const sync = () => { pressed(themeGroup, state.theme); pressed(widthGroup, state.width); sideBtn.setAttribute('aria-pressed', String(state.side)); themeGroup.classList.toggle('is-off', state.side); widthGroup.classList.toggle('is-off', state.side); };
+    themeGroup.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; state.theme = b.dataset.v; sync(); drawStage(); });
+    widthGroup.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; state.width = Number(b.dataset.v); sync(); drawStage(); });
+    sideBtn.addEventListener('click', () => { state.side = !state.side; sync(); drawStage(); });
+    sync();
+  }
+
+  /* ---- token table ---- */
+  const kindText = r => r.kind === 'new' ? 'new' : 'existing';
+  const val = v => /gradient/.test(v) ? `<span class="sw" style="background:${v}"></span>${esc(v)}` : `<span class="sw" style="background:${v}"></span>${esc(v)}`;
+  function drawTokens() {
+    const rows = TABLE.tokens.map(r => `<tr><th scope="row"><code>${esc(r.token)}</code></th><td>${esc(r.area)}</td><td>${val(r.defaultValue)}<details><summary>${r.sources.length} source line${r.sources.length === 1 ? '' : 's'}</summary><small>${r.sources.map(esc).join(', ')}</small></details></td><td>${val(r.parchment)}</td><td>${val(r.cyberpunk)}</td><td>${kindText(r)}</td></tr>`).join('');
+    document.getElementById('token-rows').innerHTML = rows;
+    document.getElementById('art-rows').innerHTML = TABLE.roomArt.map(r => `<tr><td><span class="sw" style="background:${r.value}"></span>${esc(r.value)}</td><td><small>${r.sources.map(esc).join(', ')}</small></td><td>${esc(r.reason)}</td></tr>`).join('');
+    document.getElementById('token-notes').innerHTML = TABLE.notes.map(n => `<li>${esc(n)}</li>`).join('');
+    document.getElementById('token-count').textContent = `${TABLE.tokens.length} tokens (${TABLE.tokens.filter(r => r.kind === 'new').length} new, ${TABLE.tokens.filter(r => r.kind !== 'new').length} existing), ${TABLE.roomArt.length} room-art literals`;
+  }
+
+  /* ---- contrast readout: same WCAG maths as client/scripts/check-themes.mjs, colours read from the rendered tokens ---- */
+  const lin = c => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
+  const lum = ([r, g, b]) => 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+  const contrast = (a, b) => { const [hi, lo] = [lum(a), lum(b)].sort((x, y) => y - x); return (hi + 0.05) / (lo + 0.05); };
+  const probeHost = document.getElementById('probe');
+  function colourOf(themeId, token) {
+    probeHost.setAttribute('data-theme', themeId);
+    const el = probeHost.querySelector('i');
+    el.style.backgroundColor = '';
+    el.style.backgroundColor = `var(${token})`;
+    const m = getComputedStyle(el).backgroundColor.match(/[\d.]+/g).map(Number);
+    return { rgb: [m[0] / 255, m[1] / 255, m[2] / 255], a: m.length > 3 ? m[3] : 1 };
+  }
+  const flatten = (top, base) => top.rgb.map((c, i) => top.a * c + (1 - top.a) * base[i]);
+  function drawContrast() {
+    let fails = 0, total = 0;
+    const rows = TABLE.pairs.map(p => {
+      const cells = THEMES.map(t => {
+        const fg = colourOf(t.id, p.fg), bg = colourOf(t.id, p.bg);
+        const base = p.over ? colourOf(t.id, p.over).rgb : [1, 1, 1];
+        const bgRgb = bg.a < 1 ? flatten(bg, base) : bg.rgb;
+        const fgRgb = fg.a < 1 ? flatten(fg, bgRgb) : fg.rgb;
+        const ratio = contrast(fgRgb, bgRgb);
+        const ok = ratio >= p.min;
+        total += 1; if (!ok) fails += 1;
+        return `<td class="${ok ? 'ok' : 'bad'}">${ratio.toFixed(2)}:1 ${ok ? '✓' : '✗ below ' + p.min}</td>`;
+      }).join('');
+      return `<tr><th scope="row"><code>${esc(p.fg)}</code> on <code>${esc(p.bg)}</code>${p.over ? ` <small>over <code>${esc(p.over)}</code></small>` : ''}</th><td>${p.min}</td>${cells}</tr>`;
+    }).join('');
+    document.getElementById('contrast-rows').innerHTML = rows;
+    document.getElementById('contrast-summary').innerHTML = fails === 0 ? `<b class="ok-text">All ${total} checks pass AA</b> (${TABLE.pairs.length} pairs × 3 themes).` : `<b class="bad-text">${fails} of ${total} checks fail</b>.`;
+  }
+
+  wireControls();
+  drawStage();
+  drawTokens();
+  drawContrast();
+}());
+
+</script>
+</body>
+</html>

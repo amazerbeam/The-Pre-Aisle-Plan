@@ -1,8 +1,10 @@
 import {
-  DECOR_ALL_OWNED, DECOR_BUY_MORE, DECOR_EMPTY_LABEL, DECOR_ITEMS, DECOR_PICKER_CLOSE, DECOR_SPOT_LABELS
+  DECOR_ALL_OWNED, DECOR_BUY_MORE, DECOR_EMPTY_LABEL, DECOR_PICKER_CLOSE, DECOR_SPOT_LABELS
 } from '../../../constants/petDecor'
+import { decorLabel } from '../../../constants/petRoomLabels'
 import { catalogueFor, hasDefault, ownedFor } from '../../../utils/roomPlacements'
 import DecorThumb from './DecorThumb'
+import { useRoomPack } from './roomPackContext'
 import './DecorPicker.css'
 
 /**
@@ -13,6 +15,7 @@ import './DecorPicker.css'
  * (onBuyMore is null when the shop isn't available).
  */
 function DecorPicker({ spot, room, error, titleId, panelRef, onPick, onBuyMore, onClose }) {
+  const { line } = useRoomPack()
   const current = room.placements?.[spot] ?? null
   const owned = ownedFor(room.decor, spot)
   const allOwned = owned.length >= catalogueFor(room.decor, spot).length
@@ -34,7 +37,7 @@ function DecorPicker({ spot, room, error, titleId, panelRef, onPick, onBuyMore, 
         {owned.map(({ id }) => (
           <button key={id} type="button" className="pip-decor-option" aria-pressed={current === id} onClick={() => onPick(spot, id)}>
             <DecorThumb id={id} />
-            {DECOR_ITEMS[id].label}
+            {decorLabel(line, id)}
           </button>
         ))}
       </div>

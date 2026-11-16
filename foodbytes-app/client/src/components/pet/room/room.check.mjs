@@ -303,5 +303,11 @@ assert.equal(decorBoughtLine('rug-braided', room), 'Braided rug bought and appli
 assert.equal(decorBoughtLine('bunting', room), 'Bunting bought. Swap it in with ✏️ Edit room.')
 assert.equal(decorBoughtLine('wall-mint', room), 'Mint bought and applied.')
 assert.equal(decorBoughtLine('sofa', room), null)
+// MPP-46: the bought line names the item (and a style) in the room's line; herb is the default.
+assert.equal(decorBoughtLine('herb-shelf', room, 'dragon'), 'Potion shelf bought and put in the "Over the wardrobe" spot.')
+assert.equal(decorBoughtLine('rug-sheepskin', room, 'dragon'), 'Cave-bear pelt bought and applied.')
+assert.equal(decorBoughtLine('wall-mint', room, 'dragon'), 'Mossy stone bought and applied.')
+assert.equal(decorBoughtLine('bunting', room, 'robot'), 'Pennant lights bought. Swap it in with ✏️ Edit room.') // MPP-47: robot decor names
+assert.equal(decorBoughtLine('rug-stripe', room, 'robot'), 'Hazard mat bought and applied.')
 
 console.log('room checks passed')

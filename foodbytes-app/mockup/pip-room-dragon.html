@@ -1,0 +1,2444 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pip room: Dragon lair</title>
+<!-- Contract: .claude/contract/2026-11-16-themed-pip-rooms-mockups/ (Phase 1). Mockup only: nothing under client/src changes until the developer approves it. -->
+<style>
+  :root {
+    --brand: #4a3f80; --text: #2c3e50; --muted: #5f6b76;
+    --bg: #f3f5f0; --card: #ffffff; --line: #e1e6dc; --ok: #2f7d32; --bad: #c62828;
+    --thumb: 96px;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; }
+  main { max-width: 1280px; margin: 0 auto; padding: 20px 14px 64px; }
+  h1 { color: var(--brand); margin: 0 0 4px; font-size: 1.6rem; }
+  h2 { color: var(--brand); margin: 32px 0 10px; font-size: 1.2rem; }
+  h3 { margin: 0 0 8px; font-size: 1rem; }
+  .lede { color: var(--muted); margin: 0 0 14px; max-width: 880px; }
+  .card { background: var(--card); border-radius: 16px; padding: 14px; box-shadow: 0 4px 18px rgba(40,60,30,.08); }
+  .note { font-size: .85rem; color: var(--muted); }
+  button, select { font: inherit; }
+  button { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+  .bar { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; margin: 0 0 12px; }
+  .group { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .group > b { font-size: .8rem; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; margin-right: 2px; }
+  .tog, .btn { min-width: 44px; min-height: 44px; border: 1px solid #c9d2c0; background: #fff; color: var(--text); border-radius: 999px; padding: 6px 14px; font-size: .88rem; font-weight: 600; cursor: pointer; }
+  .tog[aria-pressed="true"] { background: var(--brand); border-color: var(--brand); color: #fff; }
+  .tog:focus-visible, .btn:focus-visible, select:focus-visible, .cell:focus-visible { outline: 3px solid #f0a000; outline-offset: 2px; }
+  @media (hover: hover) { .tog:hover:not([aria-pressed="true"]) { background: #eef1ea; } }
+  select { min-height: 44px; border: 1px solid #c9d2c0; border-radius: 10px; padding: 6px 10px; background: #fff; max-width: 100%; }
+  label.sel { display: flex; flex-direction: column; gap: 2px; font-size: .78rem; font-weight: 700; color: var(--muted); }
+  label.sel select { font-weight: 500; color: var(--text); font-size: .9rem; }
+
+  /* ---- workbench: the room stays in view on wide screens ---- */
+  .bench { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; align-items: start; }
+  .stagecol { position: static; }
+  .stage { border-radius: 16px; overflow: hidden; position: relative; background: #ecebf3; box-shadow: 0 4px 18px rgba(40,60,30,.12); }
+  .stage .room-svg { display: block; width: 100%; height: auto; }
+  .status { font-size: .82rem; margin: 8px 2px 0; color: var(--muted); }
+  .status .fail { color: var(--bad); font-weight: 700; }
+  .herbnote { margin: 8px 2px 0; font-size: .85rem; font-weight: 700; color: var(--brand); }
+  @media (min-width: 1000px) {
+    .bench { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); }
+    .stagecol { position: sticky; top: 12px; }
+  }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { display: flex; flex-direction: column; align-items: center; gap: 2px; width: 96px; padding: 6px 4px; border-radius: 12px; border: 2px solid transparent; background: #f7f9f4; cursor: pointer; font-size: .74rem; font-weight: 700; color: var(--text); min-height: 44px; }
+  .chip[aria-pressed="true"] { border-color: var(--brand); background: #eceaf8; }
+  .chip svg { width: 76px; height: 76px; display: block; }
+
+  .station { margin-bottom: 14px; padding: 10px; background: #f8faf6; border-radius: 14px; }
+  .station .head { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; margin-bottom: 8px; }
+  .levels { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+  .lvl { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 4px; border-radius: 10px; border: 2px solid transparent; background: #fff; cursor: pointer; font-size: .68rem; font-weight: 700; min-height: 44px; color: var(--text); }
+  .lvl[aria-pressed="true"] { border-color: var(--brand); }
+  .lvl svg, .cell svg { width: var(--thumb); max-width: 100%; height: auto; aspect-ratio: 1; display: block; background: #f1f1f6; border-radius: 8px; }
+  .lvl small { font-weight: 500; color: var(--muted); text-align: center; line-height: 1.15; }
+
+  .spots { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 8px 12px; margin-bottom: 14px; }
+  .decorgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(calc(var(--thumb) + 14px), 1fr)); gap: 8px; }
+  .cell { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 5px; border-radius: 12px; border: 2px solid transparent; background: #f7f9f4; cursor: pointer; font-size: .7rem; font-weight: 700; text-align: center; line-height: 1.15; color: var(--text); min-height: 44px; }
+  .cell[aria-pressed="true"] { border-color: var(--brand); background: #eceaf8; }
+  .cell small { font-weight: 500; color: var(--muted); }
+  .fxs { display: grid; grid-template-columns: repeat(auto-fill, minmax(calc(var(--thumb) + 18px), 1fr)); gap: 8px; margin-top: 8px; }
+  .fxs figure { margin: 0; text-align: center; font-size: .72rem; font-weight: 700; background: #f7f9f4; border-radius: 12px; padding: 6px; }
+  .fxs svg { width: var(--thumb); max-width: 100%; height: auto; aspect-ratio: 1; display: block; margin: 0 auto 2px; background: #f1f1f6; border-radius: 8px; }
+
+  table { border-collapse: collapse; width: 100%; font-size: .8rem; }
+  th, td { border-bottom: 1px solid var(--line); padding: 5px 6px; text-align: left; vertical-align: top; }
+  th { position: sticky; top: 0; background: #fff; }
+  .tablewrap { overflow-x: auto; max-height: 560px; overflow-y: auto; }
+  .pass { color: var(--ok); font-weight: 700; }
+  .fail { color: var(--bad); font-weight: 700; }
+  .todo { color: var(--muted); }
+
+  /* ---- room effects and ambience: CSS only, transform + opacity, stopped by Low FX, reduced motion and thumbnails ---- */
+  .room-fx { transform-box: fill-box; transform-origin: center; }
+  .room-fx--steam { animation: room-steam 1.2s ease-in-out infinite; }
+  .room-fx--zzz { animation: room-zzz 2.4s ease-in-out infinite; }
+  @keyframes room-steam { 0% { opacity: .2; transform: translateY(2px); } 50% { opacity: 1; } 100% { opacity: .2; transform: translateY(-6px); } }
+  @keyframes room-zzz { 0%, 100% { opacity: .55; transform: translateY(0); } 50% { opacity: 1; transform: translateY(-5px); } }
+  .room-fx--flicker { transform-origin: 50% 100%; animation: room-flicker 1.7s ease-in-out infinite; }
+  .room-fx--embers { animation: room-embers 2.4s ease-out infinite; }
+  .room-fx--glint { animation: room-glint 2.8s ease-in-out infinite; }
+  .room-fx--sway { transform-origin: 50% 0; animation: room-sway 4.2s ease-in-out infinite; }
+  @keyframes room-flicker { 0%, 100% { opacity: 1; transform: scale(1, 1); } 30% { opacity: .8; transform: scale(.94, 1.07); } 55% { opacity: .95; transform: scale(1.05, .95); } 78% { opacity: .75; transform: scale(.96, 1.05); } }
+  @keyframes room-embers { 0% { opacity: 0; transform: translateY(3px); } 20% { opacity: 1; } 100% { opacity: 0; transform: translateY(-14px); } }
+  @keyframes room-glint { 0%, 55%, 100% { opacity: .3; transform: scale(.8); } 72% { opacity: 1; transform: scale(1.15); } }
+  @keyframes room-sway { 0%, 100% { transform: rotate(-2.4deg); } 50% { transform: rotate(2.4deg); } }
+  body.lowfx .room-fx, body.reduced .room-fx, .is-still .room-fx { animation: none !important; }
+  body.lowfx [data-glow] { filter: none !important; }
+  @media (prefers-reduced-motion: reduce) { .room-fx { animation: none !important; } }
+</style>
+</head>
+<body>
+<!-- approved 2026-11-16 -->
+<main id="app"></main>
+<script id="room-geometry">
+/* ======================================================================
+   GEOMETRY: copied verbatim from the live room code (read-only source). Every statement ends with
+   "// source: <file>:<line>", the path relative to foodbytes-app/client/src/. mockup-smoke.mjs re-reads each
+   cited line and fails when a number here is not on it, so drift from the live code is caught.
+   ====================================================================== */
+const ROOM_STATIONS = { BED: 'bed', FRIDGE: 'fridge', COOKER: 'cooker', CABINET: 'cabinet', WARDROBE: 'wardrobe' }; // source: constants/petRoom.js:5-11
+const ROOM_MIN_LEVEL = 1; // source: constants/petRoom.js:13
+const ROOM_MAX_LEVEL = 4; // source: constants/petRoom.js:14
+const DEFAULT_ROOM_LEVELS = { bed: 1, fridge: 1, cooker: 1, cabinet: 1, wardrobe: 1 }; // source: constants/petRoom.js:16-22
+
+const GEOMETRY = {
+  ROOM_SIZE: { u: 260, v: 300, h: 150 }, // source: constants/petRoom.js:29
+  ROOM_WORLD: { x: -84, y: 10, width: 564, height: 394 }, // source: constants/petRoom.js:33
+  WINDOW_GAP: { v0: 158, v1: 238, h0: 56 }, // source: components/pet/room/roomDecor.jsx:26
+  RUG: { cu: 140, cv: 150, ru: 58, rv: 44 }, // source: components/pet/room/roomLayout.js:24
+  ROOM_DRAW_ORDER: ['wardrobe', 'cooker', 'fridge', 'cabinet', 'bed'], // source: components/pet/room/roomLayout.js:15-21
+  PIP_SCALE: 0.46, // source: components/pet/room/roomLayout.js:28
+  PIP_COOKER_SPOT: [126, 64], // source: components/pet/room/roomLayout.js:32
+  PIP_BED_SCALE: 0.36, // source: components/pet/room/roomLayout.js:39
+  PIP_BED_DROP: 4, // source: components/pet/room/roomLayout.js:40
+  SLEEP_Z_LIFT: 30, // source: components/pet/room/roomLayout.js:41
+  NIGHT_DIM_FILL: 'rgba(30,20,80,.38)', // source: components/pet/room/roomLayout.js:42
+  STATION_SHIFT: { cooker: [30, 0], fridge: [60, 0], cabinet: [0, 30], bed: [0, 70], wardrobe: [0, 0] }, // source: components/pet/room/roomLayout.js:46-51
+  DECOR_LEGACY_SHIFT: { overWardrobe: [-130, 0, -30], frontRightWall: [0, 216, -40], byFridge: [70, 20, 0] }, // source: components/pet/room/roomLayout.js:55-59
+  WINDOW_SHIFT: [0, 70, -30], // source: components/pet/room/roomLayout.js:62
+  STATION_ANCHORS: {
+    fridgeTop: [[166, 14, 34], [166, 17, 58], [163, 19, 112], [156, 20, 120]], // source: components/pet/room/roomLayout.js:85
+    cookerPot: [[118, 15, 46], [80, 19, 70], [92, 20, 80], [90, 20, 82]], // source: components/pet/room/roomLayout.js:86
+    cookerPlate: [[100, 22, 26], [106, 19, 55], [118, 20, 62], [112, 20, 63]], // source: components/pet/room/roomLayout.js:87
+    bedTop: [[48, 148, 5], [50, 148, 30], [40, 148, 30], [40, 148, 30]] // source: components/pet/room/roomLayout.js:88
+  },
+  FRIDGE_GAUGE_LIFT: 8, // source: components/pet/room/roomLayout.js:94
+  FRIDGE_GAUGE_HALF_HEIGHT: 7, // source: components/pet/room/roomLayout.js:95
+  FOOTPRINT: {
+    // fridge rows are [u, v, du, dv, h]; the others are [u, v, du, dv, h0, h1]
+    fridge: [[145, -1, 42, 30, 34], [146, 0, 40, 34, 58], [140, 0, 46, 38, 112], [124, 0, 64, 40, 120]], // source: components/pet/room/roomLayout.js:93
+    cabinet: [[0, 26, 24, 78, 0, 48], [0, 30, 22, 72, 30, 88], [0, 30, 26, 66, 0, 112], [0, 26, 30, 74, 0, 134]], // source: components/pet/room/roomLayout.js:99
+    cooker: [[96, 0, 44, 30, 0, 46], [58, 0, 84, 38, 0, 70], [70, 0, 70, 38, 0, 80], [48, 0, 94, 40, 0, 150]], // source: components/pet/room/roomLayout.js:104
+    bed: [[10, 122, 74, 52, 0, 11], [4, 122, 80, 52, 0, 36], [0, 120, 91, 56, 0, 64], [0, 118, 91, 60, 0, 127]], // source: components/pet/room/roomLayout.js:105
+    wardrobe: [[6, 4, 63, 22, 0, 82], [10, 0, 52, 26, 0, 78], [6, 0, 60, 30, 0, 92], [2, 0, 70, 32, 0, 96]] // source: components/pet/room/roomLayout.js:109
+  },
+  DECOR_LAYERS: {
+    rug: ['rug'],
+    wall: ['overWardrobe', 'bedsideWall', 'frontRightWall', 'windowDressing', 'windowsill'],
+    backFloor: ['backCorner', 'bedsideNook'],
+    frontFloor: ['cornerByDoor', 'footOfBed', 'byFridge', 'frontOfRoom']
+  }, // source: constants/petDecor.js:35-40
+  FRIDGE_GAUGE_COLOURS: { high: '#5cb85c', mid: '#f0ad4e', low: '#e5534b' }, // source: constants/petRoom.js:75-79
+  FRIDGE_LOW_PCT: 20, // source: constants/petRoom.js:64
+  FRIDGE_PLENTY_PCT: 50 // source: constants/petRoom.js:65
+};
+GEOMETRY.PIP_HOME = [GEOMETRY.RUG.cu, GEOMETRY.RUG.cv]; // source: components/pet/room/roomLayout.js:27
+
+// The 12 physical spots (display order), then the shapes. Legacy ids keep their MPP-27 art coords and are slid to their spot.
+const DECOR_SPOTS = ['overWardrobe', 'bedsideWall', 'frontRightWall', 'windowDressing', 'windowsill', 'rug', 'backCorner', 'bedsideNook', 'footOfBed', 'byFridge', 'cornerByDoor', 'frontOfRoom']; // source: constants/petDecor.js:27-31
+const LEGACY_IDS = ['basil-print', 'recipe-board', 'herb-shelf', 'fairy-lights', 'wall-clock', 'bunting', 'pan-rail', 'mirror', 'watering-can', 'cookbook-stack', 'bean-bag', 'lemon-tree']; // source: components/pet/room/decorArt.jsx:17
+
+const floorSpot = (u0, u1, v0, v1, h1, tag) => ({
+  corners: [[u0, v0, 0], [u1, v0, 0], [u1, v1, 0], [u0, v1, 0]],
+  plus: [(u0 + u1) / 2, (v0 + v1) / 2, 0],
+  tag: tag ?? [(u0 + u1) / 2, (v0 + v1) / 2, 0],
+  volume: [u0, v0, u1 - u0, v1 - v0, 0, h1]
+}); // source: constants/petDecor.js:68-73
+
+GEOMETRY.DECOR_SPOT_SHAPES = {
+  overWardrobe: {
+    corners: [[20, 0, 102], [56, 0, 102], [56, 0, 140], [20, 0, 140]],
+    plus: [38, 0, 121], tag: [38, 0, 140], volume: [20, 0, 36, 8, 98, 146]
+  }, // source: constants/petDecor.js:79-82
+  bedsideWall: {
+    corners: [[0, 134, 60], [0, 154, 60], [0, 154, 124], [0, 134, 124]],
+    plus: [0, 144, 92], tag: [0, 144, 52], volume: [0, 134, 6, 20, 60, 132]
+  }, // source: constants/petDecor.js:83-86
+  frontRightWall: {
+    corners: [[0, 250, 102], [0, 296, 102], [0, 296, 134], [0, 250, 134]],
+    plus: [0, 273, 118], tag: [0, 273, 134], volume: [0, 250, 4, 46, 98, 138]
+  }, // source: constants/petDecor.js:87-90
+  windowDressing: {
+    corners: [[0, 156, 60], [0, 244, 60], [0, 244, 146], [0, 156, 146]],
+    plus: [0, 160, 140], tag: [0, 198, 146], volume: [0, 156, 16, 88, 60, 150]
+  }, // source: constants/petDecor.js:91-94
+  windowsill: {
+    corners: [[0, 158, 74], [14, 158, 74], [14, 238, 74], [0, 238, 74]],
+    plus: [7, 198, 74], tag: [7, 198, 66], volume: [0, 158, 14, 80, 74, 100]
+  }, // source: constants/petDecor.js:95-98
+  rug: { ...floorSpot(82, 198, 106, 194, 2, [198, 150, 0]), plus: [140, 150, 0] }, // source: constants/petDecor.js:99
+  backCorner: floorSpot(2, 30, 32, 52, 80, [16, 42, -4]), // source: constants/petDecor.js:100
+  bedsideNook: floorSpot(2, 32, 140, 182, 70), // source: constants/petDecor.js:101
+  footOfBed: floorSpot(96, 126, 196, 240, 30), // source: constants/petDecor.js:102
+  byFridge: floorSpot(220, 256, 130, 170, 64), // source: constants/petDecor.js:103
+  cornerByDoor: floorSpot(4, 40, 258, 294, 100), // source: constants/petDecor.js:104
+  frontOfRoom: floorSpot(172, 208, 232, 268, 40) // source: constants/petDecor.js:105
+};
+
+const SPOT_LABELS = {
+  overWardrobe: 'Over the wardrobe', bedsideWall: 'Bedside wall', frontRightWall: 'Front right wall', windowDressing: 'Window dressing',
+  windowsill: 'Windowsill', rug: 'Rug', backCorner: 'Back corner', bedsideNook: 'Bedside nook', footOfBed: 'Foot of the bed',
+  byFridge: 'By the fridge', cornerByDoor: 'Corner by the door', frontOfRoom: 'Front of the room', wallStyle: 'Walls', floorStyle: 'Floor'
+}; // source: constants/petDecor.js:49-64
+
+/* The ids a creature must draw: 5 stations (x 4 levels), 55 decor ids in their spots, 10 styles. */
+const IDS = {
+  stations: ['bed', 'fridge', 'cooker', 'cabinet', 'wardrobe'], // source: constants/petRoom.js:5-11
+  decor: {
+    'basil-print': 'overWardrobe', 'recipe-board': 'overWardrobe', 'herb-shelf': 'overWardrobe', 'fairy-lights': 'overWardrobe', 'pip-portrait': 'overWardrobe',
+    'growth-chart': 'bedsideWall', 'meal-calendar': 'bedsideWall', 'wall-sconce': 'bedsideWall', 'photo-strip': 'bedsideWall',
+    'wall-clock': 'frontRightWall', bunting: 'frontRightWall', 'pan-rail': 'frontRightWall', mirror: 'frontRightWall', 'coat-hooks': 'frontRightWall',
+    'curtains-gingham': 'windowDressing', 'curtains-linen': 'windowDressing', 'roller-blind': 'windowDressing', 'window-lights': 'windowDressing', 'plant-hanger': 'windowDressing',
+    'sill-basil': 'windowsill', 'sill-succulents': 'windowsill', 'sill-cactus': 'windowsill', 'sill-radio': 'windowsill', 'sill-cat': 'windowsill',
+    'rug-pink': 'rug', 'rug-braided': 'rug', 'rug-leaf': 'rug', 'rug-stripe': 'rug', 'rug-picnic': 'rug', 'rug-sheepskin': 'rug',
+    'snake-plant': 'backCorner', cactus: 'backCorner', 'umbrella-stand': 'backCorner', broom: 'backCorner',
+    'side-table-lamp': 'bedsideNook', 'record-player': 'bedsideNook', 'plant-stand': 'bedsideNook', 'stool-books': 'bedsideNook',
+    'toy-chest': 'footOfBed', bench: 'footOfBed', 'laundry-basket': 'footOfBed', slippers: 'footOfBed',
+    'watering-can': 'byFridge', 'cookbook-stack': 'byFridge', 'bean-bag': 'byFridge', 'lemon-tree': 'byFridge', 'veg-basket': 'byFridge',
+    monstera: 'cornerByDoor', 'coat-stand': 'cornerByDoor', 'arc-lamp': 'cornerByDoor', guitar: 'cornerByDoor',
+    pouffe: 'frontOfRoom', 'tea-table': 'frontOfRoom', 'pip-ball': 'frontOfRoom', 'picnic-basket': 'frontOfRoom'
+  }, // source: constants/petDecor.js:110-175
+  styles: ['wall-white', 'wall-lavender', 'wall-mint', 'wall-peach', 'wall-sky', 'wall-sprig', 'floor-lilac', 'floor-oak', 'floor-terracotta', 'floor-checker'] // source: constants/petDecor.js:187-196
+};
+
+/* The herb room's own names, for the names table (id -> herb label). */
+const HERB_LABELS = {
+  stations: { bed: 'Bed', fridge: 'Fridge', cooker: 'Cooker', cabinet: 'Trophy cabinet', wardrobe: 'Wardrobe' }, // source: constants/petShop.js:19-23
+  levels: {
+    bed: ['Blanket on the floor', 'Camp cot', 'Wooden bed', 'Canopy bed'],
+    fridge: ['Cool box', 'Mini fridge', 'Full fridge', 'Double-door fridge'],
+    cooker: ['Camping stove', 'Counter and hob', 'Range cooker', "Chef's kitchen"],
+    cabinet: ['Planks on bricks', 'Wall shelves', 'Wooden cabinet', 'Glass display cabinet'],
+    wardrobe: ['Clothes rail', 'Chest of drawers', 'Wooden wardrobe', 'Mirrored wardrobe']
+  }, // source: constants/petShop.js:27-31
+  decor: {
+    'basil-print': 'Basil print', 'recipe-board': 'Recipe chalkboard', 'herb-shelf': 'Herb shelf', 'fairy-lights': 'Fairy lights', 'pip-portrait': 'Pip portrait',
+    'growth-chart': 'Growth chart', 'meal-calendar': 'Meal-plan calendar', 'wall-sconce': 'Wall lamp', 'photo-strip': 'Photo frames',
+    'wall-clock': 'Wall clock', bunting: 'Bunting', 'pan-rail': 'Copper pan rail', mirror: 'Round mirror', 'coat-hooks': 'Coat hooks',
+    'curtains-gingham': 'Gingham curtains', 'curtains-linen': 'Linen curtains', 'roller-blind': 'Roller blind', 'window-lights': 'Window fairy lights', 'plant-hanger': 'Hanging plant',
+    'sill-basil': 'Basil pots', 'sill-succulents': 'Succulents', 'sill-cactus': 'Cactus pair', 'sill-radio': 'Retro radio', 'sill-cat': 'Lucky cat',
+    'rug-pink': 'Pink rug', 'rug-braided': 'Braided rug', 'rug-leaf': 'Basil-leaf rug', 'rug-stripe': 'Rainbow stripes', 'rug-picnic': 'Picnic blanket', 'rug-sheepskin': 'Sheepskin',
+    'snake-plant': 'Snake plant', cactus: 'Tall cactus', 'umbrella-stand': 'Umbrella stand', broom: 'Broom + dustpan',
+    'side-table-lamp': 'Side table + lamp', 'record-player': 'Record player', 'plant-stand': 'Plant stand', 'stool-books': 'Stool + books',
+    'toy-chest': 'Toy chest', bench: 'Bed bench', 'laundry-basket': 'Laundry basket', slippers: 'Mat + slippers',
+    'watering-can': 'Watering can', 'cookbook-stack': 'Cookbook stack', 'bean-bag': 'Bean bag', 'lemon-tree': 'Potted lemon tree', 'veg-basket': 'Veg basket',
+    monstera: 'Monstera', 'coat-stand': 'Coat stand', 'arc-lamp': 'Arc floor lamp', guitar: 'Guitar',
+    pouffe: 'Pouffe', 'tea-table': 'Tea table', 'pip-ball': "Pip's ball", 'picnic-basket': 'Picnic basket'
+  }, // source: constants/petDecor.js:110-175
+  styles: {
+    'wall-white': 'White', 'wall-lavender': 'Lavender', 'wall-mint': 'Mint', 'wall-peach': 'Peach', 'wall-sky': 'Sky', 'wall-sprig': 'Sprig wallpaper',
+    'floor-lilac': 'Lilac', 'floor-oak': 'Oak boards', 'floor-terracotta': 'Terracotta tiles', 'floor-checker': 'Checkerboard'
+  } // source: constants/petDecor.js:187-196
+};
+
+/* ---- geometry helpers, bodies copied from roomLayout.js (P comes from the iso block) ---- */
+function shiftPx([du, dv, dh = 0]) {
+  const [x0, y0] = P(0, 0, 0);
+  const [x, y] = P(du, dv, dh);
+  return [x - x0, y - y0];
+} // source: components/pet/room/roomLayout.js:65-69
+
+function shiftTransform(shift) {
+  const [dx, dy] = shiftPx(shift);
+  return `translate(${dx.toFixed(1)} ${dy.toFixed(1)})`;
+} // source: components/pet/room/roomLayout.js:71-75
+
+function boxCorners(u, v, du, dv, h0, h1) {
+  const corners = [];
+  for (const cu of [u, u + du]) {
+    for (const cv of [v, v + dv]) {
+      for (const ch of [h0, h1]) corners.push(P(cu, cv, ch));
+    }
+  }
+  return corners;
+} // source: components/pet/room/roomLayout.js:198-206
+
+function boundsOf(points, extraYs = []) {
+  const xs = points.map(([x]) => x);
+  const ys = [...points.map(([, y]) => y), ...extraYs];
+  const x = Math.min(...xs);
+  const y = Math.min(...ys);
+  return { x, y, width: Math.max(...xs) - x, height: Math.max(...ys) - y };
+} // source: components/pet/room/roomLayout.js:209-215
+
+function squareAround({ x, y, width, height }, pad) {
+  const side = Math.max(width, height) + 2 * pad;
+  return { x: x + width / 2 - side / 2, y: y + height / 2 - side / 2, width: side, height: side };
+} // source: components/pet/room/roomLayout.js:218-221
+
+function resolveRoomLevels(levels) {
+  const resolved = {};
+  for (const station of Object.keys(DEFAULT_ROOM_LEVELS)) {
+    const level = levels?.[station];
+    const valid = Number.isInteger(level) && level >= ROOM_MIN_LEVEL && level <= ROOM_MAX_LEVEL;
+    resolved[station] = valid ? level : DEFAULT_ROOM_LEVELS[station];
+  }
+  return resolved;
+} // source: components/pet/room/roomLayout.js:162-170
+
+/** One footprint as [u, v, du, dv, h0, h1] (the fridge's 5-tuple gets h0 = 0, as THUMB_FOOTPRINTS does). */
+function footprint3(station, level) {
+  const row = GEOMETRY.FOOTPRINT[station][level - 1];
+  if (station !== 'fridge') return row;
+  const [u, v, du, dv, h] = row;
+  return [u, v, du, dv, 0, h];
+} // source: components/pet/room/roomLayout.js:117-126
+
+const THUMB_PAD = 6; // source: components/pet/room/roomLayout.js:110
+const DECOR_SPOT_PAD = 4; // source: components/pet/room/roomLayout.js:131
+
+function stationThumbBox(station, level) {
+  const index = resolveRoomLevels({ [station]: level })[station] - 1;
+  return squareAround(boundsOf(boxCorners(...footprint3(station, index + 1))), THUMB_PAD);
+} // source: components/pet/room/roomLayout.js:125-128
+
+function decorSpotHitBox(spot) {
+  const { x, y, width, height } = boundsOf(boxCorners(...GEOMETRY.DECOR_SPOT_SHAPES[spot].volume));
+  return { x: x - DECOR_SPOT_PAD, y: y - DECOR_SPOT_PAD, width: width + 2 * DECOR_SPOT_PAD, height: height + 2 * DECOR_SPOT_PAD };
+} // source: components/pet/room/roomLayout.js:138-141
+
+function decorThumbBox(spot) {
+  return squareAround(boundsOf(boxCorners(...GEOMETRY.DECOR_SPOT_SHAPES[spot].volume)), THUMB_PAD);
+} // source: components/pet/room/roomLayout.js:144-146
+
+function pipPose(position, mood, levels) {
+  if (position === 'cooker') {
+    return { face: 'happy', showProps: false, anchor: [...GEOMETRY.PIP_COOKER_SPOT, 0], scale: GEOMETRY.PIP_SCALE, dropPx: 0 };
+  }
+  if (position === 'bed') {
+    const bedLevel = resolveRoomLevels(levels).bed;
+    return { face: 'sleep', showProps: false, anchor: GEOMETRY.STATION_ANCHORS.bedTop[bedLevel - 1], scale: GEOMETRY.PIP_BED_SCALE, dropPx: GEOMETRY.PIP_BED_DROP };
+  }
+  return { face: mood, showProps: true, anchor: [...GEOMETRY.PIP_HOME, 0], scale: GEOMETRY.PIP_SCALE, dropPx: 0 };
+} // source: components/pet/room/roomLayout.js:227-242
+
+GEOMETRY.THUMB = { station: stationThumbBox, decor: decorThumbBox };
+</script>
+<script id="room-iso">
+/* ======================================================================
+   Iso helpers. P / pts / shade / boxFaces / ellipsePoints / cylinderSidePoints and the flat-rectangle points are
+   iso.js, logic unchanged (ES exports -> plain functions). Floor coords: u along the LEFT wall (plane v = 0), v along the
+   RIGHT wall (plane u = 0), h up; the viewer is at +u, +v. Below them: the shape helpers (isoShapes.jsx) as SVG-string
+   functions, plus a bounds collector the fit table and the smoke use to measure the art against the live footprints.
+   ====================================================================== */
+const ISO_N = Math.hypot(180, 70);
+const ISO_C = 180 / ISO_N;
+const ISO_S = 70 / ISO_N;
+
+/** Floor point (u, v) at height h -> SVG [x, y]. */
+function P(u, v, h = 0) {
+  return [180 - u * ISO_C + v * ISO_C, 180 + (u + v) * ISO_S - h];
+}
+
+/** [[x, y], ...] -> an SVG `points` string, one decimal place. */
+function pts(points) {
+  return points.map(p => p.map(n => n.toFixed(1)).join(',')).join(' ');
+}
+
+/** Lighten (pct > 0) or darken (pct < 0) a '#rrggbb' colour. */
+function shade(hex, pct) {
+  const n = parseInt(hex.slice(1), 16);
+  const f = pct / 100;
+  const channel = s => {
+    const c = (n >> s) & 255;
+    return Math.round(f > 0 ? c + (255 - c) * f : c * (1 + f));
+  };
+  return `rgb(${channel(16)},${channel(8)},${channel(0)})`;
+}
+
+/** Like shade, but returns a '#rrggbb' hex (so the result can be shaded again). */
+function tint(hex, pct) {
+  const n = parseInt(hex.slice(1), 16);
+  const f = pct / 100;
+  const channel = s => {
+    const c = (n >> s) & 255;
+    return Math.round(f > 0 ? c + (255 - c) * f : c * (1 + f));
+  };
+  return '#' + [16, 8, 0].map(s => channel(s).toString(16).padStart(2, '0')).join('');
+}
+
+/** The three visible faces of a solid box, in draw order: front (u = u+du), side (v = v+dv), top. */
+function boxFaces(u, v, du, dv, h0, h1) {
+  const U = u + du;
+  const V = v + dv;
+  return {
+    front: [P(U, v, h0), P(U, V, h0), P(U, V, h1), P(U, v, h1)],
+    side: [P(u, V, h0), P(U, V, h0), P(U, V, h1), P(u, V, h1)],
+    top: [P(u, v, h1), P(U, v, h1), P(U, V, h1), P(u, V, h1)]
+  };
+}
+
+function rectVPoints(vp, u0, u1, h0, h1) {
+  return [P(u0, vp, h0), P(u1, vp, h0), P(u1, vp, h1), P(u0, vp, h1)];
+}
+
+function rectUPoints(up, v0, v1, h0, h1) {
+  return [P(up, v0, h0), P(up, v1, h0), P(up, v1, h1), P(up, v0, h1)];
+}
+
+function rectHPoints(h, u0, u1, v0, v1) {
+  return [P(u0, v0, h), P(u1, v0, h), P(u1, v1, h), P(u0, v1, h)];
+}
+
+function ellipsePoints(cu, cv, h, ru, rv, steps = 24) {
+  const points = [];
+  for (let i = 0; i < steps; i++) {
+    const t = (i / steps) * Math.PI * 2;
+    points.push(P(cu + ru * Math.cos(t), cv + rv * Math.sin(t), h));
+  }
+  return points;
+}
+
+function cylinderSidePoints(cu, cv, r, h0, h1) {
+  const angle = i => -Math.PI / 4 + (i / 12) * Math.PI;
+  const points = [];
+  for (let i = 0; i <= 12; i++) points.push(P(cu + r * Math.cos(angle(i)), cv + r * Math.sin(angle(i)), h0));
+  for (let i = 12; i >= 0; i--) points.push(P(cu + r * Math.cos(angle(i)), cv + r * Math.sin(angle(i)), h1));
+  return points;
+}
+
+/* ---------- bounds collector: every shape helper reports the points it draws ---------- */
+let ART_INK = '#2b2630'; // the room's outline colour; the engine sets it from pack.ink before each draw
+let _bounds = null;
+
+function track(points) {
+  if (!_bounds) return;
+  for (const [x, y] of points) {
+    if (x < _bounds.x0) _bounds.x0 = x;
+    if (y < _bounds.y0) _bounds.y0 = y;
+    if (x > _bounds.x1) _bounds.x1 = x;
+    if (y > _bounds.y1) _bounds.y1 = y;
+  }
+}
+
+/** Run fn (which draws) and return the screen bounds {x, y, width, height} of everything it drew, or null if nothing. */
+function measure(fn) {
+  const previous = _bounds;
+  const b = { x0: Infinity, y0: Infinity, x1: -Infinity, y1: -Infinity };
+  _bounds = b;
+  try { fn(); } finally { _bounds = previous; }
+  return b.x0 === Infinity ? null : { x: b.x0, y: b.y0, width: b.x1 - b.x0, height: b.y1 - b.y0 };
+}
+
+/* ---------- shape helpers: SVG strings, outline ART_INK, shading as the live Box (-6 front, -20 side, +14 top) ---------- */
+const n1 = n => n.toFixed(1);
+
+function poly(points, fill, o = {}) {
+  track(points);
+  const stroke = o.stroke === undefined ? ART_INK : o.stroke;
+  const strokeAttrs = stroke ? ` stroke="${stroke}" stroke-width="${o.sw ?? 1.6}" stroke-linejoin="round"` : '';
+  return `<polygon points="${pts(points)}" fill="${fill}"${strokeAttrs}${o.op != null ? ` opacity="${o.op}"` : ''}/>`;
+}
+
+function isoLine(points, width = 1.6, color = ART_INK, o = {}) {
+  track(points);
+  return `<polyline points="${pts(points)}" fill="none" stroke="${color}" stroke-width="${width}" stroke-linecap="round" stroke-linejoin="round"${o.dash ? ` stroke-dasharray="${o.dash}"` : ''}${o.op != null ? ` opacity="${o.op}"` : ''}/>`;
+}
+
+/** Solid box: the two visible sides, then the top. */
+function box(u, v, du, dv, h0, h1, color, o = {}) {
+  const f = boxFaces(u, v, du, dv, h0, h1);
+  return poly(f.front, shade(color, -6), o) + poly(f.side, shade(color, -20), o) + poly(f.top, shade(color, 14), o);
+}
+
+function rectV(vp, u0, u1, h0, h1, fill, o) { return poly(rectVPoints(vp, u0, u1, h0, h1), fill, o); }
+function rectU(up, v0, v1, h0, h1, fill, o) { return poly(rectUPoints(up, v0, v1, h0, h1), fill, o); }
+function rectH(h, u0, u1, v0, v1, fill, o) { return poly(rectHPoints(h, u0, u1, v0, v1), fill, o); }
+function ellH(cu, cv, h, ru, rv, fill, o) { return poly(ellipsePoints(cu, cv, h, ru, rv), fill, o); }
+
+/** Points along an ellipse from angle t0 to t1 (radians) at height h. */
+function arcPts(cu, cv, h, ru, rv, t0, t1, n = 14) {
+  const out = [];
+  for (let i = 0; i <= n; i++) {
+    const t = t0 + ((t1 - t0) * i) / n;
+    out.push(P(cu + ru * Math.cos(t), cv + rv * Math.sin(t), h));
+  }
+  return out;
+}
+
+/** The near (viewer-facing) half of a floor ellipse as an angle range, [t0, t1]. */
+function nearRange(ru, rv) {
+  const t0 = Math.atan2(-rv, ru);
+  return [t0, t0 + Math.PI];
+}
+
+/** Short cylinder / drum, optionally tapered: the near side band, then the top ellipse. */
+function cylE(cu, cv, ru, rv, h0, h1, color, ru1 = ru, rv1 = rv, o = {}) {
+  const [t0, t1] = nearRange(ru, rv);
+  const band = [...arcPts(cu, cv, h0, ru, rv, t0, t1), ...arcPts(cu, cv, h1, ru1, rv1, t0, t1).reverse()];
+  return poly(band, shade(color, -12), o) + poly(ellipsePoints(cu, cv, h1, ru1, rv1), shade(color, 12), o);
+}
+function cyl(cu, cv, r, h0, h1, color, o) { return cylE(cu, cv, r, r, h0, h1, color, r, r, o); }
+
+/** Billboard: flat art pinned to a floor point. ext = the art's extent [x0, y0, x1, y1] around that point, for the bounds. */
+function bill(u, v, h, inner, ext = [-8, -16, 8, 2]) {
+  const [x, y] = P(u, v, h);
+  track([[x + ext[0], y + ext[1]], [x + ext[2], y + ext[3]]]);
+  return `<g transform="translate(${x.toFixed(1)},${y.toFixed(1)})">${inner}</g>`;
+}
+
+/** An animated group. The class never sits on a group that carries a transform (position goes on an outer <g>). */
+function fxg(effect, inner, delay = 0) {
+  return `<g class="room-fx room-fx--${effect}"${delay ? ` style="animation-delay:-${delay}s"` : ''}>${inner}</g>`;
+}
+
+/** Several line segments [[p, q], ...] as one <path>, all tracked for the bounds. */
+function isoLines(segs, width = 1, color = ART_INK, op) {
+  if (!segs.length) return '';
+  let d = '';
+  for (const [a, b] of segs) {
+    track([a, b]);
+    d += `M${a[0].toFixed(1)} ${a[1].toFixed(1)}L${b[0].toFixed(1)} ${b[1].toFixed(1)}`;
+  }
+  return `<path d="${d}" fill="none" stroke="${color}" stroke-width="${width}" stroke-linecap="round"${op != null ? ` opacity="${op}"` : ''}/>`;
+}
+
+/** A glow: CSS drop-shadow on the element. Removed under Low FX by `.lowfx [data-glow]`. */
+function glowAttr(color, radius = 3) {
+  return `data-glow style="filter:drop-shadow(0 0 ${radius}px ${color})"`;
+}
+</script>
+<script id="room-creature">
+const FOOT_X = 100, FOOT_Y = 186;
+const WARDROBE_INK = '#2f4a22';          // clothing outlines (the herb ink's value)
+const INK = WARDROBE_INK;
+const HERB_INK = '#2f4a22', DRAGON_INK = '#1f3d34', ROBOT_INK = '#22303f';
+const MOODS = ['content', 'happy', 'bored', 'mischievous', 'sleep'];
+const MOOD_LABELS = { content: 'Content', happy: 'Happy', bored: 'Bored', mischievous: 'Mischievous', sleep: 'Asleep' };
+const ellipsePath = (cx, cy, rx, ry) => `M${cx - rx} ${cy} A${rx} ${ry} 0 1 0 ${cx + rx} ${cy} A${rx} ${ry} 0 1 0 ${cx - rx} ${cy} Z`;
+
+/* ---------- faces (herb mockup, ink parameterised) ---------- */
+function face(cx, ey, gap, mood, s = 1, ink = HERB_INK) {
+  const L = cx - gap, R = cx + gap, my = ey + 17 * s;
+  const st = `stroke="${ink}" stroke-width="${4 * s}" stroke-linecap="round" fill="none"`;
+  const blush = (o) => `<ellipse cx="${L - 11 * s}" cy="${ey + 11 * s}" rx="${9 * s}" ry="${5 * s}" fill="#ff8fab" opacity="${o}"/><ellipse cx="${R + 11 * s}" cy="${ey + 11 * s}" rx="${9 * s}" ry="${5 * s}" fill="#ff8fab" opacity="${o}"/>`;
+  const eye = (x, dx = 0) => `<ellipse cx="${x + dx}" cy="${ey}" rx="${7 * s}" ry="${9 * s}" fill="${ink}"/><circle cx="${x + dx + 2.4 * s}" cy="${ey - 3.4 * s}" r="${2.8 * s}" fill="#fff"/>`;
+  switch (mood) {
+    case 'happy':
+      return `<path d="M${L - 9 * s} ${ey + 2 * s} Q${L} ${ey - 11 * s} ${L + 9 * s} ${ey + 2 * s}" ${st}/><path d="M${R - 9 * s} ${ey + 2 * s} Q${R} ${ey - 11 * s} ${R + 9 * s} ${ey + 2 * s}" ${st}/>
+        <path d="M${cx - 10 * s} ${my - 3 * s} Q${cx} ${my + 15 * s} ${cx + 10 * s} ${my - 3 * s} Z" fill="#7a2e45" stroke="${ink}" stroke-width="${3 * s}" stroke-linejoin="round"/>${blush(0.8)}`;
+    case 'bored':
+      return `<path d="M${L - 8 * s} ${ey} A${8 * s} ${8 * s} 0 0 0 ${L + 8 * s} ${ey} Z" fill="${ink}"/><path d="M${R - 8 * s} ${ey} A${8 * s} ${8 * s} 0 0 0 ${R + 8 * s} ${ey} Z" fill="${ink}"/>
+        <path d="M${L - 10 * s} ${ey} L${L + 10 * s} ${ey} M${R - 10 * s} ${ey} L${R + 10 * s} ${ey}" ${st}/><path d="M${cx - 7 * s} ${my + 2 * s} L${cx + 7 * s} ${my + 2 * s}" ${st}/>${blush(0.3)}`;
+    case 'mischievous':
+      return `${eye(L, 4 * s)}${eye(R, 4 * s)}
+        <path d="M${L - 10 * s} ${ey - 13 * s} Q${L} ${ey - 15 * s} ${L + 10 * s} ${ey - 20 * s}" ${st}/><path d="M${R - 10 * s} ${ey - 20 * s} Q${R} ${ey - 15 * s} ${R + 10 * s} ${ey - 13 * s}" ${st}/>
+        <path d="M${cx - 11 * s} ${my} Q${cx - 3 * s} ${my + 8 * s} ${cx + 3 * s} ${my + 1 * s} Q${cx + 8 * s} ${my - 3 * s} ${cx + 13 * s} ${my + 2 * s}" ${st}/>${blush(0.5)}`;
+    case 'sleep':
+      return `<path d="M${L - 9 * s} ${ey} Q${L} ${ey + 9 * s} ${L + 9 * s} ${ey}" ${st}/><path d="M${R - 9 * s} ${ey} Q${R} ${ey + 9 * s} ${R + 9 * s} ${ey}" ${st}/>
+        <ellipse cx="${cx}" cy="${my + 1 * s}" rx="${4 * s}" ry="${3.4 * s}" fill="#7a2e45"/>${blush(0.5)}`;
+    default:
+      return `${eye(L)}${eye(R)}<path d="M${cx - 8 * s} ${my - 2 * s} Q${cx} ${my + 6 * s} ${cx + 8 * s} ${my - 2 * s}" ${st}/>${blush(0.55)}`;
+  }
+}
+
+/* ======================================================================
+   DRAGON line (Parchment) — generic fantasy dragon, no franchise marks.
+   Body = head + torso in one path (the torso-clothes clip). Horns / shell cap are the crown.
+   ====================================================================== */
+const DRAGON_FORMS = [
+  { name: 'Hatchling', scale: 0.84, fill: ['#c4f2dc', '#6cc59a'],
+    body: 'M100 92 C124 92 134 108 132 126 C131 136 126 142 128 148 C134 162 128 182 100 182 C72 182 66 162 72 148 C74 142 69 136 68 126 C66 108 76 92 100 92Z',
+    hat: { y: 104, w: 50 }, eyes: { y: 122, gap: 12, s: 0.75 }, neck: 146, waist: 168, side: 28,
+    feet: [[[88, 178], [78, 185]], [[112, 178], [122, 185]]], growTop: 92, crownTop: 89, growthRise: 12, miniViewBox: '50 92 100 100' },
+  { name: 'Wyrmling', scale: 0.9, fill: ['#a8e8cc', '#3fa57c'],
+    body: 'M100 68 C128 68 140 86 138 106 C137 118 130 124 130 130 C142 142 142 182 100 182 C58 182 58 142 70 130 C70 124 63 118 62 106 C60 86 72 68 100 68Z',
+    hat: { y: 82, w: 60 }, eyes: { y: 102, gap: 15, s: 0.85 }, neck: 132, waist: 164, side: 34,
+    feet: [[[84, 178], [72, 186]], [[116, 178], [128, 186]]], growTop: 72, crownTop: 65, growthRise: 20, miniViewBox: '34 60 132 132' },
+  { name: 'Drake', scale: 0.98, fill: ['#8fdcbf', '#2a8a66'],
+    body: 'M100 56 C126 56 138 72 136 92 C135 104 128 110 126 116 C146 124 152 150 148 168 C144 182 124 184 100 184 C76 184 56 182 52 168 C48 150 54 124 74 116 C72 110 65 104 64 92 C62 72 74 56 100 56Z',
+    hat: { y: 70, w: 62 }, eyes: { y: 88, gap: 15, s: 0.9 }, neck: 126, waist: 162, side: 42,
+    feet: [[[80, 178], [64, 186]], [[120, 178], [136, 186]]], growTop: 60, crownTop: 53, growthRise: 28, miniViewBox: '5 18 190 190' },
+];
+const DR = { belly: '#fdf1cc', bellyLine: '#e3c98a', wing: '#f4bf63', wingRib: '#c98f2c', horn: '#f7ead0', claw: '#fffaf0', shell: '#fffaf3', shellSpot: '#b5e0c9', iris: '#ffcf4d' };
+
+const WING = 'M0 0 C8 -26 34 -44 62 -50 C56 -38 54 -28 56 -16 C46 -20 38 -16 36 -8 C28 -12 18 -8 14 0 Z';
+const WING_RIBS = 'M5 -4 L62 -50 M10 -5 L56 -16 M9 -3 L36 -8';
+function dragonWing(x, y, dir, sz, droop) {
+  return `<g transform="translate(${x} ${y}) scale(${dir * sz} ${sz}) rotate(${droop ? 48 : 0})"><path d="${WING}" fill="${DR.wing}" stroke="${DRAGON_INK}" stroke-width="${3.2 / sz}" stroke-linejoin="round"/><path d="${WING_RIBS}" stroke="${DR.wingRib}" stroke-width="${2 / sz}" fill="none" stroke-linecap="round"/></g>`;
+}
+const TAILS = [
+  { up: ['M116 172 Q138 180 146 166', [146, 166]], down: ['M116 172 Q140 186 152 184', [152, 184]], w: 6 },
+  { up: ['M122 170 Q154 182 160 152', [160, 152]], down: ['M122 170 Q156 188 170 184', [170, 184]], w: 7 },
+  { up: ['M128 172 C168 190 186 152 172 128', [172, 128]], down: ['M128 172 C164 192 184 186 192 180', [192, 180]], w: 8 },
+];
+function dragonBack(fi, droop, f) {
+  const t = TAILS[fi], [d, [tx, ty]] = droop ? t.down : t.up;
+  let b = `<path d="${d}" stroke="${DRAGON_INK}" stroke-width="${t.w + 5}" fill="none" stroke-linecap="round"/><path d="${d}" stroke="${f.fill[1]}" stroke-width="${t.w}" fill="none" stroke-linecap="round"/>
+    <path d="M${tx} ${ty - 8} l7 8 l-7 8 l-7 -8 Z" fill="${f.fill[1]}" stroke="${DRAGON_INK}" stroke-width="2.6" stroke-linejoin="round"/>`;
+  if (fi === 0) {
+    let zig = 'M62 168';
+    for (let i = 1; i <= 10; i++) zig += ` L${62 + i * 7.6} ${i % 2 ? 159 : 168}`;
+    b += `<path d="${zig} C138 196 62 196 62 168Z" fill="${DR.shell}" stroke="${DRAGON_INK}" stroke-width="3" stroke-linejoin="round"/>
+      <ellipse cx="72" cy="178" rx="4" ry="3" fill="${DR.shellSpot}"/><ellipse cx="130" cy="176" rx="3.5" ry="2.6" fill="${DR.shellSpot}"/>`;
+  }
+  if (fi === 1) b += dragonWing(100 - (f.side - 6), f.neck - 4, -1, 0.42, droop) + dragonWing(100 + (f.side - 6), f.neck - 4, 1, 0.42, droop);
+  if (fi === 2) b += dragonWing(100 - (f.side - 10), f.neck - 2, -1, 1, droop) + dragonWing(100 + (f.side - 10), f.neck - 2, 1, 1, droop);
+  return b;
+}
+function claws(x, y, dir) {
+  return [[5, -1], [1, 2], [-3, 1]].map(([dx, dy]) => `<circle cx="${x + dir * dx}" cy="${y + dy}" r="2.2" fill="${DR.claw}" stroke="${DRAGON_INK}" stroke-width="1.2"/>`).join('');
+}
+function dragonLimbs(f, fi) {
+  let s = '';
+  const len = [10, 14, 18][fi], ay = f.neck + 6;
+  [-1, 1].forEach(dir => {
+    const sx = 100 + dir * (f.side - 4), ex = sx + dir * len, ey = ay + len;
+    const d = `M${sx} ${ay} Q${sx + dir * len * 0.7} ${ay + len * 0.15} ${ex} ${ey}`;
+    s += `<path d="${d}" stroke="${DRAGON_INK}" stroke-width="10" fill="none" stroke-linecap="round"/><path d="${d}" stroke="${f.fill[1]}" stroke-width="5" fill="none" stroke-linecap="round"/>${claws(ex, ey + 2, dir)}`;
+  });
+  f.feet.forEach(([r, t]) => {
+    const d = `M${r[0]} ${r[1]} Q${r[0]} ${t[1]} ${t[0]} ${t[1]}`, dir = t[0] < r[0] ? -1 : 1;
+    s += `<path d="${d}" stroke="${DRAGON_INK}" stroke-width="12" fill="none" stroke-linecap="round"/><path d="${d}" stroke="${f.fill[1]}" stroke-width="6.5" fill="none" stroke-linecap="round"/>${claws(t[0], t[1], dir)}`;
+  });
+  return s;
+}
+function dragonDetails(f, fi) {
+  const { y: ey, gap, s } = f.eyes;
+  const cy = (f.neck + f.waist) / 2 + 6, rx = f.side * 0.58, ry = (f.waist - f.neck) / 2 + 12;
+  let d = `<ellipse cx="100" cy="${cy}" rx="${rx}" ry="${ry}" fill="${DR.belly}"/>`;
+  for (let i = -1; i <= 1; i++) d += `<path d="M${100 - rx * 0.72} ${cy + i * ry * 0.42} Q100 ${cy + i * ry * 0.42 + 6} ${100 + rx * 0.72} ${cy + i * ry * 0.42}" stroke="${DR.bellyLine}" stroke-width="2" fill="none"/>`;
+  d += `<ellipse cx="100" cy="${ey + 14 * s}" rx="${gap + 8 * s}" ry="${10 * s}" fill="#fff" opacity=".32"/>`;
+  d += `<circle cx="${100 - 4 * s}" cy="${ey + 9 * s}" r="${1.7 * s}" fill="${DRAGON_INK}"/><circle cx="${100 + 4 * s}" cy="${ey + 9 * s}" r="${1.7 * s}" fill="${DRAGON_INK}"/>`;
+  if (fi >= 1) d += `<ellipse cx="${100 - gap * 0.9}" cy="${f.hat.y + 4}" rx="4" ry="2.6" fill="${f.fill[1]}" opacity=".5"/><ellipse cx="${100 + gap * 0.9}" cy="${f.hat.y + 4}" rx="4" ry="2.6" fill="${f.fill[1]}" opacity=".5"/>`;
+  return d;
+}
+function dragonHorn(x, base, h, dir) {
+  return `<path d="M${x - 5} ${base + 6} Q${x - 3 + dir * 2} ${base - h * 0.6} ${x + dir * 7} ${base - h} Q${x + 4 + dir * 2} ${base - h * 0.45} ${x + 6} ${base + 6} Z" fill="${DR.horn}" stroke="${DRAGON_INK}" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M${x - 2} ${base} q${dir * 3} -2 ${dir * 6} -1 M${x - 1} ${base - h * 0.3} q${dir * 3} -2 ${dir * 5} -1" stroke="${DRAGON_INK}" stroke-width="1.4" opacity=".4" fill="none"/>`;
+}
+function dragonCrown(fi, droop, base) {
+  if (fi === 0) {
+    let zig = `M84 ${base + 4}`;
+    for (let i = 1; i <= 8; i++) zig += ` L${84 + i * 4} ${i % 2 ? base - 1 : base + 4}`;
+    return `<g transform="rotate(${droop ? -20 : -8} 100 ${base})"><path d="${zig} C116 ${base - 16} 84 ${base - 16} 84 ${base + 4}Z" fill="${DR.shell}" stroke="${DRAGON_INK}" stroke-width="2.8" stroke-linejoin="round"/><ellipse cx="96" cy="${base - 4}" rx="3" ry="2" fill="${DR.shellSpot}"/></g>`;
+  }
+  if (fi === 1) return dragonHorn(85, base, 18, -1) + dragonHorn(115, base, 18, 1);
+  return `<path d="M95 ${base + 6} L100 ${base - 10} L105 ${base + 6} Z" fill="${DR.horn}" stroke="${DRAGON_INK}" stroke-width="2.6" stroke-linejoin="round"/>` + dragonHorn(82, base, 26, -1) + dragonHorn(118, base, 26, 1);
+}
+function dragonFace(f, mood) {
+  const { y: ey, gap, s } = f.eyes, ink = DRAGON_INK, L = 100 - gap, R = 100 + gap, my = ey + 17 * s;
+  const fang = `<path d="M${100 + 3 * s} ${my + 1 * s} l${2.5 * s} ${5 * s} l${2.5 * s} ${-5 * s} Z" fill="#fff" stroke="${ink}" stroke-width="${1.6 * s}" stroke-linejoin="round"/>`;
+  if (mood === 'content' || mood === 'mischievous') {
+    const dx = mood === 'mischievous' ? 3 * s : 0;
+    const st = `stroke="${ink}" stroke-width="${4 * s}" stroke-linecap="round" fill="none"`;
+    const eye = (x) => `<ellipse cx="${x + dx}" cy="${ey}" rx="${7.5 * s}" ry="${9.5 * s}" fill="${DR.iris}" stroke="${ink}" stroke-width="${2.6 * s}"/><ellipse cx="${x + dx}" cy="${ey + 0.5 * s}" rx="${2.6 * s}" ry="${7 * s}" fill="${ink}"/><circle cx="${x + dx + 2.6 * s}" cy="${ey - 4 * s}" r="${2.2 * s}" fill="#fff"/>`;
+    const brows = mood === 'mischievous' ? `<path d="M${L - 10 * s} ${ey - 13 * s} Q${L} ${ey - 15 * s} ${L + 10 * s} ${ey - 20 * s}" ${st}/><path d="M${R - 10 * s} ${ey - 20 * s} Q${R} ${ey - 15 * s} ${R + 10 * s} ${ey - 13 * s}" ${st}/>` : '';
+    const mouth = mood === 'mischievous'
+      ? `<path d="M${100 - 11 * s} ${my} Q${100 - 3 * s} ${my + 8 * s} ${100 + 3 * s} ${my + 1 * s} Q${100 + 8 * s} ${my - 3 * s} ${100 + 13 * s} ${my + 2 * s}" ${st}/>`
+      : `<path d="M${100 - 9 * s} ${my - 2 * s} Q100 ${my + 6 * s} ${100 + 9 * s} ${my - 2 * s}" ${st}/>`;
+    const blush = `<ellipse cx="${L - 11 * s}" cy="${ey + 11 * s}" rx="${8 * s}" ry="${4.5 * s}" fill="#ff8fab" opacity=".45"/><ellipse cx="${R + 11 * s}" cy="${ey + 11 * s}" rx="${8 * s}" ry="${4.5 * s}" fill="#ff8fab" opacity=".45"/>`;
+    return eye(L) + eye(R) + brows + mouth + fang + blush;
+  }
+  return face(100, ey, gap, mood, s, ink) + (mood === 'happy' ? fang : '');
+}
+
+/* ======================================================================
+   The creature in the room: the dragon with no outfit, composed in pipFigure's layer order with the wardrobe layers empty.
+   Returned in the 200-unit Pip space, feet on (100, 186). Form 1-3 = Hatchling / Wyrmling / Drake.
+   ====================================================================== */
+let _creatureUid = 0;
+function creatureSVG(form, mood) {
+  const fi = Math.min(Math.max(Math.round(form), 1), DRAGON_FORMS.length) - 1;
+  const f = DRAGON_FORMS[fi], id = `cr${_creatureUid++}`, droop = mood === 'bored' || mood === 'sleep';
+  let s = `<defs><linearGradient id="${id}g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${f.fill[0]}"/><stop offset="1" stop-color="${f.fill[1]}"/></linearGradient></defs>`;
+  s += dragonBack(fi, droop, f);
+  s += dragonLimbs(f, fi);
+  s += `<path d="${f.body}" fill="url(#${id}g)"/>`;
+  s += `<ellipse cx="${100 - f.side * 0.55}" cy="${f.hat.y + 10}" rx="11" ry="6" transform="rotate(-32 ${100 - f.side * 0.55} ${f.hat.y + 10})" fill="#fff" opacity=".45"/>`;
+  s += dragonDetails(f, fi);
+  s += `<path d="${f.body}" fill="none" stroke="${DRAGON_INK}" stroke-width="5" stroke-linejoin="round"/>`;
+  s += dragonFace(f, mood);
+  s += dragonCrown(fi, droop, f.growTop);
+  const k = f.scale;
+  return `<ellipse cx="100" cy="189" rx="${56 * k}" ry="6" fill="rgba(40,60,20,.13)"/><g transform="translate(100 186) scale(${k}) translate(-100 -186)">${s}</g>`;
+}
+</script>
+<script id="room-pack">
+/* ======================================================================
+   DRAGON_ROOM: the planned room-pack shape contract 2 ports verbatim (plan.md -> Data shapes).
+   { ink, styles, backdrop, stations, decor, effects, ambience, labels }. Every drawing is an anchor-driven function
+   returning an SVG string in the live coords: stations in their own (unshifted) art coords inside GEOMETRY.FOOTPRINT,
+   decor in world coords inside its spot volume (the 12 legacy ids in MPP-27 coords, slid by DECOR_LEGACY_SHIFT), the
+   window in world coords inside GEOMETRY.WINDOW_GAP. The bed returns { back, front } so a sleeping creature sits between.
+   Animated parts are wrapped in fxg(effect, ...) = class="room-fx room-fx--<effect>"; the class never sits on a transformed group.
+   ====================================================================== */
+const ROOM_NAME = 'Dragon lair';
+
+/* ---------- drawing helpers for this pack (no DOM) ---------- */
+const rnd = seed => { let s = seed >>> 0; return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; };
+const fmt = n => n.toFixed(1);
+const gaugeColour = pct => (pct > GEOMETRY.FRIDGE_PLENTY_PCT ? GEOMETRY.FRIDGE_GAUGE_COLOURS.high : pct > GEOMETRY.FRIDGE_LOW_PCT ? GEOMETRY.FRIDGE_GAUGE_COLOURS.mid : GEOMETRY.FRIDGE_GAUGE_COLOURS.low);
+
+/* A wall plane as a function (along, height) -> screen point. */
+const wallAt = plane => (a, h) => (plane === 'left' ? P(a, 0, h) : P(0, a, h));
+const wallLen = plane => (plane === 'left' ? GEOMETRY.ROOM_SIZE.u : GEOMETRY.ROOM_SIZE.v);
+
+/** Hewn-stone courses on one wall: tinted blocks, then mortar joints (staggered), as a few elements. */
+function stoneCourses(plane, w) {
+  const at = wallAt(plane), len = wallLen(plane), r = rnd(plane === 'left' ? 11 : 23);
+  const ROW = 15, ROWS = GEOMETRY.ROOM_SIZE.h / ROW;
+  const base = plane === 'left' ? w.left : w.right;
+  const mortar = shade(base, -22);
+  let tints = '', joints = '';
+  for (let row = 0; row < ROWS; row++) {
+    const h0 = row * ROW, h1 = h0 + ROW;
+    let a = -(row % 2) * 17;
+    while (a < len) {
+      const bw = 26 + Math.floor(r() * 18);
+      const a0 = Math.max(a, 0), a1 = Math.min(a + bw, len);
+      const pick = r();
+      if (a1 > a0 && pick < 0.66) {
+        tints += `<polygon points="${pts([at(a0, h0), at(a1, h0), at(a1, h1), at(a0, h1)])}" fill="${pick < 0.33 ? '#ffffff' : '#000000'}" opacity=".08"/>`;
+      }
+      if (a1 < len && a1 > 0) joints += `M${at(a1, h0).map(fmt).join(' ')}L${at(a1, h1).map(fmt).join(' ')}`;
+      a += bw;
+    }
+    if (row > 0) joints += `M${at(0, h0).map(fmt).join(' ')}L${at(len, h0).map(fmt).join(' ')}`;
+  }
+  return tints + `<path d="${joints}" fill="none" stroke="${mortar}" stroke-width="1.1" stroke-linecap="round"/>`;
+}
+
+/** Moss clumps hugging the base and the joints (wall pattern 'moss'). */
+function mossPatches(plane) {
+  const at = wallAt(plane), len = wallLen(plane), r = rnd(plane === 'left' ? 3 : 8);
+  let s = '';
+  for (let i = 0; i < 24; i++) {
+    const a = 6 + r() * (len - 12), low = r() < 0.6, h = low ? 3 + r() * 12 : 30 + r() * 100;
+    const [x, y] = at(a, h), rx = 5 + r() * 9, ry = 2.5 + r() * 4;
+    s += `<ellipse cx="${fmt(x)}" cy="${fmt(y)}" rx="${fmt(rx)}" ry="${fmt(ry)}" fill="#5d8a43" opacity=".85"/>`
+      + `<ellipse cx="${fmt(x - rx * 0.25)}" cy="${fmt(y - ry * 0.35)}" rx="${fmt(rx * 0.55)}" ry="${fmt(ry * 0.5)}" fill="#86b85e" opacity=".9"/>`;
+  }
+  return s;
+}
+
+/** Hanging ivy: a wavering stem with leaves down each side (wall pattern 'ivy'). */
+function ivyVines(plane) {
+  const at = wallAt(plane), r = rnd(plane === 'left' ? 41 : 57);
+  const stems = plane === 'left' ? [34, 98, 214] : [14, 128, 274];
+  let s = '';
+  for (const a0 of stems) {
+    const top = 146 - r() * 8, bottom = 44 + r() * 40;
+    const path = [];
+    for (let h = top; h >= bottom; h -= 5) path.push(at(a0 + Math.sin(h * 0.19 + a0) * 3.2, h));
+    s += `<polyline points="${pts(path)}" fill="none" stroke="#3f6b34" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`;
+    path.forEach(([x, y], i) => {
+      if (i % 2) return;
+      const side = (i / 2) % 2 ? 1 : -1;
+      s += `<ellipse cx="${fmt(x + side * 4)}" cy="${fmt(y + 1)}" rx="4.4" ry="2.3" transform="rotate(${side * 32} ${fmt(x + side * 4)} ${fmt(y + 1)})" fill="${i % 4 ? '#5a9a45' : '#79b857'}" stroke="#2f5a2a" stroke-width=".7"/>`;
+    });
+  }
+  return s;
+}
+
+/** Glowing cracks (wall pattern 'cracks'): ember-lit fissures, glow removed under Low FX. */
+function emberCracks(plane) {
+  const at = wallAt(plane), len = wallLen(plane), r = rnd(plane === 'left' ? 71 : 83);
+  let s = '';
+  for (let k = 0; k < 5; k++) {
+    let a = 20 + r() * (len - 40), h = 30 + r() * 90;
+    const path = [at(a, h)];
+    for (let i = 0; i < 6; i++) { a += (r() - 0.45) * 12; h -= 6 + r() * 8; path.push(at(a, h)); }
+    s += `<polyline points="${pts(path)}" fill="none" stroke="#ff8a3c" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>`;
+  }
+  return `<g ${glowAttr('#ff6a1a', 3)}>${s}</g>`;
+}
+
+/** A wall torch: iron plate, arm and cup, a wrapped head and a flickering flame (animated, glowing). */
+function wallTorch(plane, a, h, delay = 0) {
+  const iron = '#4a4a54';
+  const out = (du, dv) => (plane === 'left' ? [a + du, dv] : [dv, a + du]); // (along-offset, outward-offset) -> [u, v]
+  const [cu, cv] = out(0, 9);
+  const plate = plane === 'left' ? rectV(0, a - 4, a + 4, h, h + 12, iron) : rectU(0, a - 4, a + 4, h, h + 12, iron);
+  const arm = plane === 'left' ? box(a - 2, 0, 4, 9, h + 2, h + 6, iron) : box(0, a - 2, 9, 4, h + 2, h + 6, iron);
+  const cup = cyl(cu, cv, 4.6, h + 6, h + 13, iron);
+  const flame = `<path d="M0 2 C-8 -2 -8 -13 -1 -22 C0 -14 6 -11 5 -3 C4 1 2 2 0 2Z" fill="#ff8a2a" stroke="${ART_INK}" stroke-width="1.2" stroke-linejoin="round"/>`
+    + '<path d="M0 1 C-4 -2 -4 -8 0 -13 C1 -8 4 -6 3 -2 C2 0 1 1 0 1Z" fill="#ffe27a"/>';
+  const wrap = `<ellipse cx="0" cy="3" rx="4.2" ry="2.4" fill="#6b4a2a" stroke="${ART_INK}" stroke-width="1.2"/>`;
+  return plate + arm + cup
+    + bill(cu, cv, h + 13, wrap + `<g ${glowAttr('#ff9a3a', 5)}><g class="room-fx room-fx--flicker" style="animation-delay:-${delay}s">${flame}</g></g>`, [-8, -24, 8, 5]);
+}
+
+/** A hanging banner on the right wall: a rod, a swallow-tail cloth with a gold flame crest, swaying from the rod. */
+function wallBanner(v0, v1, hTop, hBottom) {
+  const mid = (v0 + v1) / 2;
+  const cloth = poly([P(0, v0 + 2, hTop), P(0, v1 - 2, hTop), P(0, v1 - 2, hBottom), P(0, mid, hBottom + 12), P(0, v0 + 2, hBottom)], '#8e2f3a');
+  const trim = isoLine([P(0, v0 + 2, hTop - 4), P(0, v1 - 2, hTop - 4)], 2, '#e8b838');
+  const [cx, cy] = P(0, mid, (hTop + hBottom) / 2 + 4);
+  const crest = `<g transform="translate(${fmt(cx)} ${fmt(cy)})"><circle r="9" fill="#e8b838" stroke="${ART_INK}" stroke-width="1.4"/>`
+    + `<path d="M0 6 C-6 3 -5 -4 0 -8 C1 -3 5 -2 4 3 C3 5 1 6 0 6Z" fill="#8e2f3a" stroke="${ART_INK}" stroke-width="1"/></g>`;
+  const rod = box(0, v0 - 3, 4, v1 - v0 + 6, hTop, hTop + 3, '#4a4a54');
+  track([[cx - 9, cy - 9], [cx + 9, cy + 9]]);
+  return rod + fxg('sway', cloth + trim + crest);
+}
+
+/** The shell's wall fixtures: two torches and a banner, drawn over the courses and any pattern. */
+const shellFixtures = () => wallTorch('left', 254, 100, 0) + wallTorch('right', 290, 50, 0.9) + wallBanner(6, 46, 132, 76);
+
+/* ---------- floors ---------- */
+function earthFloor(f) {
+  const r = rnd(5);
+  let s = '';
+  for (let i = 0; i < 9; i++) s += poly(ellipsePoints(14 + r() * 230, 14 + r() * 270, 0, 12 + r() * 14, 8 + r() * 10), shade(f.base, -9), { stroke: null, op: 0.45 });
+  for (let i = 0; i < 52; i++) {
+    const [u, v] = [8 + r() * 244, 8 + r() * 284];
+    s += poly(ellipsePoints(u, v, 0, 2.4 + r() * 2.6, 1.4 + r() * 1.6, 10), shade(f.base, r() < 0.5 ? 16 : -20), { stroke: null });
+  }
+  for (let k = 0; k < 6; k++) {
+    let u = 20 + r() * 220, v = 20 + r() * 260;
+    const path = [P(u, v)];
+    for (let i = 0; i < 5; i++) { u += (r() - 0.5) * 16; v += (r() - 0.3) * 14; path.push(P(u, v)); }
+    s += isoLine(path, 1, shade(f.base, -34), { op: 0.7 });
+  }
+  return s;
+}
+
+function flagFloor(f) {
+  const r = rnd(9), RU = GEOMETRY.ROOM_SIZE.u, RV = GEOMETRY.ROOM_SIZE.v, ROW = 36;
+  let tints = '', seams = '';
+  for (let v = 0; v < RV; v += ROW) {
+    const v1 = Math.min(v + ROW, RV);
+    let u = -(((v / ROW) % 2) * 22);
+    while (u < RU) {
+      const sw = 44 + Math.floor(r() * 24), u0 = Math.max(u, 0), u1 = Math.min(u + sw, RU), pick = r();
+      if (u1 > u0 && pick < 0.7) tints += `<polygon points="${pts([P(u0, v), P(u1, v), P(u1, v1), P(u0, v1)])}" fill="${pick < 0.35 ? '#ffffff' : '#000000'}" opacity=".07"/>`;
+      if (u1 < RU && u1 > 0) seams += `M${P(u1, v).map(fmt).join(' ')}L${P(u1, v1).map(fmt).join(' ')}`;
+      u += sw;
+    }
+    if (v > 0) seams += `M${P(0, v).map(fmt).join(' ')}L${P(RU, v).map(fmt).join(' ')}`;
+  }
+  return tints + `<path d="${seams}" fill="none" stroke="${shade(f.base, -32)}" stroke-width="1.4" stroke-linecap="round"/>`;
+}
+
+function slateFloor(f) {
+  const r = rnd(14), RU = GEOMETRY.ROOM_SIZE.u, RV = GEOMETRY.ROOM_SIZE.v, STEP = 30;
+  let tints = '', dark = '', light = '';
+  for (let a = 0; a * STEP < RU; a++) {
+    for (let b = 0; b * STEP < RV; b++) {
+      const [u0, v0] = [a * STEP, b * STEP], [u1, v1] = [Math.min(u0 + STEP, RU), Math.min(v0 + STEP, RV)], pick = r();
+      if (pick < 0.55) tints += `<polygon points="${pts([P(u0, v0), P(u1, v0), P(u1, v1), P(u0, v1)])}" fill="${pick < 0.28 ? '#ffffff' : '#000000'}" opacity=".07"/>`;
+    }
+  }
+  for (let k = STEP; k < RV; k += STEP) { dark += `M${P(0, k).map(fmt).join(' ')}L${P(RU, k).map(fmt).join(' ')}`; light += `M${P(0, k + 1.5).map(fmt).join(' ')}L${P(RU, k + 1.5).map(fmt).join(' ')}`; }
+  for (let k = STEP; k < RU; k += STEP) { dark += `M${P(k, 0).map(fmt).join(' ')}L${P(k, RV).map(fmt).join(' ')}`; light += `M${P(k + 1.5, 0).map(fmt).join(' ')}L${P(k + 1.5, RV).map(fmt).join(' ')}`; }
+  return tints + `<path d="${dark}" fill="none" stroke="${shade(f.base, -38)}" stroke-width="1.4"/><path d="${light}" fill="none" stroke="${shade(f.base, 22)}" stroke-width=".8" opacity=".7"/>`;
+}
+
+function runeFloor(f) {
+  const RU = GEOMETRY.ROOM_SIZE.u, RV = GEOMETRY.ROOM_SIZE.v, STEP = 25;
+  let tiles = '', runes = '';
+  for (let a = 0; a * STEP < RU; a++) {
+    for (let b = 0; b * STEP < RV; b++) {
+      const [u0, v0] = [a * STEP, b * STEP], [u1, v1] = [Math.min(u0 + STEP, RU), Math.min(v0 + STEP, RV)];
+      if ((a + b) % 2) tiles += `<polygon points="${pts([P(u0, v0), P(u1, v0), P(u1, v1), P(u0, v1)])}" fill="${f.checker}"/>`;
+      if ((a * 3 + b * 5) % 7 === 0 && u1 - u0 === STEP && v1 - v0 === STEP) {
+        const [x, y] = P(u0 + STEP / 2, v0 + STEP / 2);
+        runes += `<g transform="translate(${fmt(x)} ${fmt(y)}) scale(1 .5)"><path d="M-4 -5 L4 5 M4 -5 L-4 5 M0 -8 V8" fill="none" stroke="#7de3ff" stroke-width="1.6" stroke-linecap="round"/></g>`;
+      }
+    }
+  }
+  return tiles + `<g ${glowAttr('#7de3ff', 3)}>${runes}</g>`;
+}
+
+/* ---------- the window: a cave mouth on the right wall, drawn in world coords inside WINDOW_GAP ---------- */
+const CAVE = { vc: 198, rxIn: 35, ryIn: 30, rxOut: 40, ryOut: 37, hBottom: 74, hRimBottom: 64, hSpring: 108 }; // inside WINDOW_GAP v 158-238, h from 56
+function caveArch(rx, ry, hb) {
+  const out = [[CAVE.vc - rx, hb], [CAVE.vc - rx, CAVE.hSpring]];
+  for (let i = 1; i < 18; i++) {
+    const t = Math.PI - (Math.PI * i) / 18;
+    out.push([CAVE.vc + rx * Math.cos(t), CAVE.hSpring + ry * Math.sin(t)]);
+  }
+  out.push([CAVE.vc + rx, CAVE.hSpring], [CAVE.vc + rx, hb]);
+  return out.map(([v, h]) => P(0, v, h));
+}
+const caveRimQuad = (t0, t1) => [
+  P(0, CAVE.vc + CAVE.rxIn * Math.cos(t0), CAVE.hSpring + CAVE.ryIn * Math.sin(t0)), P(0, CAVE.vc + CAVE.rxOut * Math.cos(t0), CAVE.hSpring + CAVE.ryOut * Math.sin(t0)),
+  P(0, CAVE.vc + CAVE.rxOut * Math.cos(t1), CAVE.hSpring + CAVE.ryOut * Math.sin(t1)), P(0, CAVE.vc + CAVE.rxIn * Math.cos(t1), CAVE.hSpring + CAVE.ryIn * Math.sin(t1))
+];
+const cavePt = (v, h) => P(0, v, h);
+
+/* ---------- station helpers ---------- */
+const STONE = '#8c8996', STONE_DK = '#6a6776', STONE_LT = '#a6a3b2';
+const IRON = '#4a525c', IRON_LT = '#6b7480';
+const WOOD = '#8a5a35', WOOD_DK = '#6a4526', WOOD_LT = '#b07a45';
+const GOLD = '#e6b832', GOLD_HI = '#ffd95a', GOLD_DK = '#b8861e';
+const ICE = '#aee2f4', ICE_HI = '#e4f6fb', ICE_DK = '#7ec8e3';
+const FIRE = '#ff8a2a', FIRE_HI = '#ffe27a', EMBER = '#ff6a1a';
+const CLOAK = '#8e2f3a';
+
+/** A flat coin lying on the floor or a surface. */
+const coin = (u, v, h, r = 2.4, color = GOLD) => poly(ellipsePoints(u, v, h, r, r * 0.8, 8), color, { sw: 0.8 });
+
+/** A gem: a small faceted diamond billboard. */
+const gem = (u, v, h, color) => bill(u, v, h, `<path d="M0 -4.5 L3.2 -1.4 L0 3 L-3.2 -1.4Z" fill="${color}" stroke="${ART_INK}" stroke-width="1" stroke-linejoin="round"/><path d="M-1.4 -2 L0 -3.4 L1 -2" fill="none" stroke="#fff" stroke-width=".8" opacity=".8"/>`, [-4, -5, 4, 3.5]);
+
+/** A twinkle (animated): used on coins, gems and the hoard. */
+const sparkle = (u, v, h, delay) => bill(u, v, h, fxg('glint', '<path d="M0 -3.6 L1 -1 L3.6 0 L1 1 L0 3.6 L-1 1 L-3.6 0 L-1 -1Z" fill="#fff6c2"/>', delay), [-4, -4, 4, 4]);
+
+/** A trophy cup billboard (s = scale). */
+const trophy = (u, v, h, s = 0.6) => bill(u, v, h,
+  `<g transform="scale(${s})"><path d="M-9 -24 h18 q0 12 -9 14 q-9 -2 -9 -14z" fill="${GOLD}" stroke="${ART_INK}" stroke-width="1.6" stroke-linejoin="round"/>`
+  + `<path d="M-9 -22 q-7 0 -5 7 q2 4 6 3 M9 -22 q7 0 5 7 q-2 4 -6 3" fill="none" stroke="${ART_INK}" stroke-width="1.6"/>`
+  + `<rect x="-1.8" y="-10" width="3.6" height="6" fill="${GOLD_DK}"/><rect x="-7" y="-4" width="14" height="4" rx="1" fill="${GOLD_DK}" stroke="${ART_INK}" stroke-width="1.4"/>`
+  + `<path d="M-5 -21 q0 6 3 8" fill="none" stroke="#fff6c2" stroke-width="1.4" stroke-linecap="round"/></g>`, [-14 * s, -25 * s, 14 * s, 0.5]);
+
+/** A rosette ribbon billboard. */
+const ribbon = (u, v, h, s = 0.6, color = '#c0392b') => bill(u, v, h,
+  `<g transform="scale(${s})"><path d="M-6 -2 l-4 12 l6 -3 l3 5z M6 -2 l4 12 l-6 -3 l-3 5z" fill="${color}" stroke="${ART_INK}" stroke-width="1.3" stroke-linejoin="round"/>`
+  + `<circle cx="0" cy="-8" r="9" fill="${color}" stroke="${ART_INK}" stroke-width="1.5"/><circle cx="0" cy="-8" r="4.6" fill="${GOLD}" stroke="${ART_INK}" stroke-width="1.1"/></g>`, [-10 * s, -17 * s, 10 * s, 11 * s]);
+
+/** A crown billboard (hoard top). */
+const crown = (u, v, h, s = 0.6) => bill(u, v, h,
+  `<g transform="scale(${s})"><path d="M-12 0 l-2 -16 l7 7 l7 -13 l7 13 l7 -7 l-2 16z" fill="${GOLD}" stroke="${ART_INK}" stroke-width="1.6" stroke-linejoin="round"/><rect x="-12" y="-2" width="24" height="4" fill="${GOLD_DK}" stroke="${ART_INK}" stroke-width="1.2"/>`
+  + `<circle cx="0" cy="-8" r="2" fill="#d63a4a"/><circle cx="-7" cy="-5" r="1.4" fill="#4aa8e8"/><circle cx="7" cy="-5" r="1.4" fill="#5cc46a"/></g>`, [-15 * s, -23 * s, 15 * s, 3 * s]);
+
+/** A flame billboard (animated flicker, glowing). */
+const flameArt = s => `<g transform="scale(${s})"><path d="M0 2 C-8 -2 -8 -13 -1 -22 C0 -14 6 -11 5 -3 C4 1 2 2 0 2Z" fill="${FIRE}" stroke="${ART_INK}" stroke-width="1.2" stroke-linejoin="round"/><path d="M0 1 C-4 -2 -4 -8 0 -13 C1 -8 4 -6 3 -2 C2 0 1 1 0 1Z" fill="${FIRE_HI}"/></g>`;
+const flame = (u, v, h, s = 1, delay = 0) => bill(u, v, h, `<g ${glowAttr('#ff9a3a', 5)}>${fxg('flicker', flameArt(s), delay)}</g>`, [-9 * s, -23 * s, 9 * s, 3]);
+
+/** Rising embers (animated, glowing): n tiny sparks above a point, each on its own delay. */
+function embers(u, v, h, n = 4) {
+  const r = rnd(u * 7 + v * 3 + n);
+  let s = '';
+  for (let i = 0; i < n; i++) s += bill(u + (r() - 0.5) * 12, v, h + (r() - 0.5) * 3, `<g ${glowAttr('#ff7a2a', 3)}>${fxg('embers', `<circle r="${(1 + r() * 0.8).toFixed(1)}" fill="#ffb35a"/>`, i * 0.6 + r())}</g>`, [-2, -2, 2, 2]);
+  return s;
+}
+
+/** Stone courses (mortar lines) on the plane v = vp, then on the plane u = up. */
+function brickV(vp, u0, u1, h0, h1, color, row = 9, bw = 15) {
+  const segs = [];
+  let r = 0;
+  for (let h = h0 + row; h < h1 - 1; h += row, r++) {
+    segs.push([P(u0, vp, h), P(u1, vp, h)]);
+    for (let u = u0 + (r % 2 ? bw / 2 : bw); u < u1 - 1; u += bw) segs.push([P(u, vp, h - row), P(u, vp, h)]);
+  }
+  return isoLines(segs, 0.9, color, 0.6);
+}
+function brickU(up, v0, v1, h0, h1, color, row = 9, bw = 15) {
+  const segs = [];
+  let r = 0;
+  for (let h = h0 + row; h < h1 - 1; h += row, r++) {
+    segs.push([P(up, v0, h), P(up, v1, h)]);
+    for (let v = v0 + (r % 2 ? bw / 2 : bw); v < v1 - 1; v += bw) segs.push([P(up, v, h - row), P(up, v, h)]);
+  }
+  return isoLines(segs, 0.9, color, 0.6);
+}
+/** A box with stone courses on both visible faces. */
+const stoneBox = (u, v, du, dv, h0, h1, color = STONE) => box(u, v, du, dv, h0, h1, color) + brickU(u + du, v, v + dv, h0, h1, shade(color, -38)) + brickV(v + dv, u, u + du, h0, h1, shade(color, -38));
+
+/** An arch-topped opening on the plane v = vp: straight sides to hs, then an elliptical arch of height ry. */
+function archV(vp, uc, hw, h0, hs, ry, fill, o) {
+  const out = [[uc - hw, h0], [uc - hw, hs]];
+  for (let i = 1; i < 12; i++) {
+    const t = Math.PI - (Math.PI * i) / 12;
+    out.push([uc + hw * Math.cos(t), hs + ry * Math.sin(t)]);
+  }
+  out.push([uc + hw, hs], [uc + hw, h0]);
+  return poly(out.map(([u, h]) => P(u, vp, h)), fill, o);
+}
+
+/** A disc on the plane v = vp (a round door, a shield): centre (uc, hc), radii (ru, rh) in floor units. */
+const discV = (vp, uc, hc, ru, rh, fill, o, n = 20) => poly(Array.from({ length: n }, (_, i) => P(uc + ru * Math.cos((i / n) * Math.PI * 2), vp, hc + rh * Math.sin((i / n) * Math.PI * 2))), fill, o);
+
+/** Wooden plank face on the plane v = vp: the rect plus vertical seams. */
+function planksV(vp, u0, u1, h0, h1, color, n) {
+  const us = Array.from({ length: n - 1 }, (_, i) => u0 + ((i + 1) * (u1 - u0)) / n);
+  return rectV(vp, u0, u1, h0, h1, color) + isoLines(us.map(u => [P(u, vp, h0), P(u, vp, h1)]), 0.9, shade(color, -34), 0.8);
+}
+
+/** A mound of stacked truncated cones (coins, rock). */
+function mound(cu, cv, ru, rv, hTop, layers, color, topScale = 0.45) {
+  let s = '';
+  for (let i = 0; i < layers; i++) {
+    const k0 = 1 - (1 - topScale) * (i / layers), k1 = 1 - (1 - topScale) * ((i + 1) / layers);
+    s += cylE(cu, cv, ru * k0, rv * k0, (hTop * i) / layers, (hTop * (i + 1)) / layers, i % 2 ? tint(color, 7) : color, ru * k1, rv * k1);
+  }
+  return s;
+}
+
+/** Coins scattered inside an ellipse on a surface at height h (r = coin radius), kept clear of the rim by `fill`. */
+function coinScatter(cu, cv, ru, rv, h, n, seed, fill = 0.9, r = 2.4) {
+  const g = rnd(seed);
+  let s = '';
+  for (let i = 0; i < n; i++) {
+    const a = g() * Math.PI * 2, d = Math.sqrt(g()) * fill;
+    s += coin(cu + ru * d * Math.cos(a), cv + rv * d * Math.sin(a), h, r * (0.8 + g() * 0.5), i % 3 ? GOLD : GOLD_HI);
+  }
+  return s;
+}
+
+/** Straw strands over the ring rMin..rMax of an ellipse at height h; near = only the viewer-facing half. */
+function straw(cu, cv, ru, rv, h, n, seed, { rMin = 0.3, rMax = 0.95, near = false } = {}) {
+  const g = rnd(seed), [t0, t1] = nearRange(ru, rv);
+  const light = [], dark = [];
+  for (let i = 0; i < n; i++) {
+    const a = near ? t0 + g() * (t1 - t0) : g() * Math.PI * 2, rr = rMin + g() * (rMax - rMin);
+    const u = cu + ru * rr * Math.cos(a), v = cv + rv * rr * Math.sin(a);
+    const ang = g() * Math.PI, len = 4 + g() * 5;
+    const u2 = u + Math.cos(ang) * len, v2 = v + Math.sin(ang) * len * (rv / ru);
+    if (((u2 - cu) / ru) ** 2 + ((v2 - cv) / rv) ** 2 > 0.94) continue;
+    (i % 2 ? dark : light).push([P(u, v, h + g() * 1.5), P(u2, v2, h + g() * 1.5)]);
+  }
+  return isoLines(light, 1.3, '#f0d680') + isoLines(dark, 1.2, '#8f6f26');
+}
+
+/** A nest: a woven bowl with a hollow. Returns { back, front }: front is the near rim, drawn over a sleeping creature. */
+function nest(cu, cv, ru, rv, h0, h1, tone, innerTone, seed) {
+  const [t0, t1] = nearRange(ru, rv), ri = 0.74, rj = 0.7;
+  const side = poly([...arcPts(cu, cv, h0, ru, rv, t0, t1), ...arcPts(cu, cv, h1, ru, rv, t0, t1).reverse()], shade(tone, -14));
+  const weave = isoLines([0.33, 0.66].flatMap(k => {
+    const a = arcPts(cu, cv, h0 + (h1 - h0) * k, ru, rv, t0, t1, 10);
+    return a.slice(1).map((p, i) => [a[i], p]).filter((_, i) => i % 2 === 0);
+  }), 1.1, shade(tone, -38), 0.8);
+  const nearRim = poly([...arcPts(cu, cv, h1, ru, rv, t0, t1), ...arcPts(cu, cv, h1, ru * ri, rv * rj, t0, t1).reverse()], shade(tone, 12));
+  return {
+    back: side + weave + ellH(cu, cv, h1, ru, rv, shade(tone, 12)) + ellH(cu, cv, h1 - 0.4, ru * ri, rv * rj, innerTone, { sw: 1.2 })
+      + straw(cu, cv, ru, rv, h1, 40, seed, { rMin: 0.3, rMax: 0.95 }),
+    front: side + weave + nearRim + straw(cu, cv, ru, rv, h1, 16, seed + 1, { rMin: 0.78, rMax: 0.95, near: true })
+  };
+}
+
+/** A fur pelt: an irregular oval with a scalloped edge and spots, flat at height h. */
+function pelt(cu, cv, ru, rv, h, tone, seed) {
+  const g = rnd(seed), n = 18, pts2 = [];
+  for (let i = 0; i < n; i++) {
+    const t = (i / n) * Math.PI * 2, k = 0.9 + 0.1 * Math.sin(i * 2.7) + g() * 0.04;
+    pts2.push(P(cu + ru * k * Math.cos(t), cv + rv * k * Math.sin(t), h));
+  }
+  let s = poly(pts2, tone, { sw: 1.4 });
+  for (let i = 0; i < 6; i++) s += poly(ellipsePoints(cu + (g() - 0.5) * ru, cv + (g() - 0.5) * rv, h + 0.2, 2.6 + g() * 2, 1.8 + g() * 1.4, 8), shade(tone, -26), { stroke: null });
+  return s;
+}
+
+/** Vertical seams on the plane v = vp at the given u values; and on the plane u = up at the given v values. */
+const seamsV = (vp, us, h0, h1, color = ART_INK, w = 0.9, op = 0.8) => isoLines(us.map(u => [P(u, vp, h0), P(u, vp, h1)]), w, color, op);
+const seamsU = (up, vs, h0, h1, color = ART_INK, w = 0.9, op = 0.8) => isoLines(vs.map(v => [P(up, v, h0), P(up, v, h1)]), w, color, op);
+
+/** A rivet row along a strap on the plane v = vp. */
+const rivetsV = (vp, us, h, color = IRON_LT) => us.map(u => bill(u, vp, h, `<circle r="1.3" fill="${color}" stroke="${ART_INK}" stroke-width=".7"/>`, [-1.5, -1.5, 1.5, 1.5])).join('');
+
+/** Icicles / frost drips hanging from an edge on the plane v = vp: triangles at the given u values. */
+const icicles = (vp, us, hTop, len, color = ICE_HI) => us.map((u, i) => poly([P(u - 1.8, vp, hTop), P(u + 1.8, vp, hTop), P(u, vp, hTop - len * (0.6 + 0.4 * ((i * 7) % 3) / 2))], color, { sw: 1 })).join('');
+
+/** A pointed ice crystal: a box prism with a pyramid cap. */
+function crystal(u, v, du, dv, h0, h1, color = ICE) {
+  const cu = u + du / 2, cv = v + dv / 2, tip = h1 + Math.max(du, dv) * 0.9;
+  return box(u, v, du, dv, h0, h1, color)
+    + poly([P(u, v + dv, h1), P(u + du, v + dv, h1), P(cu, cv, tip)], shade(color, -10), { sw: 1.2 })
+    + poly([P(u + du, v, h1), P(u + du, v + dv, h1), P(cu, cv, tip)], shade(color, 8), { sw: 1.2 });
+}
+
+/** A fur drape over a rim: the near arc of an ellipse at hTop, hanging to a scalloped hem at hBot. */
+function drape(cu, cv, ru, rv, hTop, hBot, tone, trim = 0.35) {
+  const [t0, t1] = nearRange(ru, rv), a = t0 + trim, b = t1 - trim;
+  const top = arcPts(cu, cv, hTop, ru + 0.5, rv + 0.5, a, b, 12);
+  const hem = arcPts(cu, cv, hBot, ru + 2.5, rv + 2.5, a, b, 12).map((p, i) => [p[0], p[1] + (i % 2 ? 3 : 0)]).reverse();
+  return poly([...top, ...hem], tone, { sw: 1.4 });
+}
+
+/** The tall station helper: a dragon egg billboard. */
+const egg = (u, v, h) => bill(u, v, h, `<ellipse cx="0" cy="-5" rx="4.2" ry="5.4" fill="#b5e0c9" stroke="${ART_INK}" stroke-width="1.2"/><circle cx="-1.2" cy="-6.5" r="1" fill="#6cc59a"/><circle cx="1.5" cy="-3.6" r=".9" fill="#6cc59a"/><path d="M-2.4 -8.4 q1 -1 2 -.6" stroke="#fff" stroke-width=".9" fill="none"/>`, [-5, -11, 5, 0.5]);
+
+/** Coins scattered on the ring between two radii of a heap layer. */
+function coinRing(cu, cv, ru, rv, kIn, kOut, h, n, seed, r = 2.2) {
+  const g = rnd(seed);
+  let s = '';
+  for (let i = 0; i < n; i++) {
+    const a = g() * Math.PI * 2, d = kIn + g() * (kOut - kIn);
+    s += coin(cu + ru * d * Math.cos(a), cv + rv * d * Math.sin(a), h, r * (0.8 + g() * 0.5), i % 3 ? GOLD : GOLD_HI);
+  }
+  return s;
+}
+
+/* ---------- armour ---------- */
+const STEEL = '#b4bdc8', STEEL_DK = '#8f98a3';
+
+/** A horned helm billboard (s = scale), standing on a shelf. */
+const helm = (u, v, h, s = 0.8) => bill(u, v, h,
+  `<g transform="scale(${s})"><path d="M-9 0 Q-9 -17 0 -17 Q9 -17 9 0 Z" fill="${STEEL}" stroke="${ART_INK}" stroke-width="1.6" stroke-linejoin="round"/>`
+  + `<path d="M-9 -1 h18" stroke="${ART_INK}" stroke-width="1.6"/><path d="M-6 -8 h12" stroke="#1c2024" stroke-width="2.6" stroke-linecap="round"/><path d="M0 -17 v9" stroke="${STEEL_DK}" stroke-width="1.4"/>`
+  + `<path d="M-9 -9 Q-16 -10 -14 -20 M9 -9 Q16 -10 14 -20" fill="none" stroke="#f7ead0" stroke-width="3" stroke-linecap="round"/>`
+  + `<path d="M-9 -9 Q-16 -10 -14 -20 M9 -9 Q16 -10 14 -20" fill="none" stroke="${ART_INK}" stroke-width=".7" stroke-linecap="round"/></g>`, [-16 * s, -21 * s, 16 * s, 1]);
+
+/** A suit of armour billboard (origin at the feet), scaled s. full = greaves and arms, else the plates float on a stand; plume = a crest. */
+function armour(u, v, h, full, plume, s) {
+  const k = `stroke="${ART_INK}" stroke-width="1.5" stroke-linejoin="round"`;
+  let f = '';
+  if (full) {
+    f += `<path d="M-10 -28 h8 v24 h-10z M2 -28 h8 v24 h2z" fill="${STEEL_DK}" ${k}/><path d="M-12 -4 h10 v4 h-12z M2 -4 h10 v4 h2z" fill="#5a3a1f" ${k}/>`;
+    f += `<rect x="-19" y="-58" width="6" height="22" rx="2" fill="${STEEL_DK}" ${k}/><rect x="13" y="-58" width="6" height="22" rx="2" fill="${STEEL_DK}" ${k}/><circle cx="-16" cy="-34" r="3.4" fill="${STEEL}" ${k}/><circle cx="16" cy="-34" r="3.4" fill="${STEEL}" ${k}/>`;
+  }
+  f += `<path d="M-12 -38 H12 L15 -26 H-15 Z" fill="${STEEL_DK}" ${k}/><path d="M-9 -32 H9" stroke="${ART_INK}" stroke-width="1" opacity=".6"/>`;
+  f += `<path d="M-11 -66 Q0 -72 11 -66 L10 -38 Q0 -34 -10 -38 Z" fill="${STEEL}" ${k}/><path d="M0 -68 V-37" stroke="${STEEL_DK}" stroke-width="1.4"/><path d="M-6 -62 Q-6 -52 -4 -44" fill="none" stroke="#fff" stroke-width="1.4" opacity=".7" stroke-linecap="round"/>`;
+  f += `<path d="M-8 -52 h16" stroke="${GOLD}" stroke-width="2"/><ellipse cx="-14" cy="-64" rx="7.5" ry="5.5" fill="${STEEL}" ${k}/><ellipse cx="14" cy="-64" rx="7.5" ry="5.5" fill="${STEEL}" ${k}/>`;
+  f += `<path d="M-6 -68 h12 v4 h-12z" fill="${STEEL_DK}" ${k}/><path d="M-8 -70 Q-8 -85 0 -85 Q8 -85 8 -70 Z" fill="${STEEL}" ${k}/><path d="M-6 -76 h12" stroke="#1c2024" stroke-width="2.8" stroke-linecap="round"/><path d="M0 -85 v9" stroke="${STEEL_DK}" stroke-width="1.4"/>`;
+  f += `<path d="M-8 -78 Q-15 -79 -13 -88 M8 -78 Q15 -79 13 -88" fill="none" stroke="#f7ead0" stroke-width="3" stroke-linecap="round"/>`;
+  if (plume) f += `<path d="M-1 -85 Q9 -91 4 -99 Q-4 -92 -1 -85Z" fill="${CLOAK}" ${k}/>`;
+  const top = plume ? 100 : 89;
+  return bill(u, v, h, `<g transform="scale(${s})">${f}</g>`, [-20 * s, -top * s, 20 * s, 2]);
+}
+
+/* ---------- decor helpers: wall-plane shapes and small props (no DOM) ---------- */
+const HI = 'rgba(255,255,255,.7)';
+const COPPER = '#c9753a', BONE = '#efe4c8', TEAL = '#2f6b5a', TEAL_HI = '#3fa57c', GLOW = '#7de3ff', HIDE = '#a98660';
+const ringPts = (n, f) => Array.from({ length: n }, (_, i) => f((i / n) * Math.PI * 2));
+/** An ellipse standing on the right wall (plane u = up), centre (vc, hc), radii (rv, rh). */
+const ellU = (up, vc, hc, rv, rh, fill, o, n = 16) => poly(ringPts(n, t => P(up, vc + rv * Math.cos(t), hc + rh * Math.sin(t))), fill, o);
+/** A flat cut-out on the right wall with a visible thickness: a darker back copy, the front copy on top. vh = [[v, h], ...]. */
+const slabU = (up, th, vh, fill, o) => poly(vh.map(([v, h]) => P(up, v, h)), shade(fill, -22), o) + poly(vh.map(([v, h]) => P(up + th, v, h)), fill, o);
+/** A short candle with a flickering flame (animated). */
+const candle = (u, v, h, hh = 5, s = 0.5, delay = 0) => cyl(u, v, 3, h, h + hh, '#f4ead2', { sw: 1 }) + flame(u, v, h + hh, s, delay);
+/** A ring line round a cylinder (near half only). */
+const bandAt = (cu, cv, r, h, color = IRON, w = 1.4) => isoLine(arcPts(cu, cv, h, r, r, ...nearRange(r, r)), w, color);
+/** A flask: glass body in a colour, a neck and a cork (a potion). */
+const flask = (u, v, h, c) => cyl(u, v, 3.6, h, h + 7, c, { sw: 1.2 })
+  + bill(u, v, h + 7, `<rect x="-1.5" y="-6" width="3" height="6" fill="#d7f0ff" stroke="${ART_INK}" stroke-width="1.1"/><rect x="-2" y="-8.4" width="4" height="2.6" rx="1" fill="${WOOD_LT}" stroke="${ART_INK}" stroke-width="1"/>`, [-2.5, -9, 2.5, 0]);
+/** A row of glowing rune strokes on the left wall plane v = vp. */
+function runeRowV(vp, u0, h, n) {
+  const segs = [];
+  for (let i = 0; i < n; i++) {
+    const u = u0 + i * 5.5, k = (i * 5 + 2) % 3;
+    segs.push([P(u, vp, h), P(u, vp, h + 7)]);
+    if (k === 0) segs.push([P(u, vp, h + 6), P(u + 3, vp, h + 3)]);
+    if (k === 1) segs.push([P(u, vp, h + 2), P(u + 3, vp, h + 5)], [P(u + 3, vp, h + 5), P(u, vp, h + 7)]);
+    if (k === 2) segs.push([P(u - 2.2, vp, h + 4), P(u + 2.2, vp, h + 4)]);
+  }
+  return `<g ${glowAttr(GLOW, 2)}>${isoLines(segs, 1.3, GLOW)}</g>`;
+}
+/** A glowing orb (animated glint) on a wire: billboard centred on the point. */
+const orb = (u, v, h, c, delay) => bill(u, v, h, `<g ${glowAttr(c, 3)}>${fxg('glint', `<circle r="2.6" fill="${c}" stroke="${ART_INK}" stroke-width="1"/><circle cx="-.8" cy="-.8" r=".8" fill="#fff"/>`, delay)}</g>`, [-3.4, -3.4, 3.4, 3.4]);
+/** A double-stroked path (ink under colour) for limbs, handles and spouts inside a billboard. */
+const limb = (d, w, color) => `<path d="${d}" fill="none" stroke="${ART_INK}" stroke-width="${w + 2.4}" stroke-linecap="round" stroke-linejoin="round"/><path d="${d}" fill="none" stroke="${color}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"/>`;
+
+/** A horizontal band of a floor ellipse (normalised offsets a..b across its depth, -1..1) as a flat polygon at height h. */
+function ellBand(cu, cv, ru, rv, a, b, h, fill) {
+  const arc = y => Math.sqrt(Math.max(0, 1 - y * y));
+  const ys = Array.from({ length: 7 }, (_, i) => a + ((b - a) * i) / 6);
+  return poly([...ys.map(y => P(cu + ru * arc(y), cv + rv * y, h)), ...ys.map(y => P(cu - ru * arc(y), cv + rv * y, h)).reverse()], fill, { stroke: null });
+}
+/** A closed ring line (a flat ellipse outline) at height h, optionally dashed. */
+const ringLine = (cu, cv, h, ru, rv, w, color, dash) => { const p = ellipsePoints(cu, cv, h, ru, rv, 32); return isoLine([...p, p[0]], w, color, dash ? { dash } : {}); };
+
+const DRAGON_ROOM = {
+  ink: '#2b2630',
+
+  /* The 10 styles keep the slot meaning of the herb's: wall-* give left / right / skirting (+ optional pattern), floor-* give base (+ pattern). */
+  styles: {
+    'wall-white': { left: '#9a9aa4', right: '#aeaeb8', skirting: '#7f7f8a' },
+    'wall-lavender': { left: '#7d8aa3', right: '#8f9cb5', skirting: '#667189' },
+    'wall-mint': { left: '#7f9a92', right: '#92aca4', skirting: '#647c75', pattern: 'moss' },
+    'wall-peach': { left: '#a8827a', right: '#bc9a90', skirting: '#8a655e', pattern: 'cracks' },
+    'wall-sky': { left: '#bfa77f', right: '#d1ba92', skirting: '#a38c66' },
+    'wall-sprig': { left: '#939f8a', right: '#a6b29c', skirting: '#74806c', pattern: 'ivy' },
+    'floor-lilac': { base: '#8b7a68', pattern: 'earth' },
+    'floor-oak': { base: '#8e8c93', pattern: 'flags' },
+    'floor-terracotta': { base: '#555d6e', pattern: 'slate' },
+    'floor-checker': { base: '#3a3c52', checker: '#4d5070', pattern: 'runes' }
+  },
+
+  backdrop: {
+    // Hewn-stone courses on both walls, then the style's pattern, then the shell's fixtures (two torches, a banner).
+    wallPattern: w => {
+      let s = stoneCourses('left', w) + stoneCourses('right', w);
+      if (w.pattern === 'moss') s += mossPatches('left') + mossPatches('right');
+      if (w.pattern === 'ivy') s += ivyVines('left') + ivyVines('right');
+      if (w.pattern === 'cracks') s += emberCracks('left') + emberCracks('right');
+      return s + shellFixtures();
+    },
+    floorPattern: f => ({ earth: earthFloor, flags: flagFloor, slate: slateFloor, runes: runeFloor })[f.pattern]?.(f) ?? '',
+    // A rubble line along both walls: small irregular stones on the skirting.
+    skirting: w => {
+      let s = '';
+      const r = rnd(31);
+      for (const plane of ['left', 'right']) {
+        const len = plane === 'left' ? GEOMETRY.ROOM_SIZE.u : GEOMETRY.ROOM_SIZE.v;
+        for (let a = 4; a < len - 2; a += 7 + r() * 5) {
+          const [x, y] = plane === 'left' ? P(a, 3, 0) : P(3, a, 0);
+          const sz = 2.2 + r() * 2.6;
+          const stone = [[x - sz * 1.3, y + 0.6], [x - sz * 0.8, y - sz * 1.1], [x + sz * 0.3, y - sz * 1.5], [x + sz * 1.4, y - sz * 0.5], [x + sz * 1.1, y + 0.9]];
+          s += poly(stone, shade(w.skirting, r() < 0.5 ? 12 : -14), { sw: 0.9 });
+        }
+      }
+      return s;
+    },
+    // The cave mouth: a rock rim with voussoir stones round the arch, jamb stones below the springline.
+    windowFrame: () => {
+      let s = poly(caveArch(CAVE.rxOut, CAVE.ryOut, CAVE.hRimBottom), '#9b98a6', { sw: 2 });
+      for (let k = 0; k < 9; k++) s += poly(caveRimQuad(Math.PI - (Math.PI * k) / 9, Math.PI - (Math.PI * (k + 1)) / 9), k % 2 ? '#aeabb9' : '#8d8a9a', { sw: 1.2 });
+      const step = (CAVE.hSpring - CAVE.hRimBottom) / 3;
+      for (let i = 0; i < 3; i++) {
+        const h0 = CAVE.hRimBottom + i * step, h1 = h0 + step, tone = i % 2 ? '#aeabb9' : '#8d8a9a';
+        s += poly([cavePt(CAVE.vc - CAVE.rxOut, h0), cavePt(CAVE.vc - CAVE.rxIn, h0), cavePt(CAVE.vc - CAVE.rxIn, h1), cavePt(CAVE.vc - CAVE.rxOut, h1)], tone, { sw: 1.2 });
+        s += poly([cavePt(CAVE.vc + CAVE.rxIn, h0), cavePt(CAVE.vc + CAVE.rxOut, h0), cavePt(CAVE.vc + CAVE.rxOut, h1), cavePt(CAVE.vc + CAVE.rxIn, h1)], tone, { sw: 1.2 });
+      }
+      return s;
+    },
+    glass: night => poly(caveArch(CAVE.rxIn, CAVE.ryIn, CAVE.hBottom), night ? '#232a5e' : '#cfe8ff', { sw: 2 }),
+    // Day: pale sky, sun, a cloud, two mountain ridges. Night: moon, stars (glinting), dark ridges. All inside the arch.
+    sky: night => {
+      const far = [[163, 74], [163, 88], [173, 97], [181, 90], [192, 102], [203, 92], [213, 99], [224, 88], [233, 94], [233, 74]];
+      const near = [[163, 74], [163, 80], [176, 86], [189, 81], [201, 88], [216, 82], [233, 87], [233, 74]];
+      let s = poly(far.map(([v, h]) => cavePt(v, h)), night ? '#141a3d' : '#b3bfd8', { stroke: null })
+        + poly(near.map(([v, h]) => cavePt(v, h)), night ? '#0c1030' : '#8fa0c0', { stroke: null });
+      if (night) {
+        s += bill(0, 212, 122, '<path d="M0 -8 a8 8 0 1 0 6 13 a6 6 0 1 1 -6 -13z" fill="#fff6c2"/>', [-8, -9, 8, 6]);
+        [[176, 121, 0], [190, 131, 0.9], [200, 126, 1.7], [222, 128, 0.4], [181, 110, 2.1], [228, 112, 1.3]].forEach(([v, h, d]) => {
+          s += bill(0, v, h, `<g class="room-fx room-fx--glint" style="animation-delay:-${d}s"><path d="M0 -2.6 L.8 -.8 L2.6 0 L.8 .8 L0 2.6 L-.8 .8 L-2.6 0 L-.8 -.8Z" fill="#ffffff"/></g>`, [-3, -3, 3, 3]);
+        });
+      } else {
+        s += bill(0, 214, 121, '<circle r="7" fill="#fff6c2" stroke="#f2cf6a" stroke-width="1.2"/>', [-8, -8, 8, 8]);
+        s += bill(0, 183, 119, '<ellipse rx="9" ry="3" fill="#ffffff" opacity=".9"/><ellipse cx="5" cy="-1.6" rx="5" ry="2.4" fill="#ffffff" opacity=".9"/>', [-9, -4, 10, 3]);
+      }
+      // stalactites hanging from the arch, so it reads as a cave mouth
+      const topH = v => CAVE.hSpring + CAVE.ryIn * Math.sqrt(1 - ((v - CAVE.vc) / CAVE.rxIn) ** 2);
+      [[184, 6.5], [196, 9], [209, 7], [221, 5]].forEach(([v, len]) => {
+        s += poly([cavePt(v - 2.4, topH(v - 2.4) + 0.4), cavePt(v, topH(v) - len), cavePt(v + 2.4, topH(v + 2.4) + 0.4)], night ? '#1a1a30' : '#7e7a8a', { sw: 1 });
+      });
+      return s + `<polyline points="${pts(caveArch(CAVE.rxIn - 2.5, CAVE.ryIn - 2.5, CAVE.hBottom))}" fill="none" stroke="rgba(0,0,0,.2)" stroke-width="4" stroke-linejoin="round"/>`;
+    },
+    // A stone ledge on two corbels, the live sill's size and place (v 158-238, h 68-74).
+    sill: () => box(0, 167, 9, 3, 58, 68, '#8d8a98') + box(0, 227, 9, 3, 58, 68, '#8d8a98') + box(0, 158, 14, 80, 68, 74, '#aeabb9')
+  },
+
+  stations: {
+    // The nest: sleeping surface at STATION_ANCHORS.bedTop (L1 h 5, L2-L4 h 30). Each level returns { back, front }; front = the near rim, over the creature.
+    bed: [
+      // L1: a straw nest on the floor, a speckled egg in the hollow
+      () => {
+        const n = nest(47, 148, 36.5, 25.5, 0, 9, '#c9a24a', '#8f6f26', 5);
+        return { back: n.back + egg(29, 152, 9), front: n.front };
+      },
+      // L2: a bigger nest on a rock ledge, lined with a fur and draped with another
+      () => {
+        const n = nest(44, 148, 31, 21, 19, 30, '#c9a24a', '#8f6f26', 11);
+        const rock = stoneBox(8, 124, 72, 46, 0, 10, STONE_DK) + stoneBox(13, 128, 62, 38, 10, 19, STONE);
+        const furTone = '#a98660';
+        return {
+          back: rock + n.back + pelt(44, 148, 21, 13.5, 29.4, furTone, 4) + egg(33, 152, 29.5),
+          front: n.front + drape(44, 148, 31, 21, 30.5, 20.5, furTone) + isoLines([[P(20, 160, 29), P(18, 164, 23)], [P(30, 166, 29), P(29, 170, 23)], [P(44, 169, 29), P(44, 173, 23)], [P(58, 166, 29), P(60, 170, 23)]], 1.1, '#6f5238', 0.8)
+        };
+      },
+      // L3: the nest on a heap with a scatter of coins, gems and a goblet
+      () => {
+        const heap = mound(44, 148, 41, 27, 18, 4, '#d4a42a', 0.7);
+        const n = nest(40, 148, 24, 16.5, 18, 30, '#c9a24a', '#8f6f26', 17);
+        let coins = '';
+        for (let i = 0; i < 4; i++) coins += coinRing(44, 148, 41 * (1 - 0.3 * (i / 4)), 27 * (1 - 0.3 * (i / 4)), 0.55 + i * 0.05, 0.98 - i * 0.12, (i + 1) * 4.5 + 0.3, 9, 40 + i);
+        return {
+          back: heap + coins + gem(74, 160, 6, '#d63a4a') + gem(20, 168, 5, '#4aa8e8') + gem(78, 140, 6, '#5cc46a') + trophy(70, 168, 6, 0.5)
+            + n.back + sparkle(66, 152, 12, 0) + sparkle(24, 162, 10, 1.1) + sparkle(54, 132, 14, 1.9),
+          front: n.front
+        };
+      },
+      // L4: the nest on a gold pile with a hoard against the wall: crown, candelabra, gems
+      () => {
+        const heap = mound(46, 148, 44, 29, 22, 5, '#d4a42a', 0.62);
+        const n = nest(40, 148, 24, 16.5, 22, 30, '#c9a24a', '#8f6f26', 23);
+        const wall = mound(12, 150, 12, 27, 48, 6, '#e0b030', 0.5);
+        let coins = '';
+        for (let i = 0; i < 5; i++) coins += coinRing(46, 148, 44 * (1 - 0.38 * (i / 5)), 29 * (1 - 0.38 * (i / 5)), 0.55 + i * 0.04, 0.98 - i * 0.1, (i + 1) * 4.4 + 0.3, 9, 60 + i);
+        const candles = [121, 127, 133].map(v => box(5, v, 2, 2, 93, 100, '#f4ead2', { sw: 1 }) + flame(6, v + 1, 100, 0.55, v % 3)).join('');
+        const candelabra = box(5, 125, 3, 3, 14, 91, GOLD_DK) + box(4, 119, 5, 18, 90, 93, GOLD) + candles;
+        return {
+          back: heap + coins + wall + coinRing(12, 150, 12, 27, 0.1, 0.6, 30, 6, 81) + candelabra
+            + crown(12, 150, 48, 0.8) + gem(80, 160, 8, '#d63a4a') + gem(18, 170, 8, '#4aa8e8') + gem(74, 134, 8, '#5cc46a') + trophy(76, 166, 8, 0.55)
+            + n.back + sparkle(66, 156, 14, 0) + sparkle(24, 168, 12, 0.8) + sparkle(14, 140, 34, 1.5) + sparkle(12, 162, 28, 2.2) + sparkle(60, 130, 12, 1.1),
+          front: n.front
+        };
+      }
+    ],
+
+    // The ice chest: the frost gauge reads at STATION_ANCHORS.fridgeTop (the top centre of each level).
+    fridge: [
+      // L1: a small ice chest, iron-strapped, frost crystals on the lid
+      () => box(146, 0, 40, 28, 0, 24, WOOD)
+        + seamsV(28, [153, 160, 167, 174, 181], 1, 23, WOOD_DK) + seamsU(186, [7, 14, 21], 1, 23, WOOD_DK)
+        + rectV(28, 149, 155, 0, 24, IRON) + rectV(28, 177, 183, 0, 24, IRON) + rectU(186, 3, 9, 0, 24, IRON) + rectU(186, 19, 25, 0, 24, IRON)
+        + rectV(28, 162, 170, 13, 21, IRON_LT) + bill(166, 28, 16, `<circle r="1.6" fill="${ART_INK}"/><rect x="-.6" y="0" width="1.2" height="3.2" fill="${ART_INK}"/>`, [-2, -2, 2, 3.5])
+        + box(145, -1, 42, 30, 24, 31, WOOD_DK) + rectH(31, 147, 185, 1, 27, ICE_HI, { stroke: null })
+        + icicles(28, [150, 158, 169, 178, 184], 24, 5)
+        + crystal(154, 7, 5, 5, 31, 32, ICE) + crystal(163, 11, 5, 5, 31, 32.5, ICE_HI) + crystal(172, 6, 5, 6, 31, 32, ICE),
+      // L2: an iron-bound locker with a frost cap and a crown of ice
+      () => box(146, 0, 40, 34, 0, 44, '#6a5240')
+        + seamsV(34, [153, 160, 167, 174, 181], 1, 43, WOOD_DK) + seamsU(186, [8, 17, 26], 1, 43, WOOD_DK)
+        + rectV(34, 146, 186, 8, 13, IRON) + rectV(34, 146, 186, 30, 35, IRON) + rectU(186, 0, 34, 8, 13, IRON) + rectU(186, 0, 34, 30, 35, IRON)
+        + rivetsV(34, [150, 158, 166, 174, 182], 10.5) + rivetsV(34, [150, 158, 166, 174, 182], 32.5)
+        + rectV(34, 161, 173, 16, 28, IRON_LT) + bill(167, 34, 22, `<circle r="2" fill="${ART_INK}"/><rect x="-.7" y="0" width="1.4" height="4" fill="${ART_INK}"/>`, [-2, -2, 2, 4.5])
+        + box(146, 0, 40, 34, 44, 48, ICE_HI) + icicles(34, [150, 156, 163, 171, 178, 184], 44, 6)
+        + crystal(152, 6, 7, 7, 48, 52, ICE) + crystal(176, 8, 6, 7, 48, 51, ICE_HI) + crystal(160, 20, 6, 6, 48, 52, ICE_HI) + crystal(166, 12, 7, 7, 48, 54, ICE),
+      // L3: a cold-cellar door in the rock: arched plank door, iron bands, frost and icicles
+      () => {
+        const doorTop = u => 50 + 14 * Math.sqrt(Math.max(0, 1 - ((u - 163) / 14) ** 2));
+        const seams = [154.8, 159.4, 163, 166.6, 171.2].map(u => [P(u, 38, 6), P(u, 38, doorTop(u) - 1)]);
+        return box(140, 0, 46, 38, 0, 76, '#6f6c80') + brickU(186, 0, 38, 0, 76, '#4d4a5c') + brickV(38, 140, 186, 0, 76, '#4d4a5c')
+          + box(144, 0, 38, 34, 76, 98, '#7b788c') + brickV(34, 144, 182, 76, 98, '#555266') + box(150, 0, 26, 28, 98, 112, '#868399')
+          + rectH(112, 150, 176, 0, 28, ICE_HI, { stroke: null })
+          + archV(38, 163, 17, 4, 52, 18, STONE_LT) + archV(38, 163, 14, 6, 50, 14, WOOD)
+          + isoLines(seams, 0.9, WOOD_DK, 0.9)
+          + rectV(38, 149, 177, 16, 21, IRON) + rectV(38, 149, 177, 38, 43, IRON)
+          + rivetsV(38, [152, 160, 168, 175], 18.5) + rivetsV(38, [152, 160, 168, 175], 40.5)
+          + bill(171, 38, 30, `<circle r="3.4" fill="none" stroke="${IRON_LT}" stroke-width="1.8"/><circle r="3.4" fill="none" stroke="${ART_INK}" stroke-width=".8"/>`, [-4, -4, 4, 4])
+          + icicles(38, [148, 153, 158, 163, 168, 173, 178], 66, 8) + icicles(34, [150, 160, 172, 180], 98, 7)
+          + poly([P(140, 38, 76), P(186, 38, 76), P(186, 38, 80), P(140, 38, 80)], ICE_HI, { sw: 1, op: 0.85 });
+      },
+      // L4: a frost vault: blue stone, a round iron door with a locking wheel, icicles and a crown of ice
+      () => {
+        const spokes = Array.from({ length: 6 }, (_, i) => {
+          const a = (i / 6) * Math.PI * 2;
+          return [P(156, 40, 50), P(156 + 17 * Math.cos(a), 40, 50 + 17 * Math.sin(a))];
+        });
+        const bolts = Array.from({ length: 10 }, (_, i) => {
+          const a = (i / 10) * Math.PI * 2;
+          return bill(156 + 24 * Math.cos(a), 40, 50 + 24 * Math.sin(a), `<circle r="1.4" fill="${IRON_LT}" stroke="${ART_INK}" stroke-width=".7"/>`, [-1.5, -1.5, 1.5, 1.5]);
+        }).join('');
+        return stoneBox(124, 0, 64, 40, 0, 100, '#6f86a3') + box(124, 0, 64, 40, 100, 108, ICE_HI)
+          + icicles(40, [128, 135, 142, 149, 163, 170, 177, 184], 100, 9)
+          + discV(40, 156, 50, 26.5, 26.5, IRON, { sw: 2 }) + discV(40, 156, 50, 21, 21, IRON_LT) + discV(40, 156, 50, 16, 16, '#3c434c', { sw: 1.2 })
+          + isoLines(spokes, 2.2, IRON_LT) + discV(40, 156, 50, 4.6, 4.6, GOLD_DK, { sw: 1.4 }) + bolts
+          + rectV(40, 180, 184, 36, 46, IRON) + rectV(40, 128, 132, 36, 46, IRON)
+          + isoLines([[P(142, 40, 66), P(150, 40, 74)], [P(166, 40, 28), P(172, 40, 33)]], 1.6, ICE_HI, 0.9)
+          + crystal(136, 8, 8, 8, 108, 114, ICE) + crystal(170, 10, 8, 8, 108, 113, ICE_HI) + crystal(152, 16, 8, 8, 108, 117, ICE_HI) + crystal(146, 26, 6, 6, 108, 111, ICE);
+      }
+    ],
+
+    // The forge hearth: steam rises from the cauldron at STATION_ANCHORS.cookerPot; the creature stands at PIP_COOKER_SPOT; the plate lands at cookerPlate.
+    cooker: [
+      // L1: a campfire ring with a pot on a tripod
+      () => {
+        const rocks = Array.from({ length: 9 }, (_, i) => {
+          const a = (i / 9) * Math.PI * 2;
+          return [118 + 11.5 * Math.cos(a), 15 + 11.5 * Math.sin(a), i];
+        }).sort((x, y) => x[0] + x[1] - (y[0] + y[1]));
+        const ring = rocks.map(([u, v, i]) => box(u - 2.5, v - 2.5, 5, 5, 0, 4.5 + (i % 3), i % 2 ? STONE : STONE_DK)).join('');
+        const legs = [[108, 5], [128, 6], [118, 25]];
+        const poles = legs.map(([u, v]) => isoLines([[P(u, v, 5), P(118, 15, 44)]], 2.8, WOOD_DK));
+        return ellH(118, 15, 3, 13, 13, '#2a1f1c', { sw: 1.2 }) + poles[0] + poles[1] + ring.slice(0, ring.length / 2)
+          + ellH(118, 15, 4.4, 8.6, 8.6, EMBER, { sw: 1 }) + box(109, 13, 17, 3, 4.5, 8, WOOD_DK) + box(116, 7, 3, 17, 7.5, 11, WOOD)
+          + flame(118, 15, 11, 1.15, 0.3) + flame(112, 17, 8, 0.85, 1.1) + flame(124, 13, 8, 0.85, 0.7)
+          + isoLines([[P(113, 15, 34), P(118, 15, 44)], [P(123, 15, 34), P(118, 15, 44)]], 1.3, IRON)
+          + cylE(118, 15, 6, 6, 17, 24, IRON, 9, 9) + cylE(118, 15, 9, 9, 24, 33, IRON, 9.8, 9.8) + cylE(118, 15, 10.4, 10.4, 33, 35, IRON_LT)
+          + ellH(118, 15, 35, 8.4, 8.4, '#6fae5a', { sw: 1 }) + poles[2] + ring.slice(ring.length / 2) + embers(118, 28, 12, 3);
+      },
+      // L2: a stone hearth with a glowing firebox, firewood and a cauldron
+      () => stoneBox(60, 0, 80, 36, 0, 50, STONE_DK) + box(58, 0, 84, 38, 50, 55, STONE_LT)
+        + stoneBox(112, 1, 22, 10, 55, 70, STONE)
+        + archV(36, 100, 20, 6, 28, 14, STONE_LT) + archV(36, 100, 17, 6, 26, 12, '#1d1618') + archV(36, 100, 13, 8, 26, 9, '#7a2a14') + archV(36, 100, 8, 8, 24, 6, FIRE, { stroke: null })
+        + flame(93, 36, 9, 0.95, 0.2) + flame(100, 36, 9, 1.2, 0.7) + flame(107, 36, 9, 0.95, 1.2) + embers(100, 37, 42, 4)
+        + box(120, 22, 18, 6, 55, 61, WOOD) + box(120, 28, 18, 6, 55, 61, WOOD_DK) + box(122, 24, 14, 6, 61, 66, WOOD_LT)
+        + [[73, 14], [87, 14], [80, 25]].map(([u, v]) => box(u - 1.5, v - 1.5, 3, 3, 55, 59, IRON)).join('')
+        + cylE(80, 19, 9, 9, 58, 64, IRON, 11.5, 11.5) + cylE(80, 19, 11.5, 11.5, 64, 68.5, IRON, 10.5, 10.5) + cylE(80, 19, 11.6, 11.6, 68.5, 70, IRON_LT)
+        + ellH(80, 19, 70, 9.8, 9.8, '#6fb35a', { sw: 1 }),
+      // L3: a forge hearth with a hooded flue, a cauldron on top, an anvil and a leather bellows
+      () => {
+        const folds = [18, 25, 32, 39].map(h => [P(110.5, 36, h), P(131.5, 36, h)]);
+        return box(78, 0, 18, 12, 62, 76, STONE) + box(76, 0, 22, 14, 76, 80, STONE_LT)
+          + stoneBox(72, 0, 66, 36, 0, 58, STONE_DK) + box(70, 0, 70, 38, 58, 62, '#5d5a68')
+          + archV(36, 90, 17, 6, 30, 12, STONE_LT) + archV(36, 90, 14, 6, 28, 10, '#1d1618') + archV(36, 90, 10, 8, 28, 7, '#7a2a14') + archV(36, 90, 6, 8, 25, 5, FIRE, { stroke: null })
+          + flame(84, 36, 9, 1, 0.3) + flame(91, 36, 9, 1.25, 0.9) + flame(98, 36, 9, 1, 1.4) + embers(91, 37, 44, 4)
+          + poly([P(110, 36, 10), P(132, 36, 10), P(128, 36, 43), P(114, 36, 43)], '#7a4a2a') + isoLines(folds, 1.1, '#4a2c18')
+          + rectV(36, 108, 134, 8, 12, WOOD) + rectV(36, 112, 130, 43, 47, WOOD) + isoLines([[P(110, 36, 22), P(104, 36, 22)]], 3, IRON)
+          + isoLines([[P(126, 36, 46), P(127, 36, 56)]], 3, WOOD_LT) + box(122, 6, 14, 8, 62, 64, IRON) + box(124, 8, 10, 4, 64, 68, IRON_LT)
+          + [[83, 13], [101, 13], [92, 27]].map(([u, v]) => box(u - 1.5, v - 1.5, 3, 3, 62, 65, IRON)).join('')
+          + cylE(92, 20, 10, 10, 64, 69, IRON, 12.5, 12.5) + cylE(92, 20, 12.5, 12.5, 69, 78.6, IRON, 11, 11) + cylE(92, 20, 12.6, 12.6, 78.6, 80, IRON_LT)
+          + ellH(92, 20, 80, 10.8, 10.8, '#6fb35a', { sw: 1 });
+      },
+      // L4: a great forge: arched firebox, oven door, a hood over the cauldron, a tall stone chimney, an anvil
+      () => {
+        const vents = [112, 118, 124].map(u => rectV(38, u - 1, u + 1, 20, 26, '#14181c', { stroke: null })).join('');
+        const posts = [62, 120].map(u => isoLines([[P(u, 2, 63), P(u, 2, 94)]], 3, IRON)).join('');
+        return stoneBox(50, 0, 90, 38, 0, 58, '#5d5a68') + rectV(38, 50, 140, 54, 58, GOLD_DK) + box(48, 0, 94, 40, 58, 63, STONE_LT)
+          + archV(38, 72, 19, 6, 34, 14, STONE_LT) + archV(38, 72, 16, 6, 32, 12, '#1d1618') + archV(38, 72, 12, 8, 32, 9, '#7a2a14') + archV(38, 72, 7, 8, 28, 6, FIRE, { stroke: null })
+          + flame(64, 38, 9, 1.05, 0.2) + flame(72, 38, 9, 1.35, 0.8) + flame(80, 38, 9, 1.05, 1.5) + embers(72, 39, 46, 5)
+          + archV(38, 118, 15, 6, 30, 10, IRON) + archV(38, 118, 12, 8, 30, 8, '#3c434c') + vents + bill(125, 38, 26, `<circle r="2.4" fill="${GOLD_DK}" stroke="${ART_INK}" stroke-width="1"/>`, [-3, -3, 3, 3])
+          + rivetsV(38, [105, 111, 125, 131], 9, IRON_LT) + box(126, 10, 12, 8, 63, 67, IRON) + box(128, 12, 8, 4, 67, 71, IRON_LT)
+          + box(86, 0, 12, 8, 118, 146, STONE_LT) + brickV(8, 86, 98, 118, 146, '#6a6875') + brickU(98, 0, 8, 118, 146, '#6a6875') + box(84, 0, 16, 10, 146, 150, STONE_DK)
+          + box(72, 0, 38, 12, 102, 118, STONE) + brickV(12, 72, 110, 102, 118, '#555266') + box(60, 0, 62, 18, 94, 102, '#6a6875') + brickV(18, 60, 122, 94, 102, '#4d4a5c') + posts
+          + [[77, 13], [103, 13], [90, 29]].map(([u, v]) => box(u - 1.5, v - 1.5, 3, 3, 63, 66, IRON)).join('')
+          + cylE(90, 20, 10, 10, 65, 70, IRON, 13, 13) + cylE(90, 20, 13, 13, 70, 80.5, IRON, 11.5, 11.5) + cylE(90, 20, 13.1, 13.1, 80.5, 82, IRON_LT)
+          + ellH(90, 20, 82, 11.2, 11.2, '#6fb35a', { sw: 1 });
+      }
+    ],
+
+    // The hoard (the trophy cabinet): trophies and ribbons sit where the live cabinet shows them. Against the right wall (u = 0), running along v.
+    cabinet: [
+      // L1: a small hoard chest, lid open against the wall, gold heaped inside with a trophy and a ribbon
+      () => box(0, 30, 22, 70, 0, 26, WOOD) + seamsU(22, [44, 52, 60, 68, 76, 84, 92], 1, 25, WOOD_DK)
+        + rectU(22, 36, 42, 0, 26, IRON) + rectU(22, 88, 94, 0, 26, IRON) + rectU(22, 60, 70, 10, 20, GOLD_DK) + bill(22, 65, 15, `<circle r="1.6" fill="${ART_INK}"/><rect x="-.6" y="0" width="1.2" height="3" fill="${ART_INK}"/>`, [-2, -2, 2, 3.5])
+        + box(0, 28, 3, 74, 26, 48, WOOD_DK) + rectU(3, 36, 42, 28, 46, IRON) + rectU(3, 88, 94, 28, 46, IRON)
+        + cylE(11, 65, 9, 31, 26, 30, GOLD, 8, 29) + cylE(11, 65, 8, 29, 30, 33, GOLD_HI, 6, 25) + coinScatter(11, 65, 6, 23, 33.2, 12, 7, 0.9, 2.2)
+        + trophy(11, 48, 31, 0.55) + trophy(11, 65, 33, 0.65) + ribbon(11, 82, 31, 0.5) + sparkle(14, 58, 35, 0.4) + sparkle(12, 75, 36, 1.5),
+      // L2: a hoard chest on a stone shelf, a second shelf of trophies above (the shelves float on the wall from h 30)
+      () => box(0, 38, 14, 3, 30, 40, STONE_DK) + box(0, 92, 14, 3, 30, 40, STONE_DK) + stoneBox(0, 30, 22, 72, 40, 46, STONE)
+        + box(2, 38, 16, 56, 46, 60, WOOD) + seamsU(18, [46, 54, 62, 70, 78, 86], 47, 59, WOOD_DK) + rectU(18, 44, 49, 46, 60, IRON) + rectU(18, 83, 88, 46, 60, IRON) + rectU(18, 62, 70, 50, 58, GOLD_DK)
+        + box(2, 38, 16, 56, 60, 66, WOOD_DK) + cylE(10, 66, 7, 22, 66, 69, GOLD, 6, 19) + coinScatter(10, 66, 5, 17, 69.2, 8, 3, 0.9, 2) + gem(18, 50, 66, '#d63a4a') + gem(18, 82, 66, '#4aa8e8')
+        + box(0, 38, 14, 3, 68, 78, STONE_DK) + box(0, 92, 14, 3, 68, 78, STONE_DK) + stoneBox(0, 30, 22, 72, 78, 84, STONE)
+        + trophy(14, 46, 84, 0.55) + ribbon(12, 66, 84, 0.5) + trophy(12, 84, 84, 0.6) + sparkle(12, 60, 70, 0.7) + sparkle(12, 90, 88, 1.6),
+      // L3: a hoard chest below, a recessed stone niche above with trophies on two ledges
+      () => box(0, 32, 24, 62, 0, 28, WOOD) + seamsU(24, [40, 48, 56, 64, 72, 80, 88], 1, 27, WOOD_DK)
+        + rectU(24, 38, 44, 0, 28, IRON) + rectU(24, 82, 88, 0, 28, IRON) + rectU(24, 58, 68, 10, 22, GOLD_DK)
+        + box(0, 32, 24, 62, 28, 34, WOOD_DK) + cylE(12, 63, 10, 29, 34, 36, GOLD, 8.5, 27) + coinScatter(12, 63, 7, 24, 36.2, 9, 5, 0.9, 2.2)
+        + stoneBox(0, 30, 10, 66, 36, 112, STONE) + rectU(10, 38, 88, 46, 104, '#3b3340') + rectU(10, 40, 86, 48, 102, '#4a3d3c', { stroke: null })
+        + box(10, 40, 4, 46, 46, 49, STONE_LT) + box(10, 40, 4, 46, 74, 77, STONE_LT) + box(0, 30, 12, 66, 104, 112, STONE_LT)
+        + trophy(12, 52, 77, 0.55) + trophy(12, 64, 77, 0.65) + ribbon(12, 78, 77, 0.5) + crown(12, 52, 49, 0.5) + gem(12, 66, 49, '#5cc46a') + trophy(12, 78, 49, 0.5)
+        + sparkle(12, 58, 60, 0.3) + sparkle(12, 74, 90, 1.4),
+      // L4: a treasure alcove: stone columns and lintel, a gold heap at its foot and trophies on stone shelves
+      () => stoneBox(0, 26, 30, 10, 0, 122, STONE) + rectU(24, 36, 90, 8, 122, '#3b3340') + rectU(24, 40, 86, 12, 118, '#4a3d3c', { stroke: null })
+        + box(8, 36, 20, 54, 44, 48, STONE_LT) + box(8, 36, 20, 54, 84, 88, STONE_LT) + box(8, 36, 20, 54, 4, 8, STONE_LT)
+        + trophy(22, 48, 88, 0.6) + crown(22, 63, 88, 0.62) + trophy(22, 78, 88, 0.6) + ribbon(22, 46, 48, 0.5) + trophy(22, 63, 48, 0.6) + gem(22, 74, 48, '#d63a4a') + gem(22, 82, 48, '#4aa8e8')
+        + mound(16, 63, 13, 24, 9, 3, '#d4a42a', 0.7) + coinScatter(16, 63, 11, 21, 4, 8, 13, 0.9, 2) + gem(24, 52, 9, '#d63a4a') + gem(24, 74, 9, '#5cc46a')
+        + stoneBox(0, 90, 30, 10, 0, 122, STONE) + stoneBox(0, 26, 30, 74, 122, 134, STONE_LT) + gem(30, 63, 129, '#d63a4a')
+        + sparkle(24, 44, 56, 0.2) + sparkle(24, 82, 96, 1.2) + sparkle(24, 63, 20, 2.1) + sparkle(24, 70, 66, 0.8)
+    ],
+
+    // The armour rack (Dress Pip): world coords, no shift, along the left wall (v = 0). Tapping it opens the wardrobe, so each level shows clothes and armour to wear.
+    wardrobe: [
+      // L1: a wooden peg frame with two cloaks, a satchel and a pair of boots
+      () => {
+        const cloakA = poly([P(16, 9.5, 76), P(40, 9.5, 76), P(44, 9.5, 42), P(12, 9.5, 42)], CLOAK);
+        const cloakB = poly([P(44, 9.5, 76), P(58, 9.5, 76), P(61, 9.5, 52), P(42, 9.5, 52)], '#2f6b5a');
+        const folds = isoLines([[P(22, 9.5, 74), P(21, 9.5, 44)], [P(28, 9.5, 74), P(28, 9.5, 43)], [P(34, 9.5, 74), P(35, 9.5, 43)]], 1.1, '#5a1c25', 0.8)
+          + isoLines([[P(49, 9.5, 74), P(48, 9.5, 54)], [P(54, 9.5, 74), P(55, 9.5, 54)]], 1.1, '#1f4a3d', 0.8);
+        return box(6, 4, 11, 11, 0, 3, WOOD_DK) + box(10, 8, 3, 3, 3, 82, WOOD) + box(58, 4, 11, 11, 0, 3, WOOD_DK) + box(62, 8, 3, 3, 3, 82, WOOD)
+          + isoLines([[P(11.5, 9.5, 80), P(63.5, 9.5, 80)]], 3.2, WOOD_DK)
+          + isoLines([[P(20, 9.5, 80), P(20, 9.5, 77)], [P(32, 9.5, 80), P(32, 9.5, 77)], [P(50, 9.5, 80), P(50, 9.5, 77)]], 1.6, IRON)
+          + cloakA + cloakB + folds + bill(28, 9.5, 74, `<circle r="3" fill="${GOLD}" stroke="${ART_INK}" stroke-width="1.2"/>`, [-3.5, -3.5, 3.5, 3.5])
+          + box(30, 16, 14, 10, 0, 7, '#9a6b3a') + poly([P(30, 26, 7), P(44, 26, 7), P(44, 26, 3), P(30, 26, 3)], '#7a4f28', { sw: 1.2 })
+          + bill(37, 26, 5, `<rect x="-2" y="-2" width="4" height="4" rx="1" fill="${GOLD}" stroke="${ART_INK}" stroke-width="1"/>`, [-2.5, -2.5, 2.5, 2.5])
+          + box(18, 18, 5, 7, 0, 7, '#5a3a1f') + box(24, 18, 5, 7, 0, 7, '#5a3a1f') + box(18, 20, 5, 5, 7, 11, '#6e4a28') + box(24, 20, 5, 5, 7, 11, '#6e4a28');
+      },
+      // L2: an armour stand: a wooden mannequin in a steel breastplate and a horned helm, a round shield and a sword leaning
+      () => box(30, 6, 16, 14, 0, 4, WOOD_DK) + box(36, 11, 4, 4, 4, 38, WOOD)
+        + discV(20, 20, 14, 9, 9, '#6a4526', { sw: 1.8 }) + discV(20, 20, 14, 6.2, 6.2, CLOAK, { sw: 1.2 }) + bill(20, 20, 14, `<circle r="2.4" fill="${GOLD}" stroke="${ART_INK}" stroke-width="1"/>`, [-3, -3, 3, 3])
+        + isoLines([[P(52, 18, 3), P(50, 11, 52)]], 3, '#b4bdc8') + isoLines([[P(47, 14, 20), P(53, 16, 20)]], 2.4, GOLD_DK)
+        + armour(38, 13, 4, false, false, 0.8),
+      // L3: an armour rack: back board, two shelves, helms, a mail shirt, crossed swords, a spear and a round shield
+      () => box(6, 0, 60, 5, 2, 88, WOOD_DK) + seamsV(5, [16, 26, 36, 46, 56], 3, 87, '#3f2814')
+        + box(6, 0, 4, 30, 0, 92, WOOD) + box(62, 0, 4, 30, 0, 92, WOOD)
+        + box(10, 5, 52, 9, 28, 31, WOOD_LT) + box(10, 5, 52, 9, 58, 61, WOOD_LT)
+        + poly([P(30, 5.5, 56), P(46, 5.5, 56), P(44, 5.5, 34), P(32, 5.5, 34)], '#8f98a3') + seamsV(5.5, [34, 38, 42], 35, 55, '#5d6670', 0.8, 0.8)
+        + isoLines([[P(32, 5.5, 50), P(44, 5.5, 50)], [P(33, 5.5, 44), P(43, 5.5, 44)], [P(34, 5.5, 38), P(42, 5.5, 38)]], 0.9, '#5d6670', 0.8)
+        + isoLines([[P(14, 5.5, 64), P(26, 5.5, 86)], [P(26, 5.5, 64), P(14, 5.5, 86)]], 2.6, '#b4bdc8') + isoLines([[P(12, 5.5, 70), P(18, 5.5, 70)], [P(22, 5.5, 70), P(28, 5.5, 70)]], 2.4, GOLD_DK)
+        + isoLines([[P(56, 12, 0), P(58, 12, 84)]], 2.4, WOOD) + bill(58, 12, 84, '<path d="M0 -10 L3.4 0 L0 1 L-3.4 0Z" fill="#b4bdc8" stroke="#1c2024" stroke-width="1.2" stroke-linejoin="round"/>', [-4, -11, 4, 1])
+        + helm(22, 11, 58, 0.8) + helm(54, 11, 58, 0.8) + helm(40, 11, 28, 0.7)
+        + discV(12, 22, 16, 11, 11, '#6a4526', { sw: 1.8 }) + discV(12, 22, 16, 8, 8, '#2f6b5a', { sw: 1.2 }) + bill(22, 12, 16, `<circle r="3" fill="${GOLD}" stroke="${ART_INK}" stroke-width="1"/>`, [-3.5, -3.5, 3.5, 3.5])
+        + box(6, 0, 60, 14, 88, 92, WOOD_DK),
+      // L4: an armoury wall: stone plinth and wall, an arched niche with a full suit of armour, shields and crossed axes either side
+      () => stoneBox(2, 0, 70, 32, 0, 10, STONE_DK) + stoneBox(2, 0, 70, 8, 10, 96, STONE)
+        + archV(8, 37, 15, 12, 58, 16, '#3b3340') + archV(8, 37, 12, 12, 58, 13, '#4a3d3c', { stroke: null })
+        + discV(8, 12, 52, 8, 8, '#6a4526', { sw: 1.8 }) + discV(8, 12, 52, 5.6, 5.6, CLOAK, { sw: 1.2 }) + discV(8, 62, 52, 8, 8, '#6a4526', { sw: 1.8 }) + discV(8, 62, 52, 5.6, 5.6, '#2f6b5a', { sw: 1.2 })
+        + bill(12, 8, 52, `<circle r="2.2" fill="${GOLD}" stroke="${ART_INK}" stroke-width="1"/>`, [-3, -3, 3, 3]) + bill(62, 8, 52, `<circle r="2.2" fill="${GOLD}" stroke="${ART_INK}" stroke-width="1"/>`, [-3, -3, 3, 3])
+        + isoLines([[P(6, 8, 70), P(18, 8, 90)], [P(18, 8, 70), P(6, 8, 90)], [P(56, 8, 70), P(68, 8, 90)], [P(68, 8, 70), P(56, 8, 90)]], 2.6, WOOD) + [12, 62].map(u => bill(u, 8, 88, `<path d="M-6 -2 q6 -8 12 0 l-2 4 l-8 0z" fill="#b4bdc8" stroke="${ART_INK}" stroke-width="1.2" stroke-linejoin="round"/>`, [-7, -10, 7, 3])).join('')
+        + box(2, 0, 70, 12, 92, 96, STONE_LT)
+        + armour(37, 14, 10, true, true, 0.82)
+    ]
+  },
+
+  /* The 55 decor ids, one lair counterpart each, in the live spot and footprint. World coords; the 12 legacy ids are in MPP-27 coords
+     (slid to their spot by DECOR_LEGACY_SHIFT). Wall items sit on the left wall (plane v = 0, along u) or the right wall (plane u = 0, along v). */
+  decor: {
+    /* ---------- over the wardrobe (left wall; legacy ids drawn at u 150-186, h 128-176) ---------- */
+    // a dragon scale mounted on a plaque
+    'basil-print': () => rectV(0, 154, 182, 136, 166, WOOD_LT) + rectV(0, 157, 179, 139, 163, '#2e3b3a')
+      + bill(168, 0, 151,
+        `<path d="M0 -13 C9 -13 13 -4 0 12 C-13 -4 -9 -13 0 -13Z" fill="${TEAL_HI}" stroke="${ART_INK}" stroke-width="1.4" stroke-linejoin="round"/>`
+        + '<path d="M0 -10 V9 M-5 -6 Q0 -3 5 -6 M-6 -1 Q0 2 6 -1 M-4 4 Q0 6 4 4" stroke="#1f6b4c" stroke-width="1" fill="none"/>'
+        + '<path d="M-5 -8 q2 -3 5 -3" stroke="#bff0d8" stroke-width="1.4" fill="none" stroke-linecap="round"/>', [-13, -14, 13, 13]),
+    // a slate tablet with glowing runes
+    'recipe-board': () => rectV(0, 152, 184, 134, 168, WOOD) + rectV(0, 155, 181, 137, 165, '#3a3c4a') + [156, 148, 140].map(h => runeRowV(0, 158, h, 4)).join(''),
+    // a stone shelf on two iron brackets with three potion flasks
+    'herb-shelf': () => [154, 180].map(u => box(u, 0, 3, 6, 128, 136, IRON)).join('') + box(150, 0, 36, 8, 136, 140, WOOD)
+      + [[156, '#6fd36a'], [168, '#b05ad8'], [180, '#e5534b']].map(([u, c]) => `<g ${glowAttr(c, 2)}>${flask(u, 4, 140, c)}</g>`).join(''),
+    // a wire of five hanging crystals (animated glints, glowing)
+    'fairy-lights': () => {
+      const at = i => [150 + i * 6, 166 - Math.sin((i / 6) * Math.PI) * 10];
+      const cols = ['#7de3ff', '#ff8fab', '#8fe08a', '#ffd34d', '#b58cff'];
+      return isoLine(Array.from({ length: 7 }, (_, i) => P(at(i)[0], 0, at(i)[1])), 1.3, IRON)
+        + [1, 2, 3, 4, 5].map((i, k) => bill(at(i)[0], 0, at(i)[1],
+          `<g ${glowAttr(cols[k], 3)}>${fxg('glint', `<path d="M0 0 L3.2 4 L0 12 L-3.2 4Z" fill="${cols[k]}" stroke="${ART_INK}" stroke-width="1.1" stroke-linejoin="round"/><path d="M-1 3 L0 1 L1 3" stroke="#fff" fill="none" stroke-width=".8"/>`, k * 0.5)}</g>`, [-3.8, -0.5, 3.8, 12.5])).join('');
+    },
+    // a gilt frame round a painted hatchling
+    'pip-portrait': () => box(24, 0, 28, 2.4, 106, 138, GOLD_DK) + rectV(2.55, 27, 49, 109, 135, '#27403f')
+      + bill(38, 2.7, 121,
+        `<path d="M-6 -6 L-9.5 -14 L-2 -8Z M6 -6 L9.5 -14 L2 -8Z" fill="${BONE}" stroke="${ART_INK}" stroke-width="1.2" stroke-linejoin="round"/>`
+        + `<ellipse rx="9" ry="8.4" fill="#6cc59a" stroke="${ART_INK}" stroke-width="1.5"/><ellipse cy="4.2" rx="5" ry="3.2" fill="#a8e8cc"/>`
+        + `<ellipse cx="-3.6" cy="-1.4" rx="2.2" ry="2.8" fill="#ffcf4d" stroke="${ART_INK}" stroke-width="1"/><ellipse cx="3.6" cy="-1.4" rx="2.2" ry="2.8" fill="#ffcf4d" stroke="${ART_INK}" stroke-width="1"/>`
+        + `<path d="M-3.6 -3.6 v4.4 M3.6 -3.6 v4.4" stroke="${ART_INK}" stroke-width="1.2"/><circle cx="-1.4" cy="3.4" r=".7" fill="${ART_INK}"/><circle cx="1.4" cy="3.4" r=".7" fill="${ART_INK}"/>`, [-10, -15, 10, 9])
+      + isoLine([P(25.5, 2.45, 136.4), P(50.5, 2.45, 136.4)], 1, HI),
+
+    /* ---------- bedside wall (right wall, v 134-154: tall and narrow) ---------- */
+    // a wooden post notched with growth marks and a claw print
+    'growth-chart': () => box(0, 137, 1.8, 12, 62, 122, WOOD_LT)
+      + isoLines([70, 80, 90, 100, 110].map((h, i) => [P(1.95, 138.4, h), P(1.95, i % 2 ? 141 : 143.2, h)]), 1.2, ART_INK)
+      + rectU(1.95, 138, 148, 114, 119, '#b8402e', { stroke: null })
+      + bill(1.95, 146, 90, `<ellipse cy="1" rx="3.2" ry="2.6" fill="${TEAL_HI}" stroke="${ART_INK}" stroke-width="1.1"/><path d="M-4 -2 l-1 -4 M0 -3 v-5 M4 -2 l1 -4" stroke="${ART_INK}" stroke-width="1.6" stroke-linecap="round"/>`, [-6, -9, 6, 4])
+      + isoLine([P(1.95, 137.6, 121), P(1.95, 137.6, 63)], 1, HI),
+    // a stone slab scored with tally marks, a few picked out in gold
+    'meal-calendar': () => {
+      const marks = [];
+      for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) {
+        if ((r + c) % 2) continue;
+        const v = 138.6 + c * 4.6, h = 84 + r * 8;
+        marks.push([P(3.15, v, h + 1), P(3.15, v, h + 6)], [P(3.15, v + 1.8, h + 1), P(3.15, v + 1.8, h + 6)]);
+      }
+      return box(0, 136, 3, 16, 76, 114, STONE) + rectU(3.05, 138, 150, 82, 108, '#7d7a88', { stroke: null })
+        + isoLines([[P(3.1, 142.5, 82), P(3.1, 142.5, 108)], [P(3.1, 147, 82), P(3.1, 147, 108)], [P(3.1, 138, 90), P(3.1, 150, 90)], [P(3.1, 138, 98), P(3.1, 150, 98)]], 1, '#55525f')
+        + isoLines(marks, 1.5, GOLD_HI) + ellU(3.05, 144, 111, 1.6, 1.6, GOLD, { sw: 1 });
+    },
+    // an iron-bracketed wall torch (animated flame, glowing)
+    'wall-sconce': () => rectU(0, 140.5, 147.5, 84, 98, IRON) + box(0, 142.5, 5, 3, 88, 91, IRON) + cyl(4.8, 144, 3.4, 90, 98, IRON)
+      + bill(4.8, 144, 98, `<ellipse cy="2" rx="3.6" ry="2.2" fill="#6b4a2a" stroke="${ART_INK}" stroke-width="1.1"/>`, [-4, -1, 4, 4]) + flame(4.8, 144, 99, 0.9, 0.4),
+    // three framed gems, each with a twinkle (animated glints)
+    'photo-strip': () => [[64, '#d63a4a'], [82, '#4aa8e8'], [100, '#5cc46a']].map(([h, c], i) =>
+      box(0, 137, 1.6, 14, h, h + 14, WOOD_DK) + rectU(1.75, 139, 149, h + 2, h + 12, '#241f2b', { stroke: null }) + gem(1.8, 144, h + 8, c) + sparkle(1.95, 147.5, h + 11, i * 0.9)).join(''),
+
+    /* ---------- front right wall (right wall; legacy ids drawn at v 34-80, h 138-178) ---------- */
+    // a wall hourglass: a wooden frame round two glass bulbs and a stream of sand
+    'wall-clock': () => bill(0, 57, 158,
+      `<path d="M-9 -17 V17 M9 -17 V17" stroke="${WOOD}" stroke-width="3" stroke-linecap="round"/>`
+      + `<path d="M-7 -15 H7 C7 -7 1.4 -3 1.4 0 C1.4 3 7 7 7 15 H-7 C-7 7 -1.4 3 -1.4 0 C-1.4 -3 -7 -7 -7 -15Z" fill="#d7f0ff" fill-opacity=".7" stroke="${ART_INK}" stroke-width="1.6" stroke-linejoin="round"/>`
+      + '<path d="M-4.6 -13 H4.6 C3.8 -8 1 -5 0 -2Z" fill="#e8b838"/><path d="M0 -1 V8" stroke="#e8b838" stroke-width="1"/><path d="M-6 14 C-5 9 -2 7 0 6 C2 7 5 9 6 14Z" fill="#e8b838"/>'
+      + `<rect x="-10.5" y="-19" width="21" height="4" rx="1.5" fill="${WOOD}" stroke="${ART_INK}" stroke-width="1.4"/><rect x="-10.5" y="15" width="21" height="4" rx="1.5" fill="${WOOD}" stroke="${ART_INK}" stroke-width="1.4"/>`, [-11.5, -20, 11.5, 20]),
+    // a string of swallow-tail pennants (each sways)
+    bunting: () => isoLine([P(0, 34, 172), P(0, 80, 172)], 1.4, IRON)
+      + [CLOAK, GOLD, TEAL, CLOAK, GOLD].map((c, i) => {
+        const v = 36 + i * 9;
+        return fxg('sway', poly([P(0, v, 171), P(0, v + 8, 171), P(0, v + 8, 159), P(0, v + 4, 163.5), P(0, v, 159)], c, { sw: 1.2 }), i * 0.6);
+      }).join(''),
+    // an iron rail with three small cauldrons
+    'pan-rail': () => isoLine([P(0, 36, 170), P(0, 78, 170)], 2.6, IRON)
+      + [44, 57, 70].map((v, i) => bill(0, v, 170,
+        `<path d="M0 0 V5" stroke="${ART_INK}" stroke-width="1.4"/><g transform="translate(0 4) scale(${1 + i * 0.12})"><path d="M-7 2 Q-8 14 0 15 Q8 14 7 2Z" fill="#3c434c" stroke="${ART_INK}" stroke-width="1.4" stroke-linejoin="round"/>`
+        + `<ellipse cy="2" rx="7" ry="2.2" fill="#6b7480" stroke="${ART_INK}" stroke-width="1.2"/><path d="M-5 5 q1 5 3 7" stroke="#fff" stroke-opacity=".5" fill="none" stroke-width="1.1" stroke-linecap="round"/></g>`, [-10, -1, 10, 24])).join(''),
+    // a polished round buckler: steel face, crimson cross, gold boss
+    mirror: () => bill(0, 57, 158,
+      `<circle r="16" fill="#8f98a3" stroke="${ART_INK}" stroke-width="2.2"/><circle r="12.4" fill="#d3dbe3" stroke="#5d6670" stroke-width="1.2"/><path d="M0 -12 V12 M-12 0 H12" stroke="${CLOAK}" stroke-width="2.4"/>`
+      + `<circle r="4.6" fill="${GOLD}" stroke="${ART_INK}" stroke-width="1.4"/><path d="M-7 -7 l5 -4" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".8"/>`
+      + [0, 1, 2, 3, 4, 5].map(i => `<circle cx="${(14.2 * Math.cos((i / 6) * Math.PI * 2)).toFixed(1)}" cy="${(14.2 * Math.sin((i / 6) * Math.PI * 2)).toFixed(1)}" r="1" fill="${IRON_LT}"/>`).join(''), [-17.5, -17.5, 17.5, 17.5]),
+    // a plank with pegs: a crimson cloak, a horned helm and a teal pouch hang from it
+    'coat-hooks': () => box(0, 252, 2, 42, 121, 128, WOOD_LT) + isoLine([P(2.1, 253, 127), P(2.1, 293, 127)], 1, HI)
+      + [260, 273, 286].map(v => box(2, v - 0.8, 2, 1.6, 124, 126.5, IRON)).join('')
+      + slabU(2, 0.9, [[256, 124], [266, 124], [268, 99], [254, 99]], CLOAK) + ellU(2.95, 261, 120, 1.6, 1.6, GOLD, { sw: 1 })
+      + isoLines([[P(2.95, 258, 122), P(2.95, 257, 100)], [P(2.95, 262, 122), P(2.95, 262, 100)]], 1.1, '#5a1c25', 0.8)
+      + isoLine([P(3, 273, 119), P(3, 273, 124)], 1.2, ART_INK) + helm(3.4, 273, 103, 0.75)
+      + slabU(2, 0.9, [[281, 113], [291, 113], [292, 100], [280, 100]], TEAL) + isoLine([P(2.95, 283, 113), P(2.95, 285, 124), P(2.95, 287, 124), P(2.95, 289, 113)], 1.4, ART_INK),
+
+    /* ---------- window dressing (right wall, v 156-244, above the sill) ---------- */
+    // patchwork hide panels on a bone rod
+    'curtains-gingham': () => {
+      const tones = [HIDE, '#8f6e4a', '#bf9e74'];
+      const panel = ([a, b]) => box(0.5, a, 1.8, b - a, 74, 141, HIDE)
+        + [0, 1, 2].flatMap(c => [0, 1, 2, 3, 4].map(r => rectU(2.35, a + c * 5, a + c * 5 + 5, 74 + r * 13.4, 74 + (r + 1) * 13.4, tones[(c + r) % 3], { stroke: null }))).join('')
+        + isoLines([5, 10].map(d => [P(2.4, a + d, 74), P(2.4, a + d, 141)]), 1, '#5a4026', 0.7)
+        + [0, 1, 2, 3, 4].map(k => poly([P(2.35, a + k * 3 + 0.6, 74), P(2.35, a + k * 3 + 3, 74), P(2.35, a + k * 3 + 1.8, 70)], '#8f6e4a', { sw: 0.8 })).join('');
+      return box(0.4, 155, 2, 86, 141, 143.5, BONE) + [154, 240.5].map(v => box(0.4, v, 2, 1.5, 139.5, 146, IRON_LT)).join('') + [[158, 173], [223, 238]].map(panel).join('');
+    },
+    // crimson velvet drapes tied back with a gold cord
+    'curtains-linen': () => {
+      const left = [[158, 141], [176, 141], [171, 104], [169, 100], [171, 96], [178, 74], [158, 74]];
+      const right = left.map(([v, h]) => [396 - v, h]);
+      return box(0.4, 155, 2, 86, 141, 143.5, GOLD) + [154, 240.5].map(v => box(0.4, v, 2, 1.5, 139.5, 146, GOLD_DK)).join('')
+        + slabU(0.6, 1.6, left, '#8e2f3a') + slabU(0.6, 1.6, right, '#8e2f3a')
+        + isoLines([161.5, 165.5, 396 - 161.5, 396 - 165.5].map(v => [P(2.2, v, 140), P(2.2, v, 75)]), 1, '#5a1c25', 0.8)
+        + isoLines([[P(2.3, 158, 141), P(2.3, 176, 141)], [P(2.3, 220, 141), P(2.3, 238, 141)]], 1.6, GOLD_HI)
+        + isoLines([[P(2.3, 158, 100), P(2.3, 169, 100)], [P(2.3, 238, 100), P(2.3, 227, 100)]], 2.6, GOLD);
+    },
+    // an iron portcullis raised partway: a beam, bars with spiked tips
+    'roller-blind': () => {
+      const vs = Array.from({ length: 9 }, (_, i) => 168 + i * 7.5);
+      const bars = vs.map(v => [P(1.8, v, 108), P(1.8, v, 133)]);
+      const cross = [114, 124].map(h => [P(1.8, 166, h), P(1.8, 230, h)]);
+      return box(0.5, 162, 2, 3, 131, 141, IRON) + box(0.5, 231, 2, 3, 131, 141, IRON) + box(0.5, 165, 2, 66, 133, 139, IRON_LT)
+        + isoLines([...bars, ...cross], 4.4, ART_INK) + isoLines([...bars, ...cross], 2.2, IRON)
+        + vs.map(v => poly([P(1.8, v - 1.8, 108), P(1.8, v + 1.8, 108), P(1.8, v, 99)], IRON_LT, { sw: 1 })).join('')
+        + isoLine([P(2.3, 167, 132), P(2.3, 229, 132)], 1, HI);
+    },
+    // wires of glowing glowworm orbs (animated glints)
+    'window-lights': () => {
+      const cols = ['#7de3ff', '#b6f06a', '#ffd34d', '#ff8fab', '#b58cff'];
+      const wire = Array.from({ length: 13 }, (_, i) => [160 + i * 6.3, 140 - Math.sin((i / 12) * Math.PI) * 8]);
+      let s = isoLine(wire.map(([v, h]) => P(1, v, h)), 1.3, IRON);
+      wire.slice(1, -1).forEach(([v, h], i) => { s += orb(1, v, h - 3, cols[i % 5], (i % 6) * 0.45); });
+      for (const v0 of [160, 236]) {
+        const strand = [0, 1, 2, 3, 4, 5].map(k => [v0 + Math.sin(k) * 2, 136 - k * 13]);
+        s += isoLine(strand.map(([v, h]) => P(1, v, h)), 1.3, IRON);
+        strand.slice(1).forEach(([v, h], k) => { s += orb(1, v, h, cols[(k + 2) % 5], k * 0.55); });
+      }
+      return s;
+    },
+    // a brazier on three chains, a low flame and rising embers (animated, glowing)
+    'plant-hanger': () => [[13, 198], [8, 203], [8, 193]].map(([u, v]) => isoLine([P(8, 198, 150), P(u, v, 130)], 1.3, IRON_LT)).join('')
+      + cylE(8, 198, 3.5, 3.5, 120, 130, IRON, 6.6, 6.6) + ellH(8, 198, 130, 5.6, 5.6, '#4a1c12', { sw: 1 }) + ellH(8, 198, 130.2, 3.4, 3.4, EMBER, { stroke: null })
+      + flame(8, 198, 130.5, 0.6, 0.5) + embers(8, 198, 134, 3),
+
+    /* ---------- windowsill (stone ledge at h 74, u 3-14) ---------- */
+    // three clay pots of glowing cave mushrooms (animated spots)
+    'sill-basil': () => [178, 198, 218].map((v, i) => cylE(8.5, v, 3.6, 3.6, 74, 81, '#6a4526', 4.4, 4.4) + bandAt(8.5, v, 4, 77.5, '#3a2616', 1.1)
+      + bill(8.5, v, 81, `<g ${glowAttr('#38d6c4', 3)}><path d="M-3 0 v-6 M2.4 0 v-4" stroke="#cfeee6" stroke-width="2" stroke-linecap="round"/>`
+        + `<path d="M-8 -6 Q-3 -15 2 -6Z" fill="#38d6c4" stroke="${ART_INK}" stroke-width="1.2" stroke-linejoin="round"/><path d="M-.2 -4 Q2.4 -10 5 -4Z" fill="#7de3ff" stroke="${ART_INK}" stroke-width="1.1" stroke-linejoin="round"/>`
+        + fxg('glint', '<circle cx="-4.6" cy="-9" r="1" fill="#fff"/><circle cx="-1.2" cy="-8" r=".8" fill="#fff"/><circle cx="2.6" cy="-6" r=".7" fill="#fff"/>', i * 0.7) + '</g>', [-9, -16, 6.5, 1])).join(''),
+    // three stone bases, each holding a small cluster of gem crystals
+    'sill-succulents': () => [[178, '#d63a4a'], [198, '#4aa8e8'], [218, '#5cc46a']].map(([v, c]) => cylE(8.5, v, 3.4, 3.4, 74, 79, STONE, 4.2, 4.2)
+      + crystal(7, v - 3, 3, 3, 79, 84, c) + crystal(9.5, v - 0.5, 3, 3, 79, 87, tint(c, 22)) + crystal(6.5, v + 1.5, 2.4, 2.4, 79, 83, c)).join(''),
+    // a tall and a squat stalagmite, one tipped with a gem
+    'sill-cactus': () => cylE(8.5, 186, 4.5, 4.5, 74, 83, STONE, 3.2, 3.2) + cylE(8.5, 186, 3.2, 3.2, 83, 91, STONE_LT, 1.1, 1.1) + gem(8.5, 186, 91, '#4aa8e8')
+      + cylE(8.5, 214, 3.8, 3.8, 74, 80, STONE, 2.6, 2.6) + cylE(8.5, 214, 2.6, 2.6, 80, 86, STONE_LT, 0.9, 0.9)
+      + isoLines([[P(7, 188, 76), P(7.6, 188, 88)], [P(7, 216, 76), P(7.6, 216, 84)]], 1, HI),
+    // a bone horn on a wooden rest, a candle beside it (animated flame)
+    'sill-radio': () => box(3.2, 182, 8, 20, 74, 80, WOOD)
+      + bill(7.2, 192, 80,
+        `<path d="M-10 -2 C-10 -12 4 -18 12 -9 C14 -6 12 -2 9 -3 C10 -8 4 -10 0 -6 C-3 -3 -4 0 -4 2 Z" fill="${BONE}" stroke="${ART_INK}" stroke-width="1.4" stroke-linejoin="round"/>`
+        + `<path d="M-6 -9 q2 3 1 6 M-1 -13 q2 3 1 6 M4 -13 q3 2 3 5" stroke="#b7a57e" stroke-width="1.1" fill="none" stroke-linecap="round"/><rect x="-11" y="-3" width="4.5" height="5" rx="1" fill="${GOLD}" stroke="${ART_INK}" stroke-width="1.1"/>`, [-12, -20, 15, 4])
+      + candle(8.5, 222, 74),
+    // a small golden dragon idol on a plinth, a candle beside it (animated flame)
+    'sill-cat': () => box(5.5, 184, 6, 6, 74, 76, STONE_LT)
+      + bill(8.5, 187, 76,
+        `<path d="M6 -1 Q14 -2 12 -9 Q11 -12 9 -10" fill="none" stroke="${ART_INK}" stroke-width="4.6" stroke-linecap="round"/><path d="M6 -1 Q14 -2 12 -9 Q11 -12 9 -10" fill="none" stroke="${GOLD_DK}" stroke-width="2.2" stroke-linecap="round"/>`
+        + `<path d="M-5 -9 q-8 -6 -7 -14 q5 3 8 8z" fill="${GOLD_HI}" stroke="${ART_INK}" stroke-width="1.2" stroke-linejoin="round"/>`
+        + `<ellipse cy="-6" rx="6.5" ry="6.5" fill="${GOLD}" stroke="${ART_INK}" stroke-width="1.3"/><ellipse cy="-5" rx="3.4" ry="4.4" fill="${GOLD_HI}"/>`
+        + `<circle cy="-15" r="4.8" fill="${GOLD}" stroke="${ART_INK}" stroke-width="1.3"/><path d="M-3 -18.5 l-2 -4 l3.4 2z M3 -18.5 l2 -4 l-3.4 2z" fill="${GOLD_HI}" stroke="${ART_INK}" stroke-width="1" stroke-linejoin="round"/>`
+        + '<circle cx="-1.8" cy="-15.6" r=".9" fill="#d63a4a"/><circle cx="1.8" cy="-15.6" r=".9" fill="#d63a4a"/><path d="M-1.6 -12.6 h3.2" stroke="#8a5a14" stroke-width="1" stroke-linecap="round"/>', [-9, -24, 14, 1])
+      + candle(8.5, 216, 74),
+    /* ---------- rug (flat on the floor inside GEOMETRY.RUG: centre 140,150, radii 58 x 44) ---------- */
+    // a crimson rug with a gold dashed ring
+    'rug-pink': () => {
+      const { cu, cv, ru, rv } = GEOMETRY.RUG;
+      return ellH(cu, cv, 0, ru, rv, '#8e2f3a', { sw: 2 }) + ellH(cu, cv, 1, ru - 6, rv - 5, '#a8404c', { stroke: null }) + ringLine(cu, cv, 1.2, 40, 30, 2, GOLD, '6 5');
+    },
+    // concentric braided rings of hide
+    'rug-braided': () => {
+      const { cu, cv } = GEOMETRY.RUG;
+      const rings = [[58, 44, '#5a3a20'], [52, 39, '#8a5a35'], [46, 34, '#a87848'], [40, 29.5, '#8a5a35'], [34, 25, '#a87848'], [28, 20.5, '#8a5a35'], [22, 16, '#a87848'], [16, 11.5, '#6a4526']];
+      return rings.map(([a, b, c], i) => ellH(cu, cv, i ? 1.4 : 0, a, b, c, i ? { stroke: null } : { sw: 2 })).join('')
+        + [49, 37, 25].map(k => ringLine(cu, cv, 1.6, k, (k * 44) / 58, 1.4, '#4a2c18', '3 4')).join('');
+    },
+    // a green dragon-scale rug: overlapping scale arcs inside a gold ring
+    'rug-leaf': () => {
+      const { cu, cv, ru, rv } = GEOMETRY.RUG;
+      let s = ellH(cu, cv, 0, ru, rv, '#24574a', { sw: 2 });
+      for (let row = -4; row <= 4; row++) {
+        for (let col = -7; col <= 7; col++) {
+          const du = col * 7.4 + (row % 2 ? 3.7 : 0), dv = row * 8.6;
+          if ((du / (ru - 7)) ** 2 + (dv / (rv - 6)) ** 2 > 1) continue;
+          s += poly(arcPts(cu + du, cv + dv, 1, 3.7, 4.2, 0, Math.PI, 8), (row + col) % 2 ? '#2f8f7a' : TEAL_HI, { stroke: '#183a30', sw: 0.9 });
+        }
+      }
+      return s + ringLine(cu, cv, 1.3, ru - 3, rv - 2.3, 2, GOLD);
+    },
+    // warband stripes: seven bands of crimson, gold, bone and teal
+    'rug-stripe': () => {
+      const { cu, cv, ru, rv } = GEOMETRY.RUG;
+      return ellH(cu, cv, 0, ru, rv, CLOAK, { sw: 2 })
+        + [CLOAK, GOLD, BONE, TEAL, BONE, GOLD, CLOAK].map((c, i) => ellBand(cu, cv, ru - 3, rv - 2.4, -1 + (i * 2) / 7, -1 + ((i + 1) * 2) / 7, 1, c)).join('')
+        + ringLine(cu, cv, 1.4, ru - 1.5, rv - 1.2, 1.4, GOLD_DK);
+    },
+    // a plaid feast blanket with a goblet and a roast leg
+    'rug-picnic': () => {
+      let s = rectH(0, 100, 180, 120, 180, '#7a2a35', { sw: 2 });
+      for (let i = 0; i < 8; i++) for (let j = 0; j < 6; j++) if ((i + j) % 2 === 0) s += rectH(0.4, 100 + i * 10, 110 + i * 10, 120 + j * 10, 130 + j * 10, BONE, { stroke: null, op: 0.85 });
+      return s
+        + bill(108, 128, 0.6, `<path d="M-4 -7 h8 q0 5 -4 6 q-4 -1 -4 -6z" fill="${GOLD}" stroke="${ART_INK}" stroke-width="1.2" stroke-linejoin="round"/><path d="M0 -1 v3" stroke="${ART_INK}" stroke-width="1.4"/><ellipse cy="2" rx="3" ry="1" fill="${GOLD_DK}" stroke="${ART_INK}" stroke-width="1"/>`, [-5, -8, 5, 4])
+        + bill(172, 172, 0.6, `<path d="M-6 -3 q5 -8 11 -3 q2 4 -2 6 q-6 2 -9 -3z" fill="#b5502e" stroke="${ART_INK}" stroke-width="1.2" stroke-linejoin="round"/><path d="M5 -6 l5 -3" stroke="${BONE}" stroke-width="3" stroke-linecap="round"/><circle cx="10.5" cy="-9" r="1.8" fill="${BONE}" stroke="${ART_INK}" stroke-width=".8"/>`, [-7, -11, 13, 4]);
+    },
+    // a big cave-bear pelt: a scalloped hide with darker flecks and a lighter back
+    'rug-sheepskin': () => {
+      const { cu, cv } = GEOMETRY.RUG, g = rnd(21), segs = [];
+      for (let i = 0; i < 40; i++) {
+        const a = g() * Math.PI * 2, d = Math.sqrt(g()) * 0.8, u = cu + 52 * d * Math.cos(a), v = cv + 40 * d * Math.sin(a), l = 2 + g() * 2.4, t = g() * Math.PI;
+        segs.push([P(u, v, 0.6), P(u + Math.cos(t) * l, v + Math.sin(t) * l * 0.76, 0.6)]);
+      }
+      const lobes = [[32, 22], [32, -22], [-32, 22], [-32, -22]].map(([du, dv]) => poly(ellipsePoints(cu + du, cv + dv, 0, 10, 7, 14), '#8b6b4a', { sw: 1.4 })
+        + [-1, 0, 1].map(k => poly(ellipsePoints(cu + du + Math.sign(du) * 9.2, cv + dv + k * 3, 0.5, 1.1, 1.1, 6), BONE, { stroke: null })).join('')).join('');
+      const head = poly(ellipsePoints(cu + 46, cv, 0, 9, 8, 14), '#8b6b4a', { sw: 1.4 })
+        + [-1, 1].map(s => poly(ellipsePoints(cu + 41, cv + s * 6.4, 0.6, 2.6, 2.2, 8), '#5a4026', { sw: 1 })).join('') + poly(ellipsePoints(cu + 53.4, cv, 0.8, 1.7, 1.5, 8), '#2b2630', { stroke: null });
+      return lobes + head + pelt(cu, cv, 52, 40, 0, '#8b6b4a', 7) + pelt(cu, cv, 38, 28, 0.4, '#a98660', 9) + isoLines(segs, 1, '#4a3320', 0.7);
+    },
+
+    /* ---------- back corner (u 2-30, v 32-52, h 0-80) ---------- */
+    // a stone urn of cave ferns with glowing tips
+    'snake-plant': () => cylE(20, 38.5, 5.4, 5.4, 0, 14, STONE, 6.2, 6.2) + bandAt(20, 38.5, 5.8, 10, STONE_DK, 1.2) + ellH(20, 38.5, 14.1, 4.6, 4.6, '#3a2a1e', { sw: 1 })
+      + bill(20, 38.5, 14, [[-5, -32, -3], [-1.5, -40, 0], [2.5, -35, 2], [5.5, -26, 5]].map(([x, y, t]) =>
+        `<path d="M${x - 2} 0 Q${x - 2 + t / 2} ${y / 2} ${x + t / 2} ${y} Q${x + 2 + t / 2} ${y / 2} ${x + 2} 0z" fill="#2f8f7a" stroke="${ART_INK}" stroke-width="1.2" stroke-linejoin="round"/>`
+        + `<path d="M${x} -2 Q${x + t * 0.45} ${y / 2} ${x + t / 2} ${y + 3}" stroke="#8fe0cc" stroke-width="1" fill="none" stroke-linecap="round"/><circle cx="${x + t / 2}" cy="${y}" r="1.7" fill="${GLOW}" ${glowAttr(GLOW, 2)}/>`).join(''), [-9, -43, 10, 1]),
+    // a dead thorn tree in a stone pot, glowing ember berries
+    cactus: () => cylE(16, 42, 7, 7, 0, 12, STONE_DK, 8, 8) + bandAt(16, 42, 7.5, 8.5, '#4a4858', 1.2) + ellH(16, 42, 12.1, 6.2, 6.2, '#3a2a1e', { sw: 1 })
+      + bill(16, 42, 12,
+        limb('M0 0 V-30', 5.5, '#5a4636') + limb('M0 -16 L-10 -26 L-11 -35', 3, '#5a4636') + limb('M0 -24 L9 -32 L10 -42', 3, '#5a4636') + limb('M0 -30 L-3 -44', 2.6, '#5a4636')
+        + '<path d="M-3 -10 l-3 -2 M3 -20 l3 -2 M-6 -22 l-3 -1 M5 -28 l3 -1 M-8 -30 l-3 1 M8 -38 l3 -1" stroke="#cfc4a8" stroke-width="1.2" stroke-linecap="round" fill="none"/>'
+        + `<g ${glowAttr('#ff6a3c', 3)}><circle cx="-3" cy="-45" r="2.4" fill="#ff6a3c" stroke="${ART_INK}" stroke-width="1"/><circle cx="10" cy="-43" r="2.2" fill="#ff8a2a" stroke="${ART_INK}" stroke-width="1"/></g>`, [-14, -49, 14, 1]),
+    // an oak barrel bristling with a spear, an axe and a sword
+    'umbrella-stand': () => bill(16, 42, 24,
+      limb('M-4 0 V-32', 2, WOOD_LT) + `<path d="M-4 -42 L-1.4 -32 L-4 -30 L-6.6 -32Z" fill="#d3dbe3" stroke="${ART_INK}" stroke-width="1.2" stroke-linejoin="round"/>`
+      + limb('M5 0 V-28', 2, WOOD_LT) + `<path d="M5 -34 Q13 -36 12 -26 Q9 -28 5 -27Z" fill="#b4bdc8" stroke="${ART_INK}" stroke-width="1.2" stroke-linejoin="round"/>`
+      + `<rect x="-1.2" y="-14" width="2.4" height="14" fill="#5a3a1f" stroke="${ART_INK}" stroke-width="1"/><path d="M-5 -14 h10" stroke="${GOLD}" stroke-width="2.6" stroke-linecap="round"/><circle cy="-17.4" r="2" fill="${GOLD}" stroke="${ART_INK}" stroke-width="1"/>`, [-14, -44, 14, 1])
+      + cylE(16, 42, 6, 6, 0, 12, WOOD, 7, 7) + cylE(16, 42, 7, 7, 12, 24, WOOD, 6, 6) + bandAt(16, 42, 6.6, 5) + bandAt(16, 42, 7, 12) + bandAt(16, 42, 6.4, 19),
+    // a long-handled ash rake leaning on the wall and an iron shovel on the floor
+    broom: () => isoLine([P(8, 40, 14), P(4, 44, 76)], 2.6, WOOD) + isoLine([P(7.6, 40.3, 16), P(3.6, 44.3, 74)], 1, HI)
+      + bill(8, 40, 0.8, `<path d="M-8 -13 h16 v3 h-16z" fill="${IRON}" stroke="${ART_INK}" stroke-width="1.3" stroke-linejoin="round"/><path d="M-7 -10 v10 M-3.5 -10 v10 M0 -10 v10 M3.5 -10 v10 M7 -10 v10" stroke="${IRON_LT}" stroke-width="1.6" stroke-linecap="round"/>`, [-9, -14, 9, 1])
+      + box(19, 34, 10, 12, 0, 1.5, IRON) + box(19, 34, 2, 12, 1.5, 5, IRON_LT) + isoLine([P(27, 40, 1.5), P(25, 38.5, 28)], 2, WOOD) + isoLine([P(20.5, 35, 1.4), P(27.5, 35, 1.4)], 1, HI),
+
+    /* ---------- bedside nook (u 2-32, v 140-182, h 0-70) ---------- */
+    // a wooden table with a caged lantern (animated flame, glowing)
+    'side-table-lamp': () => box(4, 148, 26, 26, 0, 32, WOOD) + box(3, 147, 28, 28, 32, 35, WOOD_LT) + rectU(30, 152, 170, 12, 28, WOOD_DK)
+      + bill(30, 161, 20, `<circle r="1.8" fill="${GOLD}" stroke="${ART_INK}" stroke-width="1.1"/>`, [-2.5, -2.5, 2.5, 2.5]) + cyl(17, 161, 5, 35, 38, IRON)
+      + bill(17, 161, 42, '<circle r="9" fill="#ffb347" opacity=".22"/>', [-9, -9, 9, 9]) + flame(17, 161, 38.5, 0.8, 0.2)
+      + [[13, 157], [21, 157], [13, 165], [21, 165]].map(([x, y]) => isoLine([P(x, y, 38), P(x, y, 54)], 1.6, IRON_LT)).join('')
+      + cylE(17, 161, 6.5, 6.5, 54, 57, IRON, 6.5, 6.5) + cylE(17, 161, 6.5, 6.5, 57, 62, IRON, 1.6, 1.6),
+    // a table with a hide war drum and two bone sticks
+    'record-player': () => {
+      const t0 = nearRange(9, 9)[0];
+      const rope = Array.from({ length: 11 }, (_, i) => P(17 + 9 * Math.cos(t0 + (i / 10) * Math.PI), 161 + 9 * Math.sin(t0 + (i / 10) * Math.PI), i % 2 ? 46.6 : 39.4));
+      return box(4, 148, 26, 26, 0, 34, '#6a4526') + rectU(30, 152, 170, 6, 28, '#4a3018') + [156, 161, 166].map(v => ellU(30.1, v, 17, 1.6, 1.6, GOLD, { sw: 0.8 })).join('')
+        + box(7, 151, 20, 20, 34, 36, '#4a3018') + cylE(17, 161, 9, 9, 36, 48, '#9a6b3a', 9, 9) + ellH(17, 161, 48, 9, 9, BONE, { sw: 1.4 }) + isoLine(rope, 1.2, '#e8dcc0')
+        + isoLine([P(11, 155, 48.6), P(22, 160, 49)], 2.2, BONE) + isoLine([P(13, 167, 48.6), P(22, 162, 49)], 2.2, BONE);
+    },
+    // an iron stand cradling a speckled dragon egg on a crimson cushion
+    'plant-stand': () => [[11, 155], [21, 155], [11, 165], [21, 165]].map(([u, v]) => box(u, v, 2, 2, 0, 36, IRON)).join('')
+      + cyl(17, 161, 9.5, 36, 39, IRON_LT) + cylE(17, 161, 6.5, 6.5, 39, 42, CLOAK, 7.5, 7.5)
+      + bill(17, 161, 42, `<ellipse cy="-10" rx="8" ry="10.5" fill="#b5e0c9" stroke="${ART_INK}" stroke-width="1.4"/><circle cx="-2.4" cy="-13" r="1.8" fill="#6cc59a"/><circle cx="3" cy="-7.4" r="1.6" fill="#6cc59a"/><circle cx="1" cy="-16" r="1.2" fill="#6cc59a"/><path d="M-5 -16 q1.4 -2.6 4 -3" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round"/>`, [-9, -22, 9, 1])
+      + sparkle(21, 158, 56, 0.6),
+    // a wooden stool with two stacked tomes and a candle (animated flame)
+    'stool-books': () => [[9, 153], [25, 153], [9, 169], [25, 169]].map(([u, v]) => box(u, v, 2, 2, 0, 26, WOOD)).join('')
+      + cyl(17, 161, 11, 26, 30, WOOD_DK) + box(10, 155, 14, 10, 30, 34, TEAL) + poly(rectUPoints(24.02, 156, 164, 30.8, 33.2), '#f4ead2', { stroke: null })
+      + box(11, 156, 12, 9, 34, 37, CLOAK) + poly(rectUPoints(23.02, 157, 164, 34.7, 36.3), '#f4ead2', { stroke: null }) + rectU(23.05, 159, 162, 34.6, 36.4, GOLD, { stroke: null })
+      + candle(17, 160, 37, 5, 0.45, 0.3),
+
+    /* ---------- foot of the bed (u 96-126, v 196-240, h 0-30) ---------- */
+    // an iron-banded treasure chest with a gold lock and coins on the lid
+    'toy-chest': () => box(98, 200, 26, 38, 0, 22, WOOD) + seamsU(124.05, [208, 215, 222, 229], 1, 21, WOOD_DK) + rectU(124.05, 203, 209, 0, 22, IRON) + rectU(124.05, 229, 235, 0, 22, IRON)
+      + box(97, 199, 28, 40, 22, 26, WOOD_DK) + rectU(125.05, 203, 209, 22, 26, IRON) + rectU(125.05, 229, 235, 22, 26, IRON) + ellU(125.1, 219, 22, 3.2, 3.2, GOLD, { sw: 1.2 })
+      + coinScatter(110, 219, 13, 18, 26.2, 8, 3, 0.85, 2),
+    // a stone slab bench with a crimson cushion
+    bench: () => [[99, 201], [118, 201], [99, 233], [118, 233]].map(([u, v]) => box(u, v, 4, 4, 0, 16, STONE_DK)).join('')
+      + stoneBox(98, 200, 24, 36, 16, 21, STONE) + box(99, 202, 22, 32, 21, 25, CLOAK)
+      + [[104, 208], [104, 218], [104, 228], [114, 208], [114, 218], [114, 228]].map(([u, v]) => ellH(u, v, 25.1, 1.1, 1.1, GOLD, { stroke: null })).join('')
+      + isoLine([P(100, 202.8, 24.7), P(120, 202.8, 24.7)], 1, HI),
+    // a woven basket heaped with coins and gems (animated glint)
+    'laundry-basket': () => cylE(111, 218, 10, 10, 0, 20, '#b88a4a', 12, 12) + bandAt(111, 218, 10.7, 6, '#7a5a2a', 1.2) + bandAt(111, 218, 11.4, 13, '#7a5a2a', 1.2)
+      + ellH(111, 218, 20, 10.6, 10.6, '#3a2a1e', { sw: 1 }) + coinScatter(111, 218, 9, 9, 20.3, 16, 4, 0.92, 2.2)
+      + gem(106, 214, 20.4, '#d63a4a') + gem(116, 222, 20.4, '#4aa8e8') + gem(113, 212, 20.4, '#5cc46a') + sparkle(110, 218, 24, 0.2),
+    // a hide mat with a pair of claw boots
+    slippers: () => box(98, 198, 26, 40, 0, 1.2, '#6a2a30') + rectH(1.3, 101, 121, 201, 235, 'none', { stroke: GOLD, sw: 1.2 })
+      + [208, 224].map(v => ellH(110, v, 1.5, 9, 4.2, '#2f6b5a') + cyl(114.5, v, 3.6, 1.5, 5, '#3fa57c')
+        + [-2, 0, 2].map(d => poly([P(101, v + d - 0.8, 1.6), P(97.6, v + d * 1.2, 1.6), P(101, v + d + 0.8, 1.6)], BONE, { sw: 0.8 })).join('')).join(''),
+    /* ---------- by the fridge (legacy ids drawn at u 150-186, v 110-150; the veg basket in world coords) ---------- */
+    // a copper ewer for quenching the forge
+    'watering-can': () => cylE(169, 129, 5.5, 5.5, 0, 12, COPPER, 6.5, 6.5) + bandAt(169, 129, 6, 6, '#8a4a22', 1.2) + ellH(169, 129, 12, 5.2, 5.2, '#2a1a12', { sw: 1 })
+      + isoLine([P(174, 129, 8), P(184, 129, 16)], 4.6, ART_INK) + isoLine([P(174, 129, 8), P(184, 129, 16)], 2.4, COPPER)
+      + isoLine([P(164, 129, 10), P(161, 129, 15), P(164, 129, 20), P(167, 129, 21)], 4.2, ART_INK) + isoLine([P(164, 129, 10), P(161, 129, 15), P(164, 129, 20), P(167, 129, 21)], 2, COPPER),
+    // four leather spellbooks, stacked, one with a gem on top
+    'cookbook-stack': () => box(160, 122, 18, 14, 0, 5, CLOAK) + poly(rectUPoints(178.05, 123, 135, 0.8, 4.2), '#f4ead2', { stroke: null })
+      + box(161, 123, 16, 12, 5, 10, TEAL) + box(160, 122, 18, 14, 10, 15, '#4a3a7a') + poly(rectUPoints(178.05, 123, 135, 10.8, 14.2), '#f4ead2', { stroke: null })
+      + box(162, 124, 14, 10, 15, 19, '#8a5a35') + rectU(176.05, 126, 132, 15.6, 18.4, GOLD, { stroke: null }) + gem(169, 129, 19, '#7de3ff'),
+    // a crimson hide cushion with gold stitching and tassels
+    'bean-bag': () => ellH(168, 130, 0, 16, 14, '#5a1c25')
+      + bill(168, 130, 0, `<path d="M-20 -2 q-2 -22 20 -24 q22 2 20 24 q-20 8 -40 0z" fill="#a8404c" stroke="${ART_INK}" stroke-width="1.6"/><path d="M-8 -14 q8 -6 16 0" stroke="${GOLD}" stroke-width="2" fill="none" stroke-dasharray="3 2"/><path d="M-12 -6 q12 6 24 0" stroke="#5a1c25" stroke-width="1.4" fill="none"/><circle cx="-19" cy="-3" r="2.2" fill="${GOLD}" stroke="${ART_INK}" stroke-width="1"/><circle cx="19" cy="-3" r="2.2" fill="${GOLD}" stroke="${ART_INK}" stroke-width="1"/>`, [-21.5, -27, 21.5, 5]),
+    // a potted tree hung with glowing ember-fruit (animated glints)
+    'lemon-tree': () => cylE(168, 130, 9, 9, 0, 14, STONE_DK, 10.5, 10.5) + bandAt(168, 130, 9.8, 7, '#4a4858', 1.2) + isoLine([P(168, 130, 14), P(168, 130, 34)], 2.6, '#5a4636')
+      + bill(168, 130, 46,
+        `<circle r="15" fill="#1f5b4c" stroke="${ART_INK}" stroke-width="1.6"/><circle cx="-4" cy="-5" r="8" fill="#2f8f7a" opacity=".55"/>`
+        + [[-6, -3, 0], [5, 4, 0.8], [4, -8, 1.5], [-3, 7, 2.2]].map(([x, y, d]) => `<g ${glowAttr('#ff8a2a', 3)}>${fxg('glint', `<circle cx="${x}" cy="${y}" r="3" fill="#ff8a2a" stroke="${ART_INK}" stroke-width="0.9"/><circle cx="${x - 0.8}" cy="${y - 0.8}" r=".8" fill="#ffe27a"/>`, d)}</g>`).join(''), [-16, -16, 16, 16]),
+    // a forage basket: glowcaps, a roast leg and an egg
+    'veg-basket': () => cylE(238, 150, 10, 10, 0, 12, '#b88a4a', 12, 12) + bandAt(238, 150, 10.8, 4, '#7a5a2a', 1.2) + bandAt(238, 150, 11.4, 8, '#7a5a2a', 1.2)
+      + ellH(238, 150, 12, 10.6, 10.6, '#3a2a1e', { sw: 1 })
+      + isoLine(Array.from({ length: 11 }, (_, i) => P(238 + 11 * Math.cos((i / 10) * Math.PI), 150, 12 + 12 * Math.sin((i / 10) * Math.PI))), 2.2, WOOD_DK)
+      + bill(238, 150, 12,
+        `<path d="M-6 0 v-6 M-1.6 0 v-4" stroke="#cfeee6" stroke-width="2" stroke-linecap="round"/><g ${glowAttr('#38d6c4', 2)}><path d="M-10 -6 Q-6 -14 -2 -6Z" fill="#38d6c4" stroke="${ART_INK}" stroke-width="1.1" stroke-linejoin="round"/><path d="M-4 -4 Q-1.6 -10 1 -4Z" fill="#7de3ff" stroke="${ART_INK}" stroke-width="1" stroke-linejoin="round"/></g>`
+        + `<path d="M3 -3 q4 -8 9 -4 q2 4 -2 6 q-4 2 -7 -2z" fill="#b5502e" stroke="${ART_INK}" stroke-width="1.2" stroke-linejoin="round"/><path d="M3 -4 l-3 -5" stroke="${BONE}" stroke-width="2.4" stroke-linecap="round"/><ellipse cx="-1" cy="-2" rx="3" ry="3.6" fill="#b5e0c9" stroke="${ART_INK}" stroke-width="1"/>`, [-11.5, -15, 13, 1]),
+
+    /* ---------- corner by the door (u 4-40, v 258-294, h 0-100) ---------- */
+    // a stone urn of broad leaves with glowing veins
+    monstera: () => cylE(22, 276, 8, 8, 0, 18, STONE, 10, 10) + bandAt(22, 276, 9.2, 12, STONE_DK, 1.6) + ellH(22, 276, 18, 8.6, 8.6, '#3a2a1e', { sw: 1 })
+      + bill(22, 276, 18,
+        '<path d="M0 0 L-10 -20 M0 0 L8 -26 M0 0 L-2 -40" stroke="#1f5b4c" stroke-width="2"/>'
+        + [[-10, -26, -30], [8, -34, 25], [-2, -50, 0], [12, -18, 50]].map(([x, y, r]) =>
+          `<g transform="translate(${x} ${y}) rotate(${r})"><path d="M0 12 C-14 4 -12 -12 0 -12 C12 -12 14 4 0 12z" fill="#1f5b4c" stroke="${ART_INK}" stroke-width="1.2" stroke-linejoin="round"/>`
+          + `<path d="M0 12 C-8 6 -8 -8 0 -12 C-3 -4 -2 4 0 12z" fill="#2f8f7a"/><g ${glowAttr(GLOW, 2)}><path d="M0 12 V-10 M0 0 L-7 -4 M0 4 L7 0" stroke="${GLOW}" stroke-width="1.1" fill="none"/></g></g>`).join(''), [-27, -64, 29, 1]),
+    // a stand holding a crimson cloak and a horned helm
+    'coat-stand': () => cyl(22, 276, 8, 0, 3, WOOD_DK) + cyl(22, 276, 1.6, 3, 80, WOOD)
+      + [[28, 276], [16, 276], [22, 282], [22, 270]].map(([u, v]) => isoLine([P(22, 276, 72), P(u, v, 78)], 2.4, WOOD)).join('')
+      + bill(22, 276, 74, `<path d="M-9 -3 q-3 18 1 34 h8 q-1 -20 0 -32z" fill="${CLOAK}" stroke="${ART_INK}" stroke-width="1.3" stroke-linejoin="round" transform="translate(3 -2)"/><path d="M-5 4 q-1 10 0 18" stroke="#c9626e" stroke-width="1.2" fill="none" stroke-linecap="round"/><circle cx="-5" cy="-4" r="2" fill="${GOLD}" stroke="${ART_INK}" stroke-width="1"/>`, [-12, -6, 5, 32])
+      + helm(22, 276, 80, 0.7),
+    // a tall iron stand with a brazier: flame and embers (animated, glowing)
+    'arc-lamp': () => cyl(22, 276, 7, 0, 2.5, IRON) + [[14, 272], [30, 272], [22, 284]].map(([u, v]) => isoLine([P(22, 276, 58), P(u, v, 2)], 2.2, IRON)).join('')
+      + cyl(22, 276, 1.8, 2.5, 60, IRON) + cylE(22, 276, 4, 4, 60, 68, IRON, 9, 9) + ellH(22, 276, 68, 8, 8, '#4a1c12', { sw: 1 }) + ellH(22, 276, 68.2, 5.4, 5.4, EMBER, { stroke: null })
+      + flame(22, 276, 68.5, 0.95, 0.2) + embers(22, 276, 76, 3),
+    // a lute with a scaled body, a gold sound-hole and bone pegs, on a small stand
+    guitar: () => bill(12, 276, 0.8,
+      `<path d="M-7 0 L0 -5 L7 0 M0 -5 V-9" stroke="${ART_INK}" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`
+      + '<g transform="translate(0 -7) rotate(-12)">'
+      + `<path d="M0 -2 c-10 0 -12 -10 -6 -14 c-4 -6 0 -12 6 -12 c6 0 10 6 6 12 c6 4 4 14 -6 14z" fill="#1f5b4c" stroke="${ART_INK}" stroke-width="1.4" transform="translate(2 1.2)"/>`
+      + `<path d="M0 -2 c-10 0 -12 -10 -6 -14 c-4 -6 0 -12 6 -12 c6 0 10 6 6 12 c6 4 4 14 -6 14z" fill="${TEAL_HI}" stroke="${ART_INK}" stroke-width="1.4" stroke-linejoin="round"/>`
+      + '<path d="M-6 -6 q3 3 6 0 q3 3 6 0 M-5 -12 q2.5 3 5 0 q2.5 3 5 0 M-3 -19 q3 3 6 0" stroke="#1f6b4c" stroke-width="1" fill="none"/>'
+      + `<circle cy="-14" r="2.8" fill="#14181c" stroke="${GOLD}" stroke-width="1.4"/><rect x="-4" y="-8" width="8" height="1.8" fill="${BONE}"/>`
+      + `<rect x="-1.5" y="-56" width="3" height="30" fill="#4a3a2a" stroke="${ART_INK}" stroke-width="1"/><path d="M-.7 -8 V-56 M.7 -8 V-56" stroke="#f1f0f6" stroke-width=".6"/><path d="M-1.5 -34 h3 M-1.5 -42 h3 M-1.5 -50 h3" stroke="${ART_INK}" stroke-width=".8"/>`
+      + `<rect x="-3" y="-62" width="6" height="7" rx="1" fill="#4a3a2a" stroke="${ART_INK}" stroke-width="1.2"/><circle cx="-4" cy="-60" r="1.2" fill="${BONE}"/><circle cx="4" cy="-60" r="1.2" fill="${BONE}"/></g>`, [-17, -72, 17, 2]),
+
+    /* ---------- front of the room (u 172-208, v 232-268, h 0-40) ---------- */
+    // a tree-stump seat with growth rings
+    pouffe: () => cylE(190, 250, 13, 13, 0, 16, '#7a5a3a', 12, 12)
+      + [0, 1, 2, 3, 4, 5].map(i => { const t = (i / 6) * Math.PI * 2 + 0.3; return isoLine([P(190 + 12 * Math.cos(t), 250 + 12 * Math.sin(t), 2), P(190 + 11.5 * Math.cos(t), 250 + 11.5 * Math.sin(t), 14)], 1, '#4a3320', { op: 0.5 }); }).join('')
+      + ellH(190, 250, 16, 12, 12, '#c9a06a', { sw: 1.4 }) + ringLine(190, 250, 16.2, 8.6, 8.6, 1, '#8a5a35') + ringLine(190, 250, 16.2, 4.6, 4.6, 1, '#8a5a35') + ellH(190, 250, 16.3, 1.4, 1.4, '#8a5a35', { stroke: null })
+      + bill(184, 244, 16, '<ellipse rx="4" ry="1.6" fill="#5d8a43" stroke="#2f5a2a" stroke-width=".8"/><ellipse cx="1" cy="-.8" rx="2" ry=".9" fill="#86b85e"/>', [-5, -3, 5, 2]),
+    // a round stone feast table: two goblets and a candle (animated flame)
+    'tea-table': () => cyl(190, 250, 8, 0, 2, STONE_DK) + cyl(190, 250, 2.4, 2, 20, STONE) + cylE(190, 250, 16, 16, 20, 23, STONE_LT, 16, 16) + bandAt(190, 250, 16, 21.5, STONE_DK, 1)
+      + bill(184, 250, 23, `<path d="M-4 -7 h8 q0 5 -4 6 q-4 -1 -4 -6z" fill="${GOLD}" stroke="${ART_INK}" stroke-width="1.3" stroke-linejoin="round"/><path d="M0 -1 v3" stroke="${ART_INK}" stroke-width="1.5"/><ellipse cy="2" rx="3.2" ry="1.1" fill="${GOLD_DK}" stroke="${ART_INK}" stroke-width="1"/><path d="M-2.4 -6 q-.4 2 .6 3" stroke="#fff6c2" stroke-width="1" fill="none" stroke-linecap="round"/>`, [-5, -9, 5, 4])
+      + bill(197, 256, 23, `<path d="M-3 -5 h6 q0 4 -3 5 q-3 -1 -3 -5z" fill="${GOLD}" stroke="${ART_INK}" stroke-width="1.2" stroke-linejoin="round"/><ellipse cy="1.6" rx="2.6" ry=".9" fill="${GOLD_DK}" stroke="${ART_INK}" stroke-width=".9"/>`, [-4, -6, 4, 3])
+      + candle(190, 244, 23, 4, 0.4, 0.9),
+    // a glowing orb Pip bats about (animated glint)
+    'pip-ball': () => poly(ellipsePoints(190, 250, 0.1, 8, 8), 'rgba(0,0,0,.14)', { stroke: null })
+      + bill(190, 250, 8.8,
+        `<g ${glowAttr('#7de3ff', 4)}><circle r="8" fill="#5cc4e8" stroke="${ART_INK}" stroke-width="1.4"/><circle cx="-1.6" cy="-1.6" r="5.2" fill="#9eeaff" opacity=".75"/>`
+        + `<path d="M-6 1 q4 -6 9 -3 M-3 5 q6 -2 8 -7" stroke="#fff" stroke-width="1.3" fill="none" stroke-linecap="round" opacity=".85"/>${fxg('glint', '<path d="M-3.4 -4.6 l.8 -2 l.8 2 l2 .8 l-2 .8 l-.8 2 l-.8 -2 l-2 -.8z" fill="#fff"/>')}</g>`, [-9, -9, 9, 9]),
+    // a rope-handled provision crate with a cloth cover and a roast leg
+    'picnic-basket': () => isoLine(Array.from({ length: 11 }, (_, i) => P(190, 250 + 8 * Math.cos((i / 10) * Math.PI), 15 + 8 * Math.sin((i / 10) * Math.PI))), 2.4, '#c9a06a')
+      + box(180, 242, 20, 16, 0, 12, WOOD) + isoLines([4, 8].map(h => [P(200.05, 242.6, h), P(200.05, 257.4, h)]), 1, WOOD_DK) + isoLines([4, 8].map(h => [P(180.6, 258.05, h), P(199.4, 258.05, h)]), 1, WOOD_DK)
+      + rectU(200.05, 242, 245, 0, 12, IRON) + rectU(200.05, 255, 258, 0, 12, IRON)
+      + box(179, 241, 22, 18, 12, 15, '#8e2f3a') + bill(194, 254, 15, `<path d="M-6 -3 q5 -8 11 -3 q2 4 -2 6 q-6 2 -9 -3z" fill="#b5502e" stroke="${ART_INK}" stroke-width="1.2" stroke-linejoin="round"/><path d="M5 -6 l5 -3" stroke="${BONE}" stroke-width="3" stroke-linecap="round"/><circle cx="10.5" cy="-9" r="1.8" fill="${BONE}" stroke="${ART_INK}" stroke-width=".8"/>`, [-7, -11, 13, 1])
+    // @@decor-next
+  },
+
+  effects: {
+    // Frost gauge: an ice-framed track filling with frost, in the live gauge colours, at STATION_ANCHORS.fridgeTop + the live lift.
+    gauge: (level, pct) => {
+      const [u, v, h] = GEOMETRY.STATION_ANCHORS.fridgeTop[level - 1];
+      const w = (34 * pct) / 100;
+      let spikes = '';
+      for (let x = 0; x < w - 3; x += 5) spikes += `<path d="M${fmt(-17 + x)} -2 l2 -3 l2 3z" fill="#ffffff" opacity=".85"/>`;
+      return bill(u, v, h + GEOMETRY.FRIDGE_GAUGE_LIFT,
+        `<rect x="-19" y="-7" width="38" height="10" rx="5" fill="#eaf8ff" stroke="${ART_INK}" stroke-width="1.4"/>`
+        + (w > 0 ? `<rect x="-17" y="-5" width="${fmt(w)}" height="6" rx="3" fill="${gaugeColour(pct)}"/>${spikes}` : '')
+        + `<path d="M-24 -2 l3 -3 l3 3 l-3 3z M21 -2 l3 -3 l3 3 l-3 3z" fill="#bfeaff" stroke="${ART_INK}" stroke-width="1"/>`, [-25, -8, 25, 4]);
+    },
+    // Steam off the cauldron: three wisps rising and fading (animated).
+    steam: level => {
+      const [u, v, h] = GEOMETRY.STATION_ANCHORS.cookerPot[level - 1];
+      return bill(u, v, h, fxg('steam', '<path d="M-6 -3 q5 -8 0 -14 M2 -4 q6 -9 0 -16 M9 -2 q5 -7 0 -12" stroke="#ffffff" stroke-width="3" fill="none" stroke-linecap="round" opacity=".92"/>'), [-9, -20, 12, 0]);
+    },
+    // Smoke-ring Zs above the nest, drifting up (animated).
+    zzz: level => {
+      const [u, v, h] = GEOMETRY.STATION_ANCHORS.bedTop[level - 1];
+      const ring = (x, y, r, size) => `<circle cx="${x}" cy="${y}" r="${r}" fill="#ffffff" opacity=".9" stroke="#8d8a98" stroke-width="1.2"/><text x="${x}" y="${y + size * 0.36}" font-size="${size}" font-weight="700" text-anchor="middle" fill="#5d5a68" font-family="system-ui,sans-serif">z</text>`;
+      return bill(u, v, h + GEOMETRY.SLEEP_Z_LIFT, fxg('zzz', ring(14, 0, 8, 12) + ring(27, -14, 6, 9)), [5, -22, 34, 8]);
+    },
+    // The dish that appears when a meal is served: a wooden trencher with a roast leg.
+    servedPlate: level => {
+      const [u, v, h] = GEOMETRY.STATION_ANCHORS.cookerPlate[level - 1];
+      return bill(u, v, h,
+        `<ellipse cx="0" cy="-2" rx="12" ry="5" fill="#a8723d" stroke="${ART_INK}" stroke-width="1.4"/><ellipse cx="0" cy="-3" rx="9" ry="3.2" fill="#c8924f"/>`
+        + `<path d="M-6 -4 q6 -10 13 -3 q1 4 -3 5 q-6 1 -10 -2z" fill="#b5502e" stroke="${ART_INK}" stroke-width="1.2" stroke-linejoin="round"/>`
+        + `<path d="M6 -6 l5 -4" stroke="#f4ead2" stroke-width="3" stroke-linecap="round"/><circle cx="12" cy="-10" r="1.8" fill="#f4ead2" stroke="${ART_INK}" stroke-width=".8"/>`, [-13, -13, 14, 3]);
+    },
+    nightDim: () => `<rect class="night-dim" x="${GEOMETRY.ROOM_WORLD.x}" y="${GEOMETRY.ROOM_WORLD.y}" width="${GEOMETRY.ROOM_WORLD.width}" height="${GEOMETRY.ROOM_WORLD.height}" fill="${GEOMETRY.NIGHT_DIM_FILL}" pointer-events="none"/>`
+  },
+
+  // What animates, by target (a station, a decor id, 'shell' for the walls and fixtures, 'window' for the cave mouth). Light ambience only.
+  ambience: [
+    { target: 'shell', effect: 'flicker' }, // the two wall torches
+    { target: 'shell', effect: 'sway' }, // the banner
+    { target: 'window', effect: 'glint' }, // stars at night
+    { target: 'cooker', effect: 'flicker' }, // the fire
+    { target: 'cooker', effect: 'embers' }, // sparks rising from the hearth
+    { target: 'bed', effect: 'glint' }, // coins and gems on the hoard
+    { target: 'bed', effect: 'flicker' }, // the candelabra at the L4 hoard
+    { target: 'cabinet', effect: 'glint' }, // the trophies and the gold
+    // decor
+    { target: 'fairy-lights', effect: 'glint' }, { target: 'wall-sconce', effect: 'flicker' }, { target: 'photo-strip', effect: 'glint' },
+    { target: 'bunting', effect: 'sway' }, { target: 'window-lights', effect: 'glint' },
+    { target: 'plant-hanger', effect: 'flicker' }, { target: 'plant-hanger', effect: 'embers' },
+    { target: 'sill-basil', effect: 'glint' }, { target: 'sill-radio', effect: 'flicker' }, { target: 'sill-cat', effect: 'flicker' },
+    { target: 'side-table-lamp', effect: 'flicker' }, { target: 'plant-stand', effect: 'glint' }, { target: 'stool-books', effect: 'flicker' }, { target: 'laundry-basket', effect: 'glint' },
+    { target: 'lemon-tree', effect: 'glint' }, { target: 'arc-lamp', effect: 'flicker' }, { target: 'arc-lamp', effect: 'embers' }, { target: 'tea-table', effect: 'flicker' }, { target: 'pip-ball', effect: 'glint' }
+  ],
+
+  labels: {
+    stations: { bed: 'Nest', fridge: 'Ice chest', cooker: 'Forge hearth', cabinet: 'Hoard', wardrobe: 'Armour rack' },
+    // the live shop names each station level, so each pack does too (L1 to L4, matching the art in `stations`)
+    levels: {
+      bed: ['Straw nest', 'Fur nest', 'Coin nest', 'Gold-pile nest'],
+      fridge: ['Ice chest', 'Iron frost locker', 'Cold-cellar door', 'Frost vault'],
+      cooker: ['Campfire pot', 'Stone hearth', 'Forge hearth', 'Great forge'],
+      cabinet: ['Hoard chest', 'Shelf hoard', 'Hoard niche', 'Treasure alcove'],
+      wardrobe: ['Peg frame', 'Armour stand', 'Armour rack', 'Armoury wall']
+    },
+    decor: {
+      // over the wardrobe
+      'basil-print': 'Mounted dragon scale', 'recipe-board': 'Rune slate', 'herb-shelf': 'Potion shelf', 'fairy-lights': 'Crystal string', 'pip-portrait': 'Hatchling portrait',
+      // bedside wall
+      'growth-chart': 'Claw-mark height post', 'meal-calendar': 'Carved tally stone', 'wall-sconce': 'Wall torch', 'photo-strip': 'Gem frames',
+      // front right wall
+      'wall-clock': 'Wall hourglass', bunting: 'Tattered pennants', 'pan-rail': 'Iron cauldron rail', mirror: 'Polished buckler', 'coat-hooks': 'Cloak hooks',
+      // window dressing
+      'curtains-gingham': 'Patchwork hide curtains', 'curtains-linen': 'Crimson drapes', 'roller-blind': 'Iron portcullis', 'window-lights': 'Glowworm strings', 'plant-hanger': 'Hanging brazier',
+      // windowsill
+      'sill-basil': 'Glowcap pots', 'sill-succulents': 'Gem clusters', 'sill-cactus': 'Stalagmite pair', 'sill-radio': 'Echo horn', 'sill-cat': 'Golden dragon idol',
+      // rug
+      'rug-pink': 'Crimson rug', 'rug-braided': 'Braided hide rug', 'rug-leaf': 'Scale rug', 'rug-stripe': 'Banner-stripe rug', 'rug-picnic': 'Feast blanket', 'rug-sheepskin': 'Cave-bear pelt',
+      // back corner
+      'snake-plant': 'Cave fern urn', cactus: 'Thorn tree', 'umbrella-stand': 'Weapon barrel', broom: 'Hearth rake and shovel',
+      // bedside nook
+      'side-table-lamp': 'Table and lantern', 'record-player': 'Table and war drum', 'plant-stand': 'Egg stand', 'stool-books': 'Stool and tomes',
+      // foot of the bed
+      'toy-chest': 'Treasure chest', bench: 'Stone bench', 'laundry-basket': 'Loot basket', slippers: 'Hide mat and claw boots',
+      // by the fridge
+      'watering-can': 'Copper ewer', 'cookbook-stack': 'Spellbook stack', 'bean-bag': 'Hide cushion', 'lemon-tree': 'Ember-fruit tree', 'veg-basket': 'Forage basket',
+      // corner by the door
+      monstera: 'Glowvein plant', 'coat-stand': 'Cloak and helm stand', 'arc-lamp': 'Standing brazier', guitar: 'Dragon-hide lute',
+      // front of the room
+      pouffe: 'Stump seat', 'tea-table': 'Feast table', 'pip-ball': "Pip's glow-orb", 'picnic-basket': 'Provision crate'
+    },
+    styles: {
+      'wall-white': 'Grey stone', 'wall-lavender': 'Cold slate', 'wall-mint': 'Mossy stone', 'wall-peach': 'Ember stone', 'wall-sky': 'Sandstone', 'wall-sprig': 'Ivy-hung stone',
+      'floor-lilac': 'Cave earth', 'floor-oak': 'Flagstones', 'floor-terracotta': 'Slate tiles', 'floor-checker': 'Rune tiles'
+    }
+  }
+};
+
+/* ======================================================================
+   HERB_REFERENCE: the herb room for comparison, a simplified redraw (not a port of the ~2,500 lines of live art):
+   white walls, the lilac floor, the window, the pink rug, and the five stations at level 2 (the live level-2 art as SVG strings).
+   Live reference: /pet on Default. The engine draws this in place of DRAGON_ROOM when state.herb is set.
+   ====================================================================== */
+const HERB_L2 = {
+  bed: () => ({ // camp cot
+    back: [[6, 124], [6, 170], [80, 124]].map(([u, v]) => box(u, v, 3, 3, 0, 22, '#7a6a4f')).join('')
+      + box(4, 122, 80, 52, 22, 30, '#8fb38a') + box(8, 132, 16, 32, 30, 36, '#ffffff'),
+    front: box(80, 170, 3, 3, 0, 22, '#7a6a4f')
+  }),
+  fridge: () => box(146, 0, 40, 34, 0, 58, '#eef0f6') + rectV(34, 150, 153, 24, 48, '#b9bdc8') + rectV(34, 168, 178, 38, 46, '#ff8fab'), // mini fridge
+  cooker: () => box(60, 0, 80, 36, 0, 50, '#f3e3c3') + rectV(36, 64, 98, 6, 44, 'none') + rectV(36, 102, 136, 6, 44, 'none')
+    + box(58, 0, 84, 38, 50, 55, '#d8c09a') + ellH(118, 19, 55, 10, 9, '#444444') + cyl(80, 19, 11, 55, 70, '#e76f51'), // counter and hob
+  cabinet: () => box(0, 38, 14, 3, 30, 40, '#7a5a3a') + box(0, 92, 14, 3, 30, 40, '#7a5a3a') + box(0, 30, 22, 72, 40, 46, '#b98a5a')
+    + bill(10, 46, 46, `<path d="M-6 0 h12 l-2 -9 h-8z" fill="#ffd34d" stroke="${ART_INK}" stroke-width="1.2"/>`, [-6, -9, 6, 0])
+    + box(0, 38, 14, 3, 72, 82, '#7a5a3a') + box(0, 92, 14, 3, 72, 82, '#7a5a3a') + box(0, 30, 22, 72, 82, 88, '#b98a5a'), // wall shelves
+  wardrobe: () => box(10, 0, 52, 26, 0, 58, '#c9965f') // chest of drawers
+    + [6, 24, 42].map(h => rectV(26, 14, 58, h, h + 13, '#e2b989') + bill(36, 26, h + 6.5, `<circle r="2" fill="#8a5a2b" stroke="${ART_INK}" stroke-width="1.4"/>`, [-2, -2, 2, 2])).join('')
+    + cyl(20, 12, 5, 58, 66, '#c0563b') + box(36, 6, 16, 12, 58, 61, '#ff8fab')
+};
+
+const HERB_REFERENCE = {
+  ink: '#3b2f5c',
+  styles: {
+    'wall-white': { left: '#eceef2', right: '#ffffff', skirting: '#dfe3e9' },
+    'floor-lilac': { base: '#d6c9f0' }
+  },
+  backdrop: {
+    wallPattern: () => '',
+    floorPattern: () => '',
+    skirting: () => '',
+    windowFrame: () => rectU(0, 164, 232, 74, 134, '#ffffff'),
+    glass: night => rectU(0, 168, 228, 78, 130, night ? '#2b2d5c' : '#cfe8ff', { stroke: null }),
+    sky: night => (night
+      ? bill(0, 210, 116, '<path d="M0 -8 a8 8 0 1 0 6 13 a6 6 0 1 1 -6 -13z" fill="#fff6c2"/>', [-8, -9, 8, 6]) + bill(0, 178, 120, '<circle r="1.4" fill="#fff"/>', [-2, -2, 2, 2])
+      : bill(0, 215, 116, '<circle r="6" fill="#fff6c2"/>', [-6, -6, 6, 6])) + rectU(0, 196.5, 199.5, 78, 130, '#ffffff', { stroke: null }),
+    sill: () => box(0, 167, 9, 3, 58, 68, '#cbbdea') + box(0, 227, 9, 3, 58, 68, '#cbbdea') + box(0, 158, 14, 80, 68, 74, '#e6dcf7')
+  },
+  stations: Object.fromEntries(Object.entries(HERB_L2).map(([station, fn]) => [station, [fn, fn, fn, fn]])),
+  decor: {
+    'rug-pink': () => ellH(GEOMETRY.RUG.cu, GEOMETRY.RUG.cv, 0, GEOMETRY.RUG.ru, GEOMETRY.RUG.rv, '#f4a7c0')
+      + ellH(GEOMETRY.RUG.cu, GEOMETRY.RUG.cv, 1, GEOMETRY.RUG.ru - 10, GEOMETRY.RUG.rv - 8, '#fbc6d9', { stroke: null })
+  },
+  effects: {
+    gauge: (level, pct) => {
+      const [u, v, h] = GEOMETRY.STATION_ANCHORS.fridgeTop[level - 1];
+      const w = (34 * pct) / 100;
+      return bill(u, v, h + GEOMETRY.FRIDGE_GAUGE_LIFT, `<rect x="-19" y="-7" width="38" height="10" rx="5" fill="#fff" stroke="${ART_INK}" stroke-width="1.4"/>`
+        + (w > 0 ? `<rect x="-17" y="-5" width="${fmt(w)}" height="6" rx="3" fill="${gaugeColour(pct)}"/>` : ''), [-19, -7, 19, 3]);
+    },
+    steam: level => {
+      const [u, v, h] = GEOMETRY.STATION_ANCHORS.cookerPot[level - 1];
+      return bill(u, v, h, fxg('steam', '<path d="M-4 -4 q5 -8 0 -14 M5 -6 q5 -8 0 -14" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/>'), [-6, -20, 10, 0]);
+    },
+    zzz: level => {
+      const [u, v, h] = GEOMETRY.STATION_ANCHORS.bedTop[level - 1];
+      return bill(u, v, h + GEOMETRY.SLEEP_Z_LIFT, fxg('zzz', '<text x="10" y="0" font-size="15" font-weight="700" fill="#fff">z</text><text x="22" y="-12" font-size="11" font-weight="700" fill="#fff">z</text>'), [10, -22, 30, 4]);
+    },
+    servedPlate: level => {
+      const [u, v, h] = GEOMETRY.STATION_ANCHORS.cookerPlate[level - 1];
+      return bill(u, v, h, `<ellipse cx="0" cy="-2" rx="11" ry="4.5" fill="#fff" stroke="${ART_INK}" stroke-width="1.4"/><path d="M-7 -4 q7 -10 14 0z" fill="#f4a259" stroke="${ART_INK}" stroke-width="1.2"/>`, [-11, -12, 11, 3]);
+    },
+    nightDim: () => `<rect class="night-dim" x="${GEOMETRY.ROOM_WORLD.x}" y="${GEOMETRY.ROOM_WORLD.y}" width="${GEOMETRY.ROOM_WORLD.width}" height="${GEOMETRY.ROOM_WORLD.height}" fill="${GEOMETRY.NIGHT_DIM_FILL}" pointer-events="none"/>`
+  }
+};
+</script>
+<script id="room-engine">
+/* ======================================================================
+   Room engine. renderRoomSVG(pack, state, opts?) -> an SVG string; thumbSVG(pack, kind, id, level) -> a cropped SVG string.
+   Pure (no document / window): the node smoke loads this block. Draw order follows the live PetRoom:
+   backdrop -> rug -> wall decor -> back stations (wardrobe, cooker, fridge, cabinet) -> back-floor decor -> bed
+   (back, sleeping creature, front) -> creature -> front-floor decor -> effects -> overlay.
+   Effects are drawn in a station's own (unshifted) art coords, inside that station's shifted group, so they follow it.
+   ====================================================================== */
+const WORLD = GEOMETRY.ROOM_WORLD;
+const WORLD_VIEWBOX = `${WORLD.x} ${WORLD.y} ${WORLD.width} ${WORLD.height}`;
+const SPOT_OF = IDS.decor;
+const LEGACY_SET = new Set(LEGACY_IDS);
+const FALLBACK_WALL = { left: '#bdbdbd', right: '#d6d6d6', skirting: '#9e9e9e' };
+const FALLBACK_FLOOR = { base: '#c9c9c9' };
+const FIT_TOLERANCE = 1; // px: outline stroke and billboard rounding
+
+function defaultState() {
+  const placements = {};
+  for (const spot of DECOR_SPOTS) placements[spot] = null;
+  placements.rug = 'rug-pink';
+  return {
+    night: false, wallStyle: 'wall-white', floorStyle: 'floor-lilac',
+    levels: { ...DEFAULT_ROOM_LEVELS }, placements,
+    form: 3, fridgePct: 50, cooking: false, sleeping: false, served: false, overlay: false, herb: false
+  };
+}
+
+/* ---------- missing art: a visible red dashed box, never a blank ---------- */
+function missingBox(b, id) {
+  return `<rect class="missing" x="${n1(b.x)}" y="${n1(b.y)}" width="${n1(b.width)}" height="${n1(b.height)}" fill="rgba(229,57,53,.13)" stroke="#e53935" stroke-width="1.4" stroke-dasharray="4 3"/>`
+    + `<text x="${n1(b.x + 3)}" y="${n1(b.y + 10)}" font-size="9" font-weight="700" fill="#c62828" font-family="system-ui,sans-serif">missing: ${id}</text>`;
+}
+const stackBox = miss => ({ x: WORLD.x + 6, y: WORLD.y + 6 + miss.n++ * 14, width: 168, height: 12 });
+
+/** Call a pack part (fn may be absent): its string, or a stacked missing box naming it. */
+function part(fn, args, id, miss) {
+  return typeof fn === 'function' ? fn(...args) : missingBox(stackBox(miss), id);
+}
+
+/* ---------- boxes ---------- */
+const footBox = (station, level) => boundsOf(boxCorners(...footprint3(station, level)));
+function footBoxWorld(station, level) {
+  const [dx, dy] = shiftPx(GEOMETRY.STATION_SHIFT[station]);
+  const b = footBox(station, level);
+  return { ...b, x: b.x + dx, y: b.y + dy };
+}
+const spotBox = spot => boundsOf(boxCorners(...GEOMETRY.DECOR_SPOT_SHAPES[spot].volume));
+
+/* ---------- stations, decor, creature ---------- */
+/** One station level's art as { back, front } (a plain string is all `back`), or null when the pack has none. */
+function stationParts(pack, station, level) {
+  const fn = pack.stations?.[station]?.[level - 1];
+  if (typeof fn !== 'function') return null;
+  const out = fn();
+  return typeof out === 'string' ? { back: out, front: '' } : { back: out.back || '', front: out.front || '' };
+}
+
+/** A decor id's art in world coords (legacy ids are drawn in their MPP-27 coords and slid to their spot), or null. */
+function decorArtWorld(pack, id) {
+  const fn = pack.decor?.[id];
+  if (typeof fn !== 'function') return null;
+  const art = fn();
+  const shift = LEGACY_SET.has(id) ? GEOMETRY.DECOR_LEGACY_SHIFT[SPOT_OF[id]] : null;
+  return shift ? `<g transform="${shiftTransform(shift)}">${art}</g>` : art;
+}
+
+function creatureAt(pose, form) {
+  const [x, y] = P(...pose.anchor);
+  const k = pose.scale;
+  return `<g class="room-creature" transform="translate(${n1(x - FOOT_X * k)},${n1(y + pose.dropPx - FOOT_Y * k)}) scale(${k})">${creatureSVG(form, pose.face)}</g>`;
+}
+
+function effectAt(fn, args, id, anchor) {
+  if (typeof fn === 'function') return fn(...args);
+  const [x, y] = P(...anchor);
+  return missingBox({ x: x - 34, y: y - 18, width: 68, height: 12 }, id);
+}
+
+function stationGroup(pack, st, station, miss) {
+  const level = resolveRoomLevels(st.levels)[station];
+  const parts = stationParts(pack, station, level);
+  const fx = pack.effects || {};
+  let inner = '';
+  if (station === 'bed') {
+    const sleeping = st.sleeping;
+    inner += parts ? parts.back : missingBox(footBox(station, level), `${station}:L${level}`);
+    if (sleeping && !st.herb) inner += creatureAt(pipPose('bed', 'sleep', st.levels), st.form);
+    if (sleeping && !st.herb) inner += effectAt(fx.zzz, [level], 'effect:zzz', [...GEOMETRY.STATION_ANCHORS.bedTop[level - 1]]);
+    if (parts) inner += parts.front;
+  } else {
+    inner += parts ? parts.back + parts.front : missingBox(footBox(station, level), `${station}:L${level}`);
+    if (station === 'fridge' && st.fridgePct != null) inner += effectAt(fx.gauge, [level, st.fridgePct], 'effect:gauge', GEOMETRY.STATION_ANCHORS.fridgeTop[level - 1]);
+    if (station === 'cooker' && (st.cooking || st.served)) inner += effectAt(fx.steam, [level], 'effect:steam', GEOMETRY.STATION_ANCHORS.cookerPot[level - 1]);
+    if (station === 'cooker' && st.served) inner += effectAt(fx.servedPlate, [level], 'effect:servedPlate', GEOMETRY.STATION_ANCHORS.cookerPlate[level - 1]);
+  }
+  return `<g data-station="${station}" transform="${shiftTransform(GEOMETRY.STATION_SHIFT[station])}">${inner}</g>`;
+}
+
+function decorLayer(pack, st, layer) {
+  return GEOMETRY.DECOR_LAYERS[layer].map(spot => {
+    const id = st.placements[spot];
+    if (!id) return '';
+    return decorArtWorld(pack, id) ?? missingBox(spotBox(spot), `decor:${id}`);
+  }).join('');
+}
+
+/* ---------- backdrop: walls, floor, skirting, window and sill from the pack's styles and backdrop ---------- */
+function backdropSVG(pack, st, miss) {
+  const { u: RU, v: RV, h: WH } = GEOMETRY.ROOM_SIZE;
+  const bd = pack.backdrop || {};
+  const wallId = IDS.styles.includes(st.wallStyle) && st.wallStyle.startsWith('wall-') ? st.wallStyle : 'wall-white';
+  const floorId = IDS.styles.includes(st.floorStyle) && st.floorStyle.startsWith('floor-') ? st.floorStyle : 'floor-lilac';
+  let s = '';
+  let wall = pack.styles?.[wallId];
+  let floor = pack.styles?.[floorId];
+  if (!wall) { s += missingBox(stackBox(miss), `style:${wallId}`); wall = FALLBACK_WALL; }
+  if (!floor) { s += missingBox(stackBox(miss), `style:${floorId}`); floor = FALLBACK_FLOOR; }
+  const corner = shade(floor.base, -22);
+  const skirtHeight = 7; // source: components/pet/room/roomDecor.jsx:23
+  s += `<polygon points="${pts([P(RU, 0, WH), P(0, 0, WH), P(0, 0, 0), P(RU, 0, 0)])}" fill="${wall.left}"/>`;
+  s += `<polygon points="${pts([P(0, 0, WH), P(0, RV, WH), P(0, RV, 0), P(0, 0, 0)])}" fill="${wall.right}"/>`;
+  s += part(bd.wallPattern, [wall], 'backdrop.wallPattern', miss);
+  s += `<polygon points="${pts([P(0, 0), P(RU, 0), P(RU, RV), P(0, RV)])}" fill="${floor.base}"/>`;
+  s += part(bd.floorPattern, [floor], 'backdrop.floorPattern', miss);
+  s += `<polygon points="${pts([P(RU, 0, 0), P(0, 0, 0), P(0, 0, skirtHeight), P(RU, 0, skirtHeight)])}" fill="${wall.skirting}"/>`;
+  s += `<polygon points="${pts([P(0, 0, 0), P(0, RV, 0), P(0, RV, skirtHeight), P(0, 0, skirtHeight)])}" fill="${shade(wall.skirting, -6)}"/>`;
+  s += part(bd.skirting, [wall], 'backdrop.skirting', miss);
+  s += `<polyline points="${pts([P(0, 0, 0), P(0, 0, WH)])}" fill="none" stroke="${shade(wall.left, -14)}" stroke-width="2.5" stroke-linecap="round"/>`;
+  s += `<polyline points="${pts([P(RU, 0), P(0, 0), P(0, RV)])}" fill="none" stroke="${corner}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>`;
+  s += part(bd.windowFrame, [st.night], 'backdrop.windowFrame', miss);
+  s += part(bd.glass, [st.night], 'backdrop.glass', miss);
+  s += part(bd.sky, [st.night], 'backdrop.sky', miss);
+  s += part(bd.sill, [], 'backdrop.sill', miss);
+  return s;
+}
+
+/* ---------- overlay: the live hit boxes ---------- */
+function overlaySVG(st) {
+  const levels = resolveRoomLevels(st.levels);
+  let s = '<g class="overlay" fill="none" stroke-width="1.5" stroke-dasharray="5 3" pointer-events="none">';
+  for (const station of IDS.stations) {
+    const [u, v, du, dv, h0, h1] = footprint3(station, levels[station]);
+    const f = boxFaces(u, v, du, dv, h0, h1);
+    s += `<g transform="${shiftTransform(GEOMETRY.STATION_SHIFT[station])}" stroke="#d81b60">`
+      + `<polygon points="${pts(f.front)}"/><polygon points="${pts(f.side)}"/><polygon points="${pts(f.top)}"/></g>`;
+  }
+  for (const spot of DECOR_SPOTS) {
+    const { corners, tag } = GEOMETRY.DECOR_SPOT_SHAPES[spot];
+    s += `<polygon points="${pts(corners.map(c => P(...c)))}" stroke="#0288d1"/>`;
+    const [x, y] = P(...tag);
+    s += `<text x="${n1(x)}" y="${n1(y - 3)}" font-size="7" fill="#0277bd" stroke="none" text-anchor="middle" font-family="system-ui,sans-serif">${SPOT_LABELS[spot]}</text>`;
+  }
+  const { v0, v1, h0 } = GEOMETRY.WINDOW_GAP;
+  s += `<polygon points="${pts([P(0, v0, h0), P(0, v1, h0), P(0, v1, GEOMETRY.ROOM_SIZE.h), P(0, v0, GEOMETRY.ROOM_SIZE.h)])}" stroke="#2e7d32"/>`;
+  return s + '</g>';
+}
+
+/* ---------- the room ---------- */
+function renderRoomSVG(pack, state, opts = {}) {
+  const st = { ...defaultState(), ...state };
+  const pk = st.herb ? HERB_REFERENCE : pack;
+  if (st.herb) { st.wallStyle = 'wall-white'; st.floorStyle = 'floor-lilac'; st.placements = { ...defaultState().placements }; }
+  ART_INK = pk.ink;
+  const miss = { n: 0 };
+  let s = backdropSVG(pk, st, miss);
+  if (!opts.bare) {
+    s += decorLayer(pk, st, 'rug') + decorLayer(pk, st, 'wall');
+    for (const station of GEOMETRY.ROOM_DRAW_ORDER.filter(x => x !== 'bed')) s += stationGroup(pk, st, station, miss);
+    s += decorLayer(pk, st, 'backFloor');
+    s += stationGroup(pk, st, 'bed', miss);
+    if (!st.sleeping && !st.herb) {
+      const pose = st.cooking || st.served ? pipPose('cooker', 'happy', st.levels) : pipPose('rug', 'content', st.levels);
+      s += creatureAt(pose, st.form);
+    }
+    s += decorLayer(pk, st, 'frontFloor');
+    if (st.night) s += effectAt(pk.effects?.nightDim, [], 'effect:nightDim', [100, 150, 60]);
+    if (st.overlay) s += overlaySVG(st);
+  }
+  const label = `${st.herb ? 'Herb room, simplified' : ROOM_NAME}${st.night ? ', night' : ', day'}`;
+  return `<svg class="room-svg${opts.still ? ' is-still' : ''}" viewBox="${opts.viewBox || WORLD_VIEWBOX}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${label}">${s}</svg>`;
+}
+
+/* ---------- thumbnails: cropped with the live thumb boxes; the root carries .is-still so nothing animates ---------- */
+const svgBox = b => `${n1(b.x)} ${n1(b.y)} ${n1(b.width)} ${n1(b.height)}`;
+const thumbWrap = (b, inner) => `<svg class="is-still" viewBox="${svgBox(b)}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">${inner}</svg>`;
+const STYLE_CROPS = { wall: { x: 60, y: 30, width: 240, height: 240 }, floor: { x: 108, y: 192, width: 180, height: 180 } };
+
+function thumbSVG(pack, kind, id, level = 1) {
+  ART_INK = pack.ink;
+  if (kind === 'station') {
+    const parts = stationParts(pack, id, level);
+    return thumbWrap(stationThumbBox(id, level), parts ? parts.back + parts.front : missingBox(footBox(id, level), `${id}:L${level}`));
+  }
+  if (kind === 'decor') {
+    const spot = SPOT_OF[id];
+    return thumbWrap(decorThumbBox(spot), decorArtWorld(pack, id) ?? missingBox(spotBox(spot), `decor:${id}`));
+  }
+  const isWall = id.startsWith('wall-');
+  const svg = renderRoomSVG(pack, { wallStyle: isWall ? id : 'wall-white', floorStyle: isWall ? 'floor-lilac' : id }, { bare: true, still: true, viewBox: svgBox(STYLE_CROPS[isWall ? 'wall' : 'floor']) });
+  return svg.replace('role="img"', 'aria-hidden="true"').replace(/aria-label="[^"]*"/, '');
+}
+
+/** The station art with one effect on it, for the effects strip: kind = gauge | steam | zzz | servedPlate. */
+function effectThumbSVG(pack, kind, level, pct) {
+  ART_INK = pack.ink;
+  const station = { gauge: 'fridge', steam: 'cooker', servedPlate: 'cooker', zzz: 'bed' }[kind];
+  const parts = stationParts(pack, station, level);
+  const anchorKey = { gauge: 'fridgeTop', steam: 'cookerPot', servedPlate: 'cookerPlate', zzz: 'bedTop' }[kind];
+  const fn = pack.effects?.[kind];
+  const args = kind === 'gauge' ? [level, pct] : [level];
+  const fx = effectAt(fn, args, `effect:${kind}`, GEOMETRY.STATION_ANCHORS[anchorKey][level - 1]);
+  return thumbWrap(stationThumbBox(station, level), (parts ? parts.back + parts.front : missingBox(footBox(station, level), `${station}:L${level}`)) + fx);
+}
+
+/* ---------- fit: the art's measured screen bounds against the live footprint / spot volume ---------- */
+function fitRow(label, kind, boxText, box, art) {
+  if (!art) return { id: label, kind, box: boxText, ok: false, missing: true, note: 'art missing' };
+  const over = {
+    left: box.x - art.x, top: box.y - art.y,
+    right: art.x + art.width - (box.x + box.width), bottom: art.y + art.height - (box.y + box.height)
+  };
+  const bad = Object.entries(over).filter(([, v]) => v > FIT_TOLERANCE).map(([k, v]) => `${k} +${v.toFixed(1)}px`);
+  return { id: label, kind, box: boxText, ok: bad.length === 0, missing: false, note: bad.join(', ') };
+}
+
+function fitReport(pack) {
+  ART_INK = pack.ink;
+  const rows = [];
+  for (const station of IDS.stations) {
+    for (let level = ROOM_MIN_LEVEL; level <= ROOM_MAX_LEVEL; level++) {
+      const fp = footprint3(station, level);
+      const art = pack.stations?.[station]?.[level - 1] ? measure(() => stationParts(pack, station, level)) : null;
+      rows.push(fitRow(`${station} L${level}`, 'station', `[${fp.join(', ')}]`, boundsOf(boxCorners(...fp)), art));
+    }
+  }
+  for (const [id, spot] of Object.entries(SPOT_OF)) {
+    const vol = GEOMETRY.DECOR_SPOT_SHAPES[spot].volume;
+    let art = pack.decor?.[id] ? measure(() => decorArtWorld(pack, id)) : null;
+    if (art && LEGACY_SET.has(id)) { // the collector sees pre-shift coords; the live room slides legacy ids to their spot
+      const [dx, dy] = shiftPx(GEOMETRY.DECOR_LEGACY_SHIFT[spot]);
+      art = { ...art, x: art.x + dx, y: art.y + dy };
+    }
+    rows.push(fitRow(id, 'decor', `${spot} [${vol.join(', ')}]`, spotBox(spot), art));
+  }
+  return rows;
+}
+</script>
+<script id="room-ui">
+/* ======================================================================
+   UI wiring only. Every control rewrites `state` and replaces the innerHTML of one container (no timers, no
+   listeners on detached nodes). The thumbnail grids render once; the room, the effect previews and the toggle states re-render on input.
+   ====================================================================== */
+const PACK = DRAGON_ROOM;
+const state = defaultState();
+const ui = { thumb: 96 };
+const app = document.getElementById('app');
+
+const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+const nameOf = (kind, id) => PACK.labels?.[kind]?.[id] || '';
+const levelName = (station, level) => PACK.labels?.levels?.[station]?.[level - 1] || '';
+const tog = (act, text, data = '') => `<button type="button" class="tog" aria-pressed="false" data-act="${act}" ${data}>${text}</button>`;
+const fxOf = target => (PACK.ambience || []).filter(a => a.target === target).map(a => a.effect).join(', ');
+
+/* ---------- page skeleton ---------- */
+function skeleton() {
+  const stationBlocks = IDS.stations.map(station => `
+    <div class="station" data-station="${station}">
+      <div class="head"><h3>${esc(HERB_LABELS.stations[station])}${nameOf('stations', station) ? ` &rarr; ${esc(nameOf('stations', station))}` : ' &rarr; <span class="todo">unnamed</span>'}</h3>
+        <span class="note">${[1, 2, 3, 4].map(l => `L${l} <b>${levelName(station, l) ? esc(levelName(station, l)) : '<span class="todo">unnamed</span>'}</b> (herb: ${esc(HERB_LABELS.levels[station][l - 1])})`).join(' &middot; ')}</span></div>
+      <div class="levels">${[1, 2, 3, 4].map(l => `<button type="button" class="lvl" aria-pressed="false" data-act="level" data-s="${station}" data-v="${l}" aria-label="${esc(HERB_LABELS.stations[station])} level ${l}">${thumbSVG(PACK, 'station', station, l)}<span>L${l}</span><small><b>${esc(levelName(station, l))}</b><br>${esc(HERB_LABELS.levels[station][l - 1])}</small></button>`).join('')}</div>
+    </div>`).join('');
+
+  const spotPickers = DECOR_SPOTS.map(spot => {
+    const ids = Object.keys(SPOT_OF).filter(id => SPOT_OF[id] === spot);
+    const options = (spot === 'rug' ? '' : '<option value="">Empty</option>')
+      + ids.map(id => `<option value="${id}">${esc(nameOf('decor', id) || id)}</option>`).join('');
+    return `<label class="sel">${esc(SPOT_LABELS[spot])}<select data-spot="${spot}" aria-label="${esc(SPOT_LABELS[spot])}">${options}</select></label>`;
+  }).join('');
+
+  const decorCells = Object.keys(SPOT_OF).map(id => `<button type="button" class="cell" aria-pressed="false" data-act="place" data-id="${id}" aria-label="${esc(nameOf('decor', id) || id)}">${thumbSVG(PACK, 'decor', id)}<span>${esc(nameOf('decor', id) || id)}</span><small>${esc(HERB_LABELS.decor[id])}</small></button>`).join('');
+
+  const styleChips = (prefix, act) => IDS.styles.filter(id => id.startsWith(prefix)).map(id => `<button type="button" class="chip" aria-pressed="false" data-act="${act}" data-v="${id}" aria-label="${esc(nameOf('styles', id) || id)}">${thumbSVG(PACK, 'style', id)}<span>${esc(nameOf('styles', id) || id)}</span><small class="note">${esc(HERB_LABELS.styles[id])}</small></button>`).join('');
+
+  app.innerHTML = `
+    <h1>Pip room: ${esc(ROOM_NAME)}</h1>
+    <p class="lede">The live isometric room rebuilt from the app's real geometry (a <code>GEOMETRY</code> table copied from the live code), drawn as <b>${esc(ROOM_NAME)}</b>. Stations keep their jobs and levels, every decor id and style keeps its spot, and the camera, footprints and Pip's poses are unchanged. Turn on <b>Hit boxes</b> to see the live tap areas the art has to fit. Names are proposals for red-lining.</p>
+
+    <h2>1 &middot; Controls</h2>
+    <div class="bar">
+      <div class="group" role="group" aria-label="Scene"><b>Scene</b>${tog('night', 'Night')}${tog('herb', 'Herb reference')}${tog('overlay', 'Hit boxes')}</div>
+      <div class="group" role="group" aria-label="Motion"><b>Motion</b>${tog('lowfx', 'Low FX')}${tog('reduced', 'Reduced motion')}</div>
+      <div class="group" role="group" aria-label="Creature form"><b>Creature</b>${[1, 2, 3].map(f => tog('form', `${f} &middot; ${DRAGON_FORMS[f - 1].name}`, `data-v="${f}"`)).join('')}</div>
+      <div class="group" role="group" aria-label="Thumbnail size"><b>Crop size</b>${tog('thumb', 'Shop 96 px', 'data-v="96"')}${tog('thumb', 'Picker 56 px', 'data-v="56"')}</div>
+    </div>
+
+    <div class="bench">
+      <div class="stagecol">
+        <h2 style="margin-top:0">2 &middot; The room</h2>
+        <div class="stage" id="room"></div>
+        <p class="herbnote" id="herbnote" hidden>Herb room (simplified). Live reference: /pet on Default.</p>
+        <p class="status" id="status" role="status"></p>
+      </div>
+      <div>
+        <h2 style="margin-top:0">3 &middot; Walls and floors</h2>
+        <h3>Walls</h3><div class="chips" role="group" aria-label="Wall style">${styleChips('wall-', 'wall')}</div>
+        <h3 style="margin-top:12px">Floors</h3><div class="chips" role="group" aria-label="Floor style">${styleChips('floor-', 'floor')}</div>
+
+        <h2>4 &middot; Stations (levels 1 to 4)</h2>
+        ${stationBlocks}
+
+        <h2>5 &middot; Decor (12 spots, 55 items)</h2>
+        <div class="spots">${spotPickers}</div>
+        <div class="decorgrid" role="group" aria-label="All decor">${decorCells}</div>
+
+        <h2>6 &middot; Effects and ambience</h2>
+        <div class="bar">
+          <div class="group" role="group" aria-label="Pose and effects"><b>Pose</b>${tog('sleeping', 'Sleeping')}${tog('cooking', 'Cooking')}${tog('served', 'Served plate')}</div>
+          <div class="group" role="group" aria-label="Fridge gauge"><b>Fridge</b>${[0, 50, 100].map(p => tog('pct', `${p} %`, `data-v="${p}"`)).join('')}</div>
+        </div>
+        <div class="fxs" id="fxs"></div>
+        <div class="tablewrap" style="margin-top:10px"><table id="ambience"></table></div>
+      </div>
+    </div>
+
+    <h2>7 &middot; Names (90 rows: 5 stations, 20 levels, 55 decor, 10 styles; id, spot, herb label, ${esc(ROOM_NAME.toLowerCase())} label, fx)</h2>
+    <div class="card tablewrap"><table id="names"></table></div>
+
+    <h2>8 &middot; Fit against the live footprints</h2>
+    <p class="lede">Every row is the drawn art's measured bounds against the live footprint (stations, in their own art coords) or the spot volume (decor, in world coords), with ${FIT_TOLERANCE} px tolerance for the outline stroke. The hit-box overlay is the visual check.</p>
+    <div class="card tablewrap"><table id="fit"></table></div>`;
+
+  const first = DECOR_SPOTS.map(spot => spot);
+  first.forEach(spot => { const sel = app.querySelector(`select[data-spot="${spot}"]`); sel.value = state.placements[spot] || ''; });
+}
+
+/* ---------- tables, built once ---------- */
+function buildTables() {
+  const rows = [];
+  for (const station of IDS.stations) rows.push(['station', station, '-', HERB_LABELS.stations[station], nameOf('stations', station), fxOf(station)]);
+  for (const station of IDS.stations) for (let l = 1; l <= 4; l++) rows.push(['level', `${station} L${l}`, '-', HERB_LABELS.levels[station][l - 1], levelName(station, l), '']);
+  for (const id of IDS.styles) rows.push(['style', id, id.startsWith('wall-') ? 'Walls' : 'Floor', HERB_LABELS.styles[id], nameOf('styles', id), '']);
+  for (const [id, spot] of Object.entries(SPOT_OF)) rows.push(['decor', id, SPOT_LABELS[spot], HERB_LABELS.decor[id], nameOf('decor', id), fxOf(id)]);
+  document.getElementById('names').innerHTML = `<thead><tr><th>Kind</th><th>Id</th><th>Spot</th><th>Herb label</th><th>${esc(ROOM_NAME)} label</th><th>fx</th></tr></thead><tbody>`
+    + rows.map(r => `<tr><td>${r[0]}</td><td><code>${esc(r[1])}</code></td><td>${esc(r[2])}</td><td>${esc(r[3])}</td><td>${r[4] ? `<b>${esc(r[4])}</b>` : '<span class="todo">not named yet</span>'}</td><td>${esc(r[5])}</td></tr>`).join('') + '</tbody>';
+
+  document.getElementById('ambience').innerHTML = '<thead><tr><th>Ambience target</th><th>Effect</th></tr></thead><tbody>'
+    + ((PACK.ambience || []).length ? PACK.ambience.map(a => `<tr><td>${esc(a.target)}</td><td>${esc(a.effect)}</td></tr>`).join('') : '<tr><td colspan="2" class="todo">none yet</td></tr>') + '</tbody>';
+
+  const fit = fitReport(PACK);
+  const stations = fit.filter(r => r.kind === 'station'), decor = fit.filter(r => r.kind === 'decor');
+  const summary = (list) => `${list.filter(r => r.ok).length} of ${list.length} fit` + (list.some(r => r.missing) ? `, ${list.filter(r => r.missing).length} not drawn yet` : '');
+  document.getElementById('fit').innerHTML = `<thead><tr><th>Item</th><th>Box (live)</th><th>Fits</th></tr></thead><tbody>`
+    + `<tr><td colspan="3"><b>Stations: ${summary(stations)}. Decor: ${summary(decor)}.</b></td></tr>`
+    + fit.map(r => `<tr><td>${esc(r.id)}</td><td><code>${esc(r.box)}</code></td><td>${r.missing ? '<span class="todo">not drawn yet</span>' : r.ok ? '<span class="pass">&check;</span>' : `<span class="fail">${esc(r.note)}</span>`}</td></tr>`).join('') + '</tbody>';
+}
+
+/* ---------- re-rendered on input ---------- */
+function renderEffects() {
+  const lv = resolveRoomLevels(state.levels);
+  const items = [
+    ...[0, 50, 100].map(p => [`Gauge ${p} %`, effectThumbSVG(PACK, 'gauge', lv.fridge, p)]),
+    ['Steam', effectThumbSVG(PACK, 'steam', lv.cooker)],
+    ['Zzz', effectThumbSVG(PACK, 'zzz', lv.bed)],
+    ['Served plate', effectThumbSVG(PACK, 'servedPlate', lv.cooker)]
+  ];
+  document.getElementById('fxs').innerHTML = items.map(([text, svg]) => `<figure>${svg}${esc(text)}</figure>`).join('')
+    + `<figure>${renderRoomSVG(PACK, { night: true, levels: state.levels }, { still: true })}Night dim</figure>`;
+}
+
+function isOn(b) {
+  const d = b.dataset;
+  switch (d.act) {
+    case 'night': return state.night;
+    case 'herb': return state.herb;
+    case 'overlay': return state.overlay;
+    case 'lowfx': return document.body.classList.contains('lowfx');
+    case 'reduced': return document.body.classList.contains('reduced');
+    case 'sleeping': return state.sleeping;
+    case 'cooking': return state.cooking;
+    case 'served': return state.served;
+    case 'form': return state.form === Number(d.v);
+    case 'pct': return state.fridgePct === Number(d.v);
+    case 'thumb': return ui.thumb === Number(d.v);
+    case 'wall': return state.wallStyle === d.v;
+    case 'floor': return state.floorStyle === d.v;
+    case 'level': return state.levels[d.s] === Number(d.v);
+    case 'place': return state.placements[SPOT_OF[d.id]] === d.id;
+    default: return false;
+  }
+}
+
+function render() {
+  const html = renderRoomSVG(PACK, state);
+  document.getElementById('room').innerHTML = html;
+  const missing = [...new Set([...html.matchAll(/>missing: ([^<]+)</g)].map(m => m[1]))];
+  document.getElementById('status').innerHTML = missing.length
+    ? `<span class="fail">Missing art in this view (${missing.length}):</span> ${esc(missing.join(', '))}`
+    : 'No missing art in this view.';
+  document.getElementById('herbnote').hidden = !state.herb;
+  app.querySelectorAll('button[data-act]').forEach(b => b.setAttribute('aria-pressed', String(isOn(b))));
+  document.documentElement.style.setProperty('--thumb', `${ui.thumb}px`);
+  renderEffects();
+}
+
+app.addEventListener('click', e => {
+  const b = e.target.closest('button[data-act]');
+  if (!b) return;
+  const d = b.dataset;
+  switch (d.act) {
+    case 'night': state.night = !state.night; break;
+    case 'herb': state.herb = !state.herb; break;
+    case 'overlay': state.overlay = !state.overlay; break;
+    case 'lowfx': document.body.classList.toggle('lowfx'); break;
+    case 'reduced': document.body.classList.toggle('reduced'); break;
+    case 'sleeping': state.sleeping = !state.sleeping; if (state.sleeping) { state.cooking = false; state.served = false; } break;
+    case 'cooking': state.cooking = !state.cooking; if (state.cooking) state.sleeping = false; break;
+    case 'served': state.served = !state.served; if (state.served) state.sleeping = false; break;
+    case 'form': state.form = Number(d.v); break;
+    case 'pct': state.fridgePct = Number(d.v); break;
+    case 'thumb': ui.thumb = Number(d.v); break;
+    case 'wall': state.wallStyle = d.v; break;
+    case 'floor': state.floorStyle = d.v; break;
+    case 'level': state.levels[d.s] = Number(d.v); break;
+    case 'place': {
+      const spot = SPOT_OF[d.id];
+      state.placements[spot] = d.id;
+      app.querySelector(`select[data-spot="${spot}"]`).value = d.id;
+      break;
+    }
+    default: return;
+  }
+  render();
+});
+
+app.addEventListener('change', e => {
+  const sel = e.target.closest('select[data-spot]');
+  if (!sel) return;
+  state.placements[sel.dataset.spot] = sel.value || null;
+  render();
+});
+
+/* ---------- deep links: #night&overlay&herb&sleeping&cooking&served&lowfx&reduced, #form=2&pct=0&wall=wall-mint&floor=floor-oak, #bed=3 (a station level), #rug=rug-braided (a spot) ---------- */
+function applyHash() {
+  for (const token of location.hash.slice(1).split('&').filter(Boolean)) {
+    const [key, value] = token.split('=');
+    if (value === undefined) {
+      if (key === 'lowfx' || key === 'reduced') document.body.classList.add(key);
+      else if (['night', 'overlay', 'herb', 'sleeping', 'cooking', 'served'].includes(key)) state[key] = true;
+    } else if (key in state.levels) state.levels[key] = Number(value);
+    else if (key in state.placements) state.placements[key] = value || null;
+    else if (key === 'wall') state.wallStyle = value;
+    else if (key === 'floor') state.floorStyle = value;
+    else if (key === 'form') state.form = Number(value);
+    else if (key === 'pct') state.fridgePct = Number(value);
+  }
+}
+
+applyHash();
+skeleton();
+buildTables();
+render();
+</script>
+</body>
+</html>

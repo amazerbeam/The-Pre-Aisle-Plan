@@ -1,14 +1,25 @@
-/* Themes: Pip's room keeps its own palette in every theme (decision 4, CLAUDE.md → Themes). */
+/* Themes: Pip's room UI follows the theme through --pet-* role tokens (styles/themes/*.css); only the room art
+   below keeps the Default palette (CLAUDE.md → Themes). */
 .pet-view {
+  color-scheme: light; /* a dark theme's root color-scheme must not reach the room's native controls */
+  color: var(--text-primary);
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+/* MPP-45: room art keeps the Default palette in every theme (CLAUDE.md → Themes); chrome follows the theme via --pet-* tokens.
+   The Fridge interior, Trophy cabinet scene and Dress Pip stage re-declare the Default tokens; the room SVG and head bar
+   are drawn from literals and need no pin. --pip-focus-ring is re-pinned so the ring stays visible on the light fridge. */
+.pip-fridge-view,
+.pip-cabinet-view,
+.pip-wardrobe-preview {
   --brand-primary: #4a3f80; --brand-primary-dark: #3a3266; --brand-primary-light: #6b5fa0;
   --text-primary: #2c3e50; --text-secondary: #6c757d;
   --bg-primary: #ffffff; --bg-secondary: #f8f9fa; --border-color: #e9ecef;
   --success: #28a745; --warning: #ffc107; --error: #dc3545;
   --on-brand: #ffffff;
   --focus-ring-color: #4a3f80;
-  color-scheme: light; /* a dark theme's root color-scheme must not reach the room's native controls */
+  --pip-focus-ring: #7c5cd6;
   color: var(--text-primary);
-  font-family: 'Inter', system-ui, sans-serif;
 }
 
 /* A non-default theme's base input defaults (dark surface, theme ink) stop at the room. Scoped under
@@ -41,7 +52,7 @@
   max-width: min(190px, 55%);
   margin: 0;
   padding: 7px 10px;
-  background: #fff;
+  background: var(--bg-primary);
   border-radius: 12px;
   font-size: 0.8rem;
   font-weight: 500;
@@ -57,7 +68,7 @@
   bottom: -8px;
   left: 20px;
   border: 8px solid transparent;
-  border-top-color: #fff;
+  border-top-color: var(--bg-primary);
   border-bottom: 0;
 }
 
@@ -85,7 +96,7 @@
   justify-content: space-between;
   gap: var(--spacing-sm);
   padding: 2px 8px 2px 14px;
-  background: #fff;
+  background: var(--bg-primary);
   border-bottom: 1px solid var(--border-color);
 }
 
@@ -181,7 +192,7 @@
 .pet-name-error {
   margin: 4px 0 0;
   font-size: 0.75rem;
-  color: #a71d2a;
+  color: var(--macro-over-target-pill-text);
 }
 
 .pet-chip {
@@ -192,10 +203,10 @@
   font-weight: 600;
 }
 
-.pet-chip--content { background: rgba(74, 63, 128, 0.12); color: var(--brand-primary); }
-.pet-chip--happy { background: rgba(40, 167, 69, 0.15); color: #1b6b2e; }
-.pet-chip--bored { background: rgba(255, 193, 7, 0.22); color: #856404; }
-.pet-chip--mischievous { background: rgba(255, 107, 53, 0.18); color: #a8431a; }
+.pet-chip--content { background: var(--pet-chip-content-bg); color: var(--brand-primary); }
+.pet-chip--happy { background: var(--macro-on-target-pill-bg); color: var(--macro-on-target-pill-text); }
+.pet-chip--bored { background: var(--macro-near-target-pill-bg); color: var(--macro-near-target-pill-text); }
+.pet-chip--mischievous { background: var(--pet-chip-mischievous-bg); color: var(--pet-chip-mischievous-text); }
 
 .pet-name-edit-btn:focus-visible,
 .pet-view-state-btn:focus-visible {
@@ -222,6 +233,6 @@
   border: none;
   border-radius: var(--radius-md);
   background: var(--brand-primary);
-  color: #fff;
+  color: var(--on-brand);
   font-weight: 600;
 }

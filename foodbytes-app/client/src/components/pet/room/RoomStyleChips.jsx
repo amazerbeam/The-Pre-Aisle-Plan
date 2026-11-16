@@ -1,5 +1,8 @@
-import { DECOR_SPOT_LABELS, ROOM_STYLES, STYLE_SPOTS } from '../../../constants/petDecor'
+import { DECOR_SPOT_LABELS, STYLE_SPOTS } from '../../../constants/petDecor'
+import { styleLabel } from '../../../constants/petRoomLabels'
 import { ownedFor } from '../../../utils/roomPlacements'
+import { useRoomPack } from './roomPackContext'
+import { packStyle } from './roomPacks'
 
 /**
  * MPP-27 AC 3: while editing, the owned wall and floor styles as chips under the strip (mockup
@@ -7,6 +10,7 @@ import { ownedFor } from '../../../utils/roomPlacements'
  * so each row has at least one chip.
  */
 function RoomStyleChips({ room, behind, onPick }) {
+  const pack = useRoomPack()
   return (
     <div className="pip-room-styles" {...behind}>
       {STYLE_SPOTS.map(spot => (
@@ -14,7 +18,8 @@ function RoomStyleChips({ room, behind, onPick }) {
           <p className="pip-room-styles-label" aria-hidden="true">{DECOR_SPOT_LABELS[spot]}</p>
           <div className="pip-room-styles-row">
             {ownedFor(room.decor, spot).map(({ id }) => {
-              const style = ROOM_STYLES[id]
+              const style = packStyle(pack, id)
+              if (!style) return null
               return (
                 <button
                   key={id}
@@ -24,7 +29,7 @@ function RoomStyleChips({ room, behind, onPick }) {
                   onClick={() => onPick(spot, id)}
                 >
                   <span className="pip-style-swatch" style={{ background: style.left ?? style.base }} aria-hidden="true" />
-                  {style.label}
+                  {styleLabel(pack.line, id)}
                 </button>
               )
             })}

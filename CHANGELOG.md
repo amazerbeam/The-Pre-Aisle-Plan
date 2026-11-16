@@ -2,6 +2,10 @@
 
 One line per ticket, newest first: `<version> — <ticket key>: <summary>`. Bump rules and how
 to check what is deployed: `CLAUDE.md` → Versioning & deploy verification.
+1.37.0 — MPP-47: Robot workshop decor: all 55 items drawn and named as workshop counterparts on Cyberpunk
+1.36.0 — MPP-46: Dragon lair decor: all 55 items drawn and named as lair counterparts on Parchment
+1.35.0 — MPP-45: themed Pip rooms — room packs per creature (dragon lair, robot workshop shell, stations, styles, ambience) and themed room UI tokens
+1.34.0 — 2026-11-16-themed-pip-rooms-mockups: mockups for Pip's dragon lair, robot workshop and themed room UI (no app change)
 1.33.0 — 2026-11-15-themed-pip-lines: Pip is a dragon on Parchment and a robot on Cyberpunk (3 forms each); no line de-evolves any more — forms follow peak points
 1.32.2 — parchment-tick-cross: Parchment Provisions ticked-item ✗ drawn inside its box instead of spilling out of it
 1.32.1 — parchment-swipe-showthrough: Parchment mobile day view no longer shows Replace/Move/Remove through the meal entries

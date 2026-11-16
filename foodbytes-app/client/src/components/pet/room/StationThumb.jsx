@@ -1,11 +1,13 @@
 import { ROOM_STATIONS } from '../../../constants/petRoom'
-import { stationArt } from './furniture'
+import { useRoomPack } from './roomPackContext'
+import { packStationArt } from './roomPacks'
 import { stationThumbBox } from './roomLayout'
 
 /** MPP-26 AC 3: one station at one level, cropped from the room art (the bed's back + front layers). */
 function StationThumb({ station, level }) {
   const { x, y, width, height } = stationThumbBox(station, level)
-  const art = stationArt(station, level)
+  const pack = useRoomPack()
+  const art = packStationArt(pack, station, level)
   return (
     <svg
       className="pip-shop-thumb-svg"

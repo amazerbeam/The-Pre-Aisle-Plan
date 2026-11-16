@@ -9,9 +9,9 @@
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  background: #fff;
-  color: #2c3e50;
-  box-shadow: 0 0 40px rgba(30, 40, 20, 0.25);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  box-shadow: 0 0 40px var(--pet-sheet-shadow);
   animation: pip-shop-up var(--pip-sheet-in) var(--pip-sheet-ease);
 }
 
@@ -27,14 +27,14 @@
   align-items: center;
   gap: 8px;
   padding: 8px 10px;
-  border-bottom: 1px solid #e3dcf3;
+  border-bottom: 1px solid var(--pet-divider-border);
 }
 
 .pip-shop-head h3 {
   flex: 1;
   margin: 0;
   font-size: 1.05rem;
-  color: #4a3f80;
+  color: var(--brand-primary);
   text-align: center;
 }
 
@@ -54,16 +54,16 @@
   font-size: 1.3rem;
 }
 
-.pip-shop-icon-btn:active { background: #ece5fb; }
+.pip-shop-icon-btn:active { background: var(--pet-press-bg); }
 
 @media (hover: hover) {
-  .pip-shop-icon-btn:hover { background: #f6f3ff; }
+  .pip-shop-icon-btn:hover { background: var(--pet-hover-bg); }
 }
 
 .pip-shop-balance {
   padding: 6px 10px;
   border-radius: 999px;
-  background: #fff7d6;
+  background: var(--pet-balance-bg);
   font-weight: 800;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
@@ -79,7 +79,7 @@
 .pip-shop-foot {
   margin: 0 0 10px;
   font-size: 0.82rem;
-  color: #6f6789;
+  color: var(--pet-muted-text);
   line-height: 1.4;
 }
 
@@ -94,8 +94,8 @@
   font-weight: 600;
 }
 
-.pip-shop-status { background: #e8f6e8; color: #2f7a3a; }
-.pip-shop-error { background: #fdecea; color: #a4281d; }
+.pip-shop-status { background: var(--pet-success-bg); color: var(--pet-success-text); }
+.pip-shop-error { background: var(--danger-hover-bg); color: var(--pet-error-text); }
 
 .pip-shop-list {
   margin: 0;
@@ -109,9 +109,9 @@
   gap: 10px;
   margin-bottom: 10px;
   padding: 10px;
-  border: 1px solid #e3dcf3;
+  border: 1px solid var(--pet-divider-border);
   border-radius: 14px;
-  background: #fcfbff;
+  background: var(--pet-card-bg);
 }
 
 .pip-shop-thumb {
@@ -121,7 +121,7 @@
   width: 84px;
   height: 84px;
   border-radius: 10px;
-  background: linear-gradient(#ece5fb, #d6c9f0);
+  background: var(--pet-thumb-bg);
 }
 
 .pip-shop-thumb-svg { width: 76px; height: 76px; }
@@ -132,8 +132,8 @@
   left: 3px;
   padding: 1px 5px;
   border-radius: 6px;
-  background: rgba(46, 38, 69, 0.8);
-  color: #fff;
+  background: var(--pet-tag-bg);
+  color: var(--pet-scrim-text);
   font-size: 0.6rem;
   font-weight: 700;
 }
@@ -147,10 +147,10 @@
 }
 
 .pip-shop-dots { display: inline-flex; gap: 3px; margin-left: auto; }
-.pip-shop-dots b { width: 9px; height: 9px; border-radius: 50%; background: #ddd6ee; }
-.pip-shop-dots b.is-on { background: #7c5cd6; }
+.pip-shop-dots b { width: 9px; height: 9px; border-radius: 50%; background: var(--pet-divider-strong-border); }
+.pip-shop-dots b.is-on { background: var(--pet-accent-color); }
 
-.pip-shop-now { margin: 2px 0 6px; font-size: 0.78rem; color: #6f6789; }
+.pip-shop-now { margin: 2px 0 6px; font-size: 0.78rem; color: var(--pet-muted-text); }
 .pip-shop-next { margin: 0 0 8px; font-size: 0.82rem; }
 
 .pip-shop-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
@@ -158,15 +158,15 @@
 .pip-shop-btn {
   min-height: 44px;
   padding: 0 14px;
-  border: 1px solid #7c5cd6;
+  border: 1px solid var(--pet-accent-color);
   border-radius: 999px;
-  background: #7c5cd6;
-  color: #fff;
+  background: var(--pet-accent-color);
+  color: var(--on-brand);
   font: inherit;
   font-weight: 700;
 }
 
-.pip-shop-btn.is-confirm { border-color: #e0b52c; background: #ffd34d; color: #3f2716; }
+.pip-shop-btn.is-confirm { border-color: var(--pet-gold-border); background: var(--pet-gold-bg); color: var(--pet-gold-text); }
 .pip-shop-btn:active { filter: brightness(0.92); }
 
 @media (hover: hover) {
@@ -180,14 +180,14 @@
 }
 
 .pip-shop-btn:disabled {
-  border-color: #ddd6ee;
-  background: #eee9f7;
-  color: #8d86a3;
+  border-color: var(--pet-divider-strong-border);
+  background: var(--pet-disabled-bg);
+  color: var(--pet-disabled-text);
   cursor: default;
 }
 
-.pip-shop-short { font-size: 0.76rem; font-weight: 600; color: #b4531b; }
-.pip-shop-max { font-size: 0.82rem; font-weight: 700; color: #2f7a3a; }
+.pip-shop-short { font-size: 0.76rem; font-weight: 600; color: var(--pet-warn-text); }
+.pip-shop-max { font-size: 0.82rem; font-weight: 700; color: var(--pet-success-text); }
 
 @media (prefers-reduced-motion: reduce) {
   .pip-shop { animation: none; }
@@ -197,7 +197,7 @@
 .pip-shop-tabs {
   display: flex;
   padding: 0 8px;
-  border-bottom: 1px solid #e3dcf3;
+  border-bottom: 1px solid var(--pet-divider-border);
 }
 
 .pip-shop-tab {
@@ -206,7 +206,7 @@
   border: 0;
   border-bottom: 3px solid transparent;
   background: none;
-  color: #6f6789;
+  color: var(--pet-muted-text);
   font: inherit;
   font-size: 0.84rem;
   font-weight: 700;
@@ -216,14 +216,14 @@
 }
 
 .pip-shop-tab[aria-selected='true'] {
-  border-bottom-color: #7c5cd6;
-  color: #7c5cd6;
+  border-bottom-color: var(--pet-accent-color);
+  color: var(--pet-accent-color);
 }
 
-.pip-shop-tab:active { background: #f6f3ff; }
+.pip-shop-tab:active { background: var(--pet-hover-bg); }
 
 @media (hover: hover) {
-  .pip-shop-tab:not([aria-selected='true']):hover { color: #4a3f80; }
+  .pip-shop-tab:not([aria-selected='true']):hover { color: var(--brand-primary); }
 }
 
 .pip-shop-tab:focus-visible {
@@ -233,7 +233,7 @@
 
 .pip-shop-group {
   margin: 4px 0 6px;
-  color: #6f6789;
+  color: var(--pet-muted-text);
   font-size: 0.78rem;
   font-weight: 800;
   letter-spacing: 0.04em;
@@ -254,9 +254,9 @@
   justify-items: center;
   gap: 4px;
   padding: 8px 6px;
-  border: 1px solid #e3dcf3;
+  border: 1px solid var(--pet-divider-border);
   border-radius: 12px;
-  background: #fcfbff;
+  background: var(--pet-card-bg);
   text-align: center;
 }
 
@@ -266,7 +266,7 @@
   width: 72px;
   height: 64px;
   border-radius: 8px;
-  background: linear-gradient(#ece5fb, #d6c9f0);
+  background: var(--pet-thumb-bg);
 }
 
 .pip-shop-item-art .pip-decor-thumb,
@@ -293,7 +293,7 @@
   display: grid;
   place-items: center;
   min-height: 44px;
-  color: #2f7a3a;
+  color: var(--pet-success-text);
   font-size: 0.76rem;
   font-weight: 800;
 }
@@ -305,8 +305,8 @@
   margin: 0 0 10px;
   padding: 8px 10px;
   border-radius: 10px;
-  background: #fff1c9;
-  color: #7a5800;
+  background: var(--pet-notice-bg);
+  color: var(--pet-notice-text);
   font-size: 0.82rem;
   font-weight: 600;
 }
@@ -316,10 +316,10 @@
 .pip-shop-level-chip {
   min-width: 44px;
   min-height: 44px;
-  border: 1px solid #ddd6ee;
+  border: 1px solid var(--pet-divider-strong-border);
   border-radius: 999px;
-  background: #fff;
-  color: #3b2f5c;
+  background: var(--bg-primary);
+  color: var(--pet-label-text);
   font: inherit;
   font-weight: 700;
   cursor: pointer;
@@ -328,9 +328,9 @@
 }
 
 .pip-shop-level-chip[aria-pressed="true"] {
-  border-color: #7c5cd6;
-  background: #7c5cd6;
-  color: #fff;
+  border-color: var(--pet-accent-color);
+  background: var(--pet-accent-color);
+  color: var(--on-brand);
 }
 
 .pip-shop-level-chip:active { filter: brightness(0.92); }
@@ -342,7 +342,7 @@
 }
 
 @media (hover: hover) {
-  .pip-shop-level-chip:not(:disabled):not([aria-pressed="true"]):hover { background: #f3effc; }
+  .pip-shop-level-chip:not(:disabled):not([aria-pressed="true"]):hover { background: var(--pet-tint-bg); }
 }
 
 /* MPP-42 AC 7: "See Earn →" — link-styled, with a 44px hit area. */
@@ -353,7 +353,7 @@
   padding: 0 4px;
   border: 0;
   background: none;
-  color: #7c5cd6;
+  color: var(--pet-accent-color);
   font: inherit;
   font-weight: 700;
   text-decoration: underline;
@@ -361,9 +361,9 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.pip-shop-foot-link:active { color: #4a3f80; }
-.pip-shop-foot-link:focus-visible { outline: 2px solid #7c5cd6; outline-offset: 2px; border-radius: 4px; }
+.pip-shop-foot-link:active { color: var(--brand-primary); }
+.pip-shop-foot-link:focus-visible { outline: 2px solid var(--pip-focus-ring); outline-offset: 2px; border-radius: 4px; }
 
 @media (hover: hover) {
-  .pip-shop-foot-link:hover { color: #4a3f80; }
+  .pip-shop-foot-link:hover { color: var(--brand-primary); }
 }

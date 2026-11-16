@@ -1,6 +1,6 @@
 {
   "name": "foodbytes-client",
-  "version": "1.33.0",
+  "version": "1.37.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -9,7 +9,8 @@
     "check:macros": "node src/utils/macroStatus.check.mjs",
     "check:pet": "node src/utils/petMood.check.mjs",
     "check:pip": "node src/utils/pipPosition.check.mjs",
-    "check:room": "node src/components/pet/room/room.check.mjs",
+    "check:room": "node src/components/pet/room/room.check.mjs && node src/components/pet/room/packs/packs.check.mjs",
+    "snapshot:room": "node scripts/room-ssr.mjs",
     "check:camera": "node src/utils/roomCamera.check.mjs",
     "check:cook": "node src/utils/cookServe.check.mjs",
     "check:fridge": "node src/utils/fridgeFill.check.mjs",

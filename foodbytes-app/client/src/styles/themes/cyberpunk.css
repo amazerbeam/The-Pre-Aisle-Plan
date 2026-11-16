@@ -335,6 +335,65 @@
   --landing-brand-border-hover: var(--pink);
   --landing-brand-tint-faint: rgba(255, 42, 109, 0.08);
   --landing-brand-glow: rgba(255, 42, 109, 0.3);
+
+  /* ---- Pip's room UI (MPP-45): --pet-<area>[-<tone>]-<role> ---- */
+  --pet-accent-color: #ff2a6d;
+  --pet-badge-bg: #ff4d5e;
+  --pet-balance-bg: #2a2606;
+  --pet-divider-hover-border: #4a7d99;
+  --pet-disabled-bg: #141d2b;
+  --pet-card-bg: #0f1620;
+  --pet-chip-content-bg: rgba(255, 42, 109, 0.14);
+  --pet-chip-mischievous-bg: rgba(255, 159, 28, 0.16);
+  --pet-chip-mischievous-text: #ff9f1c;
+  --pet-error-text: #ff4d5e;
+  --pet-float-bg: rgba(11, 17, 25, 0.92);
+  --pet-float-active-bg: #2a2606;
+  --pet-gold-bg: #f9f002;
+  --pet-gold-border: #f9f002;
+  --pet-gold-text: #05070b;
+  --pet-hit-active-bg: rgba(249, 240, 2, 0.25);
+  --pet-hit-hover-bg: rgba(249, 240, 2, 0.16);
+  --pet-hover-bg: #141d2b;
+  --pet-divider-border: #22384a;
+  --pet-divider-faint-border: #141d2b;
+  --pet-divider-mid-border: #22384a;
+  --pet-divider-strong-border: #4a7d99;
+  --pet-lock-note-bg: #1f1a08;
+  --pet-lock-note-border: #7a6a1a;
+  --pet-notice-bg: #2a1f05;
+  --pet-notice-text: #f9f002;
+  --pet-picker-shadow: rgba(5, 217, 232, 0.25);
+  --pet-press-bg: #101a28;
+  --pet-scrim-bg: rgba(2, 3, 5, 0.88);
+  --pet-scrim-error-text: #ff8a96;
+  --pet-scrim-text: #eaf6ff;
+  --pet-selected-bg: #141d2b;
+  --pet-sheet-shadow: rgba(0, 0, 0, 0.6);
+  --pet-spot-fill: rgba(11, 17, 25, 0.4);
+  --pet-spot-filled-fill: rgba(255, 42, 109, 0.1);
+  --pet-spot-selected-fill: rgba(249, 240, 2, 0.2);
+  --pet-spot-selected-stroke: #f9f002;
+  --pet-success-bg: #08150f;
+  --pet-success-text: #39ff88;
+  --pet-tag-bg: rgba(2, 3, 5, 0.8);
+  --pet-disabled-text: #5f7488;
+  --pet-disabled-neutral-text: #5f7488;
+  --pet-label-text: #eaf6ff;
+  --pet-muted-text: #9db2c7;
+  --pet-soft-text: #9db2c7;
+  --pet-thumb-bg: linear-gradient(#141d2b, #0b1119);
+  --pet-tint-bg: #141d2b;
+  --pet-wardrobe-error-text: #ff4d5e;
+  --pet-wardrobe-text: #eaf6ff;
+  --pet-wardrobe-border: #22384a;
+  --pet-wardrobe-lineup-bg: #0f1620;
+  --pet-wardrobe-worn-fill: #39ff88;
+  --pet-wardrobe-worn-on-brand-fill: #05070b;
+  --pet-wardrobe-worn-shadow: rgba(255, 42, 109, 0.35);
+  --pet-warn-text: #ff9f1c;
+  --pet-gold-ring-shadow: rgba(249, 240, 2, 0.35);
+  --pip-focus-ring: var(--yellow);
 }
 
 /* Low FX: no glow, rain or flicker; display font falls back to the body font. The glow tokens

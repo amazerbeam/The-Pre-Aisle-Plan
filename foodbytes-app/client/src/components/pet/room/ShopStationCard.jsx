@@ -1,5 +1,7 @@
 import { ROOM_MAX_LEVEL, ROOM_MIN_LEVEL, SPRINKLES_ICON } from '../../../constants/petRoom'
-import { FREE_MODE_LEVEL_LABEL, SHOP_BUSY_LABEL, SHOP_FULLY_UPGRADED, SHOP_MAX_LEVEL_LABEL, STATION_LEVEL_NAMES } from '../../../constants/petShop'
+import { FREE_MODE_LEVEL_LABEL, SHOP_BUSY_LABEL, SHOP_FULLY_UPGRADED, SHOP_MAX_LEVEL_LABEL } from '../../../constants/petShop'
+import { stationLabel, stationLevelName } from '../../../constants/petRoomLabels'
+import { useRoomPack } from './roomPackContext'
 import StationThumb from './StationThumb'
 
 const LEVELS = Array.from({ length: ROOM_MAX_LEVEL - ROOM_MIN_LEVEL + 1 }, (_, i) => ROOM_MIN_LEVEL + i)
@@ -13,7 +15,8 @@ const LEVELS = Array.from({ length: ROOM_MAX_LEVEL - ROOM_MIN_LEVEL + 1 }, (_, i
 function ShopStationCard({ station, level, costs, sprinkles, armed, busy, freeMode = false, onArm, onConfirm, onSetLevel }) {
   const maxed = level >= ROOM_MAX_LEVEL
   const shown = maxed || freeMode ? level : level + 1
-  const names = STATION_LEVEL_NAMES[station.key]
+  const { line } = useRoomPack()
+  const label = stationLabel(line, station.key)
   return (
     <li className="pip-shop-card">
       <div className="pip-shop-thumb">
@@ -22,13 +25,13 @@ function ShopStationCard({ station, level, costs, sprinkles, armed, busy, freeMo
       </div>
       <div className="pip-shop-card-body">
         <h4 className="pip-shop-card-title">
-          <span aria-hidden="true">{station.icon}</span> {station.label}
+          <span aria-hidden="true">{station.icon}</span> {label}
           <LevelDots level={level} />
         </h4>
-        <p className="pip-shop-now">Now: {names[level - 1]}</p>
-        <p className="pip-shop-next">{maxed ? SHOP_FULLY_UPGRADED : <>Next: <b>{names[level]}</b></>}</p>
+        <p className="pip-shop-now">Now: {stationLevelName(line, station.key, level)}</p>
+        <p className="pip-shop-next">{maxed ? SHOP_FULLY_UPGRADED : <>Next: <b>{stationLevelName(line, station.key, level + 1)}</b></>}</p>
         {freeMode ? (
-          <div className="pip-shop-levels" role="group" aria-label={`${station.label} level`}>
+          <div className="pip-shop-levels" role="group" aria-label={`${label} level`}>
             {LEVELS.map(n => (
               <button
                 key={n}
@@ -47,6 +50,7 @@ function ShopStationCard({ station, level, costs, sprinkles, armed, busy, freeMo
           <div className="pip-shop-row">
             <UpgradeAction
               station={station}
+              label={label}
               maxed={maxed}
               next={level + 1}
               cost={costs?.[level + 1] ?? null}
@@ -63,7 +67,7 @@ function ShopStationCard({ station, level, costs, sprinkles, armed, busy, freeMo
   )
 }
 
-function UpgradeAction({ station, maxed, next, cost, sprinkles, armed, busy, onArm, onConfirm }) {
+function UpgradeAction({ station, label, maxed, next, cost, sprinkles, armed, busy, onArm, onConfirm }) {
   if (maxed) return <span className="pip-shop-max">{SHOP_MAX_LEVEL_LABEL}</span>
   if (cost == null) return null
   if (busy === station.key) {
@@ -83,7 +87,7 @@ function UpgradeAction({ station, maxed, next, cost, sprinkles, armed, busy, onA
       type="button"
       className={confirming ? 'pip-shop-btn is-confirm' : 'pip-shop-btn'}
       disabled={busy != null}
-      aria-label={`${confirming ? 'Confirm: upgrade' : 'Upgrade'} ${station.label} to level ${next} for ${cost} sprinkles`}
+      aria-label={`${confirming ? 'Confirm: upgrade' : 'Upgrade'} ${label} to level ${next} for ${cost} sprinkles`}
       onClick={() => (confirming ? onConfirm(station.key) : onArm(station.key))}
     >
       {confirming ? `Confirm ${SPRINKLES_ICON} ${cost}` : `Upgrade · ${SPRINKLES_ICON} ${cost}`}

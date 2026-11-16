@@ -316,6 +316,65 @@
   --landing-brand-tint-faint: var(--brand-tint-faint);
   --landing-brand-glow: rgba(122, 31, 20, 0.25);
   --google-btn-active-bg: #f1f3f4;
+
+  /* ---- Pip's room UI (MPP-45): --pet-<area>[-<tone>]-<role> ---- */
+  --pet-accent-color: #7a1f14;
+  --pet-badge-bg: #9c3a2a;
+  --pet-balance-bg: #f1e0a8;
+  --pet-divider-hover-border: #a88a45;
+  --pet-disabled-bg: #e3d2a8;
+  --pet-card-bg: #fbf4df;
+  --pet-chip-content-bg: rgba(122, 31, 20, 0.12);
+  --pet-chip-mischievous-bg: rgba(154, 108, 12, 0.18);
+  --pet-chip-mischievous-text: #7a3a12;
+  --pet-error-text: #9b2318;
+  --pet-float-bg: rgba(247, 238, 214, 0.92);
+  --pet-float-active-bg: #ecd89a;
+  --pet-gold-bg: #d8b25a;
+  --pet-gold-border: #a88a45;
+  --pet-gold-text: #3b2415;
+  --pet-hit-active-bg: rgba(216, 178, 90, 0.3);
+  --pet-hit-hover-bg: rgba(216, 178, 90, 0.2);
+  --pet-hover-bg: #efe2c2;
+  --pet-divider-border: #c9ad78;
+  --pet-divider-faint-border: #e3d2a8;
+  --pet-divider-mid-border: #c9ad78;
+  --pet-divider-strong-border: #c9ad78;
+  --pet-lock-note-bg: #f3e6c0;
+  --pet-lock-note-border: #c9ad78;
+  --pet-notice-bg: #ecd89a;
+  --pet-notice-text: #5e4a10;
+  --pet-picker-shadow: rgba(60, 35, 10, 0.3);
+  --pet-press-bg: #e3d2a8;
+  --pet-scrim-bg: rgba(34, 20, 10, 0.88);
+  --pet-scrim-error-text: #f2b8a8;
+  --pet-scrim-text: #f7eed6;
+  --pet-selected-bg: #efe2c2;
+  --pet-sheet-shadow: rgba(60, 35, 10, 0.45);
+  --pet-spot-fill: rgba(247, 238, 214, 0.4);
+  --pet-spot-filled-fill: rgba(122, 31, 20, 0.1);
+  --pet-spot-selected-fill: rgba(216, 178, 90, 0.3);
+  --pet-spot-selected-stroke: #a88a45;
+  --pet-success-bg: #dfe8c8;
+  --pet-success-text: #2f5530;
+  --pet-tag-bg: rgba(34, 20, 10, 0.8);
+  --pet-disabled-text: #8a7a5e;
+  --pet-disabled-neutral-text: #8a7a5e;
+  --pet-label-text: #2b1d10;
+  --pet-muted-text: #5e4a32;
+  --pet-soft-text: #5e4a32;
+  --pet-thumb-bg: linear-gradient(#efe2c2, #ead9b1);
+  --pet-tint-bg: #efe2c2;
+  --pet-wardrobe-error-text: #7a1a12;
+  --pet-wardrobe-text: #2b1d10;
+  --pet-wardrobe-border: #c9ad78;
+  --pet-wardrobe-lineup-bg: #f1e6c8;
+  --pet-wardrobe-worn-fill: #3f6b3a;
+  --pet-wardrobe-worn-on-brand-fill: #f7eed6;
+  --pet-wardrobe-worn-shadow: rgba(122, 31, 20, 0.2);
+  --pet-warn-text: #8a4a12;
+  --pet-gold-ring-shadow: rgba(216, 178, 90, 0.35);
+  --pip-focus-ring: var(--focus-ink);
 }
 
 /* Low FX for Parchment is handled in parchment/shell.css (ambient layer, page-turn, ink-blot).

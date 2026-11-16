@@ -2,6 +2,7 @@ import { useEffect, useId, useRef } from 'react'
 import { MEAL_TYPE_LABELS } from '../../../constants/mealTypes'
 import { COOK_PHASES, PET_MOOD_LABELS, PIP_POSITIONS, PIP_POSITION_LABELS } from '../../../constants/pet'
 import { SHOP_TAB_KEYS } from '../../../constants/petDecor'
+import { PIP_DEFAULT_LINE } from '../../../constants/pipLines'
 import { DEFAULT_ROOM_LEVELS, ROOM_CAMERA_LABEL, ROOM_HINT, ROOM_PX_PER_UNIT, ROOM_STATIONS, ROOM_WORLD, ROOM_WORLD_VIEWBOX } from '../../../constants/petRoom'
 import usePipCamera from '../../../hooks/usePipCamera'
 import useRoomOverlay from '../../../hooks/useRoomOverlay'
@@ -10,12 +11,12 @@ import DecorPicker from './DecorPicker'
 import DecorSpotButtons from './DecorSpotButtons'
 import EditRoomBar from './EditRoomBar'
 import EditRoomButton from './EditRoomButton'
-import { stationArt } from './furniture'
 import FreeModeBadge from './FreeModeBadge'
 import FridgeView from './FridgeView'
 import { DecorLayer } from './RoomDecorLayers'
-import { roomBackdrop } from './roomDecor'
-import { FridgeGauge, NightDim, PotSteam, ServedPlate, SleepZs } from './roomEffects'
+import { NightDim } from './roomEffects'
+import { RoomPackContext, useRoomPack } from './roomPackContext'
+import { packBackdrop, packEffects, packStationArt, roomPack } from './roomPacks'
 import { COOK_WALK_OFFSET, ROOM_DRAW_ORDER, STATION_SHIFT, cabinetHitBox, cookPose, fridgeHitBox, hitBoxStyle, pipFocusPoint, pipPose, resolveRoomLevels, shiftTransform, wardrobeHitBox } from './roomLayout'
 import PipHeadBarStatus from './PipHeadBarStatus'
 import RecentreButton from './RecentreButton'
@@ -27,6 +28,7 @@ import TrophyCabinetView from './TrophyCabinetView'
 import WardrobeButton from './WardrobeButton'
 import WardrobeView from './WardrobeView'
 import './PetRoom.css'
+import './roomFx.css'
 
 // MPP-40: every station but the bed, back to front; the bed is drawn after the back-floor decor layer.
 const BACK_STATIONS = ROOM_DRAW_ORDER.filter(station => station !== ROOM_STATIONS.BED)
@@ -50,9 +52,11 @@ const BACK_STATIONS = ROOM_DRAW_ORDER.filter(station => station !== ROOM_STATION
  * MPP-39: the room is a bigger world on a camera (usePipCamera) — drag, pinch, Ctrl+wheel or keys to look around; it floats back to Pip and follows him. Stations are shifted groups (roomLayout STATION_SHIFT); decor is drawn in world coords.
  * MPP-27: `decor` ({ room, editing, selectedSpot, openSpot, closeSpot, place, toggle, done, error }) draws your own wall / floor styles and placed decor, and drives ✏️ Edit room.
  * MPP-40: 12 decor spots drawn in four layers among the stations (rug, wall, back floor, front floor), a wardrobe station whose button opens Dress Pip, and a 🧪 badge while the server's free mode is on.
+ * MPP-45: `line` (theme.pipLine) picks the room pack (roomPacks.js); every leaf reads it through RoomPackContext, and a pack missing an item draws the herb one.
  * MPP-26: `shop` ({ room, sprinkles, armed, busy, status, error, arm, upgrade, reset }) adds the 🛍 Shop pill beside Wardrobe and the Shop sheet; `levels` (from the pet's room) draws each station at its owned level.
  */
-function PetRoom({ name, mood, bubble, bubbleActions = null, position = PIP_POSITIONS.RUG, levels = DEFAULT_ROOM_LEVELS, serving = null, fridge = null, cabinet = null, herb, levelBar = null, wardrobe = null, shop = null, decor = null }) {
+function PetRoom({ name, mood, bubble, bubbleActions = null, position = PIP_POSITIONS.RUG, levels = DEFAULT_ROOM_LEVELS, serving = null, fridge = null, cabinet = null, herb, levelBar = null, wardrobe = null, shop = null, decor = null, line = PIP_DEFAULT_LINE }) {
+  const pack = roomPack(line)
   const resolved = resolveRoomLevels(levels)
   // MPP-27: `decor` = { room, editing, … } from useRoomEdit; null until the pet's room has loaded.
   const placements = decor?.room?.placements ?? null
@@ -117,12 +121,14 @@ function PetRoom({ name, mood, bubble, bubbleActions = null, position = PIP_POSI
   }
 
   return (
+    <RoomPackContext.Provider value={pack}>
     <div className="pip-room">
       {/* MPP-39: the stage is the screen-sized, focusable viewport; the world layer inside holds the
           room SVG and its tap areas and is moved by the camera. Bubble, hint and 🎯 stay on the screen, above the night dim (MPP-44). */}
       <div
         ref={stageRef}
         className={editing ? 'pip-room-stage is-editing' : 'pip-room-stage'}
+        style={pack.surround ? { background: pack.surround } : undefined}
         tabIndex={anyOpen ? -1 : 0}
         role="group"
         aria-label={ROOM_CAMERA_LABEL}
@@ -134,7 +140,7 @@ function PetRoom({ name, mood, bubble, bubbleActions = null, position = PIP_POSI
           style={{ width: `${ROOM_WORLD.width * ROOM_PX_PER_UNIT}px`, height: `${ROOM_WORLD.height * ROOM_PX_PER_UNIT}px` }}
         >
           <svg className="pip-room-svg" viewBox={ROOM_WORLD_VIEWBOX} xmlns="http://www.w3.org/2000/svg" role="img" aria-label={label}>
-            {roomBackdrop(asleep, placements?.wallStyle, placements?.floorStyle)}
+            {packBackdrop(pack, asleep, placements?.wallStyle, placements?.floorStyle)}
             <DecorLayer layer="rug" {...decorProps} />
             <DecorLayer layer="wall" {...decorProps} />
             {BACK_STATIONS.map(station => <ShiftedStation key={station} station={station} {...stationProps} />)}
@@ -142,7 +148,6 @@ function PetRoom({ name, mood, bubble, bubbleActions = null, position = PIP_POSI
             <ShiftedStation station={ROOM_STATIONS.BED} {...stationProps} />
             <PipWalker phase={phase}>{!asleep && <RoomPip pose={pose} herb={herb} levelBar={levelBar} />}</PipWalker>
             <DecorLayer layer="frontFloor" {...decorProps} />
-            {asleep && <SleepZs level={resolved.bed} />}
           </svg>
           <StationButton
             box={fridgeHitBox(resolved.fridge)}
@@ -206,13 +211,16 @@ function PetRoom({ name, mood, bubble, bubbleActions = null, position = PIP_POSI
         />
       )}
     </div>
+    </RoomPackContext.Provider>
   )
 }
 
 // Steam and the served plate sit on the cooker before the fridge is drawn over it; a
-// sleeping Pip lies between the bed's back and front layers (MPP-17).
+// sleeping Pip lies between the bed's back and front layers (MPP-17). MPP-45: his Zs are drawn after the bed's front, inside its shifted group (they were ~70 units off the shifted bed).
 function Station({ station, level, position, phase, pose, herb, levelBar, fridgePct }) {
-  const art = stationArt(station, level)
+  const pack = useRoomPack()
+  const { FridgeGauge, PotSteam, ServedPlate, SleepZs } = packEffects(pack)
+  const art = packStationArt(pack, station, level)
   // MPP-19: the gauge sits on the fridge, before the cabinet and bed are drawn (back → front).
   if (station === ROOM_STATIONS.FRIDGE) {
     return (
@@ -238,6 +246,7 @@ function Station({ station, level, position, phase, pose, herb, levelBar, fridge
       {art.back}
       {position === PIP_POSITIONS.BED && <RoomPip pose={pose} herb={herb} levelBar={levelBar} />}
       {art.front}
+      {position === PIP_POSITIONS.BED && <SleepZs level={level} />}
     </>
   )
 }

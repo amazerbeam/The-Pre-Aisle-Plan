@@ -58,6 +58,9 @@ export const DECOR_LEGACY_SHIFT = {
   byFridge: [70, 20, 0]
 }
 
+// MPP-27's 12 ids, drawn in their original coords by every room pack and slid to their MPP-40 spot by DECOR_LEGACY_SHIFT.
+export const DECOR_LEGACY_IDS = new Set(['basil-print', 'recipe-board', 'herb-shelf', 'fairy-lights', 'wall-clock', 'bunting', 'pan-rail', 'mirror', 'watering-can', 'cookbook-stack', 'bean-bag', 'lemon-tree'])
+
 // MPP-39: the window (and its sky) follows the bed and sits lower on the lower wall.
 export const WINDOW_SHIFT = [0, 70, -30]
 

@@ -55,7 +55,7 @@ function PetView() {
     lastLoggedType: moodInfo.lastLoggedType
   })
   const dressing = usePipWardrobe({ userId: petUserId, wardrobe: pet?.wardrobe ?? null, setWardrobe, line })
-  const shopState = usePetShop({ applyRoomWrite, refreshPet })
+  const shopState = usePetShop({ applyRoomWrite, refreshPet, line })
   const roomEdit = useRoomEdit({ room: pet?.room ?? null, setRoom, applyRoomWrite })
   // MPP-28 AC 2: award > outfit > shop line. MPP-42 AC 16: what you earned queues after them, and after the cook scene.
   const higherAnnouncement = awards.announcement ?? dressing.announcement ?? shopState.announcement
@@ -143,6 +143,7 @@ function PetView() {
         levels={pet.room?.stations}
         shop={shop}
         decor={decor}
+        line={line}
       />
     </div>
   )

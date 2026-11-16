@@ -1,5 +1,6 @@
 import { RECENT_EMPTY, RECENT_TITLE } from '../../../constants/petSprinkles'
 import { groupRecent, localISO, relativeDay } from '../../../utils/sprinkleHistory'
+import { useRoomPack } from './roomPackContext'
 
 /**
  * MPP-42 AC 5: "Your recent sprinkles" — the caller's own last 14 days, newest first, earnings green +
@@ -7,7 +8,7 @@ import { groupRecent, localISO, relativeDay } from '../../../utils/sprinkleHisto
  */
 function EarnRecentList({ entries }) {
   const todayISO = localISO(new Date())
-  const lines = groupRecent(entries)
+  const lines = groupRecent(entries, useRoomPack().line)
 
   return (
     <section aria-labelledby="pip-earn-recent">

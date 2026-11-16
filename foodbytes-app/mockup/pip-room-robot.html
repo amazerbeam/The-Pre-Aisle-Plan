@@ -1,0 +1,2252 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pip's room: robot workshop (Cyberpunk)</title>
+<!-- Contract: .claude/contract/2026-11-16-themed-pip-rooms-mockups/ (Phase 2). Mockup only: nothing under client/src changes until the developer approves it. -->
+<style>
+  :root {
+    --brand: #4a3f80; --text: #2c3e50; --muted: #5f6b76;
+    --bg: #f3f5f0; --card: #ffffff; --line: #e1e6dc; --ok: #2f7d32; --bad: #c62828;
+    --thumb: 96px;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; }
+  main { max-width: 1280px; margin: 0 auto; padding: 20px 14px 64px; }
+  h1 { color: var(--brand); margin: 0 0 4px; font-size: 1.6rem; }
+  h2 { color: var(--brand); margin: 32px 0 10px; font-size: 1.2rem; }
+  h3 { margin: 0 0 8px; font-size: 1rem; }
+  .lede { color: var(--muted); margin: 0 0 14px; max-width: 880px; }
+  .card { background: var(--card); border-radius: 16px; padding: 14px; box-shadow: 0 4px 18px rgba(40,60,30,.08); }
+  .note { font-size: .85rem; color: var(--muted); }
+  button, select { font: inherit; }
+  button { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+  .bar { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; margin: 0 0 12px; }
+  .group { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .group > b { font-size: .8rem; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; margin-right: 2px; }
+  .tog, .btn { min-width: 44px; min-height: 44px; border: 1px solid #c9d2c0; background: #fff; color: var(--text); border-radius: 999px; padding: 6px 14px; font-size: .88rem; font-weight: 600; cursor: pointer; }
+  .tog[aria-pressed="true"] { background: var(--brand); border-color: var(--brand); color: #fff; }
+  .tog:focus-visible, .btn:focus-visible, select:focus-visible, .cell:focus-visible { outline: 3px solid #f0a000; outline-offset: 2px; }
+  @media (hover: hover) { .tog:hover:not([aria-pressed="true"]) { background: #eef1ea; } }
+  select { min-height: 44px; border: 1px solid #c9d2c0; border-radius: 10px; padding: 6px 10px; background: #fff; max-width: 100%; }
+  label.sel { display: flex; flex-direction: column; gap: 2px; font-size: .78rem; font-weight: 700; color: var(--muted); }
+  label.sel select { font-weight: 500; color: var(--text); font-size: .9rem; }
+
+  /* ---- workbench: the room stays in view on wide screens ---- */
+  .bench { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; align-items: start; }
+  .stagecol { position: static; }
+  .stage { border-radius: 16px; overflow: hidden; position: relative; background: #ecebf3; box-shadow: 0 4px 18px rgba(40,60,30,.12); }
+  .stage .room-svg { display: block; width: 100%; height: auto; }
+  .status { font-size: .82rem; margin: 8px 2px 0; color: var(--muted); }
+  .status .fail { color: var(--bad); font-weight: 700; }
+  .herbnote { margin: 8px 2px 0; font-size: .85rem; font-weight: 700; color: var(--brand); }
+  @media (min-width: 1000px) {
+    .bench { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); }
+    .stagecol { position: sticky; top: 12px; }
+  }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { display: flex; flex-direction: column; align-items: center; gap: 2px; width: 96px; padding: 6px 4px; border-radius: 12px; border: 2px solid transparent; background: #f7f9f4; cursor: pointer; font-size: .74rem; font-weight: 700; color: var(--text); min-height: 44px; }
+  .chip[aria-pressed="true"] { border-color: var(--brand); background: #eceaf8; }
+  .chip svg { width: 76px; height: 76px; display: block; }
+
+  .station { margin-bottom: 14px; padding: 10px; background: #f8faf6; border-radius: 14px; }
+  .station .head { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; margin-bottom: 8px; }
+  .levels { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+  .lvl { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 4px; border-radius: 10px; border: 2px solid transparent; background: #fff; cursor: pointer; font-size: .68rem; font-weight: 700; min-height: 44px; color: var(--text); }
+  .lvl[aria-pressed="true"] { border-color: var(--brand); }
+  .lvl svg, .cell svg { width: var(--thumb); max-width: 100%; height: auto; aspect-ratio: 1; display: block; background: #f1f1f6; border-radius: 8px; }
+  .lvl small { font-weight: 500; color: var(--muted); text-align: center; line-height: 1.15; }
+
+  .spots { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 8px 12px; margin-bottom: 14px; }
+  .decorgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(calc(var(--thumb) + 14px), 1fr)); gap: 8px; }
+  .cell { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 5px; border-radius: 12px; border: 2px solid transparent; background: #f7f9f4; cursor: pointer; font-size: .7rem; font-weight: 700; text-align: center; line-height: 1.15; color: var(--text); min-height: 44px; }
+  .cell[aria-pressed="true"] { border-color: var(--brand); background: #eceaf8; }
+  .cell small { font-weight: 500; color: var(--muted); }
+  .fxs { display: grid; grid-template-columns: repeat(auto-fill, minmax(calc(var(--thumb) + 18px), 1fr)); gap: 8px; margin-top: 8px; }
+  .fxs figure { margin: 0; text-align: center; font-size: .72rem; font-weight: 700; background: #f7f9f4; border-radius: 12px; padding: 6px; }
+  .fxs svg { width: var(--thumb); max-width: 100%; height: auto; aspect-ratio: 1; display: block; margin: 0 auto 2px; background: #f1f1f6; border-radius: 8px; }
+
+  table { border-collapse: collapse; width: 100%; font-size: .8rem; }
+  th, td { border-bottom: 1px solid var(--line); padding: 5px 6px; text-align: left; vertical-align: top; }
+  th { position: sticky; top: 0; background: #fff; }
+  .tablewrap { overflow-x: auto; max-height: 560px; overflow-y: auto; }
+  .pass { color: var(--ok); font-weight: 700; }
+  .fail { color: var(--bad); font-weight: 700; }
+  .todo { color: var(--muted); }
+
+  /* ---- room effects and ambience: CSS only, transform + opacity, stopped by Low FX, reduced motion and thumbnails ---- */
+  .room-fx { transform-box: fill-box; transform-origin: center; }
+  .room-fx--steam { animation: room-steam 1.2s ease-in-out infinite; }
+  .room-fx--zzz { animation: room-zzz 2.4s ease-in-out infinite; }
+  @keyframes room-steam { 0% { opacity: .2; transform: translateY(2px); } 50% { opacity: 1; } 100% { opacity: .2; transform: translateY(-6px); } }
+  @keyframes room-zzz { 0%, 100% { opacity: .55; transform: translateY(0); } 50% { opacity: 1; transform: translateY(-5px); } }
+  .room-fx--scan { animation: room-scan 3.1s steps(1, end) infinite; }
+  .room-fx--blink { animation: room-blink 1.6s steps(1, end) infinite; }
+  .room-fx--fan { animation: room-fan 2.8s linear infinite; }
+  .room-fx--buzz { animation: room-buzz 2.6s steps(1, end) infinite; }
+  .room-fx--rain { animation: room-rain .8s linear infinite; }
+  @keyframes room-scan { 0%, 100% { opacity: 1; transform: translateY(0); } 8% { opacity: .5; } 10% { opacity: 1; } 55% { opacity: .85; transform: translateY(2px); } 57% { opacity: 1; transform: translateY(0); } }
+  @keyframes room-blink { 0%, 62% { opacity: 1; } 63%, 100% { opacity: .15; } }
+  @keyframes room-fan { to { transform: rotate(360deg); } }
+  @keyframes room-buzz { 0%, 100% { opacity: 1; } 6% { opacity: .4; } 8% { opacity: 1; } 9% { opacity: .6; } 11% { opacity: 1; } 55% { opacity: .85; } 57% { opacity: 1; } }
+  @keyframes room-rain { from { transform: translateY(0); } to { transform: translateY(14px); } }
+  body.lowfx .room-fx, body.reduced .room-fx, .is-still .room-fx { animation: none !important; }
+  body.lowfx [data-glow] { filter: none !important; }
+  @media (prefers-reduced-motion: reduce) { .room-fx { animation: none !important; } }
+</style>
+</head>
+<body>
+<!-- approved 2026-11-16 -->
+<main id="app"></main>
+<script id="room-geometry">
+/* ======================================================================
+   GEOMETRY: copied verbatim from the live room code (read-only source). Every statement ends with
+   "// source: <file>:<line>", the path relative to foodbytes-app/client/src/. mockup-smoke.mjs re-reads each
+   cited line and fails when a number here is not on it, so drift from the live code is caught.
+   ====================================================================== */
+const ROOM_STATIONS = { BED: 'bed', FRIDGE: 'fridge', COOKER: 'cooker', CABINET: 'cabinet', WARDROBE: 'wardrobe' }; // source: constants/petRoom.js:5-11
+const ROOM_MIN_LEVEL = 1; // source: constants/petRoom.js:13
+const ROOM_MAX_LEVEL = 4; // source: constants/petRoom.js:14
+const DEFAULT_ROOM_LEVELS = { bed: 1, fridge: 1, cooker: 1, cabinet: 1, wardrobe: 1 }; // source: constants/petRoom.js:16-22
+
+const GEOMETRY = {
+  ROOM_SIZE: { u: 260, v: 300, h: 150 }, // source: constants/petRoom.js:29
+  ROOM_WORLD: { x: -84, y: 10, width: 564, height: 394 }, // source: constants/petRoom.js:33
+  WINDOW_GAP: { v0: 158, v1: 238, h0: 56 }, // source: components/pet/room/roomDecor.jsx:26
+  RUG: { cu: 140, cv: 150, ru: 58, rv: 44 }, // source: components/pet/room/roomLayout.js:24
+  ROOM_DRAW_ORDER: ['wardrobe', 'cooker', 'fridge', 'cabinet', 'bed'], // source: components/pet/room/roomLayout.js:15-21
+  PIP_SCALE: 0.46, // source: components/pet/room/roomLayout.js:28
+  PIP_COOKER_SPOT: [126, 64], // source: components/pet/room/roomLayout.js:32
+  PIP_BED_SCALE: 0.36, // source: components/pet/room/roomLayout.js:39
+  PIP_BED_DROP: 4, // source: components/pet/room/roomLayout.js:40
+  SLEEP_Z_LIFT: 30, // source: components/pet/room/roomLayout.js:41
+  NIGHT_DIM_FILL: 'rgba(30,20,80,.38)', // source: components/pet/room/roomLayout.js:42
+  STATION_SHIFT: { cooker: [30, 0], fridge: [60, 0], cabinet: [0, 30], bed: [0, 70], wardrobe: [0, 0] }, // source: components/pet/room/roomLayout.js:46-51
+  DECOR_LEGACY_SHIFT: { overWardrobe: [-130, 0, -30], frontRightWall: [0, 216, -40], byFridge: [70, 20, 0] }, // source: components/pet/room/roomLayout.js:55-59
+  WINDOW_SHIFT: [0, 70, -30], // source: components/pet/room/roomLayout.js:62
+  STATION_ANCHORS: {
+    fridgeTop: [[166, 14, 34], [166, 17, 58], [163, 19, 112], [156, 20, 120]], // source: components/pet/room/roomLayout.js:85
+    cookerPot: [[118, 15, 46], [80, 19, 70], [92, 20, 80], [90, 20, 82]], // source: components/pet/room/roomLayout.js:86
+    cookerPlate: [[100, 22, 26], [106, 19, 55], [118, 20, 62], [112, 20, 63]], // source: components/pet/room/roomLayout.js:87
+    bedTop: [[48, 148, 5], [50, 148, 30], [40, 148, 30], [40, 148, 30]] // source: components/pet/room/roomLayout.js:88
+  },
+  FRIDGE_GAUGE_LIFT: 8, // source: components/pet/room/roomLayout.js:94
+  FRIDGE_GAUGE_HALF_HEIGHT: 7, // source: components/pet/room/roomLayout.js:95
+  FOOTPRINT: {
+    // fridge rows are [u, v, du, dv, h]; the others are [u, v, du, dv, h0, h1]
+    fridge: [[145, -1, 42, 30, 34], [146, 0, 40, 34, 58], [140, 0, 46, 38, 112], [124, 0, 64, 40, 120]], // source: components/pet/room/roomLayout.js:93
+    cabinet: [[0, 26, 24, 78, 0, 48], [0, 30, 22, 72, 30, 88], [0, 30, 26, 66, 0, 112], [0, 26, 30, 74, 0, 134]], // source: components/pet/room/roomLayout.js:99
+    cooker: [[96, 0, 44, 30, 0, 46], [58, 0, 84, 38, 0, 70], [70, 0, 70, 38, 0, 80], [48, 0, 94, 40, 0, 150]], // source: components/pet/room/roomLayout.js:104
+    bed: [[10, 122, 74, 52, 0, 11], [4, 122, 80, 52, 0, 36], [0, 120, 91, 56, 0, 64], [0, 118, 91, 60, 0, 127]], // source: components/pet/room/roomLayout.js:105
+    wardrobe: [[6, 4, 63, 22, 0, 82], [10, 0, 52, 26, 0, 78], [6, 0, 60, 30, 0, 92], [2, 0, 70, 32, 0, 96]] // source: components/pet/room/roomLayout.js:109
+  },
+  DECOR_LAYERS: {
+    rug: ['rug'],
+    wall: ['overWardrobe', 'bedsideWall', 'frontRightWall', 'windowDressing', 'windowsill'],
+    backFloor: ['backCorner', 'bedsideNook'],
+    frontFloor: ['cornerByDoor', 'footOfBed', 'byFridge', 'frontOfRoom']
+  }, // source: constants/petDecor.js:35-40
+  FRIDGE_GAUGE_COLOURS: { high: '#5cb85c', mid: '#f0ad4e', low: '#e5534b' }, // source: constants/petRoom.js:75-79
+  FRIDGE_LOW_PCT: 20, // source: constants/petRoom.js:64
+  FRIDGE_PLENTY_PCT: 50 // source: constants/petRoom.js:65
+};
+GEOMETRY.PIP_HOME = [GEOMETRY.RUG.cu, GEOMETRY.RUG.cv]; // source: components/pet/room/roomLayout.js:27
+
+// The 12 physical spots (display order), then the shapes. Legacy ids keep their MPP-27 art coords and are slid to their spot.
+const DECOR_SPOTS = ['overWardrobe', 'bedsideWall', 'frontRightWall', 'windowDressing', 'windowsill', 'rug', 'backCorner', 'bedsideNook', 'footOfBed', 'byFridge', 'cornerByDoor', 'frontOfRoom']; // source: constants/petDecor.js:27-31
+const LEGACY_IDS = ['basil-print', 'recipe-board', 'herb-shelf', 'fairy-lights', 'wall-clock', 'bunting', 'pan-rail', 'mirror', 'watering-can', 'cookbook-stack', 'bean-bag', 'lemon-tree']; // source: components/pet/room/decorArt.jsx:17
+
+const floorSpot = (u0, u1, v0, v1, h1, tag) => ({
+  corners: [[u0, v0, 0], [u1, v0, 0], [u1, v1, 0], [u0, v1, 0]],
+  plus: [(u0 + u1) / 2, (v0 + v1) / 2, 0],
+  tag: tag ?? [(u0 + u1) / 2, (v0 + v1) / 2, 0],
+  volume: [u0, v0, u1 - u0, v1 - v0, 0, h1]
+}); // source: constants/petDecor.js:68-73
+
+GEOMETRY.DECOR_SPOT_SHAPES = {
+  overWardrobe: {
+    corners: [[20, 0, 102], [56, 0, 102], [56, 0, 140], [20, 0, 140]],
+    plus: [38, 0, 121], tag: [38, 0, 140], volume: [20, 0, 36, 8, 98, 146]
+  }, // source: constants/petDecor.js:79-82
+  bedsideWall: {
+    corners: [[0, 134, 60], [0, 154, 60], [0, 154, 124], [0, 134, 124]],
+    plus: [0, 144, 92], tag: [0, 144, 52], volume: [0, 134, 6, 20, 60, 132]
+  }, // source: constants/petDecor.js:83-86
+  frontRightWall: {
+    corners: [[0, 250, 102], [0, 296, 102], [0, 296, 134], [0, 250, 134]],
+    plus: [0, 273, 118], tag: [0, 273, 134], volume: [0, 250, 4, 46, 98, 138]
+  }, // source: constants/petDecor.js:87-90
+  windowDressing: {
+    corners: [[0, 156, 60], [0, 244, 60], [0, 244, 146], [0, 156, 146]],
+    plus: [0, 160, 140], tag: [0, 198, 146], volume: [0, 156, 16, 88, 60, 150]
+  }, // source: constants/petDecor.js:91-94
+  windowsill: {
+    corners: [[0, 158, 74], [14, 158, 74], [14, 238, 74], [0, 238, 74]],
+    plus: [7, 198, 74], tag: [7, 198, 66], volume: [0, 158, 14, 80, 74, 100]
+  }, // source: constants/petDecor.js:95-98
+  rug: { ...floorSpot(82, 198, 106, 194, 2, [198, 150, 0]), plus: [140, 150, 0] }, // source: constants/petDecor.js:99
+  backCorner: floorSpot(2, 30, 32, 52, 80, [16, 42, -4]), // source: constants/petDecor.js:100
+  bedsideNook: floorSpot(2, 32, 140, 182, 70), // source: constants/petDecor.js:101
+  footOfBed: floorSpot(96, 126, 196, 240, 30), // source: constants/petDecor.js:102
+  byFridge: floorSpot(220, 256, 130, 170, 64), // source: constants/petDecor.js:103
+  cornerByDoor: floorSpot(4, 40, 258, 294, 100), // source: constants/petDecor.js:104
+  frontOfRoom: floorSpot(172, 208, 232, 268, 40) // source: constants/petDecor.js:105
+};
+
+const SPOT_LABELS = {
+  overWardrobe: 'Over the wardrobe', bedsideWall: 'Bedside wall', frontRightWall: 'Front right wall', windowDressing: 'Window dressing',
+  windowsill: 'Windowsill', rug: 'Rug', backCorner: 'Back corner', bedsideNook: 'Bedside nook', footOfBed: 'Foot of the bed',
+  byFridge: 'By the fridge', cornerByDoor: 'Corner by the door', frontOfRoom: 'Front of the room', wallStyle: 'Walls', floorStyle: 'Floor'
+}; // source: constants/petDecor.js:49-64
+
+/* The ids a creature must draw: 5 stations (x 4 levels), 55 decor ids in their spots, 10 styles. */
+const IDS = {
+  stations: ['bed', 'fridge', 'cooker', 'cabinet', 'wardrobe'], // source: constants/petRoom.js:5-11
+  decor: {
+    'basil-print': 'overWardrobe', 'recipe-board': 'overWardrobe', 'herb-shelf': 'overWardrobe', 'fairy-lights': 'overWardrobe', 'pip-portrait': 'overWardrobe',
+    'growth-chart': 'bedsideWall', 'meal-calendar': 'bedsideWall', 'wall-sconce': 'bedsideWall', 'photo-strip': 'bedsideWall',
+    'wall-clock': 'frontRightWall', bunting: 'frontRightWall', 'pan-rail': 'frontRightWall', mirror: 'frontRightWall', 'coat-hooks': 'frontRightWall',
+    'curtains-gingham': 'windowDressing', 'curtains-linen': 'windowDressing', 'roller-blind': 'windowDressing', 'window-lights': 'windowDressing', 'plant-hanger': 'windowDressing',
+    'sill-basil': 'windowsill', 'sill-succulents': 'windowsill', 'sill-cactus': 'windowsill', 'sill-radio': 'windowsill', 'sill-cat': 'windowsill',
+    'rug-pink': 'rug', 'rug-braided': 'rug', 'rug-leaf': 'rug', 'rug-stripe': 'rug', 'rug-picnic': 'rug', 'rug-sheepskin': 'rug',
+    'snake-plant': 'backCorner', cactus: 'backCorner', 'umbrella-stand': 'backCorner', broom: 'backCorner',
+    'side-table-lamp': 'bedsideNook', 'record-player': 'bedsideNook', 'plant-stand': 'bedsideNook', 'stool-books': 'bedsideNook',
+    'toy-chest': 'footOfBed', bench: 'footOfBed', 'laundry-basket': 'footOfBed', slippers: 'footOfBed',
+    'watering-can': 'byFridge', 'cookbook-stack': 'byFridge', 'bean-bag': 'byFridge', 'lemon-tree': 'byFridge', 'veg-basket': 'byFridge',
+    monstera: 'cornerByDoor', 'coat-stand': 'cornerByDoor', 'arc-lamp': 'cornerByDoor', guitar: 'cornerByDoor',
+    pouffe: 'frontOfRoom', 'tea-table': 'frontOfRoom', 'pip-ball': 'frontOfRoom', 'picnic-basket': 'frontOfRoom'
+  }, // source: constants/petDecor.js:110-175
+  styles: ['wall-white', 'wall-lavender', 'wall-mint', 'wall-peach', 'wall-sky', 'wall-sprig', 'floor-lilac', 'floor-oak', 'floor-terracotta', 'floor-checker'] // source: constants/petDecor.js:187-196
+};
+
+/* The herb room's own names, for the names table (id -> herb label). */
+const HERB_LABELS = {
+  stations: { bed: 'Bed', fridge: 'Fridge', cooker: 'Cooker', cabinet: 'Trophy cabinet', wardrobe: 'Wardrobe' }, // source: constants/petShop.js:19-23
+  levels: {
+    bed: ['Blanket on the floor', 'Camp cot', 'Wooden bed', 'Canopy bed'],
+    fridge: ['Cool box', 'Mini fridge', 'Full fridge', 'Double-door fridge'],
+    cooker: ['Camping stove', 'Counter and hob', 'Range cooker', "Chef's kitchen"],
+    cabinet: ['Planks on bricks', 'Wall shelves', 'Wooden cabinet', 'Glass display cabinet'],
+    wardrobe: ['Clothes rail', 'Chest of drawers', 'Wooden wardrobe', 'Mirrored wardrobe']
+  }, // source: constants/petShop.js:27-31
+  decor: {
+    'basil-print': 'Basil print', 'recipe-board': 'Recipe chalkboard', 'herb-shelf': 'Herb shelf', 'fairy-lights': 'Fairy lights', 'pip-portrait': 'Pip portrait',
+    'growth-chart': 'Growth chart', 'meal-calendar': 'Meal-plan calendar', 'wall-sconce': 'Wall lamp', 'photo-strip': 'Photo frames',
+    'wall-clock': 'Wall clock', bunting: 'Bunting', 'pan-rail': 'Copper pan rail', mirror: 'Round mirror', 'coat-hooks': 'Coat hooks',
+    'curtains-gingham': 'Gingham curtains', 'curtains-linen': 'Linen curtains', 'roller-blind': 'Roller blind', 'window-lights': 'Window fairy lights', 'plant-hanger': 'Hanging plant',
+    'sill-basil': 'Basil pots', 'sill-succulents': 'Succulents', 'sill-cactus': 'Cactus pair', 'sill-radio': 'Retro radio', 'sill-cat': 'Lucky cat',
+    'rug-pink': 'Pink rug', 'rug-braided': 'Braided rug', 'rug-leaf': 'Basil-leaf rug', 'rug-stripe': 'Rainbow stripes', 'rug-picnic': 'Picnic blanket', 'rug-sheepskin': 'Sheepskin',
+    'snake-plant': 'Snake plant', cactus: 'Tall cactus', 'umbrella-stand': 'Umbrella stand', broom: 'Broom + dustpan',
+    'side-table-lamp': 'Side table + lamp', 'record-player': 'Record player', 'plant-stand': 'Plant stand', 'stool-books': 'Stool + books',
+    'toy-chest': 'Toy chest', bench: 'Bed bench', 'laundry-basket': 'Laundry basket', slippers: 'Mat + slippers',
+    'watering-can': 'Watering can', 'cookbook-stack': 'Cookbook stack', 'bean-bag': 'Bean bag', 'lemon-tree': 'Potted lemon tree', 'veg-basket': 'Veg basket',
+    monstera: 'Monstera', 'coat-stand': 'Coat stand', 'arc-lamp': 'Arc floor lamp', guitar: 'Guitar',
+    pouffe: 'Pouffe', 'tea-table': 'Tea table', 'pip-ball': "Pip's ball", 'picnic-basket': 'Picnic basket'
+  }, // source: constants/petDecor.js:110-175
+  styles: {
+    'wall-white': 'White', 'wall-lavender': 'Lavender', 'wall-mint': 'Mint', 'wall-peach': 'Peach', 'wall-sky': 'Sky', 'wall-sprig': 'Sprig wallpaper',
+    'floor-lilac': 'Lilac', 'floor-oak': 'Oak boards', 'floor-terracotta': 'Terracotta tiles', 'floor-checker': 'Checkerboard'
+  } // source: constants/petDecor.js:187-196
+};
+
+/* ---- geometry helpers, bodies copied from roomLayout.js (P comes from the iso block) ---- */
+function shiftPx([du, dv, dh = 0]) {
+  const [x0, y0] = P(0, 0, 0);
+  const [x, y] = P(du, dv, dh);
+  return [x - x0, y - y0];
+} // source: components/pet/room/roomLayout.js:65-69
+
+function shiftTransform(shift) {
+  const [dx, dy] = shiftPx(shift);
+  return `translate(${dx.toFixed(1)} ${dy.toFixed(1)})`;
+} // source: components/pet/room/roomLayout.js:71-75
+
+function boxCorners(u, v, du, dv, h0, h1) {
+  const corners = [];
+  for (const cu of [u, u + du]) {
+    for (const cv of [v, v + dv]) {
+      for (const ch of [h0, h1]) corners.push(P(cu, cv, ch));
+    }
+  }
+  return corners;
+} // source: components/pet/room/roomLayout.js:198-206
+
+function boundsOf(points, extraYs = []) {
+  const xs = points.map(([x]) => x);
+  const ys = [...points.map(([, y]) => y), ...extraYs];
+  const x = Math.min(...xs);
+  const y = Math.min(...ys);
+  return { x, y, width: Math.max(...xs) - x, height: Math.max(...ys) - y };
+} // source: components/pet/room/roomLayout.js:209-215
+
+function squareAround({ x, y, width, height }, pad) {
+  const side = Math.max(width, height) + 2 * pad;
+  return { x: x + width / 2 - side / 2, y: y + height / 2 - side / 2, width: side, height: side };
+} // source: components/pet/room/roomLayout.js:218-221
+
+function resolveRoomLevels(levels) {
+  const resolved = {};
+  for (const station of Object.keys(DEFAULT_ROOM_LEVELS)) {
+    const level = levels?.[station];
+    const valid = Number.isInteger(level) && level >= ROOM_MIN_LEVEL && level <= ROOM_MAX_LEVEL;
+    resolved[station] = valid ? level : DEFAULT_ROOM_LEVELS[station];
+  }
+  return resolved;
+} // source: components/pet/room/roomLayout.js:162-170
+
+/** One footprint as [u, v, du, dv, h0, h1] (the fridge's 5-tuple gets h0 = 0, as THUMB_FOOTPRINTS does). */
+function footprint3(station, level) {
+  const row = GEOMETRY.FOOTPRINT[station][level - 1];
+  if (station !== 'fridge') return row;
+  const [u, v, du, dv, h] = row;
+  return [u, v, du, dv, 0, h];
+} // source: components/pet/room/roomLayout.js:117-126
+
+const THUMB_PAD = 6; // source: components/pet/room/roomLayout.js:110
+const DECOR_SPOT_PAD = 4; // source: components/pet/room/roomLayout.js:131
+
+function stationThumbBox(station, level) {
+  const index = resolveRoomLevels({ [station]: level })[station] - 1;
+  return squareAround(boundsOf(boxCorners(...footprint3(station, index + 1))), THUMB_PAD);
+} // source: components/pet/room/roomLayout.js:125-128
+
+function decorSpotHitBox(spot) {
+  const { x, y, width, height } = boundsOf(boxCorners(...GEOMETRY.DECOR_SPOT_SHAPES[spot].volume));
+  return { x: x - DECOR_SPOT_PAD, y: y - DECOR_SPOT_PAD, width: width + 2 * DECOR_SPOT_PAD, height: height + 2 * DECOR_SPOT_PAD };
+} // source: components/pet/room/roomLayout.js:138-141
+
+function decorThumbBox(spot) {
+  return squareAround(boundsOf(boxCorners(...GEOMETRY.DECOR_SPOT_SHAPES[spot].volume)), THUMB_PAD);
+} // source: components/pet/room/roomLayout.js:144-146
+
+function pipPose(position, mood, levels) {
+  if (position === 'cooker') {
+    return { face: 'happy', showProps: false, anchor: [...GEOMETRY.PIP_COOKER_SPOT, 0], scale: GEOMETRY.PIP_SCALE, dropPx: 0 };
+  }
+  if (position === 'bed') {
+    const bedLevel = resolveRoomLevels(levels).bed;
+    return { face: 'sleep', showProps: false, anchor: GEOMETRY.STATION_ANCHORS.bedTop[bedLevel - 1], scale: GEOMETRY.PIP_BED_SCALE, dropPx: GEOMETRY.PIP_BED_DROP };
+  }
+  return { face: mood, showProps: true, anchor: [...GEOMETRY.PIP_HOME, 0], scale: GEOMETRY.PIP_SCALE, dropPx: 0 };
+} // source: components/pet/room/roomLayout.js:227-242
+
+GEOMETRY.THUMB = { station: stationThumbBox, decor: decorThumbBox };
+</script>
+<script id="room-iso">
+/* ======================================================================
+   Iso helpers. P / pts / shade / boxFaces / ellipsePoints / cylinderSidePoints and the flat-rectangle points are
+   iso.js, logic unchanged (ES exports -> plain functions). Floor coords: u along the LEFT wall (plane v = 0), v along the
+   RIGHT wall (plane u = 0), h up; the viewer is at +u, +v. Below them: the shape helpers (isoShapes.jsx) as SVG-string
+   functions, plus a bounds collector the fit table and the smoke use to measure the art against the live footprints.
+   ====================================================================== */
+const ISO_N = Math.hypot(180, 70);
+const ISO_C = 180 / ISO_N;
+const ISO_S = 70 / ISO_N;
+
+/** Floor point (u, v) at height h -> SVG [x, y]. */
+function P(u, v, h = 0) {
+  return [180 - u * ISO_C + v * ISO_C, 180 + (u + v) * ISO_S - h];
+}
+
+/** [[x, y], ...] -> an SVG `points` string, one decimal place. */
+function pts(points) {
+  return points.map(p => p.map(n => n.toFixed(1)).join(',')).join(' ');
+}
+
+/** Lighten (pct > 0) or darken (pct < 0) a '#rrggbb' colour. */
+function shade(hex, pct) {
+  const n = parseInt(hex.slice(1), 16);
+  const f = pct / 100;
+  const channel = s => {
+    const c = (n >> s) & 255;
+    return Math.round(f > 0 ? c + (255 - c) * f : c * (1 + f));
+  };
+  return `rgb(${channel(16)},${channel(8)},${channel(0)})`;
+}
+
+/** Like shade, but returns a '#rrggbb' hex (so the result can be shaded again). */
+function tint(hex, pct) {
+  const n = parseInt(hex.slice(1), 16);
+  const f = pct / 100;
+  const channel = s => {
+    const c = (n >> s) & 255;
+    return Math.round(f > 0 ? c + (255 - c) * f : c * (1 + f));
+  };
+  return '#' + [16, 8, 0].map(s => channel(s).toString(16).padStart(2, '0')).join('');
+}
+
+/** The three visible faces of a solid box, in draw order: front (u = u+du), side (v = v+dv), top. */
+function boxFaces(u, v, du, dv, h0, h1) {
+  const U = u + du;
+  const V = v + dv;
+  return {
+    front: [P(U, v, h0), P(U, V, h0), P(U, V, h1), P(U, v, h1)],
+    side: [P(u, V, h0), P(U, V, h0), P(U, V, h1), P(u, V, h1)],
+    top: [P(u, v, h1), P(U, v, h1), P(U, V, h1), P(u, V, h1)]
+  };
+}
+
+function rectVPoints(vp, u0, u1, h0, h1) {
+  return [P(u0, vp, h0), P(u1, vp, h0), P(u1, vp, h1), P(u0, vp, h1)];
+}
+
+function rectUPoints(up, v0, v1, h0, h1) {
+  return [P(up, v0, h0), P(up, v1, h0), P(up, v1, h1), P(up, v0, h1)];
+}
+
+function rectHPoints(h, u0, u1, v0, v1) {
+  return [P(u0, v0, h), P(u1, v0, h), P(u1, v1, h), P(u0, v1, h)];
+}
+
+function ellipsePoints(cu, cv, h, ru, rv, steps = 24) {
+  const points = [];
+  for (let i = 0; i < steps; i++) {
+    const t = (i / steps) * Math.PI * 2;
+    points.push(P(cu + ru * Math.cos(t), cv + rv * Math.sin(t), h));
+  }
+  return points;
+}
+
+function cylinderSidePoints(cu, cv, r, h0, h1) {
+  const angle = i => -Math.PI / 4 + (i / 12) * Math.PI;
+  const points = [];
+  for (let i = 0; i <= 12; i++) points.push(P(cu + r * Math.cos(angle(i)), cv + r * Math.sin(angle(i)), h0));
+  for (let i = 12; i >= 0; i--) points.push(P(cu + r * Math.cos(angle(i)), cv + r * Math.sin(angle(i)), h1));
+  return points;
+}
+
+/* ---------- bounds collector: every shape helper reports the points it draws ---------- */
+let ART_INK = '#2b2630'; // the room's outline colour; the engine sets it from pack.ink before each draw
+let _bounds = null;
+
+function track(points) {
+  if (!_bounds) return;
+  for (const [x, y] of points) {
+    if (x < _bounds.x0) _bounds.x0 = x;
+    if (y < _bounds.y0) _bounds.y0 = y;
+    if (x > _bounds.x1) _bounds.x1 = x;
+    if (y > _bounds.y1) _bounds.y1 = y;
+  }
+}
+
+/** Run fn (which draws) and return the screen bounds {x, y, width, height} of everything it drew, or null if nothing. */
+function measure(fn) {
+  const previous = _bounds;
+  const b = { x0: Infinity, y0: Infinity, x1: -Infinity, y1: -Infinity };
+  _bounds = b;
+  try { fn(); } finally { _bounds = previous; }
+  return b.x0 === Infinity ? null : { x: b.x0, y: b.y0, width: b.x1 - b.x0, height: b.y1 - b.y0 };
+}
+
+/* ---------- shape helpers: SVG strings, outline ART_INK, shading as the live Box (-6 front, -20 side, +14 top) ---------- */
+const n1 = n => n.toFixed(1);
+
+function poly(points, fill, o = {}) {
+  track(points);
+  const stroke = o.stroke === undefined ? ART_INK : o.stroke;
+  const strokeAttrs = stroke ? ` stroke="${stroke}" stroke-width="${o.sw ?? 1.6}" stroke-linejoin="round"` : '';
+  return `<polygon points="${pts(points)}" fill="${fill}"${strokeAttrs}${o.op != null ? ` opacity="${o.op}"` : ''}/>`;
+}
+
+function isoLine(points, width = 1.6, color = ART_INK, o = {}) {
+  track(points);
+  return `<polyline points="${pts(points)}" fill="none" stroke="${color}" stroke-width="${width}" stroke-linecap="round" stroke-linejoin="round"${o.dash ? ` stroke-dasharray="${o.dash}"` : ''}${o.op != null ? ` opacity="${o.op}"` : ''}/>`;
+}
+
+/** Solid box: the two visible sides, then the top. */
+function box(u, v, du, dv, h0, h1, color, o = {}) {
+  const f = boxFaces(u, v, du, dv, h0, h1);
+  return poly(f.front, shade(color, -6), o) + poly(f.side, shade(color, -20), o) + poly(f.top, shade(color, 14), o);
+}
+
+function rectV(vp, u0, u1, h0, h1, fill, o) { return poly(rectVPoints(vp, u0, u1, h0, h1), fill, o); }
+function rectU(up, v0, v1, h0, h1, fill, o) { return poly(rectUPoints(up, v0, v1, h0, h1), fill, o); }
+function rectH(h, u0, u1, v0, v1, fill, o) { return poly(rectHPoints(h, u0, u1, v0, v1), fill, o); }
+function ellH(cu, cv, h, ru, rv, fill, o) { return poly(ellipsePoints(cu, cv, h, ru, rv), fill, o); }
+
+/** Points along an ellipse from angle t0 to t1 (radians) at height h. */
+function arcPts(cu, cv, h, ru, rv, t0, t1, n = 14) {
+  const out = [];
+  for (let i = 0; i <= n; i++) {
+    const t = t0 + ((t1 - t0) * i) / n;
+    out.push(P(cu + ru * Math.cos(t), cv + rv * Math.sin(t), h));
+  }
+  return out;
+}
+
+/** The near (viewer-facing) half of a floor ellipse as an angle range, [t0, t1]. */
+function nearRange(ru, rv) {
+  const t0 = Math.atan2(-rv, ru);
+  return [t0, t0 + Math.PI];
+}
+
+/** Short cylinder / drum, optionally tapered: the near side band, then the top ellipse. */
+function cylE(cu, cv, ru, rv, h0, h1, color, ru1 = ru, rv1 = rv, o = {}) {
+  const [t0, t1] = nearRange(ru, rv);
+  const band = [...arcPts(cu, cv, h0, ru, rv, t0, t1), ...arcPts(cu, cv, h1, ru1, rv1, t0, t1).reverse()];
+  return poly(band, shade(color, -12), o) + poly(ellipsePoints(cu, cv, h1, ru1, rv1), shade(color, 12), o);
+}
+function cyl(cu, cv, r, h0, h1, color, o) { return cylE(cu, cv, r, r, h0, h1, color, r, r, o); }
+
+/** Billboard: flat art pinned to a floor point. ext = the art's extent [x0, y0, x1, y1] around that point, for the bounds. */
+function bill(u, v, h, inner, ext = [-8, -16, 8, 2]) {
+  const [x, y] = P(u, v, h);
+  track([[x + ext[0], y + ext[1]], [x + ext[2], y + ext[3]]]);
+  return `<g transform="translate(${x.toFixed(1)},${y.toFixed(1)})">${inner}</g>`;
+}
+
+/** An animated group. The class never sits on a group that carries a transform (position goes on an outer <g>). */
+function fxg(effect, inner, delay = 0) {
+  return `<g class="room-fx room-fx--${effect}"${delay ? ` style="animation-delay:-${delay}s"` : ''}>${inner}</g>`;
+}
+
+/** Several line segments [[p, q], ...] as one <path>, all tracked for the bounds. */
+function isoLines(segs, width = 1, color = ART_INK, op) {
+  if (!segs.length) return '';
+  let d = '';
+  for (const [a, b] of segs) {
+    track([a, b]);
+    d += `M${a[0].toFixed(1)} ${a[1].toFixed(1)}L${b[0].toFixed(1)} ${b[1].toFixed(1)}`;
+  }
+  return `<path d="${d}" fill="none" stroke="${color}" stroke-width="${width}" stroke-linecap="round"${op != null ? ` opacity="${op}"` : ''}/>`;
+}
+
+/** A glow: CSS drop-shadow on the element. Removed under Low FX by `.lowfx [data-glow]`. */
+function glowAttr(color, radius = 3) {
+  return `data-glow style="filter:drop-shadow(0 0 ${radius}px ${color})"`;
+}
+</script>
+<script id="room-creature">
+const FOOT_X = 100, FOOT_Y = 186;
+const WARDROBE_INK = '#2f4a22';          // clothing outlines (the herb ink's value)
+const INK = WARDROBE_INK;
+const HERB_INK = '#2f4a22', DRAGON_INK = '#1f3d34', ROBOT_INK = '#22303f';
+const MOODS = ['content', 'happy', 'bored', 'mischievous', 'sleep'];
+const MOOD_LABELS = { content: 'Content', happy: 'Happy', bored: 'Bored', mischievous: 'Mischievous', sleep: 'Asleep' };
+const ellipsePath = (cx, cy, rx, ry) => `M${cx - rx} ${cy} A${rx} ${ry} 0 1 0 ${cx + rx} ${cy} A${rx} ${ry} 0 1 0 ${cx - rx} ${cy} Z`;
+
+/* ---------- faces (herb mockup, ink parameterised) ---------- */
+function face(cx, ey, gap, mood, s = 1, ink = HERB_INK) {
+  const L = cx - gap, R = cx + gap, my = ey + 17 * s;
+  const st = `stroke="${ink}" stroke-width="${4 * s}" stroke-linecap="round" fill="none"`;
+  const blush = (o) => `<ellipse cx="${L - 11 * s}" cy="${ey + 11 * s}" rx="${9 * s}" ry="${5 * s}" fill="#ff8fab" opacity="${o}"/><ellipse cx="${R + 11 * s}" cy="${ey + 11 * s}" rx="${9 * s}" ry="${5 * s}" fill="#ff8fab" opacity="${o}"/>`;
+  const eye = (x, dx = 0) => `<ellipse cx="${x + dx}" cy="${ey}" rx="${7 * s}" ry="${9 * s}" fill="${ink}"/><circle cx="${x + dx + 2.4 * s}" cy="${ey - 3.4 * s}" r="${2.8 * s}" fill="#fff"/>`;
+  switch (mood) {
+    case 'happy':
+      return `<path d="M${L - 9 * s} ${ey + 2 * s} Q${L} ${ey - 11 * s} ${L + 9 * s} ${ey + 2 * s}" ${st}/><path d="M${R - 9 * s} ${ey + 2 * s} Q${R} ${ey - 11 * s} ${R + 9 * s} ${ey + 2 * s}" ${st}/>
+        <path d="M${cx - 10 * s} ${my - 3 * s} Q${cx} ${my + 15 * s} ${cx + 10 * s} ${my - 3 * s} Z" fill="#7a2e45" stroke="${ink}" stroke-width="${3 * s}" stroke-linejoin="round"/>${blush(0.8)}`;
+    case 'bored':
+      return `<path d="M${L - 8 * s} ${ey} A${8 * s} ${8 * s} 0 0 0 ${L + 8 * s} ${ey} Z" fill="${ink}"/><path d="M${R - 8 * s} ${ey} A${8 * s} ${8 * s} 0 0 0 ${R + 8 * s} ${ey} Z" fill="${ink}"/>
+        <path d="M${L - 10 * s} ${ey} L${L + 10 * s} ${ey} M${R - 10 * s} ${ey} L${R + 10 * s} ${ey}" ${st}/><path d="M${cx - 7 * s} ${my + 2 * s} L${cx + 7 * s} ${my + 2 * s}" ${st}/>${blush(0.3)}`;
+    case 'mischievous':
+      return `${eye(L, 4 * s)}${eye(R, 4 * s)}
+        <path d="M${L - 10 * s} ${ey - 13 * s} Q${L} ${ey - 15 * s} ${L + 10 * s} ${ey - 20 * s}" ${st}/><path d="M${R - 10 * s} ${ey - 20 * s} Q${R} ${ey - 15 * s} ${R + 10 * s} ${ey - 13 * s}" ${st}/>
+        <path d="M${cx - 11 * s} ${my} Q${cx - 3 * s} ${my + 8 * s} ${cx + 3 * s} ${my + 1 * s} Q${cx + 8 * s} ${my - 3 * s} ${cx + 13 * s} ${my + 2 * s}" ${st}/>${blush(0.5)}`;
+    case 'sleep':
+      return `<path d="M${L - 9 * s} ${ey} Q${L} ${ey + 9 * s} ${L + 9 * s} ${ey}" ${st}/><path d="M${R - 9 * s} ${ey} Q${R} ${ey + 9 * s} ${R + 9 * s} ${ey}" ${st}/>
+        <ellipse cx="${cx}" cy="${my + 1 * s}" rx="${4 * s}" ry="${3.4 * s}" fill="#7a2e45"/>${blush(0.5)}`;
+    default:
+      return `${eye(L)}${eye(R)}<path d="M${cx - 8 * s} ${my - 2 * s} Q${cx} ${my + 6 * s} ${cx + 8 * s} ${my - 2 * s}" ${st}/>${blush(0.55)}`;
+  }
+}
+
+/* ======================================================================
+   ROBOT line (Cyberpunk) — humanoid, LED eyes, antenna crown, upgrade plating on the Android.
+   ====================================================================== */
+const ROBOT_FORMS = [
+  { name: 'Bot-kid', scale: 0.84, fill: ['#cfd6dc', '#7e8a96'],
+    body: 'M74 84 H126 Q140 84 140 98 V126 Q140 140 126 140 H122 V146 Q124 146 124 150 V174 Q124 182 116 182 H84 Q76 182 76 174 V150 Q76 146 78 146 V140 H74 Q60 140 60 126 V98 Q60 84 74 84Z',
+    hat: { y: 96, w: 60 }, eyes: { y: 112, gap: 14, s: 0.8 }, neck: 150, waist: 168, side: 23,
+    feet: [[[88, 180], [82, 185]], [[112, 180], [118, 185]]], growTop: 84, crownTop: 81, growthRise: 22, miniViewBox: '45 80 110 110' },
+  { name: 'Teen Unit', scale: 0.9, fill: ['#c6ced5', '#717e8b'],
+    body: 'M80 66 H120 Q132 66 132 78 V104 Q132 116 120 116 H108 V122 H118 Q130 122 130 134 V170 Q130 182 118 182 H82 Q70 182 70 170 V134 Q70 122 82 122 H92 V116 H80 Q68 116 68 104 V78 Q68 66 80 66Z',
+    hat: { y: 76, w: 56 }, eyes: { y: 92, gap: 13, s: 0.8 }, neck: 128, waist: 158, side: 30,
+    feet: [[[86, 180], [80, 186]], [[114, 180], [120, 186]]], growTop: 66, crownTop: 63, growthRise: 26, miniViewBox: '30 52 140 140' },
+  { name: 'Android', scale: 0.98, fill: ['#bcc5cd', '#65717e'],
+    body: 'M86 50 H114 Q126 50 126 62 V84 Q126 96 114 96 H108 V104 H128 Q142 104 142 118 L134 150 L134 172 Q134 182 124 182 H76 Q66 182 66 172 L66 150 L58 118 Q58 104 72 104 H92 V96 H86 Q74 96 74 84 V62 Q74 50 86 50Z',
+    hat: { y: 60, w: 48 }, eyes: { y: 74, gap: 11, s: 0.75 }, neck: 112, waist: 150, side: 42,
+    feet: [[[84, 180], [76, 186]], [[116, 180], [124, 186]]], growTop: 50, crownTop: 47, growthRise: 20, miniViewBox: '20 32 160 160' },
+];
+/* Screen-face robot: a CRT-monitor head whose glowing pixel face is the expression, on a worn
+   gunmetal body (scuffs, rust, patched panels, trailing cables). Genre feel only — no franchise look. */
+const RB = { dark: '#0b141c', screen: '#10202a', glow: '#37e6ff', glowSoft: '#37e6ff55', accent: '#ff5fa2', lime: '#9cff6a', limb: '#7f8c9a', plate: '#56616e', bolt: '#aeb8c2', dim: '#8d99a6', rust: '#b5653a', patch: '#6f7b86', cable: '#2b3a48' };
+const ROBOT_HEAD = [{ x0: 60, x1: 140, y0: 84, y1: 140, ym: 112 }, { x0: 68, x1: 132, y0: 66, y1: 116, ym: 91 }, { x0: 74, x1: 126, y0: 50, y1: 96, ym: 73 }];
+const ROBOT_SCREEN = [{ x: 67, y: 91, w: 66, h: 42, r: 9 }, { x: 74, y: 72, w: 52, h: 38, r: 8 }, { x: 79, y: 55, w: 42, h: 35, r: 7 }];
+
+function robotBack(fi, droop, f) {
+  const h = ROBOT_HEAD[fi];
+  // side dials on the monitor head
+  let b = [h.x0 - 6, h.x1 + 6].map(x => `<circle cx="${x}" cy="${h.ym}" r="6" fill="${RB.bolt}" stroke="${ROBOT_INK}" stroke-width="2.6"/><path d="M${x} ${h.ym - 3.5} V${h.ym}" stroke="${ROBOT_INK}" stroke-width="2" stroke-linecap="round"/>`).join('');
+  // a trailing cable from the back of the head (teen + android), slack when drooped
+  if (fi >= 1) {
+    const sx = h.x1 - 4, sy = h.y1 - 4, ex = 100 + f.side + 14, ey = f.waist + 4;
+    const d = droop ? `M${sx} ${sy} C${sx + 14} ${sy + 22} ${ex + 6} ${ey + 18} ${ex} ${ey + 14}` : `M${sx} ${sy} C${sx + 22} ${sy + 6} ${ex + 10} ${ey - 20} ${ex} ${ey}`;
+    b += `<path d="${d}" stroke="${ROBOT_INK}" stroke-width="6.5" fill="none" stroke-linecap="round"/><path d="${d}" stroke="${RB.cable}" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+  }
+  return b;
+}
+function robotLimbs(f, fi) {
+  let s = '';
+  const L = [18, 24, 28][fi];
+  [-1, 1].forEach(dir => {
+    const sx = 100 + dir * (f.side - 3), sy = f.neck + 4, ex = 100 + dir * (f.side + 6), ey = sy + L * 0.5, hx = 100 + dir * (f.side + 9), hy = sy + L;
+    const d = `M${sx} ${sy} L${ex} ${ey} L${hx} ${hy}`;
+    s += `<path d="${d}" stroke="${ROBOT_INK}" stroke-width="10" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="${d}" stroke="${RB.limb}" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="${ex}" cy="${ey}" r="3.4" fill="${RB.bolt}" stroke="${ROBOT_INK}" stroke-width="2"/><circle cx="${hx}" cy="${hy}" r="4.8" fill="${RB.plate}" stroke="${ROBOT_INK}" stroke-width="2.4"/>`;
+  });
+  f.feet.forEach(([r, t]) => {
+    const dir = t[0] < r[0] ? -1 : 1, d = `M${r[0]} ${r[1] - 4} L${t[0]} ${t[1] - 3}`;
+    s += `<path d="${d}" stroke="${ROBOT_INK}" stroke-width="10" stroke-linecap="round"/><path d="${d}" stroke="${RB.limb}" stroke-width="5" stroke-linecap="round"/>
+      <rect x="${t[0] - 8 + dir * 2}" y="${t[1] - 6}" width="16" height="8" rx="3" fill="${RB.plate}" stroke="${ROBOT_INK}" stroke-width="2.5"/>`;
+  });
+  if (fi === 2) [-1, 1].forEach(dir => {
+    const cx = 100 + dir * (f.side - 2), cy = f.neck - 6;
+    s += `<ellipse cx="${cx}" cy="${cy}" rx="15" ry="11" fill="${RB.plate}" stroke="${ROBOT_INK}" stroke-width="3"/><path d="M${cx - 10} ${cy + 2} Q${cx} ${cy - 6} ${cx + 10} ${cy + 2}" stroke="${RB.glow}" stroke-width="2" fill="none"/>
+      <circle cx="${cx - 8 * dir}" cy="${cy - 4}" r="1.8" fill="${RB.bolt}"/><circle cx="${cx + 8 * dir}" cy="${cy + 3}" r="1.8" fill="${RB.bolt}"/>`;
+  });
+  return s;
+}
+function robotDetails(f, fi) {
+  const sc = ROBOT_SCREEN[fi], hd = ROBOT_HEAD[fi];
+  // the monitor screen: dark glass, faint scanlines, a soft glow at the edges
+  let d = `<rect x="${sc.x}" y="${sc.y}" width="${sc.w}" height="${sc.h}" rx="${sc.r}" fill="${RB.screen}" stroke="${ROBOT_INK}" stroke-width="3"/>`;
+  d += `<rect x="${sc.x + 2}" y="${sc.y + 2}" width="${sc.w - 4}" height="${sc.h - 4}" rx="${sc.r - 2}" fill="none" stroke="${RB.glowSoft}" stroke-width="2"/>`;
+  for (let y = sc.y + 5; y < sc.y + sc.h - 3; y += 4) d += `<path d="M${sc.x + 4} ${y} H${sc.x + sc.w - 4}" stroke="${RB.glow}" stroke-width=".8" opacity=".12"/>`;
+  // bezel status light under the screen
+  d += `<circle cx="${sc.x + sc.w - 7}" cy="${(sc.y + sc.h + hd.y1) / 2}" r="1.8" fill="${RB.lime}"/>`;
+  // wear: scuffs and rust on the head and body, a riveted patch on the chest
+  d += `<path d="M${hd.x0 + 5} ${hd.y0 + 6} l7 2 M${hd.x1 - 12} ${hd.y1 - 4} l6 -2" stroke="${ROBOT_INK}" stroke-width="1.4" opacity=".35" stroke-linecap="round"/>`;
+  d += `<ellipse cx="${100 - f.side * 0.55}" cy="${f.waist + 6}" rx="4" ry="2.6" fill="${RB.rust}" opacity=".7"/><ellipse cx="${hd.x0 + 6}" cy="${hd.y1 - 6}" rx="3" ry="2" fill="${RB.rust}" opacity=".6"/>`;
+  const pw = f.side * 0.8, ph = (f.waist - f.neck) * 0.5, px = 100 + f.side * 0.05, py = f.neck + (f.waist - f.neck) * 0.22;
+  d += `<rect x="${px - pw / 2}" y="${py}" width="${pw}" height="${ph}" rx="3" fill="${RB.patch}" stroke="${ROBOT_INK}" stroke-width="2" transform="rotate(-4 ${px} ${py + ph / 2})"/>`;
+  d += [[-1, -1], [1, -1], [-1, 1], [1, 1]].map(([kx, ky]) => `<circle cx="${px + kx * (pw / 2 - 3)}" cy="${py + ph / 2 + ky * (ph / 2 - 3)}" r="1.3" fill="${RB.bolt}"/>`).join('');
+  if (fi === 2) d += `<path d="M${100 - f.side * 0.7} ${f.neck - 4} L100 ${f.neck + 2} L${100 + f.side * 0.7} ${f.neck - 4}" stroke="${RB.plate}" stroke-width="3" fill="none" stroke-linejoin="round"/>`;
+  return d;
+}
+function robotCrown(fi, droop, base) {
+  const h = ROBOT_FORMS[fi].growthRise, tipY = base - h + 6;
+  const stalk = droop ? `M100 ${base + 2} Q100 ${base - h * 0.45} ${112} ${base - h * 0.5}` : `M100 ${base + 2} V${tipY}`;
+  const [bx, by] = droop ? [114, base - h * 0.5] : [100, tipY];
+  return `<rect x="93" y="${base - 2}" width="14" height="6" rx="2" fill="${RB.plate}" stroke="${ROBOT_INK}" stroke-width="2.2"/>
+    <path d="${stalk}" stroke="${ROBOT_INK}" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+    ${droop ? '' : `<circle cx="${bx}" cy="${by}" r="9" fill="${RB.accent}" opacity=".25"/>`}
+    <circle cx="${bx}" cy="${by}" r="5" fill="${droop ? RB.dim : RB.accent}" stroke="${ROBOT_INK}" stroke-width="2.4"/>`;
+}
+/* The face is light on the screen: chunky pixel shapes in phosphor cyan, two eyes at the eyes anchor. */
+function robotFace(f, mood) {
+  const { y: ey, gap, s } = f.eyes, L = 100 - gap, R = 100 + gap, my = ey + 15 * s, g = RB.glow, p = 3.2 * s;
+  const glow = (svg) => `<g style="filter:drop-shadow(0 0 ${2 * s}px ${g})">${svg}</g>`;
+  const px = (x, y) => `<rect x="${(x - p / 2).toFixed(2)}" y="${(y - p / 2).toFixed(2)}" width="${p.toFixed(2)}" height="${p.toFixed(2)}" fill="${g}"/>`;
+  const pixels = (cells, cx, cy) => cells.map(([i, j]) => px(cx + i * p, cy + j * p)).join('');
+  const BLOCK = [[-1, -1], [0, -1], [1, -1], [-1, 0], [0, 0], [1, 0], [-1, 1], [0, 1], [1, 1], [-1, -2], [0, -2], [1, -2]];
+  const CHEVRON = [[-2, 1], [-1, 0], [0, -1], [1, 0], [2, 1]];
+  const LINE = [[-2, 0], [-1, 0], [0, 0], [1, 0], [2, 0]];
+  const LID = [[-1, 0], [0, 0], [1, 0], [-1, 1], [0, 1], [1, 1]];
+  const SMILE = [[-3, -1], [-2, 0], [-1, 1], [0, 1], [1, 1], [2, 0], [3, -1]];
+  const GRIN = [[-3, -1], [-2, 0], [-1, 0], [0, 0], [1, 0], [2, 0], [3, -1], [-1, 1], [0, 1], [1, 1]];
+  const FLAT = [[-2, 0], [-1, 0], [0, 0], [1, 0], [2, 0]];
+  const SMIRK = [[-2, 0], [-1, 0], [0, 0], [1, -1], [2, -2]];
+  const blush = `<rect x="${L - 10 * s}" y="${ey + 7 * s}" width="${6 * s}" height="${2.4 * s}" fill="${RB.accent}" opacity=".85"/><rect x="${R + 4 * s}" y="${ey + 7 * s}" width="${6 * s}" height="${2.4 * s}" fill="${RB.accent}" opacity=".85"/>`;
+  switch (mood) {
+    case 'happy': return glow(pixels(CHEVRON, L, ey) + pixels(CHEVRON, R, ey) + pixels(GRIN, 100, my)) + blush;
+    case 'bored': return glow(pixels(LID, L, ey) + pixels(LID, R, ey) + pixels(FLAT, 100, my + p));
+    case 'mischievous': return glow(pixels(LINE, L, ey) + pixels(BLOCK, R, ey) + pixels(SMIRK, 100, my));
+    case 'sleep': return `<g opacity=".45">${pixels(LINE, L, ey + p) + pixels(LINE, R, ey + p) + px(100, my + p)}</g>`;
+    default: return glow(pixels(BLOCK, L, ey) + pixels(BLOCK, R, ey) + pixels(SMILE, 100, my));
+  }
+}
+
+
+/* ======================================================================
+   The creature in the room: the robot with no outfit, composed in pipFigure's layer order with the wardrobe layers empty.
+   Returned in the 200-unit Pip space, feet on (100, 186). Form 1-3 = Bot-kid / Teen Unit / Android.
+   ====================================================================== */
+let _creatureUid = 0;
+function creatureSVG(form, mood) {
+  const fi = Math.min(Math.max(Math.round(form), 1), ROBOT_FORMS.length) - 1;
+  const f = ROBOT_FORMS[fi], id = `cr${_creatureUid++}`, droop = mood === 'bored' || mood === 'sleep';
+  let s = `<defs><linearGradient id="${id}g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${f.fill[0]}"/><stop offset="1" stop-color="${f.fill[1]}"/></linearGradient></defs>`;
+  s += robotBack(fi, droop, f);
+  s += robotLimbs(f, fi);
+  s += `<path d="${f.body}" fill="url(#${id}g)"/>`;
+  s += `<ellipse cx="${100 - f.side * 0.55}" cy="${f.hat.y + 10}" rx="11" ry="6" transform="rotate(-32 ${100 - f.side * 0.55} ${f.hat.y + 10})" fill="#fff" opacity=".45"/>`;
+  s += robotDetails(f, fi);
+  s += `<path d="${f.body}" fill="none" stroke="${ROBOT_INK}" stroke-width="5" stroke-linejoin="round"/>`;
+  s += robotFace(f, mood);
+  s += robotCrown(fi, droop, f.growTop);
+  const k = f.scale;
+  return `<ellipse cx="100" cy="189" rx="${56 * k}" ry="6" fill="rgba(40,60,20,.13)"/><g transform="translate(100 186) scale(${k}) translate(-100 -186)">${s}</g>`;
+}
+</script>
+<script id="room-pack">
+/* ======================================================================
+   ROBOT_ROOM: the planned room-pack shape contract 2 ports verbatim (plan.md -> Data shapes).
+   { ink, styles, backdrop, stations, decor, effects, ambience, labels }. Every drawing is an anchor-driven function
+   returning an SVG string in the live coords: stations in their own (unshifted) art coords inside GEOMETRY.FOOTPRINT,
+   decor in world coords inside its spot volume (the 12 legacy ids in MPP-27 coords, slid by DECOR_LEGACY_SHIFT), the
+   window in world coords inside GEOMETRY.WINDOW_GAP. The bed returns { back, front } so a sleeping creature sits between.
+   Animated parts are wrapped in fxg(effect, ...) = class="room-fx room-fx--<effect>"; the class never sits on a transformed group.
+   The look: a cluttered night workshop. Gunmetal panels, rivets and scuffs, neon tubes, cable runs, CRT screens, hazard
+   stripes. Generic sci-fi: no franchise names, marks or lookalikes.
+   ====================================================================== */
+const ROOM_NAME = 'Robot workshop';
+
+/* ---------- drawing helpers for this pack (no DOM) ---------- */
+const rnd = seed => { let s = seed >>> 0; return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; };
+const fmt = n => n.toFixed(1);
+const gaugeColour = pct => (pct > GEOMETRY.FRIDGE_PLENTY_PCT ? GEOMETRY.FRIDGE_GAUGE_COLOURS.high : pct > GEOMETRY.FRIDGE_LOW_PCT ? GEOMETRY.FRIDGE_GAUGE_COLOURS.mid : GEOMETRY.FRIDGE_GAUGE_COLOURS.low);
+
+/* A wall plane as a function (along, height) -> screen point. */
+const wallAt = plane => (a, h) => (plane === 'left' ? P(a, 0, h) : P(0, a, h));
+const wallLen = plane => (plane === 'left' ? GEOMETRY.ROOM_SIZE.u : GEOMETRY.ROOM_SIZE.v);
+
+/* ---------- palette (the room's own; Pip keeps hers) ---------- */
+const GUN = '#6b7885', GUN_DK = '#45505c', GUN_LT = '#8b97a4';
+const STEEL = '#b4bdc8', STEEL_DK = '#8f98a3';
+const OLIVE = '#66795a', OLIVE_DK = '#4f6046';
+const SCREEN = '#0b141c', SCREEN_LT = '#10202a';
+const NEON = '#37e6ff', PINK = '#ff5fa2', LIME = '#9cff6a', AMBER = '#ffb02e', RUST = '#b5653a';
+const HAZ = '#e8b72c', HAZ_DK = '#262a31', GLASS = '#9fe8f5', FROST = '#d9f6fb';
+const CABLE_DK = '#1b2630';
+
+const glow = (color, inner, r = 3) => `<g ${glowAttr(color, r)}>${inner}</g>`;
+/** A status LED (blinks, glows) and a steady one. */
+const led = (u, v, h, color, delay = 0) => bill(u, v, h, glow(color, fxg('blink', `<circle r="1.5" fill="${color}"/>`, delay), 2.5), [-2, -2, 2, 2]);
+const ledOn = (u, v, h, color) => bill(u, v, h, glow(color, `<circle r="1.5" fill="${color}"/>`, 2.5), [-2, -2, 2, 2]);
+/** A neon tube along a polyline of screen points. */
+const neon = (points, color = NEON, w = 1.8, r = 3) => glow(color, isoLine(points, w, color), r);
+
+/** A disc on the plane v = vp (centre u, h) or u = up (centre v, h). */
+const discV = (vp, uc, hc, ru, rh, fill, o, n = 20) => poly(Array.from({ length: n }, (_, i) => P(uc + ru * Math.cos((i / n) * Math.PI * 2), vp, hc + rh * Math.sin((i / n) * Math.PI * 2))), fill, o);
+const discU = (up, vc, hc, rv, rh, fill, o, n = 20) => poly(Array.from({ length: n }, (_, i) => P(up, vc + rv * Math.cos((i / n) * Math.PI * 2), hc + rh * Math.sin((i / n) * Math.PI * 2))), fill, o);
+
+/** Vertical seams on the plane v = vp at the given u values; and on the plane u = up at the given v values. */
+const seamsV = (vp, us, h0, h1, color = ART_INK, w = 0.9, op = 0.8) => isoLines(us.map(u => [P(u, vp, h0), P(u, vp, h1)]), w, color, op);
+const seamsU = (up, vs, h0, h1, color = ART_INK, w = 0.9, op = 0.8) => isoLines(vs.map(v => [P(up, v, h0), P(up, v, h1)]), w, color, op);
+/** Horizontal slots (vents) on the plane v = vp / u = up, n evenly spaced lines. */
+const slotsV = (vp, u0, u1, h0, h1, n, color = ART_INK, w = 1) => isoLines(Array.from({ length: n }, (_, i) => { const h = h0 + ((h1 - h0) * i) / Math.max(n - 1, 1); return [P(u0, vp, h), P(u1, vp, h)]; }), w, color, 0.85);
+const slotsU = (up, v0, v1, h0, h1, n, color = ART_INK, w = 1) => isoLines(Array.from({ length: n }, (_, i) => { const h = h0 + ((h1 - h0) * i) / Math.max(n - 1, 1); return [P(up, v0, h), P(up, v1, h)]; }), w, color, 0.85);
+/** A rivet row along a strap on the plane v = vp / u = up. */
+const rivetsV = (vp, us, h, color = STEEL) => us.map(u => bill(u, vp, h, `<circle r="1.2" fill="${color}" stroke="${ART_INK}" stroke-width=".6"/>`, [-1.5, -1.5, 1.5, 1.5])).join('');
+const rivetsU = (up, vs, h, color = STEEL) => vs.map(v => bill(up, v, h, `<circle r="1.2" fill="${color}" stroke="${ART_INK}" stroke-width=".6"/>`, [-1.5, -1.5, 1.5, 1.5])).join('');
+
+/** A dark CRT-style screen with a glowing frame on the plane v = vp / u = up. */
+const screenV = (vp, u0, u1, h0, h1, color = NEON) => rectV(vp, u0, u1, h0, h1, SCREEN, { sw: 1.2 })
+  + glow(color, rectV(vp, u0 + 1, u1 - 1, h0 + 1, h1 - 1, 'none', { stroke: color, sw: 0.7 }), 2);
+const screenU = (up, v0, v1, h0, h1, color = NEON) => rectU(up, v0, v1, h0, h1, SCREEN, { sw: 1.2 })
+  + glow(color, rectU(up, v0 + 1, v1 - 1, h0 + 1, h1 - 1, 'none', { stroke: color, sw: 0.7 }), 2);
+/** A glowing readout trace on a screen: points are [along, h]. */
+const traceV = (vp, points, color = NEON, w = 1) => glow(color, isoLine(points.map(([u, h]) => P(u, vp, h)), w, color), 2);
+const traceU = (up, points, color = NEON, w = 1) => glow(color, isoLine(points.map(([v, h]) => P(up, v, h)), w, color), 2);
+/** A flicker-sweep band over a screen (animated). */
+const scanV = (vp, u0, u1, h0, h1) => fxg('scan', rectV(vp, u0 + 1.5, u1 - 1.5, h0 + (h1 - h0) * 0.3, h0 + (h1 - h0) * 0.46, NEON, { stroke: null, op: 0.3 }));
+const scanU = (up, v0, v1, h0, h1) => fxg('scan', rectU(up, v0 + 1.5, v1 - 1.5, h0 + (h1 - h0) * 0.3, h0 + (h1 - h0) * 0.46, NEON, { stroke: null, op: 0.3 }));
+
+/** Clip a polygon of [a, h] points to lo <= a <= hi (Sutherland-Hodgman, two half-planes). */
+function clipA(poly0, lo, hi) {
+  const cut = (pts0, inside, at) => {
+    const out = [];
+    for (let i = 0; i < pts0.length; i++) {
+      const p = pts0[i], q = pts0[(i + 1) % pts0.length], pin = inside(p), qin = inside(q);
+      if (pin) out.push(p);
+      if (pin !== qin) { const t = (at - p[0]) / (q[0] - p[0]); out.push([at, p[1] + t * (q[1] - p[1])]); }
+    }
+    return out;
+  };
+  return cut(cut(poly0, p => p[0] >= lo, lo), p => p[0] <= hi, hi);
+}
+/** A hazard-stripe band: amber ground, dark diagonal stripes, clipped to the rectangle. map(a, h) -> screen point. */
+function hazard(map, a0, a1, h0, h1, stripe = 5) {
+  let s = poly([map(a0, h0), map(a1, h0), map(a1, h1), map(a0, h1)], HAZ, { sw: 1.2 });
+  const H = h1 - h0;
+  for (let a = a0 - H; a < a1; a += stripe * 2) {
+    const quad = clipA([[a, h0], [a + stripe, h0], [a + stripe + H, h1], [a + H, h1]], a0, a1);
+    if (quad.length > 2) s += poly(quad.map(([x, h]) => map(x, h)), HAZ_DK, { stroke: null });
+  }
+  return s;
+}
+const hazardV = (vp, u0, u1, h0, h1, stripe) => hazard((u, h) => P(u, vp, h), u0, u1, h0, h1, stripe);
+const hazardU = (up, v0, v1, h0, h1, stripe) => hazard((v, h) => P(up, v, h), v0, v1, h0, h1, stripe);
+
+/** A trophy cup billboard (steel, a neon band), a medal billboard, a sensor cube billboard (s = scale). */
+const cup = (u, v, h, s = 0.6) => bill(u, v, h,
+  `<g transform="scale(${s})"><path d="M-9 -24 h18 q0 12 -9 14 q-9 -2 -9 -14z" fill="${STEEL}" stroke="${ART_INK}" stroke-width="1.6" stroke-linejoin="round"/>`
+  + `<path d="M-9 -22 q-7 0 -5 7 q2 4 6 3 M9 -22 q7 0 5 7 q-2 4 -6 3" fill="none" stroke="${ART_INK}" stroke-width="1.6"/>`
+  + `<rect x="-1.8" y="-10" width="3.6" height="6" fill="${STEEL_DK}"/><rect x="-7" y="-4" width="14" height="4" rx="1" fill="${GUN_DK}" stroke="${ART_INK}" stroke-width="1.4"/>`
+  + `<path d="M-6 -19 h12" stroke="${NEON}" stroke-width="2" stroke-linecap="round"/></g>`, [-14 * s, -25 * s, 14 * s, 0.5]);
+const medal = (u, v, h, s = 0.6, color = PINK) => bill(u, v, h,
+  `<g transform="scale(${s})"><path d="M-6 -2 l-4 12 l6 -3 l3 5z M6 -2 l4 12 l-6 -3 l-3 5z" fill="${color}" stroke="${ART_INK}" stroke-width="1.3" stroke-linejoin="round"/>`
+  + `<circle cx="0" cy="-8" r="9" fill="${STEEL}" stroke="${ART_INK}" stroke-width="1.5"/><circle cx="0" cy="-8" r="4.6" fill="${GUN_DK}" stroke="${ART_INK}" stroke-width="1.1"/><circle cx="0" cy="-8" r="1.8" fill="${NEON}"/></g>`, [-10 * s, -17 * s, 10 * s, 11 * s]);
+const sensor = (u, v, h, s = 0.6) => bill(u, v, h,
+  `<g transform="scale(${s})"><rect x="-8" y="-14" width="16" height="14" rx="2.5" fill="${GUN_LT}" stroke="${ART_INK}" stroke-width="1.5"/><rect x="-5" y="-11" width="10" height="7" rx="1.5" fill="${SCREEN}" stroke="${ART_INK}" stroke-width="1"/>`
+  + `<circle cx="0" cy="-7.5" r="2.2" fill="${NEON}"/></g>`, [-8 * s, -14 * s, 8 * s, 0.5]);
+
+/* ---------- walls: gunmetal panels with rivets and scuffs, then the style's pattern, then the shell's fixtures ---------- */
+function wallPanels(plane, w) {
+  const at = wallAt(plane), len = wallLen(plane), r = rnd(plane === 'left' ? 13 : 29);
+  const COL = 40, H = GEOMETRY.ROOM_SIZE.h, SEAM = 72;
+  const base = plane === 'left' ? w.left : w.right;
+  const dark = shade(base, -30), light = shade(base, 22);
+  let tints = '', seams = '', lights = '', rivets = '', drips = '', scuffs = '';
+  const dot = (a, h, k) => {
+    const [x, y] = at(a, h);
+    rivets += `<circle cx="${fmt(x)}" cy="${fmt(y)}" r="1.15" fill="${light}" stroke="${dark}" stroke-width=".6"/>`;
+    if (k < 0.2) drips += `M${fmt(x)} ${fmt(y + 1.2)}L${fmt(x)} ${fmt(y + 5 + k * 40)}`;
+  };
+  for (let row = 0; row < 2; row++) {
+    const h0 = row ? SEAM : 0, h1 = row ? H : SEAM;
+    for (let a = 0; a < len; a += COL) {
+      const a1 = Math.min(a + COL, len), pick = r();
+      if (pick < 0.55) tints += `<polygon points="${pts([at(a, h0), at(a1, h0), at(a1, h1), at(a, h1)])}" fill="${pick < 0.27 ? '#ffffff' : '#000000'}" opacity=".07"/>`;
+      if (a > 0) { seams += `M${at(a, h0).map(fmt).join(' ')}L${at(a, h1).map(fmt).join(' ')}`; lights += `M${at(a + 1.4, h0).map(fmt).join(' ')}L${at(a + 1.4, h1).map(fmt).join(' ')}`; }
+      if (a1 - a > 16) for (const aa of [a + 5, a1 - 5]) for (const hh of [h0 + (row ? 5 : 12), h1 - 5]) dot(aa, hh, r());
+    }
+  }
+  seams += `M${at(0, SEAM).map(fmt).join(' ')}L${at(len, SEAM).map(fmt).join(' ')}`;
+  lights += `M${at(0, SEAM - 1.6).map(fmt).join(' ')}L${at(len, SEAM - 1.6).map(fmt).join(' ')}`;
+  for (let k = 0; k < 14; k++) {
+    const a = 6 + r() * (len - 24), h = 14 + r() * 120, l = 5 + r() * 11;
+    scuffs += `M${at(a, h).map(fmt).join(' ')}L${at(a + l, h - l * 0.45).map(fmt).join(' ')}`;
+  }
+  return tints
+    + `<path d="${seams}" fill="none" stroke="${dark}" stroke-width="1.3" stroke-linecap="round"/><path d="${lights}" fill="none" stroke="${light}" stroke-width=".8" opacity=".55"/>`
+    + `<path d="${drips}" fill="none" stroke="${RUST}" stroke-width="1.1" opacity=".45" stroke-linecap="round"/><path d="${scuffs}" fill="none" stroke="#000000" stroke-width="1" opacity=".22" stroke-linecap="round"/>`
+    + rivets;
+}
+
+/** Circuit-board wallpaper (wall pattern 'circuit'): chamfered traces ending in vias, and a few chips. */
+function circuitTraces(plane) {
+  const at = wallAt(plane), len = wallLen(plane), r = rnd(plane === 'left' ? 41 : 57);
+  let d = '', vias = '', chips = '';
+  for (let k = 0; k < 11; k++) {
+    let a = 8 + r() * (len - 16), h = 16 + r() * 118, dir = r() < 0.5 ? 1 : -1;
+    d += `M${at(a, h).map(fmt).join(' ')}`;
+    for (let i = 0; i < 4; i++) {
+      const run = 10 + r() * 26;
+      a = Math.min(Math.max(a + dir * run, 4), len - 4); d += `L${at(a, h).map(fmt).join(' ')}`;
+      const drop = (r() < 0.5 ? 1 : -1) * (8 + r() * 16);
+      h = Math.min(Math.max(h + drop, 12), 140); d += `L${at(a + dir * Math.abs(drop) * 0.4, h).map(fmt).join(' ')}`;
+      a = Math.min(Math.max(a + dir * Math.abs(drop) * 0.4, 4), len - 4);
+    }
+    const [x, y] = at(a, h);
+    vias += `<circle cx="${fmt(x)}" cy="${fmt(y)}" r="2" fill="#e6c25a" stroke="#2b3a30" stroke-width=".8"/><circle cx="${fmt(x)}" cy="${fmt(y)}" r=".7" fill="#2b3a30"/>`;
+  }
+  for (let k = 0; k < 4; k++) {
+    const a = 20 + r() * (len - 60), h = 30 + r() * 90, cw = 20, ch = 12;
+    chips += `<polygon points="${pts([at(a, h), at(a + cw, h), at(a + cw, h + ch), at(a, h + ch)])}" fill="#1c2a24" stroke="#0d1511" stroke-width="1.2"/>`;
+    for (let p = 0; p < 4; p++) chips += `<path d="M${at(a + 3 + p * 5, h).map(fmt).join(' ')}L${at(a + 3 + p * 5, h - 3).map(fmt).join(' ')}M${at(a + 3 + p * 5, h + ch).map(fmt).join(' ')}L${at(a + 3 + p * 5, h + ch + 3).map(fmt).join(' ')}" stroke="#e6c25a" stroke-width="1.1"/>`;
+    chips += `<circle cx="${fmt(at(a + 4, h + ch - 4)[0])}" cy="${fmt(at(a + 4, h + ch - 4)[1])}" r="1" fill="#9cff6a"/>`;
+  }
+  return `<path d="${d}" fill="none" stroke="#9ee6b8" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" opacity=".7"/>` + vias + chips;
+}
+
+/** A sagging cable along the right wall between two v values at height h. */
+function sagCable(v0, v1, h, depth, color) {
+  const points = [];
+  for (let i = 0; i <= 14; i++) { const t = i / 14; points.push(P(0, v0 + (v1 - v0) * t, h - depth * Math.sin(Math.PI * t))); }
+  return isoLine(points, 3.6, CABLE_DK) + isoLine(points, 1.8, color);
+}
+
+/** The shell's wall fixtures: neon trim along both wall tops, two pipe runs, a vent fan, a buzzing neon sign, sagging cables. */
+function shellFixtures() {
+  const RU = GEOMETRY.ROOM_SIZE.u, RV = GEOMETRY.ROOM_SIZE.v;
+  let s = '';
+  // neon trim under the ceiling line: cyan on the right wall, pink on the left
+  s += isoLine([P(0, 0, 147.5), P(0, RV, 147.5)], 4, CABLE_DK) + neon([P(0, 0, 147.5), P(0, RV, 147.5)], NEON, 1.8, 3.5);
+  s += isoLine([P(0, 0, 147.5), P(RU, 0, 147.5)], 4, CABLE_DK) + neon([P(0, 0, 147.5), P(RU, 0, 147.5)], PINK, 1.8, 3.5);
+  // pipe runs with strap brackets: steel on the left wall, copper on the right
+  const brackets = (map, n, step, h0, h1) => isoLines(Array.from({ length: n }, (_, i) => [map(20 + i * step, h0), map(20 + i * step, h1)]), 5, GUN_DK);
+  s += brackets((a, h) => P(a, 0, h), 5, 50, 126, 138) + isoLine([P(0, 0, 132), P(RU, 0, 132)], 6.2, CABLE_DK) + isoLine([P(0, 0, 132), P(RU, 0, 132)], 4, STEEL_DK) + isoLine([P(0, 0, 133.2), P(RU, 0, 133.2)], 1.1, '#e3e9ee', { op: 0.7 });
+  s += brackets((a, h) => P(0, a, h), 6, 52, 132, 144) + isoLine([P(0, 0, 138), P(0, RV, 138)], 6.2, CABLE_DK) + isoLine([P(0, 0, 138), P(0, RV, 138)], 4, RUST) + isoLine([P(0, 0, 139.2), P(0, RV, 139.2)], 1.1, '#f1b894', { op: 0.7 });
+  s += bill(246, 0, 132, `<circle r="5.5" fill="none" stroke="${PINK}" stroke-width="1.8"/><path d="M-5.5 0 H5.5 M0 -5.5 V5.5" stroke="${PINK}" stroke-width="1.4"/><circle r="1.4" fill="${ART_INK}"/>`, [-6, -6, 6, 6]);
+  // sagging cables across the right wall
+  s += sagCable(0, 150, 143, 9, PINK) + sagCable(150, RV, 143, 7, NEON);
+  // the vent fan on the right wall: a plate, a round bezel and slow blades (animated)
+  const blade = a => `<path transform="rotate(${a})" d="M0 0 C3 -2 8 -5 4 -9.2 C-1 -8.4 -2.6 -3.6 0 0Z" fill="${STEEL}" stroke="${ART_INK}" stroke-width=".9" stroke-linejoin="round"/>`;
+  s += rectU(0, 5, 35, 101, 131, GUN_DK, { sw: 1.6 }) + rivetsU(0, [8, 32], 104, STEEL) + rivetsU(0, [8, 32], 128, STEEL);
+  s += bill(0, 20, 116, `<circle r="12.5" fill="${CABLE_DK}" stroke="${ART_INK}" stroke-width="1.6"/><circle r="10.4" fill="${SCREEN}" stroke="${GUN_LT}" stroke-width="1.2"/>`
+    + fxg('fan', [0, 90, 180, 270].map(blade).join('')) + `<circle r="2.2" fill="${GUN_LT}" stroke="${ART_INK}" stroke-width="1"/>`, [-13, -13, 13, 13]);
+  // the neon sign above the fridge: a pink frame round a cyan bolt, buzzing (animated)
+  const frame = [P(192, 0, 124), P(244, 0, 124), P(244, 0, 144), P(192, 0, 144), P(192, 0, 124)];
+  const bolt = [[214, 142], [205, 134], [214, 134], [207, 126], [228, 137], [219, 137], [226, 142]].map(([u, h]) => P(u, 0, h));
+  s += rectV(0, 190, 246, 122, 146, CABLE_DK, { sw: 1.4 }) + fxg('buzz', neon(frame, PINK, 1.8, 4) + neon(bolt, NEON, 1.6, 3));
+  return s;
+}
+
+/* ---------- floors ---------- */
+/** Rubber mat: fine ribs along v, tile seams, a few scuffs. */
+function matFloor(f) {
+  const r = rnd(5), RU = GEOMETRY.ROOM_SIZE.u, RV = GEOMETRY.ROOM_SIZE.v;
+  let ribs = '', seams = '', scuffs = '';
+  for (let v = 6; v < RV; v += 8) ribs += `M${P(0, v).map(fmt).join(' ')}L${P(RU, v).map(fmt).join(' ')}`;
+  for (let u = 65; u < RU; u += 65) seams += `M${P(u, 0).map(fmt).join(' ')}L${P(u, RV).map(fmt).join(' ')}`;
+  for (let v = 75; v < RV; v += 75) seams += `M${P(0, v).map(fmt).join(' ')}L${P(RU, v).map(fmt).join(' ')}`;
+  for (let k = 0; k < 18; k++) { const u = 10 + r() * 230, v = 10 + r() * 280, l = 6 + r() * 12; scuffs += `M${P(u, v).map(fmt).join(' ')}L${P(u + l, v + l * 0.3).map(fmt).join(' ')}`; }
+  return `<path d="${ribs}" fill="none" stroke="${shade(f.base, 9)}" stroke-width=".8" opacity=".55"/><path d="${seams}" fill="none" stroke="${shade(f.base, -38)}" stroke-width="1.6"/>`
+    + `<path d="${scuffs}" fill="none" stroke="${shade(f.base, 24)}" stroke-width="1.1" opacity=".5" stroke-linecap="round"/>`;
+}
+
+/** Diamond plate: alternating lozenge ridges in a staggered grid. */
+function diamondFloor(f) {
+  const RU = GEOMETRY.ROOM_SIZE.u, RV = GEOMETRY.ROOM_SIZE.v, STEP = 13;
+  let hi = '', lo = '';
+  for (let a = 0; a * STEP < RU - STEP; a++) {
+    for (let b = 0; b * STEP < RV - STEP; b++) {
+      const cu = a * STEP + STEP / 2, cv = b * STEP + STEP / 2, flip = (a + b) % 2;
+      const p = flip ? [cu - 3.4, cv - 1.4, cu + 3.4, cv + 1.4] : [cu - 1.4, cv - 3.4, cu + 1.4, cv + 3.4];
+      hi += `M${P(p[0], p[1]).map(fmt).join(" ")}L${P(p[2], p[3]).map(fmt).join(" ")}`;
+      lo += `M${P(p[0] + 0.8, p[1] + 0.8).map(fmt).join(" ")}L${P(p[2] + 0.8, p[3] + 0.8).map(fmt).join(" ")}`;
+    }
+  }
+  return `<path d="${lo}" fill="none" stroke="${shade(f.base, -34)}" stroke-width="1.4" stroke-linecap="round"/><path d="${hi}" fill="none" stroke="${shade(f.base, 30)}" stroke-width="1.3" stroke-linecap="round"/>`;
+}
+
+/** Floor grate: dark pit, bright bars along v, cross bars every 26. */
+function grateFloor(f) {
+  const RU = GEOMETRY.ROOM_SIZE.u, RV = GEOMETRY.ROOM_SIZE.v;
+  let bars = '', cross = '', glowLines = '';
+  for (let u = 4; u < RU; u += 6) bars += `M${P(u, 0).map(fmt).join(' ')}L${P(u, RV).map(fmt).join(' ')}`;
+  for (let v = 0; v <= RV; v += 26) cross += `M${P(0, v).map(fmt).join(' ')}L${P(RU, v).map(fmt).join(' ')}`;
+  for (let v = 39; v < RV; v += 78) glowLines += `M${P(0, v).map(fmt).join(' ')}L${P(RU, v).map(fmt).join(' ')}`;
+  return `<path d="${glowLines}" fill="none" stroke="${NEON}" stroke-width="3" opacity=".12"/><path d="${bars}" fill="none" stroke="${shade(f.base, 55)}" stroke-width="1.3"/>`
+    + `<path d="${cross}" fill="none" stroke="${shade(f.base, 38)}" stroke-width="2.4"/>`;
+}
+
+/** Hazard checker: dark and amber tiles, the amber ones striped. */
+function hazardFloor(f) {
+  const RU = GEOMETRY.ROOM_SIZE.u, RV = GEOMETRY.ROOM_SIZE.v, STEP = 26;
+  let tiles = '', stripes = '';
+  for (let a = 0; a * STEP < RU; a++) {
+    for (let b = 0; b * STEP < RV; b++) {
+      const [u0, v0] = [a * STEP, b * STEP], [u1, v1] = [Math.min(u0 + STEP, RU), Math.min(v0 + STEP, RV)];
+      if ((a + b) % 2) {
+        tiles += `<polygon points="${pts([P(u0, v0), P(u1, v0), P(u1, v1), P(u0, v1)])}" fill="${f.checker}"/>`;
+        if (u1 - u0 === STEP && v1 - v0 === STEP) for (const k of [6.5, 13, 19.5]) stripes += `M${P(u0 + k, v0).map(fmt).join(' ')}L${P(u0, v0 + k).map(fmt).join(' ')}M${P(u1, v0 + k).map(fmt).join(' ')}L${P(u0 + k, v1).map(fmt).join(' ')}`;
+      }
+    }
+  }
+  return tiles + `<path d="${stripes}" fill="none" stroke="${HAZ_DK}" stroke-width="2.4" opacity=".85"/>`;
+}
+
+/* ---------- the window: a neon-trimmed pane on the right wall, drawn in world coords inside WINDOW_GAP ---------- */
+const WIN = { v0: 160, v1: 236, hb: 74, ht: 142, gv0: 166, gv1: 230, gb: 80, gt: 136 }; // inside WINDOW_GAP v 158-238, h from 56
+const winGlassPts = () => [P(0, WIN.gv0, WIN.gb), P(0, WIN.gv1, WIN.gb), P(0, WIN.gv1, WIN.gt), P(0, WIN.gv0, WIN.gt)];
+
+/** The skyline: far and near buildings on the pane, lit windows at night, a billboard glow. */
+function skyline(night) {
+  const far = [[166, 9, 108], [175, 7, 121], [182, 11, 100], [193, 8, 127], [201, 10, 112], [211, 8, 123], [219, 11, 104], [226, 4, 118]];
+  const near = [[166, 13, 94], [179, 9, 90], [188, 13, 110], [201, 9, 92], [210, 12, 102], [222, 8, 96]];
+  const base = WIN.gb;
+  let s = '';
+  for (const [v, w, h] of far) s += rectU(0, v, v + w, base, h, night ? '#161f3d' : '#93a4b1', { stroke: null });
+  for (const [v, w, h] of near) s += rectU(0, v, v + w, base, h, night ? '#0b1228' : '#6c7d8b', { stroke: null });
+  const r = rnd(7), palette = [AMBER, NEON, PINK, '#fff3c4'];
+  for (const [v, w, h] of near) {
+    for (let hh = base + 5; hh < h - 4; hh += 7) {
+      for (let vv = v + 2.2; vv < v + w - 2; vv += 4) {
+        if (r() < (night ? 0.55 : 0.18)) s += rectU(0, vv, vv + 1.7, hh, hh + 2.4, night ? palette[Math.floor(r() * palette.length)] : '#e8f4ff', { stroke: null, op: night ? 0.95 : 0.55 });
+      }
+    }
+  }
+  if (night) {
+    s += glow(PINK, rectU(0, 191, 201, 112, 117, PINK, { stroke: null, op: 0.9 }), 4) + glow(NEON, rectU(0, 212, 218, 104, 107, NEON, { stroke: null, op: 0.9 }), 4);
+  } else {
+    s += bill(0, 214, 122, '<circle r="14" fill="#fff4d0" opacity=".28"/><circle r="8" fill="#fff4d0" opacity=".7"/>', [-14, -14, 14, 14]);
+    s += rectU(0, WIN.gv0, WIN.gv1, base, base + 14, '#c9d3da', { stroke: null, op: 0.45 });
+  }
+  return s;
+}
+
+/** Rain on the night pane: slanted streaks, one period tall so the loop is seamless, clipped to the glass (animated). */
+function rainOnGlass() {
+  const segs = [];
+  for (let col = 0, v = WIN.gv0 + 2; v < WIN.gv1; col++, v += 6.4) {
+    for (let k = -1; k < 7; k++) {
+      const h = WIN.gb - 14 + k * 14 + ((col * 5) % 14);
+      segs.push([P(0, v, h), P(0, v - 1.1, h - 6)]);
+    }
+  }
+  const clip = '<clipPath id="robot-glass-clip"><polygon points="' + pts(winGlassPts()) + '"/></clipPath>';
+  return `${clip}<g clip-path="url(#robot-glass-clip)"><g class="room-fx room-fx--rain">${isoLines(segs, 0.9, '#9fd6ff', 0.65)}</g></g>`;
+}
+
+/* ---------- station helpers ---------- */
+const VIAL_COLOURS = [NEON, PINK, LIME, AMBER];
+/** Rows of glowing sample vials on shelves, on the plane v = vp: bases are the shelf heights (the first row rests on the cabinet floor). */
+const vialRows = (vp, u0, u1, bases, tall = 7, step = 6) => bases.map((h, row) => (row ? rectV(vp, u0, u1, h - 1.6, h, STEEL_DK, { sw: 0.8 }) : '')
+  + Array.from({ length: Math.floor((u1 - u0 - 2) / step) }, (_, i) => rectV(vp, u0 + 2 + i * step, u0 + 2 + i * step + step * 0.45, h, h + tall - (i % 3), VIAL_COLOURS[(i + row) % 4], { stroke: null, op: 0.92 })).join('')).join('');
+/** A robot-arm segment from point a to b (screen points), and a joint disc. */
+const armSeg = (a, b, w = 3.6, color = '#e07a22') => isoLine([a, b], w + 2.2, ART_INK) + isoLine([a, b], w, color);
+const joint = (u, v, h, r = 3) => bill(u, v, h, `<circle r="${r}" fill="${STEEL}" stroke="${ART_INK}" stroke-width="1.2"/><circle r="${fmt(r / 2.4)}" fill="${GUN_DK}"/>`, [-r - 1, -r - 1, r + 1, r + 1]);
+/** A round dial knob billboard. */
+const dial = (u, v, h, r = 2.6) => bill(u, v, h, `<circle r="${r}" fill="${STEEL}" stroke="${ART_INK}" stroke-width="1.1"/><path d="M0 0 L${fmt(r * 0.7)} ${fmt(-r * 0.7)}" stroke="${ART_INK}" stroke-width="1.2" stroke-linecap="round"/>`, [-r - 1, -r - 1, r + 1, r + 1]);
+/** A spinning fan billboard (animated), 4 blades on a hub, in a round bezel of radius r. */
+const fanBill = (u, v, h, r = 6) => bill(u, v, h, `<circle r="${r + 1.4}" fill="${CABLE_DK}" stroke="${ART_INK}" stroke-width="1.4"/><circle r="${r}" fill="${SCREEN}"/>`
+  + fxg('fan', [0, 90, 180, 270].map(a => `<path transform="rotate(${a})" d="M0 0 C${fmt(r * 0.3)} ${fmt(-r * 0.2)} ${fmt(r * 0.75)} ${fmt(-r * 0.5)} ${fmt(r * 0.4)} ${fmt(-r * 0.9)} C${fmt(-r * 0.1)} ${fmt(-r * 0.8)} ${fmt(-r * 0.25)} ${fmt(-r * 0.35)} 0 0Z" fill="${STEEL}" stroke="${ART_INK}" stroke-width=".8" stroke-linejoin="round"/>`).join(''))
+  + `<circle r="${fmt(r * 0.2)}" fill="${GUN_LT}" stroke="${ART_INK}" stroke-width=".8"/>`, [-r - 2, -r - 2, r + 2, r + 2]);
+/** Soft glass: a translucent pane with a bright edge, on a plane. */
+const glassV = (vp, u0, u1, h0, h1, op = 0.16) => rectV(vp, u0, u1, h0, h1, GLASS, { stroke: '#d7f7ff', sw: 0.8, op });
+const glassU = (up, v0, v1, h0, h1, op = 0.16) => rectU(up, v0, v1, h0, h1, GLASS, { stroke: '#d7f7ff', sw: 0.8, op });
+/** A mattress-top charging coil: two glowing rings centred on the sleeping spot. */
+const coil = (cu, cv, h, ru = 24, rv = 16) => glow(NEON, ellH(cu, cv, h, ru, rv, 'none', { stroke: NEON, sw: 1.1, op: 0.85 }) + ellH(cu, cv, h, ru * 0.62, rv * 0.62, 'none', { stroke: NEON, sw: 1, op: 0.85 }), 3);
+
+/* ---------- decor helpers: wall-plane shapes and small props (no DOM) ---------- */
+const HI = 'rgba(255,255,255,.7)';
+const PLATE = '#2d3a48', INKBLUE = '#10171d';
+const ringPts = (n, f) => Array.from({ length: n }, (_, i) => f((i / n) * Math.PI * 2));
+/** An ellipse standing on the right wall (plane u = up), centre (vc, hc), radii (rv, rh). */
+const ellU = (up, vc, hc, rv, rh, fill, o, n = 16) => poly(ringPts(n, t => P(up, vc + rv * Math.cos(t), hc + rh * Math.sin(t))), fill, o);
+/** A flat cut-out on the right wall with a visible thickness: a darker back copy, the front copy on top. vh = [[v, h], ...]. */
+const slabU = (up, th, vh, fill, o) => poly(vh.map(([v, h]) => P(up, v, h)), shade(fill, -22), o) + poly(vh.map(([v, h]) => P(up + th, v, h)), fill, o);
+/** A ring line round a cylinder (near half only). */
+const bandAt = (cu, cv, r, h, color = GUN_DK, w = 1.4) => isoLine(arcPts(cu, cv, h, r, r, ...nearRange(r, r)), w, color);
+/** A closed ring line (a flat ellipse outline) at height h, optionally dashed. */
+const ringLine = (cu, cv, h, ru, rv, w, color, dash) => { const p = ellipsePoints(cu, cv, h, ru, rv, 32); return isoLine([...p, p[0]], w, color, dash ? { dash } : {}); };
+/** A horizontal band of a floor ellipse (normalised offsets a..b across its depth, -1..1) as a flat polygon at height h. */
+function ellBand(cu, cv, ru, rv, a, b, h, fill) {
+  const arc = y => Math.sqrt(Math.max(0, 1 - y * y));
+  const ys = Array.from({ length: 7 }, (_, i) => a + ((b - a) * i) / 6);
+  return poly([...ys.map(y => P(cu + ru * arc(y), cv + rv * y, h)), ...ys.map(y => P(cu - ru * arc(y), cv + rv * y, h)).reverse()], fill, { stroke: null });
+}
+/** A double-stroked path (ink under colour) for rods, arms and handles inside a billboard. */
+const limb = (d, w, color) => `<path d="${d}" fill="none" stroke="${ART_INK}" stroke-width="${w + 2.4}" stroke-linecap="round" stroke-linejoin="round"/><path d="${d}" fill="none" stroke="${color}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"/>`;
+/** A cog billboard (16 teeth edges, a dark hub), r = outer radius; its centre sits r/2 above the point. */
+const gear = (u, v, h, r, color) => bill(u, v, h,
+  `<path d="${Array.from({ length: 16 }, (_, i) => { const a = (i / 16) * Math.PI * 2, rr = i % 2 ? r * 0.78 : r; return `${i ? 'L' : 'M'}${fmt(rr * Math.cos(a))} ${fmt(rr * Math.sin(a) * 0.8 - r * 0.5)}`; }).join('')}Z" fill="${color}" stroke="${ART_INK}" stroke-width="1" stroke-linejoin="round"/>`
+  + `<circle cy="${fmt(-r * 0.5)}" r="${fmt(r * 0.28)}" fill="${INKBLUE}"/>`, [-r - 1, -r * 1.3 - 1, r + 1, r * 0.3 + 1]);
+/** A hard hat billboard (yellow dome, brim, centre ridge); base centre at the point. */
+const hat = (u, v, h, s = 1) => bill(u, v, h,
+  `<g transform="scale(${s})"><path d="M-8 0 q0 -11 8 -11 q8 0 8 11z" fill="${HAZ}" stroke="${ART_INK}" stroke-width="1.5" stroke-linejoin="round"/><rect x="-10" y="-1" width="20" height="3" rx="1.4" fill="${HAZ}" stroke="${ART_INK}" stroke-width="1.3"/>`
+  + `<path d="M0 -11 V-2" stroke="#b3861b" stroke-width="1.6"/><path d="M-5 -8 q2 -2 4 -2" stroke="#fff" stroke-width="1.2" fill="none" stroke-linecap="round" opacity=".75"/></g>`, [-10 * s, -11.5 * s, 10 * s, 2.5 * s]);
+/** A seven-segment digit as a path at (x, y), 4 wide and 7 tall. */
+const SEG7 = { 0: 'abcdef', 1: 'bc', 2: 'abdeg', 3: 'abcdg', 4: 'bcfg', 5: 'acdfg', 6: 'acdefg', 7: 'abc', 8: 'abcdefg', 9: 'abcdfg' };
+const SEG7_D = { a: 'M0 0H4', b: 'M4 0V3.5', c: 'M4 3.5V7', d: 'M0 7H4', e: 'M0 3.5V7', f: 'M0 0V3.5', g: 'M0 3.5H4' };
+const digit7 = (n, x, y) => `<path transform="translate(${x} ${y})" d="${[...SEG7[n]].map(k => SEG7_D[k]).join('')}" fill="none" stroke="${NEON}" stroke-width="1.3" stroke-linecap="round"/>`;
+
+const ROBOT_ROOM = {
+  ink: '#141b24',
+
+  /* The 10 styles keep the slot meaning of the herb's: wall-* give left / right / skirting (+ optional pattern), floor-* give base (+ pattern). */
+  styles: {
+    'wall-white': { left: '#56626e', right: '#667380', skirting: '#3f4852' },
+    'wall-lavender': { left: '#69704f', right: '#7a8260', skirting: '#4f5539' },
+    'wall-mint': { left: '#3f7479', right: '#4f868b', skirting: '#2f5a5e' },
+    'wall-peach': { left: '#9a5f3d', right: '#ad6f4b', skirting: '#774a30' },
+    'wall-sky': { left: '#516e8e', right: '#617f9f', skirting: '#3d556f' },
+    'wall-sprig': { left: '#2d5f4f', right: '#386f5c', skirting: '#22473b', pattern: 'circuit' },
+    'floor-lilac': { base: '#363d46', pattern: 'mat' },
+    'floor-oak': { base: '#6b7682', pattern: 'diamond' },
+    'floor-terracotta': { base: '#1d232a', pattern: 'grate' },
+    'floor-checker': { base: '#2a2f36', checker: '#d4a82a', pattern: 'hazard' }
+  },
+
+  backdrop: {
+    // Panelled gunmetal on both walls, the style's pattern, then the shell's fixtures (neon trim, pipes, vent fan, sign, cables).
+    wallPattern: w => {
+      let s = wallPanels('left', w) + wallPanels('right', w);
+      if (w.pattern === 'circuit') s += circuitTraces('left') + circuitTraces('right');
+      return s + shellFixtures();
+    },
+    floorPattern: f => ({ mat: matFloor, diamond: diamondFloor, grate: grateFloor, hazard: hazardFloor })[f.pattern]?.(f) ?? '',
+    // A cable tray along both walls: a steel ledge with three cable runs and cable ties.
+    skirting: w => {
+      const RU = GEOMETRY.ROOM_SIZE.u, RV = GEOMETRY.ROOM_SIZE.v;
+      let s = box(0, 0, RU, 3, 7, 13, w.skirting) + box(0, 0, 3, RV, 7, 13, w.skirting);
+      s += isoLines([[P(0, 3, 8.3), P(RU, 3, 8.3)]], 1.3, PINK, 0.9) + isoLines([[P(0, 3, 10), P(RU, 3, 10)]], 1.3, NEON, 0.9) + isoLines([[P(0, 3, 11.7), P(RU, 3, 11.7)]], 1.3, CABLE_DK, 0.9);
+      s += isoLines([[P(3, 0, 8.3), P(3, RV, 8.3)]], 1.3, LIME, 0.9) + isoLines([[P(3, 0, 10), P(3, RV, 10)]], 1.3, AMBER, 0.9) + isoLines([[P(3, 0, 11.7), P(3, RV, 11.7)]], 1.3, CABLE_DK, 0.9);
+      const ties = [];
+      for (let a = 14; a < RU; a += 26) ties.push([P(a, 3, 7.5), P(a, 3, 12.5)]);
+      for (let a = 14; a < RV; a += 26) ties.push([P(3, a, 7.5), P(3, a, 12.5)]);
+      return s + isoLines(ties, 1.6, ART_INK, 0.7);
+    },
+    // The window: a gunmetal frame with a neon trim ring inside it.
+    windowFrame: () => rectU(0, WIN.v0, WIN.v1, WIN.hb, WIN.ht, GUN_DK, { sw: 2 }) + rectU(0, WIN.v0 + 2.5, WIN.v1 - 2.5, WIN.hb + 2.5, WIN.ht - 2.5, GUN, { sw: 1 })
+      + rivetsU(0, [WIN.v0 + 4, WIN.v1 - 4], WIN.hb + 4, STEEL) + rivetsU(0, [WIN.v0 + 4, WIN.v1 - 4], WIN.ht - 4, STEEL)
+      + neon([P(0, 164, 78), P(0, 232, 78), P(0, 232, 138), P(0, 164, 138), P(0, 164, 78)], NEON, 1.6, 3.5),
+    glass: night => poly(winGlassPts(), night ? '#0a1224' : '#c3d0d8', { sw: 1.4 }),
+    // Day: a hazy city skyline with a sun glare. Night: a dark city with lit windows and a neon billboard, then rain; the mullions go over both.
+    sky: night => {
+      let s = skyline(night);
+      if (night) s += rainOnGlass();
+      s += poly([P(0, 170, 80), P(0, 178, 80), P(0, 218, 136), P(0, 210, 136)], '#ffffff', { stroke: null, op: night ? 0.05 : 0.14 });
+      s += rectU(0, 197, 199, WIN.gb, WIN.gt, GUN_DK, { sw: 0.8 }) + rectU(0, WIN.gv0, WIN.gv1, 107, 109, GUN_DK, { sw: 0.8 });
+      return s;
+    },
+    // A metal ledge on two brackets, the live sill's size and place (v 158-238, h 68-74).
+    sill: () => box(0, 167, 9, 3, 58, 68, GUN_DK) + box(0, 227, 9, 3, 58, 68, GUN_DK) + box(0, 158, 14, 80, 68, 74, STEEL_DK) + rivetsU(14, [166, 198, 230], 71, STEEL)
+  },
+
+  stations: {
+    // The charging pod: sleeping surface at STATION_ANCHORS.bedTop (L1 h 5, L2-L4 h 30). Each level returns { back, front }; front = the near rails, over the creature.
+    bed: [
+      // L1: a floor charging mat with a charge brick, a cable and a pillow
+      () => {
+        const mat = box(14, 124, 68, 40, 0, 5, '#2d3a48') + neon([P(15.5, 125.5, 5.3), P(80.5, 125.5, 5.3), P(80.5, 162.5, 5.3), P(15.5, 162.5, 5.3), P(15.5, 125.5, 5.3)], NEON, 1, 2.5)
+          + coil(48, 144, 5.2, 24, 14);
+        const pillow = box(17, 136, 10, 20, 5, 10, '#3a4a5c') + isoLines([[P(27, 140, 10), P(27, 152, 10)]], 1.3, NEON, 0.9);
+        const brick = box(64, 166, 10, 8, 0, 9, GUN_DK) + ledOn(74, 170, 5, LIME) + slotsU(74, 167, 173, 2, 7, 3, ART_INK, 0.9);
+        const cable = isoLine([P(64, 170, 2), P(54, 173, 1), P(44, 170, 1.5), P(38, 165, 3), P(38, 164, 4.5)], 3.6, CABLE_DK) + isoLine([P(64, 170, 2), P(54, 173, 1), P(44, 170, 1.5), P(38, 165, 3), P(38, 164, 4.5)], 1.2, NEON, { op: 0.8 });
+        return { back: mat + pillow + brick + cable, front: '' };
+      },
+      // L2: a charging cradle: a lift on four hydraulic pillars, a padded cradle on top, rails at the near edges
+      () => {
+        const base = box(4, 122, 80, 52, 0, 4, GUN_DK) + neon([P(6, 124, 4.3), P(82, 124, 4.3), P(82, 172, 4.3), P(6, 172, 4.3), P(6, 124, 4.3)], NEON, 1, 2.5);
+        const pillars = [[14, 132], [14, 164], [74, 132], [74, 164]].map(([u, v]) => cyl(u, v, 3.4, 4, 22, STEEL_DK) + cyl(u, v, 4.4, 4, 8, GUN_LT)).join('');
+        const slab = box(6, 124, 76, 48, 22, 28, GUN) + rivetsU(82, [132, 148, 164], 25, STEEL) + led(82, 138, 25, LIME) + led(82, 158, 25, AMBER, 0.8);
+        const pad = box(8, 126, 72, 44, 28, 30, '#2d3a48') + coil(50, 148, 30.2, 22, 14);
+        return {
+          back: base + pillars + slab + pad,
+          front: box(8, 170, 70, 3, 30, 35, GUN_LT) + box(78, 126, 3, 46, 30, 35, GUN_LT) + neon([P(9, 171.6, 33.6), P(77, 171.6, 33.6)], NEON, 1, 2.5)
+        };
+      },
+      // L3: a charging pod: a capsule base, a headboard with a status screen, padded rails at the near edges
+      () => {
+        const base = box(0, 120, 91, 56, 0, 26, GUN) + neon([P(91, 121, 13), P(91, 175, 13)], NEON, 1.5, 3) + neon([P(2, 176, 13), P(90, 176, 13)], NEON, 1.5, 3)
+          + seamsU(91, [134, 148, 162], 2, 24, GUN_DK, 1) + slotsU(91, 124, 172, 4, 8, 2, ART_INK, 1);
+        const pad = box(4, 124, 83, 48, 26, 30, '#2d3a48') + coil(40, 148, 30.2, 26, 17);
+        const head = box(0, 120, 8, 56, 30, 64, GUN_DK) + screenU(8, 126, 170, 40, 60, NEON)
+          + traceU(8, [[130, 50], [138, 54], [144, 46], [152, 56], [160, 48], [166, 52]], NEON, 1.1) + scanU(8, 126, 170, 40, 60)
+          + led(8, 130, 36, LIME) + led(8, 138, 36, AMBER, 0.6);
+        return {
+          back: base + pad + head,
+          front: box(85, 124, 4, 52, 30, 38, GUN_LT) + box(4, 172, 81, 4, 30, 38, GUN_LT) + neon([P(87, 125, 36.6), P(87, 175, 36.6)], PINK, 1, 2.5)
+        };
+      },
+      // L4: a canopy pod: the same pod with a tall status screen on the spine and a glass canopy over the sleeper
+      () => {
+        const base = box(0, 118, 91, 60, 0, 26, GUN) + neon([P(91, 119, 13), P(91, 177, 13)], NEON, 1.5, 3) + neon([P(2, 178, 13), P(90, 178, 13)], NEON, 1.5, 3)
+          + seamsU(91, [133, 148, 163], 2, 24, GUN_DK, 1) + slotsU(91, 122, 174, 4, 8, 2, ART_INK, 1);
+        const pad = box(4, 122, 83, 52, 26, 30, '#2d3a48') + coil(40, 148, 30.2, 26, 17);
+        const bars = [0, 1, 2, 3, 4, 5].map(i => rectU(10, 129 + i * 7.5, 134 + i * 7.5, 96, 100 + i * 3, i < 5 ? LIME : '#3a4a3a', { stroke: null }) ).join('');
+        const spine = box(0, 118, 10, 60, 30, 118, GUN_DK) + box(0, 118, 12, 60, 118, 127, GUN) + screenU(10, 124, 172, 70, 112, NEON)
+          + traceU(10, [[130, 100], [138, 106], [146, 94], [156, 108], [164, 98], [168, 104]], NEON, 1.2) + glow(LIME, bars, 2) + scanU(10, 124, 172, 70, 112)
+          + slotsU(10, 128, 168, 78, 90, 3, NEON, 0.7) + led(10, 126, 34, LIME) + led(10, 134, 34, AMBER, 0.5) + led(10, 142, 34, PINK, 1);
+        const posts = box(86, 122, 3, 3, 30, 102, GUN_LT) + box(86, 171, 3, 3, 30, 102, GUN_LT) + box(4, 171, 3, 3, 30, 102, GUN_LT);
+        const beams = box(86, 122, 3, 52, 100, 104, GUN_LT) + box(4, 171, 85, 3, 100, 104, GUN_LT);
+        const panes = glassU(88, 125, 171, 32, 100, 0.15) + glassV(173, 7, 86, 32, 100, 0.15)
+          + isoLines([[P(88, 130, 38), P(88, 146, 92)], [P(88, 138, 38), P(88, 154, 92)]], 1.2, '#ffffff', 0.35);
+        return { back: base + pad + spine, front: posts + beams + panes };
+      }
+    ],
+
+    // The cryo unit: the LED gauge reads at STATION_ANCHORS.fridgeTop (the top centre of each level).
+    fridge: [
+      // L1: a cooler box: steel-blue body, latched lid, a frost patch and a snowflake mark
+      () => box(146, 0, 40, 28, 0, 24, '#7f97aa')
+        + seamsV(28, [157, 168, 179], 3, 21, GUN_DK) + slotsU(186, 5, 23, 6, 18, 4, GUN_DK)
+        + box(145, -1, 42, 30, 24, 31, '#4d5c69') + poly(ellipsePoints(158, 14, 31.2, 6, 4), FROST, { stroke: null, op: 0.75 })
+        + rectV(29, 154, 160, 14, 28, STEEL) + rectV(29, 172, 178, 14, 28, STEEL) + rivetsV(29, [157, 175], 17, GUN_DK)
+        + bill(166, 29, 11, `<g stroke="${NEON}" stroke-width="1.4" stroke-linecap="round" fill="none" style="filter:drop-shadow(0 0 2px ${NEON})"><path d="M0 -5 V5 M-4.3 -2.5 L4.3 2.5 M-4.3 2.5 L4.3 -2.5"/></g>`, [-6, -6, 6, 6])
+        + isoLines([[P(187, 8, 17), P(187, 20, 17)], [P(186, 9, 15), P(187, 9, 17)], [P(186, 19, 15), P(187, 19, 17)]], 2.6, STEEL) + ledOn(181, 6, 31, LIME),
+      // L2: a mini cryo unit: a frosted window with sample vials, a small display and indicator lights
+      () => box(146, 0, 40, 34, 0, 52, GUN) + rectV(34, 148, 184, 0, 4, GUN_DK)
+        + rectV(34, 150, 182, 18, 48, GUN_DK, { sw: 1.6 }) + rectV(34, 152, 180, 20, 46, '#bfeaf2', { sw: 1 })
+        + vialRows(34, 152, 180, [21, 33], 8, 5.5) + rectV(34, 152, 180, 38, 46, FROST, { stroke: null, op: 0.55 })
+        + screenV(34, 152, 170, 5, 15, NEON) + traceV(34, [[154, 9], [158, 12], [162, 8], [166, 12], [168, 10]], NEON, 1)
+        + led(176, 34, 12, LIME) + led(180, 34, 9, AMBER, 0.7) + rectV(34, 182.4, 184.4, 22, 44, STEEL, { sw: 1 })
+        + box(146, 0, 40, 34, 52, 58, GUN_DK) + slotsV(34, 150, 176, 54, 56, 2, ART_INK, 1) + slotsU(186, 5, 29, 8, 44, 7, ART_INK, 1),
+      // L3: a cryo fridge: a door window showing four shelves of vials, a control strip and a glowing kick plate
+      () => box(140, 0, 46, 38, 0, 106, GUN) + box(140, 0, 46, 38, 106, 112, GUN_DK) + rectV(38, 141, 185, 0, 6, GUN_DK)
+        + rectV(38, 145, 181, 10, 98, '#566371', { sw: 1.6 }) + rectV(38, 148, 178, 16, 92, '#a9eaf5', { sw: 1 })
+        + vialRows(38, 148, 178, [16, 38, 60, 82], 7, 6) + rectV(38, 148, 178, 78, 92, FROST, { stroke: null, op: 0.45 })
+        + rectV(38, 181.5, 184, 32, 76, STEEL, { sw: 1 }) + screenV(38, 148, 170, 99, 105, NEON) + traceV(38, [[150, 102], [155, 104], [160, 101], [166, 103]], NEON, 0.9)
+        + led(176, 38, 102, LIME) + led(180, 38, 102, AMBER, 0.6) + neon([P(142, 38.2, 7), P(184, 38.2, 7)], NEON, 1.2, 2.5)
+        + slotsU(186, 5, 33, 12, 96, 10, ART_INK, 1) + hazardU(186, 6, 32, 98, 104, 4),
+      // L4: a twin-door cryo bank: two vial-stocked doors either side of a control column of status lights
+      () => box(124, 0, 64, 40, 0, 114, GUN) + box(124, 0, 64, 40, 114, 120, GUN_DK) + rectV(40, 125, 187, 0, 8, GUN_DK)
+        + [[128, 152], [160, 184]].map(([a, b]) => rectV(40, a, b, 12, 106, '#566371', { sw: 1.6 }) + rectV(40, a + 3, b - 3, 18, 100, '#a9eaf5', { sw: 1 })
+          + vialRows(40, a + 3, b - 3, [18, 40, 62, 84], 7, 5) + rectV(40, a + 3, b - 3, 88, 100, FROST, { stroke: null, op: 0.45 })).join('')
+        + rectV(40, 152, 160, 12, 106, GUN_DK, { sw: 1.2 }) + screenV(40, 153, 159, 72, 102, NEON) + traceV(40, [[154, 96], [156, 90], [158, 94], [156, 82], [154, 78]], NEON, 1) + scanV(40, 153, 159, 72, 102)
+        + [14, 22, 30, 38, 46, 54].map((h, i) => led(156, 40, h, VIAL_COLOURS[i % 4], i * 0.35)).join('')
+        + rectV(40, 149.2, 151.2, 38, 74, STEEL, { sw: 1 }) + rectV(40, 160.8, 162.8, 38, 74, STEEL, { sw: 1 })
+        + neon([P(126, 40.2, 9.5), P(186, 40.2, 9.5)], NEON, 1.2, 2.5) + rectV(40, 140, 172, 108, 113, SCREEN, { sw: 1 }) + neon([P(142, 40.3, 110.5), P(170, 40.3, 110.5)], PINK, 1.2, 2.5)
+        + slotsU(188, 5, 35, 12, 100, 12, ART_INK, 1) + hazardU(188, 4, 36, 104, 111, 5)
+    ],
+
+    // The fab oven: steam rises from the vent at STATION_ANCHORS.cookerPot; the creature stands at PIP_COOKER_SPOT; the tray lands at cookerPlate.
+    cooker: [
+      // L1: a hot plate on a crate: a glowing coil, a pressure canister with a vent pipe, a tray dock beside it
+      () => box(97, 0, 42, 30, 0, 22, GUN) + rectV(30, 100, 136, 4, 18, GUN_DK, { sw: 1 }) + dial(104, 30, 12) + dial(112, 30, 12) + led(128, 30, 12, LIME) + led(132, 30, 12, AMBER, 0.7)
+        + seamsU(139, [10, 20], 2, 20, ART_INK, 1) + box(97, 0, 42, 30, 22, 26, GUN_DK)
+        + ellH(118, 15, 26.2, 12, 12, '#2a1608', { sw: 1.2 }) + glow(AMBER, ellH(118, 15, 26.3, 9, 9, 'none', { stroke: '#ff8a2a', sw: 1.4 }) + ellH(118, 15, 26.3, 5, 5, 'none', { stroke: '#ff8a2a', sw: 1.2 }), 3)
+        + rectH(26.1, 99, 109, 17, 27, GUN_LT, { sw: 0.8 }) + isoLines([[P(101, 19, 26.2), P(107, 19, 26.2)], [P(101, 25, 26.2), P(107, 25, 26.2)]], 1, ART_INK, 0.7)
+        + cyl(118, 15, 8.5, 26.5, 39, STEEL_DK) + cyl(118, 15, 8.8, 31, 33, NEON) + cylE(118, 15, 8.5, 8.5, 39, 42, STEEL, 6, 6) + cyl(118, 15, 2.4, 42, 46, GUN_LT) + ledOn(122, 22, 34, LIME),
+      // L2: a countertop fab oven: an oven tower with a glowing window and a vent, beside a counter with a conveyor belt
+      () => box(60, 0, 40, 36, 0, 66, GUN) + rectV(36, 63, 97, 28, 56, GUN_DK, { sw: 1.6 }) + rectV(36, 66, 94, 31, 53, '#3a1d0c', { sw: 1 })
+        + glow(AMBER, rectV(36, 70, 90, 35, 49, AMBER, { stroke: null, op: 0.5 }), 5) + rectV(36, 76, 84, 36, 42, '#e07a22', { stroke: null }) + slotsV(36, 66, 94, 33, 33, 1, GUN_LT, 1)
+        + isoLines([[P(64, 36.5, 60), P(96, 36.5, 60)]], 2.6, STEEL) + screenV(36, 64, 82, 10, 24, NEON) + traceV(36, [[66, 16], [70, 20], [74, 14], [78, 19]], NEON, 1)
+        + dial(88, 36, 19) + dial(94, 36, 19) + led(88, 36, 12, LIME) + led(94, 36, 12, AMBER, 0.6)
+        + box(59, 0, 42, 37, 66, 68, GUN_DK) + cyl(80, 19, 3.6, 68, 70, STEEL_DK)
+        + box(100, 0, 42, 38, 0, 50, GUN) + seamsV(38, [114, 128], 4, 46, ART_INK, 1) + hazardV(38, 100, 142, 0, 4, 4)
+        + isoLines([[P(104, 38.3, 38), P(110, 38.3, 38)], [P(118, 38.3, 38), P(124, 38.3, 38)], [P(132, 38.3, 38), P(138, 38.3, 38)]], 2.4, STEEL)
+        + box(98, 0, 44, 38, 50, 55, STEEL_DK) + rectH(55.3, 102, 140, 5, 13, '#232a31', { sw: 1 })
+        + isoLines([106, 112, 118, 124, 130].flatMap(u => [[P(u, 6, 55.4), P(u + 3, 9, 55.4)], [P(u + 3, 9, 55.4), P(u, 12, 55.4)]]), 1, AMBER, 0.75)
+        + cylE(102, 9, 2.4, 4, 55, 57.5, STEEL) + box(136, 3, 4, 10, 55, 64, GUN_DK) + led(138, 13, 61, LIME, 0.3),
+      // L3: a fab oven with a robotic arm: a bigger oven tower with a scanned display, an arm on the counter reaching to the tray
+      () => box(72, 0, 40, 36, 0, 76, GUN) + rectV(36, 75, 109, 32, 62, GUN_DK, { sw: 1.6 }) + rectV(36, 78, 106, 35, 59, '#3a1d0c', { sw: 1 })
+        + glow(AMBER, rectV(36, 83, 101, 39, 55, AMBER, { stroke: null, op: 0.5 }), 5) + rectV(36, 90, 96, 40, 46, '#e07a22', { stroke: null })
+        + slotsV(36, 76, 108, 66, 73, 4, ART_INK, 1.1) + screenV(36, 76, 98, 8, 28, NEON) + traceV(36, [[78, 14], [82, 22], [86, 12], [90, 20], [94, 16]], NEON, 1) + scanV(36, 76, 98, 8, 28)
+        + dial(102, 36, 22) + dial(102, 36, 14) + led(106, 36, 28, LIME) + led(106, 36, 8, PINK, 0.5)
+        + box(71, 0, 42, 37, 76, 78, GUN_DK) + cyl(92, 20, 3.6, 78, 80, STEEL_DK)
+        + box(112, 0, 28, 38, 0, 58, GUN) + seamsV(38, [126], 4, 54, ART_INK, 1) + hazardV(38, 112, 140, 0, 4, 4)
+        + isoLines([[P(116, 38.3, 40), P(122, 38.3, 40)], [P(130, 38.3, 40), P(136, 38.3, 40)]], 2.4, STEEL) + box(112, 0, 28, 38, 58, 62, STEEL_DK)
+        + cyl(130, 10, 6, 62, 65, GUN_DK) + armSeg(P(130, 10, 66), P(126, 12, 78), 4) + joint(126, 12, 78, 3.2) + armSeg(P(126, 12, 78), P(119, 19, 69), 3.2)
+        + joint(119, 19, 69, 2.6) + armSeg(P(119, 19, 69), P(118, 20, 64), 2.4, STEEL) + isoLines([[P(116.5, 20, 64), P(116.5, 20, 62.5)], [P(119.5, 20, 64), P(119.5, 20, 62.5)]], 1.6, ART_INK),
+      // L4: a full fab line: a control tower, an oven module under an extraction hood and a fan duct, a second arm on the right
+      () => box(48, 0, 94, 40, 0, 58, GUN) + seamsV(40, [70, 92, 114, 130], 4, 54, ART_INK, 1) + hazardV(40, 48, 142, 0, 4, 5)
+        + isoLines([[P(74, 40.3, 40), P(86, 40.3, 40)], [P(96, 40.3, 40), P(108, 40.3, 40)], [P(118, 40.3, 40), P(126, 40.3, 40)]], 2.4, STEEL) + box(48, 0, 94, 40, 58, 63, STEEL_DK)
+        + box(48, 0, 18, 40, 63, 96, GUN_DK) + screenV(40, 50, 64, 70, 92, NEON) + traceV(40, [[52, 78], [55, 84], [58, 76], [61, 86]], NEON, 1) + scanV(40, 50, 64, 70, 92)
+        + led(53, 40, 67, LIME) + led(57, 40, 67, AMBER, 0.4) + led(61, 40, 67, PINK, 0.8)
+        + box(68, 3, 44, 34, 63, 80, GUN) + rectV(37, 71, 109, 65, 77, GUN_DK, { sw: 1.4 }) + glow(AMBER, rectV(37, 74, 106, 67, 75, '#e07a22', { sw: 1, op: 0.85 }), 5) + cyl(90, 20, 3.6, 80, 82, STEEL_DK)
+        + box(68, 0, 3, 3, 63, 98, STEEL_DK) + box(113, 0, 3, 3, 63, 98, STEEL_DK)
+        + box(66, 0, 50, 34, 98, 110, GUN) + neon([P(67, 34.3, 99), P(115, 34.3, 99)], NEON, 1.4, 3) + slotsV(34, 72, 108, 102, 107, 2, ART_INK, 1)
+        + box(82, 0, 16, 14, 110, 150, GUN_DK) + slotsV(14, 82, 98, 116, 144, 2, ART_INK, 2.2) + fanBill(90, 14, 130, 5.6) + hazardV(14, 82, 98, 106, 110, 4)
+        + box(120, 4, 20, 30, 63, 70, GUN_DK) + led(138, 34, 66, LIME, 0.2) + cyl(130, 12, 5, 70, 73, GUN) + armSeg(P(130, 12, 74), P(124, 15, 95), 4) + joint(124, 15, 95, 3.2)
+        + armSeg(P(124, 15, 95), P(114, 20, 70), 3.2) + joint(114, 20, 70, 2.6) + armSeg(P(114, 20, 70), P(113, 20, 65), 2.4, STEEL)
+    ],
+
+    // The display case (the trophy cabinet): trophies and medals sit where the live cabinet shows them. Against the right wall (u = 0), running along v.
+    cabinet: [
+      // L1: a shelf crate: a stencilled olive crate with a hazard band, a second crate, a trophy, a medal and a sensor on top
+      () => box(0, 28, 22, 74, 0, 20, OLIVE) + seamsU(22, [40, 52, 64, 76, 88], 1, 19, OLIVE_DK, 1) + hazardU(22, 28, 102, 2, 6, 5)
+        + box(0, 27, 23, 76, 20, 23, OLIVE_DK) + rectU(23, 34, 60, 9, 15, '#d9d9c8', { stroke: null, op: 0.85 }) + ledOn(23, 95, 12, LIME)
+        + box(1, 32, 19, 34, 23, 35, '#7a8a6a') + hazardU(20, 32, 66, 26, 30, 4)
+        + cup(11, 86, 23, 0.65) + sensor(11, 74, 23, 0.5) + medal(10, 48, 35, 0.5),
+      // L2: a display case: a floating shelf with a glass-fronted case, two lit shelves and a top slab
+      () => box(0, 30, 22, 72, 30, 36, GUN_DK) + box(0, 32, 3, 68, 36, 84, SCREEN_LT) + box(0, 30, 22, 72, 84, 88, GUN_DK)
+        + box(19, 31, 3, 3, 36, 86, GUN_LT) + box(19, 96, 3, 3, 36, 86, GUN_LT) + box(2, 34, 18, 62, 58, 60, STEEL_DK)
+        + cup(10, 50, 36, 0.6) + medal(10, 70, 36, 0.55) + sensor(10, 88, 36, 0.5)
+        + cup(10, 46, 60, 0.6) + cup(10, 66, 60, 0.7) + medal(10, 86, 60, 0.5, LIME)
+        + neon([P(20, 34, 57), P(20, 96, 57)], NEON, 1.2, 2.5) + glassU(21, 34, 96, 36, 84, 0.14) + isoLines([[P(21, 40, 38), P(21, 54, 82)], [P(21, 48, 38), P(21, 62, 82)]], 1.2, '#ffffff', 0.3),
+      // L3: a lit display case: a locker base, a glass case on three shelves with strip lights, a lit sign on top
+      () => box(0, 32, 24, 62, 0, 30, GUN_DK) + rectU(24, 36, 62, 4, 26, GUN, { sw: 1 }) + rectU(24, 64, 90, 4, 26, GUN, { sw: 1 })
+        + isoLines([[P(24.3, 60, 16), P(24.3, 60, 24)], [P(24.3, 66, 16), P(24.3, 66, 24)]], 2.2, STEEL) + ledOn(24, 38, 28, LIME)
+        + box(0, 30, 26, 66, 30, 106, '#142029') + box(2, 32, 22, 62, 58, 60, STEEL_DK) + box(2, 32, 22, 62, 84, 86, STEEL_DK)
+        + cup(12, 50, 30, 0.6) + medal(12, 72, 30, 0.6) + sensor(12, 86, 30, 0.5)
+        + cup(12, 46, 60, 0.55) + cup(12, 66, 60, 0.65) + medal(12, 84, 60, 0.5, LIME)
+        + sensor(12, 50, 86, 0.55) + cup(12, 76, 86, 0.6)
+        + neon([P(24.5, 34, 56.5), P(24.5, 92, 56.5)], NEON, 1.3, 3) + neon([P(24.5, 34, 82.5), P(24.5, 92, 82.5)], NEON, 1.3, 3)
+        + glassU(26, 32, 94, 32, 104, 0.13) + isoLines([[P(26, 38, 34), P(26, 54, 100)], [P(26, 46, 34), P(26, 62, 100)]], 1.2, '#ffffff', 0.28)
+        + box(24, 30, 2, 3, 30, 106, GUN_LT) + box(24, 93, 2, 3, 30, 106, GUN_LT)
+        + box(0, 30, 26, 66, 106, 112, GUN_DK) + rectU(26, 40, 86, 107.5, 110.5, SCREEN, { sw: 0.8 }) + neon([P(26.3, 41, 109), P(26.3, 85, 109)], PINK, 1.3, 2.5),
+      // L4: a holo plinth case: an emitter plinth projecting a hovering trophy, glass wings, shelves of medals either side
+      () => {
+        const beam = poly([P(14, 55, 23), P(14, 71, 23), P(14, 79, 104), P(14, 47, 104)], NEON, { stroke: null, op: 0.12 })
+          + isoLines([[P(14, 55, 23), P(14, 47, 104)], [P(14, 71, 23), P(14, 79, 104)]], 1, NEON, 0.7);
+        const holo = fxg('scan', glow(NEON, `<g transform="scale(1.1)"><path d="M-9 -24 h18 q0 12 -9 14 q-9 -2 -9 -14z" fill="${NEON}" fill-opacity=".22" stroke="${NEON}" stroke-width="1.4" stroke-linejoin="round"/>`
+          + `<path d="M-9 -22 q-7 0 -5 7 q2 4 6 3 M9 -22 q7 0 5 7 q-2 4 -6 3 M0 -10 v6 M-7 -4 h14" fill="none" stroke="${NEON}" stroke-width="1.3"/>`
+          + `<path d="M-9 -20 h18 M-9 -16 h18 M-8 -12 h16" stroke="${NEON}" stroke-width=".6" opacity=".6"/></g>`, 4));
+        return box(0, 28, 28, 70, 0, 22, GUN_DK) + neon([P(28.3, 30, 5), P(28.3, 96, 5)], NEON, 1.4, 3) + neon([P(1, 98.3, 5), P(27, 98.3, 5)], NEON, 1.4, 3)
+          + box(0, 26, 30, 74, 22, 128, '#101a24')
+          + box(2, 30, 24, 16, 58, 60, STEEL_DK) + box(2, 80, 24, 16, 58, 60, STEEL_DK) + box(2, 30, 24, 16, 92, 94, STEEL_DK) + box(2, 80, 24, 16, 92, 94, STEEL_DK)
+          + cup(14, 38, 60, 0.55) + medal(14, 88, 60, 0.5) + sensor(14, 38, 94, 0.5) + cup(14, 88, 94, 0.6)
+          + ellH(14, 63, 22.2, 10, 15, SCREEN, { sw: 1.2 }) + glow(NEON, ellH(14, 63, 22.4, 8, 12, 'none', { stroke: NEON, sw: 1.2 }), 3) + beam
+          + bill(14, 63, 70, holo, [-11, -28, 11, 2])
+          + glassU(30, 30, 96, 24, 126, 0.12) + glassV(100, 2, 28, 24, 126, 0.12) + box(28, 26, 2, 4, 22, 128, GUN_LT) + box(28, 96, 2, 4, 22, 128, GUN_LT)
+          + box(0, 26, 30, 74, 126, 134, GUN_DK) + neon([P(30.3, 28, 127.5), P(30.3, 98, 127.5)], PINK, 1.4, 3);
+      }
+    ],
+
+    // The gear locker (Dress Pip): world coords, no shift, along the left wall (v = 0). Tapping it opens the wardrobe, so each level shows gear to wear.
+    wardrobe: [
+      // L1: a hook rail: two posts and a rail with a work jacket, a coverall and a cable coil, a toolbox and a pair of boots on the floor
+      () => {
+        const jacket = poly([P(16, 9.5, 76), P(40, 9.5, 76), P(44, 9.5, 42), P(12, 9.5, 42)], OLIVE);
+        const coverall = poly([P(44, 9.5, 76), P(58, 9.5, 76), P(61, 9.5, 52), P(42, 9.5, 52)], '#c9792e');
+        const seams = isoLines([[P(22, 9.5, 74), P(21, 9.5, 44)], [P(28, 9.5, 74), P(28, 9.5, 43)], [P(34, 9.5, 74), P(35, 9.5, 43)]], 1.1, OLIVE_DK, 0.9)
+          + isoLines([[P(49, 9.5, 74), P(48, 9.5, 54)], [P(54, 9.5, 74), P(55, 9.5, 54)]], 1.1, '#8f5a22', 0.9);
+        return box(6, 4, 11, 11, 0, 3, GUN_DK) + box(10, 8, 3, 3, 3, 82, GUN) + box(58, 4, 11, 11, 0, 3, GUN_DK) + box(62, 8, 3, 3, 3, 82, GUN)
+          + isoLines([[P(11.5, 9.5, 80), P(63.5, 9.5, 80)]], 3.2, GUN_LT)
+          + isoLines([[P(20, 9.5, 80), P(20, 9.5, 77)], [P(32, 9.5, 80), P(32, 9.5, 77)], [P(50, 9.5, 80), P(50, 9.5, 77)]], 1.6, STEEL)
+          + jacket + coverall + seams + bill(28, 9.5, 74, `<circle r="3" fill="${PINK}" stroke="${ART_INK}" stroke-width="1.2"/>`, [-3.5, -3.5, 3.5, 3.5])
+          + bill(54, 9.5, 66, `<circle r="6" fill="none" stroke="${CABLE_DK}" stroke-width="3"/><circle r="6" fill="none" stroke="${NEON}" stroke-width="1" opacity=".8"/>`, [-8, -8, 8, 8])
+          + box(30, 16, 14, 10, 0, 8, RUST) + isoLines([[P(33, 21, 8), P(33, 21, 12)], [P(41, 21, 8), P(41, 21, 12)], [P(33, 21, 12), P(41, 21, 12)]], 1.6, STEEL)
+          + box(18, 18, 5, 7, 0, 7, GUN_DK) + box(24, 18, 5, 7, 0, 7, GUN_DK) + box(18, 20, 5, 5, 7, 11, GUN) + box(24, 20, 5, 5, 7, 11, GUN);
+      },
+      // L2: a gear locker: one wide olive door with louvres, a name plate, a handle and a hazard foot
+      () => box(10, 0, 52, 26, 0, 72, OLIVE) + rectV(26, 13, 59, 7, 69, OLIVE_DK, { sw: 1.2 }) + slotsV(26, 17, 55, 50, 64, 6, ART_INK, 1.2)
+        + screenV(26, 20, 40, 38, 46, NEON) + traceV(26, [[22, 42], [26, 44], [30, 40], [34, 43], [38, 41]], NEON, 0.9)
+        + rectV(26, 50, 53, 24, 38, STEEL, { sw: 1 }) + ledOn(48, 26, 60, LIME) + hazardV(26, 10, 62, 0, 5, 4)
+        + rivetsV(26, [15, 57], 10, STEEL) + rivetsV(26, [15, 57], 66, STEEL) + box(10, 0, 52, 26, 72, 78, GUN_DK) + slotsU(62, 4, 22, 10, 60, 9, ART_INK, 1),
+      // L3: a double locker: two doors with louvres and handles, status lights above each, a hazard foot
+      () => box(6, 0, 60, 30, 0, 86, OLIVE) + rectV(30, 9, 34, 6, 82, OLIVE_DK, { sw: 1.2 }) + rectV(30, 38, 63, 6, 82, OLIVE_DK, { sw: 1.2 })
+        + slotsV(30, 12, 31, 62, 76, 5, ART_INK, 1.2) + slotsV(30, 41, 60, 62, 76, 5, ART_INK, 1.2)
+        + rectV(30, 19, 27, 38, 46, '#d9d9c8', { stroke: null, op: 0.85 }) + rectV(30, 45, 53, 38, 46, '#d9d9c8', { stroke: null, op: 0.85 })
+        + rectV(30, 31.5, 33.5, 30, 50, STEEL, { sw: 1 }) + rectV(30, 38.5, 40.5, 30, 50, STEEL, { sw: 1 })
+        + ledOn(21, 30, 79, LIME) + led(50, 30, 79, PINK, 0.8) + hazardV(30, 6, 66, 0, 4, 4)
+        + box(6, 0, 60, 30, 86, 92, GUN_DK) + slotsU(66, 3, 27, 12, 80, 8, ART_INK, 1),
+      // L4: a locker bay: lockers either side of a lit screen listing the gear to wear, on a plinth
+      () => box(2, 0, 70, 32, 0, 90, OLIVE) + rectV(32, 2, 72, 0, 6, GUN_DK) + rectV(32, 5, 26, 8, 86, OLIVE_DK, { sw: 1.2 }) + rectV(32, 50, 69, 8, 86, OLIVE_DK, { sw: 1.2 })
+        + slotsV(32, 8, 23, 64, 78, 5, ART_INK, 1.2) + slotsV(32, 53, 66, 64, 78, 5, ART_INK, 1.2)
+        + rectV(32, 24, 26, 32, 56, STEEL, { sw: 1 }) + rectV(32, 50, 52, 32, 56, STEEL, { sw: 1 })
+        + screenV(32, 29, 47, 24, 82, NEON)
+        + traceV(32, [[33, 70], [35, 76], [37, 72], [39, 72], [41, 76], [43, 70], [41, 66], [35, 66], [33, 70]], NEON, 1)
+        + glow(NEON, discV(32, 38, 50, 5, 6, 'none', { stroke: NEON, sw: 1 }), 2) + traceV(32, [[33, 36], [43, 36], [43, 30], [33, 30], [33, 36]], NEON, 1) + scanV(32, 29, 47, 24, 82)
+        + ledOn(14, 32, 84, LIME) + led(60, 32, 84, PINK, 0.6) + hazardV(32, 2, 72, 6, 10, 4) + box(2, 0, 70, 32, 90, 96, GUN_DK) + slotsU(72, 3, 29, 12, 84, 9, ART_INK, 1)
+    ]
+  },
+
+  decor: {
+    /* ---------- over the wardrobe (left wall; legacy ids drawn at u 150-186, h 128-176) ---------- */
+    // a circuit-board poster: a dark plate, a chip, glowing traces and solder pads
+    'basil-print': () => rectV(0, 154, 182, 136, 166, GUN_DK) + rectV(0, 157, 179, 139, 163, '#0e2a2a')
+      + rectV(0, 166, 172, 149, 155, CABLE_DK, { sw: 1 })
+      + glow(LIME, isoLine([P(160, 0, 160), P(166, 0, 160), P(166, 0, 152), P(174, 0, 152), P(174, 0, 158), P(177, 0, 158)], 1.1, LIME)
+        + isoLine([P(160, 0, 144), P(168, 0, 144), P(168, 0, 148), P(172, 0, 148)], 1.1, LIME) + isoLine([P(174, 0, 144), P(177, 0, 144), P(177, 0, 150)], 1.1, LIME), 2)
+      + [[160, 160], [177, 158], [172, 148], [177, 150], [160, 144]].map(([u, h]) => bill(u, 0, h, `<circle r="1.6" fill="${AMBER}" stroke="${ART_INK}" stroke-width=".7"/>`, [-2, -2, 2, 2])).join(''),
+    // a schematic slate: a screen of text lines with a scan sweep (animated)
+    'recipe-board': () => rectV(0, 152, 184, 134, 168, GUN) + screenV(0, 155, 181, 137, 165, LIME)
+      + [160, 155, 150, 145, 140].map((h, i) => traceV(0, [[158, h], [158 + [18, 12, 20, 9, 15][i], h]], LIME, 1)).join('')
+      + scanV(0, 155, 181, 137, 165),
+    // a sample rack: a steel shelf on two brackets holding three glowing vials
+    'herb-shelf': () => [154, 180].map(u => box(u, 0, 3, 6, 128, 136, GUN_DK)).join('') + box(150, 0, 36, 8, 136, 140, GUN)
+      + [[156, NEON], [168, PINK], [180, LIME]].map(([u, c]) => `<g ${glowAttr(c, 2)}>${cyl(u, 4, 3.4, 140, 147, c, { sw: 1.2 })}`
+        + bill(u, 4, 147, `<rect x="-1.4" y="-5" width="2.8" height="5" fill="#d7f0ff" stroke="${ART_INK}" stroke-width="1.1"/><rect x="-2" y="-7.6" width="4" height="2.6" rx="1" fill="${STEEL}" stroke="${ART_INK}" stroke-width="1"/>`, [-2.5, -8, 2.5, 0]) + '</g>').join(''),
+    // an LED strip: a cable run with five lights chasing along it (animated)
+    'fairy-lights': () => {
+      const at = i => [150 + i * 6, 166 - Math.sin((i / 6) * Math.PI) * 10];
+      const run = Array.from({ length: 7 }, (_, i) => P(at(i)[0], 0, at(i)[1]));
+      return isoLine(run, 3.6, CABLE_DK) + isoLine(run, 1, STEEL_DK, { op: 0.8 })
+        + [NEON, PINK, LIME, AMBER, NEON].map((c, i) => led(at(i + 1)[0], 0, at(i + 1)[1], c, i * 0.3)).join('');
+    },
+    // a framed monitor showing Pip's scan portrait (animated sweep)
+    'pip-portrait': () => box(24, 0, 28, 2.4, 106, 138, GUN_DK) + rectV(2.55, 27, 49, 109, 135, SCREEN)
+      + bill(38, 2.7, 121,
+        `<rect x="-8" y="-11" width="16" height="13" rx="3.5" fill="${GUN_LT}" stroke="${ART_INK}" stroke-width="1.4"/><rect x="-5.6" y="-8" width="11.2" height="7" rx="1.8" fill="${SCREEN}"/>`
+        + `<rect x="-4" y="-6.4" width="2.8" height="3.2" fill="${NEON}"/><rect x="1.2" y="-6.4" width="2.8" height="3.2" fill="${NEON}"/><path d="M-1.8 -2.4 h3.6" stroke="${NEON}" stroke-width="1" stroke-linecap="round"/>`
+        + `<path d="M0 -11 V-14.5" stroke="${ART_INK}" stroke-width="1.4"/><circle cy="-14.8" r="1.4" fill="${PINK}"/>`, [-9, -16, 9, 2])
+      + scanV(2.6, 27, 49, 109, 135),
+
+    /* ---------- bedside wall (right wall, v 134-154: tall and narrow) ---------- */
+    // a height gauge: a steel post with tick marks, a glowing level marker and a readout
+    'growth-chart': () => box(0, 137, 1.8, 12, 62, 122, GUN)
+      + isoLines([70, 80, 90, 100, 110].map((h, i) => [P(1.95, 138.4, h), P(1.95, i % 2 ? 141 : 143.2, h)]), 1.2, ART_INK)
+      + rectU(1.95, 138, 148, 114, 119, '#0e2a2a', { sw: 1 }) + traceU(2, [[139, 116.5], [147, 116.5]], LIME, 1)
+      + glow(NEON, isoLine([P(1.95, 138, 92), P(1.95, 148, 92)], 1.4, NEON), 2) + ledOn(1.95, 146, 86, AMBER),
+    // a schedule panel: a screen grid, some cells lit
+    'meal-calendar': () => {
+      const lit = [];
+      for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) if ((r + c) % 2 === 0) lit.push(rectU(3.1, 138.8 + c * 3.8, 141.4 + c * 3.8, 83 + r * 8, 88 + r * 8, c === 1 ? LIME : NEON, { stroke: null, op: 0.9 }));
+      return box(0, 136, 3, 16, 76, 114, GUN_DK) + rectU(3.05, 138, 150, 82, 108, SCREEN, { stroke: null })
+        + isoLines([[P(3.08, 142.5, 82), P(3.08, 142.5, 108)], [P(3.08, 147, 82), P(3.08, 147, 108)], [P(3.08, 138, 90), P(3.08, 150, 90)], [P(3.08, 138, 99), P(3.08, 150, 99)]], 0.8, '#2f4a5c')
+        + lit.join('') + ledOn(3.1, 144, 111, AMBER);
+    },
+    // a work lamp on a bracket: a cone shade over a buzzing bulb (animated, glowing)
+    'wall-sconce': () => rectU(0, 140.5, 147.5, 84, 98, GUN_DK) + box(0, 142.5, 5, 3, 88, 91, GUN) + cylE(5, 144, 2.2, 2.2, 91, 99, STEEL, 4.2, 4.2)
+      + fxg('buzz', glow('#bff6ff', bill(5, 144, 99.5, '<circle r="3.2" fill="#eafcff" stroke="#9fe8f5" stroke-width="1"/>', [-4, -4, 4, 4]), 4)),
+    // three mini monitors, each running a trace with a scan sweep (animated)
+    'photo-strip': () => [[64, NEON], [82, LIME], [100, PINK]].map(([h, c]) =>
+      box(0, 137, 1.6, 14, h, h + 14, GUN_DK) + rectU(1.75, 139, 149, h + 2, h + 12, SCREEN, { stroke: null })
+      + traceU(1.8, [[140, h + 4], [142, h + 8], [144, h + 5], [146, h + 9], [148, h + 6]], c, 1) + scanU(1.8, 139, 149, h + 2, h + 12)).join(''),
+
+    /* ---------- front right wall (right wall; legacy ids drawn at v 34-80, h 138-178) ---------- */
+    // a digital clock panel: a dark plate with seven-segment digits and a blinking colon (animated)
+    'wall-clock': () => bill(0, 57, 158,
+      `<rect x="-15" y="-8.5" width="30" height="17" rx="2.5" fill="${SCREEN}" stroke="${ART_INK}" stroke-width="1.8"/><rect x="-13.4" y="-7" width="26.8" height="14" rx="1.6" fill="none" stroke="${GUN_LT}" stroke-width="1"/>`
+      + `<g ${glowAttr(NEON, 2)}>${digit7(1, -12, -3.5)}${digit7(2, -6, -3.5)}${fxg('blink', `<circle cx="0" cy="-1.6" r=".9" fill="${NEON}"/><circle cx="0" cy="1.6" r=".9" fill="${NEON}"/>`)}${digit7(0, 3, -3.5)}${digit7(8, 9, -3.5)}</g>`, [-16, -10, 16, 10]),
+    // pennant lights: five lit pennants on a cable, every other one blinking (animated)
+    bunting: () => isoLine([P(0, 34, 172), P(0, 80, 172)], 2.4, CABLE_DK)
+      + [PINK, NEON, LIME, AMBER, PINK].map((c, i) => {
+        const v = 36 + i * 9, p = poly([P(0, v, 171), P(0, v + 8, 171), P(0, v + 8, 159), P(0, v + 4, 163.5), P(0, v, 159)], c, { sw: 1.2 });
+        return i % 2 ? fxg('blink', p, i * 0.4) : p;
+      }).join(''),
+    // a tool rail: a steel rail with a wrench, a screwdriver and pliers hanging from it
+    'pan-rail': () => isoLine([P(0, 36, 170), P(0, 78, 170)], 2.6, STEEL_DK)
+      + bill(0, 44, 170, `<path d="M0 0 V4" stroke="${ART_INK}" stroke-width="1.4"/><rect x="-1.8" y="4" width="3.6" height="13" rx="1.5" fill="${STEEL}" stroke="${ART_INK}" stroke-width="1.3"/><circle cy="19" r="4.2" fill="${STEEL}" stroke="${ART_INK}" stroke-width="1.3"/><rect x="-1.5" y="15.5" width="3" height="5" fill="${SCREEN}"/>`, [-6, -1, 6, 24])
+      + bill(0, 57, 170, `<path d="M0 0 V3" stroke="${ART_INK}" stroke-width="1.4"/><rect x="-2.6" y="3" width="5.2" height="8" rx="2" fill="${AMBER}" stroke="${ART_INK}" stroke-width="1.3"/><rect x="-.9" y="11" width="1.8" height="11" fill="${STEEL}" stroke="${ART_INK}" stroke-width="1"/>`, [-3, -1, 3, 23])
+      + bill(0, 70, 170, `<path d="M0 0 V3" stroke="${ART_INK}" stroke-width="1.4"/>${limb('M-1 4 L-4 16 M1 4 L4 16', 2.2, PINK)}<path d="M-4 16 l1.6 6 M4 16 l-1.6 6" stroke="${STEEL}" stroke-width="2.2" stroke-linecap="round"/>`, [-6, -1, 6, 24]),
+    // a round monitor: a bezel round a radar screen, a sweep line and blips (animated)
+    mirror: () => bill(0, 57, 158,
+      `<circle r="16" fill="${GUN}" stroke="${ART_INK}" stroke-width="2.2"/><circle r="12.6" fill="${SCREEN}" stroke="${GUN_DK}" stroke-width="1.2"/>`
+      + `<g ${glowAttr(NEON, 2)}><circle r="10.4" fill="none" stroke="${NEON}" stroke-width=".8"/><circle r="5.2" fill="none" stroke="${NEON}" stroke-width=".6" opacity=".7"/><path d="M-10.4 0H10.4M0 -10.4V10.4" stroke="${NEON}" stroke-width=".5" opacity=".5"/></g>`
+      + `<circle cx="4.4" cy="-4.8" r="1.3" fill="${LIME}"/><circle cx="-5.6" cy="3.6" r="1.1" fill="${PINK}"/>` + fxg('scan', `<path d="M-9 5 H9" stroke="${NEON}" stroke-width="1.5" opacity=".6" stroke-linecap="round"/>`)
+      + [0, 1, 2, 3, 4, 5].map(i => `<circle cx="${(14.4 * Math.cos((i / 6) * Math.PI * 2)).toFixed(1)}" cy="${(14.4 * Math.sin((i / 6) * Math.PI * 2)).toFixed(1)}" r=".9" fill="${STEEL}"/>`).join(''), [-17.5, -17.5, 17.5, 17.5]),
+    // gear hooks: a plank with pegs, a hi-vis vest, a hard hat and a cable coil hanging from it
+    'coat-hooks': () => box(0, 252, 2, 42, 121, 128, GUN) + isoLine([P(2.1, 253, 127), P(2.1, 293, 127)], 1, HI)
+      + [260, 273, 286].map(v => box(2, v - 0.8, 2, 1.6, 124, 126.5, STEEL_DK)).join('')
+      + slabU(2, 0.9, [[256, 124], [266, 124], [268, 99], [254, 99]], HAZ) + isoLines([[P(2.95, 258, 118), P(2.95, 258, 100)], [P(2.95, 262, 118), P(2.95, 262, 100)]], 1.4, HAZ_DK, 0.9)
+      + isoLine([P(3, 273, 119), P(3.4, 273, 114)], 1.2, ART_INK) + hat(3.4, 273, 103, 0.75)
+      + ellU(2, 286, 108, 5.4, 7, CABLE_DK, { sw: 1.2 }) + ellU(2.1, 286, 108, 3.2, 4.2, 'none', { stroke: NEON, sw: 1 }) + isoLine([P(2, 286, 124), P(2.2, 286, 115)], 1.2, ART_INK),
+
+    /* ---------- window dressing (right wall, v 156-244, above the sill) ---------- */
+    // a strip curtain: clear plastic strips hanging from a rail on both sides
+    'curtains-gingham': () => {
+      const strips = v0 => Array.from({ length: 5 }, (_, i) => rectU(1.6, v0 + i * 3.2, v0 + i * 3.2 + 2.4, 74, 141, '#9fb4bf', { sw: 0.8, op: 0.6 })).join('');
+      return box(0.4, 155, 2, 86, 141, 143.5, GUN_DK) + [154, 240.5].map(v => box(0.4, v, 2, 1.5, 139.5, 146, GUN)).join('') + strips(158) + strips(223);
+    },
+    // blackout shutters: two slatted steel panels with neon edges
+    'curtains-linen': () => {
+      const left = [[158, 141], [178, 141], [178, 74], [158, 74]], right = left.map(([v, h]) => [396 - v, h]);
+      const slats = [[158, 178], [218, 238]].map(([a, b]) => isoLines(Array.from({ length: 10 }, (_, i) => [P(2.2, a, 79 + i * 6.2), P(2.2, b, 79 + i * 6.2)]), 1, GUN_DK, 0.9)).join('');
+      return box(0.4, 155, 2, 86, 141, 143.5, GUN_DK) + [154, 240.5].map(v => box(0.4, v, 2, 1.5, 139.5, 146, GUN)).join('')
+        + slabU(0.6, 1.6, left, GUN) + slabU(0.6, 1.6, right, GUN) + slats
+        + neon([P(2.3, 178, 141), P(2.3, 178, 74)], NEON, 1.2, 2) + neon([P(2.3, 218, 141), P(2.3, 218, 74)], NEON, 1.2, 2);
+    },
+    // a security shutter rolled partway: a housing, slats, a hazard bottom bar and guide rails
+    'roller-blind': () => {
+      const rows = Array.from({ length: 6 }, (_, i) => [P(1.8, 166, 118 + i * 2.9), P(1.8, 230, 118 + i * 2.9)]);
+      return box(0.5, 162, 2, 72, 131, 141, GUN_DK) + box(0.5, 162, 2, 3, 108, 131, GUN) + box(0.5, 231, 2, 3, 108, 131, GUN)
+        + isoLines(rows, 3.4, ART_INK) + isoLines(rows, 1.8, STEEL_DK) + hazardU(1.8, 166, 230, 108, 114, 4)
+        + isoLine([P(2.3, 167, 132), P(2.3, 229, 132)], 1, HI);
+    },
+    // a window LED border: a cable over the top of the glass and down both sides, lights blinking (animated)
+    'window-lights': () => {
+      const cols = [NEON, PINK, LIME, AMBER, '#b58cff'];
+      const wire = Array.from({ length: 13 }, (_, i) => [160 + i * 6.3, 140 - Math.sin((i / 12) * Math.PI) * 8]);
+      let s = isoLine(wire.map(([v, h]) => P(1, v, h)), 2.6, CABLE_DK);
+      wire.slice(1, -1).forEach(([v, h], i) => { s += led(1, v, h - 2, cols[i % 5], (i % 6) * 0.3); });
+      for (const v0 of [160, 236]) {
+        const strand = [0, 1, 2, 3, 4, 5].map(k => [v0 + Math.sin(k) * 2, 136 - k * 13]);
+        s += isoLine(strand.map(([v, h]) => P(1, v, h)), 2.6, CABLE_DK);
+        strand.slice(1).forEach(([v, h], k) => { s += led(1, v, h, cols[(k + 2) % 5], k * 0.35); });
+      }
+      return s;
+    },
+    // a hanging grow pod: three cables to a bowl of glowing sprouts (animated flicker, glowing)
+    'plant-hanger': () => [[13, 198], [8, 203], [8, 193]].map(([u, v]) => isoLine([P(8, 198, 150), P(u, v, 130)], 1.3, STEEL_DK)).join('')
+      + cylE(8, 198, 3.5, 3.5, 120, 130, GUN, 6.6, 6.6) + ellH(8, 198, 130, 5.6, 5.6, '#0e2a2a', { sw: 1 }) + ellH(8, 198, 130.2, 3.4, 3.4, '#1f6b4c', { stroke: null })
+      + bill(8, 198, 130.5, `<g ${glowAttr(LIME, 3)}>${fxg('buzz', `<path d="M0 0 q-6 -3 -8 -9 q6 0 8 9z M0 0 q6 -5 9 -8 q-1 7 -9 8z M0 -1 q-3 -8 0 -13 q3 5 0 13z" fill="${LIME}" stroke="${ART_INK}" stroke-width="1.1" stroke-linejoin="round"/>`)}</g>`, [-9, -14, 10, 1]),
+
+    /* ---------- windowsill (steel ledge at h 74, u 3-14) ---------- */
+    // three pots of seedlings under flickering grow lights (animated, glowing)
+    'sill-basil': () => [178, 198, 218].map((v, i) => cylE(8.5, v, 3.6, 3.6, 74, 81, GUN, 4.4, 4.4) + bandAt(8.5, v, 4, 77.5, GUN_DK, 1.1)
+      + bill(8.5, v, 81, `<g ${glowAttr(LIME, 3)}>${fxg('buzz', `<path d="M-1 0 v-5" stroke="${ART_INK}" stroke-width="1.6"/><path d="M-8 -6 Q-3 -15 2 -6Z" fill="${LIME}" stroke="${ART_INK}" stroke-width="1.2" stroke-linejoin="round"/><path d="M-.2 -4 Q2.4 -10 5 -4Z" fill="#c6ff9d" stroke="${ART_INK}" stroke-width="1.1" stroke-linejoin="round"/>`, i * 0.7)}</g>`, [-9, -16, 6.5, 1])).join(''),
+    // three small clusters of memory chips, each with a lit top
+    'sill-succulents': () => [[178, PINK], [198, NEON], [218, LIME]].map(([v, c]) => cylE(8.5, v, 3.4, 3.4, 74, 79, GUN_DK, 4.2, 4.2)
+      + box(6, v - 3.4, 4, 3.2, 79, 82.5, CABLE_DK) + rectH(82.6, 6.2, 9.6, v - 3.2, v - 0.4, c, { stroke: null })
+      + box(9.4, v - 1, 3.2, 3.2, 79, 86, PLATE) + rectH(86.1, 9.6, 12.4, v - 0.8, v + 1.8, c, { stroke: null })
+      + box(6.6, v + 0.8, 2.6, 2.6, 79, 83, CABLE_DK)).join(''),
+    // a tall and a squat antenna mast, each tipped with a blinking light (animated)
+    'sill-cactus': () => cylE(8.5, 186, 4.5, 4.5, 74, 78, GUN_DK, 3.2, 3.2) + cylE(8.5, 186, 3.2, 3.2, 78, 90, STEEL, 1.2, 1.2) + isoLine([P(6.4, 186, 85), P(10.6, 186, 85)], 1.4, STEEL) + led(8.5, 186, 91, PINK, 0)
+      + cylE(8.5, 214, 3.8, 3.8, 74, 79, GUN_DK, 2.6, 2.6) + cylE(8.5, 214, 2.6, 2.6, 79, 84, STEEL, 0.9, 0.9) + isoLine([P(7, 214, 81.5), P(10, 214, 81.5)], 1.3, STEEL) + led(8.5, 214, 85, LIME, 0.6),
+    // a comms radio: an olive body with a speaker grille, a dial and a blinking light (animated)
+    'sill-radio': () => box(3.2, 182, 8, 20, 74, 82, OLIVE) + rectU(11.25, 184, 193, 76, 81, SCREEN, { stroke: null }) + slotsU(11.3, 185, 192, 77, 80, 3, STEEL_DK, 0.8)
+      + dial(11.3, 197, 78, 2.2) + led(11.3, 197, 81, AMBER, 0.2) + isoLine([P(6, 198, 82), P(5, 200, 98)], 1.4, STEEL) + led(5, 200, 99, PINK, 0.5),
+    // a waving robo-cat on a plinth: a raised paw and blinking eyes (animated)
+    'sill-cat': () => box(5.5, 184, 6, 6, 74, 76, GUN_LT)
+      + bill(8.5, 187, 76,
+        `<path d="M6 -1 Q14 -2 12 -9 Q11 -12 9 -10" fill="none" stroke="${ART_INK}" stroke-width="4.6" stroke-linecap="round"/><path d="M6 -1 Q14 -2 12 -9 Q11 -12 9 -10" fill="none" stroke="${STEEL_DK}" stroke-width="2.2" stroke-linecap="round"/>`
+        + limb('M-4 -8 L-10 -14 L-11 -21', 2.4, STEEL) + `<circle cx="-11" cy="-22.5" r="2.4" fill="${PINK}" stroke="${ART_INK}" stroke-width="1.1"/>`
+        + `<ellipse cy="-6" rx="6.5" ry="6.5" fill="${STEEL}" stroke="${ART_INK}" stroke-width="1.3"/><rect x="-3.4" y="-8.6" width="6.8" height="5.4" rx="1.4" fill="${SCREEN}"/><path d="M-2 -5.6 l2 1.8 l2 -1.8" stroke="${PINK}" stroke-width="1" fill="none" stroke-linecap="round"/>`
+        + `<rect x="-5" y="-20" width="10" height="9" rx="3" fill="${STEEL}" stroke="${ART_INK}" stroke-width="1.3"/><path d="M-4.6 -19 l-1.2 -4 l3.6 2z M4.6 -19 l1.2 -4 l-3.6 2z" fill="${STEEL}" stroke="${ART_INK}" stroke-width="1" stroke-linejoin="round"/>`
+        + fxg('blink', `<g ${glowAttr(NEON, 2)}><rect x="-3.6" y="-17" width="2.4" height="2.4" fill="${NEON}"/><rect x="1.2" y="-17" width="2.4" height="2.4" fill="${NEON}"/></g>`), [-13, -26, 14, 1]),
+    /* ---------- rug (flat on the floor inside GEOMETRY.RUG: centre 140,150, radii 58 x 44) ---------- */
+    // a rubber floor mat with a dashed neon ring
+    'rug-pink': () => {
+      const { cu, cv, ru, rv } = GEOMETRY.RUG;
+      return ellH(cu, cv, 0, ru, rv, '#2c3844', { sw: 2 }) + ellH(cu, cv, 1, ru - 6, rv - 5, '#364453', { stroke: null }) + glow(NEON, ringLine(cu, cv, 1.2, 40, 30, 1.8, NEON, '6 5'), 2);
+    },
+    // an anti-static mat: concentric green rings with dashed seams
+    'rug-braided': () => {
+      const { cu, cv } = GEOMETRY.RUG;
+      const rings = [[58, 44, '#25302a'], [52, 39, '#3d5a46'], [46, 34, '#4f7a5c'], [40, 29.5, '#3d5a46'], [34, 25, '#4f7a5c'], [28, 20.5, '#3d5a46'], [22, 16, '#4f7a5c'], [16, 11.5, '#2f4437']];
+      return rings.map(([a, b, c], i) => ellH(cu, cv, i ? 1.4 : 0, a, b, c, i ? { stroke: null } : { sw: 2 })).join('')
+        + [49, 37, 25].map(k => ringLine(cu, cv, 1.6, k, (k * 44) / 58, 1.2, '#1c2a22', '3 4')).join('');
+    },
+    // a circuit mat: a green board with traces and gold solder pads inside an amber ring
+    'rug-leaf': () => {
+      const { cu, cv, ru, rv } = GEOMETRY.RUG;
+      const traces = [];
+      let pads = '';
+      for (let row = -3; row <= 3; row++) {
+        for (let col = -6; col <= 6; col++) {
+          const du = col * 8, dv = row * 9.5;
+          if ((du / (ru - 9)) ** 2 + (dv / (rv - 7)) ** 2 > 1) continue;
+          const dir = (row + col) % 2 ? 4.5 : -4.5;
+          traces.push([P(cu + du, cv + dv, 1), P(cu + du + 4, cv + dv, 1)], [P(cu + du + 4, cv + dv, 1), P(cu + du + 4, cv + dv + dir, 1)]);
+          pads += ellH(cu + du, cv + dv, 1.2, 1.3, 1.1, '#d9b34a', { stroke: null });
+        }
+      }
+      return ellH(cu, cv, 0, ru, rv, '#173a33', { sw: 2 }) + isoLines(traces, 1.1, '#6fe0c0', 0.85) + pads + ringLine(cu, cv, 1.3, ru - 3, rv - 2.3, 1.6, AMBER);
+    },
+    // a hazard mat: seven bands of amber and dark
+    'rug-stripe': () => {
+      const { cu, cv, ru, rv } = GEOMETRY.RUG;
+      return ellH(cu, cv, 0, ru, rv, HAZ_DK, { sw: 2 })
+        + [HAZ_DK, HAZ, HAZ_DK, HAZ, HAZ_DK, HAZ, HAZ_DK].map((c, i) => ellBand(cu, cv, ru - 3, rv - 2.4, -1 + (i * 2) / 7, -1 + ((i + 1) * 2) / 7, 1, c)).join('')
+        + ringLine(cu, cv, 1.4, ru - 1.5, rv - 1.2, 1.4, '#7a5d0f');
+    },
+    // a tool-outline mat: a foam sheet with cut-out slots, a battery cell and a screwdriver lying on it
+    'rug-picnic': () => {
+      let s = rectH(0, 100, 180, 120, 180, PLATE, { sw: 2 }) + rectH(0.4, 104, 176, 124, 176, 'none', { stroke: HAZ, sw: 1.2 });
+      for (const [u, v, w, d] of [[108, 128, 34, 6], [108, 140, 26, 6], [108, 152, 38, 6], [152, 126, 18, 24]]) s += rectH(0.5, u, u + w, v, v + d, INKBLUE, { stroke: '#5b6b7b', sw: 0.7 });
+      return s
+        + bill(166, 138, 0.6, `<rect x="-7" y="-6" width="14" height="6.4" rx="1.4" fill="${AMBER}" stroke="${ART_INK}" stroke-width="1.2"/><rect x="7" y="-4.4" width="2.2" height="3.2" fill="${STEEL}" stroke="${ART_INK}" stroke-width=".8"/><path d="M-4 -3 h5" stroke="${HAZ_DK}" stroke-width="1.4" stroke-linecap="round"/>`, [-8, -7, 10, 1])
+        + bill(124, 156, 0.6, `<rect x="-14" y="-5" width="9" height="5" rx="2" fill="${PINK}" stroke="${ART_INK}" stroke-width="1.2"/><rect x="-5" y="-3.4" width="19" height="1.8" fill="${STEEL}" stroke="${ART_INK}" stroke-width=".9"/>`, [-15, -6, 15, 1]);
+    },
+    // an egg-crate foam pad: a grey pad with a grid of dimples
+    'rug-sheepskin': () => {
+      const { cu, cv } = GEOMETRY.RUG;
+      let dimples = '';
+      for (let row = -4; row <= 4; row++) for (let col = -5; col <= 5; col++) {
+        const du = col * 8.6 + (row % 2 ? 4.3 : 0), dv = row * 7;
+        if ((du / 42) ** 2 + (dv / 32) ** 2 <= 1) dimples += ellH(cu + du, cv + dv, 0.8, 2.6, 1.9, '#2f3945', { stroke: null });
+      }
+      return ellH(cu, cv, 0, 52, 40, '#3b4552', { sw: 1.6 }) + ellH(cu, cv, 0.4, 47, 36, '#4a5666', { stroke: null }) + dimples;
+    },
+
+    /* ---------- back corner (u 2-30, v 32-52, h 0-80) ---------- */
+    // a pot of fibre-optic strands with glowing tips
+    'snake-plant': () => cylE(20, 38.5, 5.4, 5.4, 0, 14, GUN_DK, 6.2, 6.2) + bandAt(20, 38.5, 5.8, 10, GUN, 1.2) + ellH(20, 38.5, 14.1, 4.6, 4.6, INKBLUE, { sw: 1 })
+      + bill(20, 38.5, 14, `<g ${glowAttr(NEON, 2)}>` + [[-8, -26, NEON], [-5, -34, PINK], [-2, -38, LIME], [1, -36, AMBER], [4, -38, NEON], [7, -31, PINK], [9, -24, LIME], [-9, -20, AMBER]].map(([x, y, c]) =>
+        `<path d="M${x * 0.15} 0 Q${x * 0.4} ${y * 0.55} ${x} ${y}" stroke="${c}" stroke-width="1.1" fill="none" stroke-linecap="round"/><circle cx="${x}" cy="${y}" r="1.7" fill="${c}"/>`).join('') + '</g>', [-11, -41, 11, 1]),
+    // a tall spark coil: copper rings up a tapered tower, a buzzing ball on top (animated, glowing)
+    cactus: () => cylE(16, 42, 7, 7, 0, 10, GUN_DK, 6, 6) + bandAt(16, 42, 6.6, 5, STEEL_DK, 1.2) + cylE(16, 42, 4.6, 4.6, 10, 34, STEEL, 2.6, 2.6)
+      + [15, 21, 27].map((h, i) => bandAt(16, 42, 4 - i * 0.6, h, RUST, 1.6)).join('')
+      + bill(16, 42, 34, `<g ${glowAttr(NEON, 4)}>${fxg('buzz', `<circle cy="-5" r="5" fill="#dff7ff" stroke="${ART_INK}" stroke-width="1.3"/><path d="M-4 -10 l-4 -5 l3 0 l-3 -5 M4 -10 l5 -4 l-3 0 l4 -5" stroke="${NEON}" stroke-width="1.1" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`)}</g>`, [-10, -21, 10, 1]),
+    // an olive drum bristling with a probe, a grabber and a cable
+    'umbrella-stand': () => bill(16, 42, 24,
+      limb('M-4 0 V-32', 2, STEEL) + `<circle cx="-4" cy="-34" r="2.4" fill="${PINK}" stroke="${ART_INK}" stroke-width="1.1"/>`
+      + limb('M5 0 V-28', 2, STEEL_DK) + `<path d="M5 -28 l-3.4 -7 M5 -28 l3.4 -7" stroke="${ART_INK}" stroke-width="3.4" stroke-linecap="round"/><path d="M5 -28 l-3.4 -7 M5 -28 l3.4 -7" stroke="${STEEL}" stroke-width="1.6" stroke-linecap="round"/>`
+      + limb('M0 0 C-3 -10 4 -16 0 -26', 1.6, NEON), [-8, -44, 10, 1])
+      + cylE(16, 42, 6, 6, 0, 12, OLIVE, 7, 7) + cylE(16, 42, 7, 7, 12, 24, OLIVE, 6, 6) + bandAt(16, 42, 6.6, 5) + bandAt(16, 42, 7, 12) + bandAt(16, 42, 6.4, 19),
+    // a sweeper pole leaning on the wall with a round head, and a dustpan on the floor
+    broom: () => isoLine([P(8, 40, 14), P(4, 44, 76)], 2.6, STEEL_DK) + isoLine([P(7.6, 40.3, 16), P(3.6, 44.3, 74)], 1, HI)
+      + bill(8, 40, 0.8, `<rect x="-9" y="-9" width="18" height="8" rx="3.4" fill="${GUN_LT}" stroke="${ART_INK}" stroke-width="1.4"/><path d="M-6 -4.6 h12" stroke="${NEON}" stroke-width="1.8" stroke-linecap="round"/><circle cx="-6" cy="0" r="1.6" fill="${GUN_DK}"/><circle cx="6" cy="0" r="1.6" fill="${GUN_DK}"/>`, [-9, -10, 9, 1.6])
+      + box(19, 34, 10, 12, 0, 1.5, GUN_DK) + box(19, 34, 2, 12, 1.5, 5, GUN_LT) + isoLine([P(27, 40, 1.5), P(25, 38.5, 28)], 2, STEEL_DK) + isoLine([P(20.5, 35, 1.4), P(27.5, 35, 1.4)], 1, HI),
+
+    /* ---------- bedside nook (u 2-32, v 140-182, h 0-70) ---------- */
+    // a tool cart with an articulated work lamp (animated bulb, glowing)
+    'side-table-lamp': () => [[5, 149], [27, 149], [5, 171], [27, 171]].map(([u, v]) => box(u, v, 2, 2, 0, 28, GUN_DK)).join('') + box(4, 148, 26, 26, 8, 10, GUN)
+      + box(9, 152, 12, 10, 10, 16, RUST) + isoLine([P(11, 157, 16), P(11, 157, 19), P(19, 157, 19), P(19, 157, 16)], 1.2, ART_INK)
+      + box(3, 147, 28, 28, 28, 31, STEEL_DK) + rectU(30.05, 152, 170, 14, 26, GUN, { sw: 1 }) + dial(30.1, 161, 20, 2.2)
+      + cyl(10, 155, 3, 31, 33, GUN_DK) + armSeg(P(10, 155, 33), P(14, 158, 50), 2.4) + armSeg(P(14, 158, 50), P(22, 163, 55), 2.4) + joint(14, 158, 50, 2)
+      + ellH(24, 166, 31.1, 5.5, 4.5, '#fff6c2', { stroke: null, op: 0.35 })
+      + fxg('buzz', glow('#bff6ff', bill(22, 163, 55, `<path d="M-4 -2 L4 -2 L6 3 L-6 3Z" fill="${GUN_LT}" stroke="${ART_INK}" stroke-width="1.2" stroke-linejoin="round"/><ellipse cy="3" rx="5" ry="1.6" fill="#eafcff"/>`, [-6, -3, 6, 5]), 4)),
+    // a turntable deck on a cabinet: a glowing platter ring, a tonearm and blinking lights (animated)
+    'record-player': () => box(4, 148, 26, 26, 0, 34, GUN_DK) + rectU(30, 152, 170, 6, 28, GUN, { sw: 1 }) + [157, 161, 165].map(v => dial(30.1, v, 17, 2)).join('')
+      + box(7, 151, 20, 20, 34, 36, GUN) + cylE(17, 161, 9, 9, 36, 39, INKBLUE, 9, 9) + glow(NEON, ringLine(17, 161, 39.2, 7.6, 7.6, 1.2, NEON), 2)
+      + cyl(17, 161, 1, 39, 41, STEEL) + isoLine([P(25, 154, 38.5), P(24, 158, 40.5), P(19, 161, 40.5)], 1.8, STEEL) + led(30.1, 166, 33, LIME, 0) + led(30.1, 170, 33, AMBER, 0.6),
+    // a power-cell stand: an iron stand holding a glowing capsule (animated, glowing)
+    'plant-stand': () => [[11, 155], [21, 155], [11, 165], [21, 165]].map(([u, v]) => box(u, v, 2, 2, 0, 36, GUN_DK)).join('')
+      + cyl(17, 161, 9.5, 36, 39, STEEL) + cylE(17, 161, 6.5, 6.5, 39, 42, GUN, 7.5, 7.5)
+      + bill(17, 161, 42, `<rect x="-6" y="-24" width="12" height="22" rx="6" fill="#0e2a2a" stroke="${ART_INK}" stroke-width="1.5"/>`
+        + `<g ${glowAttr(LIME, 3)}>${fxg('buzz', `<rect x="-4" y="-21" width="8" height="16" rx="4" fill="${LIME}" opacity=".9"/><path d="M1 -19 l-3 6 h3 l-1.6 6" stroke="#0e2a2a" stroke-width="1.3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`)}</g>`, [-7, -25, 7, 1]),
+    // a stool with two service manuals and a blinking beacon (animated)
+    'stool-books': () => [[9, 153], [25, 153], [9, 169], [25, 169]].map(([u, v]) => box(u, v, 2, 2, 0, 26, GUN_DK)).join('')
+      + cyl(17, 161, 11, 26, 30, GUN) + box(10, 155, 14, 10, 30, 34, '#2f6b8a') + poly(rectUPoints(24.02, 156, 164, 30.8, 33.2), '#d9e4ea', { stroke: null })
+      + box(11, 156, 12, 9, 34, 37, RUST) + poly(rectUPoints(23.02, 157, 164, 34.7, 36.3), '#d9e4ea', { stroke: null }) + led(17, 160, 38, AMBER, 0.3),
+
+    /* ---------- foot of the bed (u 96-126, v 196-240, h 0-30) ---------- */
+    // a steel parts bin: divider seams, label plates and loose cogs inside
+    'toy-chest': () => box(98, 200, 26, 38, 0, 22, GUN) + seamsU(124.05, [208, 215, 222, 229], 1, 21, GUN_DK) + rectU(124.05, 203, 209, 12, 18, HAZ, { sw: 1 }) + rectU(124.05, 229, 235, 12, 18, HAZ, { sw: 1 })
+      + rectH(22.1, 100, 122, 202, 236, INKBLUE, { sw: 1 }) + gear(110, 212, 22.2, 5, STEEL) + gear(116, 224, 22.2, 4, AMBER) + gear(106, 230, 22.2, 3.4, GUN_LT) + gear(114, 208, 22.2, 3, PINK),
+    // a steel workbench: legs, a rubber-topped slab with a hazard edge and a small vice
+    bench: () => [[99, 201], [118, 201], [99, 233], [118, 233]].map(([u, v]) => box(u, v, 4, 4, 0, 16, GUN_DK)).join('')
+      + box(98, 200, 24, 36, 16, 20, STEEL_DK) + rectH(20.1, 100, 120, 202, 234, PLATE, { stroke: null }) + hazardU(122.05, 201, 235, 16.6, 19.4, 4)
+      + box(102, 204, 6, 8, 20, 24, RUST) + box(103, 205, 4, 6, 24, 26, GUN) + isoLine([P(106, 212, 22), P(112, 216, 23)], 1.8, STEEL),
+    // a mesh scrap bin heaped with cogs and a blinking spark (animated)
+    'laundry-basket': () => cylE(111, 218, 10, 10, 0, 20, GUN, 12, 12) + bandAt(111, 218, 10.7, 6, GUN_DK, 1.2) + bandAt(111, 218, 11.4, 13, GUN_DK, 1.2)
+      + ellH(111, 218, 20, 10.6, 10.6, INKBLUE, { sw: 1 }) + gear(108, 216, 20.3, 4, STEEL) + gear(114, 221, 20.3, 3.4, AMBER) + gear(112, 213, 20.3, 3, PINK)
+      + bill(110, 218, 24, fxg('blink', '<path d="M0 -3.6 L1 -1 L3.6 0 L1 1 L0 3.6 L-1 1 L-3.6 0 L-1 -1Z" fill="#fff6c2"/>', 0.2), [-4, -4, 4, 4]),
+    // an anti-static mat with a hazard edge and a pair of magnetic boots
+    slippers: () => box(98, 198, 26, 40, 0, 1.2, PLATE) + rectH(1.3, 101, 121, 201, 235, 'none', { stroke: HAZ, sw: 1.2 })
+      + [208, 224].map(v => ellH(110, v, 1.5, 9, 4.2, '#3a4a5c') + isoLine([P(102, v, 1.7), P(118, v, 1.7)], 1, NEON) + cyl(114.5, v, 3.6, 1.5, 5, GUN_LT) + ellH(104, v, 1.7, 3, 3.2, STEEL, { stroke: null })).join(''),
+    /* ---------- by the fridge (legacy ids drawn at u 150-186, v 110-150; the battery crate in world coords) ---------- */
+    // a coolant can: an orange body, a long spout and a handle
+    'watering-can': () => cylE(169, 129, 5.5, 5.5, 0, 12, '#e07a22', 6.5, 6.5) + bandAt(169, 129, 6, 6, '#a24c10', 1.2) + ellH(169, 129, 12, 5.2, 5.2, INKBLUE, { sw: 1 })
+      + isoLine([P(174, 129, 8), P(184, 129, 16)], 4.6, ART_INK) + isoLine([P(174, 129, 8), P(184, 129, 16)], 2.4, '#e07a22')
+      + isoLine([P(164, 129, 10), P(161, 129, 15), P(164, 129, 20), P(167, 129, 21)], 4.2, ART_INK) + isoLine([P(164, 129, 10), P(161, 129, 15), P(164, 129, 20), P(167, 129, 21)], 2, '#e07a22'),
+    // a stack of four data tablets with a lit edge each, and a sensor cube on top
+    'cookbook-stack': () => [[160, 122, 18, 14, 0, 3, STEEL_DK, NEON], [161, 123, 16, 12, 3, 6, GUN, PINK], [160, 122, 18, 14, 6, 9, STEEL, LIME], [162, 124, 14, 10, 9, 12, GUN, AMBER]]
+      .map(([u, v, du, dv, h0, h1, c, edge]) => box(u, v, du, dv, h0, h1, c) + glow(edge, isoLine([P(u + du + 0.05, v + 1.5, (h0 + h1) / 2), P(u + du + 0.05, v + dv - 1.5, (h0 + h1) / 2)], 1.1, edge), 1.5)).join('')
+      + sensor(169, 129, 12, 0.7),
+    // a crash cushion: a squashy gunmetal pad with a neon stitch line
+    'bean-bag': () => ellH(168, 130, 0, 16, 14, INKBLUE)
+      + bill(168, 130, 0, `<path d="M-20 -2 q-2 -22 20 -24 q22 2 20 24 q-20 8 -40 0z" fill="#33475b" stroke="${ART_INK}" stroke-width="1.6"/><path d="M-12 -6 q12 6 24 0" stroke="${GUN_DK}" stroke-width="1.4" fill="none"/>`
+        + `<g ${glowAttr(NEON, 2)}><path d="M-8 -14 q8 -6 16 0" stroke="${NEON}" stroke-width="1.6" fill="none" stroke-dasharray="3 2"/></g><circle cx="-14" cy="-10" r="1.2" fill="${STEEL}"/><circle cx="14" cy="-10" r="1.2" fill="${STEEL}"/>`, [-21, -27, 21, 6]),
+    // a hydroponic tube: a glass column of green liquid with bubbles blinking and leaves on top (animated)
+    'lemon-tree': () => cylE(168, 130, 9, 9, 0, 14, GUN_DK, 10.5, 10.5) + bandAt(168, 130, 9.8, 7, GUN, 1.2)
+      + isoLine([P(168, 130, 14), P(168, 130, 40)], 7.4, ART_INK) + isoLine([P(168, 130, 14), P(168, 130, 40)], 5, '#2e7d57', { op: 0.9 }) + isoLine([P(166.6, 130, 16), P(166.6, 130, 38)], 1, '#e8fff4', { op: 0.7 })
+      + bandAt(168, 130, 3.2, 24, STEEL, 1.4) + bandAt(168, 130, 3.2, 32, STEEL, 1.4)
+      + bill(168, 130, 40, `<path d="M0 0 q-10 -4 -13 -12 q10 -1 13 12z M0 0 q10 -5 14 -13 q-10 0 -14 13z M0 -2 q-3 -9 0 -15 q3 6 0 15z" fill="#5cd08a" stroke="${ART_INK}" stroke-width="1.2" stroke-linejoin="round"/>`
+        + fxg('blink', '<circle cx="-1.6" cy="14" r="1.1" fill="#d7ffe8"/><circle cx="1.4" cy="20" r="1.4" fill="#d7ffe8"/><circle cx="-1" cy="26" r="1" fill="#d7ffe8"/>'), [-15, -18, 15, 28]),
+    // a battery crate: an olive case with a handle, a lit vent and three cells inside
+    'veg-basket': () => box(228, 140, 20, 20, 0, 12, OLIVE) + rectU(248.05, 143, 157, 4, 9, CABLE_DK, { sw: 1 }) + slotsU(248.1, 144, 156, 5, 8, 3, '#4a6a58', 0.8)
+      + [[233, 145, LIME], [238, 150, NEON], [243, 155, PINK]].map(([u, v, c]) => cyl(u, v, 2.6, 12, 18, c, { sw: 1 }) + ellH(u, v, 18.1, 1.4, 1.4, STEEL, { stroke: null })).join('')
+      + isoLine(Array.from({ length: 11 }, (_, i) => P(238 + 11 * Math.cos((i / 10) * Math.PI), 150, 12 + 12 * Math.sin((i / 10) * Math.PI))), 2.2, STEEL_DK),
+
+    /* ---------- corner by the door (u 4-40, v 258-294, h 0-100) ---------- */
+    // a dish stand: a pedestal under a tilted dish, a feed arm and a blinking tip (animated)
+    monstera: () => cylE(22, 276, 8, 8, 0, 8, GUN_DK, 7, 7) + cyl(22, 276, 2, 8, 34, STEEL_DK)
+      + bill(22, 276, 34, `<g transform="translate(0 -14) rotate(-24)"><ellipse rx="18" ry="11" fill="${STEEL}" stroke="${ART_INK}" stroke-width="1.6"/><ellipse rx="14" ry="7.6" fill="${GUN_LT}"/><ellipse rx="3" ry="1.8" fill="${GUN_DK}"/></g>`
+        + limb('M0 -14 L13 -26', 1.4, STEEL_DK) + `<g ${glowAttr(LIME, 3)}>${fxg('blink', `<circle cx="13" cy="-27" r="2" fill="${LIME}"/>`, 0.4)}</g>`, [-20, -31, 20, 2]),
+    // a stand holding a hi-vis vest and a hard hat
+    'coat-stand': () => cyl(22, 276, 8, 0, 3, GUN_DK) + cyl(22, 276, 1.6, 3, 80, STEEL_DK)
+      + [[28, 276], [16, 276], [22, 282], [22, 270]].map(([u, v]) => isoLine([P(22, 276, 72), P(u, v, 78)], 2.4, STEEL_DK)).join('')
+      + bill(22, 276, 74, `<path d="M-9 -3 q-3 18 1 34 h8 q-1 -20 0 -32z" fill="${HAZ}" stroke="${ART_INK}" stroke-width="1.3" stroke-linejoin="round" transform="translate(3 -2)"/><path d="M-5 8 h8 M-4.4 16 h8" stroke="${HAZ_DK}" stroke-width="2.2" stroke-linecap="round"/>`, [-11, -6, 9, 30])
+      + hat(22, 276, 80, 0.7),
+    // a work-light tripod: three legs, a pole and a bright panel buzzing (animated, glowing)
+    'arc-lamp': () => [[14, 272], [30, 272], [22, 284]].map(([u, v]) => isoLine([P(22, 276, 58), P(u, v, 2)], 2.2, STEEL)).join('')
+      + cylE(22, 276, 3, 3, 56, 60, GUN_DK, 3, 3) + cyl(22, 276, 1.4, 60, 74, STEEL)
+      + bill(22, 276, 74, `<rect x="-11" y="-16" width="22" height="14" rx="2.5" fill="${GUN_DK}" stroke="${ART_INK}" stroke-width="1.5"/>`
+        + `<g ${glowAttr('#bff6ff', 4)}>${fxg('buzz', '<rect x="-9" y="-14" width="18" height="10" rx="1.5" fill="#eafcff"/><path d="M-9 -9 H9 M0 -14 V-4" stroke="#9fe8f5" stroke-width=".8"/>')}</g>`, [-12, -18, 12, 1]),
+    // a synth keyboard on an X-stand: keys, a small screen and three knobs
+    guitar: () => bill(16, 276, 0.8,
+      limb('M-13 0 L10 -20 M13 0 L-10 -20', 1.8, STEEL_DK)
+      + `<rect x="-18" y="-32" width="36" height="13" rx="2.4" fill="${GUN_DK}" stroke="${ART_INK}" stroke-width="1.5"/><rect x="-15" y="-30.6" width="11" height="4.2" rx="1" fill="${SCREEN}"/>`
+      + `<g ${glowAttr(NEON, 2)}><path d="M-14 -28.2 h3 l1.5 -1 l1.5 1.6 h3" stroke="${NEON}" stroke-width=".9" fill="none" stroke-linecap="round"/></g>`
+      + [[3, PINK], [8, LIME], [13, AMBER]].map(([x, c]) => `<circle cx="${x}" cy="-28.4" r="1.5" fill="${c}" stroke="${ART_INK}" stroke-width=".7"/>`).join('')
+      + Array.from({ length: 12 }, (_, i) => `<rect x="${fmt(-16 + i * 2.7)}" y="-25" width="2.6" height="5.4" fill="#e8eef2" stroke="${ART_INK}" stroke-width=".6"/>`).join('')
+      + [0, 1, 3, 4, 5, 7, 8, 10].map(i => `<rect x="${fmt(-14.4 + i * 2.7)}" y="-25" width="1.8" height="3.4" fill="${ART_INK}"/>`).join(''), [-19, -33, 19, 1]),
+
+    /* ---------- front of the room (u 172-208, v 232-268, h 0-40) ---------- */
+    // a swivel stool: a round base, a stem and a padded seat with a neon rim
+    pouffe: () => cylE(190, 250, 12, 12, 0, 3, GUN_DK, 12, 12) + cyl(190, 250, 3, 3, 12, STEEL_DK) + cylE(190, 250, 13, 13, 12, 17, '#3a4a5c', 12, 12)
+      + glow(NEON, ringLine(190, 250, 17.3, 11, 11, 1.2, NEON), 2) + ringLine(190, 250, 17.2, 7, 7, 1, '#2a3a4a'),
+    // a holo table: a round console with a neon rim, a flickering wire-cube hologram and two beakers (animated, glowing)
+    'tea-table': () => cyl(190, 250, 8, 0, 2, GUN_DK) + cyl(190, 250, 2.4, 2, 14, STEEL_DK) + cylE(190, 250, 16, 16, 14, 17, GUN, 16, 16) + glow(NEON, bandAt(190, 250, 16, 15.5, NEON, 1.2), 2)
+      + bill(183, 254, 17, `<path d="M-3 -6 h6 l-1 6 h-4z" fill="#9fe8f5" fill-opacity=".7" stroke="${ART_INK}" stroke-width="1.1" stroke-linejoin="round"/><path d="M-2.2 -2.6 h4.4 l-.5 2.6 h-3.4z" fill="${PINK}"/>`, [-4, -7, 4, 1])
+      + bill(197, 256, 17, `<path d="M-3 -5 h6 l-1 5 h-4z" fill="#9fe8f5" fill-opacity=".7" stroke="${ART_INK}" stroke-width="1.1" stroke-linejoin="round"/><path d="M-2.2 -2.2 h4.4 l-.5 2.2 h-3.4z" fill="${LIME}"/>`, [-4, -6, 4, 1])
+      + bill(190, 250, 17, `<path d="M-5 0 L-8 -6 H8 L5 0Z" fill="${NEON}" opacity=".22"/>` + `<g ${glowAttr(NEON, 3)}>${fxg('buzz', `<path d="M0 -8 L6 -11 L6 -18 L0 -21 L-6 -18 L-6 -11Z M0 -8 V-15 M-6 -18 L0 -15 L6 -18" stroke="${NEON}" stroke-width="1.2" fill="none" stroke-linejoin="round"/>`)}</g>`, [-8, -22, 8, 1]),
+    // a drone ball: a gunmetal sphere with a neon equator and an orbit ring, glinting (animated)
+    'pip-ball': () => poly(ellipsePoints(190, 250, 0.1, 8, 8), 'rgba(0,0,0,.14)', { stroke: null })
+      + bill(190, 250, 8.8,
+        `<g ${glowAttr(NEON, 4)}><circle r="8" fill="${GUN_LT}" stroke="${ART_INK}" stroke-width="1.4"/><circle cx="-1.6" cy="-1.6" r="5.2" fill="${STEEL}" opacity=".7"/>`
+        + `<path d="M-7.8 1 Q0 5 7.8 1" stroke="${NEON}" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M-6 -4 q4 -3 9 -1" stroke="#fff" stroke-width="1.3" fill="none" stroke-linecap="round" opacity=".85"/>`
+        + `<ellipse rx="11" ry="3.2" fill="none" stroke="${NEON}" stroke-width=".9" opacity=".7"/>${fxg('buzz', `<circle cx="9" cy="-1.4" r="1.6" fill="${LIME}"/>`)}</g>`, [-11, -9, 11, 9]),
+    // a cargo case: a slate crate with hazard end-straps, a handle and a lit lid plate
+    'picnic-basket': () => isoLine(Array.from({ length: 11 }, (_, i) => P(190, 250 + 8 * Math.cos((i / 10) * Math.PI), 15 + 8 * Math.sin((i / 10) * Math.PI))), 2.4, STEEL)
+      + box(180, 242, 20, 16, 0, 12, '#3a4a5c') + isoLines([4, 8].map(h => [P(200.05, 242.6, h), P(200.05, 257.4, h)]), 1, GUN_DK) + isoLines([4, 8].map(h => [P(180.6, 258.05, h), P(199.4, 258.05, h)]), 1, GUN_DK)
+      + hazardU(200.05, 242, 245, 0, 12, 3) + hazardU(200.05, 255, 258, 0, 12, 3)
+      + box(179, 241, 22, 18, 12, 15, GUN) + rectU(201.05, 247, 253, 12.4, 14.6, STEEL, { sw: 0.9 })
+      + bill(194, 254, 15, `<rect x="-6" y="-4" width="12" height="4" rx="1" fill="${SCREEN}" stroke="${ART_INK}" stroke-width="1"/><rect x="-4.5" y="-3" width="6" height="2" fill="${LIME}"/>`, [-7, -5, 7, 1]),
+  },
+
+  effects: {
+    // LED gauge: a dark housing with ten bars, lit in the live gauge colours, at STATION_ANCHORS.fridgeTop + the live lift.
+    gauge: (level, pct) => {
+      const [u, v, h] = GEOMETRY.STATION_ANCHORS.fridgeTop[level - 1];
+      const lit = Math.ceil(pct / 10), col = gaugeColour(pct);
+      let on = '', off = '';
+      for (let i = 0; i < 10; i++) {
+        const seg = `<rect x="${fmt(-17 + i * 3.5)}" y="-5" width="2.7" height="6" rx=".6" fill="${i < lit ? col : '#2a3a46'}"/>`;
+        if (i < lit) on += seg; else off += seg;
+      }
+      return bill(u, v, h + GEOMETRY.FRIDGE_GAUGE_LIFT,
+        `<rect x="-19.5" y="-7.5" width="39" height="11" rx="2.5" fill="${SCREEN}" stroke="${ART_INK}" stroke-width="1.4"/>${off}${lit ? glow(col, on, 2.5) : ''}`, [-20, -8, 20, 4]);
+    },
+    // Vapour off the fab oven vent: three wisps rising and fading (animated).
+    steam: level => {
+      const [u, v, h] = GEOMETRY.STATION_ANCHORS.cookerPot[level - 1];
+      return bill(u, v, h, fxg('steam', '<path d="M-6 -3 q5 -8 0 -14 M2 -4 q6 -9 0 -16 M9 -2 q5 -7 0 -12" stroke="#dff7ff" stroke-width="3" fill="none" stroke-linecap="round" opacity=".92"/>'), [-9, -20, 12, 0]);
+    },
+    // Pixel-font z glyphs above the pod, drifting up (animated).
+    zzz: level => {
+      const [u, v, h] = GEOMETRY.STATION_ANCHORS.bedTop[level - 1];
+      const Z = [[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [3, 1], [2, 2], [1, 3], [0, 4], [1, 4], [2, 4], [3, 4], [4, 4]];
+      const pz = (x, y, s) => glow(NEON, Z.map(([i, j]) => `<rect x="${fmt(x + i * s)}" y="${fmt(y + j * s)}" width="${fmt(s)}" height="${fmt(s)}" fill="#dff7ff"/>`).join(''), 2.5);
+      return bill(u, v, h + GEOMETRY.SLEEP_Z_LIFT, fxg('zzz', pz(8, -14, 2.4) + pz(24, -30, 1.8)), [6, -31, 34, 0]);
+    },
+    // The dish that appears when a meal is served: a steel tray with a printed ration block.
+    servedPlate: level => {
+      const [u, v, h] = GEOMETRY.STATION_ANCHORS.cookerPlate[level - 1];
+      return bill(u, v, h,
+        `<ellipse cx="0" cy="-2" rx="12" ry="5" fill="${STEEL}" stroke="${ART_INK}" stroke-width="1.4"/><ellipse cx="0" cy="-3" rx="9" ry="3.2" fill="${STEEL_DK}"/>`
+        + `<rect x="-6" y="-10" width="12" height="7" rx="2" fill="#e8923a" stroke="${ART_INK}" stroke-width="1.2"/><path d="M-4 -8 h8" stroke="#ffd9a8" stroke-width="1.2" stroke-linecap="round"/>`
+        + `<circle cx="9" cy="-6" r="1.4" fill="${NEON}" style="filter:drop-shadow(0 0 2px ${NEON})"/>`, [-13, -11, 13, 3]);
+    },
+    nightDim: () => `<rect class="night-dim" x="${GEOMETRY.ROOM_WORLD.x}" y="${GEOMETRY.ROOM_WORLD.y}" width="${GEOMETRY.ROOM_WORLD.width}" height="${GEOMETRY.ROOM_WORLD.height}" fill="${GEOMETRY.NIGHT_DIM_FILL}" pointer-events="none"/>`
+  },
+
+  // What animates, by target (a station, a decor id, 'shell' for the walls and fixtures, 'window' for the pane). Light ambience only.
+  ambience: [
+    { target: 'shell', effect: 'buzz' }, // the neon sign above the fridge
+    { target: 'shell', effect: 'fan' }, // the wall vent fan
+    { target: 'window', effect: 'rain' }, // rain on the night pane
+    { target: 'bed', effect: 'blink' }, // the pod's status LEDs
+    { target: 'bed', effect: 'scan' }, // the headboard and spine screens
+    { target: 'fridge', effect: 'blink' }, // the cryo status lights
+    { target: 'fridge', effect: 'scan' }, // the cryo bank's control screen
+    { target: 'cooker', effect: 'blink' }, // the oven status lights
+    { target: 'cooker', effect: 'scan' }, // the fab oven displays
+    { target: 'cooker', effect: 'fan' }, // the hood duct fan at the full fab line
+    { target: 'cabinet', effect: 'scan' }, // the holo trophy
+    { target: 'wardrobe', effect: 'scan' }, // the locker bay screen
+    { target: 'wardrobe', effect: 'blink' }, // the locker status lights
+    // decor
+    { target: 'fairy-lights', effect: 'blink' }, { target: 'recipe-board', effect: 'scan' }, { target: 'pip-portrait', effect: 'scan' }, { target: 'photo-strip', effect: 'scan' },
+    { target: 'wall-sconce', effect: 'buzz' }, { target: 'wall-clock', effect: 'blink' }, { target: 'bunting', effect: 'blink' }, { target: 'mirror', effect: 'scan' },
+    { target: 'window-lights', effect: 'blink' }, { target: 'plant-hanger', effect: 'buzz' }, { target: 'sill-basil', effect: 'buzz' }, { target: 'sill-cactus', effect: 'blink' },
+    { target: 'sill-radio', effect: 'blink' }, { target: 'sill-cat', effect: 'blink' },
+    { target: 'cactus', effect: 'buzz' }, { target: 'side-table-lamp', effect: 'buzz' }, { target: 'record-player', effect: 'blink' }, { target: 'plant-stand', effect: 'buzz' },
+    { target: 'stool-books', effect: 'blink' }, { target: 'laundry-basket', effect: 'blink' },
+    { target: 'lemon-tree', effect: 'blink' }, { target: 'monstera', effect: 'blink' }, { target: 'arc-lamp', effect: 'buzz' }, { target: 'tea-table', effect: 'buzz' }, { target: 'pip-ball', effect: 'buzz' }
+  ],
+
+  labels: {
+    stations: { bed: 'Charging pod', fridge: 'Cryo unit', cooker: 'Fab oven', cabinet: 'Display case', wardrobe: 'Gear locker' },
+    // One name per station level, as the live shop shows (the herb names sit in HERB_LABELS.levels).
+    levels: {
+      bed: ['Charging mat', 'Charging cradle', 'Charging pod', 'Canopy pod'],
+      fridge: ['Cooler box', 'Mini cryo unit', 'Cryo fridge', 'Twin cryo bank'],
+      cooker: ['Hot plate', 'Countertop fab oven', 'Fab oven with arm', 'Full fab line'],
+      cabinet: ['Shelf crate', 'Display case', 'Lit display case', 'Holo plinth case'],
+      wardrobe: ['Hook rail', 'Gear locker', 'Double locker', 'Locker bay']
+    },
+    decor: {
+      // over the wardrobe
+      'basil-print': 'Circuit poster', 'recipe-board': 'Schematic slate', 'herb-shelf': 'Sample rack', 'fairy-lights': 'LED strip', 'pip-portrait': 'Pip scan portrait',
+      // bedside wall
+      'growth-chart': 'Height gauge', 'meal-calendar': 'Schedule panel', 'wall-sconce': 'Work lamp', 'photo-strip': 'Monitor stack',
+      // front right wall
+      'wall-clock': 'Digital clock', bunting: 'Pennant lights', 'pan-rail': 'Tool rail', mirror: 'Round monitor', 'coat-hooks': 'Gear hooks',
+      // window dressing
+      'curtains-gingham': 'Strip curtain', 'curtains-linen': 'Blackout shutters', 'roller-blind': 'Security shutter', 'window-lights': 'Window LED border', 'plant-hanger': 'Hanging grow pod',
+      // windowsill
+      'sill-basil': 'Grow-light seedlings', 'sill-succulents': 'Memory chips', 'sill-cactus': 'Antenna pair', 'sill-radio': 'Comms radio', 'sill-cat': 'Robo-cat',
+      // rug
+      'rug-pink': 'Rubber mat', 'rug-braided': 'Anti-static mat', 'rug-leaf': 'Circuit mat', 'rug-stripe': 'Hazard mat', 'rug-picnic': 'Tool-outline mat', 'rug-sheepskin': 'Foam pad',
+      // back corner
+      'snake-plant': 'Fibre-optic plant', cactus: 'Spark coil', 'umbrella-stand': 'Probe drum', broom: 'Sweeper pole',
+      // bedside nook
+      'side-table-lamp': 'Tool cart and work lamp', 'record-player': 'Turntable deck', 'plant-stand': 'Power-cell stand', 'stool-books': 'Stool and manuals',
+      // foot of the bed
+      'toy-chest': 'Parts bin', bench: 'Steel workbench', 'laundry-basket': 'Scrap bin', slippers: 'Boot mat',
+      // by the fridge
+      'watering-can': 'Coolant can', 'cookbook-stack': 'Tablet stack', 'bean-bag': 'Crash cushion', 'lemon-tree': 'Hydroponic tube', 'veg-basket': 'Battery crate',
+      // corner by the door
+      monstera: 'Dish stand', 'coat-stand': 'Hard-hat stand', 'arc-lamp': 'Work-light tripod', guitar: 'Synth keyboard',
+      // front of the room
+      pouffe: 'Swivel stool', 'tea-table': 'Holo table', 'pip-ball': 'Drone ball', 'picnic-basket': 'Cargo case'
+    },
+    styles: {
+      'wall-white': 'Gunmetal', 'wall-lavender': 'Olive drab', 'wall-mint': 'Teal panel', 'wall-peach': 'Rust orange', 'wall-sky': 'Steel blue', 'wall-sprig': 'Circuit board',
+      'floor-lilac': 'Rubber mat', 'floor-oak': 'Diamond plate', 'floor-terracotta': 'Floor grate', 'floor-checker': 'Hazard checker'
+    }
+  }
+};
+
+/* ======================================================================
+   HERB_REFERENCE: the herb room for comparison, a simplified redraw (not a port of the ~2,500 lines of live art):
+   white walls, the lilac floor, the window, the pink rug, and the five stations at level 2 (the live level-2 art as SVG strings).
+   Live reference: /pet on Default. The engine draws this in place of ROBOT_ROOM when state.herb is set.
+   ====================================================================== */
+const HERB_L2 = {
+  bed: () => ({ // camp cot
+    back: [[6, 124], [6, 170], [80, 124]].map(([u, v]) => box(u, v, 3, 3, 0, 22, '#7a6a4f')).join('')
+      + box(4, 122, 80, 52, 22, 30, '#8fb38a') + box(8, 132, 16, 32, 30, 36, '#ffffff'),
+    front: box(80, 170, 3, 3, 0, 22, '#7a6a4f')
+  }),
+  fridge: () => box(146, 0, 40, 34, 0, 58, '#eef0f6') + rectV(34, 150, 153, 24, 48, '#b9bdc8') + rectV(34, 168, 178, 38, 46, '#ff8fab'), // mini fridge
+  cooker: () => box(60, 0, 80, 36, 0, 50, '#f3e3c3') + rectV(36, 64, 98, 6, 44, 'none') + rectV(36, 102, 136, 6, 44, 'none')
+    + box(58, 0, 84, 38, 50, 55, '#d8c09a') + ellH(118, 19, 55, 10, 9, '#444444') + cyl(80, 19, 11, 55, 70, '#e76f51'), // counter and hob
+  cabinet: () => box(0, 38, 14, 3, 30, 40, '#7a5a3a') + box(0, 92, 14, 3, 30, 40, '#7a5a3a') + box(0, 30, 22, 72, 40, 46, '#b98a5a')
+    + bill(10, 46, 46, `<path d="M-6 0 h12 l-2 -9 h-8z" fill="#ffd34d" stroke="${ART_INK}" stroke-width="1.2"/>`, [-6, -9, 6, 0])
+    + box(0, 38, 14, 3, 72, 82, '#7a5a3a') + box(0, 92, 14, 3, 72, 82, '#7a5a3a') + box(0, 30, 22, 72, 82, 88, '#b98a5a'), // wall shelves
+  wardrobe: () => box(10, 0, 52, 26, 0, 58, '#c9965f') // chest of drawers
+    + [6, 24, 42].map(h => rectV(26, 14, 58, h, h + 13, '#e2b989') + bill(36, 26, h + 6.5, `<circle r="2" fill="#8a5a2b" stroke="${ART_INK}" stroke-width="1.4"/>`, [-2, -2, 2, 2])).join('')
+    + cyl(20, 12, 5, 58, 66, '#c0563b') + box(36, 6, 16, 12, 58, 61, '#ff8fab')
+};
+
+const HERB_REFERENCE = {
+  ink: '#3b2f5c',
+  styles: {
+    'wall-white': { left: '#eceef2', right: '#ffffff', skirting: '#dfe3e9' },
+    'floor-lilac': { base: '#d6c9f0' }
+  },
+  backdrop: {
+    wallPattern: () => '',
+    floorPattern: () => '',
+    skirting: () => '',
+    windowFrame: () => rectU(0, 164, 232, 74, 134, '#ffffff'),
+    glass: night => rectU(0, 168, 228, 78, 130, night ? '#2b2d5c' : '#cfe8ff', { stroke: null }),
+    sky: night => (night
+      ? bill(0, 210, 116, '<path d="M0 -8 a8 8 0 1 0 6 13 a6 6 0 1 1 -6 -13z" fill="#fff6c2"/>', [-8, -9, 8, 6]) + bill(0, 178, 120, '<circle r="1.4" fill="#fff"/>', [-2, -2, 2, 2])
+      : bill(0, 215, 116, '<circle r="6" fill="#fff6c2"/>', [-6, -6, 6, 6])) + rectU(0, 196.5, 199.5, 78, 130, '#ffffff', { stroke: null }),
+    sill: () => box(0, 167, 9, 3, 58, 68, '#cbbdea') + box(0, 227, 9, 3, 58, 68, '#cbbdea') + box(0, 158, 14, 80, 68, 74, '#e6dcf7')
+  },
+  stations: Object.fromEntries(Object.entries(HERB_L2).map(([station, fn]) => [station, [fn, fn, fn, fn]])),
+  decor: {
+    'rug-pink': () => ellH(GEOMETRY.RUG.cu, GEOMETRY.RUG.cv, 0, GEOMETRY.RUG.ru, GEOMETRY.RUG.rv, '#f4a7c0')
+      + ellH(GEOMETRY.RUG.cu, GEOMETRY.RUG.cv, 1, GEOMETRY.RUG.ru - 10, GEOMETRY.RUG.rv - 8, '#fbc6d9', { stroke: null })
+  },
+  effects: {
+    gauge: (level, pct) => {
+      const [u, v, h] = GEOMETRY.STATION_ANCHORS.fridgeTop[level - 1];
+      const w = (34 * pct) / 100;
+      return bill(u, v, h + GEOMETRY.FRIDGE_GAUGE_LIFT, `<rect x="-19" y="-7" width="38" height="10" rx="5" fill="#fff" stroke="${ART_INK}" stroke-width="1.4"/>`
+        + (w > 0 ? `<rect x="-17" y="-5" width="${fmt(w)}" height="6" rx="3" fill="${gaugeColour(pct)}"/>` : ''), [-19, -7, 19, 3]);
+    },
+    steam: level => {
+      const [u, v, h] = GEOMETRY.STATION_ANCHORS.cookerPot[level - 1];
+      return bill(u, v, h, fxg('steam', '<path d="M-4 -4 q5 -8 0 -14 M5 -6 q5 -8 0 -14" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/>'), [-6, -20, 10, 0]);
+    },
+    zzz: level => {
+      const [u, v, h] = GEOMETRY.STATION_ANCHORS.bedTop[level - 1];
+      return bill(u, v, h + GEOMETRY.SLEEP_Z_LIFT, fxg('zzz', '<text x="10" y="0" font-size="15" font-weight="700" fill="#fff">z</text><text x="22" y="-12" font-size="11" font-weight="700" fill="#fff">z</text>'), [10, -22, 30, 4]);
+    },
+    servedPlate: level => {
+      const [u, v, h] = GEOMETRY.STATION_ANCHORS.cookerPlate[level - 1];
+      return bill(u, v, h, `<ellipse cx="0" cy="-2" rx="11" ry="4.5" fill="#fff" stroke="${ART_INK}" stroke-width="1.4"/><path d="M-7 -4 q7 -10 14 0z" fill="#f4a259" stroke="${ART_INK}" stroke-width="1.2"/>`, [-11, -12, 11, 3]);
+    },
+    nightDim: () => `<rect class="night-dim" x="${GEOMETRY.ROOM_WORLD.x}" y="${GEOMETRY.ROOM_WORLD.y}" width="${GEOMETRY.ROOM_WORLD.width}" height="${GEOMETRY.ROOM_WORLD.height}" fill="${GEOMETRY.NIGHT_DIM_FILL}" pointer-events="none"/>`
+  }
+};
+</script>
+<script id="room-engine">
+/* ======================================================================
+   Room engine. renderRoomSVG(pack, state, opts?) -> an SVG string; thumbSVG(pack, kind, id, level) -> a cropped SVG string.
+   Pure (no document / window): the node smoke loads this block. Draw order follows the live PetRoom:
+   backdrop -> rug -> wall decor -> back stations (wardrobe, cooker, fridge, cabinet) -> back-floor decor -> bed
+   (back, sleeping creature, front) -> creature -> front-floor decor -> effects -> overlay.
+   Effects are drawn in a station's own (unshifted) art coords, inside that station's shifted group, so they follow it.
+   ====================================================================== */
+const WORLD = GEOMETRY.ROOM_WORLD;
+const WORLD_VIEWBOX = `${WORLD.x} ${WORLD.y} ${WORLD.width} ${WORLD.height}`;
+const SPOT_OF = IDS.decor;
+const LEGACY_SET = new Set(LEGACY_IDS);
+const FALLBACK_WALL = { left: '#bdbdbd', right: '#d6d6d6', skirting: '#9e9e9e' };
+const FALLBACK_FLOOR = { base: '#c9c9c9' };
+const FIT_TOLERANCE = 1; // px: outline stroke and billboard rounding
+
+function defaultState() {
+  const placements = {};
+  for (const spot of DECOR_SPOTS) placements[spot] = null;
+  placements.rug = 'rug-pink';
+  return {
+    night: false, wallStyle: 'wall-white', floorStyle: 'floor-lilac',
+    levels: { ...DEFAULT_ROOM_LEVELS }, placements,
+    form: 3, fridgePct: 50, cooking: false, sleeping: false, served: false, overlay: false, herb: false
+  };
+}
+
+/* ---------- missing art: a visible red dashed box, never a blank ---------- */
+function missingBox(b, id) {
+  return `<rect class="missing" x="${n1(b.x)}" y="${n1(b.y)}" width="${n1(b.width)}" height="${n1(b.height)}" fill="rgba(229,57,53,.13)" stroke="#e53935" stroke-width="1.4" stroke-dasharray="4 3"/>`
+    + `<text x="${n1(b.x + 3)}" y="${n1(b.y + 10)}" font-size="9" font-weight="700" fill="#c62828" font-family="system-ui,sans-serif">missing: ${id}</text>`;
+}
+const stackBox = miss => ({ x: WORLD.x + 6, y: WORLD.y + 6 + miss.n++ * 14, width: 168, height: 12 });
+
+/** Call a pack part (fn may be absent): its string, or a stacked missing box naming it. */
+function part(fn, args, id, miss) {
+  return typeof fn === 'function' ? fn(...args) : missingBox(stackBox(miss), id);
+}
+
+/* ---------- boxes ---------- */
+const footBox = (station, level) => boundsOf(boxCorners(...footprint3(station, level)));
+function footBoxWorld(station, level) {
+  const [dx, dy] = shiftPx(GEOMETRY.STATION_SHIFT[station]);
+  const b = footBox(station, level);
+  return { ...b, x: b.x + dx, y: b.y + dy };
+}
+const spotBox = spot => boundsOf(boxCorners(...GEOMETRY.DECOR_SPOT_SHAPES[spot].volume));
+
+/* ---------- stations, decor, creature ---------- */
+/** One station level's art as { back, front } (a plain string is all `back`), or null when the pack has none. */
+function stationParts(pack, station, level) {
+  const fn = pack.stations?.[station]?.[level - 1];
+  if (typeof fn !== 'function') return null;
+  const out = fn();
+  return typeof out === 'string' ? { back: out, front: '' } : { back: out.back || '', front: out.front || '' };
+}
+
+/** A decor id's art in world coords (legacy ids are drawn in their MPP-27 coords and slid to their spot), or null. */
+function decorArtWorld(pack, id) {
+  const fn = pack.decor?.[id];
+  if (typeof fn !== 'function') return null;
+  const art = fn();
+  const shift = LEGACY_SET.has(id) ? GEOMETRY.DECOR_LEGACY_SHIFT[SPOT_OF[id]] : null;
+  return shift ? `<g transform="${shiftTransform(shift)}">${art}</g>` : art;
+}
+
+function creatureAt(pose, form) {
+  const [x, y] = P(...pose.anchor);
+  const k = pose.scale;
+  return `<g class="room-creature" transform="translate(${n1(x - FOOT_X * k)},${n1(y + pose.dropPx - FOOT_Y * k)}) scale(${k})">${creatureSVG(form, pose.face)}</g>`;
+}
+
+function effectAt(fn, args, id, anchor) {
+  if (typeof fn === 'function') return fn(...args);
+  const [x, y] = P(...anchor);
+  return missingBox({ x: x - 34, y: y - 18, width: 68, height: 12 }, id);
+}
+
+function stationGroup(pack, st, station, miss) {
+  const level = resolveRoomLevels(st.levels)[station];
+  const parts = stationParts(pack, station, level);
+  const fx = pack.effects || {};
+  let inner = '';
+  if (station === 'bed') {
+    const sleeping = st.sleeping;
+    inner += parts ? parts.back : missingBox(footBox(station, level), `${station}:L${level}`);
+    if (sleeping && !st.herb) inner += creatureAt(pipPose('bed', 'sleep', st.levels), st.form);
+    if (sleeping && !st.herb) inner += effectAt(fx.zzz, [level], 'effect:zzz', [...GEOMETRY.STATION_ANCHORS.bedTop[level - 1]]);
+    if (parts) inner += parts.front;
+  } else {
+    inner += parts ? parts.back + parts.front : missingBox(footBox(station, level), `${station}:L${level}`);
+    if (station === 'fridge' && st.fridgePct != null) inner += effectAt(fx.gauge, [level, st.fridgePct], 'effect:gauge', GEOMETRY.STATION_ANCHORS.fridgeTop[level - 1]);
+    if (station === 'cooker' && (st.cooking || st.served)) inner += effectAt(fx.steam, [level], 'effect:steam', GEOMETRY.STATION_ANCHORS.cookerPot[level - 1]);
+    if (station === 'cooker' && st.served) inner += effectAt(fx.servedPlate, [level], 'effect:servedPlate', GEOMETRY.STATION_ANCHORS.cookerPlate[level - 1]);
+  }
+  return `<g data-station="${station}" transform="${shiftTransform(GEOMETRY.STATION_SHIFT[station])}">${inner}</g>`;
+}
+
+function decorLayer(pack, st, layer) {
+  return GEOMETRY.DECOR_LAYERS[layer].map(spot => {
+    const id = st.placements[spot];
+    if (!id) return '';
+    return decorArtWorld(pack, id) ?? missingBox(spotBox(spot), `decor:${id}`);
+  }).join('');
+}
+
+/* ---------- backdrop: walls, floor, skirting, window and sill from the pack's styles and backdrop ---------- */
+function backdropSVG(pack, st, miss) {
+  const { u: RU, v: RV, h: WH } = GEOMETRY.ROOM_SIZE;
+  const bd = pack.backdrop || {};
+  const wallId = IDS.styles.includes(st.wallStyle) && st.wallStyle.startsWith('wall-') ? st.wallStyle : 'wall-white';
+  const floorId = IDS.styles.includes(st.floorStyle) && st.floorStyle.startsWith('floor-') ? st.floorStyle : 'floor-lilac';
+  let s = '';
+  let wall = pack.styles?.[wallId];
+  let floor = pack.styles?.[floorId];
+  if (!wall) { s += missingBox(stackBox(miss), `style:${wallId}`); wall = FALLBACK_WALL; }
+  if (!floor) { s += missingBox(stackBox(miss), `style:${floorId}`); floor = FALLBACK_FLOOR; }
+  const corner = shade(floor.base, -22);
+  const skirtHeight = 7; // source: components/pet/room/roomDecor.jsx:23
+  s += `<polygon points="${pts([P(RU, 0, WH), P(0, 0, WH), P(0, 0, 0), P(RU, 0, 0)])}" fill="${wall.left}"/>`;
+  s += `<polygon points="${pts([P(0, 0, WH), P(0, RV, WH), P(0, RV, 0), P(0, 0, 0)])}" fill="${wall.right}"/>`;
+  s += part(bd.wallPattern, [wall], 'backdrop.wallPattern', miss);
+  s += `<polygon points="${pts([P(0, 0), P(RU, 0), P(RU, RV), P(0, RV)])}" fill="${floor.base}"/>`;
+  s += part(bd.floorPattern, [floor], 'backdrop.floorPattern', miss);
+  s += `<polygon points="${pts([P(RU, 0, 0), P(0, 0, 0), P(0, 0, skirtHeight), P(RU, 0, skirtHeight)])}" fill="${wall.skirting}"/>`;
+  s += `<polygon points="${pts([P(0, 0, 0), P(0, RV, 0), P(0, RV, skirtHeight), P(0, 0, skirtHeight)])}" fill="${shade(wall.skirting, -6)}"/>`;
+  s += part(bd.skirting, [wall], 'backdrop.skirting', miss);
+  s += `<polyline points="${pts([P(0, 0, 0), P(0, 0, WH)])}" fill="none" stroke="${shade(wall.left, -14)}" stroke-width="2.5" stroke-linecap="round"/>`;
+  s += `<polyline points="${pts([P(RU, 0), P(0, 0), P(0, RV)])}" fill="none" stroke="${corner}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>`;
+  s += part(bd.windowFrame, [st.night], 'backdrop.windowFrame', miss);
+  s += part(bd.glass, [st.night], 'backdrop.glass', miss);
+  s += part(bd.sky, [st.night], 'backdrop.sky', miss);
+  s += part(bd.sill, [], 'backdrop.sill', miss);
+  return s;
+}
+
+/* ---------- overlay: the live hit boxes ---------- */
+function overlaySVG(st) {
+  const levels = resolveRoomLevels(st.levels);
+  let s = '<g class="overlay" fill="none" stroke-width="1.5" stroke-dasharray="5 3" pointer-events="none">';
+  for (const station of IDS.stations) {
+    const [u, v, du, dv, h0, h1] = footprint3(station, levels[station]);
+    const f = boxFaces(u, v, du, dv, h0, h1);
+    s += `<g transform="${shiftTransform(GEOMETRY.STATION_SHIFT[station])}" stroke="#d81b60">`
+      + `<polygon points="${pts(f.front)}"/><polygon points="${pts(f.side)}"/><polygon points="${pts(f.top)}"/></g>`;
+  }
+  for (const spot of DECOR_SPOTS) {
+    const { corners, tag } = GEOMETRY.DECOR_SPOT_SHAPES[spot];
+    s += `<polygon points="${pts(corners.map(c => P(...c)))}" stroke="#0288d1"/>`;
+    const [x, y] = P(...tag);
+    s += `<text x="${n1(x)}" y="${n1(y - 3)}" font-size="7" fill="#0277bd" stroke="none" text-anchor="middle" font-family="system-ui,sans-serif">${SPOT_LABELS[spot]}</text>`;
+  }
+  const { v0, v1, h0 } = GEOMETRY.WINDOW_GAP;
+  s += `<polygon points="${pts([P(0, v0, h0), P(0, v1, h0), P(0, v1, GEOMETRY.ROOM_SIZE.h), P(0, v0, GEOMETRY.ROOM_SIZE.h)])}" stroke="#2e7d32"/>`;
+  return s + '</g>';
+}
+
+/* ---------- the room ---------- */
+function renderRoomSVG(pack, state, opts = {}) {
+  const st = { ...defaultState(), ...state };
+  const pk = st.herb ? HERB_REFERENCE : pack;
+  if (st.herb) { st.wallStyle = 'wall-white'; st.floorStyle = 'floor-lilac'; st.placements = { ...defaultState().placements }; }
+  ART_INK = pk.ink;
+  const miss = { n: 0 };
+  let s = backdropSVG(pk, st, miss);
+  if (!opts.bare) {
+    s += decorLayer(pk, st, 'rug') + decorLayer(pk, st, 'wall');
+    for (const station of GEOMETRY.ROOM_DRAW_ORDER.filter(x => x !== 'bed')) s += stationGroup(pk, st, station, miss);
+    s += decorLayer(pk, st, 'backFloor');
+    s += stationGroup(pk, st, 'bed', miss);
+    if (!st.sleeping && !st.herb) {
+      const pose = st.cooking || st.served ? pipPose('cooker', 'happy', st.levels) : pipPose('rug', 'content', st.levels);
+      s += creatureAt(pose, st.form);
+    }
+    s += decorLayer(pk, st, 'frontFloor');
+    if (st.night) s += effectAt(pk.effects?.nightDim, [], 'effect:nightDim', [100, 150, 60]);
+    if (st.overlay) s += overlaySVG(st);
+  }
+  const label = `${st.herb ? 'Herb room, simplified' : ROOM_NAME}${st.night ? ', night' : ', day'}`;
+  return `<svg class="room-svg${opts.still ? ' is-still' : ''}" viewBox="${opts.viewBox || WORLD_VIEWBOX}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${label}">${s}</svg>`;
+}
+
+/* ---------- thumbnails: cropped with the live thumb boxes; the root carries .is-still so nothing animates ---------- */
+const svgBox = b => `${n1(b.x)} ${n1(b.y)} ${n1(b.width)} ${n1(b.height)}`;
+const thumbWrap = (b, inner) => `<svg class="is-still" viewBox="${svgBox(b)}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">${inner}</svg>`;
+const STYLE_CROPS = { wall: { x: 60, y: 30, width: 240, height: 240 }, floor: { x: 108, y: 192, width: 180, height: 180 } };
+
+function thumbSVG(pack, kind, id, level = 1) {
+  ART_INK = pack.ink;
+  if (kind === 'station') {
+    const parts = stationParts(pack, id, level);
+    return thumbWrap(stationThumbBox(id, level), parts ? parts.back + parts.front : missingBox(footBox(id, level), `${id}:L${level}`));
+  }
+  if (kind === 'decor') {
+    const spot = SPOT_OF[id];
+    return thumbWrap(decorThumbBox(spot), decorArtWorld(pack, id) ?? missingBox(spotBox(spot), `decor:${id}`));
+  }
+  const isWall = id.startsWith('wall-');
+  const svg = renderRoomSVG(pack, { wallStyle: isWall ? id : 'wall-white', floorStyle: isWall ? 'floor-lilac' : id }, { bare: true, still: true, viewBox: svgBox(STYLE_CROPS[isWall ? 'wall' : 'floor']) });
+  return svg.replace('role="img"', 'aria-hidden="true"').replace(/aria-label="[^"]*"/, '');
+}
+
+/** The station art with one effect on it, for the effects strip: kind = gauge | steam | zzz | servedPlate. */
+function effectThumbSVG(pack, kind, level, pct) {
+  ART_INK = pack.ink;
+  const station = { gauge: 'fridge', steam: 'cooker', servedPlate: 'cooker', zzz: 'bed' }[kind];
+  const parts = stationParts(pack, station, level);
+  const anchorKey = { gauge: 'fridgeTop', steam: 'cookerPot', servedPlate: 'cookerPlate', zzz: 'bedTop' }[kind];
+  const fn = pack.effects?.[kind];
+  const args = kind === 'gauge' ? [level, pct] : [level];
+  const fx = effectAt(fn, args, `effect:${kind}`, GEOMETRY.STATION_ANCHORS[anchorKey][level - 1]);
+  return thumbWrap(stationThumbBox(station, level), (parts ? parts.back + parts.front : missingBox(footBox(station, level), `${station}:L${level}`)) + fx);
+}
+
+/* ---------- fit: the art's measured screen bounds against the live footprint / spot volume ---------- */
+function fitRow(label, kind, boxText, box, art) {
+  if (!art) return { id: label, kind, box: boxText, ok: false, missing: true, note: 'art missing' };
+  const over = {
+    left: box.x - art.x, top: box.y - art.y,
+    right: art.x + art.width - (box.x + box.width), bottom: art.y + art.height - (box.y + box.height)
+  };
+  const bad = Object.entries(over).filter(([, v]) => v > FIT_TOLERANCE).map(([k, v]) => `${k} +${v.toFixed(1)}px`);
+  return { id: label, kind, box: boxText, ok: bad.length === 0, missing: false, note: bad.join(', ') };
+}
+
+function fitReport(pack) {
+  ART_INK = pack.ink;
+  const rows = [];
+  for (const station of IDS.stations) {
+    for (let level = ROOM_MIN_LEVEL; level <= ROOM_MAX_LEVEL; level++) {
+      const fp = footprint3(station, level);
+      const art = pack.stations?.[station]?.[level - 1] ? measure(() => stationParts(pack, station, level)) : null;
+      rows.push(fitRow(`${station} L${level}`, 'station', `[${fp.join(', ')}]`, boundsOf(boxCorners(...fp)), art));
+    }
+  }
+  for (const [id, spot] of Object.entries(SPOT_OF)) {
+    const vol = GEOMETRY.DECOR_SPOT_SHAPES[spot].volume;
+    let art = pack.decor?.[id] ? measure(() => decorArtWorld(pack, id)) : null;
+    if (art && LEGACY_SET.has(id)) { // the collector sees pre-shift coords; the live room slides legacy ids to their spot
+      const [dx, dy] = shiftPx(GEOMETRY.DECOR_LEGACY_SHIFT[spot]);
+      art = { ...art, x: art.x + dx, y: art.y + dy };
+    }
+    rows.push(fitRow(id, 'decor', `${spot} [${vol.join(', ')}]`, spotBox(spot), art));
+  }
+  return rows;
+}
+</script>
+<script id="room-ui">
+/* ======================================================================
+   UI wiring only. Every control rewrites `state` and replaces the innerHTML of one container (no timers, no
+   listeners on detached nodes). The thumbnail grids render once; the room, the effect previews and the toggle states re-render on input.
+   ====================================================================== */
+const PACK = ROBOT_ROOM;
+const state = defaultState();
+const ui = { thumb: 96 };
+const app = document.getElementById('app');
+
+const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+const nameOf = (kind, id) => PACK.labels?.[kind]?.[id] || '';
+const levelName = (station, level) => PACK.labels?.levels?.[station]?.[level - 1] || '';
+const tog = (act, text, data = '') => `<button type="button" class="tog" aria-pressed="false" data-act="${act}" ${data}>${text}</button>`;
+const fxOf = target => (PACK.ambience || []).filter(a => a.target === target).map(a => a.effect).join(', ');
+
+/* ---------- page skeleton ---------- */
+function skeleton() {
+  const stationBlocks = IDS.stations.map(station => `
+    <div class="station" data-station="${station}">
+      <div class="head"><h3>${esc(HERB_LABELS.stations[station])}${nameOf('stations', station) ? ` &rarr; ${esc(nameOf('stations', station))}` : ' &rarr; <span class="todo">unnamed</span>'}</h3>
+        <span class="note">${[1, 2, 3, 4].map(l => `L${l} <b>${levelName(station, l) ? esc(levelName(station, l)) : '<span class="todo">unnamed</span>'}</b> (herb: ${esc(HERB_LABELS.levels[station][l - 1])})`).join(' &middot; ')}</span></div>
+      <div class="levels">${[1, 2, 3, 4].map(l => `<button type="button" class="lvl" aria-pressed="false" data-act="level" data-s="${station}" data-v="${l}" aria-label="${esc(HERB_LABELS.stations[station])} level ${l}">${thumbSVG(PACK, 'station', station, l)}<span>L${l}</span><small><b>${esc(levelName(station, l))}</b><br>${esc(HERB_LABELS.levels[station][l - 1])}</small></button>`).join('')}</div>
+    </div>`).join('');
+
+  const spotPickers = DECOR_SPOTS.map(spot => {
+    const ids = Object.keys(SPOT_OF).filter(id => SPOT_OF[id] === spot);
+    const options = (spot === 'rug' ? '' : '<option value="">Empty</option>')
+      + ids.map(id => `<option value="${id}">${esc(nameOf('decor', id) || id)}</option>`).join('');
+    return `<label class="sel">${esc(SPOT_LABELS[spot])}<select data-spot="${spot}" aria-label="${esc(SPOT_LABELS[spot])}">${options}</select></label>`;
+  }).join('');
+
+  const decorCells = Object.keys(SPOT_OF).map(id => `<button type="button" class="cell" aria-pressed="false" data-act="place" data-id="${id}" aria-label="${esc(nameOf('decor', id) || id)}">${thumbSVG(PACK, 'decor', id)}<span>${esc(nameOf('decor', id) || id)}</span><small>${esc(HERB_LABELS.decor[id])}</small></button>`).join('');
+
+  const styleChips = (prefix, act) => IDS.styles.filter(id => id.startsWith(prefix)).map(id => `<button type="button" class="chip" aria-pressed="false" data-act="${act}" data-v="${id}" aria-label="${esc(nameOf('styles', id) || id)}">${thumbSVG(PACK, 'style', id)}<span>${esc(nameOf('styles', id) || id)}</span><small class="note">${esc(HERB_LABELS.styles[id])}</small></button>`).join('');
+
+  app.innerHTML = `
+    <h1>Pip room: ${esc(ROOM_NAME)}</h1>
+    <p class="lede">The live isometric room rebuilt from the app's real geometry (a <code>GEOMETRY</code> table copied from the live code), drawn as <b>${esc(ROOM_NAME)}</b>. Stations keep their jobs and levels, every decor id and style keeps its spot, and the camera, footprints and Pip's poses are unchanged. Turn on <b>Hit boxes</b> to see the live tap areas the art has to fit. Names are proposals for red-lining.</p>
+
+    <h2>1 &middot; Controls</h2>
+    <div class="bar">
+      <div class="group" role="group" aria-label="Scene"><b>Scene</b>${tog('night', 'Night')}${tog('herb', 'Herb reference')}${tog('overlay', 'Hit boxes')}</div>
+      <div class="group" role="group" aria-label="Motion"><b>Motion</b>${tog('lowfx', 'Low FX')}${tog('reduced', 'Reduced motion')}</div>
+      <div class="group" role="group" aria-label="Creature form"><b>Creature</b>${[1, 2, 3].map(f => tog('form', `${f} &middot; ${ROBOT_FORMS[f - 1].name}`, `data-v="${f}"`)).join('')}</div>
+      <div class="group" role="group" aria-label="Thumbnail size"><b>Crop size</b>${tog('thumb', 'Shop 96 px', 'data-v="96"')}${tog('thumb', 'Picker 56 px', 'data-v="56"')}</div>
+    </div>
+
+    <div class="bench">
+      <div class="stagecol">
+        <h2 style="margin-top:0">2 &middot; The room</h2>
+        <div class="stage" id="room"></div>
+        <p class="herbnote" id="herbnote" hidden>Herb room (simplified). Live reference: /pet on Default.</p>
+        <p class="status" id="status" role="status"></p>
+      </div>
+      <div>
+        <h2 style="margin-top:0">3 &middot; Walls and floors</h2>
+        <h3>Walls</h3><div class="chips" role="group" aria-label="Wall style">${styleChips('wall-', 'wall')}</div>
+        <h3 style="margin-top:12px">Floors</h3><div class="chips" role="group" aria-label="Floor style">${styleChips('floor-', 'floor')}</div>
+
+        <h2>4 &middot; Stations (levels 1 to 4)</h2>
+        ${stationBlocks}
+
+        <h2>5 &middot; Decor (12 spots, 55 items)</h2>
+        <div class="spots">${spotPickers}</div>
+        <div class="decorgrid" role="group" aria-label="All decor">${decorCells}</div>
+
+        <h2>6 &middot; Effects and ambience</h2>
+        <div class="bar">
+          <div class="group" role="group" aria-label="Pose and effects"><b>Pose</b>${tog('sleeping', 'Sleeping')}${tog('cooking', 'Cooking')}${tog('served', 'Served plate')}</div>
+          <div class="group" role="group" aria-label="Fridge gauge"><b>Fridge</b>${[0, 50, 100].map(p => tog('pct', `${p} %`, `data-v="${p}"`)).join('')}</div>
+        </div>
+        <div class="fxs" id="fxs"></div>
+        <div class="tablewrap" style="margin-top:10px"><table id="ambience"></table></div>
+      </div>
+    </div>
+
+    <h2>7 &middot; Names (90 rows: 5 stations, 20 levels, 55 decor, 10 styles; id, spot, herb label, ${esc(ROOM_NAME.toLowerCase())} label, fx)</h2>
+    <div class="card tablewrap"><table id="names"></table></div>
+
+    <h2>8 &middot; Fit against the live footprints</h2>
+    <p class="lede">Every row is the drawn art's measured bounds against the live footprint (stations, in their own art coords) or the spot volume (decor, in world coords), with ${FIT_TOLERANCE} px tolerance for the outline stroke. The hit-box overlay is the visual check.</p>
+    <div class="card tablewrap"><table id="fit"></table></div>`;
+
+  const first = DECOR_SPOTS.map(spot => spot);
+  first.forEach(spot => { const sel = app.querySelector(`select[data-spot="${spot}"]`); sel.value = state.placements[spot] || ''; });
+}
+
+/* ---------- tables, built once ---------- */
+function buildTables() {
+  const rows = [];
+  for (const station of IDS.stations) rows.push(['station', station, '-', HERB_LABELS.stations[station], nameOf('stations', station), fxOf(station)]);
+  for (const station of IDS.stations) for (let l = 1; l <= 4; l++) rows.push(['level', `${station} L${l}`, '-', HERB_LABELS.levels[station][l - 1], levelName(station, l), '']);
+  for (const id of IDS.styles) rows.push(['style', id, id.startsWith('wall-') ? 'Walls' : 'Floor', HERB_LABELS.styles[id], nameOf('styles', id), '']);
+  for (const [id, spot] of Object.entries(SPOT_OF)) rows.push(['decor', id, SPOT_LABELS[spot], HERB_LABELS.decor[id], nameOf('decor', id), fxOf(id)]);
+  document.getElementById('names').innerHTML = `<thead><tr><th>Kind</th><th>Id</th><th>Spot</th><th>Herb label</th><th>${esc(ROOM_NAME)} label</th><th>fx</th></tr></thead><tbody>`
+    + rows.map(r => `<tr><td>${r[0]}</td><td><code>${esc(r[1])}</code></td><td>${esc(r[2])}</td><td>${esc(r[3])}</td><td>${r[4] ? `<b>${esc(r[4])}</b>` : '<span class="todo">not named yet</span>'}</td><td>${esc(r[5])}</td></tr>`).join('') + '</tbody>';
+
+  document.getElementById('ambience').innerHTML = '<thead><tr><th>Ambience target</th><th>Effect</th></tr></thead><tbody>'
+    + ((PACK.ambience || []).length ? PACK.ambience.map(a => `<tr><td>${esc(a.target)}</td><td>${esc(a.effect)}</td></tr>`).join('') : '<tr><td colspan="2" class="todo">none yet</td></tr>') + '</tbody>';
+
+  const fit = fitReport(PACK);
+  const stations = fit.filter(r => r.kind === 'station'), decor = fit.filter(r => r.kind === 'decor');
+  const summary = (list) => `${list.filter(r => r.ok).length} of ${list.length} fit` + (list.some(r => r.missing) ? `, ${list.filter(r => r.missing).length} not drawn yet` : '');
+  document.getElementById('fit').innerHTML = `<thead><tr><th>Item</th><th>Box (live)</th><th>Fits</th></tr></thead><tbody>`
+    + `<tr><td colspan="3"><b>Stations: ${summary(stations)}. Decor: ${summary(decor)}.</b></td></tr>`
+    + fit.map(r => `<tr><td>${esc(r.id)}</td><td><code>${esc(r.box)}</code></td><td>${r.missing ? '<span class="todo">not drawn yet</span>' : r.ok ? '<span class="pass">&check;</span>' : `<span class="fail">${esc(r.note)}</span>`}</td></tr>`).join('') + '</tbody>';
+}
+
+/* ---------- re-rendered on input ---------- */
+function renderEffects() {
+  const lv = resolveRoomLevels(state.levels);
+  const items = [
+    ...[0, 50, 100].map(p => [`Gauge ${p} %`, effectThumbSVG(PACK, 'gauge', lv.fridge, p)]),
+    ['Steam', effectThumbSVG(PACK, 'steam', lv.cooker)],
+    ['Zzz', effectThumbSVG(PACK, 'zzz', lv.bed)],
+    ['Served plate', effectThumbSVG(PACK, 'servedPlate', lv.cooker)]
+  ];
+  document.getElementById('fxs').innerHTML = items.map(([text, svg]) => `<figure>${svg}${esc(text)}</figure>`).join('')
+    + `<figure>${renderRoomSVG(PACK, { night: true, levels: state.levels }, { still: true })}Night dim</figure>`;
+}
+
+function isOn(b) {
+  const d = b.dataset;
+  switch (d.act) {
+    case 'night': return state.night;
+    case 'herb': return state.herb;
+    case 'overlay': return state.overlay;
+    case 'lowfx': return document.body.classList.contains('lowfx');
+    case 'reduced': return document.body.classList.contains('reduced');
+    case 'sleeping': return state.sleeping;
+    case 'cooking': return state.cooking;
+    case 'served': return state.served;
+    case 'form': return state.form === Number(d.v);
+    case 'pct': return state.fridgePct === Number(d.v);
+    case 'thumb': return ui.thumb === Number(d.v);
+    case 'wall': return state.wallStyle === d.v;
+    case 'floor': return state.floorStyle === d.v;
+    case 'level': return state.levels[d.s] === Number(d.v);
+    case 'place': return state.placements[SPOT_OF[d.id]] === d.id;
+    default: return false;
+  }
+}
+
+function render() {
+  const html = renderRoomSVG(PACK, state);
+  document.getElementById('room').innerHTML = html;
+  const missing = [...new Set([...html.matchAll(/>missing: ([^<]+)</g)].map(m => m[1]))];
+  document.getElementById('status').innerHTML = missing.length
+    ? `<span class="fail">Missing art in this view (${missing.length}):</span> ${esc(missing.join(', '))}`
+    : 'No missing art in this view.';
+  document.getElementById('herbnote').hidden = !state.herb;
+  app.querySelectorAll('button[data-act]').forEach(b => b.setAttribute('aria-pressed', String(isOn(b))));
+  document.documentElement.style.setProperty('--thumb', `${ui.thumb}px`);
+  renderEffects();
+}
+
+app.addEventListener('click', e => {
+  const b = e.target.closest('button[data-act]');
+  if (!b) return;
+  const d = b.dataset;
+  switch (d.act) {
+    case 'night': state.night = !state.night; break;
+    case 'herb': state.herb = !state.herb; break;
+    case 'overlay': state.overlay = !state.overlay; break;
+    case 'lowfx': document.body.classList.toggle('lowfx'); break;
+    case 'reduced': document.body.classList.toggle('reduced'); break;
+    case 'sleeping': state.sleeping = !state.sleeping; if (state.sleeping) { state.cooking = false; state.served = false; } break;
+    case 'cooking': state.cooking = !state.cooking; if (state.cooking) state.sleeping = false; break;
+    case 'served': state.served = !state.served; if (state.served) state.sleeping = false; break;
+    case 'form': state.form = Number(d.v); break;
+    case 'pct': state.fridgePct = Number(d.v); break;
+    case 'thumb': ui.thumb = Number(d.v); break;
+    case 'wall': state.wallStyle = d.v; break;
+    case 'floor': state.floorStyle = d.v; break;
+    case 'level': state.levels[d.s] = Number(d.v); break;
+    case 'place': {
+      const spot = SPOT_OF[d.id];
+      state.placements[spot] = d.id;
+      app.querySelector(`select[data-spot="${spot}"]`).value = d.id;
+      break;
+    }
+    default: return;
+  }
+  render();
+});
+
+app.addEventListener('change', e => {
+  const sel = e.target.closest('select[data-spot]');
+  if (!sel) return;
+  state.placements[sel.dataset.spot] = sel.value || null;
+  render();
+});
+
+/* ---------- deep links: #night&overlay&herb&sleeping&cooking&served&lowfx&reduced, #form=2&pct=0&wall=wall-mint&floor=floor-oak, #bed=3 (a station level), #rug=rug-braided (a spot) ---------- */
+function applyHash() {
+  for (const token of location.hash.slice(1).split('&').filter(Boolean)) {
+    const [key, value] = token.split('=');
+    if (value === undefined) {
+      if (key === 'lowfx' || key === 'reduced') document.body.classList.add(key);
+      else if (['night', 'overlay', 'herb', 'sleeping', 'cooking', 'served'].includes(key)) state[key] = true;
+    } else if (key in state.levels) state.levels[key] = Number(value);
+    else if (key in state.placements) state.placements[key] = value || null;
+    else if (key === 'wall') state.wallStyle = value;
+    else if (key === 'floor') state.floorStyle = value;
+    else if (key === 'form') state.form = Number(value);
+    else if (key === 'pct') state.fridgePct = Number(value);
+  }
+}
+
+applyHash();
+skeleton();
+buildTables();
+render();
+</script>
+</body>
+</html>

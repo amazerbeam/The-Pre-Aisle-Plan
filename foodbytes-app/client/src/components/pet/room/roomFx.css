@@ -1,0 +1,37 @@
+/* MPP-45: room ambience (dragon lair + robot workshop). CSS only, transform + opacity, no colours.
+   Copied from the approved mockups (pip-room-dragon.html / pip-room-robot.html). */
+.room-fx { transform-box: fill-box; transform-origin: center; }
+.room-fx--steam { animation: room-steam 1.2s ease-in-out infinite; }
+.room-fx--zzz { animation: room-zzz 2.4s ease-in-out infinite; }
+@keyframes room-steam { 0% { opacity: .2; transform: translateY(2px); } 50% { opacity: 1; } 100% { opacity: .2; transform: translateY(-6px); } }
+@keyframes room-zzz { 0%, 100% { opacity: .55; transform: translateY(0); } 50% { opacity: 1; transform: translateY(-5px); } }
+
+/* dragon lair */
+.room-fx--flicker { transform-origin: 50% 100%; animation: room-flicker 1.7s ease-in-out infinite; }
+.room-fx--embers { animation: room-embers 2.4s ease-out infinite; }
+.room-fx--glint { animation: room-glint 2.8s ease-in-out infinite; }
+.room-fx--sway { transform-origin: 50% 0; animation: room-sway 4.2s ease-in-out infinite; }
+@keyframes room-flicker { 0%, 100% { opacity: 1; transform: scale(1, 1); } 30% { opacity: .8; transform: scale(.94, 1.07); } 55% { opacity: .95; transform: scale(1.05, .95); } 78% { opacity: .75; transform: scale(.96, 1.05); } }
+@keyframes room-embers { 0% { opacity: 0; transform: translateY(3px); } 20% { opacity: 1; } 100% { opacity: 0; transform: translateY(-14px); } }
+@keyframes room-glint { 0%, 55%, 100% { opacity: .3; transform: scale(.8); } 72% { opacity: 1; transform: scale(1.15); } }
+@keyframes room-sway { 0%, 100% { transform: rotate(-2.4deg); } 50% { transform: rotate(2.4deg); } }
+
+/* robot workshop */
+.room-fx--scan { animation: room-scan 3.1s steps(1, end) infinite; }
+.room-fx--blink { animation: room-blink 1.6s steps(1, end) infinite; }
+.room-fx--fan { animation: room-fan 2.8s linear infinite; }
+.room-fx--buzz { animation: room-buzz 2.6s steps(1, end) infinite; }
+.room-fx--rain { animation: room-rain .8s linear infinite; }
+@keyframes room-scan { 0%, 100% { opacity: 1; transform: translateY(0); } 8% { opacity: .5; } 10% { opacity: 1; } 55% { opacity: .85; transform: translateY(2px); } 57% { opacity: 1; transform: translateY(0); } }
+@keyframes room-blink { 0%, 62% { opacity: 1; } 63%, 100% { opacity: .15; } }
+@keyframes room-fan { to { transform: rotate(360deg); } }
+@keyframes room-buzz { 0%, 100% { opacity: 1; } 6% { opacity: .4; } 8% { opacity: 1; } 9% { opacity: .6; } 11% { opacity: 1; } 55% { opacity: .85; } 57% { opacity: 1; } }
+@keyframes room-rain { from { transform: translateY(0); } to { transform: translateY(14px); } }
+
+/* MPP-45: ambience stops under Low FX, reduced motion and in every thumbnail (selector-only: no thumbnail markup change). */
+body.lowfx .room-fx,
+.pip-shop-thumb-svg .room-fx,
+.pip-decor-thumb .room-fx,
+.pip-style-swatch .room-fx { animation: none !important; }
+body.lowfx .pip-room-svg [data-glow] { filter: none !important; }
+@media (prefers-reduced-motion: reduce) { .room-fx { animation: none !important; } }

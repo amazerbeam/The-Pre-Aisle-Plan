@@ -1,5 +1,7 @@
 import { DECOR_EMPTY_LABEL, DECOR_ITEMS, DECOR_SPOT_LABELS, SPOT_BUTTON_ORDER } from '../../../constants/petDecor'
+import { decorLabel } from '../../../constants/petRoomLabels'
 import { decorSpotHitBox, hitBoxStyle } from './roomLayout'
+import { useRoomPack } from './roomPackContext'
 
 /**
  * MPP-27 AC 3: in edit mode, a real button over each dashed spot (the SVG is role="img", so it can't
@@ -7,8 +9,10 @@ import { decorSpotHitBox, hitBoxStyle } from './roomLayout'
  * MPP-40: 12 spots; order = SPOT_BUTTON_ORDER (largest first, so smaller spots on top win the tap).
  */
 function DecorSpotButtons({ placements, onSpot }) {
+  const { line } = useRoomPack()
   return SPOT_BUTTON_ORDER.map(spot => {
-    const current = DECOR_ITEMS[placements?.[spot]]?.label ?? DECOR_EMPTY_LABEL.toLowerCase()
+    const id = placements?.[spot]
+    const current = (DECOR_ITEMS[id] && decorLabel(line, id)) ?? DECOR_EMPTY_LABEL.toLowerCase()
     return (
       <button
         key={spot}

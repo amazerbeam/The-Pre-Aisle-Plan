@@ -20,7 +20,7 @@ const SPRIG_FILL = '#9bd17f'
 const BOARD_STEP = 16
 const TILE_STEP = 24
 const CHECKER_STEP = 25
-const SKIRTING_HEIGHT = 7
+export const SKIRTING_HEIGHT = 7
 const { u: ROOM_U, v: ROOM_V, h: WALL_HEIGHT } = ROOM_SIZE
 // The window's spot on the right wall after WINDOW_SHIFT, so the sprigs leave it clear.
 const WINDOW_GAP = { v0: 158, v1: 238, h0: 56 }

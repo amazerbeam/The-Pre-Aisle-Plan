@@ -5,9 +5,9 @@
 }
 
 .pip-header-sprinkles.is-earning {
-  background: #fff7d6;
-  border-color: #e0b52c;
-  box-shadow: 0 0 0 3px rgba(255, 211, 77, 0.35);
+  background: var(--pet-balance-bg);
+  border-color: var(--pet-gold-border);
+  box-shadow: 0 0 0 3px var(--pet-gold-ring-shadow);
   animation: sprinkles-bump 0.32s ease-out 1;
 }
 
@@ -20,8 +20,8 @@
   margin-top: 4px;
   padding: 2px 8px;
   border-radius: 999px;
-  background: #ffd34d;
-  color: #3f2716;
+  background: var(--pet-gold-bg);
+  color: var(--pet-gold-text);
   font-size: 0.78rem;
   font-weight: 800;
   white-space: nowrap;
