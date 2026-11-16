@@ -582,3 +582,91 @@
     border-radius: 0;
   }
 }
+
+/* ---------- recipe folders (mockup/app-mockup.html: .fside .frow .ftile .vtog .crumbs .ftags) ---------- */
+:root[data-theme="cyberpunk"] .folder-sidebar,
+:root[data-theme="cyberpunk"] .folder-header {
+  --hud: var(--cyan);
+  position: relative;
+}
+
+/* HUD brackets: same shape as the one in hud.css (a background, not a mask, so the folder menus can pop out) */
+:root[data-theme="cyberpunk"] .folder-sidebar::before,
+:root[data-theme="cyberpunk"] .folder-header::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  pointer-events: none;
+  background:
+    linear-gradient(var(--hud), var(--hud)) top left / 14px 2px no-repeat,
+    linear-gradient(var(--hud), var(--hud)) top left / 2px 14px no-repeat,
+    linear-gradient(var(--hud), var(--hud)) bottom right / 14px 2px no-repeat,
+    linear-gradient(var(--hud), var(--hud)) bottom right / 2px 14px no-repeat;
+}
+
+:root[data-theme="cyberpunk"] .folder-sidebar,
+:root[data-theme="cyberpunk"] .folder-tile,
+:root[data-theme="cyberpunk"] .folder-row,
+:root[data-theme="cyberpunk"] .folder-chip,
+:root[data-theme="cyberpunk"] .folder-bar,
+:root[data-theme="cyberpunk"] .folder-new-btn,
+:root[data-theme="cyberpunk"] .folder-add-btn,
+:root[data-theme="cyberpunk"] .folder-primary-btn,
+:root[data-theme="cyberpunk"] .folder-name-input,
+:root[data-theme="cyberpunk"] .folder-check,
+:root[data-theme="cyberpunk"] .view-toggle,
+:root[data-theme="cyberpunk"] .view-toggle-btn {
+  border-radius: 0;
+}
+
+:root[data-theme="cyberpunk"] .view-toggle {
+  border-color: var(--line);
+}
+
+:root[data-theme="cyberpunk"] .folder-section-label,
+:root[data-theme="cyberpunk"] .folder-crumbs,
+:root[data-theme="cyberpunk"] .view-toggle-btn,
+:root[data-theme="cyberpunk"] .folder-tile small,
+:root[data-theme="cyberpunk"] .folder-new-btn {
+  font-family: var(--f-label);
+  text-transform: uppercase;
+}
+
+:root[data-theme="cyberpunk"] .folder-sidebar-head {
+  color: var(--cyan);
+  font-family: var(--f-label);
+  font-size: 12px;
+  font-weight: 400;
+  text-transform: uppercase;
+}
+
+:root[data-theme="cyberpunk"] .folder-crumbs {
+  font-size: 11px;
+}
+
+:root[data-theme="cyberpunk"] .folder-row.on {
+  border: 1px solid var(--folder-row-active-border);
+}
+
+:root[data-theme="cyberpunk"] .folder-row.is-drop,
+:root[data-theme="cyberpunk"] .folder-tile.is-drop {
+  background: var(--deep);
+}
+
+:root[data-theme="cyberpunk"] .folder-title {
+  font-family: var(--f-display);
+  text-shadow: var(--glow-yellow);
+}
+
+:root[data-theme="cyberpunk"] .view-toggle-btn .folder-icon {
+  color: var(--yellow);
+}
+
+:root[data-theme="cyberpunk"] .view-toggle-btn.on .folder-icon {
+  color: var(--void);
+}
+
+/* Low FX: no title glow */
+:root[data-theme="cyberpunk"] body.lowfx .folder-title {
+  text-shadow: none;
+}

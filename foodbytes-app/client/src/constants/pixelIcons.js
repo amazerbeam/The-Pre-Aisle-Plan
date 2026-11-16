@@ -59,4 +59,18 @@ export const PIXEL_ICONS = {
     ],
     accents: { a: 'var(--cyan)', b: 'var(--pink)' },
   },
+  folder: {
+    rows: [
+      '#####..........',
+      '#...#########..',
+      '#############.#',
+      '#aaaaaaaaaaaa##',
+      '#aaaaaaaaaaaa##',
+      '#aaaaaaaaaaaa##',
+      '#aaaaaaaaaaaa##',
+      '#aaaaaaaaaaaa#.',
+      '##############.',
+    ],
+    accents: { a: 'var(--deep)' },
+  },
 }

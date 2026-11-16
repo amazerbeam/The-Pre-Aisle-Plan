@@ -1,8 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 import './RecipeCard.css'
 
-/** ⋯ overflow menu on a recipe card: View, Hide / Unhide (when allowed), Edit (admin). */
-function RecipeCardMenu({ recipeName, isHidden, canHide, isAdmin, onView, onHide, onUnhide, onEdit }) {
+/** ⋯ overflow menu on a recipe card: View, folder filing, Hide / Unhide (when allowed), Edit (admin). */
+function RecipeCardMenu({
+  recipeName, isHidden, canHide, isAdmin, onView, onHide, onUnhide, onEdit,
+  canFile, removeFromLabel, onAddToFolder, onRemoveFromFolder
+}) {
   const [open, setOpen] = useState(false)
   const wrapperRef = useRef(null)
 
@@ -46,6 +49,16 @@ function RecipeCardMenu({ recipeName, isHidden, canHide, isAdmin, onView, onHide
           <li role="none">
             <button role="menuitem" type="button" onClick={choose(onView)}>📖 View recipe</button>
           </li>
+          {canFile && (
+            <li role="none">
+              <button role="menuitem" type="button" onClick={choose(onAddToFolder)}>📁 Add to folder…</button>
+            </li>
+          )}
+          {removeFromLabel && (
+            <li role="none">
+              <button role="menuitem" type="button" onClick={choose(onRemoveFromFolder)}>↩ Remove from {removeFromLabel}</button>
+            </li>
+          )}
           {isHidden && (
             <li role="none">
               <button role="menuitem" type="button" onClick={choose(onUnhide)}>👁 Unhide</button>

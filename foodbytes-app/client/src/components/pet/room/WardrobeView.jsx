@@ -62,7 +62,7 @@ function WardrobeView({ mood, herb, wardrobe, titleId, panelRef, onClose }) {
         </p>
       </div>
       {wardrobe.error && <p className="pip-wardrobe-error" role="alert">{wardrobe.error}</p>}
-      <WardrobeSlotTabs wardrobe={wardrobe.data} selected={slot} onSelect={chooseSlot} />
+      <WardrobeSlotTabs wardrobe={wardrobe.data} line={herb.line} selected={slot} onSelect={chooseSlot} />
       <div className="pip-wardrobe-body">
         <WardrobeItemGrid wardrobe={wardrobe.data} slot={slot} line={herb.line} form={herb.form} onTap={tapItem} />
         {lockedId && (

@@ -2,6 +2,7 @@
 
 One line per ticket, newest first: `<version> — <ticket key>: <summary>`. Bump rules and how
 to check what is deployed: `CLAUDE.md` → Versioning & deploy verification.
+1.38.0 — 2026-11-16-robot-pip-antennas: robot Pip hats become antennas (Prop-top, Radar bar, Toque charm, Boing spring, Neon bolt; Hat tab reads Antenna); every Champion belt is a gold title belt
 1.37.0 — MPP-47: Robot workshop decor: all 55 items drawn and named as workshop counterparts on Cyberpunk
 1.36.0 — MPP-46: Dragon lair decor: all 55 items drawn and named as lair counterparts on Parchment
 1.35.0 — MPP-45: themed Pip rooms — room packs per creature (dragon lair, robot workshop shell, stations, styles, ambience) and themed room UI tokens

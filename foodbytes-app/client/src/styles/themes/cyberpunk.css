@@ -394,6 +394,29 @@
   --pet-warn-text: #ff9f1c;
   --pet-gold-ring-shadow: rgba(249, 240, 2, 0.35);
   --pip-focus-ring: var(--yellow);
+
+  /* Recipe folders + Menu/Folders switch (2026-11-16). Reference: mockup/app-mockup.html (.fside .frow .ftile .vtog) */
+  --folder-icon: var(--cyan);
+  --folder-row-text: var(--ink);
+  --folder-row-active-bg: var(--raised);
+  --folder-row-active-border: var(--yellow);
+  --folder-row-active-text: var(--yellow);
+  --folder-count-text: var(--muted);
+  --folder-tile-bg: var(--deep);
+  --folder-tile-border: var(--line-soft);
+  --folder-tile-accent: var(--yellow);
+  --folder-tile-text: var(--ink);
+  --folder-tile-sub: var(--muted);
+  --folder-drop-border: var(--lime);
+  --folder-chip-bg: var(--deep);
+  --folder-chip-text: var(--muted);
+  --folder-crumb-text: var(--cyan);
+  --view-toggle-bg: var(--deep);
+  --view-toggle-text: var(--muted);
+  --view-toggle-on-bg: var(--yellow);
+  --view-toggle-on-text: var(--void);
+  --folder-check-on-bg: var(--lime);
+  --folder-check-on-text: var(--void);
 }
 
 /* Low FX: no glow, rain or flicker; display font falls back to the body font. The glow tokens

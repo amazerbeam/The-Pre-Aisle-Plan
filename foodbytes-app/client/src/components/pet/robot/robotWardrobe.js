@@ -1,5 +1,6 @@
 import { PIP_FOOT_X } from '../pip/pipSpace.js'
-import { arc, arcY, band, circle, curveOf, ellipse, fxGroup, group, overalls, path, pxCells, rect } from '../pip/wardrobeShapes.js'
+import { arc, arcY, band, circle, curveOf, ellipse, fxGroup, group, overalls, path, pxCells, rect, titleBelt } from '../pip/wardrobeShapes.js'
+import { ROBOT_ANTENNAS } from './robotAntennas.js'
 import { RB, ROBOT_INK } from './robotForms.js'
 
 /**
@@ -10,8 +11,8 @@ import { RB, ROBOT_INK } from './robotForms.js'
  * fxGroup descriptors (Pip.css); an animated group never carries a positioning transform. Smiley.exe and
  * Heart eyes replace the screen face while worn (REPLACES_FACE).
  *
- * Names on the robot (WARDROBE_ITEM_LABELS): beanie Cooling fan, cap Holo visor, chef-hat Steam toque,
- * straw-hat Satellite dish, top-hat Neon top hat, round-specs Smiley.exe, heart-glasses Heart eyes,
+ * Names on the robot (WARDROBE_ITEM_LABELS): beanie Prop-top, cap Radar bar, chef-hat Toque charm,
+ * straw-hat Boing spring, top-hat Neon bolt (antennas: robotAntennas.js, they replace the crown), round-specs Smiley.exe, heart-glasses Heart eyes,
  * sunglasses Shades.gif, red-scarf Cable coil, striped-scarf Hazard tape, chef-whites Oven door,
  * denim-jacket Hull plates, puffer Battery vest, leather-belt Tool belt, champion-belt Marquee belt,
  * jeans Coolant casing, joggers Servo sleeves, dungarees Maintenance overalls, sneakers Hover pads,
@@ -22,93 +23,6 @@ const CX = PIP_FOOT_X // every form is centred on x = 100
 const RI = ROBOT_INK
 
 const glowOf = (color, px) => ({ filter: `drop-shadow(0 0 ${px}px ${color})` })
-
-// ---- hats: (x, y, w) = head centre, brim line, hat width; `top` = highest y of the crown (animated parts at rest) ----
-
-const HATS = {
-  // Cooling fan: the blades spin (the invisible bounding circle keeps the group's centre on the hub)
-  beanie: (x, y, w) => {
-    const hw = w * 0.36
-    const h = w * 0.34
-    const cy = y - h / 2
-    const r = h * 0.36
-    return {
-      top: y - h,
-      straight: true,
-      shapes: [
-        rect(x - hw, y - h, hw * 2, h + 3, { rx: 4, fill: RB.plate, stroke: RI, strokeWidth: 3 }),
-        circle(x, cy, r + 2, { fill: RB.dark, stroke: RI, strokeWidth: 2 }),
-        fxGroup('spin', [
-          circle(x, cy, r * 1.05, { fill: 'none' }),
-          ...[0, 120, 240].map(a => ellipse(x, cy - r * 0.5, r * 0.32, r * 0.52, { fill: RB.bolt, transform: `rotate(${a} ${x} ${cy})` }))
-        ]),
-        circle(x, cy, r * 0.25, { fill: RB.glow }),
-        path(`M${x - hw + 4} ${y - h + 4} v${h - 6} M${x + hw - 4} ${y - h + 4} v${h - 6}`, { stroke: RI, strokeWidth: 1.5, opacity: 0.5 })
-      ]
-    }
-  },
-  // Holo visor: a light scans across
-  cap: (x, y, w) => ({
-    top: y - 10,
-    straight: true,
-    shapes: [
-      rect(x - w / 2, y - 10, w, 9, { rx: 3, fill: RB.plate, stroke: RI, strokeWidth: 3 }),
-      path(`M${x - w * 0.52} ${y - 2} H${x + w * 0.52} L${x + w * 0.42} ${y + 8} H${x - w * 0.42} Z`, { fill: RB.glow, fillOpacity: 0.28, stroke: RB.glow, strokeWidth: 2, strokeLinejoin: 'round' }),
-      fxGroup('scan', [rect(x - w * 0.42, y - 1, w * 0.12, 8, { fill: '#fff', opacity: 0.55 })])
-    ]
-  }),
-  // Steam toque: steam puffs
-  'chef-hat': (x, y, w) => {
-    const h = w * 0.55
-    return {
-      top: y - h - 24,
-      straight: true,
-      shapes: [
-        path(`M${x - w / 2 + 4} ${y - 4} C${x - w / 2 - 12} ${y - h} ${x - w / 4} ${y - h - 18} ${x} ${y - h - 8} C${x + w / 4} ${y - h - 18} ${x + w / 2 + 12} ${y - h} ${x + w / 2 - 4} ${y - 4} Z`, { fill: '#dfe6ec', stroke: RI, strokeWidth: 3.5, strokeLinejoin: 'round' }),
-        path(`M${x - w * 0.18} ${y - h * 0.9} v${h * 0.7} M${x + w * 0.18} ${y - h * 0.9} v${h * 0.7}`, { stroke: '#b9c4ce', strokeWidth: 2.5 }),
-        rect(x - w / 2, y - 9, w, 12, { rx: 3, fill: RB.plate, stroke: RI, strokeWidth: 3.5 }),
-        ...[0.3, 0.5, 0.7].map(k => circle(x - w / 2 + w * k, y - 3, 1.6, { fill: RB.bolt })),
-        ...[-0.18, 0.05, 0.22].map((k, i) => fxGroup('smoke', [circle(x + w * k, y - h - 16, 4 + i, { fill: '#e8eef3', opacity: 0.8 })], { animationDelay: `${i * 0.6}s` }))
-      ]
-    }
-  },
-  // Satellite dish: sweeps side to side
-  'straw-hat': (x, y, w) => {
-    const R = w * 0.42
-    const by = y - w * 0.42
-    return {
-      top: by - w * 0.22 - 5,
-      straight: true,
-      shapes: [
-        path(`M${x} ${y} V${by + 4}`, { stroke: RI, strokeWidth: 4, strokeLinecap: 'round' }),
-        rect(x - 7, y - 5, 14, 7, { rx: 2, fill: RB.plate, stroke: RI, strokeWidth: 2.5 }),
-        fxGroup('sway', [
-          path(`M${x - R} ${by - 6} Q${x} ${by + 16} ${x + R} ${by - 6} Q${x} ${by + 2} ${x - R} ${by - 6} Z`, { fill: '#cdd5dc', stroke: RI, strokeWidth: 3, strokeLinejoin: 'round' }),
-          path(`M${x} ${by + 4} L${x} ${by - w * 0.22}`, { stroke: RI, strokeWidth: 2.5 }),
-          circle(x, by - w * 0.22, 3.2, { fill: RB.accent, stroke: RI, strokeWidth: 1.8 })
-        ])
-      ]
-    }
-  },
-  // Neon top hat: the neon outline flickers
-  'top-hat': (x, y, w) => {
-    const h = w * 0.6
-    const cw = w * 0.66
-    const body = { rx: 3 }
-    return {
-      top: y - h,
-      shapes: [
-        rect(x - cw / 2, y - h, cw, h, { ...body, fill: '#141a22', stroke: RI, strokeWidth: 3.5 }),
-        ellipse(x, y, w * 0.58, w * 0.1, { fill: '#141a22', stroke: RI, strokeWidth: 3.5 }),
-        rect(x - cw / 2, y - h * 0.32, cw, h * 0.14, { fill: RB.glow }),
-        fxGroup('flicker', [
-          rect(x - cw / 2, y - h, cw, h, { ...body, fill: 'none', stroke: RB.accent, strokeWidth: 2 }),
-          ellipse(x, y, w * 0.58, w * 0.1, { fill: 'none', stroke: RB.accent, strokeWidth: 2 })
-        ], glowOf(RB.accent, 3))
-      ]
-    }
-  }
-}
 
 // ---- glasses: (L, R, y, s) = the two eye points and the face scale. Smiley.exe and Heart eyes replace the screen face. ----
 
@@ -151,7 +65,13 @@ const GLASSES = {
 
 // ---- torso items between the neck and waist lines, curved like a smile; clip = inside the body, extra = outside it ----
 
-const STAR_CELLS = [[0, -2], [-1, -1], [0, -1], [1, -1], [-2, 0], [-1, 0], [0, 0], [1, 0], [2, 0], [-1, 1], [1, 1]]
+const STAR_BADGE = [[0, -2], [-1, -1], [0, -1], [1, -1], [-2, 0], [-1, 0], [0, 0], [1, 0], [2, 0], [-1, 1], [1, 1], [-1, 2], [1, 2]]
+
+/** The robot's Marquee belt: the shared gold title belt; its jewels are chasing LEDs and the crest is a pixel star. */
+export const ROBOT_TITLE_BELT = {
+  ink: RI, strap: '#11161d', metal: '#e8c34a', dark: '#a8841c', light: '#fff4c0', jewel: RB.accent, jewel2: RB.glow, leds: true,
+  crest: (x, y, r, ink) => [circle(x, y, r, { fill: RB.dark, stroke: ink, strokeWidth: 1.2 }), ...pxCells(STAR_BADGE, x, y, r * 0.38, RB.accent)]
+}
 
 const TORSO = {
   // Cable coil: the plug dangles
@@ -266,21 +186,8 @@ const TORSO = {
       ]
     }
   },
-  // Marquee belt: LEDs chase round
-  'champion-belt': (f) => {
-    const c = curveOf(f)
-    const clip = [path(band(f.waist - 6, f.waist + 6, c), { fill: '#1a2028', stroke: RI, strokeWidth: 2.5 })]
-    for (let x = 4, n = 0; x < 200; x += 7, n++) {
-      clip.push(fxGroup('chase', [circle(x, arcY(x, f.waist, c), 1.5, { fill: RB.glow })], { animationDelay: `${(n % 4) * 0.2}s` }))
-    }
-    return {
-      clip,
-      extra: [
-        rect(88, f.waist - 8, 24, 16, { rx: 3, fill: '#e8c34a', stroke: RI, strokeWidth: 2.5 }),
-        ...pxCells(STAR_CELLS, 100, f.waist + 1, 2.2, RB.accent)
-      ]
-    }
-  },
+  // Marquee belt: the gold title belt; its jewels chase like marquee LEDs
+  'champion-belt': (f) => titleBelt(f, ROBOT_TITLE_BELT),
   // Coolant casing: ribbed blue casing
   jeans: (f) => {
     const c = curveOf(f)
@@ -332,7 +239,8 @@ const SHOES = {
 
 /** The robot's wardrobe in the shape every line shares (pip/wardrobeArt.js dispatches on it). */
 export const ROBOT_WARDROBE = {
-  HATS, // id → (x, y, w) → { top, shapes, straight? }
+  HATS: ROBOT_ANTENNAS, // id → (x, base, rise, droop) → { top, shapes }
+  HAT_ANCHOR: 'crown', // the hats are antennas: they replace the line's crown (wardrobeArt HAT_ANCHOR_CROWN)
   GLASSES, // id → (L, R, y, s) → shapes
   TORSO, // id → (f) → { clip, extra, back? }
   SHOES, // id → (root, tip) → shapes

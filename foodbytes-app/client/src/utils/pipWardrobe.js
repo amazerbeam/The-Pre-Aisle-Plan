@@ -1,5 +1,5 @@
 import { PIP_DEFAULT_LINE } from '../constants/pipLines.js'
-import { WARDROBE_ITEMS, WARDROBE_ITEM_LABELS, WARDROBE_SLOTS } from '../constants/pipWardrobe.js'
+import { WARDROBE_ITEMS, WARDROBE_ITEM_LABELS, WARDROBE_SLOTS, WARDROBE_SLOT_LABELS } from '../constants/pipWardrobe.js'
 
 /**
  * MPP-32: pure helpers over the server's WardrobeDTO ({ items: [{ id, slot, owned, unseen }],
@@ -40,6 +40,10 @@ export const withSlotSeen = (wardrobe, slot) => ({
 /** The item's name on this creature; unknown lines fall back to the herb's names. */
 export const wardrobeItemLabel = (line, id) =>
   (WARDROBE_ITEM_LABELS[line] ?? WARDROBE_ITEM_LABELS[PIP_DEFAULT_LINE])[id] ?? null
+
+/** The slot's tab label on this creature ("Antenna" for the robot's HAT); falls back to WARDROBE_SLOTS' label. */
+export const wardrobeSlotLabel = (line, key) =>
+  WARDROBE_SLOT_LABELS[line]?.[key] ?? WARDROBE_SLOTS.find(slot => slot.key === key)?.label ?? null
 
 /** AC 6: "🎉 New outfit: Wellies!", or "… (+2 more)" when several arrived together. */
 export function wardrobeAnnouncement(ids, line) {

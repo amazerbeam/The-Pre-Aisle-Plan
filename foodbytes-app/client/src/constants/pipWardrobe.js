@@ -26,6 +26,11 @@ export const WARDROBE_SLOTS = [
   { key: WARDROBE_SLOT.SHOES, label: 'Shoes' }
 ]
 
+// Themed lines: a slot can read differently on one creature (the robot's hats are antennas). Sparse: absent = WARDROBE_SLOTS' label.
+export const WARDROBE_SLOT_LABELS = {
+  [PIP_LINE.ROBOT]: { [WARDROBE_SLOT.HAT]: 'Antenna' }
+}
+
 const { HAT, GLASSES, SCARF, JACKET, BELT, PANTS, SHOES } = WARDROBE_SLOT
 
 // AC 1: the 20 items, in the server's catalogue order.
@@ -69,7 +74,7 @@ export const WARDROBE_ITEM_LABELS = {
     sneakers: 'Talon wraps', wellies: 'Iron sabatons'
   },
   [PIP_LINE.ROBOT]: {
-    beanie: 'Cooling fan', cap: 'Holo visor', 'chef-hat': 'Steam toque', 'straw-hat': 'Satellite dish', 'top-hat': 'Neon top hat',
+    beanie: 'Prop-top', cap: 'Radar bar', 'chef-hat': 'Toque charm', 'straw-hat': 'Boing spring', 'top-hat': 'Neon bolt',
     'round-specs': 'Smiley.exe', 'heart-glasses': 'Heart eyes', sunglasses: 'Shades.gif',
     'red-scarf': 'Cable coil', 'striped-scarf': 'Hazard tape', 'chef-whites': 'Oven door', 'denim-jacket': 'Hull plates', puffer: 'Battery vest',
     'leather-belt': 'Tool belt', 'champion-belt': 'Marquee belt', jeans: 'Coolant casing', joggers: 'Servo sleeves', dungarees: 'Maintenance overalls',

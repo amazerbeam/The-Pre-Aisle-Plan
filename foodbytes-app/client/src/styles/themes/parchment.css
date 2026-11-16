@@ -375,6 +375,29 @@
   --pet-warn-text: #8a4a12;
   --pet-gold-ring-shadow: rgba(216, 178, 90, 0.35);
   --pip-focus-ring: var(--focus-ink);
+
+  /* Recipe folders + Menu/Folders switch (2026-11-16). Reference: mockup/parchment-theme.html (.fside .frow .ftile .vtog) */
+  --folder-icon: var(--leather);
+  --folder-row-text: var(--ink);
+  --folder-row-active-bg: var(--gold-wash);
+  --folder-row-active-border: var(--wax);
+  --folder-row-active-text: var(--ink);
+  --folder-count-text: var(--ink-faded);
+  --folder-tile-bg: var(--page);
+  --folder-tile-border: var(--border-color);
+  --folder-tile-accent: var(--gold);
+  --folder-tile-text: var(--ink);
+  --folder-tile-sub: var(--ink-faded);
+  --folder-drop-border: var(--wax);
+  --folder-chip-bg: var(--gold-wash);
+  --folder-chip-text: var(--ink-faded);
+  --folder-crumb-text: var(--ink-faded);
+  --view-toggle-bg: var(--leather);
+  --view-toggle-text: var(--leather-ink);
+  --view-toggle-on-bg: var(--leather-dark);
+  --view-toggle-on-text: var(--gold);
+  --folder-check-on-bg: var(--wax);
+  --folder-check-on-text: var(--page);
 }
 
 /* Low FX for Parchment is handled in parchment/shell.css (ambient layer, page-turn, ink-blot).

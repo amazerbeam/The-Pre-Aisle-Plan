@@ -2,7 +2,7 @@
 
 > **For agentic workers:** Use `/fb-apply` to walk this contract phase-by-phase. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-Status: PLANNED
+Status: IN PROGRESS
 Started: 2026-11-16
 
 **Goal:** Personal, nested (≤3 levels) recipe folders with multi-folder membership and a Menu / Folders view switch on the Recipes page, in the Default, Cyberpunk and Parchment themes, backed by `recipe_folders` / `recipe_folder_items` and `/api/recipe-folders`.
@@ -53,14 +53,14 @@ Started: 2026-11-16
 
 The UI source of truth is updated before any code: Parchment gets its folder screens, Cyberpunk drops the delete Undo. Nothing in the app changes, so stopping here is always safe. **Phase 1 ends with a developer review checkpoint.**
 
-### Task 1: Align the Cyberpunk mockup with "delete is confirm-only"
+### Task 1: Align the Cyberpunk mockup with "delete is confirm-only" ✓
 
 - Skill: none — HTML mockup edit, no app code
 
 **Files:**
 - Modify: `foodbytes-app/mockup/app-mockup.html` (`fdoDel` action and the `fdel` dialog body)
 
-- [ ] **Step 1: Drop the Undo from `fdoDel`**
+- [x] **Step 1: Drop the Undo from `fdoDel`**
 
 Replace the toast in `fdoDel` so it has no undo callback, and remove the `snap` capture:
 
@@ -70,27 +70,27 @@ Replace the toast in `fdoDel` so it has no undo callback, and remove the `snap` 
     if(U.folder===f.id)U.folder=f.parent;U.dlg=null;toast(`Deleted “${esc(f.name)}”. Recipes kept.`)},
 ```
 
-- [ ] **Step 2: Say it in the delete dialog**
+- [x] **Step 2: Say it in the delete dialog**
 
 In the `fdel` dialog, append to the first `<p>`: ` This can't be undone.`
 
-- [ ] **Step 3: Syntax-check the page script**
+- [x] **Step 3: Syntax-check the page script**
 
 Run: `cd foodbytes-app\mockup; node -e "const s=require('fs').readFileSync('app-mockup.html','utf8');new Function(s.match(/<script>([\s\S]*)<\/script>/)[1]);console.log('ok')"`
 Expected: `ok`
 
-### Task 2: Draw folders in the Parchment mockup
+### Task 2: Draw folders in the Parchment mockup ✓
 
 - Skill: none — HTML mockup edit, no app code
 
 **Files:**
 - Modify: `foodbytes-app/mockup/parchment-theme.html` (`recipesPage` at ~line 398, the `U` state at ~line 373, the dialog renderer, the action map, CSS block)
 
-- [ ] **Step 1: Port the folder model and behaviour from `app-mockup.html`**
+- [x] **Step 1: Port the folder model and behaviour from `app-mockup.html`**
 
 Copy into `parchment-theme.html`, adapting to its state object (`U`) and its recipe ids: the seed folders (`Batch cook › Freezer friendly`, `Date night`, `Quick (under 20 min)`, `Gym days › Post-workout`) with members drawn from this file's `RECIPES`; the helpers `FB`, `fKids`, `fPath`, `fDepth`, `fDesc`, `fHeight`, `inF`, `fCount`, `rFolders`, `unfiledN`; the view toggle (`U.view`, localStorage `fb.recipes.view`); the sidebar tree, mobile Folders ▾ bar and sheet, the folder header with breadcrumbs, the subfolder tiles, the top-level tiles plus "Not in a folder yet", folder chips on cards in Folders view, card ⋯ "Add to folder…" / "Remove from <folder>", and the dialogs new / rename / move / delete (confirm-only, as in Task 1) / add-to-folder / add-recipes. Keep labels plain ("Folders", "Menu", "All folders"), as the plan's Assumptions say.
 
-- [ ] **Step 2: Give it the Parchment look**
+- [x] **Step 2: Give it the Parchment look**
 
 Style with this file's existing palette variables only (no new hex values beyond what the file already uses):
 - The sidebar is a ledger panel with a ruled hairline between rows.
@@ -101,23 +101,23 @@ Style with this file's existing palette variables only (no new hex values beyond
 - The folder glyph is an engraved-style SVG matching `engravedIcons.js` stroke weight.
 - Touch targets stay ≥44px; the layout holds at 320px.
 
-- [ ] **Step 3: Add deep links**
+- [x] **Step 3: Add deep links**
 
 Support `#view=folders`, `#fold=f1`, `#fdlg=new|add|sheet`, as `app-mockup.html` does.
 
-- [ ] **Step 4: Syntax-check**
+- [x] **Step 4: Syntax-check**
 
 Run: `cd foodbytes-app\mockup; node -e "const s=require('fs').readFileSync('parchment-theme.html','utf8');for(const m of s.matchAll(/<script>([\s\S]*?)<\/script>/g))new Function(m[1]);console.log('ok')"`
 Expected: `ok`
 
-### Task 3: Update the mockup README
+### Task 3: Update the mockup README ✓
 
 - Skill: none — docs
 
 **Files:**
 - Modify: `foodbytes-app/mockup/README.md` (the "Proposal in review: custom recipe folders" section)
 
-- [ ] **Step 1: Re-read the section, then edit it**
+- [x] **Step 1: Re-read the section, then edit it**
 
 Read the file first (it changed on disk after planning). Then:
 - Rename the heading to `## Custom recipe folders (approved 2026-11-16; contract 2026-11-16-custom-recipe-folders)`.
@@ -125,7 +125,7 @@ Read the file first (it changed on disk after planning). Then:
 - Replace "(with undo)" on delete with "(confirm-only, no Undo)".
 - Add the Parchment deep links.
 
-- [ ] **Step 2: Developer review checkpoint**
+- [x] **Step 2: Developer review checkpoint**
 
 Stop and ask the developer to open `parchment-theme.html#view=folders` and `#mobile view=folders` in a browser and approve the Parchment folder look before Phase 6 Parchment CSS is written. Record the approval date in the README section. Phases 2–5 may proceed while waiting.
 
@@ -135,14 +135,14 @@ Stop and ask the developer to open `parchment-theme.html#view=folders` and `#mob
 
 Creates two empty tables; nothing existing changes. Safe to stop after: an unmapped table does not affect Hibernate `validate`.
 
-### Task 4: Write the migration
+### Task 4: Write the migration ✓
 
 - Skill: java-backend
 
 **Files:**
 - Create: `foodbytes-app/database/migrations/2026-11-16-recipe-folders.sql`
 
-- [ ] **Step 1: Write the file**
+- [x] **Step 1: Write the file**
 
 ```sql
 -- 2026-11-16 Custom recipe folders (plan: .claude/contract/2026-11-16-custom-recipe-folders/)
@@ -179,7 +179,7 @@ CREATE TABLE IF NOT EXISTS recipe_folder_items (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 ```
 
-- [ ] **Step 2: Confirm the file exists**
+- [x] **Step 2: Confirm the file exists**
 
 Run: `Get-ChildItem foodbytes-app\database\migrations\2026-11-16-recipe-folders.sql`
 Expected: one file listed.
@@ -208,7 +208,7 @@ The Railway apply is listed in the PR description (Task 34) and must happen befo
 
 Builds the API bottom-up. Each task compiles; the new endpoints are only reachable once the controller lands, and they need only the Phase 2 tables. Safe to stop after any task.
 
-### Task 6: Extract `RecipeKeyResolver`
+### Task 6: Extract `RecipeKeyResolver` ✓
 
 - Skill: java-backend
 
@@ -217,7 +217,7 @@ Builds the API bottom-up. Each task compiles; the new endpoints are only reachab
 - Modify: `foodbytes-app/foodbytes-api/src/main/java/com/foodbytes/service/HiddenRecipeService.java` (`normalise` + fields)
 - Test: `foodbytes-app/foodbytes-api/src/test/java/com/foodbytes/service/HiddenRecipeServiceTest.java`
 
-- [ ] **Step 1: Create the resolver with the moved body**
+- [x] **Step 1: Create the resolver with the moved body**
 
 ```java
 package com.foodbytes.service;
@@ -254,7 +254,7 @@ public class RecipeKeyResolver {
 }
 ```
 
-- [ ] **Step 2: Make `HiddenRecipeService` delegate**
+- [x] **Step 2: Make `HiddenRecipeService` delegate**
 
 Replace the `RecipeRepository` and `RecipeFamilyMemberRepository` fields with `private final RecipeKeyResolver recipeKeyResolver;`, remove their now-unused imports, and replace the body of `normalise`:
 
@@ -265,7 +265,7 @@ Replace the `RecipeRepository` and `RecipeFamilyMemberRepository` fields with `p
     }
 ```
 
-- [ ] **Step 3: Rebuild the test's service from its mocks**
+- [x] **Step 3: Rebuild the test's service from its mocks**
 
 In `HiddenRecipeServiceTest`, remove `@InjectMocks` from `service`, make it a plain field, and add:
 
@@ -279,12 +279,12 @@ In `HiddenRecipeServiceTest`, remove `@InjectMocks` from `service`, make it a pl
 
 Remove the now-unused `InjectMocks` import.
 
-- [ ] **Step 4: Run the hidden-recipes tests**
+- [x] **Step 4: Run the hidden-recipes tests**
 
 Run: `cd foodbytes-app\foodbytes-api; mvn test -Dtest=HiddenRecipeServiceTest`
 Expected: `BUILD SUCCESS`, 0 failures (same count as before the change).
 
-### Task 7: Entities
+### Task 7: Entities ✓
 
 - Skill: java-backend
 
@@ -292,7 +292,7 @@ Expected: `BUILD SUCCESS`, 0 failures (same count as before the change).
 - Create: `foodbytes-app/foodbytes-api/src/main/java/com/foodbytes/model/RecipeFolder.java`
 - Create: `foodbytes-app/foodbytes-api/src/main/java/com/foodbytes/model/RecipeFolderItem.java`
 
-- [ ] **Step 1: Write `RecipeFolder`**
+- [x] **Step 1: Write `RecipeFolder`**
 
 ```java
 package com.foodbytes.model;
@@ -341,16 +341,16 @@ public class RecipeFolder {
 }
 ```
 
-- [ ] **Step 2: Write `RecipeFolderItem`**
+- [x] **Step 2: Write `RecipeFolderItem`**
 
 Same shape as `UserHiddenRecipe`: `@Table(name = "recipe_folder_items", uniqueConstraints = @UniqueConstraint(name = "uk_recipe_folder_item", columnNames = {"folder_id", "recipe_id"}))`, fields `Long id` (IDENTITY), `@Column(name = "folder_id", nullable = false) Long folderId`, `@Column(name = "recipe_id", nullable = false) Long recipeId`, `@Column(name = "created_at", insertable = false, updatable = false) LocalDateTime createdAt`, PK-based `equals`/`hashCode` using `RecipeFolderItem.class.hashCode()`.
 
-- [ ] **Step 3: Compile**
+- [x] **Step 3: Compile**
 
 Run: `cd foodbytes-app\foodbytes-api; mvn -q compile`
 Expected: `BUILD SUCCESS`, no errors.
 
-### Task 8: Repositories
+### Task 8: Repositories ✓
 
 - Skill: java-backend
 
@@ -358,7 +358,7 @@ Expected: `BUILD SUCCESS`, no errors.
 - Create: `foodbytes-app/foodbytes-api/src/main/java/com/foodbytes/repository/RecipeFolderRepository.java`
 - Create: `foodbytes-app/foodbytes-api/src/main/java/com/foodbytes/repository/RecipeFolderItemRepository.java`
 
-- [ ] **Step 1: Write both interfaces**
+- [x] **Step 1: Write both interfaces**
 
 ```java
 @Repository
@@ -387,12 +387,12 @@ public interface RecipeFolderItemRepository extends JpaRepository<RecipeFolderIt
 
 (Imports as in `UserHiddenRecipeRepository`, plus `java.util.Collection` and `java.util.Optional`.)
 
-- [ ] **Step 2: Compile**
+- [x] **Step 2: Compile**
 
 Run: `cd foodbytes-app\foodbytes-api; mvn -q compile`
 Expected: `BUILD SUCCESS`.
 
-### Task 9: `RecipeFolderTree` pure rules (test first)
+### Task 9: `RecipeFolderTree` pure rules (test first) ✓
 
 - Skill: java-backend
 
@@ -400,7 +400,7 @@ Expected: `BUILD SUCCESS`.
 - Create: `foodbytes-app/foodbytes-api/src/main/java/com/foodbytes/service/RecipeFolderTree.java`
 - Test: `foodbytes-app/foodbytes-api/src/test/java/com/foodbytes/service/RecipeFolderTreeTest.java`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```java
 package com.foodbytes.service;
@@ -442,12 +442,12 @@ class RecipeFolderTreeTest {
 }
 ```
 
-- [ ] **Step 2: Run it to see it fail**
+- [x] **Step 2: Run it to see it fail**
 
 Run: `cd foodbytes-app\foodbytes-api; mvn test -Dtest=RecipeFolderTreeTest`
 Expected: compilation failure: `cannot find symbol ... RecipeFolderTree`.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 ```java
 package com.foodbytes.service;
@@ -506,19 +506,19 @@ final class RecipeFolderTree {
 }
 ```
 
-- [ ] **Step 4: Run it to pass**
+- [x] **Step 4: Run it to pass**
 
 Run: `cd foodbytes-app\foodbytes-api; mvn test -Dtest=RecipeFolderTreeTest`
 Expected: `BUILD SUCCESS`, 5 tests, 0 failures.
 
-### Task 10: DTOs
+### Task 10: DTOs ✓
 
 - Skill: java-backend
 
 **Files:**
 - Create: `foodbytes-app/foodbytes-api/src/main/java/com/foodbytes/dto/RecipeFolderDTO.java`, `RecipeFoldersDTO.java`, `RecipeFolderCreateRequest.java`, `RecipeFolderNameRequest.java`, `RecipeFolderParentRequest.java`, `RecipeFolderItemDTO.java`
 
-- [ ] **Step 1: Write the six DTOs**
+- [x] **Step 1: Write the six DTOs**
 
 All are `@Data @NoArgsConstructor @AllArgsConstructor` (Lombok, as `HiddenRecipesDTO`):
 - `RecipeFolderDTO { Long id; String name; Long parentId; List<Long> recipeIds; }`
@@ -530,12 +530,12 @@ All are `@Data @NoArgsConstructor @AllArgsConstructor` (Lombok, as `HiddenRecipe
 
 Validation annotations from `jakarta.validation.constraints`.
 
-- [ ] **Step 2: Compile**
+- [x] **Step 2: Compile**
 
 Run: `cd foodbytes-app\foodbytes-api; mvn -q compile`
 Expected: `BUILD SUCCESS`.
 
-### Task 11: `RecipeFolderService` (test first)
+### Task 11: `RecipeFolderService` (test first) ✓
 
 - Skill: java-backend
 
@@ -543,7 +543,7 @@ Expected: `BUILD SUCCESS`.
 - Create: `foodbytes-app/foodbytes-api/src/main/java/com/foodbytes/service/RecipeFolderService.java`
 - Test: `foodbytes-app/foodbytes-api/src/test/java/com/foodbytes/service/RecipeFolderServiceTest.java`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 `@ExtendWith(MockitoExtension.class)` with `@Mock RecipeFolderRepository folderRepository`, `@Mock RecipeFolderItemRepository itemRepository`, `@Mock RecipeKeyResolver recipeKeyResolver`, `@InjectMocks RecipeFolderService service`. Helper `folder(id, userId=5L, parentId, name)`. Cases (one `@Test` each):
 1. `create_atDepthThree_isRejected`: user 5 owns 1 › 2 › 3; `create(5L, "X", 3L)` throws `IllegalArgumentException` with message `"Folders go up to 3 levels deep."`; `verify(folderRepository, never()).save(any())`.
@@ -559,12 +559,12 @@ Expected: `BUILD SUCCESS`.
 11. `addRecipe_unknownRecipe_isEmpty`: resolver empty → `Optional.empty()`, `insertIfAbsent` never called.
 12. `listFolders_sortsByNameAndAttachesKeys`: two folders "b", "A" plus items → names `["A","b"]`, each with its `recipeIds`.
 
-- [ ] **Step 2: Run to fail**
+- [x] **Step 2: Run to fail**
 
 Run: `cd foodbytes-app\foodbytes-api; mvn test -Dtest=RecipeFolderServiceTest`
 Expected: compilation failure: `cannot find symbol ... RecipeFolderService`.
 
-- [ ] **Step 3: Implement the service**
+- [x] **Step 3: Implement the service**
 
 ```java
 package com.foodbytes.service;
@@ -699,19 +699,19 @@ public class RecipeFolderService {
 
 In `delete`, the sibling check ignores the folder being deleted (`exceptId = folder.getId()`) because it leaves the parent's child list. A child whose name matches the deleted folder's own name is therefore not a clash.
 
-- [ ] **Step 4: Run to pass**
+- [x] **Step 4: Run to pass**
 
 Run: `cd foodbytes-app\foodbytes-api; mvn test -Dtest=RecipeFolderServiceTest`
 Expected: `BUILD SUCCESS`, 12 tests, 0 failures.
 
-### Task 12: `RecipeFolderController`
+### Task 12: `RecipeFolderController` ✓
 
 - Skill: java-backend
 
 **Files:**
 - Create: `foodbytes-app/foodbytes-api/src/main/java/com/foodbytes/controller/RecipeFolderController.java`
 
-- [ ] **Step 1: Write the thin controller**
+- [x] **Step 1: Write the thin controller**
 
 ```java
 /** Personal recipe folders for the Recipes screen. The caller's own folders, never the shared plan owner's. */
@@ -792,12 +792,12 @@ public class RecipeFolderController {
 
 Imports follow `HiddenRecipeController` and `PetDecorController` (`jakarta.validation.Valid`, `MethodArgumentNotValidException`, `java.util.Map`, `java.util.NoSuchElementException`). No `SecurityConfig` change: `/api/**` falls through to `authenticated()`, as `/api/hidden-recipes` does.
 
-- [ ] **Step 2: Compile and run the folder tests together**
+- [x] **Step 2: Compile and run the folder tests together**
 
 Run: `cd foodbytes-app\foodbytes-api; mvn -q compile; mvn test -Dtest="RecipeFolder*Test,HiddenRecipeServiceTest"`
 Expected: `BUILD SUCCESS`, 0 failures.
 
-- [ ] **Step 3: Grep the controller for repository use**
+- [x] **Step 3: Grep the controller for repository use**
 
 Run: `Select-String -Path foodbytes-app\foodbytes-api\src\main\java\com\foodbytes\controller\RecipeFolderController.java -Pattern "Repository"`
 Expected: zero hits.
@@ -808,14 +808,14 @@ Expected: zero hits.
 
 Adds constants, pure helpers, the service, and hooks. Nothing renders them yet, so the app is unchanged and the build stays green.
 
-### Task 13: Constants
+### Task 13: Constants ✓
 
 - Skill: react-frontend
 
 **Files:**
 - Create: `foodbytes-app/client/src/constants/recipeFolders.js`
 
-- [ ] **Step 1: Write the constants**
+- [x] **Step 1: Write the constants**
 
 ```js
 /** Custom recipe folders. Limits mirror RecipeFolderTree on the backend. */
@@ -831,19 +831,19 @@ export const FOLDER_LOAD_ERROR = "Couldn't load your folders."
 export const FOLDER_SAVE_ERROR = "Couldn't update your folders. Please try again."
 ```
 
-- [ ] **Step 2: Build**
+- [x] **Step 2: Build**
 
 Run: `cd foodbytes-app\client; npm run build`
 Expected: `built in`, no errors.
 
-### Task 14: Pure tree helpers
+### Task 14: Pure tree helpers ✓
 
 - Skill: react-frontend
 
 **Files:**
 - Create: `foodbytes-app/client/src/utils/recipeFolderTree.js`
 
-- [ ] **Step 1: Write the helpers**
+- [x] **Step 1: Write the helpers**
 
 ```js
 import { FOLDER_MAX_DEPTH } from '../constants/recipeFolders.js'
@@ -879,19 +879,19 @@ export function folderIndex(folders) {
 export const visibleCount = (folder, isHiddenKey) => folder.recipeIds.filter((k) => !isHiddenKey(k)).length
 ```
 
-- [ ] **Step 2: Smoke-test the rules with node**
+- [x] **Step 2: Smoke-test the rules with node**
 
 Run: `cd foodbytes-app\client; node --input-type=module -e "import {depthOf,heightOf,canMoveTo,canCreateIn,childrenOf} from './src/utils/recipeFolderTree.js'; const F=[{id:1,name:'b',parentId:null,recipeIds:[]},{id:2,name:'x',parentId:1,recipeIds:[]},{id:3,name:'y',parentId:2,recipeIds:[]},{id:4,name:'A',parentId:null,recipeIds:[]}]; console.log(depthOf(F,3),heightOf(F,1),canMoveTo(F,1,3),canMoveTo(F,4,2),canCreateIn(F,3),childrenOf(F,null).map(f=>f.name).join(','))"`
 Expected: `3 3 false true false A,b`
 
-### Task 15: Service module
+### Task 15: Service module ✓
 
 - Skill: react-frontend
 
 **Files:**
 - Create: `foodbytes-app/client/src/services/recipeFolderService.js`
 
-- [ ] **Step 1: Write it**
+- [x] **Step 1: Write it**
 
 ```js
 import api from './api'
@@ -912,19 +912,19 @@ export const recipeFolderService = {
 export default recipeFolderService
 ```
 
-- [ ] **Step 2: Build**
+- [x] **Step 2: Build**
 
 Run: `cd foodbytes-app\client; npm run build`
 Expected: `built in`, no errors.
 
-### Task 16: `useRecipeFolders`
+### Task 16: `useRecipeFolders` ✓
 
 - Skill: react-frontend
 
 **Files:**
 - Create: `foodbytes-app/client/src/hooks/useRecipeFolders.js`
 
-- [ ] **Step 1: Write the hook, modelled on `useHiddenRecipes`**
+- [x] **Step 1: Write the hook, modelled on `useHiddenRecipes`**
 
 Shape and behaviour (all in one file, ≤200 lines):
 - State: `folders` (array, `[]`), `loading` (`isAuthenticated`), `loadFailed` (false); `useToast()` for `{ toast, showToast, dismissToast }`; `queue` ref (`Promise.resolve()`) for ordered membership writes; `lastRemoved` ref `{ folderId, recipe }`; `loadSeq` ref to ignore stale loads.
@@ -943,12 +943,12 @@ Shape and behaviour (all in one file, ≤200 lines):
 - Return `{ folders, loading, loadFailed, retry: load, canEdit: isAuthenticated && !loading && !loadFailed, create, rename, move, removeFolder, addRecipe, removeRecipe, toggleRecipe, undo, toast, dismissToast }`.
 - Toast timings reuse `UNDO_REMOVE_MS` / `INFO_TOAST_MS` from `constants/mealPlanUi`.
 
-- [ ] **Step 2: Build and measure**
+- [x] **Step 2: Build and measure**
 
 Run: `cd foodbytes-app\client; npm run build; (Get-Content src\hooks\useRecipeFolders.js | Measure-Object -Line).Lines`
 Expected: `built in`, and a line count under 200.
 
-### Task 17: `useRecipeView` and `useRecipeFolderScope`
+### Task 17: `useRecipeView` and `useRecipeFolderScope` ✓
 
 - Skill: react-frontend
 
@@ -956,7 +956,7 @@ Expected: `built in`, and a line count under 200.
 - Create: `foodbytes-app/client/src/hooks/useRecipeView.js`
 - Create: `foodbytes-app/client/src/hooks/useRecipeFolderScope.js`
 
-- [ ] **Step 1: Write `useRecipeView`**
+- [x] **Step 1: Write `useRecipeView`**
 
 ```js
 import { useState } from 'react'
@@ -978,7 +978,7 @@ export default function useRecipeView() {
 }
 ```
 
-- [ ] **Step 2: Write `useRecipeFolderScope`**
+- [x] **Step 2: Write `useRecipeFolderScope`**
 
 Inputs `{ inFolders, folderId, folders, recipesByMeal, isHidden }`; returns `{ inScope(recipe), counts, unfiledCount }`:
 - `idx = folderIndex(folders)`.
@@ -990,7 +990,7 @@ Inputs `{ inFolders, folderId, folders, recipesByMeal, isHidden }`; returns `{ i
 - `unfiledCount`: distinct `hideKeyOf` across all meals that are not hidden and not in `idx`.
 - No `useMemo` (no profiling evidence; the lists are small).
 
-- [ ] **Step 3: Build**
+- [x] **Step 3: Build**
 
 Run: `cd foodbytes-app\client; npm run build`
 Expected: `built in`, no errors.
@@ -1001,14 +1001,14 @@ Expected: `built in`, no errors.
 
 Builds every folder component against new tokens whose Default values point at existing Default tokens, then wires them into the Recipes page. At the end of the phase the feature works end-to-end in Default; Cyberpunk and Parchment inherit Default token values until Phase 6, which is functional but unthemed. That is acceptable at this boundary because nothing is deployed between phases.
 
-### Task 18: Folder tokens in `default.css`
+### Task 18: Folder tokens in `default.css` ✓
 
 - Skill: react-frontend
 
 **Files:**
 - Modify: `foodbytes-app/client/src/styles/themes/default.css` (Recipes area, after `--macro-chip-solid-bg`, ~line 140)
 
-- [ ] **Step 1: Add the tokens (Default values reuse existing Default tokens only)**
+- [x] **Step 1: Add the tokens (Default values reuse existing Default tokens only)**
 
 ```css
   /* Recipes: custom folders + Menu/Folders switch (2026-11-16). Default reuses existing tokens: no new colours. */
@@ -1037,12 +1037,12 @@ Builds every folder component against new tokens whose Default values point at e
 
 Before saving, confirm each referenced token exists in `default.css` (`Select-String -Path src\styles\themes\default.css -Pattern "--surface-tint-brand:|--border-color:|--surface-tint-faint:|--on-brand:|--success-hover:|--text-secondary:|--bg-primary:"` → 7 hits). If one is missing, use the token `RecipeToolbar.css` uses for the same role.
 
-- [ ] **Step 2: Theme check stays green**
+- [x] **Step 2: Theme check stays green**
 
 Run: `cd foodbytes-app\client; npm run check:themes`
 Expected: the one known WARN, then `Themes OK: 3 themes, 81 contrast pairs`.
 
-### Task 19: Folder glyph in each icon set + `FolderIcon`
+### Task 19: Folder glyph in each icon set + `FolderIcon` ✓
 
 - Skill: react-frontend
 
@@ -1051,7 +1051,7 @@ Expected: the one known WARN, then `Themes OK: 3 themes, 81 contrast pairs`.
 - Modify: `foodbytes-app/client/src/constants/engravedIcons.js` (add `folder` to `ENGRAVED_ICONS`)
 - Create: `foodbytes-app/client/src/components/recipes/folders/FolderIcon.jsx`
 
-- [ ] **Step 1: Add the pixel grid (verbatim from `app-mockup.html` `ICO.folder`)**
+- [x] **Step 1: Add the pixel grid (verbatim from `app-mockup.html` `ICO.folder`)**
 
 ```js
   folder: {
@@ -1070,7 +1070,7 @@ Expected: the one known WARN, then `Themes OK: 3 themes, 81 contrast pairs`.
   },
 ```
 
-- [ ] **Step 2: Add the engraved glyph (paths from the approved Parchment mockup, Task 2)**
+- [x] **Step 2: Add the engraved glyph (paths from the approved Parchment mockup, Task 2)**
 
 ```js
   folder: ['M3 6.5a1 1 0 0 1 1-1h5l2 2h9a1 1 0 0 1 1 1V18a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z', 'M3 10h18M6 13.5h5'],
@@ -1078,7 +1078,7 @@ Expected: the one known WARN, then `Themes OK: 3 themes, 81 contrast pairs`.
 
 If the Parchment mockup's glyph differs, use the mockup's paths instead.
 
-- [ ] **Step 3: Write `FolderIcon`**
+- [x] **Step 3: Write `FolderIcon`**
 
 ```jsx
 import { useTheme } from '../../../contexts/ThemeContext'
@@ -1107,19 +1107,19 @@ function FolderIcon({ size = 18 }) {
 export default FolderIcon
 ```
 
-- [ ] **Step 4: Build**
+- [x] **Step 4: Build**
 
 Run: `cd foodbytes-app\client; npm run build`
 Expected: `built in`, no errors.
 
-### Task 20: `RecipeViewToggle`
+### Task 20: `RecipeViewToggle` ✓
 
 - Skill: react-frontend
 
 **Files:**
 - Create: `foodbytes-app/client/src/components/recipes/folders/RecipeViewToggle.jsx`
 
-- [ ] **Step 1: Write the radiogroup**
+- [x] **Step 1: Write the radiogroup**
 
 ```jsx
 import FolderIcon from './FolderIcon'
@@ -1144,12 +1144,12 @@ function RecipeViewToggle({ view, onChange }) {
 export default RecipeViewToggle
 ```
 
-- [ ] **Step 2: Build**
+- [x] **Step 2: Build**
 
 Run: `cd foodbytes-app\client; npm run build`
 Expected: `built in`, no errors.
 
-### Task 21: `FolderTree` (nav + pick modes) and `FolderActionsMenu`
+### Task 21: `FolderTree` (nav + pick modes) and `FolderActionsMenu` ✓
 
 - Skill: react-frontend
 
@@ -1157,7 +1157,7 @@ Expected: `built in`, no errors.
 - Create: `foodbytes-app/client/src/components/recipes/folders/FolderTree.jsx`
 - Create: `foodbytes-app/client/src/components/recipes/folders/FolderActionsMenu.jsx`
 
-- [ ] **Step 1: Write `FolderActionsMenu`**
+- [x] **Step 1: Write `FolderActionsMenu`**
 
 Copy `RecipeCardMenu`'s open/close mechanics (outside mousedown/touchstart, Escape, document listeners removed in cleanup). Props: `{ folder, canAddSubfolder, isCurrent, onOpen, onAddRecipes, onNewSubfolder, onRename, onMove, onDelete }`. The trigger is `⋯` with `aria-label={\`Folder actions for ${folder.name}\`}`, `aria-haspopup="menu"`, `aria-expanded`. The menu items are:
 - When `isCurrent`: `＋ Add recipes…`; otherwise `📂 Open`.
@@ -1166,7 +1166,7 @@ Copy `RecipeCardMenu`'s open/close mechanics (outside mousedown/touchstart, Esca
 - `↳ Move to…`.
 - `🗑 Delete folder`, class `danger`.
 
-- [ ] **Step 2: Write `FolderTree`**
+- [x] **Step 2: Write `FolderTree`**
 
 Props: `{ mode, folders, currentId, openIds, onToggleOpen, onOpenFolder, isHiddenKey, pickedKey, onTogglePick, renderActions, dropProps }`.
 - Renders `<div className="folder-tree">`.
@@ -1177,12 +1177,12 @@ Props: `{ mode, folders, currentId, openIds, onToggleOpen, onOpenFolder, isHidde
   - In pick mode, a `role="checkbox"` button with `aria-checked={f.recipeIds.includes(pickedKey)}`, a check box span, `<FolderIcon/>`, name and count, calling `onTogglePick(f.id)`.
 - Children recurse via `childrenOf`. In pick mode every level is open; in nav mode a level is open when `openIds.has(id)`.
 
-- [ ] **Step 3: Build and measure**
+- [x] **Step 3: Build and measure**
 
 Run: `cd foodbytes-app\client; npm run build; (Get-Content src\components\recipes\folders\FolderTree.jsx | Measure-Object -Line).Lines`
 Expected: `built in`; under 200 lines.
 
-### Task 22: `FolderSidebar`, `FolderBar`, `FolderHeader`, `FolderRoot`, `FolderChips`
+### Task 22: `FolderSidebar`, `FolderBar`, `FolderHeader`, `FolderRoot`, `FolderChips` ✓
 
 - Skill: react-frontend
 
@@ -1193,7 +1193,7 @@ Expected: `built in`; under 200 lines.
 - Create: `foodbytes-app/client/src/components/recipes/folders/FolderRoot.jsx`
 - Create: `foodbytes-app/client/src/components/recipes/folders/FolderChips.jsx`
 
-- [ ] **Step 1: Write the five components**
+- [x] **Step 1: Write the five components**
 
 - `FolderSidebar` `{ treeProps, canDrag, onNewFolder }`: `<aside className="folder-sidebar" aria-label="Recipe folders">`, a header `<FolderIcon/> My folders` with `<small>drag a card onto one</small>` only when `canDrag`, then `<FolderTree mode="nav" {...treeProps}/>`, then `<button className="folder-new-btn" onClick={onNewFolder}>＋ New folder</button>`.
 - `FolderBar` `{ folders, currentId, onOpenSheet }`: one button (`aria-haspopup="dialog"`, `className="folder-bar"`) showing `<FolderIcon/>` and either `pathOf(...).map(f => f.name).join(' › ')` or `All folders`, plus a trailing `Folders ▾` label.
@@ -1208,19 +1208,19 @@ Expected: `built in`; under 200 lines.
   - Section label `Not in a folder yet` with `<small>{unfiledCount} recipes · file them from ⋯{canDrag ? ' or drag onto a folder' : ''}</small>`.
 - `FolderChips` `{ folders, recipeKey, excludeId, onOpenFolder }`: up to 3 `<button className="folder-chip">` (FolderIcon + name) for folders containing the key, minus `excludeId`, plus a `+N` span. Renders nothing when empty.
 
-- [ ] **Step 2: Build**
+- [x] **Step 2: Build**
 
 Run: `cd foodbytes-app\client; npm run build`
 Expected: `built in`, no errors.
 
-### Task 23: `FolderDialogs`
+### Task 23: `FolderDialogs` ✓
 
 - Skill: react-frontend
 
 **Files:**
 - Create: `foodbytes-app/client/src/components/recipes/folders/FolderDialogs.jsx`
 
-- [ ] **Step 1: Write one component that switches on `dialog.type`**
+- [x] **Step 1: Write one component that switches on `dialog.type`**
 
 Props: `{ dialog, setDialog, foldersApi, recipesByMeal, isHiddenKey, onOpenFolder, treeProps }`. Every dialog renders inside `<MealPlanSheet title={…} onClose={() => setDialog(null)}>`. Local state: `name`, `error`, `busy`, `query`.
 
@@ -1236,12 +1236,12 @@ Props: `{ dialog, setDialog, foldersApi, recipesByMeal, isHiddenKey, onOpenFolde
 
 While `busy`, disable the primary button. Never close on a failed save.
 
-- [ ] **Step 2: Build and measure**
+- [x] **Step 2: Build and measure**
 
 Run: `cd foodbytes-app\client; npm run build; (Get-Content src\components\recipes\folders\FolderDialogs.jsx | Measure-Object -Line).Lines`
 Expected: `built in`; under 400 lines. If it is over 300, move the `addRecipes` body into `FolderAddRecipesList.jsx` in the same folder.
 
-### Task 24: Card menu, folder chips and drag source
+### Task 24: Card menu, folder chips and drag source ✓
 
 - Skill: react-frontend
 
@@ -1249,7 +1249,7 @@ Expected: `built in`; under 400 lines. If it is over 300, move the `addRecipes` 
 - Modify: `foodbytes-app/client/src/components/recipes/RecipeCardMenu.jsx` (props + two items)
 - Modify: `foodbytes-app/client/src/components/recipes/RecipeCard.jsx` (props, `<article>`, chips row)
 
-- [ ] **Step 1: Add the menu items**
+- [x] **Step 1: Add the menu items**
 
 New props `canFile`, `removeFromLabel`, `onAddToFolder`, `onRemoveFromFolder`. After `View recipe`:
 
@@ -1266,42 +1266,42 @@ New props `canFile`, `removeFromLabel`, `onAddToFolder`, `onRemoveFromFolder`. A
           )}
 ```
 
-- [ ] **Step 2: Wire the card**
+- [x] **Step 2: Wire the card**
 
 New optional prop `folderUi` (undefined in signed-out / guest use) = `{ canFile, showChips, folders, currentFolderId, currentFolderName, inCurrent, draggable, onAddToFolder, onRemoveFromFolder, onOpenFolder }`.
 - Pass the menu props through. `removeFromLabel` = `folderUi?.inCurrent ? folderUi.currentFolderName : null`.
 - When `folderUi?.draggable && !isHidden`, add `draggable` and an `onDragStart` to `<article>` that sets `e.dataTransfer.setData(FOLDER_DRAG_TYPE, String(hideKeyOf(recipe)))`, sets `effectAllowed = 'copy'` and adds class `is-dragging` (removed `onDragEnd`).
 - After `.recipe-card-top`, render `{folderUi?.showChips && <FolderChips folders={folderUi.folders} recipeKey={hideKeyOf(recipe)} excludeId={folderUi.currentFolderId} onOpenFolder={folderUi.onOpenFolder}/>}`.
 
-- [ ] **Step 3: Build and measure**
+- [x] **Step 3: Build and measure**
 
 Run: `cd foodbytes-app\client; npm run build; (Get-Content src\components\recipes\RecipeCard.jsx | Measure-Object -Line).Lines`
 Expected: `built in`; under 200 lines.
 
-### Task 25: Toolbar slot
+### Task 25: Toolbar slot ✓
 
 - Skill: react-frontend
 
 **Files:**
 - Modify: `foodbytes-app/client/src/components/recipes/RecipeToolbar.jsx` (props, placeholder, slot)
 
-- [ ] **Step 1: Add `folderBar` and `searchPlaceholder` props**
+- [x] **Step 1: Add `folderBar` and `searchPlaceholder` props**
 
 Render `{folderBar}` as the first child of `.recipe-toolbar` (it is `null` except on mobile Folders view). Use `placeholder={searchPlaceholder ?? \`Search ${RECIPE_TAB_LABELS[activeMeal].toLowerCase()} recipes\`}` so Menu view's text is unchanged.
 
-- [ ] **Step 2: Build**
+- [x] **Step 2: Build**
 
 Run: `cd foodbytes-app\client; npm run build`
 Expected: `built in`, no errors.
 
-### Task 26: Wire the Recipes page
+### Task 26: Wire the Recipes page ✓
 
 - Skill: react-frontend
 
 **Files:**
 - Modify: `foodbytes-app/client/src/components/recipes/RecipeList.jsx` (state, scope, layout, dialogs, drop handling)
 
-- [ ] **Step 1: Add view, folder state and scope**
+- [x] **Step 1: Add view, folder state and scope**
 
 ```jsx
   const { view, setView } = useRecipeView()
@@ -1318,7 +1318,7 @@ Expected: `built in`, no errors.
 
 Change `visible` to add `.filter(scope.inScope)` and use `scope.counts` for `RecipeToolbar` `counts`.
 
-- [ ] **Step 2: Folder navigation**
+- [x] **Step 2: Folder navigation**
 
 ```jsx
   const openFolder = (id) => {
@@ -1332,7 +1332,7 @@ Change `visible` to add `.filter(scope.inScope)` and use `scope.counts` for `Rec
 
 After opening a folder, if the active tab has no in-scope recipe, switch `setActiveMeal` to the first tab in `RECIPE_MEAL_TABS` with `scope.counts[k] > 0`. Do this in an effect keyed on `folderId`, guarded so it runs only after the folders have loaded. If `folderId` no longer exists in `foldersApi.folders` (deleted elsewhere), reset it to `null`.
 
-- [ ] **Step 3: Drop handling (desktop)**
+- [x] **Step 3: Drop handling (desktop)**
 
 ```jsx
   const dropProps = (targetId) => (canDrag ? {
@@ -1347,7 +1347,7 @@ After opening a folder, if the active tab has no in-scope recipe, switch `setAct
   } : {})
 ```
 
-- [ ] **Step 4: Render**
+- [x] **Step 4: Render**
 
 - Header: render `<RecipeViewToggle view={view} onChange={(v) => { setView(v); setFolderId(null) }}/>` inside the page heading row when `isAuthenticated`. When there is no themed heading, render it right-aligned above the toolbar.
 - Wrap the toolbar + content in `<div className={inFolders && !isMobile ? 'recipe-folder-layout' : undefined}>`. In that layout, put `<FolderSidebar …/>` first and the rest in `<div className="recipe-folder-main">`.
@@ -1361,7 +1361,7 @@ After opening a folder, if the active tab has no in-scope recipe, switch `setAct
   - Folders top level with nothing unfiled in this tab: "Every <meal> recipe is in a folder ✓".
 - Render `<FolderDialogs …/>` when `dialog`, and `<UndoToast toast={foldersApi.toast} onUndo={foldersApi.undo}/>` next to the existing hidden-recipes toast.
 
-- [ ] **Step 5: Build and measure**
+- [x] **Step 5: Build and measure**
 
 Run: `cd foodbytes-app\client; npm run build; (Get-Content src\components\recipes\RecipeList.jsx | Measure-Object -Line).Lines`
 Expected: `built in`; under 400 lines. If it is 300 or more, move Steps 2–3 into `hooks/useFolderNavigation.js` (returning `{ folderId, openIds, openFolder, toggleOpen, dropProps }`) in the same change.
@@ -1373,7 +1373,7 @@ Expected: `built in`; under 400 lines. If it is 300 or more, move Steps 2–3 in
 **Files:**
 - Create: `foodbytes-app/client/src/components/recipes/folders/RecipeFolders.css` (imported from `FolderSidebar.jsx`, `FolderHeader.jsx`, `FolderRoot.jsx`, `RecipeViewToggle.jsx`, `FolderDialogs.jsx`, `FolderChips.jsx`)
 
-- [ ] **Step 1: Write the CSS, mobile first**
+- [x] **Step 1: Write the CSS, mobile first**
 
 Classes:
 - `.view-toggle`, `.view-toggle-btn(.on)`
@@ -1397,7 +1397,7 @@ Classes:
 
 Rules: colours only via `var(--folder-*)`, `var(--view-toggle-*)` or existing tokens (no literals); every button gets `min-height: 44px; touch-action: manipulation; -webkit-tap-highlight-color: transparent`; hover styles sit inside `@media (hover: hover)` and are paired with `:active`; keyboard focus uses `:focus-visible`; the folder-actions trigger is always visible on touch and is revealed on row hover only inside `@media (hover: hover)`.
 
-- [ ] **Step 2: No literal colours**
+- [x] **Step 2: No literal colours**
 
 Run: `Select-String -Path foodbytes-app\client\src\components\recipes\folders\RecipeFolders.css -Pattern "#[0-9a-fA-F]{3,8}\b|rgba?\("`
 Expected: zero hits.

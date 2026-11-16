@@ -5,14 +5,16 @@ import RecipeViewModal from './RecipeViewModal'
 import RecipeCardMenu from './RecipeCardMenu'
 import VariantSegment from './VariantSegment'
 import ServingsChip from './ServingsChip'
+import FolderChips from './folders/FolderChips'
 import MacroChips from '../common/MacroChips'
 import { MACRO_TARGETS } from '../../constants/macroTargets'
 import { resolveStartingServings } from '../../utils/servingsUtils'
-import { cardMacros } from '../../utils/recipeCatalogueUtils'
+import { cardMacros, hideKeyOf } from '../../utils/recipeCatalogueUtils'
+import { FOLDER_DRAG_TYPE } from '../../constants/recipeFolders'
 import './RecipeCard.css'
 
 function RecipeCard({
-  recipe, currentMealType, inPlan, isHidden, canHide, onHide, onUnhide, onEdit, onSelectVariant, pickDate, onAssigned
+  recipe, currentMealType, inPlan, isHidden, canHide, onHide, onUnhide, onEdit, onSelectVariant, pickDate, onAssigned, folderUi
 }) {
   const { isAdmin, defaultServings: userDefaultServings } = useAuth()
   // MPP-3: the user's preference moves the STARTING value only. Per-serving kcal still divides by
@@ -35,8 +37,19 @@ function RecipeCard({
 
   const macros = cardMacros(recipe, selectedVariantId)
 
+  // Desktop folder view: drag the card onto a folder to file the recipe family.
+  const dragProps = folderUi?.draggable && !isHidden ? {
+    draggable: true,
+    onDragStart: (e) => {
+      e.dataTransfer.setData(FOLDER_DRAG_TYPE, String(hideKeyOf(recipe)))
+      e.dataTransfer.effectAllowed = 'copy'
+      e.currentTarget.classList.add('is-dragging')
+    },
+    onDragEnd: (e) => e.currentTarget.classList.remove('is-dragging'),
+  } : {}
+
   return (
-    <article className={`recipe-card ${inPlan ? 'is-in-plan' : ''} ${isHidden ? 'is-hidden' : ''}`}>
+    <article className={`recipe-card ${inPlan ? 'is-in-plan' : ''} ${isHidden ? 'is-hidden' : ''}`} {...dragProps}>
       <div className="recipe-card-top">
         <button type="button" className="recipe-card-name" onClick={() => setShowFullscreen(true)}>{recipe.name}</button>
         {recipe.isCheat && <span className="cheat-badge">Cheat</span>}
@@ -52,8 +65,16 @@ function RecipeCard({
           onHide={() => onHide(recipe)}
           onUnhide={() => onUnhide(recipe)}
           onEdit={() => onEdit(selectedVariantId)}
+          canFile={folderUi?.canFile}
+          removeFromLabel={folderUi?.inCurrent ? folderUi.currentFolderName : null}
+          onAddToFolder={folderUi?.onAddToFolder}
+          onRemoveFromFolder={folderUi?.onRemoveFromFolder}
         />
       </div>
+      {folderUi?.showChips && (
+        <FolderChips folders={folderUi.folders} recipeKey={hideKeyOf(recipe)}
+          excludeId={folderUi.currentFolderId} onOpenFolder={folderUi.onOpenFolder} />
+      )}
 
       <VariantSegment
         variants={recipe.variants || []}

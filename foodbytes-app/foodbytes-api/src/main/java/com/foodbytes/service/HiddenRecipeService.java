@@ -1,8 +1,6 @@
 package com.foodbytes.service;
 
 import com.foodbytes.model.UserHiddenRecipe;
-import com.foodbytes.repository.RecipeFamilyMemberRepository;
-import com.foodbytes.repository.RecipeRepository;
 import com.foodbytes.repository.UserHiddenRecipeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,8 +18,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class HiddenRecipeService {
     private final UserHiddenRecipeRepository userHiddenRecipeRepository;
-    private final RecipeRepository recipeRepository;
-    private final RecipeFamilyMemberRepository recipeFamilyMemberRepository;
+    private final RecipeKeyResolver recipeKeyResolver;
 
     @Transactional(readOnly = true)
     public List<Long> listHidden(Long userId) {
@@ -42,15 +39,7 @@ public class HiddenRecipeService {
     }
 
     /** Family default id, or the recipe itself when it has no family / no default. Empty if unknown. */
-    @Transactional(readOnly = true)
     public Optional<Long> normalise(Long recipeId) {
-        if (!recipeRepository.existsById(recipeId)) return Optional.empty();
-        // Lighter finder (no macro graph): only ids are needed here.
-        return Optional.of(recipeFamilyMemberRepository.findByRecipeId(recipeId)
-            .flatMap(m -> recipeFamilyMemberRepository.findVariantsForRecipe(recipeId).stream()
-                .filter(v -> Boolean.TRUE.equals(v.getIsDefault()))
-                .map(v -> v.getRecipe().getId())
-                .findFirst())
-            .orElse(recipeId));
+        return recipeKeyResolver.resolve(recipeId);
     }
 }

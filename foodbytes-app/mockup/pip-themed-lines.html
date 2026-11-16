@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Pip Themed Lines</title>
 <!-- Contract: .claude/contract/2026-11-15-themed-pip-lines/ (Phase 1). approved 2026-11-15 (robot redesign + per-creature wardrobe). -->
+<!-- Updated 2026-11-16 (contract 2026-11-16-robot-pip-antennas): robot hats are antennas that replace the crown; every Champion belt is the gold title belt. -->
 <style>
   :root {
     --brand: #4a3f80; --text: #2c3e50; --muted: #5f6b76;
@@ -110,7 +111,14 @@
   .sparkle { animation: twinkle 1.6s ease-in-out infinite; }
   .rise { animation: rise 2.2s ease-out infinite; }
   .cape { transform-origin: 50% 0; animation: cape 3.4s ease-in-out infinite; }
+  .prop { animation: prop .32s linear infinite; }
+  .radar { animation: prop 2.6s ease-in-out infinite; }
+  .dangle { transform-origin: 50% 100%; animation: dangle 2.4s ease-in-out infinite; }
+  .boing { transform-origin: 50% 100%; animation: boing 1.3s cubic-bezier(.3,1.6,.5,1) infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes prop { 0%,100% { transform: scaleX(1); } 50% { transform: scaleX(-1); } }
+  @keyframes dangle { 0%,100% { transform: rotate(-7deg); } 50% { transform: rotate(7deg); } }
+  @keyframes boing { 0%,100% { transform: scaleY(1); } 30% { transform: scaleY(.78); } 60% { transform: scaleY(1.1); } }
   @keyframes scan { from { transform: translateX(0); } to { transform: translateX(600%); } }
   @keyframes smoke { 0% { opacity: 0; transform: translateY(4px) scale(.6); } 30% { opacity: .9; } 100% { opacity: 0; transform: translateY(-10px) scale(1.3); } }
   @keyframes sway { 0%,100% { transform: rotate(-8deg); } 50% { transform: rotate(8deg); } }
@@ -626,36 +634,64 @@ function overalls(f, color, ink, rivet) {
 }
 
 /* ---------- ROBOT: hardware mods and screen faces ---------- */
+/* ---------- ROBOT antennas: replace the crown. draw(b, h, droop) → { top, svg }; b = head top (f.growTop), h = the form's growthRise ---------- */
+const sock = (b) => `<rect x="93" y="${b - 2}" width="14" height="6" rx="2" fill="${RB.plate}" stroke="${RI}" stroke-width="2.2"/>`;
+const rod = (d, w = 3.2) => `<path d="${d}" stroke="${RI}" stroke-width="${w}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
+const tube = (d, color, w = 2.4) => `<path d="${d}" stroke="${RI}" stroke-width="${w + 2.6}" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="${d}" stroke="${color}" stroke-width="${w}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
+const glowSt = (c, px = 3) => `filter:drop-shadow(0 0 ${px}px ${c})`;
+const lit = (droop, c) => (droop ? RB.dim : c);
+/** Generic wilt: the whole antenna bends over to the right from its socket and goes dim (twin antennas splay instead). */
+const wilt = (b, svg) => `<g transform="rotate(34 100 ${b + 2})">${svg}</g>`;
+
 const ROBOT_WARDROBE = {
   hat: {
-    beanie: { label: 'Cooling fan', note: 'blades spin', straight: true, draw: (x, y, w) => {
-      const hw = w * 0.36, h = w * 0.34, cy = y - h / 2, r = h * 0.36;
-      const blades = `<circle cx="${x}" cy="${cy}" r="${r * 1.05}" fill="none"/>` + [0, 120, 240].map(a => `<ellipse cx="${x}" cy="${cy - r * 0.5}" rx="${r * 0.32}" ry="${r * 0.52}" fill="${RB.bolt}" transform="rotate(${a} ${x} ${cy})"/>`).join('');
-      return { top: y - h, svg: `<rect x="${x - hw}" y="${y - h}" width="${hw * 2}" height="${h + 3}" rx="4" fill="${RB.plate}" stroke="${RI}" stroke-width="3"/>
-        <circle cx="${x}" cy="${cy}" r="${r + 2}" fill="${RB.dark}" stroke="${RI}" stroke-width="2"/>${fx('spin', blades)}<circle cx="${x}" cy="${cy}" r="${r * 0.25}" fill="${RB.glow}"/>
-        <path d="M${x - hw + 4} ${y - h + 4} v${h - 6} M${x + hw - 4} ${y - h + 4} v${h - 6}" stroke="${RI}" stroke-width="1.5" opacity=".5"/>` };
+    beanie: { label: 'Prop-top', note: 'A short stalk with a two-blade propeller that spins (side-on, so it flips through). Stops dead when drooped.', crown: true,
+      draw: (b, h, droop) => { const k = h / 22, t = b - h * 0.8;
+        const blades = `<ellipse cx="${100 - 13 * k}" cy="${t - 5}" rx="${13 * k}" ry="4.2" fill="${RB.accent}" stroke="${RI}" stroke-width="2"/><ellipse cx="${100 + 13 * k}" cy="${t - 5}" rx="${13 * k}" ry="4.2" fill="${RB.lime}" stroke="${RI}" stroke-width="2"/>`;
+        const svg = sock(b) + rod(`M100 ${b + 2} V${t}`) + `<rect x="96.5" y="${t - 3}" width="7" height="6" rx="2" fill="${RB.bolt}" stroke="${RI}" stroke-width="2"/>`
+          + fx('prop', blades) + `<circle cx="100" cy="${t - 5}" r="2.6" fill="${RB.bolt}" stroke="${RI}" stroke-width="1.8"/>`;
+        return { top: t - 9, svg: droop ? wilt(b, svg) : svg };
     } },
-    cap: { label: 'Holo visor', note: 'a light scans across', straight: true, draw: (x, y, w) => ({ top: y - 10, svg:
-      `<rect x="${x - w / 2}" y="${y - 10}" width="${w}" height="9" rx="3" fill="${RB.plate}" stroke="${RI}" stroke-width="3"/>
-       <path d="M${x - w * 0.52} ${y - 2} H${x + w * 0.52} L${x + w * 0.42} ${y + 8} H${x - w * 0.42} Z" fill="${RB.glow}" fill-opacity=".28" stroke="${RB.glow}" stroke-width="2" stroke-linejoin="round"/>
-       ${fx('scan', `<rect x="${x - w * 0.42}" y="${y - 1}" width="${w * 0.12}" height="8" fill="#fff" opacity=".55"/>`)}` }) },
-    chef: { label: 'Steam toque', note: 'steam puffs', straight: true, draw: (x, y, w) => { const h = w * 0.55;
-      return { top: y - h - 24, svg: `<path d="M${x - w / 2 + 4} ${y - 4} C${x - w / 2 - 12} ${y - h} ${x - w / 4} ${y - h - 18} ${x} ${y - h - 8} C${x + w / 4} ${y - h - 18} ${x + w / 2 + 12} ${y - h} ${x + w / 2 - 4} ${y - 4} Z" fill="#dfe6ec" stroke="${RI}" stroke-width="3.5" stroke-linejoin="round"/>
-        <path d="M${x - w * 0.18} ${y - h * 0.9} v${h * 0.7} M${x + w * 0.18} ${y - h * 0.9} v${h * 0.7}" stroke="#b9c4ce" stroke-width="2.5"/>
-        <rect x="${x - w / 2}" y="${y - 9}" width="${w}" height="12" rx="3" fill="${RB.plate}" stroke="${RI}" stroke-width="3.5"/>
-        ${[0.3, 0.5, 0.7].map(k => `<circle cx="${x - w / 2 + w * k}" cy="${y - 3}" r="1.6" fill="${RB.bolt}"/>`).join('')}
-        ${[-0.18, 0.05, 0.22].map((k, i) => fx('smoke', `<circle cx="${x + w * k}" cy="${y - h - 16}" r="${4 + i}" fill="#e8eef3" opacity=".8"/>`, `animation-delay:${i * 0.6}s`)).join('')}` };
+    cap: { label: 'Radar bar', note: 'A stalk carrying a slatted bar with a cyan strip that slowly sweeps round (side-on).', crown: true,
+      draw: (b, h, droop) => { const k = h / 22, t = b - h * 0.65, bw = 30 * k;
+        const bar = `<rect x="${100 - bw / 2}" y="${t - 7}" width="${bw}" height="7" rx="3" fill="${RB.plate}" stroke="${RI}" stroke-width="2.2"/>
+          <rect x="${100 - bw / 2 + 3}" y="${t - 5}" width="${bw - 6}" height="2.2" fill="${lit(droop, RB.glow)}"/>
+          <path d="M${100 - bw / 4} ${t - 7} v7 M100 ${t - 7} v7 M${100 + bw / 4} ${t - 7} v7" stroke="${RI}" stroke-width="1.2" opacity=".6"/>`;
+        const svg = sock(b) + rod(`M100 ${b + 2} V${t}`) + fx('radar', bar);
+        return { top: t - 8, svg: droop ? wilt(b, svg) : svg };
     } },
-    sunhat: { label: 'Satellite dish', note: 'sweeps side to side', straight: true, draw: (x, y, w) => { const R = w * 0.42, by = y - w * 0.42;
-      return { top: by - w * 0.22 - 5, svg: `<path d="M${x} ${y} V${by + 4}" stroke="${RI}" stroke-width="4" stroke-linecap="round"/><rect x="${x - 7}" y="${y - 5}" width="14" height="7" rx="2" fill="${RB.plate}" stroke="${RI}" stroke-width="2.5"/>
-        ${fx('sway', `<path d="M${x - R} ${by - 6} Q${x} ${by + 16} ${x + R} ${by - 6} Q${x} ${by + 2} ${x - R} ${by - 6} Z" fill="#cdd5dc" stroke="${RI}" stroke-width="3" stroke-linejoin="round"/>
-          <path d="M${x} ${by + 4} L${x} ${by - w * 0.22}" stroke="${RI}" stroke-width="2.5"/><circle cx="${x}" cy="${by - w * 0.22}" r="3.2" fill="${RB.accent}" stroke="${RI}" stroke-width="1.8"/>`)}` };
+    chef: { label: 'Toque charm', note: "Today's antenna, but the red bulb is swapped for a tiny chef's toque (a pink LED bead keeps the bulb's colour). It swings and lets off a puff of steam. Hangs off the bent stalk when drooped.", crown: true,
+      draw: (b, h, droop) => { const tipY = b - h + 6;
+        const charm = (x, y) => { const w = 22, y0 = y - 3, hh = 11;
+          return `<path d="M${x - w / 2 + 2} ${y0} C${x - w / 2 - 5} ${y0 - hh} ${x - w / 4} ${y0 - hh - 7} ${x} ${y0 - hh - 3} C${x + w / 4} ${y0 - hh - 7} ${x + w / 2 + 5} ${y0 - hh} ${x + w / 2 - 2} ${y0} Z" fill="${droop ? '#c9d0d6' : '#f1f5f8'}" stroke="${RI}" stroke-width="2.2" stroke-linejoin="round"/>
+            <path d="M${x - 3.5} ${y0 - hh} v${hh - 1.5} M${x + 3.5} ${y0 - hh} v${hh - 1.5}" stroke="#b9c4ce" stroke-width="1.6"/>
+            <rect x="${x - w / 2 + 1}" y="${y - 3.5}" width="${w - 2}" height="6" rx="2" fill="#dfe6ec" stroke="${RI}" stroke-width="2"/>
+            <circle cx="${x}" cy="${y - 0.5}" r="1.9" fill="${lit(droop, RB.accent)}"/>`; };
+        if (droop) {
+          const bx = 114, by = b - h * 0.5;
+          return { top: by - 22, svg: sock(b) + rod(`M100 ${b + 2} Q100 ${b - h * 0.45} ${bx - 2} ${by}`) + `<g transform="rotate(38 ${bx} ${by + 2})">${charm(bx, by + 2)}</g>` };
+        }
+        const steam = [-4, 4].map((dx, i) => fx('smoke', `<circle cx="${100 + dx}" cy="${tipY - 27}" r="${2.6 + i}" fill="#e8eef3" opacity=".8"/>`, `animation-delay:${i * 0.9}s`)).join('');
+        return { top: tipY - 32, svg: sock(b) + rod(`M100 ${b + 2} V${tipY + 1}`) + `<circle cx="100" cy="${tipY - 4}" r="12" fill="${RB.accent}" opacity=".16"/>` + fx('dangle', charm(100, tipY)) + steam };
     } },
-    tophat: { label: 'Neon top hat', note: 'neon flickers', draw: (x, y, w) => { const h = w * 0.6, cw = w * 0.66;
-      const shape = `<rect x="${x - cw / 2}" y="${y - h}" width="${cw}" height="${h}" rx="3"/><ellipse cx="${x}" cy="${y}" rx="${w * 0.58}" ry="${w * 0.1}"/>`;
-      return { top: y - h, svg: `<g fill="#141a22" stroke="${RI}" stroke-width="3.5">${shape}</g>
-        <rect x="${x - cw / 2}" y="${y - h * 0.32}" width="${cw}" height="${h * 0.14}" fill="${RB.glow}"/>
-        ${fx('flicker', `<g fill="none" stroke="${RB.accent}" stroke-width="2" style="filter:drop-shadow(0 0 3px ${RB.accent})">${shape}</g>`)}` };
+    sunhat: { label: 'Boing spring', note: 'A coiled spring with a pink ball on top that boings. Squashed short and dim when drooped.', crown: true,
+      draw: (b, h, droop) => { const k = h / 22, H = droop ? h * 0.55 : h * 1.05, n = 6, dx = 6 * k;
+        let d = `M100 ${b + 1}`;
+        for (let i = 1; i <= n; i++) d += ` L${i === n ? 100 : 100 + (i % 2 ? dx : -dx)} ${b + 1 - (H * i) / n}`;
+        const by = b + 1 - H - 5;
+        const body = `<path d="${d}" stroke="${RI}" stroke-width="4.6" fill="none" stroke-linejoin="round" stroke-linecap="round"/><path d="${d}" stroke="${RB.bolt}" stroke-width="2" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+          ${droop ? '' : `<circle cx="100" cy="${by}" r="10" fill="${RB.accent}" opacity=".22"/>`}
+          <circle cx="100" cy="${by}" r="6" fill="${lit(droop, RB.accent)}" stroke="${RI}" stroke-width="2.4"/><circle cx="98" cy="${by - 2}" r="1.6" fill="#fff" opacity=".7"/>`;
+        return { top: by - 11, svg: sock(b) + fx('boing', body) };
+    } },
+    tophat: { label: 'Neon bolt', note: 'A lightning-bolt neon tube that flickers, with a lime spark at the tip. The neon goes out when drooped.', crown: true,
+      draw: (b, h, droop) => { const k = h / 22, H = h * 1.35;
+        const d = `M100 ${b + 1} L100 ${b - H * 0.22} L${100 + 6 * k} ${b - H * 0.42} L${100 - 6 * k} ${b - H * 0.62} L${100 + 5 * k} ${b - H * 0.84} L100 ${b - H}`;
+        const star = (x, y, r) => `<path d="M${x} ${y - r} Q${x} ${y} ${x + r} ${y} Q${x} ${y} ${x} ${y + r} Q${x} ${y} ${x - r} ${y} Q${x} ${y} ${x} ${y - r}Z" fill="${RB.lime}"/>`;
+        let svg = sock(b) + `<path d="${d}" stroke="${RI}" stroke-width="6" fill="none" stroke-linejoin="round" stroke-linecap="round"/>`;
+        svg += droop ? `<path d="${d}" stroke="${RB.dim}" stroke-width="2.6" fill="none" stroke-linejoin="round" stroke-linecap="round"/>`
+          : fx('flicker', `<path d="${d}" stroke="${RB.accent}" stroke-width="2.6" fill="none" stroke-linejoin="round" stroke-linecap="round"/>`, glowSt(RB.accent, 3)) + fx('sparkle', star(100, b - H - 3, 5));
+        return { top: b - H - 8, svg: droop ? wilt(b, svg) : svg };
     } },
   },
   glasses: {
@@ -719,12 +755,7 @@ const ROBOT_WARDROBE = {
         extra: `<g transform="translate(${wx} ${y}) rotate(18)"><rect x="-1.6" y="2" width="3.2" height="12" rx="1" fill="${RB.bolt}" stroke="${RI}" stroke-width="1.2"/><path d="M-4.5 3 a4.5 4.5 0 1 1 9 0 h-2.6 v-3 h-3.8 v3 Z" fill="${RB.bolt}" stroke="${RI}" stroke-width="1.2"/></g>
           <g transform="translate(${sx} ${y}) rotate(-12)"><rect x="-2.6" y="0" width="5.2" height="7" rx="1.5" fill="${RB.accent}" stroke="${RI}" stroke-width="1.2"/><path d="M0 7 v8" stroke="${RB.bolt}" stroke-width="1.8"/></g>` };
     } },
-    champ: { label: 'Marquee belt', note: 'LEDs chase round', draw: (f) => { const c = curveOf(f);
-      let clip = `<path d="${band(f.waist - 6, f.waist + 6, c)}" fill="#1a2028" stroke="${RI}" stroke-width="2.5"/>`;
-      for (let x = 4, n = 0; x < 200; x += 7, n++) clip += fx('chase', `<circle cx="${x}" cy="${arcY(x, f.waist, c)}" r="1.5" fill="${RB.glow}"/>`, `animation-delay:${(n % 4) * 0.2}s`);
-      const star = [[0, -2], [-1, -1], [0, -1], [1, -1], [-2, 0], [-1, 0], [0, 0], [1, 0], [2, 0], [-1, 1], [1, 1]];
-      return { clip, extra: `<rect x="88" y="${f.waist - 8}" width="24" height="16" rx="3" fill="#e8c34a" stroke="${RI}" stroke-width="2.5"/>${pxCells(star, 100, f.waist + 1, 2.2, RB.accent)}` };
-    } },
+    champ: { label: 'Marquee belt', note: 'gold title belt', draw: (f) => titleBelt('robot', 'champ', f) },
   },
   pants: {
     jeans: { label: 'Coolant casing', note: 'ribbed blue casing', draw: (f) => { const c = curveOf(f);
@@ -823,11 +854,7 @@ const DRAGON_WARDROBE = {
       const vial = (x, col) => `<rect x="${x - 1.8}" y="${y - 1}" width="3.6" height="3" fill="#a07a50" stroke="${DI}" stroke-width="1"/><circle cx="${x}" cy="${y + 7.5}" r="4.6" fill="${col}" stroke="${DI}" stroke-width="1.4"/><rect x="${x - 1.8}" y="${y + 1.5}" width="3.6" height="3" fill="${col}"/>${fx('rise', `<circle cx="${x + 1}" cy="${y + 9}" r="1" fill="#fff" opacity=".85"/>`)}`;
       return { clip: `<path d="${band(f.waist - 4, f.waist + 4, c)}" fill="#6b4226" stroke="${DI}" stroke-width="2.5"/>`, extra: vial(100 - f.side * 0.55, '#d8475c') + vial(100 + f.side * 0.5, '#4f8ad8') };
     } },
-    champ: { label: 'Hoard belt', note: 'gem buckle sparkles', draw: (f) => { const c = curveOf(f);
-      let clip = `<path d="${band(f.waist - 6, f.waist + 6, c)}" fill="#e3b23c" stroke="${DI}" stroke-width="2.5"/>`;
-      for (let x = 6; x < 200; x += 9) clip += `<circle cx="${x}" cy="${arcY(x, f.waist, c)}" r="3" fill="#f5d06a" stroke="#b88a1f" stroke-width="1.2"/>`;
-      return { clip, extra: `<path d="M100 ${f.waist - 9} l8 9 l-8 9 l-8 -9 Z" fill="#d43a4a" stroke="${DI}" stroke-width="2.4" stroke-linejoin="round"/><path d="M100 ${f.waist - 9} v18 M92 ${f.waist} h16" stroke="#ff8a96" stroke-width="1" opacity=".7"/>${fx('sparkle', `<path d="M105 ${f.waist - 10} l1.4 3 l3 1.4 l-3 1.4 l-1.4 3 l-1.4 -3 l-3 -1.4 l3 -1.4 Z" fill="#fff"/>`)}` };
-    } },
+    champ: { label: 'Hoard belt', note: 'gold title belt', draw: (f) => titleBelt('dragon', 'champ', f) },
   },
   pants: {
     jeans: { label: 'Patched breeches', note: 'stitched patches', draw: (f) => { const c = curveOf(f);
@@ -849,6 +876,66 @@ const DRAGON_WARDROBE = {
   },
 };
 
+/* ---------- Title belts (approved 2026-11-16, Champion only): the gold title belt on every line. Mirrors client wardrobeShapes.js titleBelt. ---------- */
+const TITLE_STYLE = {
+  herb: { ink: INK, strap: '#1d1712',
+    champ: { label: 'Champion belt', metal: '#e3b23c', dark: '#a8781a', light: '#fff0b0', jewel: '#d4384a', jewel2: '#d4384a' },
+    leather: { label: 'Leather belt', metal: '#c98a4b', dark: '#8a5527', light: '#f3cf9f', jewel: '#4f9a3a', jewel2: '#4f9a3a' },
+    // a basil leaf
+    crest: (x, y, r, st) => `<path d="M${x} ${y + r} C${x - r * 0.9} ${y + r * 0.2} ${x - r * 0.7} ${y - r * 0.8} ${x} ${y - r} C${x + r * 0.7} ${y - r * 0.8} ${x + r * 0.9} ${y + r * 0.2} ${x} ${y + r} Z" fill="#6cbf4a" stroke="${st}" stroke-width="1.2"/><path d="M${x} ${y + r * 0.9} V${y - r * 0.6}" stroke="${st}" stroke-width="1" opacity=".7"/>` },
+  dragon: { ink: DI, strap: '#241a14',
+    champ: { label: 'Hoard belt', metal: '#d9a53a', dark: '#93661a', light: '#ffe6a0', jewel: '#d43a4a', jewel2: '#2f9a6a' },
+    leather: { label: "Squire's belt", metal: '#a9a39a', dark: '#6e695f', light: '#e4e0d8', jewel: '#d43a4a', jewel2: '#d43a4a' },
+    // a heater shield with a ruby
+    crest: (x, y, r, st) => `<path d="M${x - r * 0.8} ${y - r * 0.8} H${x + r * 0.8} V${y + r * 0.1} Q${x + r * 0.8} ${y + r * 0.8} ${x} ${y + r} Q${x - r * 0.8} ${y + r * 0.8} ${x - r * 0.8} ${y + r * 0.1} Z" fill="#7a2730" stroke="${st}" stroke-width="1.2"/><path d="M${x} ${y - r * 0.55} l${r * 0.35} ${r * 0.45} l${-r * 0.35} ${r * 0.45} l${-r * 0.35} ${-r * 0.45} Z" fill="#ff8a96"/>` },
+  robot: { ink: RI, strap: '#11161d',
+    champ: { label: 'Marquee belt', metal: '#e8c34a', dark: '#a8841c', light: '#fff4c0', jewel: RB.accent, jewel2: RB.glow, leds: true },
+    leather: { label: 'Chrome belt', metal: '#c7d0d8', dark: '#7f8c9a', light: '#ffffff', jewel: RB.glow, jewel2: RB.glow },
+    // a pixel star on a dark screen disc
+    crest: (x, y, r, st) => {
+      const STAR = [[0, -2], [-1, -1], [0, -1], [1, -1], [-2, 0], [-1, 0], [0, 0], [1, 0], [2, 0], [-1, 1], [1, 1], [-1, 2], [1, 2]];
+      return `<circle cx="${x}" cy="${y}" r="${r}" fill="${RB.dark}" stroke="${st}" stroke-width="1.2"/>` + pxCells(STAR, x, y, r * 0.38, RB.accent);
+    } },
+};
+
+function titleBelt(line, tier, f) {
+  const T = TITLE_STYLE[line], m = T[tier], ink = T.ink, champ = tier === 'champ';
+  const c = curveOf(f), y = f.waist, s = f.side, x = 100;
+  // the strap: black leather with gilt edges and stitching, inside the body clip
+  let clip = `<path d="${band(y - 6, y + 6, c)}" fill="${T.strap}" stroke="${ink}" stroke-width="2.5"/>`;
+  clip += `<path d="${arc(y - 4.2, c)}" stroke="${m.metal}" stroke-width="1.2" fill="none"/><path d="${arc(y + 4.2, c)}" stroke="${m.metal}" stroke-width="1.2" fill="none"/>`;
+  clip += `<path d="${arc(y, c)}" stroke="${m.metal}" stroke-width=".8" stroke-dasharray="2 2.5" fill="none" opacity=".5"/>`;
+  let extra = '';
+  // side plates (champion only): small engraved plates with two jewels each
+  if (champ) [-1, 1].forEach(dir => {
+    const px = x + dir * s * 0.74, py = arcY(px, y, c), pw = Math.max(8, s * 0.32), ph = 11;
+    extra += `<rect x="${px - pw / 2}" y="${py - ph / 2}" width="${pw}" height="${ph}" rx="2" fill="${m.metal}" stroke="${ink}" stroke-width="1.8"/>`
+      + `<rect x="${px - pw / 2 + 1.6}" y="${py - ph / 2 + 1.6}" width="${pw - 3.2}" height="${ph - 3.2}" rx="1.2" fill="none" stroke="${m.dark}" stroke-width=".9"/>`
+      + `<path d="M${px - pw * 0.25} ${py + 1} q${pw * 0.12} -3 ${pw * 0.25} 0 t${pw * 0.25} 0" stroke="${m.dark}" stroke-width=".9" fill="none"/>`
+      + `<circle cx="${px - pw / 2 + 2.6}" cy="${py - ph / 2 + 2.6}" r="1.3" fill="${m.jewel}"/><circle cx="${px + pw / 2 - 2.6}" cy="${py + ph / 2 - 2.6}" r="1.3" fill="${m.jewel}"/>`;
+  });
+  // the centre plate: scalloped (bulging top and bottom) with an inner rim, scrollwork, jewels, a crest and a blank nameplate
+  const W = Math.min(48, Math.max(26, s * (champ ? 1.2 : 0.9))), H = W * (champ ? 0.66 : 0.6);
+  const plate = (k) => { const w = W * k, h = H * k;
+    return `M${x - w / 2} ${y - h * 0.28} Q${x - w / 2} ${y - h * 0.5} ${x - w * 0.3} ${y - h * 0.44} Q${x} ${y - h * 0.64} ${x + w * 0.3} ${y - h * 0.44} Q${x + w / 2} ${y - h * 0.5} ${x + w / 2} ${y - h * 0.28} V${y + h * 0.28} Q${x + w / 2} ${y + h * 0.5} ${x + w * 0.3} ${y + h * 0.44} Q${x} ${y + h * 0.64} ${x - w * 0.3} ${y + h * 0.44} Q${x - w / 2} ${y + h * 0.5} ${x - w / 2} ${y + h * 0.28} Z`; };
+  extra += `<path d="${plate(1)}" fill="${m.metal}" stroke="${ink}" stroke-width="2.4" stroke-linejoin="round"/>`;
+  extra += `<path d="${plate(0.82)}" fill="none" stroke="${m.dark}" stroke-width="1.1"/>`;
+  [-1, 1].forEach(dir => {
+    extra += `<path d="M${x + dir * W * 0.3} ${y - H * 0.1} q${dir * W * 0.07} ${-H * 0.12} 0 ${-H * 0.22} M${x + dir * W * 0.3} ${y + H * 0.06} q${dir * W * 0.07} ${H * 0.1} 0 ${H * 0.18}" stroke="${m.dark}" stroke-width=".9" fill="none"/>`;
+  });
+  const jewels = champ ? [[-0.38, -0.2], [0.38, -0.2], [-0.38, 0.2], [0.38, 0.2], [0, -0.43]] : [[-0.34, 0], [0.34, 0]];
+  jewels.forEach(([jx, jy], i) => {
+    const col = i % 2 ? m.jewel2 : m.jewel;
+    const dot = `<circle cx="${x + jx * W}" cy="${y + jy * H}" r="${champ ? 1.8 : 1.6}" fill="${col}" stroke="${ink}" stroke-width=".7"/>`;
+    extra += m.leds ? fx('chase', dot, `animation-delay:${i * 0.2}s;filter:drop-shadow(0 0 1.5px ${col})`) : dot;
+  });
+  extra += T.crest(x, y - H * 0.06, H * (champ ? 0.2 : 0.22), ink);
+  if (champ) extra += `<rect x="${x - W * 0.2}" y="${y + H * 0.22}" width="${W * 0.4}" height="${Math.max(2.4, H * 0.1)}" rx="1" fill="${m.light}" stroke="${m.dark}" stroke-width=".7"/>`;
+  extra += `<path d="M${x - W * 0.34} ${y - H * 0.32} q${W * 0.1} ${-H * 0.06} ${W * 0.2} ${-H * 0.04}" stroke="#fff" stroke-width="1.4" stroke-linecap="round" opacity=".6"/>`;
+  if (champ) extra += fx('sparkle', `<path d="M${x + W * 0.28} ${y - H * 0.42} l1.2 2.6 l2.6 1.2 l-2.6 1.2 l-1.2 2.6 l-1.2 -2.6 l-2.6 -1.2 l2.6 -1.2 Z" fill="#fff"/>`);
+  return { clip, extra };
+}
+
 /* ---------- HERB: today's wardrobe, unchanged ---------- */
 const HERB_WARDROBE = {
   hat: mapObj(HATS, (v, k) => ({ label: v.label, draw: v.draw, straight: k === 'chef' })),
@@ -859,6 +946,7 @@ const HERB_WARDROBE = {
   pants: mapObj(PANTS, v => ({ label: v.label, draw: f => ({ clip: drawPants(v, f), extra: '' }) })),
   shoes: mapObj(SHOES, v => ({ label: v.label, draw: (r, t) => drawShoe(v, r, t) })),
 };
+HERB_WARDROBE.belt.champ = { label: 'Champion belt', note: 'gold title belt', draw: (f) => titleBelt('herb', 'champ', f) };
 const WARDROBE = { herb: HERB_WARDROBE, dragon: DRAGON_WARDROBE, robot: ROBOT_WARDROBE };
 const TORSO_ORDER = ['pants', 'jacket', 'belt', 'scarf'];
 
@@ -889,6 +977,11 @@ const formName = (line, form) => LINE_COPY[line].formNames[form - 1] ?? LINE_COP
 
 /* ---------- compose one dressed form (mirrors PipFigure's layer order) ---------- */
 let uid = 0;
+/** A worn hat's { top, svg }: crown hats (the robot's antennas) draw from the head top and replace the crown. */
+function hatDraw(line, id, f, droop = false) {
+  const item = WARDROBE[line].hat[id];
+  return item.crown ? item.draw(f.growTop, f.growthRise, droop) : item.draw(100, f.hat.y, f.hat.w);
+}
 function pipFigure(line, fi, mood, outfit = {}, { wilted = false } = {}) {
   const L = LINES[line], f = L.forms[fi], id = `p${uid++}`, droop = wilted || mood === 'bored' || mood === 'sleep';
   let s = `<defs><linearGradient id="${id}g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${f.fill[0]}"/><stop offset="1" stop-color="${f.fill[1]}"/></linearGradient><clipPath id="${id}c"><path d="${f.body}"/></clipPath></defs>`;
@@ -911,13 +1004,13 @@ function pipFigure(line, fi, mood, outfit = {}, { wilted = false } = {}) {
   const glasses = outfit.glasses && mood !== 'sleep' ? W.glasses[outfit.glasses] : null;
   if (!glasses?.replacesFace) s += L.face(f, fi, mood);   // new flag: a screen face replaces the face while worn
   if (glasses) s += glasses.draw(100 - f.eyes.gap, 100 + f.eyes.gap, f.eyes.y, f.eyes.s);
-  let base = f.growTop;
+  let base = f.growTop, crownReplaced = false;
   if (outfit.hat) {
-    const item = W.hat[outfit.hat], h = item.draw(100, f.hat.y, f.hat.w);
-    s += item.straight ? h.svg : `<g transform="rotate(-7 100 ${f.hat.y})">${h.svg}</g>`;
-    base = Math.min(base, h.top + 4);
+    const item = W.hat[outfit.hat], h = hatDraw(line, outfit.hat, f, droop);
+    s += item.crown || item.straight ? h.svg : `<g transform="rotate(-7 100 ${f.hat.y})">${h.svg}</g>`;
+    if (item.crown) crownReplaced = true; else base = Math.min(base, h.top + 4);
   }
-  s += L.crown(fi, droop, base);
+  if (!crownReplaced) s += L.crown(fi, droop, base);
   const k = f.scale;
   return `<ellipse cx="100" cy="189" rx="${56 * k}" ry="6" fill="rgba(40,60,20,.13)"/><g class="anim"><g transform="translate(100 186) scale(${k}) translate(-100 -186)">${s}</g></g>`;
 }
@@ -944,7 +1037,7 @@ function pip(line, fi, mood, outfit, { variant = 'full', viewBox = null, wilted 
 function headBarTop(line, fi, outfit = {}) {
   const f = LINES[line].forms[fi], tops = [f.crownTop];
   let base = f.growTop;
-  if (outfit.hat) { const top = WARDROBE[line].hat[outfit.hat].draw(100, f.hat.y, f.hat.w).top; tops.push(top); base = Math.min(base, top + 4); }
+  if (outfit.hat) { const top = hatDraw(line, outfit.hat, f).top; tops.push(top); if (!WARDROBE[line].hat[outfit.hat].crown) base = Math.min(base, top + 4); }
   if (f.growthRise > 0) tops.push(base - f.growthRise);
   return Math.min(...tops);
 }
@@ -1108,14 +1201,14 @@ function fitIssues(line, fi) {
     [null, ...Object.keys(HATS)].forEach(hat => {
       const outfit = hat ? { hat } : {}, y = headBarY(line, fi, outfit), toScaled = (v) => FOOT_Y + (v - FOOT_Y) * f.scale;
       if (y > toScaled(f.crownTop) - 22 + 1e-9) out.push(`bar overlaps crown (${hat ?? 'no hat'})`);
-      if (hat && y > toScaled(WARDROBE[line].hat[hat].draw(100, f.hat.y, f.hat.w).top) - 22 + 1e-9) out.push(`bar overlaps ${hat}`);
+      if (hat && y > toScaled(hatDraw(line, hat, f).top) - 22 + 1e-9) out.push(`bar overlaps ${hat}`);
     });
   }
   // every item of this line's wardrobe draws on this form: hats rise above the brim, nothing renders NaN
   SLOTS.forEach(([slot, , items]) => Object.keys(items).forEach(id => {
     const item = WARDROBE[line][slot][id];
     if (!item) { out.push(`${slot}:${id} missing`); return; }
-    if (slot === 'hat' && !(item.draw(100, f.hat.y, f.hat.w).top < f.hat.y)) out.push(`${item.label} crown below brim`);
+    if (slot === 'hat' && !(hatDraw(line, id, f).top < f.hat.y)) out.push(`${item.label} crown below brim`);
     if (/NaN|undefined/.test(pipFigure(line, fi, 'content', { [slot]: id }))) out.push(`${item.label} renders NaN`);
   }));
   return out;

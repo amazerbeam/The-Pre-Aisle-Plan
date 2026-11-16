@@ -13,7 +13,7 @@ import { dressLayers } from './wardrobeLayers'
  * (100, PIP_FOOT_Y) — Pip wraps it in an <svg>, RoomPip places it in the room. The line's art
  * (lineArt) supplies the parts; this component owns the layer order the wardrobe check pins:
  * shadow → back → back-wear (a cape) → limbs → shoes → body + shine → details → torso clip →
- * outline → extras → face (skipped while a screen-face item is worn) → glasses → hat → crown.
+ * outline → extras → face (skipped while a screen-face item is worn) → glasses → hat → crown (skipped while an antenna is worn).
  * `wilted` droops and desaturates; `phase` drives the evolve pulse; `still` stops the idle
  * animation (Dress Pip cards and lineup).
  */
@@ -23,7 +23,7 @@ function PipFigure({ line, form, mood, wilted = false, phase = null, showProps =
   const f = pipForm(line, form)
   const art = lineArt(line)
   const droop = wilted || mood === PET_MOODS.BORED || mood === PET_SLEEP_FACE
-  const dress = dressLayers(outfit, line, form, { asleep: mood === PET_SLEEP_FACE })
+  const dress = dressLayers(outfit, line, form, { asleep: mood === PET_SLEEP_FACE, droop })
   const k = f.scale
   const shineX = 100 - f.side * 0.55
   const shineY = f.hat.y + 10
@@ -60,7 +60,7 @@ function PipFigure({ line, form, mood, wilted = false, phase = null, showProps =
           {!dress.replacesFace && <art.Face form={form} mood={mood} />}
           <PipOutfit shapes={dress.glasses} />
           {dress.hat && <g transform={dress.hat.transform ?? undefined}><PipOutfit shapes={dress.hat.shapes} /></g>}
-          <art.Crown form={form} droop={droop} base={dress.growTop} />
+          {!dress.replacesCrown && <art.Crown form={form} droop={droop} base={dress.growTop} />}
         </g>
       </g>
       {showProps && <HerbProps mood={mood} ink={art.ink} />}

@@ -519,3 +519,143 @@
 :root[data-theme="parchment"] .macro-target-sources li {
   font-style: italic;
 }
+
+/* ---------- recipe folders (parchment-theme.html: .fside .frow .ftile .vtog .crumbs) ---------- */
+/* Ledger sidebar: ruled hairlines between rows, wax-red rule on the open row */
+:root[data-theme="parchment"] .folder-sidebar {
+  border-radius: 0;
+  background: var(--page) var(--paper-noise);
+  box-shadow: var(--page-shadow);
+}
+
+:root[data-theme="parchment"] .folder-sidebar-head {
+  border-bottom: 2px solid var(--ink-faded);
+  font-family: var(--f-label);
+  font-size: 17px;
+  font-weight: 400;
+}
+
+:root[data-theme="parchment"] .folder-tree {
+  gap: 0;
+}
+
+:root[data-theme="parchment"] .folder-row {
+  border-radius: 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+:root[data-theme="parchment"] .folder-row.on {
+  border-left-color: transparent;
+  box-shadow: inset 3px 0 0 var(--folder-row-active-border);
+}
+
+:root[data-theme="parchment"] .folder-row.on .folder-icon {
+  color: var(--wax);
+}
+
+:root[data-theme="parchment"] .folder-row.is-drop,
+:root[data-theme="parchment"] .folder-tile.is-drop {
+  outline-width: 1.5px;
+  background: var(--gold-wash);
+}
+
+:root[data-theme="parchment"] .folder-row-name {
+  font-family: var(--f-body);
+  font-size: 17px;
+}
+
+/* Leather-edged tiles with a gilt top rule */
+:root[data-theme="parchment"] .folder-tile {
+  border: 2px solid var(--leather);
+  border-radius: 3px;
+  background: var(--page) var(--paper-noise);
+  box-shadow: inset 0 3px 0 var(--folder-tile-accent), 0 6px 10px -8px rgba(60, 35, 10, 0.6);
+}
+
+:root[data-theme="parchment"] .folder-tile.add {
+  border: 1.5px dashed var(--ink-faded);
+  background: none;
+  box-shadow: none;
+  font-family: var(--f-label);
+}
+
+:root[data-theme="parchment"] .folder-tile-text b {
+  font-family: var(--f-display);
+  font-size: 18px;
+  font-weight: 400;
+}
+
+:root[data-theme="parchment"] .folder-tile-text small {
+  font-family: var(--f-label);
+  font-size: 13px;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+/* Small-caps labels and breadcrumbs */
+:root[data-theme="parchment"] .folder-crumbs,
+:root[data-theme="parchment"] .folder-section-label {
+  font-family: var(--f-label);
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+:root[data-theme="parchment"] .folder-title {
+  font-family: var(--f-display);
+  font-weight: 400;
+}
+
+:root[data-theme="parchment"] .folder-bar,
+:root[data-theme="parchment"] .folder-new-btn,
+:root[data-theme="parchment"] .folder-add-btn,
+:root[data-theme="parchment"] .folder-chip,
+:root[data-theme="parchment"] .folder-name-input {
+  border-radius: 3px;
+}
+
+:root[data-theme="parchment"] .folder-chip {
+  border: 1px solid var(--border-color);
+  font-family: var(--f-label);
+  font-size: 13px;
+}
+
+/* Two leather tabs; the active one is gold on leather with a gilt foot rule */
+:root[data-theme="parchment"] .view-toggle {
+  gap: 4px;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+}
+
+:root[data-theme="parchment"] .view-toggle-btn {
+  justify-content: center;
+  border: 1px solid var(--leather-dark);
+  border-radius: 3px;
+  background: var(--paper-noise), linear-gradient(180deg, #4a2d1a, var(--view-toggle-bg));
+  box-shadow: inset 0 0 0 1px rgba(216, 178, 90, 0.25);
+  font-family: var(--f-label);
+  font-size: 16px;
+}
+
+:root[data-theme="parchment"] .view-toggle-btn.on {
+  background: var(--paper-noise), linear-gradient(180deg, var(--leather-dark), var(--view-toggle-bg));
+  box-shadow: inset 0 0 0 1px var(--gold-dim), inset 0 -3px 0 var(--gold);
+  font-weight: 400;
+}
+
+:root[data-theme="parchment"] .view-toggle-btn .folder-icon {
+  color: inherit;
+}
+
+@media (max-width: 767px) {
+  :root[data-theme="parchment"] .view-toggle {
+    width: 100%;
+  }
+
+  :root[data-theme="parchment"] .view-toggle-btn {
+    flex: 1;
+  }
+}

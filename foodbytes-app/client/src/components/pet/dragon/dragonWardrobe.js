@@ -1,5 +1,5 @@
 import { PIP_FOOT_X } from '../pip/pipSpace.js'
-import { arc, arcY, band, circle, curveOf, ellipse, fxGroup, heartPath, overalls, path, rect } from '../pip/wardrobeShapes.js'
+import { arc, arcY, band, circle, curveOf, ellipse, fxGroup, heartPath, overalls, path, rect, titleBelt } from '../pip/wardrobeShapes.js'
 import { DRAGON_INK } from './dragonForms.js'
 
 /**
@@ -138,6 +138,15 @@ const GLASSES = {
 
 // ---- torso items between the neck and waist lines, curved like a smile; clip = inside the body, extra = outside, back = behind it ----
 
+/** The dragon's Hoard belt: the shared gold title belt with a ruby shield crest (wardrobeShapes titleBelt). */
+export const DRAGON_TITLE_BELT = {
+  ink: DI, strap: '#241a14', metal: '#d9a53a', dark: '#93661a', light: '#ffe6a0', jewel: '#d43a4a', jewel2: '#2f9a6a',
+  crest: (x, y, r, ink) => [
+    path(`M${x - r * 0.8} ${y - r * 0.8} H${x + r * 0.8} V${y + r * 0.1} Q${x + r * 0.8} ${y + r * 0.8} ${x} ${y + r} Q${x - r * 0.8} ${y + r * 0.8} ${x - r * 0.8} ${y + r * 0.1} Z`, { fill: '#7a2730', stroke: ink, strokeWidth: 1.2 }),
+    path(`M${x} ${y - r * 0.55} l${r * 0.35} ${r * 0.45} l${-r * 0.35} ${r * 0.45} l${-r * 0.35} ${-r * 0.45} Z`, { fill: '#ff8a96' })
+  ]
+}
+
 const TORSO = {
   // Knight's cape: sways behind the body (the back layer), a collar and a clasp
   'red-scarf': (f) => {
@@ -233,20 +242,8 @@ const TORSO = {
       extra: [...vial(CX - f.side * 0.55, '#d8475c'), ...vial(CX + f.side * 0.5, '#4f8ad8')]
     }
   },
-  // Hoard belt: the gem buckle sparkles
-  'champion-belt': (f) => {
-    const c = curveOf(f)
-    const clip = [path(band(f.waist - 6, f.waist + 6, c), { fill: '#e3b23c', stroke: DI, strokeWidth: 2.5 })]
-    for (let x = 6; x < 200; x += 9) clip.push(circle(x, arcY(x, f.waist, c), 3, { fill: '#f5d06a', stroke: '#b88a1f', strokeWidth: 1.2 }))
-    return {
-      clip,
-      extra: [
-        path(`M${CX} ${f.waist - 9} l8 9 l-8 9 l-8 -9 Z`, { fill: '#d43a4a', stroke: DI, strokeWidth: 2.4, strokeLinejoin: 'round' }),
-        path(`M${CX} ${f.waist - 9} v18 M92 ${f.waist} h16`, { stroke: '#ff8a96', strokeWidth: 1, opacity: 0.7 }),
-        fxGroup('sparkle', [path(`M105 ${f.waist - 10} l1.4 3 l3 1.4 l-3 1.4 l-1.4 3 l-1.4 -3 l-3 -1.4 l3 -1.4 Z`, { fill: '#fff' })])
-      ]
-    }
-  },
+  // Hoard belt: the gold title belt (a glint sparkles on the plate)
+  'champion-belt': (f) => titleBelt(f, DRAGON_TITLE_BELT),
   // Patched breeches: stitched patches
   jeans: (f) => {
     const c = curveOf(f)

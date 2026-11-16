@@ -92,11 +92,27 @@ const PET_PAIRS = [
   ['macro-over-target-pill-text', 'bg-primary', 4.5],
 ]
 
+// Recipe folders + Menu/Folders switch (2026-11-16). Same pairs in every theme.
+const FOLDER_PAIRS = [
+  ['folder-row-text', 'bg-primary', 4.5],
+  ['folder-row-active-text', 'folder-row-active-bg', 4.5, 'bg-primary'],
+  ['folder-count-text', 'bg-primary', 4.5],
+  ['folder-tile-text', 'folder-tile-bg', 4.5, 'bg-primary'],
+  ['folder-tile-sub', 'folder-tile-bg', 4.5, 'bg-primary'],
+  ['folder-chip-text', 'folder-chip-bg', 4.5, 'bg-primary'],
+  ['folder-crumb-text', 'bg-primary', 4.5],
+  ['view-toggle-text', 'view-toggle-bg', 4.5, 'bg-primary'],
+  ['view-toggle-on-text', 'view-toggle-on-bg', 4.5],
+  ['folder-check-on-text', 'folder-check-on-bg', 4.5],
+  ['folder-icon', 'bg-primary', 3],
+]
+
 const PAIRS = {
   default: [
     ...on(['text-primary', 'text-secondary'], ['bg-primary', 'bg-secondary'], 4.5),
     ['on-brand', 'brand-primary', 4.5],
     ...PET_PAIRS,
+    ...FOLDER_PAIRS,
   ],
   cyberpunk: [
     ...on(['ink', 'muted', 'pink', 'cyan', 'yellow', 'lime', 'red'], ['panel', 'raised'], 4.5),
@@ -107,6 +123,7 @@ const PAIRS = {
     ['line', 'panel', 3.0],
     ...AISLES.map((a) => [`aisle-${a}`, 'paper', 3.0]),
     ...PET_PAIRS,
+    ...FOLDER_PAIRS,
   ],
   parchment: [
     ...on(['text-primary', 'text-secondary', 'brand-primary'], ['bg-primary', 'bg-secondary'], 4.5),
@@ -115,6 +132,7 @@ const PAIRS = {
     ['focus-ink', 'page', 3.0],
     ...AISLES.map((a) => [`aisle-${a}`, 'page', 3.0]),
     ...PET_PAIRS,
+    ...FOLDER_PAIRS,
   ],
 }
 

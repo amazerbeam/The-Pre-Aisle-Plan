@@ -93,6 +93,10 @@
 .pip-fx--sparkle { animation: pip-fx-sparkle 1.6s ease-in-out infinite; }
 .pip-fx--rise { animation: pip-fx-rise 2.2s ease-out infinite; }
 .pip-fx--cape { transform-origin: 50% 0; animation: pip-fx-cape 3.4s ease-in-out infinite; }
+.pip-fx--prop { animation: pip-fx-prop .32s linear infinite; }
+.pip-fx--radar { animation: pip-fx-prop 2.6s ease-in-out infinite; }
+.pip-fx--dangle { transform-origin: 50% 100%; animation: pip-fx-dangle 2.4s ease-in-out infinite; }
+.pip-fx--boing { transform-origin: 50% 100%; animation: pip-fx-boing 1.3s cubic-bezier(.3, 1.6, .5, 1) infinite; }
 
 @keyframes pip-fx-spin { to { transform: rotate(360deg); } }
 @keyframes pip-fx-scan { from { transform: translateX(0); } to { transform: translateX(600%); } }
@@ -111,6 +115,9 @@
 @keyframes pip-fx-sparkle { 0%, 100% { transform: scale(.3); opacity: .2; } 50% { transform: scale(1); opacity: 1; } }
 @keyframes pip-fx-rise { 0% { transform: translateY(0); opacity: 0; } 20% { opacity: 1; } 100% { transform: translateY(-12px); opacity: 0; } }
 @keyframes pip-fx-cape { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(1.6deg); } }
+@keyframes pip-fx-prop { 0%, 100% { transform: scaleX(1); } 50% { transform: scaleX(-1); } }
+@keyframes pip-fx-dangle { 0%, 100% { transform: rotate(-7deg); } 50% { transform: rotate(7deg); } }
+@keyframes pip-fx-boing { 0%, 100% { transform: scaleY(1); } 30% { transform: scaleY(.78); } 60% { transform: scaleY(1.1); } }
 
 body.lowfx .pip-fx,
 .pip-herb-figure.is-still .pip-fx { animation: none !important; }

@@ -16,8 +16,24 @@ export const LINE_WARDROBE = {
 
 const wardrobeOf = (line) => LINE_WARDROBE[line] ?? LINE_WARDROBE[PIP_DEFAULT_LINE]
 
-/** { top, straight?, shapes } on the head anchor, or null for an id that isn't a hat. */
-export const hatArt = (line, id, f) => wardrobeOf(line).HATS[id]?.(PIP_FOOT_X, f.hat.y, f.hat.w) ?? null
+/** A wardrobe whose hats replace the line's crown (the robot's antennas) sets HAT_ANCHOR to this. */
+export const HAT_ANCHOR_CROWN = 'crown'
+
+/** 'crown' when this line's hats replace its crown, otherwise null (hats sit on the hat anchor). */
+export const hatAnchor = (line) => wardrobeOf(line).HAT_ANCHOR ?? null
+
+/**
+ * { top, shapes, straight?, replacesCrown } on the head anchor, or null for an id that isn't a hat.
+ * Crown-anchored hats draw from the head top (growTop) and the form's growthRise, and redraw when drooped.
+ */
+export function hatArt(line, id, f, { droop = false } = {}) {
+  const draw = wardrobeOf(line).HATS[id]
+  if (!draw) return null
+  if (hatAnchor(line) === HAT_ANCHOR_CROWN) {
+    return { ...draw(PIP_FOOT_X, f.growTop, f.growthRise, droop), straight: true, replacesCrown: true }
+  }
+  return { ...draw(PIP_FOOT_X, f.hat.y, f.hat.w), replacesCrown: false }
+}
 
 /** { shapes, replacesFace } on the two eye points, or null for an id that isn't glasses. */
 export function glassesArt(line, id, f) {

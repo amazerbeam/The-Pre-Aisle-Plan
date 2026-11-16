@@ -3,10 +3,12 @@ import './RecipeToolbar.css'
 
 function RecipeToolbar({
   activeMeal, counts, onMealChange, query, onQueryChange,
-  hiddenCount, showHidden, onToggleHidden, hiddenAvailable, isAdmin, onAddRecipe
+  hiddenCount, showHidden, onToggleHidden, hiddenAvailable, isAdmin, onAddRecipe,
+  folderBar, searchPlaceholder
 }) {
   return (
     <div className="recipe-toolbar">
+      {folderBar}
       <div className="recipe-tabs" role="tablist" aria-label="Meal type">
         {RECIPE_MEAL_TABS.map((k) => (
           <button
@@ -26,7 +28,7 @@ function RecipeToolbar({
         type="search"
         className="recipe-search"
         aria-label="Search recipes"
-        placeholder={`Search ${RECIPE_TAB_LABELS[activeMeal].toLowerCase()} recipes`}
+        placeholder={searchPlaceholder ?? `Search ${RECIPE_TAB_LABELS[activeMeal].toLowerCase()} recipes`}
         value={query}
         onChange={(e) => onQueryChange(e.target.value)}
       />

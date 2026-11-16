@@ -139,6 +139,29 @@
   --storebought-text: #e65100;
   --macro-chip-solid-bg: #ffffff;
 
+  /* Recipes: custom folders + Menu/Folders switch (2026-11-16). Default reuses existing tokens: no new colours. */
+  --folder-icon: var(--brand-primary);
+  --folder-row-text: var(--text-primary);
+  --folder-row-active-bg: var(--surface-tint-brand);
+  --folder-row-active-border: var(--brand-primary);
+  --folder-row-active-text: var(--brand-primary);
+  --folder-count-text: var(--text-secondary);
+  --folder-tile-bg: var(--bg-primary);
+  --folder-tile-border: var(--border-color);
+  --folder-tile-accent: var(--brand-primary);
+  --folder-tile-text: var(--text-primary);
+  --folder-tile-sub: var(--text-secondary);
+  --folder-drop-border: var(--success-hover);
+  --folder-chip-bg: var(--surface-tint-faint);
+  --folder-chip-text: var(--text-secondary);
+  --folder-crumb-text: var(--brand-primary);
+  --view-toggle-bg: var(--bg-primary);
+  --view-toggle-text: var(--text-secondary);
+  --view-toggle-on-bg: var(--brand-primary);
+  --view-toggle-on-text: var(--on-brand);
+  --folder-check-on-bg: var(--brand-primary);
+  --folder-check-on-text: var(--on-brand);
+
   /* Meal plan: timetable, day view, cards, summary */
   --on-brand-faint: rgba(255, 255, 255, 0.12);
   --chip-selected-bg: #ffffff;

@@ -1,5 +1,5 @@
 import { PIP_FOOT_X } from '../pip/pipSpace.js'
-import { arc, arcY, band, curveOf } from '../pip/wardrobeShapes.js'
+import { arc, arcY, band, curveOf, path, titleBelt } from '../pip/wardrobeShapes.js'
 import { HERB_INK } from './herbForms.js'
 
 /**
@@ -152,21 +152,17 @@ function jacket({ color, dark, style }, f) {
   return { clip, extra: [] }
 }
 
-// AC 3: the buckle sits outside the clip.
-function belt({ color, buckle, big }, f) {
+// AC 3: the buckle sits outside the clip. (The Champion belt is the shared title belt: HERB_TITLE_BELT.)
+function belt({ color, buckle }, f) {
   const c = curveOf(f)
-  const h = big ? 12 : 8
   const w = f.waist
-  const extra = big
-    ? [
-        { tag: 'ellipse', cx: CX, cy: w, rx: 15, ry: 11, fill: buckle, stroke: HERB_INK, strokeWidth: 3 },
-        { tag: 'path', d: `M${CX} ${w - 6} l2 4 h4 l-3 3 l1 4 l-4 -2 l-4 2 l1 -4 l-3 -3 h4 Z`, fill: '#e8574a' }
-      ]
-    : [
-        { tag: 'rect', x: CX - 6, y: w - 6, width: 12, height: 12, rx: 2, fill: 'none', stroke: buckle, strokeWidth: 3 },
-        { tag: 'rect', x: CX - 6, y: w - 6, width: 12, height: 12, rx: 2, fill: 'none', stroke: HERB_INK, strokeWidth: 1 }
-      ]
-  return { clip: [bandShape(band(w - h / 2, w + h / 2, c), color, 2.5)], extra }
+  return {
+    clip: [bandShape(band(w - 4, w + 4, c), color, 2.5)],
+    extra: [
+      { tag: 'rect', x: CX - 6, y: w - 6, width: 12, height: 12, rx: 2, fill: 'none', stroke: buckle, strokeWidth: 3 },
+      { tag: 'rect', x: CX - 6, y: w - 6, width: 12, height: 12, rx: 2, fill: 'none', stroke: HERB_INK, strokeWidth: 1 }
+    ]
+  }
 }
 
 // AC 3: the tail and knot sit outside the clip.
@@ -186,14 +182,23 @@ function scarf({ color, stripe }, f) {
   }
 }
 
+/** The herb's Champion belt: the shared gold title belt with a basil-leaf crest (wardrobeShapes titleBelt). */
+export const HERB_TITLE_BELT = {
+  ink: HERB_INK, strap: '#1d1712', metal: '#e3b23c', dark: '#a8781a', light: '#fff0b0', jewel: '#d4384a', jewel2: '#d4384a',
+  crest: (x, y, r, ink) => [
+    path(`M${x} ${y + r} C${x - r * 0.9} ${y + r * 0.2} ${x - r * 0.7} ${y - r * 0.8} ${x} ${y - r} C${x + r * 0.7} ${y - r * 0.8} ${x + r * 0.9} ${y + r * 0.2} ${x} ${y + r} Z`, { fill: '#6cbf4a', stroke: ink, strokeWidth: 1.2 }),
+    path(`M${x} ${y + r * 0.9} V${y - r * 0.6}`, { stroke: ink, strokeWidth: 1, opacity: 0.7 })
+  ]
+}
+
 const TORSO = {
   'red-scarf': (f) => scarf({ color: '#e8574a', stripe: '#c63f34' }, f),
   'striped-scarf': (f) => scarf({ color: '#ffd34d', stripe: '#4a86e0' }, f),
   'chef-whites': (f) => jacket({ color: '#fbfbf7', dark: '#d9d9cf', style: 'chef' }, f),
   'denim-jacket': (f) => jacket({ color: '#5b85c4', dark: '#3f669f', style: 'open' }, f),
   puffer: (f) => jacket({ color: '#f0a03c', dark: '#c97f24', style: 'quilted' }, f),
-  'leather-belt': (f) => belt({ color: '#7a4a2a', buckle: '#e3c35a', big: false }, f),
-  'champion-belt': (f) => belt({ color: '#d6a52b', buckle: '#fff3b0', big: true }, f),
+  'leather-belt': (f) => belt({ color: '#7a4a2a', buckle: '#e3c35a' }, f),
+  'champion-belt': (f) => titleBelt(f, HERB_TITLE_BELT),
   jeans: (f) => pants({ color: '#4a6fb0', seam: '#e3c35a' }, f),
   joggers: (f) => pants({ color: '#8a8f99', seam: '#fff' }, f),
   dungarees: (f) => pants({ color: '#6f9a4a', seam: '#e3c35a', straps: true }, f)

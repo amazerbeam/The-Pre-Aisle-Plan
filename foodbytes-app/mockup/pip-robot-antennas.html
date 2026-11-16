@@ -1,0 +1,526 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pip Robot Antennas</title>
+<!-- Proposal in review (2026-11-16): the robot (Cyberpunk) Pip's five hat items become antenna styles instead of hats.
+     Robot geometry and the "Now" hats are copied verbatim from pip-themed-lines.html (ROBOT_FORMS, robot*, ROBOT_WARDROBE.hat). -->
+<style>
+  :root {
+    --brand: #4a3f80; --text: #2c3e50; --muted: #5f6b76;
+    --bg: #f3f5f0; --card: #ffffff; --line: #e1e6dc; --ok: #2f7d32; --bad: #c62828;
+    --stage: #0e1622; --stage-line: #1d2a3a; --stage-text: #b9c7d6; --pick: #ff5fa2;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; }
+  main { max-width: 1180px; margin: 0 auto; padding: 24px 16px 64px; }
+  h1 { color: var(--brand); margin: 0 0 4px; font-size: 1.7rem; }
+  h2 { color: var(--brand); margin: 36px 0 10px; font-size: 1.25rem; }
+  h3 { margin: 0; font-size: 1.05rem; }
+  .lede { color: var(--muted); margin: 0 0 16px; max-width: 860px; }
+  .note { font-size: .85rem; color: var(--muted); }
+  .card { background: var(--card); border-radius: 16px; padding: 16px; box-shadow: 0 4px 18px rgba(40,60,30,.08); margin-bottom: 18px; }
+  button { font: inherit; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chips button, .btn { min-height: 40px; border: 1px solid #c9d2c0; background: #fff; color: var(--text); border-radius: 999px; padding: 6px 14px; font-size: .88rem; font-weight: 600; cursor: pointer; touch-action: manipulation; }
+  .chips button.on { background: var(--brand); border-color: var(--brand); color: #fff; }
+  .controls { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; margin: 0 0 18px; position: sticky; top: 0; z-index: 2; background: var(--bg); padding: 8px 0; }
+  .controls > span { font-size: .88rem; font-weight: 700; }
+
+  .item-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; margin-bottom: 12px; }
+  .item-head .hint { font-size: .82rem; color: var(--muted); }
+  .opts { display: grid; grid-template-columns: minmax(150px, .8fr) 1.6fr 1.6fr; gap: 12px; }
+  @media (max-width: 860px) { .opts { grid-template-columns: 1fr; } }
+  .opt { border: 2px solid var(--line); border-radius: 14px; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+  .opt.now { background: #f7f8f5; }
+  .opt.picked { border-color: var(--pick); box-shadow: 0 0 0 3px #ff5fa233; }
+  .opt-title { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  .opt-title b { font-size: .95rem; }
+  .tag { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; padding: 2px 8px; border-radius: 999px; background: #e8ebf3; color: #3d4a63; }
+  .tag.charm { background: #ffe1ee; color: #8a1f4f; }
+  .tag.old { background: #f3dede; color: #8b2020; }
+  .opt p { margin: 0; font-size: .84rem; color: var(--muted); }
+  .stage { background: var(--stage); background-image: linear-gradient(var(--stage-line) 1px, transparent 1px), linear-gradient(90deg, var(--stage-line) 1px, transparent 1px); background-size: 16px 16px; border-radius: 10px; display: flex; align-items: flex-end; justify-content: center; gap: 2px; padding: 4px; min-height: 120px; }
+  .stage svg { width: 33%; max-width: 130px; height: auto; display: block; }
+  .opt.now .stage svg { width: 80%; max-width: 150px; }
+  .thumbs { display: flex; gap: 8px; align-items: center; }
+  .thumb { width: 64px; height: 64px; border-radius: 12px; background: #fff; border: 1px solid var(--line); flex: none; }
+  .thumbs span { font-size: .78rem; color: var(--muted); }
+  .pick { align-self: flex-start; }
+  .opt.picked .pick { background: var(--pick); border-color: var(--pick); color: #fff; }
+
+  .lineup { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+  @media (max-width: 640px) { .lineup { grid-template-columns: repeat(3, 1fr); } }
+  .lineup figure { margin: 0; text-align: center; }
+  .lineup .stage svg { width: 100%; max-width: 160px; }
+  .lineup figcaption { font-size: .8rem; font-weight: 600; margin-top: 4px; }
+  .lineup figcaption small { display: block; font-weight: 400; color: var(--muted); }
+  table { border-collapse: collapse; width: 100%; font-size: .86rem; }
+  th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  ul { margin: 6px 0; padding-left: 20px; }
+  li { margin: 3px 0; }
+
+  /* ---- Pip idle animation (mirrors client Pip.css) ---- */
+  .anim { transform-box: fill-box; transform-origin: 50% 100%; }
+  .mood-content .anim { animation: bob 2.6s ease-in-out infinite; }
+  .mood-happy .anim { animation: bounce 1.1s ease-in-out infinite; }
+  .mood-bored .anim { animation: droop 4s ease-in-out infinite; }
+  @keyframes bob { 0%,100% { transform: translateY(0) scale(1,1); } 50% { transform: translateY(-5px) scale(.98,1.02); } }
+  @keyframes bounce { 0%,100% { transform: translateY(0) scale(1,1); } 40% { transform: translateY(-16px) scale(.95,1.05); } 70% { transform: translateY(0) scale(1.05,.95); } }
+  @keyframes droop { 0%,100% { transform: rotate(0); } 50% { transform: rotate(-3deg) translateY(2px); } }
+
+  /* ---- wardrobe effects (existing ones mirror Pip.css; new ones marked NEW) ---- */
+  .fx { transform-box: fill-box; transform-origin: center; }
+  .spin { animation: spin 1.1s linear infinite; }
+  .scan { animation: scan 2.2s ease-in-out infinite alternate; }
+  .smoke { animation: smoke 2.1s ease-out infinite; }
+  .sway { transform-origin: 50% 100%; animation: sway 3s ease-in-out infinite; }
+  .flicker { animation: flicker 3.4s linear infinite; }
+  .sparkle { animation: twinkle 1.6s ease-in-out infinite; }
+  .prop { animation: prop .32s linear infinite; }                                         /* NEW: propeller seen side-on */
+  .radar { animation: prop 2.6s ease-in-out infinite; }                                   /* NEW: slow sweep */
+  .wiggle { animation: wiggle 1.4s ease-in-out infinite; }                                /* NEW: feelers */
+  .dangle { transform-origin: 50% 100%; animation: dangle 2.4s ease-in-out infinite; }   /* NEW: charm swings on its stalk */
+  .boing { transform-origin: 50% 100%; animation: boing 1.3s cubic-bezier(.3,1.6,.5,1) infinite; } /* NEW: spring */
+  .whisk { transform-origin: 50% 100%; animation: whisk .5s ease-in-out infinite alternate; }      /* NEW */
+  .tipblink { animation: tipblink 1.2s steps(1) infinite; }                               /* NEW: alternating tip lights */
+  .orbit { animation: spin 2.4s linear infinite; }                                        /* NEW: bead around the loop */
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes scan { from { transform: translateX(0); } to { transform: translateX(600%); } }
+  @keyframes smoke { 0% { opacity: 0; transform: translateY(4px) scale(.6); } 30% { opacity: .9; } 100% { opacity: 0; transform: translateY(-10px) scale(1.3); } }
+  @keyframes sway { 0%,100% { transform: rotate(-8deg); } 50% { transform: rotate(8deg); } }
+  @keyframes flicker { 0%,40%,46%,52%,100% { opacity: 1; } 43% { opacity: .3; } 49% { opacity: .55; } }
+  @keyframes twinkle { 0%,100% { transform: scale(.3); opacity: .2; } 50% { transform: scale(1); opacity: 1; } }
+  @keyframes prop { 0%,100% { transform: scaleX(1); } 50% { transform: scaleX(-1); } }
+  @keyframes wiggle { 0%,100% { transform: rotate(-5deg); } 50% { transform: rotate(6deg); } }
+  @keyframes dangle { 0%,100% { transform: rotate(-7deg); } 50% { transform: rotate(7deg); } }
+  @keyframes boing { 0%,100% { transform: scaleY(1); } 30% { transform: scaleY(.78); } 60% { transform: scaleY(1.1); } }
+  @keyframes whisk { from { transform: rotate(-6deg); } to { transform: rotate(6deg); } }
+  @keyframes tipblink { 0%,49% { opacity: 1; } 50%,100% { opacity: .25; } }
+
+  .drooped { filter: saturate(.25) brightness(.9); }
+  .drooped .fx, body.lowfx .fx, body.lowfx .anim { animation: none !important; }
+  body.lowfx .glowy { filter: none !important; }
+  @media (prefers-reduced-motion: reduce) { .fx, .anim { animation: none !important; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Pip robot: antennas instead of hats</h1>
+  <p class="lede">Cyberpunk only. The robot's five hat items stop sitting on the monitor head and <b>replace the antenna</b> instead.
+    Most are a different antenna <i>shape</i> (cartoon and game robots: propeller caps, TV rabbit ears, boing springs, bug feelers, neon tubes).
+    Only the chef hat leans on a charm: the red bulb becomes a tiny toque. Each item has two options; pick one per row and the lineup at the bottom updates.
+    Item ids, slots and unlocks don't change. Herb and dragon keep their hats.</p>
+
+  <div class="controls">
+    <span>Mood</span>
+    <div class="chips" id="moods"></div>
+    <div class="chips"><button id="lowfx" type="button" aria-pressed="false">Low FX</button></div>
+  </div>
+
+  <div class="card">
+    <div class="item-head"><h3>Today: bare antenna</h3><span class="hint">The default every option replaces (Bot-kid, Teen Unit, Android).</span></div>
+    <div class="stage" id="bare"></div>
+  </div>
+
+  <div id="items"></div>
+
+  <h2>Approved picks</h2>
+  <div class="card">
+    <p class="note" style="margin-top:0">Approved 2026-11-16: Prop-top, Radar bar, Toque charm, Boing spring, Neon bolt. Teen Unit, in the current mood. You can still try other options (remembered in this browser only). <button type="button" class="btn" id="resetPicks">Reset to approved</button></p>
+    <div class="lineup" id="lineup"></div>
+    <p class="note" id="pickText"></p>
+  </div>
+
+  <h2>How it would build</h2>
+  <div class="card">
+    <ul>
+      <li><b>Hat replaces the crown on the robot.</b> A new <code>REPLACES_CROWN</code> flag on <code>ROBOT_WARDROBE</code> (like <code>REPLACES_FACE</code> for Smiley.exe). When it's set, <code>PipFigure</code> skips <code>art.Crown</code> and the hat draws from <code>f.growTop</code> with the form's <code>growthRise</code>, instead of from the hat anchor.</li>
+      <li><b>Each antenna takes <code>(base, rise, droop)</code></b>, not <code>(x, y, w)</code>, so it grows with the form and wilts like today's antenna (bent over, tip light off, animation stopped). The drooped state here is a generic tilt; the twin antennas (rabbit ears, feelers) splay instead.</li>
+      <li><b>Head bar and card crops</b> read the antenna's <code>top</code>, the same way they read a hat's top today. The Dress Pip card thumbnails shown here use the existing hat crop unchanged, and every option fits.</li>
+      <li><b>Names</b> change in <code>WARDROBE_ITEM_LABELS</code> for the robot only. <b>Decided 2026-11-16:</b> on the robot the Hat slot is labelled <i>Antenna</i> in Dress Pip (tab, card and slot heading); the slot key stays <code>HAT</code> and herb and dragon keep <i>Hat</i>.</li>
+      <li>New effects (propeller, sweep, wiggle, dangle, boing, whisk, tip blink, orbit) go in <code>Pip.css</code> and stop under Low FX and reduced motion like the others.</li>
+    </ul>
+  </div>
+</main>
+
+<script>
+/* ======================================================================
+   Robot geometry — verbatim from pip-themed-lines.html (source of client robot/*Forms.js)
+   ====================================================================== */
+const ROBOT_INK = '#22303f', RI = ROBOT_INK;
+const FOOT_Y = 186;
+const ROBOT_FORMS = [
+  { name: 'Bot-kid', scale: 0.84, fill: ['#cfd6dc', '#7e8a96'],
+    body: 'M74 84 H126 Q140 84 140 98 V126 Q140 140 126 140 H122 V146 Q124 146 124 150 V174 Q124 182 116 182 H84 Q76 182 76 174 V150 Q76 146 78 146 V140 H74 Q60 140 60 126 V98 Q60 84 74 84Z',
+    hat: { y: 96, w: 60 }, eyes: { y: 112, gap: 14, s: 0.8 }, neck: 150, waist: 168, side: 23,
+    feet: [[[88, 180], [82, 185]], [[112, 180], [118, 185]]], growTop: 84, crownTop: 81, growthRise: 22 },
+  { name: 'Teen Unit', scale: 0.9, fill: ['#c6ced5', '#717e8b'],
+    body: 'M80 66 H120 Q132 66 132 78 V104 Q132 116 120 116 H108 V122 H118 Q130 122 130 134 V170 Q130 182 118 182 H82 Q70 182 70 170 V134 Q70 122 82 122 H92 V116 H80 Q68 116 68 104 V78 Q68 66 80 66Z',
+    hat: { y: 76, w: 56 }, eyes: { y: 92, gap: 13, s: 0.8 }, neck: 128, waist: 158, side: 30,
+    feet: [[[86, 180], [80, 186]], [[114, 180], [120, 186]]], growTop: 66, crownTop: 63, growthRise: 26 },
+  { name: 'Android', scale: 0.98, fill: ['#bcc5cd', '#65717e'],
+    body: 'M86 50 H114 Q126 50 126 62 V84 Q126 96 114 96 H108 V104 H128 Q142 104 142 118 L134 150 L134 172 Q134 182 124 182 H76 Q66 182 66 172 L66 150 L58 118 Q58 104 72 104 H92 V96 H86 Q74 96 74 84 V62 Q74 50 86 50Z',
+    hat: { y: 60, w: 48 }, eyes: { y: 74, gap: 11, s: 0.75 }, neck: 112, waist: 150, side: 42,
+    feet: [[[84, 180], [76, 186]], [[116, 180], [124, 186]]], growTop: 50, crownTop: 47, growthRise: 20 },
+];
+const RB = { dark: '#0b141c', screen: '#10202a', glow: '#37e6ff', glowSoft: '#37e6ff55', accent: '#ff5fa2', lime: '#9cff6a', limb: '#7f8c9a', plate: '#56616e', bolt: '#aeb8c2', dim: '#8d99a6', rust: '#b5653a', patch: '#6f7b86', cable: '#2b3a48' };
+const ROBOT_HEAD = [{ x0: 60, x1: 140, y0: 84, y1: 140, ym: 112 }, { x0: 68, x1: 132, y0: 66, y1: 116, ym: 91 }, { x0: 74, x1: 126, y0: 50, y1: 96, ym: 73 }];
+const ROBOT_SCREEN = [{ x: 67, y: 91, w: 66, h: 42, r: 9 }, { x: 74, y: 72, w: 52, h: 38, r: 8 }, { x: 79, y: 55, w: 42, h: 35, r: 7 }];
+const fx = (cls, svg, style = '') => `<g class="fx ${cls}"${style ? ` style="${style}"` : ''}>${svg}</g>`;
+
+function robotBack(fi, droop, f) {
+  const h = ROBOT_HEAD[fi];
+  let b = [h.x0 - 6, h.x1 + 6].map(x => `<circle cx="${x}" cy="${h.ym}" r="6" fill="${RB.bolt}" stroke="${RI}" stroke-width="2.6"/><path d="M${x} ${h.ym - 3.5} V${h.ym}" stroke="${RI}" stroke-width="2" stroke-linecap="round"/>`).join('');
+  if (fi >= 1) {
+    const sx = h.x1 - 4, sy = h.y1 - 4, ex = 100 + f.side + 14, ey = f.waist + 4;
+    const d = droop ? `M${sx} ${sy} C${sx + 14} ${sy + 22} ${ex + 6} ${ey + 18} ${ex} ${ey + 14}` : `M${sx} ${sy} C${sx + 22} ${sy + 6} ${ex + 10} ${ey - 20} ${ex} ${ey}`;
+    b += `<path d="${d}" stroke="${RI}" stroke-width="6.5" fill="none" stroke-linecap="round"/><path d="${d}" stroke="${RB.cable}" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+  }
+  return b;
+}
+function robotLimbs(f, fi) {
+  let s = '';
+  const L = [18, 24, 28][fi];
+  [-1, 1].forEach(dir => {
+    const sx = 100 + dir * (f.side - 3), sy = f.neck + 4, ex = 100 + dir * (f.side + 6), ey = sy + L * 0.5, hx = 100 + dir * (f.side + 9), hy = sy + L;
+    const d = `M${sx} ${sy} L${ex} ${ey} L${hx} ${hy}`;
+    s += `<path d="${d}" stroke="${RI}" stroke-width="10" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="${d}" stroke="${RB.limb}" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="${ex}" cy="${ey}" r="3.4" fill="${RB.bolt}" stroke="${RI}" stroke-width="2"/><circle cx="${hx}" cy="${hy}" r="4.8" fill="${RB.plate}" stroke="${RI}" stroke-width="2.4"/>`;
+  });
+  f.feet.forEach(([r, t]) => {
+    const dir = t[0] < r[0] ? -1 : 1, d = `M${r[0]} ${r[1] - 4} L${t[0]} ${t[1] - 3}`;
+    s += `<path d="${d}" stroke="${RI}" stroke-width="10" stroke-linecap="round"/><path d="${d}" stroke="${RB.limb}" stroke-width="5" stroke-linecap="round"/>
+      <rect x="${t[0] - 8 + dir * 2}" y="${t[1] - 6}" width="16" height="8" rx="3" fill="${RB.plate}" stroke="${RI}" stroke-width="2.5"/>`;
+  });
+  if (fi === 2) [-1, 1].forEach(dir => {
+    const cx = 100 + dir * (f.side - 2), cy = f.neck - 6;
+    s += `<ellipse cx="${cx}" cy="${cy}" rx="15" ry="11" fill="${RB.plate}" stroke="${RI}" stroke-width="3"/><path d="M${cx - 10} ${cy + 2} Q${cx} ${cy - 6} ${cx + 10} ${cy + 2}" stroke="${RB.glow}" stroke-width="2" fill="none"/>
+      <circle cx="${cx - 8 * dir}" cy="${cy - 4}" r="1.8" fill="${RB.bolt}"/><circle cx="${cx + 8 * dir}" cy="${cy + 3}" r="1.8" fill="${RB.bolt}"/>`;
+  });
+  return s;
+}
+function robotDetails(f, fi) {
+  const sc = ROBOT_SCREEN[fi], hd = ROBOT_HEAD[fi];
+  let d = `<rect x="${sc.x}" y="${sc.y}" width="${sc.w}" height="${sc.h}" rx="${sc.r}" fill="${RB.screen}" stroke="${RI}" stroke-width="3"/>`;
+  d += `<rect x="${sc.x + 2}" y="${sc.y + 2}" width="${sc.w - 4}" height="${sc.h - 4}" rx="${sc.r - 2}" fill="none" stroke="${RB.glowSoft}" stroke-width="2"/>`;
+  for (let y = sc.y + 5; y < sc.y + sc.h - 3; y += 4) d += `<path d="M${sc.x + 4} ${y} H${sc.x + sc.w - 4}" stroke="${RB.glow}" stroke-width=".8" opacity=".12"/>`;
+  d += `<circle cx="${sc.x + sc.w - 7}" cy="${(sc.y + sc.h + hd.y1) / 2}" r="1.8" fill="${RB.lime}"/>`;
+  d += `<path d="M${hd.x0 + 5} ${hd.y0 + 6} l7 2 M${hd.x1 - 12} ${hd.y1 - 4} l6 -2" stroke="${RI}" stroke-width="1.4" opacity=".35" stroke-linecap="round"/>`;
+  d += `<ellipse cx="${100 - f.side * 0.55}" cy="${f.waist + 6}" rx="4" ry="2.6" fill="${RB.rust}" opacity=".7"/><ellipse cx="${hd.x0 + 6}" cy="${hd.y1 - 6}" rx="3" ry="2" fill="${RB.rust}" opacity=".6"/>`;
+  const pw = f.side * 0.8, ph = (f.waist - f.neck) * 0.5, px = 100 + f.side * 0.05, py = f.neck + (f.waist - f.neck) * 0.22;
+  d += `<rect x="${px - pw / 2}" y="${py}" width="${pw}" height="${ph}" rx="3" fill="${RB.patch}" stroke="${RI}" stroke-width="2" transform="rotate(-4 ${px} ${py + ph / 2})"/>`;
+  d += [[-1, -1], [1, -1], [-1, 1], [1, 1]].map(([kx, ky]) => `<circle cx="${px + kx * (pw / 2 - 3)}" cy="${py + ph / 2 + ky * (ph / 2 - 3)}" r="1.3" fill="${RB.bolt}"/>`).join('');
+  if (fi === 2) d += `<path d="M${100 - f.side * 0.7} ${f.neck - 4} L100 ${f.neck + 2} L${100 + f.side * 0.7} ${f.neck - 4}" stroke="${RB.plate}" stroke-width="3" fill="none" stroke-linejoin="round"/>`;
+  return d;
+}
+function robotCrown(fi, droop, base) {
+  const h = ROBOT_FORMS[fi].growthRise, tipY = base - h + 6;
+  const stalk = droop ? `M100 ${base + 2} Q100 ${base - h * 0.45} ${112} ${base - h * 0.5}` : `M100 ${base + 2} V${tipY}`;
+  const [bx, by] = droop ? [114, base - h * 0.5] : [100, tipY];
+  return `<rect x="93" y="${base - 2}" width="14" height="6" rx="2" fill="${RB.plate}" stroke="${RI}" stroke-width="2.2"/>
+    <path d="${stalk}" stroke="${RI}" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+    ${droop ? '' : `<circle cx="${bx}" cy="${by}" r="9" fill="${RB.accent}" opacity=".25"/>`}
+    <circle cx="${bx}" cy="${by}" r="5" fill="${droop ? RB.dim : RB.accent}" stroke="${RI}" stroke-width="2.4"/>`;
+}
+function robotFace(f, mood) {
+  const { y: ey, gap, s } = f.eyes, L = 100 - gap, R = 100 + gap, my = ey + 15 * s, g = RB.glow, p = 3.2 * s;
+  const glow = (svg) => `<g class="glowy" style="filter:drop-shadow(0 0 ${2 * s}px ${g})">${svg}</g>`;
+  const px = (x, y) => `<rect x="${(x - p / 2).toFixed(2)}" y="${(y - p / 2).toFixed(2)}" width="${p.toFixed(2)}" height="${p.toFixed(2)}" fill="${g}"/>`;
+  const pixels = (cells, cx, cy) => cells.map(([i, j]) => px(cx + i * p, cy + j * p)).join('');
+  const BLOCK = [[-1, -1], [0, -1], [1, -1], [-1, 0], [0, 0], [1, 0], [-1, 1], [0, 1], [1, 1], [-1, -2], [0, -2], [1, -2]];
+  const CHEVRON = [[-2, 1], [-1, 0], [0, -1], [1, 0], [2, 1]];
+  const LINE = [[-2, 0], [-1, 0], [0, 0], [1, 0], [2, 0]];
+  const LID = [[-1, 0], [0, 0], [1, 0], [-1, 1], [0, 1], [1, 1]];
+  const SMILE = [[-3, -1], [-2, 0], [-1, 1], [0, 1], [1, 1], [2, 0], [3, -1]];
+  const GRIN = [[-3, -1], [-2, 0], [-1, 0], [0, 0], [1, 0], [2, 0], [3, -1], [-1, 1], [0, 1], [1, 1]];
+  const FLAT = [[-2, 0], [-1, 0], [0, 0], [1, 0], [2, 0]];
+  const blush = `<rect x="${L - 10 * s}" y="${ey + 7 * s}" width="${6 * s}" height="${2.4 * s}" fill="${RB.accent}" opacity=".85"/><rect x="${R + 4 * s}" y="${ey + 7 * s}" width="${6 * s}" height="${2.4 * s}" fill="${RB.accent}" opacity=".85"/>`;
+  switch (mood) {
+    case 'happy': return glow(pixels(CHEVRON, L, ey) + pixels(CHEVRON, R, ey) + pixels(GRIN, 100, my)) + blush;
+    case 'bored': return glow(pixels(LID, L, ey) + pixels(LID, R, ey) + pixels(FLAT, 100, my + p));
+    case 'sleep': return `<g opacity=".45">${pixels(LINE, L, ey + p) + pixels(LINE, R, ey + p) + px(100, my + p)}</g>`;
+    default: return glow(pixels(BLOCK, L, ey) + pixels(BLOCK, R, ey) + pixels(SMILE, 100, my));
+  }
+}
+
+/* ======================================================================
+   NOW: today's robot hats — verbatim from pip-themed-lines.html ROBOT_WARDROBE.hat
+   ====================================================================== */
+const CURRENT_HATS = {
+  beanie: { label: 'Cooling fan', draw: (x, y, w) => {
+    const hw = w * 0.36, h = w * 0.34, cy = y - h / 2, r = h * 0.36;
+    const blades = `<circle cx="${x}" cy="${cy}" r="${r * 1.05}" fill="none"/>` + [0, 120, 240].map(a => `<ellipse cx="${x}" cy="${cy - r * 0.5}" rx="${r * 0.32}" ry="${r * 0.52}" fill="${RB.bolt}" transform="rotate(${a} ${x} ${cy})"/>`).join('');
+    return { top: y - h, svg: `<rect x="${x - hw}" y="${y - h}" width="${hw * 2}" height="${h + 3}" rx="4" fill="${RB.plate}" stroke="${RI}" stroke-width="3"/>
+      <circle cx="${x}" cy="${cy}" r="${r + 2}" fill="${RB.dark}" stroke="${RI}" stroke-width="2"/>${fx('spin', blades)}<circle cx="${x}" cy="${cy}" r="${r * 0.25}" fill="${RB.glow}"/>
+      <path d="M${x - hw + 4} ${y - h + 4} v${h - 6} M${x + hw - 4} ${y - h + 4} v${h - 6}" stroke="${RI}" stroke-width="1.5" opacity=".5"/>` };
+  } },
+  cap: { label: 'Holo visor', draw: (x, y, w) => ({ top: y - 10, svg:
+    `<rect x="${x - w / 2}" y="${y - 10}" width="${w}" height="9" rx="3" fill="${RB.plate}" stroke="${RI}" stroke-width="3"/>
+     <path d="M${x - w * 0.52} ${y - 2} H${x + w * 0.52} L${x + w * 0.42} ${y + 8} H${x - w * 0.42} Z" fill="${RB.glow}" fill-opacity=".28" stroke="${RB.glow}" stroke-width="2" stroke-linejoin="round"/>
+     ${fx('scan', `<rect x="${x - w * 0.42}" y="${y - 1}" width="${w * 0.12}" height="8" fill="#fff" opacity=".55"/>`)}` }) },
+  'chef-hat': { label: 'Steam toque', draw: (x, y, w) => { const h = w * 0.55;
+    return { top: y - h - 24, svg: `<path d="M${x - w / 2 + 4} ${y - 4} C${x - w / 2 - 12} ${y - h} ${x - w / 4} ${y - h - 18} ${x} ${y - h - 8} C${x + w / 4} ${y - h - 18} ${x + w / 2 + 12} ${y - h} ${x + w / 2 - 4} ${y - 4} Z" fill="#dfe6ec" stroke="${RI}" stroke-width="3.5" stroke-linejoin="round"/>
+      <path d="M${x - w * 0.18} ${y - h * 0.9} v${h * 0.7} M${x + w * 0.18} ${y - h * 0.9} v${h * 0.7}" stroke="#b9c4ce" stroke-width="2.5"/>
+      <rect x="${x - w / 2}" y="${y - 9}" width="${w}" height="12" rx="3" fill="${RB.plate}" stroke="${RI}" stroke-width="3.5"/>
+      ${[0.3, 0.5, 0.7].map(k => `<circle cx="${x - w / 2 + w * k}" cy="${y - 3}" r="1.6" fill="${RB.bolt}"/>`).join('')}
+      ${[-0.18, 0.05, 0.22].map((k, i) => fx('smoke', `<circle cx="${x + w * k}" cy="${y - h - 16}" r="${4 + i}" fill="#e8eef3" opacity=".8"/>`, `animation-delay:${i * 0.6}s`)).join('')}` };
+  } },
+  'straw-hat': { label: 'Satellite dish', draw: (x, y, w) => { const R = w * 0.42, by = y - w * 0.42;
+    return { top: by - w * 0.22 - 5, svg: `<path d="M${x} ${y} V${by + 4}" stroke="${RI}" stroke-width="4" stroke-linecap="round"/><rect x="${x - 7}" y="${y - 5}" width="14" height="7" rx="2" fill="${RB.plate}" stroke="${RI}" stroke-width="2.5"/>
+      ${fx('sway', `<path d="M${x - R} ${by - 6} Q${x} ${by + 16} ${x + R} ${by - 6} Q${x} ${by + 2} ${x - R} ${by - 6} Z" fill="#cdd5dc" stroke="${RI}" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M${x} ${by + 4} L${x} ${by - w * 0.22}" stroke="${RI}" stroke-width="2.5"/><circle cx="${x}" cy="${by - w * 0.22}" r="3.2" fill="${RB.accent}" stroke="${RI}" stroke-width="1.8"/>`)}` };
+  } },
+  'top-hat': { label: 'Neon top hat', tilt: true, draw: (x, y, w) => { const h = w * 0.6, cw = w * 0.66;
+    const shape = `<rect x="${x - cw / 2}" y="${y - h}" width="${cw}" height="${h}" rx="3"/><ellipse cx="${x}" cy="${y}" rx="${w * 0.58}" ry="${w * 0.1}"/>`;
+    return { top: y - h, svg: `<g fill="#141a22" stroke="${RI}" stroke-width="3.5">${shape}</g>
+      <rect x="${x - cw / 2}" y="${y - h * 0.32}" width="${cw}" height="${h * 0.14}" fill="${RB.glow}"/>
+      ${fx('flicker', `<g fill="none" stroke="${RB.accent}" stroke-width="2" style="filter:drop-shadow(0 0 3px ${RB.accent})">${shape}</g>`)}` };
+  } },
+};
+
+/* ======================================================================
+   PROPOSED: antennas. draw(b, h, droop) → { svg, top }
+   b = head top (f.growTop), h = the form's growthRise, droop = bored / asleep / wilted.
+   ====================================================================== */
+const sock = (b) => `<rect x="93" y="${b - 2}" width="14" height="6" rx="2" fill="${RB.plate}" stroke="${RI}" stroke-width="2.2"/>`;
+const rod = (d, w = 3.2) => `<path d="${d}" stroke="${RI}" stroke-width="${w}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
+const tube = (d, color, w = 2.4) => `<path d="${d}" stroke="${RI}" stroke-width="${w + 2.6}" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="${d}" stroke="${color}" stroke-width="${w}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
+const glowSt = (c, px = 3) => `filter:drop-shadow(0 0 ${px}px ${c})`;
+const lit = (droop, c) => (droop ? RB.dim : c);
+/** Generic wilt: the whole antenna bends over to the right from its socket and goes dim (twin antennas splay instead). */
+const wilt = (b, svg) => `<g transform="rotate(34 100 ${b + 2})">${svg}</g>`;
+
+const ANTENNAS = {
+  beanie: [
+    { key: 'A', label: 'Prop-top', kind: 'antenna', ref: 'Propeller-cap kids in cartoons; propeller bots in platformers',
+      note: 'A short stalk with a two-blade propeller that spins (side-on, so it flips through). Stops dead when drooped.',
+      draw: (b, h, droop) => { const k = h / 22, t = b - h * 0.8;
+        const blades = `<ellipse cx="${100 - 13 * k}" cy="${t - 5}" rx="${13 * k}" ry="4.2" fill="${RB.accent}" stroke="${RI}" stroke-width="2"/><ellipse cx="${100 + 13 * k}" cy="${t - 5}" rx="${13 * k}" ry="4.2" fill="${RB.lime}" stroke="${RI}" stroke-width="2"/>`;
+        const svg = sock(b) + rod(`M100 ${b + 2} V${t}`) + `<rect x="96.5" y="${t - 3}" width="7" height="6" rx="2" fill="${RB.bolt}" stroke="${RI}" stroke-width="2"/>`
+          + fx('prop', blades) + `<circle cx="100" cy="${t - 5}" r="2.6" fill="${RB.bolt}" stroke="${RI}" stroke-width="1.8"/>`;
+        return { top: t - 9, svg: droop ? wilt(b, svg) : svg };
+      } },
+    { key: 'B', label: 'Feelers', kind: 'antenna', ref: 'Bug-eyed cartoon aliens and insect bots',
+      note: 'Two curly stalks with glowing lime tips that wiggle out of step. They flop sideways when drooped.',
+      draw: (b, h, droop) => { const k = h / 22; let svg = ''; let top = b;
+        [-1, 1].forEach((dir, i) => {
+          const rx = 100 + dir * 9, tx = 100 + dir * (droop ? 26 : 17) * k, ty = droop ? b - h * 0.3 : b - h * 1.05;
+          const d = `M${rx} ${b + 1} C${rx} ${b - h * 0.55} ${rx + dir * 2} ${ty + 7} ${tx} ${ty}`;
+          const tip = `${droop ? '' : `<circle cx="${tx}" cy="${ty}" r="7" fill="${RB.lime}" opacity=".22"/>`}<circle cx="${tx}" cy="${ty}" r="4" fill="${lit(droop, RB.lime)}" stroke="${RI}" stroke-width="2.2"/>`;
+          svg += `<rect x="${rx - 4}" y="${b - 2}" width="8" height="5" rx="2" fill="${RB.plate}" stroke="${RI}" stroke-width="2"/>`
+            + fx('wiggle', rod(d, 3) + tip, `transform-origin:${dir < 0 ? '100%' : '0%'} 100%;animation-delay:${i * -0.7}s`);
+          top = Math.min(top, ty - 7);
+        });
+        return { top, svg };
+      } },
+  ],
+  cap: [
+    { key: 'A', label: 'Rabbit ears', kind: 'antenna', ref: 'Old CRT telly aerials, a natural fit for a monitor head',
+      note: 'A domed base with two telescoping rods in a V; the tip lights blink in turn. The ears splay flat when drooped.',
+      draw: (b, h, droop) => { const ang = (droop ? 64 : 22) * Math.PI / 180, L = h * 1.55; let svg = '', top = b - 8;
+        svg += `<path d="M86 ${b + 2} Q86 ${b - 8} 100 ${b - 8} Q114 ${b - 8} 114 ${b + 2} Z" fill="${RB.plate}" stroke="${RI}" stroke-width="2.4" stroke-linejoin="round"/><path d="M91 ${b - 1} H109" stroke="${RB.bolt}" stroke-width="1.4"/>`;
+        [-1, 1].forEach((dir, i) => {
+          const sx = 100 + dir * 3, sy = b - 6, ex = sx + dir * Math.sin(ang) * L, ey = sy - Math.cos(ang) * L, mx = (sx + ex) / 2, my = (sy + ey) / 2;
+          svg += tube(`M${sx} ${sy} L${mx} ${my}`, RB.bolt, 2.4) + tube(`M${mx} ${my} L${ex} ${ey}`, RB.bolt, 1.2) + `<circle cx="${mx}" cy="${my}" r="1.8" fill="${RI}"/>`;
+          svg += droop ? `<circle cx="${ex}" cy="${ey}" r="2.8" fill="${RB.dim}" stroke="${RI}" stroke-width="1.8"/>`
+            : `<circle cx="${ex}" cy="${ey}" r="2.8" fill="${RB.dark}" stroke="${RI}" stroke-width="1.8"/>` + fx('tipblink', `<circle cx="${ex}" cy="${ey}" r="2.2" fill="${RB.glow}"/>`, `animation-delay:${i * 0.6}s;${glowSt(RB.glow, 2)}`);
+          top = Math.min(top, ey - 4);
+        });
+        return { top, svg };
+      } },
+    { key: 'B', label: 'Radar bar', kind: 'antenna', ref: 'Rotating radar heads on sci-fi rovers and mech games',
+      note: 'A stalk carrying a slatted bar with a cyan strip that slowly sweeps round (side-on).',
+      draw: (b, h, droop) => { const k = h / 22, t = b - h * 0.65, bw = 30 * k;
+        const bar = `<rect x="${100 - bw / 2}" y="${t - 7}" width="${bw}" height="7" rx="3" fill="${RB.plate}" stroke="${RI}" stroke-width="2.2"/>
+          <rect x="${100 - bw / 2 + 3}" y="${t - 5}" width="${bw - 6}" height="2.2" fill="${lit(droop, RB.glow)}"/>
+          <path d="M${100 - bw / 4} ${t - 7} v7 M100 ${t - 7} v7 M${100 + bw / 4} ${t - 7} v7" stroke="${RI}" stroke-width="1.2" opacity=".6"/>`;
+        const svg = sock(b) + rod(`M100 ${b + 2} V${t}`) + fx('radar', bar);
+        return { top: t - 8, svg: droop ? wilt(b, svg) : svg };
+      } },
+  ],
+  'chef-hat': [
+    { key: 'A', label: 'Toque charm', kind: 'charm', ref: 'Charm on the antenna tip, like a keyring on a game-character aerial',
+      note: "Today's antenna, but the red bulb is swapped for a tiny chef's toque (a pink LED bead keeps the bulb's colour). It swings and lets off a puff of steam. Hangs off the bent stalk when drooped.",
+      draw: (b, h, droop) => { const tipY = b - h + 6;
+        const charm = (x, y) => { const w = 22, y0 = y - 3, hh = 11;
+          return `<path d="M${x - w / 2 + 2} ${y0} C${x - w / 2 - 5} ${y0 - hh} ${x - w / 4} ${y0 - hh - 7} ${x} ${y0 - hh - 3} C${x + w / 4} ${y0 - hh - 7} ${x + w / 2 + 5} ${y0 - hh} ${x + w / 2 - 2} ${y0} Z" fill="${droop ? '#c9d0d6' : '#f1f5f8'}" stroke="${RI}" stroke-width="2.2" stroke-linejoin="round"/>
+            <path d="M${x - 3.5} ${y0 - hh} v${hh - 1.5} M${x + 3.5} ${y0 - hh} v${hh - 1.5}" stroke="#b9c4ce" stroke-width="1.6"/>
+            <rect x="${x - w / 2 + 1}" y="${y - 3.5}" width="${w - 2}" height="6" rx="2" fill="#dfe6ec" stroke="${RI}" stroke-width="2"/>
+            <circle cx="${x}" cy="${y - 0.5}" r="1.9" fill="${lit(droop, RB.accent)}"/>`; };
+        if (droop) {
+          const bx = 114, by = b - h * 0.5;
+          return { top: by - 22, svg: sock(b) + rod(`M100 ${b + 2} Q100 ${b - h * 0.45} ${bx - 2} ${by}`) + `<g transform="rotate(38 ${bx} ${by + 2})">${charm(bx, by + 2)}</g>` };
+        }
+        const steam = [-4, 4].map((dx, i) => fx('smoke', `<circle cx="${100 + dx}" cy="${tipY - 27}" r="${2.6 + i}" fill="#e8eef3" opacity=".8"/>`, `animation-delay:${i * 0.9}s`)).join('');
+        return { top: tipY - 32, svg: sock(b) + rod(`M100 ${b + 2} V${tipY + 1}`) + `<circle cx="100" cy="${tipY - 4}" r="12" fill="${RB.accent}" opacity=".16"/>` + fx('dangle', charm(100, tipY)) + steam };
+      } },
+    { key: 'B', label: 'Whisk tip', kind: 'antenna', ref: 'Kitchen-gadget robots (tool-arm heads in cooking games)',
+      note: 'The stalk ends in a balloon whisk with a cyan bead on top that jiggles. Kitchen-themed but still reads as an antenna, not a charm.',
+      draw: (b, h, droop) => { const k = h / 22, t = b - h * 0.42, L = h * 0.95;
+        const loop = (wd) => `M100 ${t} C${100 - wd} ${t - L * 0.25} ${100 - wd * 1.1} ${t - L * 0.9} 100 ${t - L} C${100 + wd * 1.1} ${t - L * 0.9} ${100 + wd} ${t - L * 0.25} 100 ${t}`;
+        const wires = [10 * k, 5 * k].map(wd => `<path d="${loop(wd)}" stroke="${RI}" stroke-width="3" fill="none"/><path d="${loop(wd)}" stroke="${RB.bolt}" stroke-width="1.3" fill="none"/>`).join('')
+          + `<path d="M100 ${t} V${t - L}" stroke="${RI}" stroke-width="2.4"/>`
+          + `<circle cx="100" cy="${t - L - 1}" r="2.6" fill="${lit(droop, RB.glow)}" stroke="${RI}" stroke-width="1.6"/>`;
+        const svg = sock(b) + tube(`M100 ${b + 2} V${t + 2}`, RB.plate, 3) + `<rect x="96" y="${t - 1}" width="8" height="5" rx="1.5" fill="${RB.bolt}" stroke="${RI}" stroke-width="1.8"/>` + fx('whisk', wires);
+        return { top: t - L - 4, svg: droop ? wilt(b, svg) : svg };
+      } },
+  ],
+  'straw-hat': [
+    { key: 'A', label: 'Boing spring', kind: 'antenna', ref: 'Jack-in-the-box springs and bouncy-head cartoon robots',
+      note: 'A coiled spring with a pink ball on top that boings. Squashed short and dim when drooped.',
+      draw: (b, h, droop) => { const k = h / 22, H = droop ? h * 0.55 : h * 1.05, n = 6, dx = 6 * k;
+        let d = `M100 ${b + 1}`;
+        for (let i = 1; i <= n; i++) d += ` L${i === n ? 100 : 100 + (i % 2 ? dx : -dx)} ${b + 1 - (H * i) / n}`;
+        const by = b + 1 - H - 5;
+        const body = `<path d="${d}" stroke="${RI}" stroke-width="4.6" fill="none" stroke-linejoin="round" stroke-linecap="round"/><path d="${d}" stroke="${RB.bolt}" stroke-width="2" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+          ${droop ? '' : `<circle cx="100" cy="${by}" r="10" fill="${RB.accent}" opacity=".22"/>`}
+          <circle cx="100" cy="${by}" r="6" fill="${lit(droop, RB.accent)}" stroke="${RI}" stroke-width="2.4"/><circle cx="98" cy="${by - 2}" r="1.6" fill="#fff" opacity=".7"/>`;
+        return { top: by - 11, svg: sock(b) + fx('boing', body) };
+      } },
+    { key: 'B', label: 'Mini dish', kind: 'antenna', ref: "Today's satellite dish, shrunk onto the stalk",
+      note: 'Keeps the dish idea but as the antenna itself: a small dish on the stalk with the pink bulb as its feed, sweeping side to side.',
+      draw: (b, h, droop) => { const k = h / 22, t = b - h * 0.6, R = 12 * k, by = t - 4;
+        const dish = `<path d="M${100 - R} ${by - 5} Q100 ${by + 12} ${100 + R} ${by - 5} Q100 ${by + 1} ${100 - R} ${by - 5} Z" fill="#cdd5dc" stroke="${RI}" stroke-width="2.6" stroke-linejoin="round"/>
+          <path d="M100 ${by + 3} V${by - 11}" stroke="${RI}" stroke-width="2.2"/><circle cx="100" cy="${by - 12}" r="2.8" fill="${lit(droop, RB.accent)}" stroke="${RI}" stroke-width="1.6"/>`;
+        const svg = sock(b) + rod(`M100 ${b + 2} V${t}`) + fx('sway', dish);
+        return { top: by - 16, svg: droop ? wilt(b, svg) : svg };
+      } },
+  ],
+  'top-hat': [
+    { key: 'A', label: 'Neon bolt', kind: 'antenna', ref: 'Zig-zag lightning aerials on super-hero and arcade robots',
+      note: 'A lightning-bolt neon tube that flickers, with a lime spark at the tip. The neon goes out when drooped.',
+      draw: (b, h, droop) => { const k = h / 22, H = h * 1.35;
+        const d = `M100 ${b + 1} L100 ${b - H * 0.22} L${100 + 6 * k} ${b - H * 0.42} L${100 - 6 * k} ${b - H * 0.62} L${100 + 5 * k} ${b - H * 0.84} L100 ${b - H}`;
+        const star = (x, y, r) => `<path d="M${x} ${y - r} Q${x} ${y} ${x + r} ${y} Q${x} ${y} ${x} ${y + r} Q${x} ${y} ${x - r} ${y} Q${x} ${y} ${x} ${y - r}Z" fill="${RB.lime}"/>`;
+        let svg = sock(b) + `<path d="${d}" stroke="${RI}" stroke-width="6" fill="none" stroke-linejoin="round" stroke-linecap="round"/>`;
+        svg += droop ? `<path d="${d}" stroke="${RB.dim}" stroke-width="2.6" fill="none" stroke-linejoin="round" stroke-linecap="round"/>`
+          : fx('flicker', `<path d="${d}" stroke="${RB.accent}" stroke-width="2.6" fill="none" stroke-linejoin="round" stroke-linecap="round"/>`, glowSt(RB.accent, 3)) + fx('sparkle', star(100, b - H - 3, 5));
+        return { top: b - H - 8, svg: droop ? wilt(b, svg) : svg };
+      } },
+    { key: 'B', label: 'Neon halo', kind: 'antenna', ref: 'Loop aerials on retro sci-fi robots',
+      note: 'A short stalk holding a cyan neon ring with a pink bead orbiting it. Ring goes dark when drooped.',
+      draw: (b, h, droop) => { const k = h / 22, t = b - h * 0.5, r = 9 * k, cy = t - r - 1;
+        let svg = sock(b) + rod(`M100 ${b + 2} V${t}`) + `<circle cx="100" cy="${cy}" r="${r}" fill="none" stroke="${RI}" stroke-width="5"/>`;
+        svg += droop ? `<circle cx="100" cy="${cy}" r="${r}" fill="none" stroke="${RB.dim}" stroke-width="2.2"/>`
+          : fx('flicker', `<circle cx="100" cy="${cy}" r="${r}" fill="none" stroke="${RB.glow}" stroke-width="2.2"/>`, glowSt(RB.glow, 3))
+            + fx('orbit', `<circle cx="100" cy="${cy}" r="${r}" fill="none"/><circle cx="${100 + r}" cy="${cy}" r="2.6" fill="${RB.accent}" stroke="${RI}" stroke-width="1.4"/>`);
+        return { top: cy - r - 4, svg: droop ? wilt(b, svg) : svg };
+      } },
+  ],
+};
+const ITEMS = [
+  { id: 'beanie', hint: 'Owned from the start' },
+  { id: 'cap', hint: '5 days alcohol-free' },
+  { id: 'chef-hat', hint: 'Your first homemade extra' },
+  { id: 'straw-hat', hint: 'Grow to Sprig' },
+  { id: 'top-hat', hint: 'Any 1-month streak' },
+];
+
+/* ======================================================================
+   Compose (mirrors PipFigure's layer order; the hat/antenna step is the only change)
+   ====================================================================== */
+let uid = 0;
+function robot(fi, mood, { current = null, antenna = null } = {}) {
+  const f = ROBOT_FORMS[fi], id = `r${uid++}`, droop = mood === 'bored' || mood === 'sleep', k = f.scale;
+  let s = `<defs><linearGradient id="${id}g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${f.fill[0]}"/><stop offset="1" stop-color="${f.fill[1]}"/></linearGradient></defs>`;
+  s += robotBack(fi, droop, f) + robotLimbs(f, fi);
+  s += `<path d="${f.body}" fill="url(#${id}g)"/>`;
+  s += `<ellipse cx="${100 - f.side * 0.55}" cy="${f.hat.y + 10}" rx="11" ry="6" transform="rotate(-32 ${100 - f.side * 0.55} ${f.hat.y + 10})" fill="#fff" opacity=".45"/>`;
+  s += robotDetails(f, fi);
+  s += `<path d="${f.body}" fill="none" stroke="${RI}" stroke-width="5" stroke-linejoin="round"/>`;
+  s += robotFace(f, mood);
+  if (antenna) {
+    const a = antenna.draw(f.growTop, f.growthRise, droop);
+    s += `<g${droop ? ' class="drooped"' : ''}>${a.svg}</g>`;             // replaces the crown
+  } else if (current) {
+    const h = current.draw(100, f.hat.y, f.hat.w);
+    s += current.tilt ? `<g transform="rotate(-7 100 ${f.hat.y})">${h.svg}</g>` : h.svg;
+    s += robotCrown(fi, droop, Math.min(f.growTop, h.top + 4));         // today: antenna pokes through the hat
+  } else s += robotCrown(fi, droop, f.growTop);
+  return `<ellipse cx="100" cy="189" rx="${56 * k}" ry="6" fill="rgba(0,0,0,.35)"/><g class="anim"><g transform="translate(100 ${FOOT_Y}) scale(${k}) translate(-100 -${FOOT_Y})">${s}</g></g>`;
+}
+function svg(fi, mood, opts, viewBox = '0 -14 200 212', label = '') {
+  const a11y = label ? `role="img" aria-label="${label}"` : 'aria-hidden="true" focusable="false"';
+  return `<svg viewBox="${viewBox}" class="mood-${mood}" xmlns="http://www.w3.org/2000/svg" ${a11y}>${robot(fi, mood, opts)}</svg>`;
+}
+/** The Dress Pip item card crop for the Hat slot (wardrobeLayers.js slotCropViewBox, unchanged). */
+function hatCrop(fi) {
+  const f = ROBOT_FORMS[fi], cy = f.hat.y - f.hat.w * 0.35, size = f.hat.w * 1.9 + 26, k = f.scale;
+  const y = FOOT_Y + (cy - FOOT_Y) * k, s = size * k;
+  return [100 - s / 2, y - s / 2, s, s].map(n => n.toFixed(1)).join(' ');
+}
+
+/* ======================================================================
+   UI
+   ====================================================================== */
+const MOODS = [['content', 'Content'], ['happy', 'Happy'], ['bored', 'Bored (drooped)'], ['sleep', 'Asleep']];
+let mood = 'content';
+const PICK_KEY = 'fb.mockup.robotAntennaPicks';
+/** Approved 2026-11-16. A browser can still try other options; Reset returns to these. */
+const APPROVED = { beanie: 'A', cap: 'B', 'chef-hat': 'A', 'straw-hat': 'A', 'top-hat': 'A' };
+let picks = { ...APPROVED };
+try { picks = { ...APPROVED, ...(JSON.parse(localStorage.getItem(PICK_KEY) || '{}') || {}) }; } catch { picks = { ...APPROVED }; }
+const savePicks = () => { try { localStorage.setItem(PICK_KEY, JSON.stringify(picks)); } catch { /* private window */ } };
+const pickOf = (id) => ANTENNAS[id].find(o => o.key === picks[id]) ?? ANTENNAS[id][0];
+
+function renderMoods() {
+  document.getElementById('moods').innerHTML = MOODS.map(([m, l]) => `<button type="button" data-mood="${m}" class="${m === mood ? 'on' : ''}" aria-pressed="${m === mood}">${l}</button>`).join('');
+}
+function renderBare() {
+  document.getElementById('bare').innerHTML = [0, 1, 2].map(fi => svg(fi, mood, {}, undefined, `${ROBOT_FORMS[fi].name}, bare antenna`)).join('');
+}
+function renderItems() {
+  document.getElementById('items').innerHTML = ITEMS.map(({ id, hint }) => {
+    const cur = CURRENT_HATS[id];
+    const opts = ANTENNAS[id].map(o => {
+      const picked = pickOf(id) === o && picks[id];
+      return `<div class="opt${picked ? ' picked' : ''}">
+        <div class="opt-title"><b>Option ${o.key} · ${o.label}</b><span class="tag${o.kind === 'charm' ? ' charm' : ''}">${APPROVED[id] === o.key ? 'approved · ' : ''}${o.kind}</span></div>
+        <div class="stage">${[0, 1, 2].map(fi => svg(fi, mood, { antenna: o }, undefined, `${ROBOT_FORMS[fi].name} with ${o.label}`)).join('')}</div>
+        <p>${o.note}</p>
+        <p><i>Inspired by:</i> ${o.ref}</p>
+        <div class="thumbs">${svg(1, mood, { antenna: o }, hatCrop(1)).replace('<svg ', '<svg class="thumb" ')}<span>Dress Pip card (Teen Unit, today's hat crop)</span></div>
+        <button type="button" class="btn pick" data-item="${id}" data-key="${o.key}" aria-pressed="${!!picked}">${picked ? '✓ Picked' : `Pick ${o.key}`}</button>
+      </div>`;
+    }).join('');
+    return `<section class="card">
+      <div class="item-head"><h3>${id}</h3><span class="hint">Unlock: ${hint}</span></div>
+      <div class="opts">
+        <div class="opt now">
+          <div class="opt-title"><b>Now · ${cur.label}</b><span class="tag old">hat</span></div>
+          <div class="stage">${svg(1, mood, { current: cur }, undefined, `Teen Unit wearing today's ${cur.label}`)}</div>
+          <p>Sits on the monitor head; the antenna pokes through it.</p>
+        </div>
+        ${opts}
+      </div>
+    </section>`;
+  }).join('');
+}
+function renderLineup() {
+  document.getElementById('lineup').innerHTML = ITEMS.map(({ id }) => {
+    const o = pickOf(id);
+    return `<figure><div class="stage">${svg(1, mood, { antenna: o }, '20 -6 160 196', `Teen Unit with ${o.label}`)}</div>
+      <figcaption>${o.label}<small>${id} · option ${o.key}${APPROVED[id] === o.key ? ' ✓ approved' : ' (trying)'}</small></figcaption></figure>`;
+  }).join('');
+  document.getElementById('pickText').textContent = 'Picks: ' + ITEMS.map(({ id }) => `${id} → ${pickOf(id).key} ${pickOf(id).label}`).join(', ')
+    + (ITEMS.some(({ id }) => picks[id] !== APPROVED[id]) ? '. Differs from the approved set; press Reset to go back.' : '. Matches the approved set.');
+}
+function renderAll() { renderMoods(); renderBare(); renderItems(); renderLineup(); }
+
+document.addEventListener('click', (e) => {
+  const m = e.target.closest('[data-mood]');
+  if (m) { mood = m.dataset.mood; renderAll(); return; }
+  const p = e.target.closest('[data-item]');
+  if (p) { picks[p.dataset.item] = p.dataset.key; savePicks(); renderItems(); renderLineup(); return; }
+  if (e.target.id === 'resetPicks') { picks = { ...APPROVED }; savePicks(); renderItems(); renderLineup(); return; }
+  if (e.target.id === 'lowfx') {
+    const on = document.body.classList.toggle('lowfx');
+    e.target.classList.toggle('on', on); e.target.setAttribute('aria-pressed', on);
+  }
+});
+renderAll();
+</script>
+</body>
+</html>

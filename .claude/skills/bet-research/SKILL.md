@@ -166,6 +166,17 @@ A Lucky 15 is **not** a stake split. It's a single structured bet type (4 single
 
 Without this, the strategy can't be sized correctly. If the user can't say, ask. **Sense-check the ceiling against what the other members actually bet** — if the group's typical winning slip is €100–€150 (small singles, doubles, the occasional Bet Builder), a Lucky 15 returning ~€150 on all-4 already wins; you don't need a €293 straight-acca shot.
 
+### Layer B1.5 — Head-to-head vs a known rival slip (when the user shows you the opponent's bet)
+
+When the user shares the rival's actual slip, the target is no longer a single ceiling — it's the rival's **full outcome distribution**. Enumerate it (each outcome's return + probability from margin-stripped odds), then score every candidate structure on **P(our return > their return)**, not on "does all-4 beat the max".
+
+**Mandatory check: what does our 3-of-4 Lucky 15 outcome return vs the rival's most likely paying outcome?** 3-of-4 is the single most likely Lucky 15 outcome (~40%). If it can't beat the rival's mid outcome, the structure collapses to "need all 4" and the Lucky 15 insurance is buying nothing that matters in the head-to-head.
+
+- Very short legs (1.25–1.50) shrink the 3-of-4 return to ~€39–€45 on €50. That loses to any rival outcome of ~€47+.
+- Fix: keep legs in the 1.45–1.65 band so 3-of-4 lands ~€45–€51, or pick legs whose 3-of-4 clears the rival's likely middle outcome. Show this comparison in the B4 outcomes table (add a "beats rival?" column).
+
+**Case 2026-11-14 (loss, close):** rival €30 on two GAA singles (11/8 + 9/4) → settled at **€47.50**. Our €49.95 Lucky 15 Norway 3/10, Portugal 4/7, Sweden 10/21, France 1/4. Result 3 of 4 (Portugal lost 1-4 to Denmark) → **~€39.34 returned, lost by ~€8**. Every 3-of-4 combination of those prices returned €39–€45, below €47.50 — the B1.5 check would have caught it before placement. The rival also settled before our legs started, so a cash-out at ≥€47.50 (offered €49.95 pre-match) would have locked the win — see B6.
+
 ### Layer B2 — Compute target odds
 
 ```
@@ -232,6 +243,10 @@ Run a WebSearch for each question. Quote the source. Then in the output, produce
 
 If a question can't be answered confidently from web sources, say so explicitly and treat it as a downside risk on that leg. Don't fabricate a confident answer.
 
+**Squad-upheaval legs are drop, not flag.** If the favoured side is playing its first match after a star's retirement / fall-out with the manager / sudden squad departure, swap the leg out rather than marking it ⚠️ and keeping it. Case 2026-11-14: Portugal 4/7 in their first game without Ronaldo (reported fall-out with Jorge Jesus) lost **1-4 at home to Denmark** — their heaviest competitive home defeat. Flagged ⚠️ in B3.5, kept anyway, and it was the leg that cost the head-to-head.
+
+**Lucky 15 bonuses are often horse-racing only** (Ladbrokes included). Confirm the bonus covers football before counting it; if unconfirmed, compute returns without it.
+
 The output of this layer is a Q&A block embedded in the response — see the Mode B output template below.
 
 ### Layer B4 — State the EV cost transparently
@@ -243,6 +258,22 @@ The user must see what they're paying for variance. Quote the expected loss per 
 - **Single** at 1.50 → ~€2.50 expected loss per €50
 
 Confirm the user accepts the trade. The Lucky 15 costs an extra ~€7–€9 of EV per slip to remove the ~83% blank rate. State this number.
+
+### Layer B6 — Live updates & cash-out (when the user asks "update" / "what's the latest")
+
+**Format — scoreboard first, always.** One row per leg, the user's pick in the LEFT column even if it's the away side:
+
+| Your pick | Score | Clock | Opponent | |
+|---|---|---|---|---|
+| **Norway** | 3 – 1 | FT | Wales | ✅ |
+| **Portugal** | 0 – 0 | 34' | Denmark | ⏳ |
+| **France** | – | Sun 15 Nov 19:45 | Turkiye | ⏳ |
+
+- Live → score + match minute. Finished → FT + ✅/❌. Not started → kick-off day + time in the Clock column, no score.
+- In a head-to-head, show a second board for the rival's slip with its running/final total.
+- Analysis (cash-out, what's still needed) goes **below** the boards, kept to a few lines.
+
+**Cash-out rule (head-to-head):** once the rival's slip has settled, compare the current cash-out offer to their final return. If cash-out > rival's return and our remaining structure needs more than ~1 in 2 to beat them, recommend cashing out (or a partial that locks just above their figure). Verify the rival's result from two sources first — a wrong read flips the decision.
 
 ### Mode B reject conditions
 
@@ -407,6 +438,8 @@ Project-wide rules live at `.claude/rules/`. Before answering, scan `.claude/rul
 - The matching mode's layers/structure are completed in the response
 - Mode A: full six-layer block before any stake or verdict; Layer 6 log row is paste-ready
 - Mode B: B0 blank-cost gate answered, leaderboard ceiling, target odds, 4-leg construction (straight acca OR Lucky 15), **B3.5 pre-placement verification Q&A table with researched answers and source links**, EV cost, and **B5 bets-to-place table + step-by-step placement instructions as the terminal section of the response**; no 5+ leg accas; no two-slip stake splits; no asking the user for publicly-available context
+- Mode B head-to-head (rival slip known): B1.5 check done — 3-of-4 return compared against the rival's likely outcomes, "beats rival?" column in the outcomes table
+- Live updates: B6 scoreboard first (pick on left, score + clock, kick-off time if not started)
 - Mode C: structure suggested without LARPing as +EV research; "this is -EV" disclosure present
 - Verdict is a single concrete recommendation (BET / PASS / WAIT FOR TEAM NEWS for Mode A; STRUCTURE / PASS for Mode B; suggested structure for Mode C)
 - No forbidden phrases appear in the output

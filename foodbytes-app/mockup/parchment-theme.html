@@ -232,7 +232,7 @@ button,input{font:inherit;color:inherit}
 .aisle h5 small{font-family:var(--f-body);font-style:italic;font-size:13px;color:var(--text-secondary);order:3}
 .item{display:flex;align-items:center;gap:12px;padding:5px 2px;border:0;background:none;width:100%;text-align:left;font-size:17px;border-bottom:1px solid var(--rule)}
 .box{width:18px;height:18px;flex:none;border:1.5px solid var(--text-primary);border-radius:1px 3px 2px 2px;position:relative}
-.item.on .box::after{content:"";position:absolute;inset:2px;background:var(--brand-primary);-webkit-mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path d='M3.5 3.2C7 7.4 11.6 12.6 16.8 17' fill='none' stroke='black' stroke-width='2.6' stroke-linecap='round'/><path d='M16.4 3C12.5 7.2 8.4 11.8 3.2 16.6' fill='none' stroke='black' stroke-width='2.3' stroke-linecap='round'/></svg>") center/contain no-repeat;mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path d='M3.5 3.2C7 7.4 11.6 12.6 16.8 17' fill='none' stroke='black' stroke-width='2.6' stroke-linecap='round'/><path d='M16.4 3C12.5 7.2 8.4 11.8 3.2 16.6' fill='none' stroke='black' stroke-width='2.3' stroke-linecap='round'/></svg>") center/contain no-repeat;rotate:-4deg}
+.item.on .box::after,.fchk.on .box::after{content:"";position:absolute;inset:2px;background:var(--brand-primary);-webkit-mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path d='M3.5 3.2C7 7.4 11.6 12.6 16.8 17' fill='none' stroke='black' stroke-width='2.6' stroke-linecap='round'/><path d='M16.4 3C12.5 7.2 8.4 11.8 3.2 16.6' fill='none' stroke='black' stroke-width='2.3' stroke-linecap='round'/></svg>") center/contain no-repeat;mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path d='M3.5 3.2C7 7.4 11.6 12.6 16.8 17' fill='none' stroke='black' stroke-width='2.6' stroke-linecap='round'/><path d='M16.4 3C12.5 7.2 8.4 11.8 3.2 16.6' fill='none' stroke='black' stroke-width='2.3' stroke-linecap='round'/></svg>") center/contain no-repeat;rotate:-4deg}
 .item .q{margin-left:auto;font-variant-numeric:oldstyle-nums;color:var(--text-secondary);font-style:italic}
 .item.on .n{text-decoration:line-through;color:var(--ink-faded)}
 .sealrow{display:flex;justify-content:space-between;align-items:center;margin-top:22px;gap:12px}
@@ -304,6 +304,125 @@ button,input{font:inherit;color:inherit}
 .mob .paper{padding:24px 18px 20px}
 .mob .rod{margin:0 -8px}
 .mob .scrollwrap{padding:4px 6px}
+
+/* ---------- recipe folders (proposal 2026-11-16; palette variables only) ---------- */
+.vtog{display:inline-flex;gap:4px}
+.vtog button{min-height:44px;padding:0 16px;display:inline-flex;align-items:center;justify-content:center;gap:7px;font-family:var(--f-label);font-size:16px;color:#e0cba0;
+  border:1px solid var(--leather-dark);border-radius:3px;background:var(--noise),linear-gradient(180deg,#4a2d1a,var(--leather));box-shadow:inset 0 0 0 1px rgba(216,178,90,.25)}
+.vtog button svg{width:18px;height:18px}
+.vtog button[aria-checked="true"]{color:var(--gold);background:var(--noise),linear-gradient(180deg,var(--leather-dark),var(--leather));box-shadow:inset 0 0 0 1px var(--gold-dim),inset 0 -3px 0 var(--gold)}
+.mob .vtog{width:100%}.mob .vtog button{flex:1}
+.rlayout{display:grid;grid-template-columns:260px minmax(0,1fr);gap:24px;align-items:start}
+.rmain{min-width:0}
+.fside{position:sticky;top:0;z-index:4;background:var(--bg-primary) var(--noise);border:1px solid var(--border-color);padding:10px 12px 12px;box-shadow:inset 0 0 30px rgba(160,120,60,.2),0 10px 20px -14px rgba(60,35,10,.6)}
+.fside-h{display:flex;align-items:center;gap:7px;font-family:var(--f-label);font-size:17px;color:var(--text-secondary);padding-bottom:6px;border-bottom:2px solid var(--ink-faded);margin-bottom:2px}
+.fside-h svg{width:18px;height:18px;flex:none}
+.fside-h small{margin-left:auto;font-family:var(--f-body);font-style:italic;font-size:13px}
+.ftree{display:flex;flex-direction:column}
+.frow{position:relative;display:flex;align-items:center;padding-left:calc(var(--d,0) * 16px);border-bottom:1px solid var(--rule)}
+.frow.on{background:rgba(216,178,90,.14);box-shadow:inset 3px 0 0 var(--wax)}
+.frow.on .fname{font-weight:600}
+.frow.on .fname svg{color:var(--wax)}
+.frow.drop{outline:1.5px dashed var(--brand-primary);outline-offset:-2px;background:rgba(216,178,90,.22)}
+.ftog{width:28px;min-height:44px;border:0;background:none;color:var(--ink-faded);font-size:13px;flex:none;padding:0}
+.ftog.none{visibility:hidden}
+.fname{flex:1;min-width:0;display:flex;align-items:center;gap:8px;border:0;background:none;color:var(--text-primary);text-align:left;padding:6px 4px;min-height:44px;font-family:var(--f-body);font-size:17px}
+.fname svg{width:18px;height:18px;flex:none;color:var(--ink-faded)}
+.fname .t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fname .n{margin-left:auto;font-family:var(--f-head);font-variant-numeric:oldstyle-nums;font-size:16px;color:var(--text-secondary)}
+.fname:hover{color:var(--brand-primary)}
+.fk{width:44px;min-height:44px;border:0;background:none;color:var(--ink-faded);font-size:18px;flex:none;opacity:0}
+.frow:hover .fk,.frow.on .fk,.fk:focus-visible,.mob .fk,.fdlg .fk{opacity:1}
+.fk:hover{color:var(--text-primary)}
+.fnew{width:100%;margin-top:10px;min-height:44px;border:1px dashed var(--ink-faded);background:none;color:var(--brand-primary);font-family:var(--f-label);font-size:16px;display:flex;align-items:center;justify-content:center;gap:6px}
+.fnew:hover{border-style:solid}
+.fnew svg{width:16px;height:16px}
+.ffbar{margin:0 0 14px}
+.fpick{width:100%;display:flex;align-items:center;gap:9px;min-height:44px;padding:0 12px;text-align:left;background:var(--bg-primary) var(--noise);border:1px solid var(--border-color);box-shadow:inset 0 0 18px rgba(160,120,60,.16);font-family:var(--f-head);font-style:italic;font-size:17px;color:var(--text-primary)}
+.fpick svg{width:20px;height:20px;flex:none;color:var(--wax)}
+.fpick .t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fpick .c{margin-left:auto;flex:none;font-family:var(--f-label);font-style:normal;font-size:14px;color:var(--text-secondary)}
+.fhead{position:relative;display:flex;align-items:flex-start;gap:12px;margin:0 0 4px;padding:8px 16px 14px;background:var(--bg-primary) var(--noise);border:1px solid var(--border-color);box-shadow:inset 0 0 26px rgba(160,120,60,.18),0 8px 14px -10px rgba(60,35,10,.55)}
+.fhead-main{min-width:0;flex:1}
+.crumbs{display:flex;flex-wrap:wrap;align-items:center;gap:0;font-family:var(--f-label);font-size:14px;color:var(--text-secondary)}
+.crumbs button{border:0;background:none;color:var(--text-secondary);font-family:inherit;font-size:inherit;padding:8px 4px;min-height:40px}
+.crumbs button:hover{color:var(--brand-primary);text-decoration:underline}
+.crumbs .sep{color:var(--ink-faded);padding:0 2px}
+.mob .crumbs button{min-height:44px}
+.fhead h3{display:flex;align-items:center;gap:9px;margin:0;font-family:var(--f-head);font-weight:400;font-size:28px;line-height:1.1;color:var(--text-primary)}
+.fhead h3 svg{width:26px;height:26px;flex:none;color:var(--wax)}
+.mob .fhead h3{font-size:24px}
+.fhead .meta{font-style:italic;color:var(--text-secondary);margin-top:3px}
+.fhead .acts{position:relative;display:flex;gap:6px;flex:none;margin-top:6px}
+.fhead .acts .btn{min-height:44px}
+.fhead .acts .kebab{width:44px;justify-content:center;padding:0;font-size:20px;line-height:1}
+.ftiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin:14px 0 6px}
+.mob .ftiles{grid-template-columns:1fr 1fr;gap:10px}
+.ftile{display:flex;align-items:center;gap:10px;min-height:56px;padding:10px 12px;text-align:left;color:var(--text-primary);background:var(--bg-primary) var(--noise);border:2px solid var(--leather);border-radius:3px;
+  box-shadow:inset 0 3px 0 var(--gold),inset 0 0 18px rgba(160,120,60,.2),0 6px 10px -8px rgba(60,35,10,.6)}
+.ftile:hover{border-color:var(--wax)}
+.ftile.drop{border-style:dashed;border-color:var(--brand-primary);background-color:var(--bg-secondary)}
+.ftile svg{width:24px;height:24px;flex:none;color:var(--leather)}
+.ftile .t{display:flex;flex-direction:column;min-width:0}
+.ftile .t b{font-family:var(--f-head);font-weight:400;font-size:18px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ftile .t small{font-family:var(--f-label);font-size:13px;color:var(--text-secondary)}
+.ftile.fadd{justify-content:center;background:none;border:1.5px dashed var(--ink-faded);box-shadow:none;color:var(--brand-primary);font-family:var(--f-label);font-size:15px}
+.ftile.fadd svg{width:16px;height:16px;color:inherit}
+.fsec{display:flex;align-items:baseline;gap:8px;margin:18px 0 0;padding-bottom:3px;border-bottom:1px solid var(--ink-faded);font-family:var(--f-label);font-size:17px;color:var(--text-secondary)}
+.fsec svg{width:16px;height:16px;align-self:center}
+.fsec small{margin-left:auto;font-family:var(--f-body);font-style:italic;font-size:13px;text-align:right}
+.fsec+.grid{margin-top:16px}
+.ftags{display:flex;flex-wrap:wrap;gap:6px;margin-top:-2px}
+.ftag{position:relative;display:inline-flex;align-items:center;gap:4px;border:1px solid var(--ink-faded);border-radius:2px;background:none;color:var(--text-secondary);font-family:var(--f-label);font-size:13px;padding:1px 7px;min-height:26px}
+.ftag::before{content:"";position:absolute;inset:-9px -3px}
+.ftag svg{width:13px;height:13px;color:var(--wax)}
+.ftag:hover{border-color:var(--brand-primary);color:var(--brand-primary)}
+.tabs .tn{margin-left:6px;font-family:var(--f-head);font-variant-numeric:oldstyle-nums;font-size:13px;color:var(--ink-faded)}
+.card.menuopen{z-index:6}
+.card[draggable="true"]{cursor:grab}
+.card.dragging{opacity:.45}
+.card .acts{position:relative}
+.card .acts .btn{min-height:44px}
+.card .acts .kebab{flex:none;width:44px;padding:0;justify-content:center;font-size:20px;line-height:1}
+.card .acts .fpop{bottom:calc(100% + 4px);right:0}
+.fpop{position:absolute;z-index:8;min-width:220px;display:flex;flex-direction:column;padding:4px;background:var(--bg-primary) var(--noise);border:1px solid var(--border-color);border-radius:3px;box-shadow:inset 0 0 20px rgba(160,120,60,.2),0 14px 28px rgba(30,15,0,.4)}
+.fpop button{min-height:44px;display:flex;align-items:center;gap:8px;border:0;background:none;text-align:left;padding:0 10px;font-family:var(--f-label);font-size:16px;color:var(--text-primary)}
+.fpop button svg{width:16px;height:16px;flex:none;color:var(--ink-faded)}
+.fpop button:hover{background:rgba(216,178,90,.2)}
+.fpop button[disabled]{opacity:.5;cursor:not-allowed}
+.fpop small{font-family:var(--f-body);font-style:italic;font-size:13px;color:var(--text-secondary)}
+.fpop hr{margin:2px 6px;border:0;border-top:1px solid var(--rule)}
+.fpop .danger{color:var(--error)}
+.frow .fpop{top:44px;right:0}
+.fhead .fpop{top:100%;right:0}
+.fnote{grid-column:1/-1;margin:4px 0;padding:6px 0 6px 14px;border-left:3px solid var(--gold-dim);font-style:italic;color:var(--text-secondary)}
+.fnote b{font-style:normal;color:var(--text-primary)}
+.flk{border:0;background:none;padding:0;color:var(--brand-primary);font:inherit;text-decoration:underline}
+.mob .ovl.fovl{align-items:flex-end;padding:0}
+.fdlg{position:relative;width:min(440px,100%);max-height:100%;overflow:auto;padding:18px 22px 20px;background:var(--bg-primary) var(--noise);border:1px solid var(--border-color);border-top:3px double var(--gold-dim);border-radius:3px;
+  box-shadow:inset 0 0 26px rgba(160,120,60,.22),0 30px 60px rgba(30,15,0,.55)}
+.mob .fdlg{width:100%;max-height:88%;border-radius:12px 12px 0 0}
+.fdlg h3{margin:0 0 4px;padding-right:76px;font-family:var(--f-head);font-weight:400;font-size:24px;line-height:1.15}
+.fdlg p{margin:0 0 10px;font-style:italic;color:var(--text-secondary)}
+.fdlg p b{font-style:normal;color:var(--text-primary)}
+.fclosex{position:absolute;top:6px;right:8px;min-height:44px;padding:0 8px;border:0;background:none;font-family:var(--f-label);font-size:15px;color:var(--text-secondary)}
+.fin{display:block;margin:8px 0 10px;font-family:var(--f-label);font-size:15px;color:var(--text-secondary)}
+.fin input{display:block;width:100%;min-height:44px;border:0;border-bottom:1.5px solid var(--ink-faded);background:none;outline:none;font-family:var(--f-head);font-style:italic;font-size:19px;color:var(--text-primary)}
+.fin input::placeholder{color:var(--ink-faded)}
+.fwarn{margin:8px 0 10px;padding:6px 0 6px 12px;border-left:3px solid var(--wax);background:rgba(216,178,90,.14);font-size:16px;color:var(--text-primary)}
+.finfo{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px solid var(--rule)}
+.finfo b{font-family:var(--f-head);font-weight:400;font-variant-numeric:oldstyle-nums}
+.fbig{width:100%;justify-content:center;min-height:44px;margin-top:12px}
+.fbig svg{width:16px;height:16px}
+.flink{display:block;width:100%;min-height:44px;margin-top:4px;border:0;background:none;color:var(--text-secondary);font-family:var(--f-label);font-size:16px;text-decoration:underline}
+.fgrp{margin:12px 0 2px;font-family:var(--f-label);font-size:14px;color:var(--ink-faded);border-bottom:1px solid var(--rule)}
+.fopt{display:flex;align-items:center;gap:8px;width:100%;min-height:44px;border:0;border-bottom:1px solid var(--rule);background:none;text-align:left;color:var(--text-primary);font-family:var(--f-body);font-size:17px}
+.fopt svg{width:18px;height:18px;flex:none;color:var(--ink-faded)}
+.fopt small{margin-left:auto;font-style:italic;font-size:13px;color:var(--text-secondary)}
+.fopt.sel{background:rgba(216,178,90,.14);box-shadow:inset 3px 0 0 var(--wax)}
+.fopt[disabled]{opacity:.55;cursor:not-allowed}
+.fdlg .search{min-width:0;margin-bottom:6px}
+.tundo{border:0;background:none;min-height:44px;padding:0 4px;font-family:var(--f-label);font-size:16px;color:var(--brand-primary);text-decoration:underline}
 </style>
 </head>
 <body>
@@ -364,6 +483,9 @@ const ICO={
  glass:I('<circle cx="10" cy="10" r="6"/><path d="M14.5 14.5L20 20"/>'),
  plus:I('<path d="M12 5v14M5 12h14"/>'),
  cal:I('<rect x="3" y="5" width="18" height="16" rx="1"/><path d="M3 10h18M8 3v4M16 3v4"/>'),
+ // engraved folder: same 24x24 grid and 1.5 stroke as the rest (the client copy in engravedIcons.js uses these paths)
+ folder:I('<path d="M3 6.5a1 1 0 0 1 1-1h5l2 2h9a1 1 0 0 1 1 1V18.5a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M3 10.5h18M7 14.5h5"/>'),
+ menu:I('<path d="M4 7h16M4 12h16M4 17h16"/>'),
 };
 const BRAND_MARK=`<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="14.5" fill="none" stroke="#d8b25a" stroke-width="1.2"/><circle cx="16" cy="16" r="12.3" fill="none" stroke="#d8b25a" stroke-width=".6" stroke-dasharray="1.2 1.6"/><path d="M23 7c-6 1-10 6-11.5 12L10 25l2.6-2.8C18.5 21 22.4 15.6 23 7z" fill="#d8b25a"/><path d="M12.4 21.6l5.2-6" stroke="#3b2415" stroke-width="1"/></svg>`;
 const FLOUR=`<svg class="flour" viewBox="0 0 220 12" aria-hidden="true"><path d="M2 6h88c6 0 8-4 12-4s4 4 8 4 6-4 10-4 4 4 8 4h90" fill="none" stroke="currentColor" stroke-width="1"/><circle cx="110" cy="6" r="1.6" fill="currentColor"/></svg>`;
@@ -384,7 +506,124 @@ function status(m){ // day scope: P ≥105 g; fat 25–35 %; carbs 40–50 %
   return{p:m.p>=105?'on':m.p>=95?'near':'under',f:fp>35?'over':fp>=25?'on':'under',c:cp<38?'under':cp<40?'near':cp<=50?'on':'near',fp,cp}}
 function chips(m){const s=status(m);return `<span class="chips"><span class="chip s-${s.p}"><i></i>P ${m.p}g</span><span class="chip s-${s.c}"><i></i>C ${Math.round(s.cp)}%</span><span class="chip s-${s.f}"><i></i>F ${Math.round(s.fp)}%</span></span>`}
 function dayTot(iso){let k=0,p=0,c=0,f=0;Object.values(PLAN[iso]||{}).forEach(e=>{if(!e)return;const x=v(RB[e[0]],e[1]);k+=x.k;p+=x.p;c+=x.c;f+=x.f});return{k,p,c,f}}
-function toast(msg){U.toast=msg;const t=msg;setTimeout(()=>{if(U.toast===t){U.toast=null;render()}},2600)}
+function toast(msg,undo){U.toast=msg;U.undo=undo||null;const t=msg;setTimeout(()=>{if(U.toast===t){U.toast=null;U.undo=null;document.querySelector('.toast')?.remove()}},undo?6000:2600)}
+
+/* ================= recipe folders (proposal 2026-11-16) =================
+   Personal, nest up to 3 deep, a recipe can sit in several folders. Menu / Folders view is remembered per device
+   (localStorage fb.recipes.view). Delete is confirm-only (no Undo); "Remove from folder" keeps its Undo. */
+const FMAX_DEPTH=3;
+const TABS=['breakfast','lunch','dinner','snacks','extras'];
+const TABL={breakfast:'Breakfast',lunch:'Lunch',dinner:'Dinner',snacks:'Snacks',extras:'Extras'};
+const S={
+  folders:[{id:'f1',name:'Batch cook',parent:null},{id:'f2',name:'Freezer friendly',parent:'f1'},{id:'f3',name:'Date night',parent:null},
+    {id:'f4',name:'Quick (under 20 min)',parent:null},{id:'f5',name:'Gym days',parent:null},{id:'f6',name:'Post-workout',parent:'f5'}],
+  fmem:{f1:new Set(['curry','bolo','shaw','padt']),f2:new Set(['curry','bolo']),f3:new Set(['pican','pizza','avo','salm']),
+    f4:new Set(['yog','oats','caes','tikka','popc']),f5:new Set(['hash','omel','shaw','tikka','curry']),f6:new Set(['oats','yog'])}};
+Object.assign(U,{folder:null,fopen:{f1:true,f5:true},fseq:7,menu:null,fd:null,undo:null});
+try{U.rview=localStorage.getItem('fb.recipes.view')==='folders'?'folders':'menu'}catch{U.rview='menu'}
+const escA=s=>esc(s).replace(/"/g,'&quot;');
+const FB=id=>S.folders.find(f=>f.id===id);
+const fKids=pid=>S.folders.filter(f=>f.parent===pid).sort((a,b)=>a.name.localeCompare(b.name));
+function fPath(id){const p=[];let f=FB(id);while(f){p.unshift(f);f=FB(f.parent)}return p}
+const fDepth=id=>id?fPath(id).length:0;
+function fDesc(id){return fKids(id).flatMap(k=>[k.id,...fDesc(k.id)])}
+function fHeight(id){const k=fKids(id);return k.length?1+Math.max(...k.map(x=>fHeight(x.id))):1}
+const inF=(fid,rid)=>!!S.fmem[fid]?.has(rid);
+const fCount=fid=>(S.fmem[fid]||new Set()).size;
+const rFolders=rid=>S.folders.filter(f=>inF(f.id,rid));
+const unfiledN=()=>RECIPES.filter(r=>!rFolders(r.id).length).length;
+const vTog=()=>`<div class="vtog" role="radiogroup" aria-label="Recipe view"><button role="radio" aria-checked="${U.rview!=='folders'}" data-a="vset" data-v="menu">${ICO.menu} Menu</button><button role="radio" aria-checked="${U.rview==='folders'}" data-a="vset" data-v="folders">${ICO.folder} Folders</button></div>`;
+// one tree for the sidebar, the mobile sheet and the "Add to folder" picker
+function ftree(mode,rid){ // mode: 'nav' | 'pick'
+  const row=(f,d)=>{const kids=fKids(f.id),open=mode==='pick'||U.fopen[f.id],on=mode==='nav'&&U.folder===f.id,chk=mode==='pick'&&inF(f.id,rid);
+    return `<div class="frow ${on?'on':''}" style="--d:${d}" ${mode==='nav'?`data-fdrop="${f.id}"`:''}>
+      <button class="ftog ${kids.length&&mode==='nav'?'':'none'}" data-a="ftog" data-v="${f.id}" aria-label="${open?'Collapse':'Expand'} ${escA(f.name)}" aria-expanded="${!!open}">${open?'▾':'▸'}</button>
+      ${mode==='pick'?`<button class="fname fchk ${chk?'on':''}" role="checkbox" aria-checked="${chk}" data-a="fmemTog" data-v="${f.id}" data-r="${rid}"><span class="box" aria-hidden="true"></span>${ICO.folder}<span class="t">${esc(f.name)}</span><span class="n">${fCount(f.id)}</span></button>`
+        :`<button class="fname" data-a="fopen" data-v="${f.id}" aria-current="${on?'true':'false'}">${ICO.folder}<span class="t">${esc(f.name)}</span><span class="n">${fCount(f.id)}</span></button>
+      <button class="fk" data-a="menu" data-v="f-${f.id}" aria-label="Folder actions for ${escA(f.name)}">⋯</button>${U.menu==='f-'+f.id?fMenu(f):''}`}
+    </div>${open?kids.map(k=>row(k,d+1)).join(''):''}`};
+  return `<div class="ftree">${mode==='nav'?`<div class="frow ${U.folder?'':'on'}"><span class="ftog none"></span><button class="fname" data-a="fopen" data-v="" aria-current="${!U.folder}">${ICO.book}<span class="t">All folders</span><span class="n">${unfiledN()}</span></button><span class="fk" aria-hidden="true"></span></div>`:''}
+    ${fKids(null).map(f=>row(f,0)).join('')}</div>`}
+function fMenu(f){const deep=fDepth(f.id)>=FMAX_DEPTH;return `<div class="fpop" role="menu" data-stop>
+  ${U.folder===f.id?`<button data-a="faddHere">${ICO.plus} Add recipes…</button>`:`<button data-a="fopen" data-v="${f.id}">${ICO.folder} Open</button>`}
+  <button data-a="fnewDlg" data-v="${f.id}" ${deep?'disabled title="Folders go 3 levels deep"':''}>${ICO.plus} New subfolder${deep?' <small>(max depth)</small>':''}</button>
+  <button data-a="frenameDlg" data-v="${f.id}">${ICO.quill} Rename</button>
+  <button data-a="fmoveDlg" data-v="${f.id}">↳ Move to…</button><hr>
+  <button class="danger" data-a="fdelDlg" data-v="${f.id}">✕ Delete folder</button></div>`}
+function fSide(){return `<aside class="fside" aria-label="Recipe folders"><div class="fside-h">${ICO.folder} My folders<small>drag a card onto one</small></div>
+  ${ftree('nav')}<button class="fnew" data-a="fnewDlg" data-v="">${ICO.plus} New folder</button></aside>`}
+const ftile=k=>{const kn=fCount(k.id),kk=fKids(k.id).length;return `<button class="ftile" data-a="fopen" data-v="${k.id}" data-fdrop="${k.id}">${ICO.folder}<span class="t"><b>${esc(k.name)}</b><small>${kn} recipe${kn===1?'':'s'}${kk?` · ${kk} folder${kk===1?'':'s'}`:''}</small></span></button>`};
+function fHead(mob){const f=FB(U.folder);if(!f)return '';const p=fPath(f.id),kids=fKids(f.id),n=fCount(f.id),deep=fDepth(f.id)>=FMAX_DEPTH;
+  return `<div class="fhead"><div class="fhead-main">
+    <nav class="crumbs" aria-label="Folder path"><button data-a="fopen" data-v="">All folders</button>${p.slice(0,-1).map(x=>`<span class="sep">›</span><button data-a="fopen" data-v="${x.id}">${esc(x.name)}</button>`).join('')}<span class="sep">›</span></nav>
+    <h3>${ICO.folder} ${esc(f.name)}</h3><div class="meta">${n} recipe${n===1?'':'s'}${kids.length?` · ${kids.length} subfolder${kids.length===1?'':'s'}`:''}</div></div>
+    <div class="acts">${mob?'':`<button class="btn" data-a="faddHere">${ICO.plus} Add recipes</button>`}<button class="btn kebab" data-a="menu" data-v="fh-${f.id}" aria-label="Folder actions" aria-haspopup="menu">⋯</button>${U.menu==='fh-'+f.id?fMenu(f):''}</div></div>
+    ${kids.length||!deep?`<div class="ftiles">${kids.map(ftile).join('')}${deep?'':`<button class="ftile fadd" data-a="fnewDlg" data-v="${f.id}">${ICO.plus} New subfolder</button>`}</div>`:''}`}
+function fRoot(mob){const top=fKids(null);return `<div class="fsec">${ICO.folder} Your folders <small>${top.length}</small></div><div class="ftiles">${top.map(ftile).join('')}<button class="ftile fadd" data-a="fnewDlg" data-v="">${ICO.plus} New folder</button></div>
+  <div class="fsec">Not in a folder yet <small>${unfiledN()} recipes · file them from ⋯${mob?'':' or drag onto a folder'}</small></div>`}
+function fdialog(){const D=U.fd;if(!D)return '';let b='';
+  const c='<button class="fclosex" data-a="fclose" aria-label="Close">✕ close</button>',path=id=>fPath(id).map(p=>p.name).join(' › ');
+  if(D.t==='sheet')b=`<h3>Folders</h3><p>Open a folder to see just its recipes. Tap ⋯ to rename, move or delete.</p>${ftree('nav')}<button class="btn primary fbig" data-a="fnewDlg" data-v="">${ICO.plus} New folder</button>`;
+  else if(D.t==='new'){const par=FB(D.parent);b=`<h3>${par?'New subfolder':'New folder'}</h3><p>${par?`Inside <b>${esc(path(par.id))}</b>.`:'At the top level.'}${D.r?` <b>${esc(RB[D.r].name)}</b> goes straight in.`:''}</p>
+     <label class="fin">Name<input data-autofocus data-a2="fname" maxlength="40" placeholder="e.g. Batch cook" value="${escA(D.name||'')}"></label>
+     ${D.err?`<div class="fwarn">${D.err}</div>`:''}
+     <button class="btn primary fbig" data-primary data-a="fcreate">Create folder</button><button class="flink" data-a="${D.back?'fback':'fclose'}">Cancel</button>`}
+  else if(D.t==='rename'){const f=FB(D.v);b=`<h3>Rename folder</h3><label class="fin">Name<input data-autofocus data-a2="fname" maxlength="40" value="${escA(D.name??f.name)}"></label>${D.err?`<div class="fwarn">${D.err}</div>`:''}<button class="btn primary fbig" data-primary data-a="fdoRename">Save</button><button class="flink" data-a="fclose">Cancel</button>`}
+  else if(D.t==='move'){const f=FB(D.v),bad=new Set([f.id,...fDesc(f.id)]),h=fHeight(f.id);
+    const ok=t=>!bad.has(t.id)&&fDepth(t.id)+h<=FMAX_DEPTH;
+    const opts=(pid,d)=>fKids(pid).flatMap(t=>[`<button class="fopt ${f.parent===t.id?'sel':''}" style="padding-left:${4+d*18}px" ${ok(t)&&f.parent!==t.id?'':'disabled'} data-a="fdoMove" data-v="${t.id}">${ICO.folder} ${esc(t.name)}<small>${f.parent===t.id?'current':bad.has(t.id)?'':ok(t)?'':'too deep'}</small></button>`,...(bad.has(t.id)?[]:opts(t.id,d+1))]);
+    b=`<h3>Move “${esc(f.name)}”</h3><p>Its recipes and subfolders come with it. Folders go up to ${FMAX_DEPTH} levels deep.</p>
+     <button class="fopt ${f.parent?'':'sel'}" ${f.parent?'':'disabled'} data-a="fdoMove" data-v="">${ICO.book} Top level<small>${f.parent?'':'current'}</small></button>${opts(null,0).join('')}`}
+  else if(D.t==='del'){const f=FB(D.v),sub=fKids(f.id),n=fCount(f.id),par=FB(f.parent);
+    b=`<h3>Delete “${esc(f.name)}”?</h3><p>Only the folder goes. <b>No recipes are deleted</b>: they stay in All recipes and in any other folder they're in. This can't be undone.</p>
+     <div class="finfo"><span>Recipes filed here</span><b>${n}</b></div>${sub.length?`<div class="finfo"><span>Subfolders</span><b>${sub.length}</b></div><div class="fwarn">Its subfolders move up to ${par?esc(par.name):'the top level'}.</div>`:''}
+     ${D.err?`<div class="fwarn">${D.err}</div>`:''}
+     <button class="btn primary fbig" data-a="fdoDel">Delete folder</button><button class="flink" data-a="fclose">Cancel</button>`}
+  else if(D.t==='addTo'){const r=RB[D.r],n=rFolders(r.id).length;b=`<h3>Add to folder</h3><p><b>${esc(r.name)}</b> can sit in as many folders as you like. ${n?`In ${n} now.`:'Not in any yet.'}</p>${ftree('pick',r.id)}
+     <button class="flink" style="text-align:left" data-a="fnewDlg" data-v="" data-r="${r.id}">${ICO.plus} New folder…</button><button class="btn primary fbig" data-a="fclose">Done</button>`}
+  else if(D.t==='addRecipes'){const f=FB(U.folder),q=(D.q||'').toLowerCase(),list=RECIPES.filter(r=>r.name.toLowerCase().includes(q));
+    b=`<h3>Add to ${esc(f.name)}</h3><p>Tick recipes from any meal. ${fCount(f.id)} in this folder.</p>
+     <label class="search">${ICO.glass}<input data-autofocus data-a2="fq" placeholder="Search all recipes" aria-label="Search all recipes" value="${escA(D.q||'')}"></label>
+     ${TABS.map(t=>{const rs=list.filter(r=>r.meal===t);return rs.length?`<div class="fgrp">${TABL[t]}</div>${rs.map(r=>{const on=inF(f.id,r.id);return `<div class="frow"><button class="fname fchk ${on?'on':''}" role="checkbox" aria-checked="${on}" data-a="fmemTog" data-v="${f.id}" data-r="${r.id}"><span class="box" aria-hidden="true"></span>${r.emoji} <span class="t">${esc(r.name)}</span></button></div>`}).join('')}`:''}).join('')}
+     <button class="btn primary fbig" data-a="fclose">Done</button>`}
+  return `<div class="ovl fovl" data-a="fclose"><div class="fdlg" role="dialog" aria-modal="true" aria-label="Recipe folders" data-stop>${c}${b}</div></div>`}
+
+const FA={
+  vset:d=>{U.rview=d.v;U.q='';U._reset=true;try{localStorage.setItem('fb.recipes.view',d.v)}catch{}},
+  fopen:d=>{U.rview='folders';U.folder=d.v||null;U.q='';if(U.fd?.t==='sheet')U.fd=null;U._reset=true;
+    if(U.folder){fPath(U.folder).forEach(x=>U.fopen[x.id]=true);
+      if(!RECIPES.some(r=>r.meal===U.meal&&inF(U.folder,r.id))){const t=TABS.find(t=>RECIPES.some(r=>r.meal===t&&inF(U.folder,r.id)));if(t)U.meal=t}}},
+  ftog:d=>{U.fopen[d.v]=!U.fopen[d.v]},
+  menu:d=>{U.menu=U.menu===d.v?null:d.v},
+  fsheet:()=>{U.fd={t:'sheet'}},
+  fclose:()=>{U.fd=null},
+  fback:()=>{U.fd=U.fd.back},
+  fnewDlg:d=>{U.fd={t:'new',parent:d.v||null,r:d.r||null,name:'',back:U.fd&&(U.fd.t==='addTo'||U.fd.t==='sheet')?U.fd:null};U._focus=true},
+  fcreate:()=>{const D=U.fd,name=(D.name||'').trim();
+    if(!name){D.err='Give the folder a name.';return}
+    if(fKids(D.parent).some(f=>f.name.toLowerCase()===name.toLowerCase())){D.err=`There's already a “${esc(name)}” here.`;return}
+    const id='f'+(U.fseq++);S.folders.push({id,name,parent:D.parent});S.fmem[id]=new Set(D.r?[D.r]:[]);if(D.parent)U.fopen[D.parent]=true;
+    if(D.back&&D.back.t==='addTo'){U.fd=D.back;toast(`Added to ${name}`)}else{U.fd=null;if(!D.r)FA.fopen({v:id});toast(`Folder “${name}” made`)}},
+  frenameDlg:d=>{U.fd={t:'rename',v:d.v};U._focus=true},
+  fdoRename:()=>{const D=U.fd,f=FB(D.v),name=(D.name??f.name).trim();if(!name){D.err='Give the folder a name.';return}
+    if(fKids(f.parent).some(x=>x.id!==f.id&&x.name.toLowerCase()===name.toLowerCase())){D.err=`There's already a “${esc(name)}” here.`;return}
+    f.name=name;U.fd=null;toast('Folder renamed')},
+  fmoveDlg:d=>{U.fd={t:'move',v:d.v}},
+  fdoMove:d=>{const f=FB(U.fd.v),to=d.v||null;
+    if(fKids(to).some(x=>x.id!==f.id&&x.name.toLowerCase()===f.name.toLowerCase())){U.fd=null;toast(`There's already a “${f.name}” there`);return}
+    f.parent=to;if(to)U.fopen[to]=true;U.fd=null;toast(`Moved to ${to?FB(to).name:'the top level'}`)},
+  fdelDlg:d=>{U.fd={t:'del',v:d.v}},
+  fdoDel:()=>{const D=U.fd,f=FB(D.v),par=FB(f.parent);
+    const clash=fKids(f.id).find(k=>fKids(f.parent).some(x=>x.id!==f.id&&x.name.toLowerCase()===k.name.toLowerCase()));
+    if(clash){D.err=`Can't delete: “${esc(clash.name)}” would clash with a folder of the same name in ${par?esc(par.name):'the top level'}.`;return}
+    fKids(f.id).forEach(k=>k.parent=f.parent);S.folders=S.folders.filter(x=>x.id!==f.id);delete S.fmem[f.id];
+    if(U.folder===f.id)U.folder=f.parent;U.fd=null;toast(`Deleted “${f.name}”. Recipes kept.`)},
+  faddDlg:d=>{U.fd={t:'addTo',r:d.r}},
+  faddHere:()=>{U.fd={t:'addRecipes',q:''};U._focus=true},
+  fmemTog:d=>{const m=S.fmem[d.v]=S.fmem[d.v]||new Set();m.has(d.r)?m.delete(d.r):m.add(d.r)},
+  fremove:d=>{const f=FB(U.folder),r=RB[d.r];S.fmem[f.id].delete(r.id);toast(`Removed from ${f.name}`,()=>{S.fmem[f.id].add(r.id)})},
+  undo:()=>{const u=U.undo;U.toast=null;U.undo=null;if(u)u()},
+};
 
 /* ================= views ================= */
 const NAV=[{k:'recipes',i:ICO.book,l:'Receipts'},{k:'mealplan',i:ICO.ledger,l:'Ledger'},{k:'pet',i:ICO.sprout,l:'Pip'},{k:'shopping',i:ICO.basket,l:'Provisions'}];
@@ -396,20 +635,36 @@ function header(mob){return `<header class="hdr"><div class="hdr-in">
 </div></header>`}
 
 function recipesPage(mob){
-  const q=U.q.toLowerCase();
-  const list=RECIPES.filter(r=>r.meal===U.meal&&(!q||r.name.toLowerCase().includes(q)));
-  return `<div class="page"><div class="board-head"><div><h2 class="title">The Receipt Book</h2><span class="title-sub">Tried &amp; true dishes, set down in good ink</span>${FLOUR}</div>
-    <label class="search">${ICO.glass}<input data-a2="q" value="${esc(U.q)}" placeholder="Seek a receipt…" aria-label="Search recipes"></label></div>
-  <div class="tabs" role="tablist">${['breakfast','lunch','dinner','snacks','extras'].map(m=>`<button role="tab" aria-selected="${U.meal===m}" class="${U.meal===m?'on':''}" data-a="meal" data-v="${m}">${{breakfast:'Breakfast',lunch:'Lunch',dinner:'Dinner',snacks:'Snacks',extras:'Extras'}[m]}</button>`).join('')}</div>
-  <div class="grid">${list.map(card).join('')||'<p class="title-sub">No receipt by that name in this book.</p>'}</div></div>`}
+  const q=U.q.toLowerCase(),fv=U.rview==='folders',fld=fv?FB(U.folder):null;
+  const inScope=r=>fld?inF(fld.id,r.id):fv?!rFolders(r.id).length:true;
+  const counts=Object.fromEntries(TABS.map(t=>[t,RECIPES.filter(r=>r.meal===t&&inScope(r)).length]));
+  const list=RECIPES.filter(r=>r.meal===U.meal&&inScope(r)&&(!q||r.name.toLowerCase().includes(q)));
+  const ph=fld?`Seek in ${fld.name}…`:fv?`Seek an unfiled ${TABL[U.meal].toLowerCase()} recipe…`:'Seek a receipt…';
+  let h=`<div class="page"><div class="board-head"><div><h2 class="title">The Receipt Book</h2><span class="title-sub">Tried &amp; true dishes, set down in good ink</span>${FLOUR}</div>${vTog()}
+    <label class="search">${ICO.glass}<input data-a2="q" value="${escA(U.q)}" placeholder="${escA(ph)}" aria-label="Search recipes"></label></div>`;
+  if(fv&&!mob)h+=`<div class="rlayout">${fSide()}<div class="rmain">`;
+  if(fv&&mob)h+=`<div class="ffbar"><button class="fpick" data-a="fsheet" aria-haspopup="dialog">${fld?ICO.folder:ICO.book}<span class="t">${fld?fPath(fld.id).map(x=>esc(x.name)).join(' › '):'All folders'}</span><span class="c">Folders ▾</span></button></div>`;
+  h+=`<div class="tabs" role="tablist">${TABS.map(m=>`<button role="tab" aria-selected="${U.meal===m}" class="${U.meal===m?'on':''}" data-a="meal" data-v="${m}">${TABL[m]}${fv?`<span class="tn">${counts[m]}</span>`:''}</button>`).join('')}</div>`;
+  if(fld)h+=fHead(mob);
+  if(fv&&!fld)h+=fRoot(mob);
+  h+=`<div class="grid">`;
+  if(list.length)h+=list.map(card).join('');
+  else if(fld&&!q){const other=TABS.filter(t=>counts[t]);h+=`<p class="fnote">No ${TABL[U.meal].toLowerCase()} recipes in <b>${esc(fld.name)}</b>.${other.length?` It has ${other.map(t=>`<button class="flk" data-a="meal" data-v="${t}">${counts[t]} ${TABL[t].toLowerCase()}</button>`).join(', ')}.`:''} Use <b>⋯ → Add to folder</b> on any recipe${mob?'':', or drag a card onto a folder'}.</p>`}
+  else if(fv&&!fld&&!q)h+=`<p class="fnote">Every ${TABL[U.meal].toLowerCase()} recipe is in a folder.</p>`;
+  else h+=`<p class="title-sub">No receipt by that name in this book.</p>`;
+  return h+`</div>${fv&&!mob?'</div></div>':''}</div>`}
 function card(r){
   const vi=U.cardVar[r.id]??(r.vars.length>1?1:0),x=v(r,vi);
-  return `<article class="card"><span class="pin" aria-hidden="true"></span>${inPlan(r)?'<span class="inplan">In the ledger</span>':''}
+  const fv=U.rview==='folders',fl=fv?rFolders(r.id).filter(f=>f.id!==U.folder):[],fld=fv?FB(U.folder):null,mopen=U.menu==='r-'+r.id;
+  return `<article class="card ${mopen?'menuopen':''}" ${fv&&U.view!=='mobile'?`draggable="true" data-rdrag="${r.id}"`:''}><span class="pin" aria-hidden="true"></span>${inPlan(r)?'<span class="inplan">In the ledger</span>':''}
     <div class="top"><div class="etch" aria-hidden="true">${r.emoji}</div><div><h3>${esc(r.name)}</h3><span class="kc">${Math.round(x.k)} kcal per serving</span></div></div>
+    ${fl.length?`<div class="ftags" aria-label="In folders">${fl.slice(0,3).map(f=>`<button class="ftag" data-a="fopen" data-v="${f.id}">${ICO.folder} ${esc(f.name)}</button>`).join('')}${fl.length>3?`<span class="ftag">+${fl.length-3}</span>`:''}</div>`:''}
     ${r.vars.length>1?`<div class="vtabs" role="radiogroup" aria-label="Variant">${r.vars.map((w,i)=>`<button role="radio" aria-checked="${i===vi}" class="${i===vi?'on':''}" data-a="cvar" data-v="${r.id}" data-i="${i}">${w.l}</button>`).join('')}</div>`:''}
     <div class="chips"><span class="chip">${x.p} g protein</span><span class="chip">${x.c} g carbs</span><span class="chip">${x.f} g fat</span></div>
     ${r.cheat?'<span class="cheat seal" aria-label="Cheat meal">Treat<br>day</span>':''}
-    <div class="acts"><button class="btn" data-a="open" data-v="${r.id}" data-i="${vi}">${ICO.book} Open</button><button class="btn primary" data-a="add" data-v="${r.id}">${ICO.quill} Add to week</button></div></article>`}
+    <div class="acts"><button class="btn" data-a="open" data-v="${r.id}" data-i="${vi}">${ICO.book} Open</button><button class="btn primary" data-a="add" data-v="${r.id}">${ICO.quill} Add to week</button>
+      <button class="btn kebab" data-a="menu" data-v="r-${r.id}" aria-label="More actions" aria-haspopup="menu" aria-expanded="${mopen}">⋯</button>
+      ${mopen?`<div class="fpop" role="menu" data-stop><button data-a="open" data-v="${r.id}" data-i="${vi}">${ICO.book} Open recipe</button><button data-a="faddDlg" data-r="${r.id}">${ICO.folder} Add to folder…</button>${fld&&inF(fld.id,r.id)?`<button data-a="fremove" data-r="${r.id}">↩ Remove from ${esc(fld.name)}</button>`:''}</div>`:''}</div></article>`}
 
 function mealWeb(){
   return `<div class="page"><div class="board-head"><div><h2 class="title">The Week’s Ledger</h2><span class="title-sub">Monday the 9th to Sunday the 15th of November</span>${FLOUR}</div>
@@ -479,25 +734,33 @@ function render(){
    <div class="seg2">${['web','mobile'].map(x=>`<button class="${U.view===x?'on':''}" data-p="view" data-v="${x}">${x==='web'?'Web':'Mobile'}</button>`).join('')}</div>
    <div class="seg2">${NAV.map(n=>`<button class="${U.route===n.k?'on':''}" data-p="route" data-v="${n.k}">${n.l}</button>`).join('')}</div>
    <div class="seg2"><button class="${U.open?'on':''}" data-p="book">Open receipt</button><button class="${U.acct?'on':''}" data-p="acct">Account menu</button><button class="${U.lowfx?'on':''}" data-p="lowfx">Low FX</button></div>
-   <span style="color:#999">Open straight in a browser. Deep links: #mobile #r=mealplan|shopping|pet #dlg=recipe #acct #lowfx</span>`;
+   <span style="color:#999">Open straight in a browser. Deep links: #mobile #r=mealplan|shopping|pet #dlg=recipe #acct #lowfx #view=folders #fold=f1 #fdlg=new|add|sheet</span>`;
   const body={recipes:recipesPage,mealplan:mob?mealMobile:mealWeb,shopping,pet:pip}[U.route](mob);
+  const oldSc=document.querySelector('.scroll'),keepTop=oldSc&&!U._reset?oldSc.scrollTop:0,oldDl=document.querySelector('.fdlg'),dlgTop=oldDl&&U._fdt===U.fd?.t?oldDl.scrollTop:0;
   const f=document.getElementById('frame');f.className=mob?'frame-mob':'frame-web';
   f.innerHTML=`<div class="app ${mob?'mob':''} ${U.lowfx?'lowfx':''}" data-theme="parchment">${header(mob)}<div class="scroll">${body}</div>
     ${mob?`<nav class="bnav">${NAV.map(n=>`<button class="${U.route===n.k?'on':''}" data-a="go" data-v="${n.k}">${n.i}${n.l}</button>`).join('')}</nav>`:''}
-    ${U.open?book(mob):''}${U.acct&&mob?`<div class="ovl" data-a="acct" style="align-items:flex-end;padding:0">${acctMenu()}</div>`:''}
-    ${U.toast?`<div class="toast"><span class="seal">✓</span>${esc(U.toast)}</div>`:''}${fx()}</div>`;
+    ${U.open?book(mob):''}${fdialog()}${U.acct&&mob?`<div class="ovl" data-a="acct" style="align-items:flex-end;padding:0">${acctMenu()}</div>`:''}
+    ${U.toast?`<div class="toast" role="status"><span class="seal">✓</span>${esc(U.toast)}${U.undo?'<button class="tundo" data-a="undo">Undo</button>':''}</div>`:''}${fx()}</div>`;
+  if(keepTop)document.querySelector('.scroll').scrollTop=keepTop;
+  if(dlgTop)document.querySelector('.fdlg').scrollTop=dlgTop;
+  U._fdt=U.fd?.t;U._reset=false;
+  if(U._focus){document.querySelector('[data-autofocus]')?.focus();U._focus=false}
   U.just=null;U.opening=false;
 }
 document.addEventListener('click',ev=>{
   const p=ev.target.closest('[data-p]');
-  if(p){const k=p.dataset.p;if(k==='view')U.view=p.dataset.v;if(k==='route'){U.route=p.dataset.v;U.open=null}if(k==='book'){U.open=U.open?null:'pizza';U.openVar=1;U.opening=true}if(k==='acct')U.acct=!U.acct;if(k==='lowfx')U.lowfx=!U.lowfx;render();return}
-  const a=ev.target.closest('[data-a]');if(!a)return;
+  if(p){const k=p.dataset.p;if(k==='view')U.view=p.dataset.v;if(k==='route'){U.route=p.dataset.v;U.open=null;U._reset=true}if(k==='book'){U.open=U.open?null:'pizza';U.openVar=1;U.opening=true}if(k==='acct')U.acct=!U.acct;if(k==='lowfx')U.lowfx=!U.lowfx;render();return}
+  const a=ev.target.closest('[data-a]');
+  if(U.menu&&!ev.target.closest('[data-stop],[data-a="menu"]')){U.menu=null;if(!a)render()}
+  if(!a)return;
+  if(a.dataset.a==='fclose'&&a.classList.contains('ovl')&&ev.target.closest('[data-stop]'))return;
   if(a.dataset.a==='close'&&ev.target.closest('[data-stop]')&&!ev.target.closest('.bx'))return;
   if(a.dataset.a==='acct'&&a.classList.contains('ovl')&&ev.target.closest('[data-stop]'))return;
   ev.preventDefault();
   const A=a.dataset.a,val=a.dataset.v;
   switch(A){
-    case 'go':U.route=val;U.open=null;U.acct=false;break;
+    case 'go':U.route=val;U.open=null;U.acct=false;U._reset=true;break;
     case 'meal':U.meal=val;break;
     case 'cvar':U.cardVar[val]=+a.dataset.i;break;
     case 'open':U.open=val;U.openVar=+(a.dataset.i||1);U.opening=true;break;
@@ -511,11 +774,23 @@ document.addEventListener('click',ev=>{
     case 'acct':U.acct=!U.acct;break;
     case 'lowfx':U.lowfx=!U.lowfx;break;
     case 'theme':U.theme=val;if(val!=='parchment')toast('This file only draws Parchment. See app-mockup.html / user-menu-themes.html');break;
-    default:return;
+    default:if(!FA[A])return;FA[A](a.dataset);
   }
   render();
 });
-document.addEventListener('input',ev=>{if(ev.target.dataset.a2==='q'){U.q=ev.target.value;const pos=ev.target.selectionStart;render();const i=document.querySelector('[data-a2="q"]');i.focus();i.setSelectionRange(pos,pos)}});
+document.addEventListener('input',ev=>{const k=ev.target.dataset.a2;
+  if(k==='q'||k==='fq'){if(k==='q')U.q=ev.target.value;else U.fd.q=ev.target.value;const pos=ev.target.selectionStart;render();const i=document.querySelector(`[data-a2="${k}"]`);i.focus();i.setSelectionRange(pos,pos)}
+  if(k==='fname'){U.fd.name=ev.target.value;if(U.fd.err){U.fd.err=null;document.querySelector('.fdlg .fwarn')?.remove()}}});
+document.addEventListener('keydown',ev=>{
+  if(ev.key==='Enter'&&ev.target.dataset?.a2==='fname'){ev.preventDefault();document.querySelector('.fdlg [data-primary]')?.click()}
+  if(ev.key==='Escape'&&(U.fd||U.menu)){if(U.fd)U.fd=null;else U.menu=null;render()}});
+// drag a recipe card onto a folder (web, Folders view)
+let rdrag=null;
+document.addEventListener('dragstart',e=>{const c=e.target.closest('[data-rdrag]');if(!c)return;rdrag=c.dataset.rdrag;c.classList.add('dragging');e.dataTransfer.setData('text/plain',rdrag);e.dataTransfer.effectAllowed='copy'});
+document.addEventListener('dragover',e=>{if(!rdrag)return;const c=e.target.closest('[data-fdrop]');document.querySelectorAll('[data-fdrop].drop').forEach(x=>x!==c&&x.classList.remove('drop'));if(!c)return;e.preventDefault();c.classList.add('drop')});
+document.addEventListener('drop',e=>{if(!rdrag)return;const c=e.target.closest('[data-fdrop]');if(!c)return;e.preventDefault();const f=FB(c.dataset.fdrop),r=RB[rdrag];rdrag=null;
+  if(inF(f.id,r.id))toast(`Already in ${f.name}`);else{S.fmem[f.id].add(r.id);toast(`Filed ${r.name} in ${f.name}`,()=>{S.fmem[f.id].delete(r.id)})}render()});
+document.addEventListener('dragend',()=>{rdrag=null;document.querySelectorAll('.dragging,[data-fdrop].drop').forEach(x=>x.classList.remove('dragging','drop'))});
 
 /* ================= design notes ================= */
 document.getElementById('notes').innerHTML=`
@@ -551,6 +826,8 @@ document.getElementById('notes').innerHTML=`
   effects:true, ticker:false,
   brand:{ name:'The Kitchen Grimoire',
     sub:'Receipts, provisions & the weekly almanac' } }</code>
+<h3>Custom recipe folders (approved 2026-11-16 for Cyberpunk; Parchment drawn here)</h3>
+<ul><li><b>Menu / Folders</b> switch: two leather tabs, gold-on-leather when active. Remembered per device (<code>fb.recipes.view</code>).</li><li><b>Sidebar</b> (web) is a ledger panel with a ruled hairline between rows; the open folder is inked with a wax-red left rule. On mobile a <b>Folders ▾</b> bar opens a sheet.</li><li><b>Folder tiles</b> are leather-edged cards with a gilt top rule; <b>breadcrumbs</b> are small-caps ink; the folder glyph is an engraved line icon.</li><li>Up to 3 levels, a recipe in many folders, subfolders move up when a folder is deleted. Delete is confirm-only (no Undo); “Remove from folder” keeps Undo.</li><li>Labels stay plain (“Folders”, “Menu”, “All folders”).</li><li>Deep links: <code>#view=folders</code>, <code>#fold=f1</code>, <code>#fdlg=new|add|sheet</code>; add <code>#mobile</code> for the phone frame (e.g. <code>#mobile&amp;view=folders</code>).</li></ul>
 <h3>Synced with the implementation (2026-11-15)</h3>
 <ul><li>Meal labels (Breakfast / Lunch / Dinner / Snacks) and aisle names are the app’s plain names; themed meal and aisle renames were deferred.</li><li>Registry also carries <code>ambient:'candlelight'</code> and <code>copy</code> (nav + page headings), read through <code>utils/themeCopy.js</code>.</li></ul>
 <h3>Open questions</h3>
@@ -560,6 +837,9 @@ document.getElementById('notes').innerHTML=`
 <li>Sepia-filtered emoji, or a hand-drawn engraved icon set for dishes?</li>
 <li>Brand in Cinzel Decorative, or blackletter (UnifrakturMaguntia) for a darker, more gothic feel?</li>
 </ul>`;
+// prototype deep links for folders
+(()=>{if(/view=folders/.test(H))U.rview='folders';const fm=H.match(/fold=(f\d+)/);if(fm)FA.fopen({v:fm[1]});
+  if(/fdlg=new/.test(H))U.fd={t:'new',parent:null,r:null,name:'',back:null};if(/fdlg=add/.test(H))U.fd={t:'addTo',r:'curry'};if(/fdlg=sheet/.test(H))U.fd={t:'sheet'}})();
 render();
 </script>
 </body>

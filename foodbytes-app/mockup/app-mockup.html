@@ -1098,7 +1098,7 @@ function dialog(mob){
     b=`<h3>Move “${esc(f.name)}”</h3><p>Its recipes and subfolders come with it. Folders go up to ${FMAX_DEPTH} levels deep.</p>
      <button class="opt ${f.parent?'':'sel'}" ${f.parent?'':'disabled'} data-a="fdoMove" data-v="">☰ Top level<small>${f.parent?'':'current'}</small></button>${opts(null,0).join('')}`}
   else if(D.t==='fdel'){const f=FB(D.v),sub=fKids(f.id),n=fCount(f.id),par=FB(f.parent);
-    b=`<h3>Delete “${esc(f.name)}”?</h3><p>Only the folder goes. <b>No recipes are deleted</b>: they stay in All recipes and in any other folder they're in.</p>
+    b=`<h3>Delete “${esc(f.name)}”?</h3><p>Only the folder goes. <b>No recipes are deleted</b>: they stay in All recipes and in any other folder they're in. This can't be undone.</p>
      <div class="row"><span>Recipes filed here</span><b>${n}</b></div>${sub.length?`<div class="row"><span>Subfolders</span><b>${sub.length}</b></div><div class="warn">Its subfolders move up to ${par?esc(par.name):'the top level'}.</div>`:''}
      <button class="big" data-a="fdoDel">Delete folder</button><button class="link" data-a="close">Cancel</button>`}
   else if(D.t==='fadd'){const r=RB[D.r],n=rFolders(r.id).length;b=`<h3>Add to folder</h3><p><b>${esc(r.name)}</b> can sit in as many folders as you like. ${n?`In ${n} now.`:'Not in any yet.'}</p>${ftree('pick',r.id)}
@@ -1183,10 +1183,9 @@ const A={
   fmoveDlg:d=>{U.menu=null;U.dlg={t:'fmove',v:d.v}},
   fdoMove:d=>{const f=FB(U.dlg.v);f.parent=d.v||null;if(f.parent)U.fopen[f.parent]=true;U.dlg=null;toast(`Moved to ${f.parent?esc(FB(f.parent).name):'the top level'}`)},
   fdelDlg:d=>{U.menu=null;U.dlg={t:'fdel',v:d.v}},
-  fdoDel:()=>{const f=FB(U.dlg.v),snap={folders:S.folders.map(x=>({...x})),mem:S.fmem[f.id],cur:U.folder};
+  fdoDel:()=>{const f=FB(U.dlg.v);
     fKids(f.id).forEach(k=>k.parent=f.parent);S.folders=S.folders.filter(x=>x.id!==f.id);delete S.fmem[f.id];
-    if(U.folder===f.id)U.folder=f.parent;U.dlg=null;
-    toast(`Deleted “${esc(f.name)}”. Recipes kept.`,()=>{S.folders=snap.folders;S.fmem[f.id]=snap.mem;U.folder=snap.cur})},
+    if(U.folder===f.id)U.folder=f.parent;U.dlg=null;toast(`Deleted “${esc(f.name)}”. Recipes kept.`)},
   faddDlg:d=>{U.menu=null;U.dlg={t:'fadd',r:d.r}},
   faddHere:()=>{U.dlg={t:'faddHere',q:''}},
   fmemTog:d=>{const m=S.fmem[d.v]=S.fmem[d.v]||new Set();m.has(d.r)?m.delete(d.r):m.add(d.r)},

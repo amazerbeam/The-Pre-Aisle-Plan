@@ -10,13 +10,17 @@ import { readFileSync } from 'node:fs'
 import { headBarTop, headBarY, spokenLevelLabel } from './headBar.js'
 import { LINE_FORMS, lineFormCount, pipForm } from './lineForms.js'
 import { PIP_FOOT_Y } from './pipSpace.js'
-import { LINE_WARDROBE, drawnItemIds, glassesArt, hatArt, shoeArt, torsoArt } from './wardrobeArt.js'
+import { HAT_ANCHOR_CROWN, LINE_WARDROBE, drawnItemIds, glassesArt, hatAnchor, hatArt, shoeArt, torsoArt } from './wardrobeArt.js'
+import { titleBelt } from './wardrobeShapes.js'
+import { HERB_TITLE_BELT } from '../herb/herbWardrobe.js'
+import { DRAGON_TITLE_BELT } from '../dragon/dragonWardrobe.js'
+import { ROBOT_TITLE_BELT } from '../robot/robotWardrobe.js'
 import { TORSO_ORDER, dressLayers, hatMiniViewBox, hatOnly, slotCropViewBox } from './wardrobeLayers.js'
 import { HEAD_BAR_GAP } from '../../../constants/pipGrowth.js'
 import { PIP_LINE_COPY } from '../../../constants/pipLines.js'
 import { WARDROBE_ITEMS, WARDROBE_SLOT, WARDROBE_SLOTS } from '../../../constants/pipWardrobe.js'
 import {
-  firstNewSlot, newItemIds, toggleTarget, wardrobeAnnouncement, wardrobeItemLabel, withSlot, withSlotSeen
+  firstNewSlot, newItemIds, toggleTarget, wardrobeAnnouncement, wardrobeItemLabel, wardrobeSlotLabel, withSlot, withSlotSeen
 } from '../../../utils/pipWardrobe.js'
 
 const LINES = Object.keys(LINE_FORMS)
@@ -27,6 +31,7 @@ const IDS = [
   'jeans', 'joggers', 'dungarees', 'sneakers', 'wellies'
 ]
 const idsIn = (slot) => IDS.filter(id => WARDROBE_ITEMS[id].slot === slot)
+const crownHats = (line) => hatAnchor(line) === HAT_ANCHOR_CROWN
 
 // Every number in a shape list (attributes and path data) must be finite; a 'g' descriptor is checked through its children.
 function assertFinite(shapes, where) {
@@ -63,13 +68,15 @@ for (const { line, form, where: at } of EACH) {
     HAT: { neck: f.neck + 7, waist: f.waist + 7, side: f.side + 7, eyes: { ...f.eyes, gap: f.eyes.gap + 7 }, feet: [] },
     GLASSES: { hat: { y: f.hat.y + 7, w: f.hat.w + 7 }, neck: f.neck + 7, side: f.side + 7, feet: [] },
     TORSO: { hat: { y: f.hat.y + 7, w: f.hat.w + 7 }, eyes: { ...f.eyes, gap: f.eyes.gap + 7 }, feet: [] },
-    SHOES: { hat: { y: f.hat.y + 7, w: f.hat.w + 7 }, neck: f.neck + 7, eyes: { ...f.eyes, gap: f.eyes.gap + 7 } }
+    SHOES: { hat: { y: f.hat.y + 7, w: f.hat.w + 7 }, neck: f.neck + 7, eyes: { ...f.eyes, gap: f.eyes.gap + 7 } },
+    CROWN: { hat: { y: f.hat.y + 7, w: f.hat.w + 7 }, neck: f.neck + 7, waist: f.waist + 7, side: f.side + 7, eyes: { ...f.eyes, gap: f.eyes.gap + 7 }, feet: [] }
   }
   const own = {
     HAT: { hat: { y: f.hat.y + 7, w: f.hat.w } },
     GLASSES: { eyes: { ...f.eyes, gap: f.eyes.gap + 7 } },
     TORSO: { neck: f.neck - 7, waist: f.waist + 7 },
-    SHOES: { feet: f.feet.map(([root, tip]) => [root, [tip[0] + 7, tip[1]]]) }
+    SHOES: { feet: f.feet.map(([root, tip]) => [root, [tip[0] + 7, tip[1]]]) },
+    CROWN: { growTop: f.growTop + 7 }
   }
   for (const id of IDS) {
     const slot = WARDROBE_ITEMS[id].slot
@@ -77,7 +84,7 @@ for (const { line, form, where: at } of EACH) {
     let draw
     let group
     if (slot === 'HAT') {
-      group = 'HAT'
+      group = crownHats(line) ? 'CROWN' : 'HAT'
       draw = (g) => hatArt(line, id, g)
       const hat = draw(f)
       assertFinite(hat.shapes, where)
@@ -103,7 +110,7 @@ for (const { line, form, where: at } of EACH) {
 }
 
 // No per-form branches anywhere in the wardrobe drawing.
-for (const file of ['./wardrobeArt.js', './wardrobeLayers.js', './wardrobeShapes.js', '../herb/herbWardrobe.js', '../dragon/dragonWardrobe.js', '../robot/robotWardrobe.js']) {
+for (const file of ['./wardrobeArt.js', './wardrobeLayers.js', './wardrobeShapes.js', '../herb/herbWardrobe.js', '../dragon/dragonWardrobe.js', '../robot/robotWardrobe.js', '../robot/robotAntennas.js']) {
   const source = readFileSync(new URL(file, import.meta.url), 'utf8')
   assert.doesNotMatch(source, /PIP_FORMS|form\s*===?|===?\s*form\b|switch\s*\(\s*form|\.name\b/, `${file} branches on a form`)
 }
@@ -119,9 +126,16 @@ for (const { line, form, where } of EACH) {
   assert.deepEqual(dress.clip, expectedClip, `${where}: clip is pants → jacket → belt → scarf`)
   assert.deepEqual(dress.extra, expectedExtra, `${where}: buckle then scarf tail`)
   assert.deepEqual(dress.shoes, shoeArt(line, 'wellies', f))
-  assert.match(dress.hat.transform, /^rotate\(-7 100 /, `${where}: hats tilt`)
   assert.equal(dressLayers({ HAT: 'chef-hat' }, line, form).hat.transform, null, `${where}: the chef hat stays straight`)
-  assert.ok(dress.growTop <= f.growTop && dress.growTop <= hatArt(line, 'top-hat', f).top + 4, `${where}: growth pokes through the hat`)
+  if (crownHats(line)) {
+    assert.equal(dress.hat.transform, null, `${where}: antennas stand straight`)
+    assert.equal(dress.replacesCrown, true, `${where}: an antenna replaces the crown`)
+    assert.equal(dress.growTop, f.growTop, `${where}: an antenna leaves growTop on the head`)
+  } else {
+    assert.match(dress.hat.transform, /^rotate\(-7 100 /, `${where}: hats tilt`)
+    assert.equal(dress.replacesCrown, false, `${where}: a hat keeps the crown`)
+    assert.ok(dress.growTop <= f.growTop && dress.growTop <= hatArt(line, 'top-hat', f).top + 4, `${where}: growth pokes through the hat`)
+  }
   assert.equal(dressLayers({}, line, form).growTop, f.growTop, `${where}: no hat leaves growth where it was`)
   assert.ok(dress.glasses.length > 0)
   assert.deepEqual(dressLayers(FULL, line, form, { asleep: true }).glasses, [], `${where}: glasses hidden asleep`)
@@ -140,6 +154,22 @@ for (const line of LINES) {
   }
 }
 assert.deepEqual(outfit, FULL, 'dressLayers must not mutate the outfit')
+
+// ---- Antennas: droop redraws a crown-anchored hat and nothing else ----
+for (const { line, form, where } of EACH) {
+  for (const id of IDS) {
+    const slot = WARDROBE_ITEMS[id].slot
+    const up = dressLayers({ [slot]: id }, line, form)
+    const down = dressLayers({ [slot]: id }, line, form, { droop: true })
+    if (slot === 'HAT' && crownHats(line)) {
+      assert.notDeepEqual(down.hat.shapes, up.hat.shapes, `${where} ${id}: an antenna wilts`)
+      assertFinite(down.hat.shapes, `${where} ${id} drooped`)
+      assert.deepEqual({ ...down, hat: null }, { ...up, hat: null }, `${where} ${id}: droop only touches the antenna`)
+    } else {
+      assert.deepEqual(down, up, `${where} ${id}: droop changes nothing`)
+    }
+  }
+}
 
 // ---- AC 4 / AC 5: crops ----
 for (const { line, form, where } of EACH) {
@@ -176,6 +206,12 @@ assert.equal(wardrobeAnnouncement(['wellies'], 'robot'), '🎉 New outfit: Mag b
 assert.equal(wardrobeAnnouncement(['round-specs'], 'dragon'), '🎉 New outfit: Battle scar!')
 assert.equal(wardrobeAnnouncement(['beanie', 'jeans'], 'herb'), '🎉 New outfit: Beanie! (+1 more)')
 assert.equal(wardrobeAnnouncement(['jetpack'], 'herb'), null)
+assert.equal(wardrobeSlotLabel('robot', 'HAT'), 'Antenna')
+assert.equal(wardrobeSlotLabel('herb', 'HAT'), 'Hat')
+assert.equal(wardrobeSlotLabel('dragon', 'HAT'), 'Hat')
+assert.equal(wardrobeSlotLabel('robot', 'BELT'), 'Belt')
+assert.equal(wardrobeSlotLabel('mystery', 'SHOES'), 'Shoes')
+assert.equal(wardrobeAnnouncement(['top-hat'], 'robot'), '🎉 New outfit: Neon bolt!')
 
 // MPP-38 AC 5: the head bar clears every hat and the head growth on every non-final form of every line (the last form has no bar, AC 8).
 for (const { line, form, where } of EACH.filter(({ line, form }) => form < lineFormCount(line))) {
@@ -233,6 +269,17 @@ for (const { line, form, where } of EACH) {
     assert.equal(dressLayers({ GLASSES: id }, line, form, { asleep: true }).replacesFace, false, `${where} ${id}: the face comes back asleep`)
     assertFinite(shapesOf(glassesArt(line, id, f).shapes), `${where} ${id}`)
   }
+}
+
+// ---- Title belts (2026-11-16): every creature's Champion belt is the shared gold title belt, on every form ----
+const TITLE_BELT_STYLE = { herb: HERB_TITLE_BELT, dragon: DRAGON_TITLE_BELT, robot: ROBOT_TITLE_BELT }
+assert.deepEqual(Object.keys(TITLE_BELT_STYLE).sort(), [...LINES].sort(), 'one title-belt style per line')
+for (const { line, form, where } of EACH) {
+  const f = pipForm(line, form)
+  const belt = torsoArt(line, 'champion-belt', f)
+  assert.deepEqual({ clip: belt.clip, extra: belt.extra }, titleBelt(f, TITLE_BELT_STYLE[line]), `${where}: champion belt is the title belt`)
+  assert.equal(belt.clip.length, 4, `${where}: strap, two gilt edges and stitching`)
+  assertFinite(shapesOf(belt.extra), `${where}: title belt plates`)
 }
 
 console.log('wardrobe checks passed')

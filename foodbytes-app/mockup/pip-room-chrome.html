@@ -2623,19 +2623,29 @@
   const FRIDGE_FOOD = ['\u{1F95A}', '\u{1F95B}', '\u{1F9C0}', '\u{1F357}', '\u{1F41F}', '\u{1F969}', '\u{1F966}', '\u{1F955}', '\u{1F345}', '\u{1FAD1}', '\u{1F96C}', '\u{1F9C5}', '\u{1F34B}', '\u{1FAD0}', '\u{1F360}'];
   const FRIDGE_NOTES = { low: 'Running low, shopping day soon?', plenty: 'Plenty left for the week', full: 'Fully stocked for the week ✨' };
   const FRIDGE_FOOTNOTE = "Always 15 slots. How full it is = planned meals you haven't eaten yet ÷ meals planned this week. It restocks when you plan your week.";
-  const CABINET_NOTE = "The ladder starts again after a month, so every award can be won again. ×N is how many times you've earned it.";
-  const MILESTONES = ['1 day', '3 days', '5 days', '1 week', '2 weeks', '3 weeks', '1 month'];
+  // Daily ladder (proposed 2026-11-16): every streak day N earns an award for day N, with no cap
+  // and no restart. ×N = how many separate streaks reached that day. A shelf shows days 1..best,
+  // then best+1 greyed (the next one to beat).
+  const CABINET_NOTE = "Every day of a streak earns an award. ×N is how many of your streaks reached that day. The greyed one is your next record.";
+  const dayLabel = n => `${n} day${n === 1 ? '' : 's'}`;
+  // runs: every streak's length, current one included; best = longest.
+  const shelf = (icon, title, kind, current, runs) => {
+    const best = Math.max(0, ...runs);
+    const counts = Array.from({ length: best + 1 }, (_, i) => runs.filter(r => r >= i + 1).length);
+    return { icon, title, kind, line: `${current}-day streak · best ${best}`, next: current ? `Next: ${dayLabel(current + 1)} in 1 day` : '', counts };
+  };
   const SHELVES = [
-    { icon: '\u{1F4C5}', title: 'Followed the plan', kind: 'trophy', line: '9-day streak · best 21', next: 'Next: 2 weeks in 5 days', counts: [3, 2, 2, 1, 0, 0, 0] },
-    { icon: '\u{1F36A}', title: 'No snacks', kind: 'ribbon', line: '4-day streak · best 6', next: 'Next: 5 days in 1 day', counts: [2, 1, 0, 0, 0, 0, 0] },
-    { icon: '\u{1F377}', title: 'No alcohol', kind: 'ribbon', line: '0-day streak · best 3', next: '', counts: [0, 0, 0, 0, 0, 0, 0] }
+    shelf('\u{1F4C5}', 'Followed the plan', 'trophy', 9, [21, 4, 2, 9]),
+    shelf('\u{1F36A}', 'No snacks', 'ribbon', 4, [6, 2, 4]),
+    shelf('\u{1F377}', 'No alcohol', 'ribbon', 0, [3, 1])
   ];
   const FIRSTS = [['Make a template', true], ['Generate a shopping list', true], ['Plan a full week', false], ['Cook a homemade extra', false]];
   const WARDROBE_SLOTS = ['Hat', 'Glasses', 'Scarf', 'Jacket', 'Belt', 'Pants', 'Shoes']; // WARDROBE_SLOTS
+  const SLOT_LABELS = { robot: { Hat: 'Antenna' } }; // WARDROBE_SLOT_LABELS
   const HAT_LABELS = { // WARDROBE_ITEM_LABELS[line], Hat slot, in catalogue order
     herb: ['Beanie', 'Cap', 'Chef hat', 'Straw hat', 'Top hat'],
     dragon: ['Horn cosy', "Bard's cap", 'Singed toque', "Bird's nest", 'Crown'],
-    robot: ['Cooling fan', 'Holo visor', 'Steam toque', 'Satellite dish', 'Neon top hat']
+    robot: ['Prop-top', 'Radar bar', 'Toque charm', 'Boing spring', 'Neon bolt']
   };
   const HAT_HINTS = ['Owned from the start', '5 days alcohol-free', 'Your first homemade extra', 'Grow to Sprig', 'Any 1-month streak'];
 
@@ -2746,7 +2756,7 @@
   const trophy = '<g transform="translate(4,38)"><rect x="6" y="-6" width="20" height="6" fill="#8a5a2b" stroke="#2f2a3a" stroke-width="2"/><rect x="13" y="-14" width="6" height="8" fill="#ffc83d" stroke="#2f2a3a" stroke-width="2"/><path d="M4 -34 h24 q0 20 -12 20 q-12 0 -12 -20z" fill="#ffd34d" stroke="#2f2a3a" stroke-width="2"/></g>';
   const ribbon = '<g transform="translate(6,34)"><path d="M8 -10 l-4 14 l6 -3 l4 5 l2 -16 M20 -10 l4 14 l-6 -3 l-4 5 l-2 -16" fill="#e63946" stroke="#2f2a3a" stroke-width="2"/><circle cx="14" cy="-18" r="10" fill="#4dabf7" stroke="#2f2a3a" stroke-width="2"/><circle cx="14" cy="-18" r="5" fill="#ffd34d"/></g>';
   function cabinet() {
-    const shelves = SHELVES.map((s, si) => `<section class="pip-cabinet-shelf" aria-labelledby="demo-shelf-${si}"><h4 id="demo-shelf-${si}"><span aria-hidden="true">${s.icon}</span> ${s.title}</h4><p class="pip-cabinet-streak"><span>${s.line}</span>${s.next ? `<span>${s.next}</span>` : ''}</p><ul class="pip-cabinet-awards">${MILESTONES.map((m, i) => `<li class="pip-award${s.counts[i] ? '' : ' is-locked'}"><svg class="pip-award-icon" viewBox="0 0 40 40" aria-hidden="true" focusable="false">${s.kind === 'trophy' ? trophy : ribbon}</svg><span aria-hidden="true">${m}</span>${s.counts[i] ? `<span class="pip-award-times" aria-hidden="true">×${s.counts[i]}</span>` : ''}</li>`).join('')}</ul></section>`).join('');
+    const shelves = SHELVES.map((s, si) => `<section class="pip-cabinet-shelf" aria-labelledby="demo-shelf-${si}"><h4 id="demo-shelf-${si}"><span aria-hidden="true">${s.icon}</span> ${s.title}</h4><p class="pip-cabinet-streak"><span>${s.line}</span>${s.next ? `<span>${s.next}</span>` : ''}</p><ul class="pip-cabinet-awards">${s.counts.map((c, i) => `<li class="pip-award${s.counts[i] ? '' : ' is-locked'}"><svg class="pip-award-icon" viewBox="0 0 40 40" aria-hidden="true" focusable="false">${s.kind === 'trophy' ? trophy : ribbon}</svg><span aria-hidden="true">${dayLabel(i + 1)}</span>${s.counts[i] ? `<span class="pip-award-times" aria-hidden="true">×${s.counts[i]}</span>` : ''}</li>`).join('')}</ul></section>`).join('');
     const firsts = FIRSTS.map(([l, e]) => `<li class="pip-cabinet-first${e ? ' is-earned' : ''}"><span>${l}</span><span>${e ? '✓ earned' : 'to do'}</span></li>`).join('');
     return `<div class="pip-cabinet-view" role="dialog" aria-modal="true" aria-label="Basil's trophy cabinet"><div class="pip-cabinet-head"><h3>\u{1F3C6} Basil&apos;s trophy cabinet</h3><button type="button" class="pip-cabinet-btn-text">Back to room</button></div>${shelves}<p class="pip-cabinet-note">${CABINET_NOTE}</p><section class="pip-cabinet-shelf" aria-labelledby="demo-shelf-firsts"><h4 id="demo-shelf-firsts">Firsts — things to try</h4><ul class="pip-cabinet-firsts">${firsts}</ul></section></div>`;
   }
@@ -2755,7 +2765,7 @@
   function wardrobe(t, mode) {
     const hats = HAT_LABELS[t.line];
     const worn = 1; // index into hats
-    const slotTabs = WARDROBE_SLOTS.map((s, i) => `<button type="button" role="tab" aria-selected="${i === 0}" class="pip-wardrobe-tab${i === 0 ? ' is-selected' : ''}">${i === 0 || i === 3 ? '<span class="pip-wardrobe-tab-worn" aria-hidden="true"></span>' : ''}${s}${i === 2 ? '<span class="pip-wardrobe-tab-new" aria-hidden="true"></span>' : ''}</button>`).join('');
+    const slotTabs = WARDROBE_SLOTS.map((s, i) => `<button type="button" role="tab" aria-selected="${i === 0}" class="pip-wardrobe-tab${i === 0 ? ' is-selected' : ''}">${i === 0 || i === 3 ? '<span class="pip-wardrobe-tab-worn" aria-hidden="true"></span>' : ''}${SLOT_LABELS[t.line]?.[s] ?? s}${i === 2 ? '<span class="pip-wardrobe-tab-new" aria-hidden="true"></span>' : ''}</button>`).join('');
     const card = (label, cls, extra = '') => `<li><button type="button" class="pip-wardrobe-item${cls}">${creature(t, 'crop')}${extra}<span class="pip-wardrobe-item-label" aria-hidden="true">${esc(label)}</span></button></li>`;
     const grid = card('None', '') + hats.map((h, i) => card(h, i === worn ? ' is-worn' : i >= 3 ? ' is-locked' : '', i >= 3 ? '<span class="pip-wardrobe-lock" aria-hidden="true">\u{1F512}</span>' : i === 2 ? '<span class="pip-wardrobe-new" aria-hidden="true">NEW</span>' : '')).join('');
     const lock = mode === 'locked' ? `<p class="pip-wardrobe-lock-note" role="status"><b>\u{1F512} ${esc(hats[4])}</b>Unlock: ${HAT_HINTS[4]}</p>` : '';

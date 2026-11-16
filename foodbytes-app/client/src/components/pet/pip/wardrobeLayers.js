@@ -7,7 +7,8 @@ import { glassesArt, hatArt, shoeArt, torsoArt } from './wardrobeArt.js'
  * MPP-32 AC 3: an outfit composed for one form of one line, in the z-slots PipFigure draws them in:
  * shoes → [back + back-wear] … → [body] → clip: pants → jacket → belt → scarf (inside the body clip) →
  * [outline] → extra (belt buckle, scarf tail) → [face, unless replacesFace] → glasses (none asleep) →
- * hat → [crown from growTop, lifted so it pokes through the hat]. Nothing here branches on the form:
+ * hat → [crown from growTop, lifted so it pokes through the hat — or skipped when the hat replaces the crown
+ * (replacesCrown: the robot's antennas, drawn from growTop and redrawn when `droop`)]. Nothing here branches on the form:
  * the same outfit gives the same layers on every form, wilted or not (AC 7).
  */
 
@@ -20,15 +21,16 @@ export const HAT_TILT_DEG = -7
  * @param {Object|null} outfit - { HAT: 'beanie', … } (absent slot = empty)
  * @param {string} line - PIP_LINE id
  * @param {number} form - 1..lineFormCount(line)
- * @param {{ asleep?: boolean }} [options]
- * @returns {{ back: Object[], shoes: Object[], clip: Object[], extra: Object[], glasses: Object[], replacesFace: boolean, hat: { shapes: Object[], transform: string|null }|null, growTop: number, itemIds: string[] }}
+ * @param {{ asleep?: boolean, droop?: boolean }} [options]
+ * @returns {{ back: Object[], shoes: Object[], clip: Object[], extra: Object[], glasses: Object[], replacesFace: boolean, replacesCrown: boolean, hat: { shapes: Object[], transform: string|null }|null, growTop: number, itemIds: string[] }}
  */
-export function dressLayers(outfit, line, form, { asleep = false } = {}) {
+export function dressLayers(outfit, line, form, { asleep = false, droop = false } = {}) {
   const worn = outfit ?? {}
   const f = pipForm(line, form)
   const torsoIds = TORSO_ORDER.map(slot => worn[slot]).filter(Boolean)
   const torso = torsoIds.map(id => torsoArt(line, id, f))
-  const hat = worn[HAT] ? hatArt(line, worn[HAT], f) : null
+  const hat = worn[HAT] ? hatArt(line, worn[HAT], f, { droop }) : null
+  const replacesCrown = Boolean(hat?.replacesCrown)
   const glasses = worn[GLASSES] && !asleep ? glassesArt(line, worn[GLASSES], f) : null
   return {
     back: torso.flatMap(t => t.back), // drawn right after the line's Back (a cape)
@@ -37,8 +39,9 @@ export function dressLayers(outfit, line, form, { asleep = false } = {}) {
     extra: torso.flatMap(t => t.extra),
     glasses: glasses?.shapes ?? [],
     replacesFace: Boolean(glasses?.replacesFace), // a screen face: PipFigure skips the line's Face
+    replacesCrown, // an antenna: PipFigure skips the line's Crown
     hat: hat && { shapes: hat.shapes, transform: hat.straight ? null : `rotate(${HAT_TILT_DEG} ${PIP_FOOT_X} ${f.hat.y})` },
-    growTop: hat ? Math.min(f.growTop, hat.top + 4) : f.growTop,
+    growTop: hat && !replacesCrown ? Math.min(f.growTop, hat.top + 4) : f.growTop,
     itemIds: [worn[SHOES], ...torsoIds, glasses ? worn[GLASSES] : null, worn[HAT]].filter(Boolean)
   }
 }

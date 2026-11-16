@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pip Dragon Fixes</title>
+<!-- Proposal in review (2026-11-16): the dragon (Parchment) Pip's horns under hats, the Battle scar, and Dress Pip card overflow.
+     Dragon geometry, face and hats are copied verbatim from pip-themed-lines.html (DRAGON_FORMS, dragon*, DRAGON_WARDROBE.hat). -->
+<style>
+  :root {
+    --brand: #7a2230; --text: #2c2a26; --muted: #6a6257;
+    --bg: #f6efe0; --card: #fffaf0; --line: #e4d8bf; --pick: #7a2230;
+    --stage: #eef6e6; --stage-line: #dfead4; --card-border: #d9c69a;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; }
+  main { max-width: 1180px; margin: 0 auto; padding: 24px 16px 64px; }
+  h1 { color: var(--brand); margin: 0 0 4px; font-size: 1.7rem; }
+  h2 { color: var(--brand); margin: 36px 0 10px; font-size: 1.25rem; }
+  h3 { margin: 0; font-size: 1.05rem; }
+  .lede { color: var(--muted); margin: 0 0 16px; max-width: 860px; }
+  .card { background: var(--card); border-radius: 16px; padding: 16px; box-shadow: 0 4px 18px rgba(60,40,20,.08); margin-bottom: 18px; }
+  button { font: inherit; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chips button, .btn { min-height: 40px; border: 1px solid var(--card-border); background: #fff; color: var(--text); border-radius: 999px; padding: 6px 14px; font-size: .88rem; font-weight: 600; cursor: pointer; touch-action: manipulation; }
+  .chips button.on { background: var(--brand); border-color: var(--brand); color: #fff; }
+  .controls { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; margin: 0 0 18px; position: sticky; top: 0; z-index: 2; background: var(--bg); padding: 8px 0; }
+  .controls > span { font-size: .88rem; font-weight: 700; }
+  .item-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; margin-bottom: 12px; }
+  .item-head .hint { font-size: .82rem; color: var(--muted); }
+  .opts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+  @media (max-width: 960px) { .opts { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 560px) { .opts { grid-template-columns: 1fr; } }
+  .opt { border: 2px solid var(--line); border-radius: 14px; padding: 10px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+  .opt.now { background: #f3ecdc; }
+  .opt.picked { border-color: var(--pick); box-shadow: 0 0 0 3px #7a223033; }
+  .opt-title { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  .opt-title b { font-size: .95rem; }
+  .tag { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; padding: 2px 8px; border-radius: 999px; background: #efe4cc; color: #6b4a1e; }
+  .tag.old { background: #f3dede; color: #8b2020; }
+  .tag.rec { background: #dcefd6; color: #2f6b25; }
+  .opt p { margin: 0; font-size: .84rem; color: var(--muted); }
+  .stage { background: var(--stage); border-radius: 10px; display: flex; align-items: flex-end; justify-content: center; gap: 2px; padding: 4px; }
+  .stage svg { width: 33%; height: auto; display: block; overflow: hidden; }
+  .stage svg.thumb { width: 72px; flex: none; border-radius: 10px; background: #f6fbef; }
+  .pick { align-self: flex-start; }
+  .opt.picked .pick { background: var(--pick); border-color: var(--pick); color: #fff; }
+  .summary { font-size: .9rem; }
+
+  /* Dress Pip card simulation (WardrobeView.css .pip-wardrobe-item) */
+  .phone { width: 340px; max-width: 100%; background: #f6efe0; border: 1px solid var(--line); border-radius: 18px; padding: 12px; }
+  .phone h4 { margin: 0 0 8px; font-size: .9rem; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  .wcard { position: relative; border: 2px solid var(--card-border); border-radius: 14px; background: #fffaf0; padding: 4px 4px 8px; text-align: center; font-size: .72rem; font-weight: 600; }
+  .wcard svg { display: block; width: 100%; aspect-ratio: 1; border-radius: 10px; background: #f6fbef; }
+  .wcard.spill svg { overflow: visible; }          /* today: .pip-herb { overflow: visible } leaks into the card */
+  .wcard.fit svg { overflow: hidden; }             /* proposed: the card clips its crop */
+  .pair { display: flex; flex-wrap: wrap; gap: 18px; }
+
+  .fx { transform-box: fill-box; transform-origin: center; }
+  .fx.sway { transform-origin: 50% 100%; animation: sway 3s ease-in-out infinite; }
+  .fx.smoke { animation: smoke 2.1s ease-out infinite; }
+  .fx.wobble { transform-origin: 50% 100%; animation: wobble 2.6s ease-in-out infinite; }
+  .fx.sparkle { animation: sparkle 1.6s ease-in-out infinite; }
+  @keyframes sway { 0%, 100% { transform: rotate(-8deg); } 50% { transform: rotate(8deg); } }
+  @keyframes smoke { 0% { opacity: 0; transform: translateY(4px) scale(.6); } 30% { opacity: .9; } 100% { opacity: 0; transform: translateY(-10px) scale(1.3); } }
+  @keyframes wobble { 0%, 70%, 100% { transform: rotate(0); } 78% { transform: rotate(-9deg); } 86% { transform: rotate(8deg); } 94% { transform: rotate(-4deg); } }
+  @keyframes sparkle { 0%, 100% { transform: scale(.3); opacity: .2; } 50% { transform: scale(1); opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) { .fx { animation: none !important; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Dragon Pip: horns, Battle scar and card fit</h1>
+  <p class="lede">Three dragon problems seen in Dress Pip. <b>1.</b> With a hat on, the horns (and the Hatchling's shell cap) are lifted to the top of the hat, so with the Bard's cap, Singed toque and Crown they float in mid-air. It's the same bug the robot antenna contract fixed. <b>2.</b> The Battle scar draws claw marks over an eye that is still open; the eye should be gone. <b>3.</b> Item cards don't clip Pip, so the dragon's head and horns spill out of the card into the row above.</p>
+
+  <div class="controls">
+    <span>Mood</span><div class="chips" id="moods"></div>
+    <button type="button" class="btn" id="resetPicks">Reset picks</button>
+  </div>
+
+  <h2>1 · Horns under hats</h2>
+  <p class="lede">Each row is one hat on Hatchling, Wyrmling and Drake. <b>Now</b> is what ships. Pick one option for the whole dragon (one rule for every hat keeps it simple; Horn cosy always keeps its horns through, since that's what the item is).</p>
+  <div id="hats"></div>
+
+  <h2>2 · Battle scar</h2>
+  <p class="lede">The left eye is gone in every option. The mood still shows in the right eye, the brows and the mouth. Asleep, glasses aren't drawn (today's rule), so the scar hides while Pip sleeps; options keep or change that as noted.</p>
+  <div id="scar"></div>
+
+  <h2>3 · Dress Pip cards (all lines)</h2>
+  <p class="lede">At phone width, Jacket slot, Wyrmling. <b>Now</b>: the card's SVG has <code>overflow: visible</code> (from <code>.pip-herb</code>), so whatever is outside the crop spills over the card above. <b>Fix</b>: the card clips its crop (<code>overflow: hidden</code> on <code>.pip-wardrobe-item .pip-herb</code> and the lineup). The crop squares don't change, so this needs no pick. It affects all three Pips, the dragon most because his head sits highest above the torso crop.</p>
+  <div class="pair" id="cards"></div>
+
+  <h2>Your picks</h2>
+  <div class="card summary" id="pickText"></div>
+</main>
+
+<script>
+/* ======================================================================
+   Dragon geometry: verbatim from pip-themed-lines.html
+   ====================================================================== */
+const FOOT_Y = 186, DRAGON_INK = '#1f3d34', DI = DRAGON_INK;
+const DRAGON_FORMS = [
+  { name: 'Hatchling', scale: 0.84, fill: ['#c4f2dc', '#6cc59a'],
+    body: 'M100 92 C124 92 134 108 132 126 C131 136 126 142 128 148 C134 162 128 182 100 182 C72 182 66 162 72 148 C74 142 69 136 68 126 C66 108 76 92 100 92Z',
+    hat: { y: 104, w: 50 }, eyes: { y: 122, gap: 12, s: 0.75 }, neck: 146, waist: 168, side: 28,
+    feet: [[[88, 178], [78, 185]], [[112, 178], [122, 185]]], growTop: 92, crownTop: 89, growthRise: 12, miniViewBox: '50 92 100 100' },
+  { name: 'Wyrmling', scale: 0.9, fill: ['#a8e8cc', '#3fa57c'],
+    body: 'M100 68 C128 68 140 86 138 106 C137 118 130 124 130 130 C142 142 142 182 100 182 C58 182 58 142 70 130 C70 124 63 118 62 106 C60 86 72 68 100 68Z',
+    hat: { y: 82, w: 60 }, eyes: { y: 102, gap: 15, s: 0.85 }, neck: 132, waist: 164, side: 34,
+    feet: [[[84, 178], [72, 186]], [[116, 178], [128, 186]]], growTop: 72, crownTop: 65, growthRise: 20, miniViewBox: '34 60 132 132' },
+  { name: 'Drake', scale: 0.98, fill: ['#8fdcbf', '#2a8a66'],
+    body: 'M100 56 C126 56 138 72 136 92 C135 104 128 110 126 116 C146 124 152 150 148 168 C144 182 124 184 100 184 C76 184 56 182 52 168 C48 150 54 124 74 116 C72 110 65 104 64 92 C62 72 74 56 100 56Z',
+    hat: { y: 70, w: 62 }, eyes: { y: 88, gap: 15, s: 0.9 }, neck: 126, waist: 162, side: 42,
+    feet: [[[80, 178], [64, 186]], [[120, 178], [136, 186]]], growTop: 60, crownTop: 53, growthRise: 28, miniViewBox: '5 18 190 190' },
+];
+const DR = { belly: '#fdf1cc', bellyLine: '#e3c98a', wing: '#f4bf63', wingRib: '#c98f2c', horn: '#f7ead0', claw: '#fffaf0', shell: '#fffaf3', shellSpot: '#b5e0c9', iris: '#ffcf4d' };
+const WING = 'M0 0 C8 -26 34 -44 62 -50 C56 -38 54 -28 56 -16 C46 -20 38 -16 36 -8 C28 -12 18 -8 14 0 Z';
+const WING_RIBS = 'M5 -4 L62 -50 M10 -5 L56 -16 M9 -3 L36 -8';
+const fx = (cls, svg, style = '') => `<g class="fx ${cls}"${style ? ` style="${style}"` : ''}>${svg}</g>`;
+function dragonWing(x, y, dir, sz, droop) {
+  return `<g transform="translate(${x} ${y}) scale(${dir * sz} ${sz}) rotate(${droop ? 48 : 0})"><path d="${WING}" fill="${DR.wing}" stroke="${DI}" stroke-width="${3.2 / sz}" stroke-linejoin="round"/><path d="${WING_RIBS}" stroke="${DR.wingRib}" stroke-width="${2 / sz}" fill="none" stroke-linecap="round"/></g>`;
+}
+const TAILS = [
+  { up: ['M116 172 Q138 180 146 166', [146, 166]], down: ['M116 172 Q140 186 152 184', [152, 184]], w: 6 },
+  { up: ['M122 170 Q154 182 160 152', [160, 152]], down: ['M122 170 Q156 188 170 184', [170, 184]], w: 7 },
+  { up: ['M128 172 C168 190 186 152 172 128', [172, 128]], down: ['M128 172 C164 192 184 186 192 180', [192, 180]], w: 8 },
+];
+function dragonBack(fi, droop, f) {
+  const t = TAILS[fi], [d, [tx, ty]] = droop ? t.down : t.up;
+  let b = `<path d="${d}" stroke="${DI}" stroke-width="${t.w + 5}" fill="none" stroke-linecap="round"/><path d="${d}" stroke="${f.fill[1]}" stroke-width="${t.w}" fill="none" stroke-linecap="round"/>
+    <path d="M${tx} ${ty - 8} l7 8 l-7 8 l-7 -8 Z" fill="${f.fill[1]}" stroke="${DI}" stroke-width="2.6" stroke-linejoin="round"/>`;
+  if (fi === 0) {
+    let zig = 'M62 168';
+    for (let i = 1; i <= 10; i++) zig += ` L${62 + i * 7.6} ${i % 2 ? 159 : 168}`;
+    b += `<path d="${zig} C138 196 62 196 62 168Z" fill="${DR.shell}" stroke="${DI}" stroke-width="3" stroke-linejoin="round"/>
+      <ellipse cx="72" cy="178" rx="4" ry="3" fill="${DR.shellSpot}"/><ellipse cx="130" cy="176" rx="3.5" ry="2.6" fill="${DR.shellSpot}"/>`;
+  }
+  if (fi === 1) b += dragonWing(100 - (f.side - 6), f.neck - 4, -1, 0.42, droop) + dragonWing(100 + (f.side - 6), f.neck - 4, 1, 0.42, droop);
+  if (fi === 2) b += dragonWing(100 - (f.side - 10), f.neck - 2, -1, 1, droop) + dragonWing(100 + (f.side - 10), f.neck - 2, 1, 1, droop);
+  return b;
+}
+function claws(x, y, dir) {
+  return [[5, -1], [1, 2], [-3, 1]].map(([dx, dy]) => `<circle cx="${x + dir * dx}" cy="${y + dy}" r="2.2" fill="${DR.claw}" stroke="${DI}" stroke-width="1.2"/>`).join('');
+}
+function dragonLimbs(f, fi) {
+  let s = '';
+  const len = [10, 14, 18][fi], ay = f.neck + 6;
+  [-1, 1].forEach(dir => {
+    const sx = 100 + dir * (f.side - 4), ex = sx + dir * len, ey = ay + len;
+    const d = `M${sx} ${ay} Q${sx + dir * len * 0.7} ${ay + len * 0.15} ${ex} ${ey}`;
+    s += `<path d="${d}" stroke="${DI}" stroke-width="10" fill="none" stroke-linecap="round"/><path d="${d}" stroke="${f.fill[1]}" stroke-width="5" fill="none" stroke-linecap="round"/>${claws(ex, ey + 2, dir)}`;
+  });
+  f.feet.forEach(([r, t]) => {
+    const d = `M${r[0]} ${r[1]} Q${r[0]} ${t[1]} ${t[0]} ${t[1]}`, dir = t[0] < r[0] ? -1 : 1;
+    s += `<path d="${d}" stroke="${DI}" stroke-width="12" fill="none" stroke-linecap="round"/><path d="${d}" stroke="${f.fill[1]}" stroke-width="6.5" fill="none" stroke-linecap="round"/>${claws(t[0], t[1], dir)}`;
+  });
+  return s;
+}
+function dragonDetails(f, fi) {
+  const { y: ey, gap, s } = f.eyes;
+  const cy = (f.neck + f.waist) / 2 + 6, rx = f.side * 0.58, ry = (f.waist - f.neck) / 2 + 12;
+  let d = `<ellipse cx="100" cy="${cy}" rx="${rx}" ry="${ry}" fill="${DR.belly}"/>`;
+  for (let i = -1; i <= 1; i++) d += `<path d="M${100 - rx * 0.72} ${cy + i * ry * 0.42} Q100 ${cy + i * ry * 0.42 + 6} ${100 + rx * 0.72} ${cy + i * ry * 0.42}" stroke="${DR.bellyLine}" stroke-width="2" fill="none"/>`;
+  d += `<ellipse cx="100" cy="${ey + 14 * s}" rx="${gap + 8 * s}" ry="${10 * s}" fill="#fff" opacity=".32"/>`;
+  d += `<circle cx="${100 - 4 * s}" cy="${ey + 9 * s}" r="${1.7 * s}" fill="${DI}"/><circle cx="${100 + 4 * s}" cy="${ey + 9 * s}" r="${1.7 * s}" fill="${DI}"/>`;
+  if (fi >= 1) d += `<ellipse cx="${100 - gap * 0.9}" cy="${f.hat.y + 4}" rx="4" ry="2.6" fill="${f.fill[1]}" opacity=".5"/><ellipse cx="${100 + gap * 0.9}" cy="${f.hat.y + 4}" rx="4" ry="2.6" fill="${f.fill[1]}" opacity=".5"/>`;
+  return d;
+}
+function dragonHorn(x, base, h, dir) {
+  return `<path d="M${x - 5} ${base + 6} Q${x - 3 + dir * 2} ${base - h * 0.6} ${x + dir * 7} ${base - h} Q${x + 4 + dir * 2} ${base - h * 0.45} ${x + 6} ${base + 6} Z" fill="${DR.horn}" stroke="${DI}" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M${x - 2} ${base} q${dir * 3} -2 ${dir * 6} -1 M${x - 1} ${base - h * 0.3} q${dir * 3} -2 ${dir * 5} -1" stroke="${DI}" stroke-width="1.4" opacity=".4" fill="none"/>`;
+}
+function dragonCrown(fi, droop, base) {
+  if (fi === 0) {
+    let zig = `M84 ${base + 4}`;
+    for (let i = 1; i <= 8; i++) zig += ` L${84 + i * 4} ${i % 2 ? base - 1 : base + 4}`;
+    return `<g transform="rotate(${droop ? -20 : -8} 100 ${base})"><path d="${zig} C116 ${base - 16} 84 ${base - 16} 84 ${base + 4}Z" fill="${DR.shell}" stroke="${DI}" stroke-width="2.8" stroke-linejoin="round"/><ellipse cx="96" cy="${base - 4}" rx="3" ry="2" fill="${DR.shellSpot}"/></g>`;
+  }
+  if (fi === 1) return dragonHorn(85, base, 18, -1) + dragonHorn(115, base, 18, 1);
+  return `<path d="M95 ${base + 6} L100 ${base - 10} L105 ${base + 6} Z" fill="${DR.horn}" stroke="${DI}" stroke-width="2.6" stroke-linejoin="round"/>` + dragonHorn(82, base, 26, -1) + dragonHorn(118, base, 26, 1);
+}
+/** Horn x positions per form (dragonCrown), used by option C to size the hat between them. */
+const HORN_X = [null, [85, 115], [82, 118]];
+
+/* ---------- faces: the dragon face split per eye so one eye can be dropped (L = viewer's left) ---------- */
+function dragonFace(f, mood, { noL = false } = {}) {
+  const { y: ey, gap, s } = f.eyes, ink = DI, L = 100 - gap, R = 100 + gap, my = ey + 17 * s;
+  const st = `stroke="${ink}" stroke-width="${4 * s}" stroke-linecap="round" fill="none"`;
+  const fang = `<path d="M${100 + 3 * s} ${my + 1 * s} l${2.5 * s} ${5 * s} l${2.5 * s} ${-5 * s} Z" fill="#fff" stroke="${ink}" stroke-width="${1.6 * s}" stroke-linejoin="round"/>`;
+  const blush = (o, rx = 8, ry = 4.5) => `<ellipse cx="${L - 11 * s}" cy="${ey + 11 * s}" rx="${rx * s}" ry="${ry * s}" fill="#ff8fab" opacity="${o}"/><ellipse cx="${R + 11 * s}" cy="${ey + 11 * s}" rx="${rx * s}" ry="${ry * s}" fill="#ff8fab" opacity="${o}"/>`;
+  const both = (fn) => (noL ? '' : fn(L)) + fn(R);
+  if (mood === 'content' || mood === 'mischievous') {
+    const dx = mood === 'mischievous' ? 3 * s : 0;
+    const eye = (x) => `<ellipse cx="${x + dx}" cy="${ey}" rx="${7.5 * s}" ry="${9.5 * s}" fill="${DR.iris}" stroke="${ink}" stroke-width="${2.6 * s}"/><ellipse cx="${x + dx}" cy="${ey + 0.5 * s}" rx="${2.6 * s}" ry="${7 * s}" fill="${ink}"/><circle cx="${x + dx + 2.6 * s}" cy="${ey - 4 * s}" r="${2.2 * s}" fill="#fff"/>`;
+    const brows = mood === 'mischievous' ? `<path d="M${L - 10 * s} ${ey - 13 * s} Q${L} ${ey - 15 * s} ${L + 10 * s} ${ey - 20 * s}" ${st}/><path d="M${R - 10 * s} ${ey - 20 * s} Q${R} ${ey - 15 * s} ${R + 10 * s} ${ey - 13 * s}" ${st}/>` : '';
+    const mouth = mood === 'mischievous'
+      ? `<path d="M${100 - 11 * s} ${my} Q${100 - 3 * s} ${my + 8 * s} ${100 + 3 * s} ${my + 1 * s} Q${100 + 8 * s} ${my - 3 * s} ${100 + 13 * s} ${my + 2 * s}" ${st}/>`
+      : `<path d="M${100 - 9 * s} ${my - 2 * s} Q100 ${my + 6 * s} ${100 + 9 * s} ${my - 2 * s}" ${st}/>`;
+    return both(eye) + brows + mouth + fang + blush(0.45);
+  }
+  if (mood === 'happy') {
+    return both(x => `<path d="M${x - 9 * s} ${ey + 2 * s} Q${x} ${ey - 11 * s} ${x + 9 * s} ${ey + 2 * s}" ${st}/>`)
+      + `<path d="M${100 - 10 * s} ${my - 3 * s} Q100 ${my + 15 * s} ${100 + 10 * s} ${my - 3 * s} Z" fill="#7a2e45" stroke="${ink}" stroke-width="${3 * s}" stroke-linejoin="round"/>` + blush(0.8, 9, 5) + fang;
+  }
+  if (mood === 'bored') {
+    return both(x => `<path d="M${x - 8 * s} ${ey} A${8 * s} ${8 * s} 0 0 0 ${x + 8 * s} ${ey} Z" fill="${ink}"/><path d="M${x - 10 * s} ${ey} L${x + 10 * s} ${ey}" ${st}/>`)
+      + `<path d="M${100 - 7 * s} ${my + 2 * s} L${100 + 7 * s} ${my + 2 * s}" ${st}/>` + blush(0.3, 9, 5);
+  }
+  // sleep
+  return both(x => `<path d="M${x - 9 * s} ${ey} Q${x} ${ey + 9 * s} ${x + 9 * s} ${ey}" ${st}/>`)
+    + `<ellipse cx="100" cy="${my + 1 * s}" rx="${4 * s}" ry="${3.4 * s}" fill="#7a2e45"/>` + blush(0.5, 9, 5);
+}
+
+/* ---------- dragon hats: verbatim from pip-themed-lines.html DRAGON_WARDROBE.hat ---------- */
+const HATS = {
+  beanie: { label: 'Horn cosy', draw: (x, y, w) => { const h = w * 0.46;
+    let knit = '';
+    for (const k of [-0.25, 0, 0.25]) knit += `<path d="M${x + w * k} ${y - h * 0.95} l-2 4 l2 4 l-2 4 l2 4 l-2 4" stroke="#b88428" stroke-width="2" fill="none"/>`;
+    return { top: y - h, svg: `<path d="M${x - w / 2} ${y} C${x - w / 2} ${y - h * 1.3} ${x + w / 2} ${y - h * 1.3} ${x + w / 2} ${y} Z" fill="#d9a441" stroke="${DI}" stroke-width="3.5" stroke-linejoin="round"/>${knit}
+      <rect x="${x - w / 2 - 3}" y="${y - 7}" width="${w + 6}" height="11" rx="5" fill="#f3e2b0" stroke="${DI}" stroke-width="3.5"/>` };
+  } },
+  cap: { label: "Bard's cap", draw: (x, y, w) => { const h = w * 0.36, fx0 = x + w * 0.18, fy0 = y - h * 0.8;
+    return { top: fy0 - w * 0.55 - 2, svg: `${fx('sway', `<path d="M${fx0} ${fy0} C${fx0 + w * 0.15} ${fy0 - w * 0.3} ${fx0 + w * 0.42} ${fy0 - w * 0.5} ${fx0 + w * 0.55} ${fy0 - w * 0.55} C${fx0 + w * 0.42} ${fy0 - w * 0.36} ${fx0 + w * 0.24} ${fy0 - w * 0.12} ${fx0 + 4} ${fy0 + 2} Z" fill="#c8463d" stroke="${DI}" stroke-width="2.4" stroke-linejoin="round"/><path d="M${fx0 + 2} ${fy0} Q${fx0 + w * 0.3} ${fy0 - w * 0.3} ${fx0 + w * 0.52} ${fy0 - w * 0.53}" stroke="#7a2520" stroke-width="1.4" fill="none"/>`)}
+      <path d="M${x - w / 2} ${y} C${x - w / 2} ${y - h * 1.4} ${x + w / 2} ${y - h * 1.4} ${x + w / 2} ${y} Z" fill="#3f7d4e" stroke="${DI}" stroke-width="3.5" stroke-linejoin="round"/>
+      <path d="M${x - w / 2 - 2} ${y - 1} Q${x} ${y + 5} ${x + w / 2 + 2} ${y - 1}" stroke="#2c5a37" stroke-width="5" stroke-linecap="round" fill="none"/>` };
+  } },
+  'chef-hat': { label: 'Singed toque', straight: true, draw: (x, y, w) => { const h = w * 0.55;
+    return { top: y - h - 24, svg: `<path d="M${x - w / 2 + 4} ${y - 4} C${x - w / 2 - 12} ${y - h} ${x - w / 4} ${y - h - 18} ${x} ${y - h - 8} C${x + w / 4} ${y - h - 18} ${x + w / 2 + 12} ${y - h} ${x + w / 2 - 4} ${y - 4} Z" fill="#fffaf0" stroke="${DI}" stroke-width="3.5" stroke-linejoin="round"/>
+      <ellipse cx="${x + w * 0.3}" cy="${y - h * 0.7}" rx="${w * 0.12}" ry="${w * 0.08}" fill="#6b4a2e" opacity=".45"/><ellipse cx="${x - w * 0.28}" cy="${y - h * 0.45}" rx="${w * 0.08}" ry="${w * 0.06}" fill="#6b4a2e" opacity=".4"/>
+      <rect x="${x - w / 2}" y="${y - 9}" width="${w}" height="12" rx="3" fill="#fffaf0" stroke="${DI}" stroke-width="3.5"/><path d="M${x + w * 0.2} ${y - 9} v12" stroke="#6b4a2e" stroke-width="3" opacity=".35"/>
+      ${[0, 1, 2].map(i => fx('smoke', `<circle cx="${x + w * 0.12 + i * 3}" cy="${y - h - 16}" r="${3.5 + i}" fill="#9a9187" opacity=".55"/>`, `animation-delay:${i * 0.7}s`)).join('')}` };
+  } },
+  'straw-hat': { label: "Bird's nest", draw: (x, y, w) => { const ex = x + w * 0.05, ey = y - w * 0.2, er = w * 0.13;
+    const twigs = [[-0.5, -0.1, 0.1, 0.05], [-0.3, 0.06, 0.45, -0.12], [-0.55, -0.02, -0.15, -0.2], [0.1, 0.08, 0.55, -0.06]].map(([a, b, c2, d]) => `<path d="M${x + w * a} ${y + w * b} L${x + w * c2} ${y + w * d}" stroke="#5e3b1a" stroke-width="2" stroke-linecap="round"/>`).join('');
+    return { top: ey - er * 1.3 - 2, svg: `<ellipse cx="${x}" cy="${y - 4}" rx="${w * 0.56}" ry="${w * 0.17}" fill="#8a5a2b" stroke="${DI}" stroke-width="3"/>
+      ${fx('wobble', `<ellipse cx="${ex}" cy="${ey}" rx="${er}" ry="${er * 1.3}" fill="#a9dbe8" stroke="${DI}" stroke-width="2.4"/><circle cx="${ex - er * 0.3}" cy="${ey - er * 0.2}" r="${er * 0.14}" fill="#6a9bb0"/><circle cx="${ex + er * 0.35}" cy="${ey + er * 0.4}" r="${er * 0.11}" fill="#6a9bb0"/>`)}
+      <path d="M${x - w * 0.56} ${y - 4} Q${x} ${y + w * 0.2} ${x + w * 0.56} ${y - 4} Q${x} ${y + 2} ${x - w * 0.56} ${y - 4} Z" fill="#a06a35" stroke="${DI}" stroke-width="2.6"/>${twigs}` };
+  } },
+  'top-hat': { label: 'Crown', draw: (x, y, w) => { const a = x - w * 0.42, b = x + w * 0.42, h = w * 0.55, q = (b - a) * 0.25;
+    return { top: y - h - 4, svg: `<path d="M${a} ${y} L${a} ${y - h * 0.6} L${a + q} ${y - h * 0.3} L${x} ${y - h} L${b - q} ${y - h * 0.3} L${b} ${y - h * 0.6} L${b} ${y} Z" fill="#f0c14b" stroke="${DI}" stroke-width="3.2" stroke-linejoin="round"/>
+      <rect x="${a}" y="${y - 7}" width="${b - a}" height="7" fill="#d9a62e" stroke="${DI}" stroke-width="2.2"/>
+      ${[[-0.22, '#d43a4a'], [0, '#3a7bd4'], [0.22, '#3aa86b']].map(([k, col]) => `<circle cx="${x + w * k}" cy="${y - 3.5}" r="2.3" fill="${col}" stroke="${DI}" stroke-width="1"/>`).join('')}
+      ${[[a, y - h * 0.6], [x, y - h], [b, y - h * 0.6]].map(([px, py]) => `<circle cx="${px}" cy="${py}" r="2.8" fill="#fff3b0" stroke="${DI}" stroke-width="1.4"/>`).join('')}
+      ${fx('sparkle', `<path d="M${x + w * 0.2} ${y - h * 0.95} l1.6 3.4 l3.4 1.6 l-3.4 1.6 l-1.6 3.4 l-1.6 -3.4 l-3.4 -1.6 l3.4 -1.6 Z" fill="#fff"/>`)}` };
+  } },
+};
+const HAT_IDS = Object.keys(HATS);
+
+/* ======================================================================
+   Horn options (what happens to dragonCrown when a hat is worn)
+   ====================================================================== */
+const HORN_OPTIONS = [
+  { key: 'A', label: 'Through the hat', rec: true,
+    note: 'Horns stay rooted on the head and are drawn over the hat, as if it has two holes cut for them. The Hatchling\'s shell cap tucks under the hat. Smallest code change: the dragon stops lifting its crown.' },
+  { key: 'B', label: 'Tucked under', rec: false,
+    note: 'Horns stay rooted on the head but go behind the hat; only the parts taller than the hat show. Tall hats (toque, Crown) hide the Wyrmling\'s horns completely. Horn cosy keeps its horns through.' },
+  { key: 'C', label: 'Hat between the horns', rec: false,
+    note: 'Hats shrink to fit between the horns and the horns stay in front, fully visible. Most "dragon wearing a tiny hat", but every hat gets a per-form size and the Bird\'s nest and toque become small.' },
+];
+
+/** Hat + crown layers for a form under one option. Returns svg drawn after the face. */
+function hatLayers(fi, hatId, droop, opt) {
+  const f = DRAGON_FORMS[fi], H = HATS[hatId];
+  const tilt = (svg, y) => (H.straight ? svg : `<g transform="rotate(-7 100 ${y})">${svg}</g>`);
+  if (opt === 'now') {
+    const h = H.draw(100, f.hat.y, f.hat.w);
+    return tilt(h.svg, f.hat.y) + dragonCrown(fi, droop, Math.min(f.growTop, h.top + 4));
+  }
+  const crown = dragonCrown(fi, droop, f.growTop);
+  if (opt === 'A') {
+    const h = H.draw(100, f.hat.y, f.hat.w);
+    return fi === 0 ? crown + tilt(h.svg, f.hat.y) : tilt(h.svg, f.hat.y) + crown;
+  }
+  if (opt === 'B') {
+    const h = H.draw(100, f.hat.y, f.hat.w);
+    return (hatId === 'beanie' && fi > 0) ? tilt(h.svg, f.hat.y) + crown : crown + tilt(h.svg, f.hat.y);
+  }
+  // C: between the horns
+  if (fi === 0) { const h = H.draw(100, f.hat.y, f.hat.w); return crown + tilt(h.svg, f.hat.y); }
+  const [hl, hr] = HORN_X[fi], w = (hr - hl) - 4, y = f.growTop + 6;
+  const h = H.draw(100, y, w);
+  return tilt(h.svg, y) + crown;
+}
+
+/* ======================================================================
+   Scar options (round-specs on the dragon): the left eye is dropped
+   ====================================================================== */
+const scarMarks = (L, y, s, o = [-4, 0, 4]) => o.map(k => {
+  const d = `M${L - 11 * s + k * s} ${y - 15 * s} L${L + 7 * s + k * s} ${y + 13 * s}`;
+  return `<path d="${d}" stroke="#b9485c" stroke-width="${3.2 * s}" stroke-linecap="round"/><path d="${d}" stroke="#f2a3b0" stroke-width="${1.1 * s}" stroke-linecap="round"/>`;
+}).join('');
+const SCAR_OPTIONS = [
+  { key: 'A', label: 'Scarred shut', rec: true,
+    note: 'The eye is closed for good: a flat healed lid line with the three claw marks across it. Reads as "lost an eye" without being grim. Shown while asleep too.',
+    draw: (L, y, s, f) => `<path d="M${L - 8 * s} ${y + 1 * s} Q${L} ${y + 4 * s} ${L + 8 * s} ${y + 1 * s}" stroke="${DI}" stroke-width="${3.4 * s}" stroke-linecap="round" fill="none"/>` + scarMarks(L, y, s) },
+  { key: 'B', label: 'Gone, healed over', rec: false,
+    note: 'No eye and no lid: smooth skin with three raised claw scars. The cleanest silhouette, but at card size the face can look unfinished.',
+    draw: (L, y, s, f) => `<ellipse cx="${L}" cy="${y}" rx="${7 * s}" ry="${8 * s}" fill="${f.fill[0]}" opacity=".7"/>` + scarMarks(L, y, s) },
+  { key: 'C', label: 'Stitched', rec: false,
+    note: 'A closed lid with stitch ticks and one bold slash, a rough-and-ready look. Busier; reads best on the Drake.',
+    draw: (L, y, s, f) => {
+      let t = `<path d="M${L - 8 * s} ${y + 1 * s} Q${L} ${y + 4 * s} ${L + 8 * s} ${y + 1 * s}" stroke="${DI}" stroke-width="${3.4 * s}" stroke-linecap="round" fill="none"/>`;
+      for (const k of [-5, 0, 5]) t += `<path d="M${L + k * s} ${y - 1 * s} l0 ${6 * s}" stroke="${DI}" stroke-width="${1.6 * s}" stroke-linecap="round"/>`;
+      const d = `M${L - 10 * s} ${y - 13 * s} L${L + 8 * s} ${y + 12 * s}`;
+      return t + `<path d="${d}" stroke="#b9485c" stroke-width="${3.6 * s}" stroke-linecap="round"/><path d="${d}" stroke="#f2a3b0" stroke-width="${1.2 * s}" stroke-linecap="round"/>`;
+    } },
+];
+const scarNow = (L, y, s) => scarMarks(L, y, s);
+
+/* ======================================================================
+   Compose (PipFigure's layer order)
+   ====================================================================== */
+let uid = 0;
+function dragon(fi, mood, { hat = null, hatOpt = 'now', scar = null } = {}) {
+  const f = DRAGON_FORMS[fi], id = `d${uid++}`, droop = mood === 'bored' || mood === 'sleep', k = f.scale;
+  const { y: ey, gap, s: es } = f.eyes, L = 100 - gap;
+  let s = `<defs><linearGradient id="${id}g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${f.fill[0]}"/><stop offset="1" stop-color="${f.fill[1]}"/></linearGradient></defs>`;
+  s += dragonBack(fi, droop, f) + dragonLimbs(f, fi);
+  s += `<path d="${f.body}" fill="url(#${id}g)"/>`;
+  s += `<ellipse cx="${100 - f.side * 0.55}" cy="${f.hat.y + 10}" rx="11" ry="6" transform="rotate(-32 ${100 - f.side * 0.55} ${f.hat.y + 10})" fill="#fff" opacity=".45"/>`;
+  s += dragonDetails(f, fi);
+  s += `<path d="${f.body}" fill="none" stroke="${DI}" stroke-width="5" stroke-linejoin="round"/>`;
+  const opt = scar && scar !== 'now' ? SCAR_OPTIONS.find(o => o.key === scar) : null;
+  const asleep = mood === 'sleep';
+  const dropEye = opt && !(asleep && opt.key !== 'A');
+  s += dragonFace(f, mood, { noL: dropEye });
+  if (scar === 'now' && !asleep) s += scarNow(L, ey, es);
+  if (dropEye) s += opt.draw(L, ey, es, f);
+  s += hat ? hatLayers(fi, hat, droop, hatOpt) : dragonCrown(fi, droop, f.growTop);
+  return `<ellipse cx="100" cy="189" rx="${56 * k}" ry="6" fill="rgba(40,60,20,.13)"/><g transform="translate(100 ${FOOT_Y}) scale(${k}) translate(-100 -${FOOT_Y})">${s}</g>`;
+}
+function svg(fi, mood, opts, viewBox = '0 -14 200 212', label = '') {
+  const a11y = label ? `role="img" aria-label="${label}"` : 'aria-hidden="true" focusable="false"';
+  return `<svg viewBox="${viewBox}" xmlns="http://www.w3.org/2000/svg" ${a11y}>${dragon(fi, mood, opts)}</svg>`;
+}
+/** wardrobeLayers.js slotCropViewBox, unchanged. */
+function slotCrop(slot, fi) {
+  const f = DRAGON_FORMS[fi];
+  const [cy, size] = slot === 'hat' ? [f.hat.y - f.hat.w * 0.35, f.hat.w * 1.9 + 26]
+    : slot === 'glasses' ? [f.eyes.y, f.eyes.gap * 2 + 56 * f.eyes.s]
+    : [(f.neck + f.waist) / 2 + 2, f.side * 2 + 34];
+  const y = FOOT_Y + (cy - FOOT_Y) * f.scale, sz = size * f.scale;
+  return [100 - sz / 2, y - sz / 2, sz, sz].map(n => n.toFixed(1)).join(' ');
+}
+const HEAD_VIEW = '36 0 128 128';
+
+/* ======================================================================
+   UI
+   ====================================================================== */
+const MOODS = [['content', 'Content'], ['happy', 'Happy'], ['mischievous', 'Mischievous'], ['bored', 'Bored (drooped)'], ['sleep', 'Asleep']];
+let mood = 'content';
+const PICK_KEY = 'fb.mockup.dragonFixPicks';
+const DEFAULT_PICKS = { horns: null, scar: null };
+let picks = { ...DEFAULT_PICKS };
+try { picks = { ...DEFAULT_PICKS, ...(JSON.parse(localStorage.getItem(PICK_KEY) || '{}') || {}) }; } catch { picks = { ...DEFAULT_PICKS }; }
+const savePicks = () => { try { localStorage.setItem(PICK_KEY, JSON.stringify(picks)); } catch { /* private window */ } };
+const tri = (opts) => `<div class="stage">${[0, 1, 2].map(fi => svg(fi, mood, opts, HEAD_VIEW, DRAGON_FORMS[fi].name)).join('')}</div>`;
+
+function optCard(group, o) {
+  const picked = picks[group] === o.key;
+  return `<div class="opt${picked ? ' picked' : ''}">
+    <div class="opt-title"><b>Option ${o.key} · ${o.label}</b>${o.rec ? '<span class="tag rec">recommended</span>' : ''}</div>
+    ${o.body}
+    <p>${o.note}</p>
+    <button type="button" class="btn pick" data-group="${group}" data-key="${o.key}" aria-pressed="${picked}">${picked ? '✓ Picked' : `Pick ${o.key}`}</button>
+  </div>`;
+}
+function renderMoods() {
+  document.getElementById('moods').innerHTML = MOODS.map(([m, l]) => `<button type="button" data-mood="${m}" class="${m === mood ? 'on' : ''}" aria-pressed="${m === mood}">${l}</button>`).join('');
+}
+function renderHats() {
+  document.getElementById('hats').innerHTML = HAT_IDS.map(id => `<section class="card">
+      <div class="item-head"><h3>${HATS[id].label}</h3><span class="hint">${id}</span></div>
+      <div class="opts">
+        <div class="opt now"><div class="opt-title"><b>Now</b><span class="tag old">floats</span></div>${tri({ hat: id, hatOpt: 'now' })}<p>Crown lifted to the hat top + 4.</p></div>
+        ${HORN_OPTIONS.map(o => optCard('horns', { ...o, body: tri({ hat: id, hatOpt: o.key }) })).join('')}
+      </div>
+    </section>`).join('');
+}
+function renderScar() {
+  const scarTri = (key) => `<div class="stage">${[0, 1, 2].map(fi => svg(fi, mood, { scar: key }, '30 20 140 120', DRAGON_FORMS[fi].name)).join('')}</div>`;
+  const card = (key) => `<div class="stage">${svg(1, mood, { scar: key }, slotCrop('glasses', 1)).replace('<svg ', '<svg class="thumb" ')}<span class="hint" style="font-size:.78rem;color:var(--muted);align-self:center;margin-left:8px">Dress Pip card</span></div>`;
+  document.getElementById('scar').innerHTML = `<section class="card"><div class="opts">
+      <div class="opt now"><div class="opt-title"><b>Now</b><span class="tag old">eye still open</span></div>${scarTri('now')}${card('now')}<p>Claw marks drawn over an open eye.</p></div>
+      ${SCAR_OPTIONS.map(o => optCard('scar', { ...o, body: scarTri(o.key) + card(o.key) })).join('')}
+    </div></section>`;
+}
+function renderCards() {
+  const items = [['None', null], ["Baker's apron", null], ['Leather jerkin', null], ['Scale mail', null]];
+  const grid = (cls) => `<div class="grid3">${items.map(([label]) => `<div class="wcard ${cls}">${svg(1, 'content', {}, slotCrop('jacket', 1))}<span>${label}</span></div>`).join('')}</div>`;
+  document.getElementById('cards').innerHTML = `<div class="phone"><h4>Now: spills</h4>${grid('spill')}</div><div class="phone"><h4>Fix: clipped to the card</h4>${grid('fit')}</div>`;
+}
+function renderPicks() {
+  const h = HORN_OPTIONS.find(o => o.key === picks.horns), sc = SCAR_OPTIONS.find(o => o.key === picks.scar);
+  document.getElementById('pickText').textContent = `Horns: ${h ? `${h.key} · ${h.label}` : 'not picked yet'}. Battle scar: ${sc ? `${sc.key} · ${sc.label}` : 'not picked yet'}. Card clipping: fixed for every Pip (no pick needed).`;
+}
+function renderAll() { renderMoods(); renderHats(); renderScar(); renderCards(); renderPicks(); }
+
+document.addEventListener('click', (e) => {
+  const m = e.target.closest('[data-mood]');
+  if (m) { mood = m.dataset.mood; renderAll(); return; }
+  const p = e.target.closest('[data-group]');
+  if (p) { picks[p.dataset.group] = p.dataset.key; savePicks(); renderHats(); renderScar(); renderPicks(); return; }
+  if (e.target.id === 'resetPicks') { picks = { ...DEFAULT_PICKS }; savePicks(); renderAll(); }
+});
+renderAll();
+</script>
+</body>
+</html>

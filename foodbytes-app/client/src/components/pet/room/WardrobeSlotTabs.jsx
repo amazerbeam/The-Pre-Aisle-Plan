@@ -1,11 +1,12 @@
 import { WARDROBE_SLOTS, WARDROBE_TABS_LABEL } from '../../../constants/pipWardrobe'
-import { slotHasNew } from '../../../utils/pipWardrobe'
+import { slotHasNew, wardrobeSlotLabel } from '../../../utils/pipWardrobe'
 
-/** MPP-32 AC 4: the seven slots, scrolling sideways; green dot = worn, red dot = something new. */
-function WardrobeSlotTabs({ wardrobe, selected, onSelect }) {
+/** MPP-32 AC 4: the seven slots, scrolling sideways; green dot = worn, red dot = something new. Labels follow the creature (the robot's Hat tab reads "Antenna"). */
+function WardrobeSlotTabs({ wardrobe, line, selected, onSelect }) {
   return (
     <div className="pip-wardrobe-tabs" role="tablist" aria-label={WARDROBE_TABS_LABEL}>
-      {WARDROBE_SLOTS.map(({ key, label }) => {
+      {WARDROBE_SLOTS.map(({ key }) => {
+        const label = wardrobeSlotLabel(line, key)
         const worn = Boolean(wardrobe.outfit?.[key])
         const fresh = slotHasNew(wardrobe, key)
         return (

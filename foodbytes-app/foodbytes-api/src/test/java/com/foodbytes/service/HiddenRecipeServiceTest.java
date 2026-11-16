@@ -8,7 +8,6 @@ import com.foodbytes.repository.RecipeRepository;
 import com.foodbytes.repository.UserHiddenRecipeRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -30,7 +29,13 @@ class HiddenRecipeServiceTest {
     @Mock private RecipeRepository recipeRepository;
     @Mock private RecipeFamilyMemberRepository recipeFamilyMemberRepository;
 
-    @InjectMocks private HiddenRecipeService service;
+    private HiddenRecipeService service;
+
+    @org.junit.jupiter.api.BeforeEach
+    void setUp() {
+        service = new HiddenRecipeService(userHiddenRecipeRepository,
+            new RecipeKeyResolver(recipeRepository, recipeFamilyMemberRepository));
+    }
 
     @Test
     void hide_variant_storesTheFamilyDefaultId() {
