@@ -3,7 +3,7 @@ import { MEAL_TYPE_LABELS } from '../../../constants/mealTypes'
 import { COOK_PHASES, PET_MOOD_LABELS, PIP_POSITIONS, PIP_POSITION_LABELS } from '../../../constants/pet'
 import { SHOP_TAB_KEYS } from '../../../constants/petDecor'
 import { PIP_DEFAULT_LINE } from '../../../constants/pipLines'
-import { DEFAULT_ROOM_LEVELS, ROOM_CAMERA_LABEL, ROOM_HINT, ROOM_PX_PER_UNIT, ROOM_STATIONS, ROOM_WORLD, ROOM_WORLD_VIEWBOX } from '../../../constants/petRoom'
+import { DEFAULT_ROOM_LEVELS, ROOM_CAMERA_LABEL, ROOM_PX_PER_UNIT, ROOM_STATIONS, ROOM_WORLD, ROOM_WORLD_VIEWBOX } from '../../../constants/petRoom'
 import usePipCamera from '../../../hooks/usePipCamera'
 import useRoomOverlay from '../../../hooks/useRoomOverlay'
 import { pipWalkMs } from '../../../utils/cookServe'
@@ -49,7 +49,7 @@ const BACK_STATIONS = ROOM_DRAW_ORDER.filter(station => station !== ROOM_STATION
  * MPP-32: `wardrobe` ({ data, hasNew, firstNewSlot, peakForm, equip, undress, markSeen, error }) adds the Wardrobe strip and the Dress Pip sheet.
  * MPP-25 / MPP-37: the sprinkles counter now lives in Pip's header (PipHeader), not in the room.
  * MPP-37: full screen — .pip-room-stage fills the height.
- * MPP-39: the room is a bigger world on a camera (usePipCamera) — drag, pinch, Ctrl+wheel or keys to look around; it floats back to Pip and follows him. Stations are shifted groups (roomLayout STATION_SHIFT); decor is drawn in world coords.
+ * MPP-39: the room is a bigger world on a camera (usePipCamera) — drag, pinch, Ctrl+wheel or keys to look around; 🎯 floats it back to Pip, who it then follows; after a drag it stays where you left it. Stations are shifted groups (roomLayout STATION_SHIFT); decor is drawn in world coords.
  * MPP-27: `decor` ({ room, editing, selectedSpot, openSpot, closeSpot, place, toggle, done, error }) draws your own wall / floor styles and placed decor, and drives ✏️ Edit room.
  * MPP-40: 12 decor spots drawn in four layers among the stations (rug, wall, back floor, front floor), a wardrobe station whose button opens Dress Pip, and a 🧪 badge while the server's free mode is on.
  * MPP-45: `line` (theme.pipLine) picks the room pack (roomPacks.js); every leaf reads it through RoomPackContext, and a pack missing an item draws the herb one.
@@ -124,7 +124,7 @@ function PetRoom({ name, mood, bubble, bubbleActions = null, position = PIP_POSI
     <RoomPackContext.Provider value={pack}>
     <div className="pip-room">
       {/* MPP-39: the stage is the screen-sized, focusable viewport; the world layer inside holds the
-          room SVG and its tap areas and is moved by the camera. Bubble, hint and 🎯 stay on the screen, above the night dim (MPP-44). */}
+          room SVG and its tap areas and is moved by the camera. Bubble and 🎯 stay on the screen, above the night dim (MPP-44). */}
       <div
         ref={stageRef}
         className={editing ? 'pip-room-stage is-editing' : 'pip-room-stage'}
@@ -173,7 +173,6 @@ function PetRoom({ name, mood, bubble, bubbleActions = null, position = PIP_POSI
         {asleep && <NightDim />}
         {levelBar && <PipHeadBarStatus levelBar={levelBar} />}
         <SpeechBubble text={bubble} actions={bubbleActions} />
-        <p className="pip-room-hint" aria-hidden="true">{ROOM_HINT}</p>
         <RecentreButton onRecentre={camera.recentre} />
       </div>
       {editing && <EditRoomBar error={decor.error} overlayOpen={anyOpen} behind={behind} onDone={finishEditing} />}

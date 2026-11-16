@@ -11,9 +11,11 @@ const KEY_ZOOM = { '+': ROOM_ZOOM.STEP, '=': ROOM_ZOOM.STEP, '-': 1 / ROOM_ZOOM.
  * MPP-39: the camera over Pip's room. `stageRef` is the screen-sized viewport, `worldRef` the layer
  * holding the SVG and the tap areas, `focus` Pip's [x, y] in world px (roomLayout.pipFocusPoint).
  * Motion lives in refs and writes one CSS transform per frame, so it never re-renders PetRoom.
- * Drag pans with a trail (AC 9–10), past the room it rubber-bands (AC 11), on release it floats back
- * to Pip over 2 s (AC 12–13) and it follows Pip when he moves (AC 14). Pinch, Ctrl+wheel and
- * + / − / 0 zoom around Pip (AC 15) and the zoom is remembered (AC 16). Arrow keys pan (AC 17).
+ * Drag pans with a trail (AC 9–10), past the room it rubber-bands (AC 11). On release it stays where
+ * it was left (eased back inside the room) — it no longer floats back to Pip on its own; 🎯 (recentre)
+ * floats back over 2 s (AC 12–13) and from then on it follows Pip when he moves (AC 14). Pinch,
+ * Ctrl+wheel and + / − / 0 zoom around the current view (around Pip while following him) and the
+ * zoom is remembered (AC 16). Arrow keys pan (AC 17).
  * Reduced motion jumps straight to the target (AC 19).
  * @returns {{ recentre: () => void }}
  */
@@ -34,7 +36,7 @@ function usePipCamera({ stageRef, worldRef, focus }) {
 function createCamera(initialZoom) {
   const s = {
     x: null, y: null, tx: 0, ty: 0, zoom: initialZoom, zoomTarget: initialZoom,
-    focus: null, pip: true, from: null, t0: 0, frame: 0, stage: null, world: null, w: 0, h: 0
+    focus: null, pip: true, hold: false, from: null, t0: 0, frame: 0, stage: null, world: null, w: 0, h: 0
   }
 
   const clampTo = (axis, x, y) => {
@@ -53,6 +55,7 @@ function createCamera(initialZoom) {
     s.zoom = reduced ? s.zoomTarget : s.zoom + (s.zoomTarget - s.zoom) * ROOM_ZOOM.EASE
     if (Math.abs(s.zoomTarget - s.zoom) < ROOM_ZOOM.SNAP) s.zoom = s.zoomTarget
     if (s.pip) [s.tx, s.ty] = aim()
+    else if (s.hold) [s.tx, s.ty] = clampTo(fitAxis, s.tx, s.ty)
     let done
     if (s.pip && s.from) {
       const t = Math.min(1, (performance.now() - s.t0) / ROOM_CAMERA.SETTLE_MS)
@@ -84,6 +87,7 @@ function createCamera(initialZoom) {
   // AC 12–14 / AC 18: float back to Pip; a float already running keeps its clock.
   const floatHome = () => {
     s.pip = true
+    s.hold = false
     if (!s.from && s.x !== null) {
       s.from = [s.x, s.y]
       s.t0 = performance.now()
@@ -94,6 +98,14 @@ function createCamera(initialZoom) {
   const pullTo = (x, y) => {
     ;[s.tx, s.ty] = clampTo(rubberAxis, x, y)
     s.pip = false
+    s.hold = false
+    s.from = null
+    chase()
+  }
+  // A gesture ended: following Pip → keep following him; otherwise stay put, eased back inside the room.
+  const settle = () => {
+    if (s.pip) return floatHome()
+    s.hold = true
     s.from = null
     chase()
   }
@@ -131,11 +143,11 @@ function createCamera(initialZoom) {
         s.w = stage.clientWidth
         s.h = stage.clientHeight
         if (s.x === null) place()
-        else if (s.pip) chase()
+        else if (s.pip || s.hold) chase()
         else paint()
       }
       measure()
-      const detach = wireInput(stage, s, { pullTo, floatHome, setZoom, saveZoom, chase })
+      const detach = wireInput(stage, s, { pullTo, settle, setZoom, saveZoom, chase })
       const observer = new ResizeObserver(measure)
       observer.observe(stage)
       return () => {
@@ -151,7 +163,7 @@ function createCamera(initialZoom) {
 }
 
 // AC 9 / 15 / 17: pointer drag + pinch, Ctrl+wheel and keys on the stage. Returns the detach.
-function wireInput(stage, s, { pullTo, floatHome, setZoom, saveZoom, chase }) {
+function wireInput(stage, s, { pullTo, settle, setZoom, saveZoom, chase }) {
   const pointers = new Map()
   let drag = null
   let pinch = null
@@ -167,7 +179,7 @@ function wireInput(stage, s, { pullTo, floatHome, setZoom, saveZoom, chase }) {
     clearTimeout(unswallow)
     unswallow = setTimeout(() => { swallow = false }, 0) // only the click from this release
     stage.classList.remove('is-dragging')
-    floatHome()
+    settle()
   }
 
   const onDown = e => {
@@ -185,7 +197,7 @@ function wireInput(stage, s, { pullTo, floatHome, setZoom, saveZoom, chase }) {
     pointers.set(e.pointerId, [e.clientX, e.clientY])
     if (pinch) {
       if (pinch.dist > 0) setZoom(pinch.zoom * (spread() / pinch.dist))
-      floatHome()
+      settle()
       return
     }
     if (!drag || e.pointerId !== drag.id || s.x === null) return
@@ -236,7 +248,7 @@ function wireInput(stage, s, { pullTo, floatHome, setZoom, saveZoom, chase }) {
     e.preventDefault()
     setZoom(s.zoomTarget * Math.exp(-e.deltaY * ROOM_ZOOM.WHEEL_RATE))
     if (drag?.moved) chase()
-    else floatHome()
+    else settle()
   }
   const onKeyDown = e => {
     if (e.ctrlKey || e.metaKey || e.altKey || s.x === null) return
@@ -252,19 +264,19 @@ function wireInput(stage, s, { pullTo, floatHome, setZoom, saveZoom, chase }) {
     if (!factor && e.key !== '0') return
     e.preventDefault()
     setZoom(factor ? s.zoomTarget * factor : ROOM_ZOOM.DEFAULT)
-    floatHome()
+    settle()
   }
   const onKeyUp = e => {
     if (!KEY_PAN[e.key]) return
     keyRaw = null
-    floatHome()
+    settle()
   }
 
   // Focus left the stage mid-key (Tab, overlay, alt-tab): no keyup will arrive, so end the hold here.
   const onFocusOut = () => {
     if (keyRaw === null) return
     keyRaw = null
-    floatHome()
+    settle()
   }
 
   const listeners = [

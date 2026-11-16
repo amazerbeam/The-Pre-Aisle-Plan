@@ -90,6 +90,5 @@ export const FRIDGE_NOTES = {
 export const FRIDGE_LOW_BUBBLE = 'The fridge is getting empty 👀'
 export const FRIDGE_EMPTY_METER = 'No meals planned this week'
 export const FRIDGE_FOOTNOTE = "Always 15 slots. How full it is = planned meals you haven't eaten yet ÷ meals planned this week. It restocks when you plan your week."
-export const ROOM_HINT = 'Drag to look around · tap the fridge 🧊, cabinet 🏆 or wardrobe 👕' // MPP-23 / MPP-39 / MPP-40
 export const SPRINKLES_ICON = '✨' // MPP-25: the room's sprinkles counter
 export const FRIDGE_LOAD_ERROR = "Couldn't load the fridge."

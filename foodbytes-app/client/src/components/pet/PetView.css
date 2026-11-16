@@ -38,8 +38,7 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
-  width: 100%;
-  max-width: 500px;
+  width: 100%; /* full screen on desktop too (was capped at 500px) */
   margin: 0 auto;
   overflow-y: auto; /* only scrolls when the content outgrows a short screen */
 }

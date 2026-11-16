@@ -167,22 +167,6 @@
   box-shadow: 0 0 0 2px var(--pip-focus-halo);
 }
 
-/* Spec: the "tap the fridge" hint, bottom-left (mockup v5 .hint). Decorative for touch, so
-   it never takes a tap. */
-.pip-room-hint {
-  position: absolute;
-  left: 10px;
-  bottom: 10px;
-  margin: 0;
-  padding: 5px 9px;
-  border-radius: 10px;
-  background: var(--pet-float-bg);
-  color: var(--pet-soft-text);
-  font-size: 0.72rem;
-  pointer-events: none;
-  z-index: 1;
-}
-
 /* MPP-26 / MPP-27 / MPP-32 / MPP-37: 🛍 Shop, ✏️ Edit room and 👕 Wardrobe — one row of equal
    columns directly above the tab bar, however many have loaded; never wraps at 360px. */
 .pip-room-actions {
@@ -262,8 +246,7 @@
 .pip-decor-spot-tag text { font: 600 7px system-ui, sans-serif; fill: var(--pet-label-text); pointer-events: none; }
 .pip-decor-spot-tag { pointer-events: none; }
 
-.pip-room-stage.is-editing .pet-bubble,
-.pip-room-stage.is-editing .pip-room-hint {
+.pip-room-stage.is-editing .pet-bubble {
   visibility: hidden;
 }
 
