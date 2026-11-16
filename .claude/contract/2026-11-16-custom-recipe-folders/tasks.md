@@ -1414,7 +1414,7 @@ Manual check (local backend with `.env` + Vite per `CLAUDE.md`, the migration ap
 
 Gives the two named themes their approved looks. Token reassignments plus theme-only overrides; component CSS stays untouched. Ends with the contrast check green.
 
-### Task 28: Cyberpunk folder look
+### Task 28: Cyberpunk folder look ✓
 
 - Skill: react-frontend
 
@@ -1422,7 +1422,7 @@ Gives the two named themes their approved looks. Token reassignments plus theme-
 - Modify: `foodbytes-app/client/src/styles/themes/cyberpunk.css` (token block under `:root[data-theme="cyberpunk"]`)
 - Modify: `foodbytes-app/client/src/styles/themes/cyberpunk/recipes.css`
 
-- [ ] **Step 1: Reassign the tokens from the approved mockup**
+- [x] **Step 1: Reassign the tokens from the approved mockup**
 
 ```css
   --folder-icon: var(--cyan);
@@ -1450,7 +1450,7 @@ Gives the two named themes their approved looks. Token reassignments plus theme-
 
 (Use the Cyberpunk palette token names as they exist in `cyberpunk.css`; if one is spelled differently there, use that spelling.)
 
-- [ ] **Step 2: Theme-only looks in `cyberpunk/recipes.css`**
+- [x] **Step 2: Theme-only looks in `cyberpunk/recipes.css`**
 
 Every selector is prefixed `:root[data-theme="cyberpunk"]`:
 - HUD corner brackets on `.folder-sidebar` and the folder header, reusing the existing HUD bracket rule from `hud.css`.
@@ -1458,12 +1458,12 @@ Every selector is prefixed `:root[data-theme="cyberpunk"]`:
 - The label font plus uppercase on `.folder-section-label`, `.folder-crumbs`, `.view-toggle-btn`, `.folder-tile small`, `.folder-new-btn`.
 - A yellow glow on `.folder-title` that is removed under `body.lowfx`.
 
-- [ ] **Step 3: Build**
+- [x] **Step 3: Build**
 
 Run: `cd foodbytes-app\client; npm run build`
 Expected: `built in`.
 
-### Task 29: Parchment folder look
+### Task 29: Parchment folder look ✓
 
 - Skill: react-frontend
 
@@ -1471,11 +1471,11 @@ Expected: `built in`.
 - Modify: `foodbytes-app/client/src/styles/themes/parchment.css` (token block under `:root[data-theme="parchment"]`)
 - Modify: `foodbytes-app/client/src/styles/themes/parchment/recipes.css`
 
-- [ ] **Step 1: Confirm the Parchment mockup was approved (Task 3 Step 2)**
+- [x] **Step 1: Confirm the Parchment mockup was approved (Task 3 Step 2)**
 
 If it is not yet approved, stop this task and ask the developer.
 
-- [ ] **Step 2: Reassign tokens to the approved Parchment mockup's colours**
+- [x] **Step 2: Reassign tokens to the approved Parchment mockup's colours**
 
 Map each `--folder-*` / `--view-toggle-*` token to the Parchment palette tokens used in `parchment-theme.html` for the same role:
 - Ink text on page for rows and tiles.
@@ -1486,7 +1486,7 @@ Map each `--folder-*` / `--view-toggle-*` token to the Parchment palette tokens 
 
 Use only tokens that already exist in `parchment.css`.
 
-- [ ] **Step 3: Theme-only looks in `parchment/recipes.css`**
+- [x] **Step 3: Theme-only looks in `parchment/recipes.css`**
 
 Every selector is prefixed `:root[data-theme="parchment"]`:
 - Ruled hairlines between `.folder-row`s.
@@ -1495,7 +1495,7 @@ Every selector is prefixed `:root[data-theme="parchment"]`:
 - Small-caps `.folder-crumbs` and `.folder-section-label`.
 - `.view-toggle` drawn as two leather tabs.
 
-- [ ] **Step 4: Build**
+- [x] **Step 4: Build**
 
 Run: `cd foodbytes-app\client; npm run build`
 Expected: `built in`.
@@ -1507,7 +1507,7 @@ Expected: `built in`.
 **Files:**
 - Modify: `foodbytes-app/client/scripts/check-themes.mjs` (new `FOLDER_PAIRS` constant near `PET_PAIRS`; spread into all three `PAIRS` lists)
 
-- [ ] **Step 1: Add the pairs**
+- [x] **Step 1: Add the pairs**
 
 ```js
 // Recipe folders + Menu/Folders switch (2026-11-16). Same pairs in every theme.
@@ -1556,7 +1556,7 @@ With the dev setup from Task 27, for each of Default, Cyberpunk and Parchment, a
 
 Compare side by side with `app-mockup.html#view=folders` (Cyberpunk) and `parchment-theme.html#view=folders` (Parchment).
 
-- [ ] **Step 2: Record any deliberate divergence**
+- [x] **Step 2: Record any deliberate divergence**
 
 If the implementation intentionally differs from a mockup, update that mockup now and add a line under the README's folder section ("Synced with the implementation (2026-11-16, contract 2026-11-16-custom-recipe-folders)").
 

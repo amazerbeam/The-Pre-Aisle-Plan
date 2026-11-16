@@ -282,6 +282,9 @@
 .pip-wardrobe-form { text-align: center; font-size: 0.62rem; color: var(--text-secondary); }
 .pip-wardrobe-form.is-current { color: var(--pet-wardrobe-text); font-weight: 700; }
 .pip-wardrobe-form .pip-herb { display: block; width: 100%; height: auto; aspect-ratio: 1; }
+/* 2026-11-16: cards and lineup show the whole Pip (cardFit.js) and never spill into the next card. */
+.pip-wardrobe-item .pip-herb,
+.pip-wardrobe-form .pip-herb { overflow: hidden; }
 .pip-wardrobe-form.is-unreached .pip-herb { filter: brightness(0) opacity(0.18); }
 
 .pip-wardrobe-icon-btn:focus-visible,

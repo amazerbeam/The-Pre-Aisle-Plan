@@ -1,6 +1,7 @@
 // Themed Pip lines: the dragon (Parchment), ported verbatim from the approved foodbytes-app/mockup/pip-themed-lines.html
 // (DRAGON_FORMS, 2026-11-15). Same 200-unit space as every line (pip/pipSpace.js): feet on y = PIP_FOOT_Y, each form
 // scaled by `scale` about (100, PIP_FOOT_Y). Keys are the herb keys (see herb/herbForms.js).
+// `crownUnderHats` (Hatchling): its shell cap always tucks under a hat (wardrobeArt crownPlacement).
 
 export const DRAGON_INK = '#1f3d34'
 
@@ -10,7 +11,7 @@ export const DRAGON_FORMS = [
     name: 'Hatchling', scale: 0.84, fill: ['#c4f2dc', '#6cc59a'],
     body: 'M100 92 C124 92 134 108 132 126 C131 136 126 142 128 148 C134 162 128 182 100 182 C72 182 66 162 72 148 C74 142 69 136 68 126 C66 108 76 92 100 92Z',
     hat: { y: 104, w: 50 }, eyes: { y: 122, gap: 12, s: 0.75 }, neck: 146, waist: 168, side: 28,
-    feet: [[[88, 178], [78, 185]], [[112, 178], [122, 185]]], growTop: 92, crownTop: 89, growthRise: 12,
+    feet: [[[88, 178], [78, 185]], [[112, 178], [122, 185]]], growTop: 92, crownTop: 89, growthRise: 12, crownUnderHats: true,
     miniViewBox: '50 92 100 100'
   },
   {

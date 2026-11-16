@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Pip Dragon Fixes</title>
-<!-- Proposal in review (2026-11-16): the dragon (Parchment) Pip's horns under hats, the Battle scar, and Dress Pip card overflow.
+<!-- Approved 2026-11-16: hats, horns per hat, Battle scar and card fit picks are the APPROVED const. Proposal (2026-11-16): the dragon (Parchment) Pip's horns under hats, the Battle scar, and Dress Pip card overflow.
      Dragon geometry, face and hats are copied verbatim from pip-themed-lines.html (DRAGON_FORMS, dragon*, DRAGON_WARDROBE.hat). -->
 <style>
   :root {
@@ -48,7 +48,7 @@
   .summary { font-size: .9rem; }
 
   /* Dress Pip card simulation (WardrobeView.css .pip-wardrobe-item) */
-  .phone { width: 340px; max-width: 100%; background: #f6efe0; border: 1px solid var(--line); border-radius: 18px; padding: 12px; }
+  .phone { width: 100%; max-width: 340px; max-width: 100%; background: #f6efe0; border: 1px solid var(--line); border-radius: 18px; padding: 12px; }
   .phone h4 { margin: 0 0 8px; font-size: .9rem; }
   .grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
   .wcard { position: relative; border: 2px solid var(--card-border); border-radius: 14px; background: #fffaf0; padding: 4px 4px 8px; text-align: center; font-size: .72rem; font-weight: 600; }
@@ -61,6 +61,8 @@
   .fx.sway { transform-origin: 50% 100%; animation: sway 3s ease-in-out infinite; }
   .fx.smoke { animation: smoke 2.1s ease-out infinite; }
   .fx.wobble { transform-origin: 50% 100%; animation: wobble 2.6s ease-in-out infinite; }
+  .fx.flicker { animation: flicker 3.4s linear infinite; }
+  @keyframes flicker { 0%, 40%, 46%, 52%, 100% { opacity: 1; } 43% { opacity: .3; } 49% { opacity: .55; } }
   .fx.sparkle { animation: sparkle 1.6s ease-in-out infinite; }
   @keyframes sway { 0%, 100% { transform: rotate(-8deg); } 50% { transform: rotate(8deg); } }
   @keyframes smoke { 0% { opacity: 0; transform: translateY(4px) scale(.6); } 30% { opacity: .9; } 100% { opacity: 0; transform: translateY(-10px) scale(1.3); } }
@@ -80,7 +82,7 @@
   </div>
 
   <h2>1 · Horns under hats</h2>
-  <p class="lede">Each row is one hat on Hatchling, Wyrmling and Drake. <b>Now</b> is what ships. Pick one option for the whole dragon (one rule for every hat keeps it simple; Horn cosy always keeps its horns through, since that's what the item is).</p>
+  <p class="lede">Each card shows Hatchling, Wyrmling and Drake. Pick the horn mode <b>per hat</b>. The Horn cosy and Bird's nest are being dropped: pick a new design for each first (ideas taken from video games and cartoons, per the brief), then its horns. Cards tagged <b>approved</b> are the picks from review on 2026-11-16; Reset picks returns to them.</p>
   <div id="hats"></div>
 
   <h2>2 · Battle scar</h2>
@@ -88,7 +90,7 @@
   <div id="scar"></div>
 
   <h2>3 · Dress Pip cards (all lines)</h2>
-  <p class="lede">At phone width, Jacket slot, Wyrmling. <b>Now</b>: the card's SVG has <code>overflow: visible</code> (from <code>.pip-herb</code>), so whatever is outside the crop spills over the card above. <b>Fix</b>: the card clips its crop (<code>overflow: hidden</code> on <code>.pip-wardrobe-item .pip-herb</code> and the lineup). The crop squares don't change, so this needs no pick. It affects all three Pips, the dragon most because his head sits highest above the torso crop.</p>
+  <p class="lede">At phone width, Jacket slot, Wyrmling. <b>Now</b>: the card's SVG has <code>overflow: visible</code> (from <code>.pip-herb</code>), so whatever is outside the crop spills over the card above. Every option also sets <code>overflow: hidden</code> on the cards, so nothing can spill again. The pick is how much of Pip each card shows. It applies to all three Pips; the dragon needs it most because his head and horns sit highest above the torso crop.</p>
   <div class="pair" id="cards"></div>
 
   <h2>Your picks</h2>
@@ -245,18 +247,85 @@ const HATS = {
       ${fx('sparkle', `<path d="M${x + w * 0.2} ${y - h * 0.95} l1.6 3.4 l3.4 1.6 l-3.4 1.6 l-1.6 3.4 l-1.6 -3.4 l-3.4 -1.6 l3.4 -1.6 Z" fill="#fff"/>`)}` };
   } },
 };
-const HAT_IDS = Object.keys(HATS);
+HATS.beanie.label = 'Horn cosy (being removed)';
+HATS['straw-hat'].label = "Bird's nest (being removed)";
+
+/* ---------- replacement designs for the Horn cosy (beanie) and Bird's nest (straw-hat) ---------- */
+const star = (cx, cy, r, fill) => `<path d="M${cx} ${cy - r} L${cx + r * 0.3} ${cy - r * 0.3} L${cx + r} ${cy} L${cx + r * 0.3} ${cy + r * 0.3} L${cx} ${cy + r} L${cx - r * 0.3} ${cy + r * 0.3} L${cx - r} ${cy} L${cx - r * 0.3} ${cy - r * 0.3} Z" fill="${fill}"/>`;
+Object.assign(HATS, {
+  wizard: { label: "Wizard's hat", ref: 'Wizard hats in Stardew Valley (Arcane Hat), Animal Crossing and storybook wizards: a tall bent cone with stars.',
+    draw: (x, y, w) => {
+      const top = y - w * 1.05;
+      return { top, svg: `<path d="M${x - w * 0.36} ${y - 3} Q${x - w * 0.12} ${y - w * 0.55} ${x + w * 0.02} ${y - w * 0.9} Q${x + w * 0.14} ${top} ${x + w * 0.36} ${y - w * 0.86} Q${x + w * 0.16} ${y - w * 0.66} ${x + w * 0.36} ${y - 3} Z" fill="#4b3a8c" stroke="${DI}" stroke-width="3.4" stroke-linejoin="round"/>
+        <path d="M${x - w * 0.3} ${y - w * 0.16} Q${x} ${y - w * 0.1} ${x + w * 0.32} ${y - w * 0.16}" stroke="#d9a62e" stroke-width="5" fill="none"/>
+        ${star(x - w * 0.08, y - w * 0.42, w * 0.07, '#ffd34d')}${star(x + w * 0.14, y - w * 0.3, w * 0.05, '#ffd34d')}
+        ${fx('sparkle', star(x + w * 0.36, y - w * 0.86, w * 0.07, '#fff3b0'))}
+        <ellipse cx="${x}" cy="${y - 2}" rx="${w * 0.62}" ry="${w * 0.12}" fill="#5a479e" stroke="${DI}" stroke-width="3.2"/>` };
+    } },
+  viking: { label: 'Raider helm', ref: 'Horned Viking helmets in How to Train Your Dragon and Animal Crossing. Here the dragon\'s own horns are the helmet horns.',
+    draw: (x, y, w) => {
+      const h = w * 0.56;
+      let rivets = '';
+      for (const k of [-0.36, -0.18, 0.18, 0.36]) rivets += `<circle cx="${x + w * k}" cy="${y - 3}" r="1.6" fill="#e3c98a"/>`;
+      return { top: y - h, straight: true, svg: `<path d="M${x - w / 2} ${y} C${x - w / 2} ${y - h * 1.32} ${x + w / 2} ${y - h * 1.32} ${x + w / 2} ${y} Z" fill="#a7b1b9" stroke="${DI}" stroke-width="3.4" stroke-linejoin="round"/>
+        <path d="M${x} ${y - h * 0.98} V${y - 6}" stroke="#7d8890" stroke-width="3"/>
+        <ellipse cx="${x - w * 0.2}" cy="${y - h * 0.6}" rx="${w * 0.08}" ry="${w * 0.05}" fill="#fff" opacity=".55"/>
+        <rect x="${x - w / 2 - 2}" y="${y - 7}" width="${w + 4}" height="9" rx="3" fill="#8a5a2b" stroke="${DI}" stroke-width="2.8"/>${rivets}
+        <rect x="${x - 2.6}" y="${y - 4}" width="5.2" height="12" rx="2" fill="#a7b1b9" stroke="${DI}" stroke-width="2.2"/>` };
+    } },
+  jester: { label: "Jester's cap", ref: 'Jester and fool caps from Animal Crossing, court jesters in fairy-tale cartoons: two floppy points with bells.',
+    draw: (x, y, w) => {
+      const bell = (bx, by) => fx('sway', `<circle cx="${bx}" cy="${by}" r="${w * 0.07}" fill="#f0c14b" stroke="${DI}" stroke-width="1.8"/><path d="M${bx - w * 0.03} ${by + w * 0.02} h${w * 0.06}" stroke="${DI}" stroke-width="1.2"/>`);
+      return { top: y - w * 0.62, svg: `<path d="M${x - w * 0.45} ${y - 2} Q${x - w * 0.5} ${y - w * 0.5} ${x - w * 0.82} ${y - w * 0.32} Q${x - w * 0.42} ${y - w * 0.72} ${x} ${y - w * 0.42} Z" fill="#b8323a" stroke="${DI}" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M${x + w * 0.45} ${y - 2} Q${x + w * 0.5} ${y - w * 0.5} ${x + w * 0.82} ${y - w * 0.32} Q${x + w * 0.42} ${y - w * 0.72} ${x} ${y - w * 0.42} Z" fill="#e3b23c" stroke="${DI}" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M${x - w * 0.45} ${y - 2} Q${x} ${y - w * 0.62} ${x + w * 0.45} ${y - 2} Z" fill="#2f6b4a" stroke="${DI}" stroke-width="3" stroke-linejoin="round"/>
+        ${bell(x - w * 0.82, y - w * 0.28)}${bell(x + w * 0.82, y - w * 0.28)}
+        <path d="M${x - w / 2} ${y - 4} Q${x} ${y + 3} ${x + w / 2} ${y - 4}" stroke="#e3b23c" stroke-width="6" stroke-linecap="round" fill="none"/>
+        <path d="M${x - w / 2} ${y - 4} Q${x} ${y + 3} ${x + w / 2} ${y - 4}" stroke="${DI}" stroke-width="1.4" stroke-dasharray="3 4" fill="none"/>` };
+    } },
+  tricorn: { label: "Pirate's tricorn", ref: 'Pirate hats in Stardew Valley, Monkey Island-style point-and-clicks and Spyro\'s pirate levels: a black three-cornered hat with gold trim.',
+    draw: (x, y, w) => ({ top: y - w * 0.52, svg: `<path d="M${x - w * 0.62} ${y - 2} Q${x - w * 0.55} ${y - w * 0.56} ${x - w * 0.18} ${y - w * 0.38} Q${x} ${y - w * 0.6} ${x + w * 0.18} ${y - w * 0.38} Q${x + w * 0.55} ${y - w * 0.56} ${x + w * 0.62} ${y - 2} Q${x} ${y + w * 0.12} ${x - w * 0.62} ${y - 2} Z" fill="#2b2420" stroke="${DI}" stroke-width="3.4" stroke-linejoin="round"/>
+        <path d="M${x - w * 0.6} ${y - 4} Q${x - w * 0.53} ${y - w * 0.5} ${x - w * 0.18} ${y - w * 0.33} Q${x} ${y - w * 0.53} ${x + w * 0.18} ${y - w * 0.33} Q${x + w * 0.53} ${y - w * 0.5} ${x + w * 0.6} ${y - 4}" stroke="#d9a62e" stroke-width="2.2" fill="none"/>
+        <circle cx="${x}" cy="${y - w * 0.2}" r="${w * 0.09}" fill="#b8323a" stroke="${DI}" stroke-width="2"/>${fx('sparkle', star(x, y - w * 0.2, w * 0.05, '#ffd34d'))}` }) },
+  candle: { label: 'Candle hat', straight: true, ref: 'Candle-headed characters in cartoons and wax/candle hats in cosy games; fits Parchment\'s candlelight. The flame flickers.',
+    draw: (x, y, w) => {
+      const cw = w * 0.2, ch = w * 0.5, ct = y - 4 - ch;
+      return { top: ct - 16, svg: `<ellipse cx="${x}" cy="${y - 3}" rx="${w * 0.36}" ry="${w * 0.1}" fill="#d9a62e" stroke="${DI}" stroke-width="3"/>
+        <path d="M${x + w * 0.34} ${y - 4} q${w * 0.18} -2 ${w * 0.14} ${w * 0.12} q-3 4 -${w * 0.12} 0" stroke="${DI}" stroke-width="2.6" fill="none"/>
+        <path d="M${x - cw / 2} ${y - 4} V${ct + 3} Q${x} ${ct - 2} ${x + cw / 2} ${ct + 3} V${y - 4} Z" fill="#fff1d0" stroke="${DI}" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M${x - cw / 2} ${ct + 5} q3 0 3 6 q0 3 2 0 v-6" fill="#fff1d0" stroke="${DI}" stroke-width="1.6"/>
+        <path d="M${x} ${ct} v-4" stroke="${DI}" stroke-width="2"/>
+        ${fx('flicker', `<path d="M${x} ${ct - 16} Q${x + 6} ${ct - 8} ${x} ${ct - 3} Q${x - 6} ${ct - 8} ${x} ${ct - 16} Z" fill="#ffb43a" style="filter:drop-shadow(0 0 3px #ffcf4d)"/><path d="M${x} ${ct - 11} Q${x + 2.5} ${ct - 7} ${x} ${ct - 4} Q${x - 2.5} ${ct - 7} ${x} ${ct - 11} Z" fill="#fff3b0"/>`)}` };
+    } },
+  knight: { label: "Knight's plume", ref: 'Knight helmets with a plume from Animal Crossing, fairy-tale cartoons and Shovel Knight-style platformers (open face, no visor so the eyes show).',
+    draw: (x, y, w) => {
+      const h = w * 0.5;
+      return { top: y - h - w * 0.42, svg: `${fx('sway', `<path d="M${x} ${y - h + 2} C${x - w * 0.05} ${y - h - w * 0.4} ${x + w * 0.4} ${y - h - w * 0.45} ${x + w * 0.52} ${y - h - w * 0.1} C${x + w * 0.34} ${y - h - w * 0.22} ${x + w * 0.16} ${y - h - w * 0.12} ${x + 4} ${y - h + 4} Z" fill="#c8463d" stroke="${DI}" stroke-width="2.6" stroke-linejoin="round"/>`)}
+        <path d="M${x - w / 2} ${y + 2} C${x - w / 2} ${y - h * 1.32} ${x + w / 2} ${y - h * 1.32} ${x + w / 2} ${y + 2} Z" fill="#c3cbd2" stroke="${DI}" stroke-width="3.4" stroke-linejoin="round"/>
+        <path d="M${x} ${y - h * 0.98} V${y}" stroke="#8d989f" stroke-width="2.6"/>
+        <ellipse cx="${x - w * 0.2}" cy="${y - h * 0.6}" rx="${w * 0.08}" ry="${w * 0.05}" fill="#fff" opacity=".6"/>
+        <path d="M${x - w / 2} ${y - 3} Q${x} ${y + 3} ${x + w / 2} ${y - 3}" stroke="#d9a62e" stroke-width="4" fill="none"/>` };
+    } },
+});
+
+/** The five hat slots. Slots marked `replace` pick a new design first; every slot then picks its horn mode. */
+/** The six new designs; either replaced slot can take any of them, but not the same one twice. */
+const NEW_DESIGNS = ['wizard', 'jester', 'viking', 'tricorn', 'candle', 'knight'];
+const HAT_SLOTS = [
+  { id: 'beanie', unlock: 'Owned from the start', old: 'beanie', designs: NEW_DESIGNS },
+  { id: 'cap', unlock: '5 days alcohol-free', designs: ['cap'] },
+  { id: 'chef-hat', unlock: 'Your first homemade extra', designs: ['chef-hat'] },
+  { id: 'straw-hat', unlock: 'Grow to the second form', old: 'straw-hat', designs: NEW_DESIGNS },
+  { id: 'top-hat', unlock: 'Any 1-month streak', designs: ['top-hat'] },
+];
 
 /* ======================================================================
    Horn options (what happens to dragonCrown when a hat is worn)
    ====================================================================== */
 const HORN_OPTIONS = [
-  { key: 'A', label: 'Through the hat', rec: true,
-    note: 'Horns stay rooted on the head and are drawn over the hat, as if it has two holes cut for them. The Hatchling\'s shell cap tucks under the hat. Smallest code change: the dragon stops lifting its crown.' },
-  { key: 'B', label: 'Tucked under', rec: false,
-    note: 'Horns stay rooted on the head but go behind the hat; only the parts taller than the hat show. Tall hats (toque, Crown) hide the Wyrmling\'s horns completely. Horn cosy keeps its horns through.' },
-  { key: 'C', label: 'Hat between the horns', rec: false,
-    note: 'Hats shrink to fit between the horns and the horns stay in front, fully visible. Most "dragon wearing a tiny hat", but every hat gets a per-form size and the Bird\'s nest and toque become small.' },
+  { key: 'A', label: 'Through the hat', note: 'Horns stay on the head and are drawn over the hat, as if it has holes cut for them.' },
+  { key: 'B', label: 'Tucked under', note: 'Horns go behind the hat; only the parts taller than the hat show.' },
+  { key: 'C', label: 'Between the horns', note: 'The hat shrinks to sit between the horns; the horns stay fully visible.' },
 ];
 
 /** Hat + crown layers for a form under one option. Returns svg drawn after the face. */
@@ -274,7 +343,7 @@ function hatLayers(fi, hatId, droop, opt) {
   }
   if (opt === 'B') {
     const h = H.draw(100, f.hat.y, f.hat.w);
-    return (hatId === 'beanie' && fi > 0) ? tilt(h.svg, f.hat.y) + crown : crown + tilt(h.svg, f.hat.y);
+    return crown + tilt(h.svg, f.hat.y);
   }
   // C: between the horns
   if (fi === 0) { const h = H.draw(100, f.hat.y, f.hat.w); return crown + tilt(h.svg, f.hat.y); }
@@ -351,16 +420,33 @@ const HEAD_VIEW = '36 0 128 128';
 const MOODS = [['content', 'Content'], ['happy', 'Happy'], ['mischievous', 'Mischievous'], ['bored', 'Bored (drooped)'], ['sleep', 'Asleep']];
 let mood = 'content';
 const PICK_KEY = 'fb.mockup.dragonFixPicks';
-const DEFAULT_PICKS = { horns: null, scar: null };
-let picks = { ...DEFAULT_PICKS };
-try { picks = { ...DEFAULT_PICKS, ...(JSON.parse(localStorage.getItem(PICK_KEY) || '{}') || {}) }; } catch { picks = { ...DEFAULT_PICKS }; }
+/**
+ * Approved in review 2026-11-16. Horn cosy → Wizard's hat, Bird's nest → Jester's cap; horns per hat;
+ * Battle scar A (scarred shut); cards B (whole Pip, smaller) on every line. A browser can still try others; Reset returns here.
+ */
+const APPROVED = {
+  design: { beanie: 'wizard', 'straw-hat': 'jester' },
+  horns: { beanie: 'A', cap: 'A', 'chef-hat': 'B', 'straw-hat': 'A', 'top-hat': 'B' },
+  scar: 'A',
+  cards: 'B'
+};
+const DEFAULT_PICKS = () => JSON.parse(JSON.stringify(APPROVED));
+let picks = DEFAULT_PICKS();
+try {
+  const saved = JSON.parse(localStorage.getItem(PICK_KEY) || '{}') || {};
+  if (saved.design && saved.horns) picks = { ...DEFAULT_PICKS(), ...saved };
+} catch { picks = DEFAULT_PICKS(); }
+/** The other replaced slot that has already picked design `d`, if any. */
+const otherSlotWith = (slotId, d) => HAT_SLOTS.find(s => s.old && s.id !== slotId && picks.design[s.id] === d);
+/** The picked design, else the first one the other slot isn't using (so the two previews differ). */
+const designOf = (slot) => picks.design[slot.id] ?? slot.designs.find(d => !otherSlotWith(slot.id, d)) ?? slot.designs[0];
 const savePicks = () => { try { localStorage.setItem(PICK_KEY, JSON.stringify(picks)); } catch { /* private window */ } };
 const tri = (opts) => `<div class="stage">${[0, 1, 2].map(fi => svg(fi, mood, opts, HEAD_VIEW, DRAGON_FORMS[fi].name)).join('')}</div>`;
 
 function optCard(group, o) {
   const picked = picks[group] === o.key;
   return `<div class="opt${picked ? ' picked' : ''}">
-    <div class="opt-title"><b>Option ${o.key} · ${o.label}</b>${o.rec ? '<span class="tag rec">recommended</span>' : ''}</div>
+    <div class="opt-title"><b>Option ${o.key} · ${o.label}</b>${APPROVED[group] === o.key ? '<span class="tag rec">approved</span>' : o.rec ? '<span class="tag">recommended</span>' : ''}</div>
     ${o.body}
     <p>${o.note}</p>
     <button type="button" class="btn pick" data-group="${group}" data-key="${o.key}" aria-pressed="${picked}">${picked ? '✓ Picked' : `Pick ${o.key}`}</button>
@@ -369,14 +455,30 @@ function optCard(group, o) {
 function renderMoods() {
   document.getElementById('moods').innerHTML = MOODS.map(([m, l]) => `<button type="button" data-mood="${m}" class="${m === mood ? 'on' : ''}" aria-pressed="${m === mood}">${l}</button>`).join('');
 }
+function pickCard({ picked, title, tag = '', body, note, data, btn }) {
+  return `<div class="opt${picked ? ' picked' : ''}">
+    <div class="opt-title"><b>${title}</b>${tag}</div>${body}<p>${note}</p>
+    <button type="button" class="btn pick" ${data} aria-pressed="${picked}">${picked ? '✓ Picked' : btn}</button>
+  </div>`;
+}
 function renderHats() {
-  document.getElementById('hats').innerHTML = HAT_IDS.map(id => `<section class="card">
-      <div class="item-head"><h3>${HATS[id].label}</h3><span class="hint">${id}</span></div>
+  document.getElementById('hats').innerHTML = HAT_SLOTS.map(slot => {
+    const design = designOf(slot), horns = picks.horns[slot.id] ?? null, preview = horns ?? 'A';
+    const designRow = slot.old ? `<p class="hint" style="margin:0 0 6px"><b>Step 1 · Design</b>: replaces the ${HATS[slot.old].label.replace(' (being removed)', '')}. Shown with horns ${preview}.</p>
+      <div class="opts" style="margin-bottom:14px">
+        <div class="opt now"><div class="opt-title"><b>Now · ${HATS[slot.old].label.replace(' (being removed)', '')}</b><span class="tag old">removing</span></div>${tri({ hat: slot.old, hatOpt: 'now' })}<p>Being dropped.</p></div>
+        ${slot.designs.map(d => pickCard({ picked: picks.design[slot.id] === d, title: HATS[d].label, tag: (APPROVED.design[slot.id] === d ? '<span class="tag rec">approved</span>' : '') + (otherSlotWith(slot.id, d) ? `<span class="tag">picked for the ${HATS[otherSlotWith(slot.id, d).old].label.replace(' (being removed)', '')} slot</span>` : ''), body: tri({ hat: d, hatOpt: preview }), note: `<i>Inspired by:</i> ${HATS[d].ref}`, data: `data-design="${slot.id}" data-key="${d}"`, btn: 'Pick design' })).join('')}
+      </div><p class="hint" style="margin:0 0 6px"><b>Step 2 · Horns</b> for the ${HATS[design].label}</p>` : '';
+    const nowCard = slot.old ? '' : `<div class="opt now"><div class="opt-title"><b>Now</b><span class="tag old">floats</span></div>${tri({ hat: design, hatOpt: 'now' })}<p>Horns lifted to the top of the hat.</p></div>`;
+    return `<section class="card">
+      <div class="item-head"><h3>${slot.old ? 'New hat' : HATS[design].label}</h3><span class="hint">${slot.id} · unlock: ${slot.unlock}</span></div>
+      ${designRow}
       <div class="opts">
-        <div class="opt now"><div class="opt-title"><b>Now</b><span class="tag old">floats</span></div>${tri({ hat: id, hatOpt: 'now' })}<p>Crown lifted to the hat top + 4.</p></div>
-        ${HORN_OPTIONS.map(o => optCard('horns', { ...o, body: tri({ hat: id, hatOpt: o.key }) })).join('')}
+        ${nowCard}
+        ${HORN_OPTIONS.map(o => pickCard({ picked: horns === o.key, title: `${o.key} · ${o.label}`, tag: APPROVED.horns[slot.id] === o.key && design === (APPROVED.design[slot.id] ?? slot.id) ? '<span class="tag rec">approved</span>' : '', body: tri({ hat: design, hatOpt: o.key }), note: o.note, data: `data-horns="${slot.id}" data-key="${o.key}"`, btn: `Pick ${o.key}` })).join('')}
       </div>
-    </section>`).join('');
+    </section>`;
+  }).join('');
 }
 function renderScar() {
   const scarTri = (key) => `<div class="stage">${[0, 1, 2].map(fi => svg(fi, mood, { scar: key }, '30 20 140 120', DRAGON_FORMS[fi].name)).join('')}</div>`;
@@ -386,23 +488,60 @@ function renderScar() {
       ${SCAR_OPTIONS.map(o => optCard('scar', { ...o, body: scarTri(o.key) + card(o.key) })).join('')}
     </div></section>`;
 }
+/**
+ * Card crops that shrink Pip until he fits. `top` = the highest point of the head with its horns or hat
+ * (the live headBarTop: min of crownTop, growTop − growthRise and the hat's top); `bottom` = under the feet.
+ *   whole: a square from top to bottom (the whole Pip, smaller);
+ *   upper: a square from top down to just below the waist (head + torso, bigger but no feet).
+ * Both are squares centred on x = 100 and mapped through the form's scale about the feet, like slotCropViewBox.
+ */
+function fitCrop(fi, mode, hatId = null, hatOpt = 'A') {
+  const f = DRAGON_FORMS[fi];
+  const tops = [f.crownTop, f.growTop - f.growthRise - 4];
+  if (hatId && hatOpt !== 'C') tops.push(HATS[hatId].draw(100, f.hat.y, f.hat.w).top);
+  const top = Math.min(...tops) - 4, bottom = mode === 'whole' ? 194 : f.waist + 14;
+  const size = bottom - top, cy = (top + bottom) / 2, k = f.scale;
+  const y = FOOT_Y + (cy - FOOT_Y) * k, sz = size * k;
+  return [100 - sz / 2, y - sz / 2, sz, sz].map(n => n.toFixed(1)).join(' ');
+}
+const CARD_OPTIONS = [
+  { key: 'A', label: 'Clip to the card', note: 'Today\'s crop, cut off at the card edge. Biggest view of the clothes, but the head and horns are cut.', crop: (fi) => slotCrop('jacket', fi), hatCrop: (fi) => slotCrop('hat', fi) },
+  { key: 'B', label: 'Whole Pip, smaller', note: 'Every card shows all of him, horns and hat to feet. Nothing is cut, but the clothes are smaller (about 60% of today on the Drake).', crop: (fi) => fitCrop(fi, 'whole'), hatCrop: (fi, h, o) => fitCrop(fi, 'whole', h, o) },
+  { key: 'C', label: 'Head to waist', note: 'Shrinks just enough to fit the top of the head (or hat) and the torso; the feet drop out. Middle ground: horns and hat whole, clothes still big. Shoe cards keep their foot crop.', crop: (fi) => fitCrop(fi, 'upper'), hatCrop: (fi, h, o) => fitCrop(fi, 'upper', h, o) },
+];
 function renderCards() {
-  const items = [['None', null], ["Baker's apron", null], ['Leather jerkin', null], ['Scale mail', null]];
-  const grid = (cls) => `<div class="grid3">${items.map(([label]) => `<div class="wcard ${cls}">${svg(1, 'content', {}, slotCrop('jacket', 1))}<span>${label}</span></div>`).join('')}</div>`;
-  document.getElementById('cards').innerHTML = `<div class="phone"><h4>Now: spills</h4>${grid('spill')}</div><div class="phone"><h4>Fix: clipped to the card</h4>${grid('fit')}</div>`;
+  const cells = (cls, crop, hatCrop) => `<div class="grid3">
+    <div class="wcard ${cls}">${svg(1, 'content', {}, crop(1))}<span>Wyrmling · jacket</span></div>
+    <div class="wcard ${cls}">${svg(2, 'content', {}, crop(2))}<span>Drake · jacket</span></div>
+    <div class="wcard ${cls}">${svg(2, 'content', { hat: 'wizard', hatOpt: 'A' }, hatCrop(2, 'wizard', 'A'))}<span>Drake · Wizard's hat</span></div>
+  </div>`;
+  const now = `<div class="opt now"><div class="opt-title"><b>Now</b><span class="tag old">spills</span></div><div class="phone">${cells('spill', CARD_OPTIONS[0].crop, CARD_OPTIONS[0].hatCrop)}</div><p>Pip spills over the card above.</p></div>`;
+  document.getElementById('cards').innerHTML = `<div class="opts" style="width:100%">${now}${CARD_OPTIONS.map(o => optCard('cards', { ...o, body: `<div class="phone">${cells('fit', o.crop, o.hatCrop)}</div>` })).join('')}</div>`;
 }
 function renderPicks() {
-  const h = HORN_OPTIONS.find(o => o.key === picks.horns), sc = SCAR_OPTIONS.find(o => o.key === picks.scar);
-  document.getElementById('pickText').textContent = `Horns: ${h ? `${h.key} · ${h.label}` : 'not picked yet'}. Battle scar: ${sc ? `${sc.key} · ${sc.label}` : 'not picked yet'}. Card clipping: fixed for every Pip (no pick needed).`;
+  const sc = SCAR_OPTIONS.find(o => o.key === picks.scar);
+  const hats = HAT_SLOTS.map(slot => {
+    const d = slot.old ? (picks.design[slot.id] ? HATS[picks.design[slot.id]].label : 'design not picked') : HATS[slot.id].label;
+    return `${slot.id} → ${d}, horns ${picks.horns[slot.id] ?? 'not picked'}`;
+  }).join('; ');
+  document.getElementById('pickText').textContent = `Hats: ${hats}. Battle scar: ${sc ? `${sc.key} · ${sc.label}` : 'not picked yet'}. Cards: ${(CARD_OPTIONS.find(o => o.key === picks.cards) || {}).label ?? 'not picked yet'}.`
+    + (JSON.stringify(picks) === JSON.stringify(DEFAULT_PICKS()) ? ' Matches the approved set.' : ' Differs from the approved set; press Reset picks to go back.');
 }
 function renderAll() { renderMoods(); renderHats(); renderScar(); renderCards(); renderPicks(); }
 
 document.addEventListener('click', (e) => {
   const m = e.target.closest('[data-mood]');
   if (m) { mood = m.dataset.mood; renderAll(); return; }
+  const d = e.target.closest('[data-design]');
+  if (d) {
+    const other = otherSlotWith(d.dataset.design, d.dataset.key);
+    if (other) delete picks.design[other.id]; // one design can't fill both slots: picking it here frees the other slot
+    picks.design[d.dataset.design] = d.dataset.key; savePicks(); renderHats(); renderPicks(); return; }
+  const h = e.target.closest('[data-horns]');
+  if (h) { picks.horns[h.dataset.horns] = h.dataset.key; savePicks(); renderHats(); renderPicks(); return; }
   const p = e.target.closest('[data-group]');
-  if (p) { picks[p.dataset.group] = p.dataset.key; savePicks(); renderHats(); renderScar(); renderPicks(); return; }
-  if (e.target.id === 'resetPicks') { picks = { ...DEFAULT_PICKS }; savePicks(); renderAll(); }
+  if (p) { picks[p.dataset.group] = p.dataset.key; savePicks(); renderScar(); renderCards(); renderPicks(); return; }
+  if (e.target.id === 'resetPicks') { picks = DEFAULT_PICKS(); savePicks(); renderAll(); }
 });
 renderAll();
 </script>

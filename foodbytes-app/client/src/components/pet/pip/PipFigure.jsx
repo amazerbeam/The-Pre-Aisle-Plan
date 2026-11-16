@@ -6,6 +6,7 @@ import { lineArt } from './lineArt'
 import { pipForm } from './lineForms'
 import { PIP_FOOT_Y } from './pipSpace'
 import PipOutfit from './PipOutfit'
+import { CROWN_UNDER } from './wardrobeArt'
 import { dressLayers } from './wardrobeLayers'
 
 /**
@@ -13,7 +14,8 @@ import { dressLayers } from './wardrobeLayers'
  * (100, PIP_FOOT_Y) — Pip wraps it in an <svg>, RoomPip places it in the room. The line's art
  * (lineArt) supplies the parts; this component owns the layer order the wardrobe check pins:
  * shadow → back → back-wear (a cape) → limbs → shoes → body + shine → details → torso clip →
- * outline → extras → face (skipped while a screen-face item is worn) → glasses → hat → crown (skipped while an antenna is worn).
+ * outline → extras → face (skipped while a screen-face item is worn; one eye dropped under a scar) → glasses →
+ * crown when it tucks under the hat → hat → crown otherwise (skipped while an antenna is worn).
  * `wilted` droops and desaturates; `phase` drives the evolve pulse; `still` stops the idle
  * animation (Dress Pip cards and lineup).
  */
@@ -57,10 +59,11 @@ function PipFigure({ line, form, mood, wilted = false, phase = null, showProps =
           {dress.clip.length > 0 && <g clipPath={`url(#${clipId})`}><PipOutfit shapes={dress.clip} /></g>}
           <path d={f.body} fill="none" stroke={art.ink} strokeWidth="5" strokeLinejoin="round" />
           <PipOutfit shapes={dress.extra} />
-          {!dress.replacesFace && <art.Face form={form} mood={mood} />}
+          {!dress.replacesFace && <art.Face form={form} mood={mood} hideEye={dress.hideEye} />}
           <PipOutfit shapes={dress.glasses} />
+          {dress.crown === CROWN_UNDER && <art.Crown form={form} droop={droop} base={dress.growTop} />}
           {dress.hat && <g transform={dress.hat.transform ?? undefined}><PipOutfit shapes={dress.hat.shapes} /></g>}
-          {!dress.replacesCrown && <art.Crown form={form} droop={droop} base={dress.growTop} />}
+          {!dress.replacesCrown && dress.crown !== CROWN_UNDER && <art.Crown form={form} droop={droop} base={dress.growTop} />}
         </g>
       </g>
       {showProps && <HerbProps mood={mood} ink={art.ink} />}

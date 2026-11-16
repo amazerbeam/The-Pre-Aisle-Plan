@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { PET_MOODS } from '../../../constants/pet'
 import { formName } from '../../../constants/pipLines'
 import { WARDROBE_LINEUP_TITLE, WARDROBE_UNREACHED_LABEL } from '../../../constants/pipWardrobe'
+import { fitViewBox } from '../pip/cardFit'
 import { lineFormCount } from '../pip/lineForms'
 import Pip from '../pip/Pip'
 
@@ -21,7 +22,7 @@ function WardrobeLineup({ outfit, line, currentForm, peakForm }) {
             const className = ['pip-wardrobe-form', !reached && 'is-unreached', form === currentForm && 'is-current'].filter(Boolean).join(' ')
             return (
               <li key={form} className={className}>
-                <Pip line={line} form={form} mood={PET_MOODS.CONTENT} variant="crop" outfit={outfit} still />
+                <Pip line={line} form={form} mood={PET_MOODS.CONTENT} variant="crop" viewBox={fitViewBox(line, form, outfit)} outfit={outfit} still />
                 <span>{reached ? formName(line, form) : WARDROBE_UNREACHED_LABEL}</span>
               </li>
             )

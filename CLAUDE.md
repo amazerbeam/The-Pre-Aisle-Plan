@@ -126,6 +126,7 @@ The client is **multi-theme**. Treat every UI change as a change to *all* themes
 - Any ticket that changes the client UI also updates the mockup in the same ticket; if the implementation diverged from the mockup for a good reason, update the mockup before the ticket closes. `/fb-plan` contracts that touch the UI include a mockup-sync task.
 - Known gap: `app-mockup.html` draws Cyberpunk and `parchment-theme.html` draws Parchment; for Default the live app is the reference until Default screens are added.
 - Root `mockups/` is a historical folder, not this one.
+- **New clothes and items come from video games and cartoons.** Before designing any new Pip wardrobe item, room decor or other collectable (or redesigning one), search video games and cartoons for how they handle that kind of item, and base the mockup options on what you find. Each option in the mockup names its inspiration (e.g. *Inspired by: wizard hats in Stardew Valley and Animal Crossing*). Borrow the idea and feel, never the property: no franchise names, marks, characters or lookalikes (see Themes).
 
 ### Backend structure (`foodbytes-api/src/main/java/com/foodbytes/`)
 Standard layered Spring layout: `controller/` → `service/` → `repository/` → `model/` (JPA entities). `security/` holds the OAuth2 success/failure handlers, JWT filter/provider, and `UserPrincipal`. `config/SecurityConfig.java` wires everything.

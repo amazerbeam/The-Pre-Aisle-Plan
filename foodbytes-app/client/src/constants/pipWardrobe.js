@@ -67,7 +67,7 @@ export const WARDROBE_ITEM_LABELS = {
     sneakers: 'Sneakers', wellies: 'Wellies'
   },
   [PIP_LINE.DRAGON]: {
-    beanie: 'Horn cosy', cap: "Bard's cap", 'chef-hat': 'Singed toque', 'straw-hat': "Bird's nest", 'top-hat': 'Crown',
+    beanie: "Wizard's hat", cap: "Bard's cap", 'chef-hat': 'Singed toque', 'straw-hat': "Jester's cap", 'top-hat': 'Crown',
     'round-specs': 'Battle scar', 'heart-glasses': 'Smitten', sunglasses: 'War paint',
     'red-scarf': "Knight's cape", 'striped-scarf': 'Ivy garland', 'chef-whites': "Baker's apron", 'denim-jacket': 'Leather jerkin', puffer: 'Scale mail',
     'leather-belt': 'Potion belt', 'champion-belt': 'Hoard belt', jeans: 'Patched breeches', joggers: 'Wool hose', dungarees: "Smith's overalls",

@@ -3,3 +3,6 @@
 export const PIP_FOOT_X = 100
 export const PIP_FOOT_Y = 186
 export const PIP_FULL_VIEWBOX = '0 -40 200 240'
+
+// The viewer's-left eye (x = PIP_FOOT_X − eyes.gap): the one a Battle scar takes.
+export const EYE_LEFT = 'L'

@@ -2,6 +2,7 @@
 
 One line per ticket, newest first: `<version> — <ticket key>: <summary>`. Bump rules and how
 to check what is deployed: `CLAUDE.md` → Versioning & deploy verification.
+1.39.0 — 2026-11-16-dragon-pip-fixes: dragon horns stay on the head under hats (over/under per hat), Wizard's hat and Jester's cap replace the Horn cosy and Bird's nest, the Battle scar takes the left eye; Dress Pip cards show the whole Pip on every line
 1.38.0 — 2026-11-16-robot-pip-antennas: robot Pip hats become antennas (Prop-top, Radar bar, Toque charm, Boing spring, Neon bolt; Hat tab reads Antenna); every Champion belt is a gold title belt
 1.37.0 — MPP-47: Robot workshop decor: all 55 items drawn and named as workshop counterparts on Cyberpunk
 1.36.0 — MPP-46: Dragon lair decor: all 55 items drawn and named as lair counterparts on Parchment

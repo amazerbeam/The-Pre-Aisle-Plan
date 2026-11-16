@@ -9,13 +9,16 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { headBarTop, headBarY, spokenLevelLabel } from './headBar.js'
 import { LINE_FORMS, lineFormCount, pipForm } from './lineForms.js'
-import { PIP_FOOT_Y } from './pipSpace.js'
-import { HAT_ANCHOR_CROWN, LINE_WARDROBE, drawnItemIds, glassesArt, hatAnchor, hatArt, shoeArt, torsoArt } from './wardrobeArt.js'
+import { EYE_LEFT, PIP_FOOT_Y } from './pipSpace.js'
+import {
+  CROWN_LIFT, CROWN_OVER, CROWN_REPLACE, CROWN_UNDER, HAT_ANCHOR_CROWN, LINE_WARDROBE, drawnItemIds, glassesArt, hatAnchor, hatArt, shoeArt, torsoArt
+} from './wardrobeArt.js'
 import { titleBelt } from './wardrobeShapes.js'
 import { HERB_TITLE_BELT } from '../herb/herbWardrobe.js'
 import { DRAGON_TITLE_BELT } from '../dragon/dragonWardrobe.js'
 import { ROBOT_TITLE_BELT } from '../robot/robotWardrobe.js'
-import { TORSO_ORDER, dressLayers, hatMiniViewBox, hatOnly, slotCropViewBox } from './wardrobeLayers.js'
+import { TORSO_ORDER, dressLayers, hatMiniViewBox, hatOnly } from './wardrobeLayers.js'
+import { FIT_MARGIN, fitViewBox, slotFitViewBox } from './cardFit.js'
 import { HEAD_BAR_GAP } from '../../../constants/pipGrowth.js'
 import { PIP_LINE_COPY } from '../../../constants/pipLines.js'
 import { WARDROBE_ITEMS, WARDROBE_SLOT, WARDROBE_SLOTS } from '../../../constants/pipWardrobe.js'
@@ -129,16 +132,23 @@ for (const { line, form, where } of EACH) {
   assert.equal(dressLayers({ HAT: 'chef-hat' }, line, form).hat.transform, null, `${where}: the chef hat stays straight`)
   if (crownHats(line)) {
     assert.equal(dress.hat.transform, null, `${where}: antennas stand straight`)
+    assert.equal(dress.crown, CROWN_REPLACE, `${where}: an antenna replaces the crown`)
     assert.equal(dress.replacesCrown, true, `${where}: an antenna replaces the crown`)
     assert.equal(dress.growTop, f.growTop, `${where}: an antenna leaves growTop on the head`)
   } else {
     assert.match(dress.hat.transform, /^rotate\(-7 100 /, `${where}: hats tilt`)
     assert.equal(dress.replacesCrown, false, `${where}: a hat keeps the crown`)
-    assert.ok(dress.growTop <= f.growTop && dress.growTop <= hatArt(line, 'top-hat', f).top + 4, `${where}: growth pokes through the hat`)
+    if (dress.crown === CROWN_LIFT) {
+      assert.ok(dress.growTop <= f.growTop && dress.growTop <= hatArt(line, 'top-hat', f).top + 4, `${where}: growth pokes through the hat`)
+    } else {
+      assert.ok([CROWN_OVER, CROWN_UNDER].includes(dress.crown), `${where}: unknown crown placement ${dress.crown}`)
+      assert.equal(dress.growTop, f.growTop, `${where}: horns stay on the head`)
+    }
   }
   assert.equal(dressLayers({}, line, form).growTop, f.growTop, `${where}: no hat leaves growth where it was`)
   assert.ok(dress.glasses.length > 0)
-  assert.deepEqual(dressLayers(FULL, line, form, { asleep: true }).glasses, [], `${where}: glasses hidden asleep`)
+  const scar = glassesArt(line, FULL.GLASSES, f).staysAsleep
+  assert.deepEqual(dressLayers(FULL, line, form, { asleep: true }).glasses, scar ? dress.glasses : [], `${where}: glasses hidden asleep unless they stay asleep`)
   const empty = dressLayers(null, line, form)
   assert.deepEqual([empty.back, empty.shoes, empty.clip, empty.extra, empty.glasses, empty.hat, empty.itemIds], [[], [], [], [], [], null, []])
 }
@@ -171,12 +181,50 @@ for (const { line, form, where } of EACH) {
   }
 }
 
-// ---- AC 4 / AC 5: crops ----
+// ---- Dragon fixes (2026-11-16): horns never float above a hat; the Battle scar takes the left eye ----
+const DRAGON_PLACEMENT = { beanie: CROWN_OVER, cap: CROWN_OVER, 'chef-hat': CROWN_UNDER, 'straw-hat': CROWN_OVER, 'top-hat': CROWN_UNDER }
 for (const { line, form, where } of EACH) {
-  for (const box of [...WARDROBE_SLOTS.map(({ key }) => slotCropViewBox(key, line, form)), hatMiniViewBox(line, form)]) {
-    const [, , w, h] = box.split(' ').map(Number)
-    assert.ok(box.split(' ').map(Number).every(Number.isFinite) && w > 0 && w === h, `${where}: bad crop ${box}`)
+  const f = pipForm(line, form)
+  for (const id of idsIn('HAT')) {
+    const { crown } = hatArt(line, id, f)
+    const expected = crownHats(line) ? CROWN_REPLACE
+      : f.crownUnderHats ? CROWN_UNDER
+        : line === 'dragon' ? DRAGON_PLACEMENT[id] : CROWN_LIFT
+    assert.equal(crown, expected, `${where} ${id}: crown placement`)
   }
+  for (const id of idsIn('GLASSES')) {
+    const g = glassesArt(line, id, f)
+    const hides = line === 'dragon' && id === 'round-specs'
+    assert.equal(g.hidesEye, hides ? EYE_LEFT : null, `${where} ${id}: hides an eye`)
+    assert.equal(g.staysAsleep, hides, `${where} ${id}: stays asleep`)
+    assert.equal(dressLayers({ GLASSES: id }, line, form, { asleep: true }).hideEye, hides ? EYE_LEFT : null, `${where} ${id}: eye hidden asleep`)
+    assert.equal(dressLayers({ GLASSES: id }, line, form).hideEye, hides ? EYE_LEFT : null, `${where} ${id}: eye hidden awake`)
+  }
+}
+Object.values(LINE_WARDROBE).forEach(w => Object.values(w.HAT_CROWN ?? {}).forEach(p => assert.ok([CROWN_OVER, CROWN_UNDER].includes(p), `HAT_CROWN value ${p}`)))
+assert.equal(pipForm('dragon', 1).crownUnderHats, true, 'the Hatchling tucks its shell under hats')
+
+// ---- AC 4 / AC 5: crops ----
+const square = (box, where) => {
+  const n = box.split(' ').map(Number)
+  assert.ok(n.length === 4 && n.every(Number.isFinite) && n[2] > 0 && n[2] === n[3], `${where}: bad crop ${box}`)
+  return n
+}
+for (const { line, form, where } of EACH) {
+  const f = pipForm(line, form)
+  const [mx, my, ms] = f.miniViewBox.split(' ').map(Number)
+  const scaled = (y) => PIP_FOOT_Y + (y - PIP_FOOT_Y) * f.scale
+  square(hatMiniViewBox(line, form), `${where} footer`)
+  for (const { key } of WARDROBE_SLOTS) {
+    const ids = idsIn(key)
+    const [x, y, s] = square(slotFitViewBox(key, line, form, ids), `${where} ${key} cards`)
+    assert.ok(Math.abs(y + s - (my + ms)) < 0.2 && Math.abs(x + s / 2 - (mx + ms / 2)) < 0.2, `${where} ${key}: cards keep the form's feet and centre`)
+    for (const outfit of [null, ...ids.map(id => ({ [key]: id }))]) {
+      assert.ok(y <= scaled(headBarTop(line, form, outfit) - FIT_MARGIN) + 0.1, `${where} ${key} ${JSON.stringify(outfit)}: the card cuts off the top of Pip`)
+    }
+  }
+  const [, ly] = square(fitViewBox(line, form, FULL), `${where} lineup`)
+  assert.ok(ly <= scaled(headBarTop(line, form, FULL) - FIT_MARGIN) + 0.1, `${where}: the lineup cuts off the top of Pip`)
 }
 assert.deepEqual(hatOnly({ HAT: 'cap', SHOES: 'wellies' }), { HAT: 'cap' })
 assert.deepEqual(hatOnly({ SHOES: 'wellies' }), {})
@@ -204,6 +252,8 @@ assert.deepEqual(wardrobe.outfit, { HAT: 'beanie' }, 'withSlot must not mutate')
 assert.equal(wardrobeAnnouncement(['wellies'], 'herb'), '🎉 New outfit: Wellies!')
 assert.equal(wardrobeAnnouncement(['wellies'], 'robot'), '🎉 New outfit: Mag boots!')
 assert.equal(wardrobeAnnouncement(['round-specs'], 'dragon'), '🎉 New outfit: Battle scar!')
+assert.equal(wardrobeAnnouncement(['beanie'], 'dragon'), "🎉 New outfit: Wizard's hat!")
+assert.equal(wardrobeAnnouncement(['straw-hat'], 'dragon'), "🎉 New outfit: Jester's cap!")
 assert.equal(wardrobeAnnouncement(['beanie', 'jeans'], 'herb'), '🎉 New outfit: Beanie! (+1 more)')
 assert.equal(wardrobeAnnouncement(['jetpack'], 'herb'), null)
 assert.equal(wardrobeSlotLabel('robot', 'HAT'), 'Antenna')

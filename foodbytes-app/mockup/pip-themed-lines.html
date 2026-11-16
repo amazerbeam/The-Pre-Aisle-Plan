@@ -322,7 +322,7 @@ function herbGrowth(fi, droop, base) {
    Body = head + torso in one path (the torso-clothes clip). Horns / shell cap are the crown.
    ====================================================================== */
 const DRAGON_FORMS = [
-  { name: 'Hatchling', scale: 0.84, fill: ['#c4f2dc', '#6cc59a'],
+  { name: 'Hatchling', scale: 0.84, crownUnderHats: true, fill: ['#c4f2dc', '#6cc59a'],
     body: 'M100 92 C124 92 134 108 132 126 C131 136 126 142 128 148 C134 162 128 182 100 182 C72 182 66 162 72 148 C74 142 69 136 68 126 C66 108 76 92 100 92Z',
     hat: { y: 104, w: 50 }, eyes: { y: 122, gap: 12, s: 0.75 }, neck: 146, waist: 168, side: 28,
     feet: [[[88, 178], [78, 185]], [[112, 178], [122, 185]]], growTop: 92, crownTop: 89, growthRise: 12, miniViewBox: '50 92 100 100' },
@@ -401,21 +401,32 @@ function dragonCrown(fi, droop, base) {
   if (fi === 1) return dragonHorn(85, base, 18, -1) + dragonHorn(115, base, 18, 1);
   return `<path d="M95 ${base + 6} L100 ${base - 10} L105 ${base + 6} Z" fill="${DR.horn}" stroke="${DRAGON_INK}" stroke-width="2.6" stroke-linejoin="round"/>` + dragonHorn(82, base, 26, -1) + dragonHorn(118, base, 26, 1);
 }
-function dragonFace(f, mood) {
-  const { y: ey, gap, s } = f.eyes, ink = DRAGON_INK, L = 100 - gap, R = 100 + gap, my = ey + 17 * s;
+function dragonFace(f, mood, { noL = false } = {}) {
+  const { y: ey, gap, s } = f.eyes, ink = DI, L = 100 - gap, R = 100 + gap, my = ey + 17 * s;
+  const st = `stroke="${ink}" stroke-width="${4 * s}" stroke-linecap="round" fill="none"`;
   const fang = `<path d="M${100 + 3 * s} ${my + 1 * s} l${2.5 * s} ${5 * s} l${2.5 * s} ${-5 * s} Z" fill="#fff" stroke="${ink}" stroke-width="${1.6 * s}" stroke-linejoin="round"/>`;
+  const blush = (o, rx = 8, ry = 4.5) => `<ellipse cx="${L - 11 * s}" cy="${ey + 11 * s}" rx="${rx * s}" ry="${ry * s}" fill="#ff8fab" opacity="${o}"/><ellipse cx="${R + 11 * s}" cy="${ey + 11 * s}" rx="${rx * s}" ry="${ry * s}" fill="#ff8fab" opacity="${o}"/>`;
+  const both = (fn) => (noL ? '' : fn(L)) + fn(R);
   if (mood === 'content' || mood === 'mischievous') {
     const dx = mood === 'mischievous' ? 3 * s : 0;
-    const st = `stroke="${ink}" stroke-width="${4 * s}" stroke-linecap="round" fill="none"`;
     const eye = (x) => `<ellipse cx="${x + dx}" cy="${ey}" rx="${7.5 * s}" ry="${9.5 * s}" fill="${DR.iris}" stroke="${ink}" stroke-width="${2.6 * s}"/><ellipse cx="${x + dx}" cy="${ey + 0.5 * s}" rx="${2.6 * s}" ry="${7 * s}" fill="${ink}"/><circle cx="${x + dx + 2.6 * s}" cy="${ey - 4 * s}" r="${2.2 * s}" fill="#fff"/>`;
     const brows = mood === 'mischievous' ? `<path d="M${L - 10 * s} ${ey - 13 * s} Q${L} ${ey - 15 * s} ${L + 10 * s} ${ey - 20 * s}" ${st}/><path d="M${R - 10 * s} ${ey - 20 * s} Q${R} ${ey - 15 * s} ${R + 10 * s} ${ey - 13 * s}" ${st}/>` : '';
     const mouth = mood === 'mischievous'
       ? `<path d="M${100 - 11 * s} ${my} Q${100 - 3 * s} ${my + 8 * s} ${100 + 3 * s} ${my + 1 * s} Q${100 + 8 * s} ${my - 3 * s} ${100 + 13 * s} ${my + 2 * s}" ${st}/>`
       : `<path d="M${100 - 9 * s} ${my - 2 * s} Q100 ${my + 6 * s} ${100 + 9 * s} ${my - 2 * s}" ${st}/>`;
-    const blush = `<ellipse cx="${L - 11 * s}" cy="${ey + 11 * s}" rx="${8 * s}" ry="${4.5 * s}" fill="#ff8fab" opacity=".45"/><ellipse cx="${R + 11 * s}" cy="${ey + 11 * s}" rx="${8 * s}" ry="${4.5 * s}" fill="#ff8fab" opacity=".45"/>`;
-    return eye(L) + eye(R) + brows + mouth + fang + blush;
+    return both(eye) + brows + mouth + fang + blush(0.45);
   }
-  return face(100, ey, gap, mood, s, ink) + (mood === 'happy' ? fang : '');
+  if (mood === 'happy') {
+    return both(x => `<path d="M${x - 9 * s} ${ey + 2 * s} Q${x} ${ey - 11 * s} ${x + 9 * s} ${ey + 2 * s}" ${st}/>`)
+      + `<path d="M${100 - 10 * s} ${my - 3 * s} Q100 ${my + 15 * s} ${100 + 10 * s} ${my - 3 * s} Z" fill="#7a2e45" stroke="${ink}" stroke-width="${3 * s}" stroke-linejoin="round"/>` + blush(0.8, 9, 5) + fang;
+  }
+  if (mood === 'bored') {
+    return both(x => `<path d="M${x - 8 * s} ${ey} A${8 * s} ${8 * s} 0 0 0 ${x + 8 * s} ${ey} Z" fill="${ink}"/><path d="M${x - 10 * s} ${ey} L${x + 10 * s} ${ey}" ${st}/>`)
+      + `<path d="M${100 - 7 * s} ${my + 2 * s} L${100 + 7 * s} ${my + 2 * s}" ${st}/>` + blush(0.3, 9, 5);
+  }
+  // sleep
+  return both(x => `<path d="M${x - 9 * s} ${ey} Q${x} ${ey + 9 * s} ${x + 9 * s} ${ey}" ${st}/>`)
+    + `<ellipse cx="100" cy="${my + 1 * s}" rx="${4 * s}" ry="${3.4 * s}" fill="#7a2e45"/>` + blush(0.5, 9, 5);
 }
 
 /* ======================================================================
@@ -778,33 +789,39 @@ const ROBOT_WARDROBE = {
   },
 };
 
+const star = (cx, cy, r, fill) => `<path d="M${cx} ${cy - r} L${cx + r * 0.3} ${cy - r * 0.3} L${cx + r} ${cy} L${cx + r * 0.3} ${cy + r * 0.3} L${cx} ${cy + r} L${cx - r * 0.3} ${cy + r * 0.3} L${cx - r} ${cy} L${cx - r * 0.3} ${cy - r * 0.3} Z" fill="${fill}"/>`;
 /* ---------- DRAGON: fantasy kit, scars and paint ---------- */
 const DRAGON_WARDROBE = {
   hat: {
-    beanie: { label: 'Horn cosy', note: 'horns poke through', draw: (x, y, w) => { const h = w * 0.46;
-      let knit = '';
-      for (const k of [-0.25, 0, 0.25]) knit += `<path d="M${x + w * k} ${y - h * 0.95} l-2 4 l2 4 l-2 4 l2 4 l-2 4" stroke="#b88428" stroke-width="2" fill="none"/>`;
-      return { top: y - h, svg: `<path d="M${x - w / 2} ${y} C${x - w / 2} ${y - h * 1.3} ${x + w / 2} ${y - h * 1.3} ${x + w / 2} ${y} Z" fill="#d9a441" stroke="${DI}" stroke-width="3.5" stroke-linejoin="round"/>${knit}
-        <rect x="${x - w / 2 - 3}" y="${y - 7}" width="${w + 6}" height="11" rx="5" fill="#f3e2b0" stroke="${DI}" stroke-width="3.5"/>` };
-    } },
-    cap: { label: "Bard's cap", note: 'feather sways', draw: (x, y, w) => { const h = w * 0.36, fx0 = x + w * 0.18, fy0 = y - h * 0.8;
+    beanie: { label: "Wizard's hat", note: 'the tip star sparkles', crownMode: 'over', draw: (x, y, w) => {
+        const top = y - w * 1.05;
+        return { top, svg: `<path d="M${x - w * 0.36} ${y - 3} Q${x - w * 0.12} ${y - w * 0.55} ${x + w * 0.02} ${y - w * 0.9} Q${x + w * 0.14} ${top} ${x + w * 0.36} ${y - w * 0.86} Q${x + w * 0.16} ${y - w * 0.66} ${x + w * 0.36} ${y - 3} Z" fill="#4b3a8c" stroke="${DI}" stroke-width="3.4" stroke-linejoin="round"/>
+          <path d="M${x - w * 0.3} ${y - w * 0.16} Q${x} ${y - w * 0.1} ${x + w * 0.32} ${y - w * 0.16}" stroke="#d9a62e" stroke-width="5" fill="none"/>
+          ${star(x - w * 0.08, y - w * 0.42, w * 0.07, '#ffd34d')}${star(x + w * 0.14, y - w * 0.3, w * 0.05, '#ffd34d')}
+          ${fx('sparkle', star(x + w * 0.36, y - w * 0.86, w * 0.07, '#fff3b0'))}
+          <ellipse cx="${x}" cy="${y - 2}" rx="${w * 0.62}" ry="${w * 0.12}" fill="#5a479e" stroke="${DI}" stroke-width="3.2"/>` };
+      } },
+    cap: { label: "Bard's cap", note: 'feather sways', crownMode: 'over', draw: (x, y, w) => { const h = w * 0.36, fx0 = x + w * 0.18, fy0 = y - h * 0.8;
       return { top: fy0 - w * 0.55 - 2, svg: `${fx('sway', `<path d="M${fx0} ${fy0} C${fx0 + w * 0.15} ${fy0 - w * 0.3} ${fx0 + w * 0.42} ${fy0 - w * 0.5} ${fx0 + w * 0.55} ${fy0 - w * 0.55} C${fx0 + w * 0.42} ${fy0 - w * 0.36} ${fx0 + w * 0.24} ${fy0 - w * 0.12} ${fx0 + 4} ${fy0 + 2} Z" fill="#c8463d" stroke="${DI}" stroke-width="2.4" stroke-linejoin="round"/><path d="M${fx0 + 2} ${fy0} Q${fx0 + w * 0.3} ${fy0 - w * 0.3} ${fx0 + w * 0.52} ${fy0 - w * 0.53}" stroke="#7a2520" stroke-width="1.4" fill="none"/>`)}
         <path d="M${x - w / 2} ${y} C${x - w / 2} ${y - h * 1.4} ${x + w / 2} ${y - h * 1.4} ${x + w / 2} ${y} Z" fill="#3f7d4e" stroke="${DI}" stroke-width="3.5" stroke-linejoin="round"/>
         <path d="M${x - w / 2 - 2} ${y - 1} Q${x} ${y + 5} ${x + w / 2 + 2} ${y - 1}" stroke="#2c5a37" stroke-width="5" stroke-linecap="round" fill="none"/>` };
     } },
-    chef: { label: 'Singed toque', note: 'smoke wisps', straight: true, draw: (x, y, w) => { const h = w * 0.55;
+    chef: { label: 'Singed toque', note: 'smoke wisps', crownMode: 'under', straight: true, draw: (x, y, w) => { const h = w * 0.55;
       return { top: y - h - 24, svg: `<path d="M${x - w / 2 + 4} ${y - 4} C${x - w / 2 - 12} ${y - h} ${x - w / 4} ${y - h - 18} ${x} ${y - h - 8} C${x + w / 4} ${y - h - 18} ${x + w / 2 + 12} ${y - h} ${x + w / 2 - 4} ${y - 4} Z" fill="#fffaf0" stroke="${DI}" stroke-width="3.5" stroke-linejoin="round"/>
         <ellipse cx="${x + w * 0.3}" cy="${y - h * 0.7}" rx="${w * 0.12}" ry="${w * 0.08}" fill="#6b4a2e" opacity=".45"/><ellipse cx="${x - w * 0.28}" cy="${y - h * 0.45}" rx="${w * 0.08}" ry="${w * 0.06}" fill="#6b4a2e" opacity=".4"/>
         <rect x="${x - w / 2}" y="${y - 9}" width="${w}" height="12" rx="3" fill="#fffaf0" stroke="${DI}" stroke-width="3.5"/><path d="M${x + w * 0.2} ${y - 9} v12" stroke="#6b4a2e" stroke-width="3" opacity=".35"/>
         ${[0, 1, 2].map(i => fx('smoke', `<circle cx="${x + w * 0.12 + i * 3}" cy="${y - h - 16}" r="${3.5 + i}" fill="#9a9187" opacity=".55"/>`, `animation-delay:${i * 0.7}s`)).join('')}` };
     } },
-    sunhat: { label: "Bird's nest", note: 'the egg wobbles', draw: (x, y, w) => { const ex = x + w * 0.05, ey = y - w * 0.2, er = w * 0.13;
-      const twigs = [[-0.5, -0.1, 0.1, 0.05], [-0.3, 0.06, 0.45, -0.12], [-0.55, -0.02, -0.15, -0.2], [0.1, 0.08, 0.55, -0.06]].map(([a, b, c2, d]) => `<path d="M${x + w * a} ${y + w * b} L${x + w * c2} ${y + w * d}" stroke="#5e3b1a" stroke-width="2" stroke-linecap="round"/>`).join('');
-      return { top: ey - er * 1.3 - 2, svg: `<ellipse cx="${x}" cy="${y - 4}" rx="${w * 0.56}" ry="${w * 0.17}" fill="#8a5a2b" stroke="${DI}" stroke-width="3"/>
-        ${fx('wobble', `<ellipse cx="${ex}" cy="${ey}" rx="${er}" ry="${er * 1.3}" fill="#a9dbe8" stroke="${DI}" stroke-width="2.4"/><circle cx="${ex - er * 0.3}" cy="${ey - er * 0.2}" r="${er * 0.14}" fill="#6a9bb0"/><circle cx="${ex + er * 0.35}" cy="${ey + er * 0.4}" r="${er * 0.11}" fill="#6a9bb0"/>`)}
-        <path d="M${x - w * 0.56} ${y - 4} Q${x} ${y + w * 0.2} ${x + w * 0.56} ${y - 4} Q${x} ${y + 2} ${x - w * 0.56} ${y - 4} Z" fill="#a06a35" stroke="${DI}" stroke-width="2.6"/>${twigs}` };
-    } },
-    tophat: { label: 'Crown', note: 'a gem sparkles', draw: (x, y, w) => { const a = x - w * 0.42, b = x + w * 0.42, h = w * 0.55, q = (b - a) * 0.25;
+    sunhat: { label: "Jester's cap", note: 'the bells sway', crownMode: 'over', draw: (x, y, w) => {
+        const bell = (bx, by) => fx('sway', `<circle cx="${bx}" cy="${by}" r="${w * 0.07}" fill="#f0c14b" stroke="${DI}" stroke-width="1.8"/><path d="M${bx - w * 0.03} ${by + w * 0.02} h${w * 0.06}" stroke="${DI}" stroke-width="1.2"/>`);
+        return { top: y - w * 0.62, svg: `<path d="M${x - w * 0.45} ${y - 2} Q${x - w * 0.5} ${y - w * 0.5} ${x - w * 0.82} ${y - w * 0.32} Q${x - w * 0.42} ${y - w * 0.72} ${x} ${y - w * 0.42} Z" fill="#b8323a" stroke="${DI}" stroke-width="3" stroke-linejoin="round"/>
+          <path d="M${x + w * 0.45} ${y - 2} Q${x + w * 0.5} ${y - w * 0.5} ${x + w * 0.82} ${y - w * 0.32} Q${x + w * 0.42} ${y - w * 0.72} ${x} ${y - w * 0.42} Z" fill="#e3b23c" stroke="${DI}" stroke-width="3" stroke-linejoin="round"/>
+          <path d="M${x - w * 0.45} ${y - 2} Q${x} ${y - w * 0.62} ${x + w * 0.45} ${y - 2} Z" fill="#2f6b4a" stroke="${DI}" stroke-width="3" stroke-linejoin="round"/>
+          ${bell(x - w * 0.82, y - w * 0.28)}${bell(x + w * 0.82, y - w * 0.28)}
+          <path d="M${x - w / 2} ${y - 4} Q${x} ${y + 3} ${x + w / 2} ${y - 4}" stroke="#e3b23c" stroke-width="6" stroke-linecap="round" fill="none"/>
+          <path d="M${x - w / 2} ${y - 4} Q${x} ${y + 3} ${x + w / 2} ${y - 4}" stroke="${DI}" stroke-width="1.4" stroke-dasharray="3 4" fill="none"/>` };
+      } },
+    tophat: { label: 'Crown', note: 'a gem sparkles', crownMode: 'under', draw: (x, y, w) => { const a = x - w * 0.42, b = x + w * 0.42, h = w * 0.55, q = (b - a) * 0.25;
       return { top: y - h - 4, svg: `<path d="M${a} ${y} L${a} ${y - h * 0.6} L${a + q} ${y - h * 0.3} L${x} ${y - h} L${b - q} ${y - h * 0.3} L${b} ${y - h * 0.6} L${b} ${y} Z" fill="#f0c14b" stroke="${DI}" stroke-width="3.2" stroke-linejoin="round"/>
         <rect x="${a}" y="${y - 7}" width="${b - a}" height="7" fill="#d9a62e" stroke="${DI}" stroke-width="2.2"/>
         ${[[-0.22, '#d43a4a'], [0, '#3a7bd4'], [0.22, '#3aa86b']].map(([k, col]) => `<circle cx="${x + w * k}" cy="${y - 3.5}" r="2.3" fill="${col}" stroke="${DI}" stroke-width="1"/>`).join('')}
@@ -813,7 +830,7 @@ const DRAGON_WARDROBE = {
     } },
   },
   glasses: {
-    round: { label: 'Battle scar', note: 'claw marks over one eye', draw: (L, R, y, s) => [-4, 0, 4].map(o => { const d = `M${L - 11 * s + o * s} ${y - 15 * s} L${L + 7 * s + o * s} ${y + 13 * s}`;
+    round: { label: 'Battle scar', note: 'the left eye is scarred shut', hidesEye: 'L', staysAsleep: true, draw: (L, R, y, s) => `<path d="M${L - 8 * s} ${y + 1 * s} Q${L} ${y + 4 * s} ${L + 8 * s} ${y + 1 * s}" stroke="${DI}" stroke-width="${3.4 * s}" stroke-linecap="round" fill="none"/>` + [-4, 0, 4].map(o => { const d = `M${L - 11 * s + o * s} ${y - 15 * s} L${L + 7 * s + o * s} ${y + 13 * s}`;
       return `<path d="${d}" stroke="#b9485c" stroke-width="${3.2 * s}" stroke-linecap="round"/><path d="${d}" stroke="#f2a3b0" stroke-width="${1.1 * s}" stroke-linecap="round"/>`; }).join('') },
     heart: { label: 'Smitten', note: 'heart pupils pulse; hearts float up', draw: (L, R, y, s) => [L, R].map(x => fx('pulse', `<path d="${heartPath(x, y, 5.5 * s)}" fill="#ff4f87" stroke="${DI}" stroke-width="${1.6 * s}"/><circle cx="${x - 2 * s}" cy="${y - 3 * s}" r="${1.4 * s}" fill="#fff"/>`)).join('')
       + [0, 1].map(i => fx('rise', `<path d="${heartPath(R + 14 * s + i * 6 * s, y - 16 * s - i * 6 * s, 2.6 * s)}" fill="#ff7aa5"/>`, `animation-delay:${i * 1.1}s`)).join('') },
@@ -962,7 +979,7 @@ const LINES = {
     crown: (fi, droop, base) => herbGrowth(fi, droop, base) },
   dragon: { label: 'Dragon', theme: 'Parchment', forms: DRAGON_FORMS, ink: DRAGON_INK,
     back: (fi, droop, f) => dragonBack(fi, droop, f), limbs: (f, fi) => dragonLimbs(f, fi), details: (f, fi) => dragonDetails(f, fi),
-    face: (f, fi, mood) => dragonFace(f, mood), crown: (fi, droop, base) => dragonCrown(fi, droop, base) },
+    face: (f, fi, mood, opts) => dragonFace(f, mood, opts), crown: (fi, droop, base) => dragonCrown(fi, droop, base) },
   robot: { label: 'Robot', theme: 'Cyberpunk', forms: ROBOT_FORMS, ink: ROBOT_INK,
     back: (fi, droop, f) => robotBack(fi, droop, f), limbs: (f, fi) => robotLimbs(f, fi), details: (f, fi) => robotDetails(f, fi),
     face: (f, fi, mood) => robotFace(f, mood), crown: (fi, droop, base) => robotCrown(fi, droop, base) },
@@ -1001,16 +1018,19 @@ function pipFigure(line, fi, mood, outfit = {}, { wilted = false } = {}) {
   if (torso.clip) s += `<g clip-path="url(#${id}c)">${torso.clip}</g>`;
   s += `<path d="${f.body}" fill="none" stroke="${L.ink}" stroke-width="5" stroke-linejoin="round"/>`;
   s += torso.extra;
-  const glasses = outfit.glasses && mood !== 'sleep' ? W.glasses[outfit.glasses] : null;
-  if (!glasses?.replacesFace) s += L.face(f, fi, mood);   // new flag: a screen face replaces the face while worn
+  const picked = outfit.glasses ? W.glasses[outfit.glasses] : null;
+  const glasses = picked && (mood !== 'sleep' || picked.staysAsleep) ? picked : null;   // a scar stays asleep
+  if (!glasses?.replacesFace) s += L.face(f, fi, mood, { noL: glasses?.hidesEye === 'L' });
   if (glasses) s += glasses.draw(100 - f.eyes.gap, 100 + f.eyes.gap, f.eyes.y, f.eyes.s);
-  let base = f.growTop, crownReplaced = false;
+  let base = f.growTop, crownReplaced = false, crownAfter = true;
   if (outfit.hat) {
     const item = W.hat[outfit.hat], h = hatDraw(line, outfit.hat, f, droop);
+    const mode = f.crownUnderHats ? 'under' : item.crownMode;           // wardrobeArt crownPlacement
+    if (mode === 'under') { s += L.crown(fi, droop, base); crownAfter = false; }
     s += item.crown || item.straight ? h.svg : `<g transform="rotate(-7 100 ${f.hat.y})">${h.svg}</g>`;
-    if (item.crown) crownReplaced = true; else base = Math.min(base, h.top + 4);
+    if (item.crown) crownReplaced = true; else if (!mode) base = Math.min(base, h.top + 4);
   }
-  if (!crownReplaced) s += L.crown(fi, droop, base);
+  if (!crownReplaced && crownAfter) s += L.crown(fi, droop, base);
   const k = f.scale;
   return `<ellipse cx="100" cy="189" rx="${56 * k}" ry="6" fill="rgba(40,60,20,.13)"/><g class="anim"><g transform="translate(100 186) scale(${k}) translate(-100 -186)">${s}</g></g>`;
 }
@@ -1037,7 +1057,7 @@ function pip(line, fi, mood, outfit, { variant = 'full', viewBox = null, wilted 
 function headBarTop(line, fi, outfit = {}) {
   const f = LINES[line].forms[fi], tops = [f.crownTop];
   let base = f.growTop;
-  if (outfit.hat) { const top = hatDraw(line, outfit.hat, f).top; tops.push(top); if (!WARDROBE[line].hat[outfit.hat].crown) base = Math.min(base, top + 4); }
+  if (outfit.hat) { const top = hatDraw(line, outfit.hat, f).top; tops.push(top); const it = WARDROBE[line].hat[outfit.hat]; if (!it.crown && !it.crownMode && !f.crownUnderHats) base = Math.min(base, top + 4); }
   if (f.growthRise > 0) tops.push(base - f.growthRise);
   return Math.min(...tops);
 }
@@ -1218,14 +1238,11 @@ function wardrobeViewBox(line, fi) {
   const [x, y, w] = LINES[line].forms[fi].miniViewBox.split(' ').map(Number), size = w + 44;
   return `${x - 22} ${y - 30} ${size} ${size}`;
 }
-/* The item card crop (mirrors wardrobeLayers slotCropViewBox), a little roomier for tall hats. */
-function slotZoom(line, fi, slot) {
-  const f = LINES[line].forms[fi];
-  const [cy, size] = slot === 'hat' ? [f.hat.y - f.hat.w * 0.5, f.hat.w * 2.2 + 30]
-    : slot === 'glasses' ? [f.eyes.y + 4, f.eyes.gap * 2 + 64 * f.eyes.s]
-    : slot === 'shoes' ? [182, f.feet[1][1][0] - f.feet[0][1][0] + 36]
-    : [(f.neck + f.waist) / 2 + 4, f.side * 2 + 44];
-  return squareAround(cy, size, f.scale);
+/* The item card crop (mirrors cardFit.js fitViewBox): the whole Pip, the form's miniViewBox grown upward to clear the top. */
+function slotZoom(line, fi, slot, outfit = {}) {
+  const f = LINES[line].forms[fi], [x0, y0, s0] = f.miniViewBox.split(' ').map(Number);
+  const top = 186 + (headBarTop(line, fi, outfit) - 4 - 186) * f.scale, bottom = y0 + s0, s = Math.max(s0, bottom - top);
+  return `${(x0 + s0 / 2 - s / 2).toFixed(1)} ${(bottom - s).toFixed(1)} ${s.toFixed(1)} ${s.toFixed(1)}`;
 }
 function renderWardrobe() {
   const lines = Object.keys(LINES);
@@ -1233,7 +1250,7 @@ function renderWardrobe() {
   SLOTS.forEach(([slot, slotLabel, items]) => Object.keys(items).forEach(id => {
     html += `<tr><td><b>${slotLabel}</b><br><span class="note">${id}</span></td>${lines.map(l => {
       const fi = Math.min(1, LINES[l].forms.length - 1), item = WARDROBE[l][slot][id];
-      return `<td><div class="wcell">${pip(l, fi, 'content', { [slot]: id }, { variant: 'crop', viewBox: wardrobeViewBox(l, fi) })}${pip(l, fi, 'content', { [slot]: id }, { variant: 'crop', viewBox: slotZoom(l, fi, slot) })}<div><b>${item.label}</b>${item.note ? `<br><span class="note">${item.note}</span>` : ''}</div></div></td>`;
+      return `<td><div class="wcell">${pip(l, fi, 'content', { [slot]: id }, { variant: 'crop', viewBox: wardrobeViewBox(l, fi) })}${pip(l, fi, 'content', { [slot]: id }, { variant: 'crop', viewBox: slotZoom(l, fi, slot, { [slot]: id }) })}<div><b>${item.label}</b>${item.note ? `<br><span class="note">${item.note}</span>` : ''}</div></div></td>`;
     }).join('')}</tr>`;
   }));
   document.getElementById('wardrobe').innerHTML = html + '</tbody>';

@@ -2,22 +2,23 @@ import { PET_MOODS } from '../../../constants/pet'
 import { WARDROBE_NEW_TAG, WARDROBE_NONE_LABEL } from '../../../constants/pipWardrobe'
 import { itemsInSlot, wardrobeItemLabel } from '../../../utils/pipWardrobe'
 import Pip from '../pip/Pip'
-import { slotCropViewBox } from '../pip/wardrobeLayers'
+import { slotFitViewBox } from '../pip/cardFit'
 
 /**
  * MPP-32 AC 4: "None" then the slot's items, 3 per row. Each card is Pip's CURRENT form (of the active line) wearing
- * that item, cropped to the part of him it changes. Locked cards stay tappable so they can
+ * that item, shown whole, at one scale per slot (cardFit.js). Locked cards stay tappable so they can
  * explain their unlock (onTap decides).
  */
 function WardrobeItemGrid({ wardrobe, slot, line, form, onTap }) {
-  const viewBox = slotCropViewBox(slot, line, form)
+  const items = itemsInSlot(wardrobe, slot)
+  const viewBox = slotFitViewBox(slot, line, form, items.map(item => item.id))
   const worn = wardrobe.outfit?.[slot] ?? null
   return (
     <ul className="pip-wardrobe-grid">
       <li>
         <ItemCard label={WARDROBE_NONE_LABEL} pressed={!worn} viewBox={viewBox} line={line} form={form} outfit={null} onClick={() => onTap(null)} />
       </li>
-      {itemsInSlot(wardrobe, slot).map(item => (
+      {items.map(item => (
         <li key={item.id}>
           <ItemCard
             label={wardrobeItemLabel(line, item.id)}

@@ -1,6 +1,7 @@
 import { PET_MOODS } from '../../../constants/pet'
 import { PIP_LINE } from '../../../constants/pipLines'
 import { pipForm } from '../pip/lineForms'
+import { EYE_LEFT } from '../pip/pipSpace'
 import { SharedFace } from '../pip/sharedFace'
 import { DRAGON_INK } from './dragonForms'
 
@@ -8,15 +9,15 @@ const BLUSH = '#ff8fab'
 const IRIS = '#ffcf4d'
 const CX = 100
 
-/** Slit-pupil eyes and a fang for content, mischievous and happy; bored and asleep use the shared round-eye faces in the dragon's ink. Reads only the eyes anchor. */
-export function DragonFace({ form, mood }) {
+/** Slit-pupil eyes and a fang for content, mischievous and happy; bored and asleep use the shared round-eye faces in the dragon's ink. Reads only the eyes anchor. `hideEye` = EYE_LEFT drops the left eye (the Battle scar). */
+export function DragonFace({ form, mood, hideEye = null }) {
   const { y: ey, gap, s } = pipForm(PIP_LINE.DRAGON, form).eyes
   if (mood === PET_MOODS.CONTENT || mood === PET_MOODS.MISCHIEVOUS) {
-    return <SlitFace ey={ey} gap={gap} s={s} mischievous={mood === PET_MOODS.MISCHIEVOUS} />
+    return <SlitFace ey={ey} gap={gap} s={s} mischievous={mood === PET_MOODS.MISCHIEVOUS} hideEye={hideEye} />
   }
   return (
     <>
-      <SharedFace ey={ey} gap={gap} s={s} mood={mood} ink={DRAGON_INK} />
+      <SharedFace ey={ey} gap={gap} s={s} mood={mood} ink={DRAGON_INK} hideEye={hideEye} />
       {mood === PET_MOODS.HAPPY && <Fang x={CX + 3 * s} y={ey + 17 * s + 1 * s} s={s} />}
     </>
   )
@@ -26,7 +27,7 @@ function Fang({ x, y, s }) {
   return <path d={`M${x} ${y} l${2.5 * s} ${5 * s} l${2.5 * s} ${-5 * s} Z`} fill="#fff" stroke={DRAGON_INK} strokeWidth={1.6 * s} strokeLinejoin="round" />
 }
 
-function SlitFace({ ey, gap, s, mischievous }) {
+function SlitFace({ ey, gap, s, mischievous, hideEye }) {
   const L = CX - gap
   const R = CX + gap
   const my = ey + 17 * s
@@ -34,7 +35,7 @@ function SlitFace({ ey, gap, s, mischievous }) {
   const line = { stroke: DRAGON_INK, strokeWidth: 4 * s, strokeLinecap: 'round', fill: 'none' }
   return (
     <>
-      {[L, R].map((x) => (
+      {(hideEye === EYE_LEFT ? [R] : [L, R]).map((x) => (
         <g key={x}>
           <ellipse cx={x + dx} cy={ey} rx={7.5 * s} ry={9.5 * s} fill={IRIS} stroke={DRAGON_INK} strokeWidth={2.6 * s} />
           <ellipse cx={x + dx} cy={ey + 0.5 * s} rx={2.6 * s} ry={7 * s} fill={DRAGON_INK} />

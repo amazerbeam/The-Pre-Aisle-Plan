@@ -1,4 +1,4 @@
-import { PIP_FOOT_X } from '../pip/pipSpace.js'
+import { EYE_LEFT, PIP_FOOT_X } from '../pip/pipSpace.js'
 import { arc, arcY, band, circle, curveOf, ellipse, fxGroup, heartPath, overalls, path, rect, titleBelt } from '../pip/wardrobeShapes.js'
 import { DRAGON_INK } from './dragonForms.js'
 
@@ -9,29 +9,35 @@ import { DRAGON_INK } from './dragonForms.js'
  * Each item reads only its slot's anchors (hat / eyes / neck + waist + side / feet). Animated parts are
  * fxGroup descriptors (Pip.css); an animated group never carries a positioning transform.
  *
- * Names on the dragon (WARDROBE_ITEM_LABELS): beanie Horn cosy, cap Bard's cap, chef-hat Singed toque,
- * straw-hat Bird's nest, top-hat Crown, round-specs Battle scar, heart-glasses Smitten, sunglasses War paint,
+ * Names on the dragon (WARDROBE_ITEM_LABELS): beanie Wizard's hat, cap Bard's cap, chef-hat Singed toque,
+ * straw-hat Jester's cap, top-hat Crown, round-specs Battle scar, heart-glasses Smitten, sunglasses War paint,
  * red-scarf Knight's cape, striped-scarf Ivy garland, chef-whites Baker's apron, denim-jacket Leather jerkin,
  * puffer Scale mail, leather-belt Potion belt, champion-belt Hoard belt, jeans Patched breeches,
  * joggers Wool hose, dungarees Smith's overalls, sneakers Talon wraps, wellies Iron sabatons.
+ * Hats keep the horns on the head (HAT_CROWN: over = through holes, under = behind); the Battle scar takes the left eye (HIDES_EYE) and stays asleep.
  */
 
 const CX = PIP_FOOT_X // every form is centred on x = 100
 const DI = DRAGON_INK
 
+// A four-point star (Wizard's hat), centred on (cx, cy) with radius r.
+const star = (cx, cy, r, fill) => path(`M${cx} ${cy - r} L${cx + r * 0.3} ${cy - r * 0.3} L${cx + r} ${cy} L${cx + r * 0.3} ${cy + r * 0.3} L${cx} ${cy + r} L${cx - r * 0.3} ${cy + r * 0.3} L${cx - r} ${cy} L${cx - r * 0.3} ${cy - r * 0.3} Z`, { fill })
 
 // ---- hats: (x, y, w) = head centre, brim line, hat width; `top` = highest y of the crown (animated parts at rest) ----
 
 const HATS = {
-  // Horn cosy: horns poke through
+  // Wizard's hat: a bent star-spangled cone; the tip star sparkles (inspired by game and storybook wizard hats)
   beanie: (x, y, w) => {
-    const h = w * 0.46
+    const top = y - w * 1.05
     return {
-      top: y - h,
+      top,
       shapes: [
-        path(`M${x - w / 2} ${y} C${x - w / 2} ${y - h * 1.3} ${x + w / 2} ${y - h * 1.3} ${x + w / 2} ${y} Z`, { fill: '#d9a441', stroke: DI, strokeWidth: 3.5, strokeLinejoin: 'round' }),
-        ...[-0.25, 0, 0.25].map(k => path(`M${x + w * k} ${y - h * 0.95} l-2 4 l2 4 l-2 4 l2 4 l-2 4`, { stroke: '#b88428', strokeWidth: 2, fill: 'none' })),
-        rect(x - w / 2 - 3, y - 7, w + 6, 11, { rx: 5, fill: '#f3e2b0', stroke: DI, strokeWidth: 3.5 })
+        path(`M${x - w * 0.36} ${y - 3} Q${x - w * 0.12} ${y - w * 0.55} ${x + w * 0.02} ${y - w * 0.9} Q${x + w * 0.14} ${top} ${x + w * 0.36} ${y - w * 0.86} Q${x + w * 0.16} ${y - w * 0.66} ${x + w * 0.36} ${y - 3} Z`, { fill: '#4b3a8c', stroke: DI, strokeWidth: 3.4, strokeLinejoin: 'round' }),
+        path(`M${x - w * 0.3} ${y - w * 0.16} Q${x} ${y - w * 0.1} ${x + w * 0.32} ${y - w * 0.16}`, { stroke: '#d9a62e', strokeWidth: 5, fill: 'none' }),
+        star(x - w * 0.08, y - w * 0.42, w * 0.07, '#ffd34d'),
+        star(x + w * 0.14, y - w * 0.3, w * 0.05, '#ffd34d'),
+        fxGroup('sparkle', [star(x + w * 0.36, y - w * 0.86, w * 0.07, '#fff3b0')]),
+        ellipse(x, y - 2, w * 0.62, w * 0.12, { fill: '#5a479e', stroke: DI, strokeWidth: 3.2 })
       ]
     }
   },
@@ -68,24 +74,24 @@ const HATS = {
       ]
     }
   },
-  // Bird's nest: the egg wobbles
+  // Jester's cap: two floppy points, the bells sway (inspired by game and fairy-tale jesters)
   'straw-hat': (x, y, w) => {
-    const ex = x + w * 0.05
-    const ey = y - w * 0.2
-    const er = w * 0.13
-    const twigs = [[-0.5, -0.1, 0.1, 0.05], [-0.3, 0.06, 0.45, -0.12], [-0.55, -0.02, -0.15, -0.2], [0.1, 0.08, 0.55, -0.06]]
-      .map(([a, b, c, d]) => path(`M${x + w * a} ${y + w * b} L${x + w * c} ${y + w * d}`, { stroke: '#5e3b1a', strokeWidth: 2, strokeLinecap: 'round' }))
+    const point = (dir, fill) => path(`M${x + dir * w * 0.45} ${y - 2} Q${x + dir * w * 0.5} ${y - w * 0.5} ${x + dir * w * 0.82} ${y - w * 0.32} Q${x + dir * w * 0.42} ${y - w * 0.72} ${x} ${y - w * 0.42} Z`, { fill, stroke: DI, strokeWidth: 3, strokeLinejoin: 'round' })
+    const bell = (bx, by) => fxGroup('sway', [
+      circle(bx, by, w * 0.07, { fill: '#f0c14b', stroke: DI, strokeWidth: 1.8 }),
+      path(`M${bx - w * 0.03} ${by + w * 0.02} h${w * 0.06}`, { stroke: DI, strokeWidth: 1.2 })
+    ])
+    const rim = `M${x - w / 2} ${y - 4} Q${x} ${y + 3} ${x + w / 2} ${y - 4}`
     return {
-      top: ey - er * 1.3 - 2,
+      top: y - w * 0.62,
       shapes: [
-        ellipse(x, y - 4, w * 0.56, w * 0.17, { fill: '#8a5a2b', stroke: DI, strokeWidth: 3 }),
-        fxGroup('wobble', [
-          ellipse(ex, ey, er, er * 1.3, { fill: '#a9dbe8', stroke: DI, strokeWidth: 2.4 }),
-          circle(ex - er * 0.3, ey - er * 0.2, er * 0.14, { fill: '#6a9bb0' }),
-          circle(ex + er * 0.35, ey + er * 0.4, er * 0.11, { fill: '#6a9bb0' })
-        ]),
-        path(`M${x - w * 0.56} ${y - 4} Q${x} ${y + w * 0.2} ${x + w * 0.56} ${y - 4} Q${x} ${y + 2} ${x - w * 0.56} ${y - 4} Z`, { fill: '#a06a35', stroke: DI, strokeWidth: 2.6 }),
-        ...twigs
+        point(-1, '#b8323a'),
+        point(1, '#e3b23c'),
+        path(`M${x - w * 0.45} ${y - 2} Q${x} ${y - w * 0.62} ${x + w * 0.45} ${y - 2} Z`, { fill: '#2f6b4a', stroke: DI, strokeWidth: 3, strokeLinejoin: 'round' }),
+        bell(x - w * 0.82, y - w * 0.28),
+        bell(x + w * 0.82, y - w * 0.28),
+        path(rim, { stroke: '#e3b23c', strokeWidth: 6, strokeLinecap: 'round', fill: 'none' }),
+        path(rim, { stroke: DI, strokeWidth: 1.4, strokeDasharray: '3 4', fill: 'none' })
       ]
     }
   },
@@ -110,17 +116,20 @@ const HATS = {
   }
 }
 
-// ---- glasses: (L, R, y, s) = the two eye points and the face scale. None replaces the dragon's face. ----
+// ---- glasses: (L, R, y, s) = the two eye points and the face scale. None replaces the dragon's face; the Battle scar takes one eye. ----
 
 const GLASSES = {
-  // Battle scar: claw marks over one eye
-  'round-specs': (L, R, y, s) => [-4, 0, 4].flatMap(o => {
-    const d = `M${L - 11 * s + o * s} ${y - 15 * s} L${L + 7 * s + o * s} ${y + 13 * s}`
-    return [
-      path(d, { stroke: '#b9485c', strokeWidth: 3.2 * s, strokeLinecap: 'round' }),
-      path(d, { stroke: '#f2a3b0', strokeWidth: 1.1 * s, strokeLinecap: 'round' })
-    ]
-  }),
+  // Battle scar: the left eye is scarred shut (HIDES_EYE drops it from the face) under three claw marks
+  'round-specs': (L, R, y, s) => [
+    path(`M${L - 8 * s} ${y + 1 * s} Q${L} ${y + 4 * s} ${L + 8 * s} ${y + 1 * s}`, { stroke: DI, strokeWidth: 3.4 * s, strokeLinecap: 'round', fill: 'none' }),
+    ...[-4, 0, 4].flatMap(o => {
+      const d = `M${L - 11 * s + o * s} ${y - 15 * s} L${L + 7 * s + o * s} ${y + 13 * s}`
+      return [
+        path(d, { stroke: '#b9485c', strokeWidth: 3.2 * s, strokeLinecap: 'round' }),
+        path(d, { stroke: '#f2a3b0', strokeWidth: 1.1 * s, strokeLinecap: 'round' })
+      ]
+    })
+  ],
   // Smitten: heart pupils pulse; hearts float up
   'heart-glasses': (L, R, y, s) => [
     ...[L, R].map(x => fxGroup('pulse', [
@@ -297,5 +306,9 @@ export const DRAGON_WARDROBE = {
   GLASSES, // id → (L, R, y, s) → shapes
   TORSO, // id → (f) → { clip, extra, back? }
   SHOES, // id → (root, tip) → shapes
-  REPLACES_FACE: [] // the dragon keeps its own face under every item
+  REPLACES_FACE: [], // the dragon keeps its own face under every item
+  // Approved 2026-11-16 (mockup pip-dragon-fixes.html): horns over the hat (as if through holes) or tucked behind it.
+  HAT_CROWN: { beanie: 'over', cap: 'over', 'chef-hat': 'under', 'straw-hat': 'over', 'top-hat': 'under' },
+  HIDES_EYE: { 'round-specs': EYE_LEFT }, // the Battle scar takes the left eye
+  STAYS_ASLEEP: ['round-specs'] // a scar doesn't come off at night
 }
