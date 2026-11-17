@@ -1,7 +1,7 @@
 import { PIP_LINE } from '../../../../../constants/pipLines'
 import { ROOM_LABELS } from '../../../../../constants/petRoomLabels'
 import { DRAGON_INK } from './dragonPalette'
-import { DRAGON_STYLES, dragonBackdrop } from './dragonShell'
+import { DRAGON_STYLES, dragonBackdrop, dragonSill } from './dragonShell'
 import { DRAGON_BED } from './dragonBed'
 import { DRAGON_FRIDGE } from './dragonFridge'
 import { DRAGON_COOKER } from './dragonCooker'
@@ -17,6 +17,7 @@ export const DRAGON_ROOM = {
   surround: DRAGON_INK,
   styles: DRAGON_STYLES,
   backdrop: dragonBackdrop,
+  sill: dragonSill,
   stations: { bed: DRAGON_BED, fridge: DRAGON_FRIDGE, cooker: DRAGON_COOKER, cabinet: DRAGON_CABINET, wardrobe: DRAGON_WARDROBE },
   decor: DRAGON_DECOR,
   effects: { FridgeGauge, PotSteam, ServedPlate, SleepZs },

@@ -2,16 +2,11 @@ import { PIP_LINE } from '../../../constants/pipLines'
 import { pipForm } from '../pip/lineForms'
 import { RB, ROBOT_INK } from './robotForms'
 
-// The monitor head and its screen per form (index = form - 1), in the unscaled 200-unit space.
+// The monitor head per form (index = form - 1), in the unscaled 200-unit space. The screen is the form's `screen` anchor (robotForms.js).
 const ROBOT_HEAD = [
   { x0: 60, x1: 140, y0: 84, y1: 140, ym: 112 },
   { x0: 68, x1: 132, y0: 66, y1: 116, ym: 91 },
   { x0: 74, x1: 126, y0: 50, y1: 96, ym: 73 }
-]
-const ROBOT_SCREEN = [
-  { x: 67, y: 91, w: 66, h: 42, r: 9 },
-  { x: 74, y: 72, w: 52, h: 38, r: 8 },
-  { x: 79, y: 55, w: 42, h: 35, r: 7 }
 ]
 const LEG_REACH = [18, 24, 28]
 
@@ -44,7 +39,7 @@ export function RobotBack({ form, droop }) {
   )
 }
 
-/** Jointed arms at the shoulders, jointed legs root to tip with plated feet, and shoulder plating on the Android. */
+/** Jointed arms at the shoulders, jointed legs root to tip (the foot itself is the wardrobe's: ball or shoe), and shoulder plating on the Android. */
 export function RobotLimbs({ form, f }) {
   const fi = form - 1
   const reach = LEG_REACH[fi] ?? LEG_REACH[0]
@@ -68,13 +63,11 @@ export function RobotLimbs({ form, f }) {
         )
       })}
       {f.feet.map(([r, t]) => {
-        const dir = t[0] < r[0] ? -1 : 1
         const d = `M${r[0]} ${r[1] - 4} L${t[0]} ${t[1] - 3}`
         return (
           <g key={t[0]}>
             <path d={d} stroke={ROBOT_INK} strokeWidth="10" fill="none" strokeLinecap="round" />
             <path d={d} stroke={RB.limb} strokeWidth="5" fill="none" strokeLinecap="round" />
-            <rect x={t[0] - 8 + dir * 2} y={t[1] - 6} width="16" height="8" rx="3" fill={RB.plate} stroke={ROBOT_INK} strokeWidth="2.5" />
           </g>
         )
       })}
@@ -96,7 +89,7 @@ export function RobotLimbs({ form, f }) {
 
 /** On the body: the monitor screen (dark glass, scanlines, edge glow), a bezel status light, scuffs and rust, a riveted chest patch, and the Android's chest chevron. */
 export function RobotDetails({ form, f }) {
-  const sc = ROBOT_SCREEN[form - 1] ?? ROBOT_SCREEN[0]
+  const sc = f.screen
   const hd = ROBOT_HEAD[form - 1] ?? ROBOT_HEAD[0]
   const scanlines = []
   for (let y = sc.y + 5; y < sc.y + sc.h - 3; y += 4) scanlines.push(y)

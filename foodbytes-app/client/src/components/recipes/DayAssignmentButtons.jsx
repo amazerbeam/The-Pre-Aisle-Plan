@@ -5,6 +5,7 @@ import { recipeService } from '../../services/recipeService'
 import ExtrasSelectionPopup from './ExtrasSelectionPopup'
 import { MEAL_SLOTS, SNACKS_SLOT } from '../../constants/mealPlanUi'
 import { slotEntryFor } from '../../utils/recipeCatalogueUtils'
+import { formatDayKcal, projectDayKcal } from '../../utils/dayKcal'
 // FR-041: Emojis are only shown in Meal Plan view, NOT on day assignment buttons
 import './DayAssignmentButtons.css'
 
@@ -12,8 +13,8 @@ import './DayAssignmentButtons.css'
  * DayAssignmentButtons - FR-014, FR-015, FR-037, NFR-016, FR-041, FR-043, FR-050, FR-087, FR-098
  * Day-of-week buttons for recipe assignment with swap behavior
  * Hidden for guest users (as per user preference)
- * FR-050 (daily calories on each day button) was removed by the Meal Plan / Recipes redesign:
- * the buttons show the day name only. With `pickDate` set (picking mode) the 7 buttons collapse to one
+ * FR-050 (restored 2026-11-17): each day button shows that day's kcal above the day name; on mouse hover or
+ * keyboard focus it shows the projected total after the click (utils/dayKcal.js). With `pickDate` set (picking mode) the 7 buttons collapse to one
  * "Add to {Day}" button for that date; `onAssigned(dateStr)` fires after a real assign (not a toggle-off).
  * FR-087: Shows extras selection popup for recipes with linked extras
  * FR-098: Optimistic UI - no loading state, instant feedback
@@ -26,11 +27,11 @@ import './DayAssignmentButtons.css'
  * FR-041: Buttons display food emojis themed by meal type
  * FR-043: selectedRecipeId prop allows assigning a variant instead of base recipe
  */
-function DayAssignmentButtons({ recipe, servings, currentMealType, selectedRecipeId, pickDate = null, onAssigned }) {
+function DayAssignmentButtons({ recipe, servings, currentMealType, selectedRecipeId, assignKcal = 0, pickDate = null, onAssigned }) {
   // FR-043: Use selectedRecipeId if provided (for variants), otherwise use recipe.id
   const recipeIdToAssign = selectedRecipeId || recipe.id
   const { isAuthenticated } = useAuth()
-  const { weekDays, weekPlan, assignRecipe, isRecipeAssigned } = useMealPlan()
+  const { weekDays, weekPlan, assignRecipe, isRecipeAssigned, getDailyCalories } = useMealPlan()
   // FR-098: Removed loading state - using optimistic UI instead
 
   // FR-087: State for extras popup
@@ -38,6 +39,7 @@ function DayAssignmentButtons({ recipe, servings, currentMealType, selectedRecip
   const [pendingDate, setPendingDate] = useState(null) // Date waiting for popup confirmation
   const [extrasData, setExtrasData] = useState(null) // Fetched extras hierarchy
   const [pendingInitialSelections, setPendingInitialSelections] = useState(undefined) // MPP-10
+  const [previewDate, setPreviewDate] = useState(null) // FR-050: day whose total shows the post-click projection
 
   // Hidden for guest users
   if (!isAuthenticated) {
@@ -178,6 +180,14 @@ function DayAssignmentButtons({ recipe, servings, currentMealType, selectedRecip
     }
   }
 
+  /** FR-050: day total after clicking this day's button (add, swap or remove). */
+  const projectedFor = (dateStr) => projectDayKcal({
+    dayTotal: getDailyCalories(dateStr),
+    slotEntries: weekPlan?.days?.find((d) => d.date === dateStr)?.mealsByType?.[currentMealType?.toLowerCase()],
+    assignId: recipeIdToAssign,
+    assignKcal,
+  })
+
   // Picking mode: one full-width button for the chosen date
   const renderPickButton = () => {
     const buttonClass = getButtonClass(pickDate)
@@ -213,19 +223,32 @@ function DayAssignmentButtons({ recipe, servings, currentMealType, selectedRecip
         <div className="days-grid">
           {weekDays.map((day) => {
             const buttonClass = getButtonClass(day.date)
-            const title = getButtonTitle(day.date, day.dayName, buttonClass)
+            const projected = projectedFor(day.date)
+            const title = `${getButtonTitle(day.date, day.dayName, buttonClass)} (day → ${projected} kcal)`
+            const isPreview = previewDate === day.date
+            const kcal = isPreview ? projected : getDailyCalories(day.date)
 
             return (
               <button
                 key={day.date}
                 type="button"
-                className={`day-btn ${buttonClass}`}
-                onClick={() => handleDayClick(day.date)}
+                className={`day-btn ${buttonClass}${isPreview ? ' preview' : ''}`}
+                onClick={() => { setPreviewDate(null); handleDayClick(day.date) }}
+                onPointerEnter={(e) => { if (e.pointerType === 'mouse') setPreviewDate(day.date) }}
+                onPointerLeave={() => setPreviewDate(null)}
+                onFocus={(e) => { if (e.currentTarget.matches(':focus-visible')) setPreviewDate(day.date) }}
+                onBlur={() => setPreviewDate(null)}
                 title={title}
                 aria-label={title}
                 aria-pressed={buttonClass === 'selected'}
               >
-                <span className="day-btn-face">{day.dayName}</span>
+                <span className="day-btn-face">
+                  <span className={`day-kcal${kcal > 0 ? '' : ' empty'}`} aria-hidden="true">
+                    {isPreview && <span className="arrow">→ </span>}
+                    {formatDayKcal(kcal)}
+                  </span>
+                  <span className="day-name">{day.dayName}</span>
+                </span>
               </button>
             )
           })}

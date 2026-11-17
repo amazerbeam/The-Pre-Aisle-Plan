@@ -97,6 +97,10 @@
 .pip-fx--radar { animation: pip-fx-prop 2.6s ease-in-out infinite; }
 .pip-fx--dangle { transform-origin: 50% 100%; animation: pip-fx-dangle 2.4s ease-in-out infinite; }
 .pip-fx--boing { transform-origin: 50% 100%; animation: pip-fx-boing 1.3s cubic-bezier(.3, 1.6, .5, 1) infinite; }
+.pip-fx--pixel-pulse { animation: pip-fx-pulse 1s steps(2, jump-none) infinite; } /* screen hearts snap between two sizes */
+.pip-fx--scroll-in { animation: pip-fx-scroll-in 3.4s steps(6, end) infinite; } /* screen shades scroll down from the glass's top edge */
+.pip-fx--glint { animation: pip-fx-glint 3.4s steps(1) infinite; } /* shows (opacity 1) whenever animations are off */
+.pip-fx--tune { animation: pip-fx-tune .45s ease-out 1 both; } /* CRT channel change when the robot's face swaps */
 
 @keyframes pip-fx-spin { to { transform: rotate(360deg); } }
 @keyframes pip-fx-scan { from { transform: translateX(0); } to { transform: translateX(600%); } }
@@ -118,6 +122,9 @@
 @keyframes pip-fx-prop { 0%, 100% { transform: scaleX(1); } 50% { transform: scaleX(-1); } }
 @keyframes pip-fx-dangle { 0%, 100% { transform: rotate(-7deg); } 50% { transform: rotate(7deg); } }
 @keyframes pip-fx-boing { 0%, 100% { transform: scaleY(1); } 30% { transform: scaleY(.78); } 60% { transform: scaleY(1.1); } }
+@keyframes pip-fx-scroll-in { 0% { transform: translateY(-120%); } 30%, 100% { transform: translateY(0); } }
+@keyframes pip-fx-glint { 0%, 34% { opacity: 0; } 36%, 48% { opacity: 1; } 50%, 100% { opacity: 0; } }
+@keyframes pip-fx-tune { 0%, 45% { transform: scale(1, .04); filter: brightness(3); } 100% { transform: scale(1, 1); filter: none; } }
 
 body.lowfx .pip-fx,
 .pip-herb-figure.is-still .pip-fx { animation: none !important; }

@@ -357,12 +357,12 @@ body.lowfx .board-head .open{text-shadow:none}
 .stepper b{min-width:28px;text-align:center;font-family:var(--f-num);font-size:26px;color:var(--yellow)}
 .dlabel{font-family:var(--f-label);font-size:11px;color:var(--muted)}
 .dbtns{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
-.dbtn{position:relative;height:44px;border:1px solid var(--line-soft);background:var(--deep);font-family:var(--f-num);font-size:18px;color:var(--muted)}
+.dbtn{position:relative;height:48px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;line-height:1;border:1px solid var(--line-soft);background:var(--deep);font-family:var(--f-num);font-size:18px;color:var(--muted)}
 .dbtn:hover{border-color:var(--cyan);color:var(--cyan)}
 .dbtn.other{color:var(--muted);background:repeating-linear-gradient(135deg,var(--deep) 0 5px,#0f1822 5px 10px)}
 .dbtn.other::after{content:"";position:absolute;right:4px;top:4px;width:5px;height:5px;background:var(--orange)}
 .dbtn.mine{background:var(--lime);border-color:var(--lime);color:var(--void)}
-.dbtn.mine::before{content:"✓"}
+.dbtn .dk{font-size:15px;color:var(--cyan)}.dbtn .dk.e{opacity:.55}.dbtn.mine .dk{color:var(--void)}
 .addto{width:100%;min-height:48px;border:none;background:var(--pink);color:var(--void);font-weight:700;font-size:15px;box-shadow:4px 4px 0 var(--cyan)}
 .addto.done{background:var(--lime);box-shadow:4px 4px 0 var(--cyan)}
 .note{grid-column:1/-1;background:var(--panel);border:1px dashed var(--line);padding:12px 14px;font-size:14px;color:var(--muted)}
@@ -940,8 +940,8 @@ function recipeCard(r){
   else if(U.pick){const e=slot(U.pick.date,meal),d=weekDays().find(x=>x.iso===U.pick.date),mine=e&&e.rid===r.id;
     days=`<button class="addto ${mine?'done':''}" data-a="assign" data-r="${r.id}" data-d="${U.pick.date}">${mine?`✓ On ${d.dow}`:`${e?'Replace on':'Add to'} ${d.dow} ${d.n}`}</button>`}
   else days=`<div class="dlabel">Add to a day</div><div class="dbtns">${weekDays().map(d=>{const e=slot(d.iso,meal),cls=e?(e.rid===r.id?'mine':'other'):'';
-      const t=e?(e.rid===r.id?`Remove from ${d.dow}`:`Replace ${RB[e.rid].name} on ${d.dow}`):`Add to ${d.dow}`;
-      return `<button class="dbtn ${cls}" title="${esc(t)}" aria-label="${esc(t)}" data-a="assign" data-r="${r.id}" data-d="${d.iso}">${d.dow}</button>`}).join('')}</div>`;
+      const k=dayTotals(d.iso).k,t=e?(e.rid===r.id?`Remove from ${d.dow}`:`Replace ${RB[e.rid].name} on ${d.dow}`):`Add to ${d.dow}`;
+      return `<button class="dbtn ${cls}" title="${esc(t)}" aria-label="${esc(t)}" data-a="assign" data-r="${r.id}" data-d="${d.iso}"><span class="dk ${k?'':'e'}">${k?Math.round(k):'—'}</span>${cls==='mine'?'✓ ':''}${d.dow}</button>`}).join('')}</div>`;
   const fv=S.signedIn&&U.view==='folders',fl=fv?rFolders(r.id).filter(f=>f.id!==U.folder):[],fld=fv?FB(U.folder):null;
   const dragOk=fv&&U.mode!=='mobile'&&!hid;
   return `<article class="rcard hud ${ip?'inplan':''} ${hid?'ishidden':''}" ${dragOk?`draggable="true" data-rdrag="${r.id}"`:''}>

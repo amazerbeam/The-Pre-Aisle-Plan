@@ -1,7 +1,7 @@
 import { PIP_LINE } from '../../../../../constants/pipLines'
 import { ROOM_LABELS } from '../../../../../constants/petRoomLabels'
 import { ROBOT_INK } from './robotPalette'
-import { ROBOT_STYLES, robotBackdrop } from './robotShell'
+import { ROBOT_STYLES, robotBackdrop, robotSill } from './robotShell'
 import { ROBOT_BED } from './robotBed'
 import { ROBOT_FRIDGE } from './robotFridge'
 import { ROBOT_COOKER } from './robotCooker'
@@ -17,6 +17,7 @@ export const ROBOT_ROOM = {
   surround: ROBOT_INK,
   styles: ROBOT_STYLES,
   backdrop: robotBackdrop,
+  sill: robotSill,
   stations: { bed: ROBOT_BED, fridge: ROBOT_FRIDGE, cooker: ROBOT_COOKER, cabinet: ROBOT_CABINET, wardrobe: ROBOT_WARDROBE },
   decor: ROBOT_DECOR,
   effects: { FridgeGauge, PotSteam, ServedPlate, SleepZs },

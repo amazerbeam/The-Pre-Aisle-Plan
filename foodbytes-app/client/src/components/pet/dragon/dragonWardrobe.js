@@ -1,5 +1,5 @@
 import { EYE_LEFT, PIP_FOOT_X } from '../pip/pipSpace.js'
-import { arc, arcY, band, circle, curveOf, ellipse, fxGroup, heartPath, overalls, path, rect, titleBelt } from '../pip/wardrobeShapes.js'
+import { arc, arcY, band, circle, curveOf, ellipse, fxGroup, footFrame, heartPath, overalls, path, rect, titleBelt } from '../pip/wardrobeShapes.js'
 import { DRAGON_INK } from './dragonForms.js'
 
 /**
@@ -13,7 +13,7 @@ import { DRAGON_INK } from './dragonForms.js'
  * straw-hat Jester's cap, top-hat Crown, round-specs Battle scar, heart-glasses Smitten, sunglasses War paint,
  * red-scarf Knight's cape, striped-scarf Ivy garland, chef-whites Baker's apron, denim-jacket Leather jerkin,
  * puffer Scale mail, leather-belt Potion belt, champion-belt Hoard belt, jeans Patched breeches,
- * joggers Wool hose, dungarees Smith's overalls, sneakers Talon wraps, wellies Iron sabatons.
+ * joggers Wool hose, dungarees Smith's overalls, sneakers Fluffy fur boots, wellies Dragonscale boots.
  * Hats keep the horns on the head (HAT_CROWN: over = through holes, under = behind); the Battle scar takes the left eye (HIDES_EYE) and stays asleep.
  */
 
@@ -277,28 +277,40 @@ const TORSO = {
   dungarees: (f) => ({ clip: overalls(f, '#5e3d26', '#d9a62e', DI), extra: [] })
 }
 
-// ---- shoes on the two foot tips: (root, tip) ----
+// ---- shoes: each replaces the whole foot, drawn in the foot frame (approved 2026-11-17, mockup pip-dragon-shoes.html) ----
+const GOLD = '#e8b838'
+const FUR = '#fbf3e4'
+const inked = (fill, strokeWidth = 2.4) => ({ fill, stroke: DI, strokeWidth, strokeLinejoin: 'round' })
 
 const SHOES = {
-  // Talon wraps: the claws stay out
-  sneakers: (root, tip) => {
-    const dir = tip[0] < root[0] ? -1 : 1
-    const [x, y] = tip
-    return [
-      path(`M${x - 8 * dir} ${y - 10} h${10 * dir} l${2 * dir} 10 h${-13 * dir} Z`, { fill: '#e9dcc0', stroke: DI, strokeWidth: 2.4, strokeLinejoin: 'round' }),
-      path(`M${x - 8 * dir} ${y - 6} l${11 * dir} 2 M${x - 8 * dir} ${y - 2} l${11 * dir} 2`, { stroke: '#b9a77f', strokeWidth: 1.5 })
-    ]
-  },
-  // Iron sabatons: plated armour
-  wellies: (root, tip) => {
-    const dir = tip[0] < root[0] ? -1 : 1
-    const [x, y] = tip
-    return [
-      path(`M${x - 9 * dir} ${y - 14} h${12 * dir} l${7 * dir} 9 q${2 * dir} 5 ${-2 * dir} 7 h${-17 * dir} Z`, { fill: '#9aa5ae', stroke: DI, strokeWidth: 3, strokeLinejoin: 'round' }),
-      path(`M${x - 9 * dir} ${y - 8} h${15 * dir} M${x - 9 * dir} ${y - 3} h${17 * dir}`, { stroke: '#6c7780', strokeWidth: 1.6 })
-    ]
-  }
+  // Fluffy fur boots: brown boots under a cream fur cuff, with a pom-pom tie
+  // (inspired by the Fluffy Fur Boots in Monster Hunter Rise and the snow boots in Animal Crossing)
+  sneakers: (root, tip) => [footFrame(root, tip, [
+    path('M-12 2.5 H15 Q16 4 15 6 H-12 Z', inked('#3d2416', 2)),
+    path('M-11 3.5 V-5 H3 Q4 -1.5 10 -0.5 Q15 0.5 15 3.5 Z', inked('#7b4a2b')),
+    ...[[-11, -5], [-6, -7], [-1, -7], [3.5, -5]].map(([cx, cy]) => circle(cx, cy, 4.2, { fill: FUR, stroke: DI, strokeWidth: 2 })),
+    ellipse(-3.8, -5.3, 9, 3.3, { fill: FUR }),
+    path('M8 -0.6 v2', { stroke: '#d9b98a', strokeWidth: 1.2 }),
+    circle(8, 2.6, 1.8, { fill: FUR, stroke: DI, strokeWidth: 1 })
+  ])],
+  // Dragonscale boots: deep-red scale boots with a gold cuff and a blue gem
+  // (inspired by the Dragonscale Boots in Stardew Valley and the drakeskin boots of Throne and Liberty)
+  wellies: (root, tip) => [footFrame(root, tip, [
+    path('M-12 3 H15 Q16.5 4.5 15 6 H-12 Z', inked('#3a1218', 2)),
+    path('M-11 3.5 V-8 H2 V-4 Q10 -3.5 14 -0.5 Q16 2.5 14 3.5 Z', inked('#9c2f3a')),
+    ...[-5, -1.5, 2].flatMap((sy, row) => [-10, -6, -2, 2, 6]
+      .filter(sx => !(sy < -2 && sx > 0)) // the top row stops at the ankle
+      .map(sx => path(`M${sx + (row % 2) * 2} ${sy} q2 2.6 4 0`, { stroke: '#6b1c26', strokeWidth: 1.2, fill: 'none' }))),
+    rect(-12.5, -11.5, 16, 4.4, { rx: 1.6, ...inked(GOLD, 2) }),
+    path('M-4.5 -11.6 l2 2.2 l-2 2.2 l-2 -2.2 Z', { fill: '#4aa8e8', stroke: DI, strokeWidth: 1 })
+  ])]
 }
+
+// ---- the bare foot: a little ball, no claws (mockup pip-dragon-shoes.html BARE.dragon) ----
+const BARE_FOOT = (root, tip, f) => [footFrame(root, tip, [
+  ellipse(1, -0.5, 7.5, 5.2, { fill: f.fill[1], stroke: DI, strokeWidth: 2.8, strokeLinejoin: 'round' }),
+  ellipse(-1, -2.8, 3.2, 1.5, { fill: '#fff', opacity: 0.35 })
+])]
 
 /** The dragon's wardrobe in the shape every line shares (pip/wardrobeArt.js dispatches on it). */
 export const DRAGON_WARDROBE = {
@@ -306,6 +318,7 @@ export const DRAGON_WARDROBE = {
   GLASSES, // id → (L, R, y, s) → shapes
   TORSO, // id → (f) → { clip, extra, back? }
   SHOES, // id → (root, tip) → shapes
+  BARE_FOOT, // (root, tip, f) → shapes: the foot when no shoe is worn
   REPLACES_FACE: [], // the dragon keeps its own face under every item
   // Approved 2026-11-16 (mockup pip-dragon-fixes.html): horns over the hat (as if through holes) or tucked behind it.
   HAT_CROWN: { beanie: 'over', cap: 'over', 'chef-hat': 'under', 'straw-hat': 'over', 'top-hat': 'under' },

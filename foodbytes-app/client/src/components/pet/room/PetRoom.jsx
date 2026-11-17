@@ -16,7 +16,7 @@ import FridgeView from './FridgeView'
 import { DecorLayer } from './RoomDecorLayers'
 import { NightDim } from './roomEffects'
 import { RoomPackContext, useRoomPack } from './roomPackContext'
-import { packBackdrop, packEffects, packStationArt, roomPack } from './roomPacks'
+import { packBackdrop, packEffects, packSill, packStationArt, roomPack } from './roomPacks'
 import { COOK_WALK_OFFSET, ROOM_DRAW_ORDER, STATION_SHIFT, cabinetHitBox, cookPose, fridgeHitBox, hitBoxStyle, pipFocusPoint, pipPose, resolveRoomLevels, shiftTransform, wardrobeHitBox } from './roomLayout'
 import PipHeadBarStatus from './PipHeadBarStatus'
 import RecentreButton from './RecentreButton'
@@ -143,6 +143,8 @@ function PetRoom({ name, mood, bubble, bubbleActions = null, position = PIP_POSI
             {packBackdrop(pack, asleep, placements?.wallStyle, placements?.floorStyle)}
             <DecorLayer layer="rug" {...decorProps} />
             <DecorLayer layer="wall" {...decorProps} />
+            {packSill(pack)}
+            <DecorLayer layer="window" {...decorProps} />
             {BACK_STATIONS.map(station => <ShiftedStation key={station} station={station} {...stationProps} />)}
             <DecorLayer layer="backFloor" {...decorProps} />
             <ShiftedStation station={ROOM_STATIONS.BED} {...stationProps} />

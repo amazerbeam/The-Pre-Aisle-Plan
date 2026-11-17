@@ -1,17 +1,19 @@
 import { WARDROBE_SLOT } from '../../../constants/pipWardrobe.js'
 import { pipForm } from './lineForms.js'
 import { PIP_FOOT_X, PIP_FOOT_Y } from './pipSpace.js'
-import { CROWN_LIFT, CROWN_REPLACE, glassesArt, hatArt, shoeArt, torsoArt } from './wardrobeArt.js'
+import { CROWN_LIFT, CROWN_REPLACE, glassesArt, hatArt, footArt, torsoArt } from './wardrobeArt.js'
+import { group } from './wardrobeShapes.js'
 
 /**
  * MPP-32 AC 3: an outfit composed for one form of one line, in the z-slots PipFigure draws them in:
- * shoes → [back + back-wear] … → [body] → clip: pants → jacket → belt → scarf (inside the body clip) →
- * [outline] → extra (belt buckle, scarf tail) → [face, unless replacesFace] → glasses (none asleep) →
+ * [back + back-wear] → [legs] → [body] → clip: pants → jacket → belt → scarf (inside the body clip) →
+ * [outline] → extra (belt buckle, scarf tail) → feet (the worn shoe, or bare ball feet: a shoe replaces the whole foot) → [face, unless replacesFace] → glasses (none asleep) →
  * hat → [crown, placed per hat (wardrobeArt crownPlacement): lifted to poke through the hat (lift), on the head over
  * the hat (over), on the head behind the hat (under, drawn before the hat), or skipped because the hat is the crown
  * (replace: the robot's antennas, drawn from growTop and redrawn when `droop`)]. Glasses that hide an eye (hideEye)
  * drop it from the face; glasses that stay asleep (a scar) are kept while Pip sleeps. Nothing here branches on the form:
  * the same outfit gives the same layers on every form, wilted or not (AC 7).
+ * A screen face (the robot) is clipped to the form's screen and dimmed when drooped.
  */
 
 const { HAT, GLASSES, BELT, JACKET, PANTS, SCARF, SHOES } = WARDROBE_SLOT
@@ -19,12 +21,15 @@ const { HAT, GLASSES, BELT, JACKET, PANTS, SCARF, SHOES } = WARDROBE_SLOT
 export const TORSO_ORDER = [PANTS, JACKET, BELT, SCARF]
 export const HAT_TILT_DEG = -7
 
+/** A screen face on a bored or wilted Pip dims like the base face (mockup pip-robot-screen-faces.html). */
+export const SCREEN_FACE_DROOP_OPACITY = 0.55
+
 /**
  * @param {Object|null} outfit - { HAT: 'beanie', … } (absent slot = empty)
  * @param {string} line - PIP_LINE id
  * @param {number} form - 1..lineFormCount(line)
  * @param {{ asleep?: boolean, droop?: boolean }} [options]
- * @returns {{ back: Object[], shoes: Object[], clip: Object[], extra: Object[], glasses: Object[], replacesFace: boolean, replacesCrown: boolean, crown: string|null, hideEye: string|null, hat: { shapes: Object[], transform: string|null }|null, growTop: number, itemIds: string[] }}
+ * @returns {{ back: Object[], feet: Object[], clip: Object[], extra: Object[], glasses: Object[], screen: {x: number, y: number, w: number, h: number, r: number}|null, replacesFace: boolean, replacesCrown: boolean, crown: string|null, hideEye: string|null, hat: { shapes: Object[], transform: string|null }|null, growTop: number, itemIds: string[] }}
  */
 export function dressLayers(outfit, line, form, { asleep = false, droop = false } = {}) {
   const worn = outfit ?? {}
@@ -35,12 +40,15 @@ export function dressLayers(outfit, line, form, { asleep = false, droop = false 
   const crown = hat?.crown ?? null
   const picked = worn[GLASSES] ? glassesArt(line, worn[GLASSES], f) : null
   const glasses = picked && (!asleep || picked.staysAsleep) ? picked : null // a scar stays on a sleeping Pip
+  const screen = glasses?.screen ?? null // the glass a screen face is clipped to; none asleep (the base face returns)
+  const glassesShapes = glasses?.shapes ?? []
   return {
     back: torso.flatMap(t => t.back), // drawn right after the line's Back (a cape)
-    shoes: worn[SHOES] ? shoeArt(line, worn[SHOES], f) : [],
     clip: torso.flatMap(t => t.clip),
     extra: torso.flatMap(t => t.extra),
-    glasses: glasses?.shapes ?? [],
+    feet: footArt(line, worn[SHOES] ?? null, f), // never empty: bare ball feet when no shoe is worn
+    glasses: screen && droop ? [group(glassesShapes, { opacity: SCREEN_FACE_DROOP_OPACITY })] : glassesShapes,
+    screen, // PipFigure clips the glasses to it and plays the channel change on face swaps
     replacesFace: Boolean(glasses?.replacesFace), // a screen face: PipFigure skips the line's Face
     hideEye: glasses?.hidesEye ?? null, // a scar: the line's Face drops that eye
     crown, // where PipFigure draws the line's Crown (null = no hat)

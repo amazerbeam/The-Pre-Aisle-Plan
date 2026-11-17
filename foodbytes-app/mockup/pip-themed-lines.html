@@ -6,6 +6,8 @@
 <title>Pip Themed Lines</title>
 <!-- Contract: .claude/contract/2026-11-15-themed-pip-lines/ (Phase 1). approved 2026-11-15 (robot redesign + per-creature wardrobe). -->
 <!-- Updated 2026-11-16 (contract 2026-11-16-robot-pip-antennas): robot hats are antennas that replace the crown; every Champion belt is the gold title belt. -->
+<!-- Updated 2026-11-17 (contract 2026-11-17-robot-pip-screen-faces): robot glasses are screen faces. -->
+<!-- 2026-11-17: ball feet + whole-foot shoes (pip-dragon-shoes.html, approved). -->
 <style>
   :root {
     --brand: #4a3f80; --text: #2c3e50; --muted: #5f6b76;
@@ -101,6 +103,9 @@
   .flicker { animation: flicker 3.4s linear infinite; }
   .blink { animation: blink 3.6s infinite; }
   .pulse { animation: pulse 1s ease-in-out infinite; }
+  .pixel-pulse { animation: pulse 1s steps(2, jump-none) infinite; }   /* robot screen hearts snap between two sizes (Pip.css .pip-fx--pixel-pulse) */
+  .scroll-in { animation: scroll-in 3.4s steps(6, end) infinite; }     /* robot screen shades scroll down from the glass's top edge */
+  .glint { animation: glint 3.4s steps(1) infinite; }                  /* shows (opacity 1) whenever animations are off */
   .drop { animation: drop .9s cubic-bezier(.3,1.6,.6,1) 1 both; }
   .flap { transform-origin: 0% 50%; animation: flap .8s ease-in-out infinite alternate; }
   .glow { animation: glowpulse 1.8s ease-in-out infinite; }
@@ -126,6 +131,8 @@
   @keyframes blink { 0%,92%,100% { transform: scaleY(1); } 95% { transform: scaleY(.1); } }
   @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.18); } }
   @keyframes drop { from { transform: translateY(-16px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  @keyframes scroll-in { 0% { transform: translateY(-120%); } 30%, 100% { transform: translateY(0); } }
+  @keyframes glint { 0%, 34% { opacity: 0; } 36%, 48% { opacity: 1; } 50%, 100% { opacity: 0; } }
   @keyframes flap { from { transform: rotate(-10deg); } to { transform: rotate(12deg); } }
   @keyframes glowpulse { 0%,100% { opacity: .8; } 50% { opacity: 1; filter: brightness(1.25); } }
   @keyframes charge { 0% { opacity: .15; } 35%,90% { opacity: 1; } 100% { opacity: .15; } }
@@ -190,7 +197,7 @@
   <div id="rows"></div>
 
   <h2>3 · Wardrobe per creature (same item, unlock and slot, different art and name)</h2>
-  <p class="lede">Each row is one wardrobe item, worn on stage 2 of each line. The robot's glasses slot holds screen faces: Smiley.exe and Heart eyes <b>replace</b> the face while worn, and the normal face comes back when it sleeps. The dragon's red scarf becomes a cape drawn <b>behind</b> the body. Both are new wardrobe layers, listed on the item.</p>
+  <p class="lede">Each row is one wardrobe item, worn on stage 2 of each line. The robot's glasses slot holds screen faces: all three are pixels on the screen and replace the face while worn, and the normal face comes back when it sleeps. The dragon's red scarf becomes a cape drawn <b>behind</b> the body. Both are new wardrobe layers, listed on the item.</p>
   <div class="card tablewrap"><table id="wardrobe"></table></div>
 
   <h2>4 · Geometry and fit invariants (what <code>wardrobe.check.mjs</code> will assert)</h2>
@@ -373,8 +380,8 @@ function dragonLimbs(f, fi) {
     s += `<path d="${d}" stroke="${DRAGON_INK}" stroke-width="10" fill="none" stroke-linecap="round"/><path d="${d}" stroke="${f.fill[1]}" stroke-width="5" fill="none" stroke-linecap="round"/>${claws(ex, ey + 2, dir)}`;
   });
   f.feet.forEach(([r, t]) => {
-    const d = `M${r[0]} ${r[1]} Q${r[0]} ${t[1]} ${t[0]} ${t[1]}`, dir = t[0] < r[0] ? -1 : 1;
-    s += `<path d="${d}" stroke="${DRAGON_INK}" stroke-width="12" fill="none" stroke-linecap="round"/><path d="${d}" stroke="${f.fill[1]}" stroke-width="6.5" fill="none" stroke-linecap="round"/>${claws(t[0], t[1], dir)}`;
+    const d = `M${r[0]} ${r[1]} Q${r[0]} ${t[1] - 2} ${t[0]} ${t[1] - 2}`;
+    s += `<path d="${d}" stroke="${DRAGON_INK}" stroke-width="12" fill="none" stroke-linecap="round"/><path d="${d}" stroke="${f.fill[1]}" stroke-width="6.5" fill="none" stroke-linecap="round"/>`;
   });
   return s;
 }
@@ -452,6 +459,61 @@ const RB = { dark: '#0b141c', screen: '#10202a', glow: '#37e6ff', glowSoft: '#37
 const ROBOT_HEAD = [{ x0: 60, x1: 140, y0: 84, y1: 140, ym: 112 }, { x0: 68, x1: 132, y0: 66, y1: 116, ym: 91 }, { x0: 74, x1: 126, y0: 50, y1: 96, ym: 73 }];
 const ROBOT_SCREEN = [{ x: 67, y: 91, w: 66, h: 42, r: 9 }, { x: 74, y: 72, w: 52, h: 38, r: 8 }, { x: 79, y: 55, w: 42, h: 35, r: 7 }];
 
+/* Robot screen faces (approved 2026-11-17, mockup/pip-robot-screen-faces.html, option B each; live in robotScreenFaces.js).
+   A face is same-sized bitmap layers ('.' = pixel off) + a palette, drawn as pixels the CRT screen displays:
+   fitted to the form's screen, centred, glowing, clipped to the glass, scanlines and sheen redrawn over it. */
+const SMILEY_DISC = [
+  '....YYYYY....',
+  '..YYYYYYYYY..',
+  '.YYYYYYYYYYY.',
+  '.YYYYYYYYYYY.',
+  'YYYYYYYYYYYYY',
+  'YYYYYYYYYYYYY',
+  'YYYYYYYYYYYYY',
+  '.YYYYYYYYYYY.',
+  '.YYYYYYYYYYY.',
+  '..YYYYYYYYY..',
+  '....YYYYY....'];
+const BLANK13 = '.............';
+const SMILEY_EYES = [BLANK13, BLANK13, BLANK13, '....E...E....', '....E...E....', BLANK13, BLANK13, BLANK13, BLANK13, BLANK13, BLANK13];
+const SMILEY_MOUTH = [BLANK13, BLANK13, BLANK13, BLANK13, BLANK13, BLANK13, '...M.....M...', '....MMMMM....', BLANK13, BLANK13, BLANK13];
+const HEART = ['.HH.HH.', 'HWHHHHH', 'HHHHHHH', '.HHHHH.', '..HHH..', '...H...'];
+const BLANK7 = '.......';
+const BLANK15 = '...............';
+const HEARTS_LEFT = [...HEART.map(r => `${r}.${BLANK7}`), BLANK15, BLANK15, BLANK15];
+const HEARTS_RIGHT = [...HEART.map(r => `${BLANK7}.${r}`), BLANK15, BLANK15, BLANK15];
+const HEARTS_MOUTH = [BLANK15, BLANK15, BLANK15, BLANK15, BLANK15, BLANK15, BLANK15, '....M.....M....', '.....MMMMM.....'];
+const BLANK17 = '.................';
+const SHADES_FRAME = ['GGGGGGGGGGGGGGGGG', 'GggggggG.GggggggG', 'GggggggG.GggggggG', '.GggggG...GggggG.', '..GGGG.....GGGG..', BLANK17, BLANK17, BLANK17];
+const SHADES_MOUTH = [BLANK17, BLANK17, BLANK17, BLANK17, BLANK17, BLANK17, '............M....', '.......MMMMM.....'];
+const SHADES_GLINT = [BLANK17, '..W........W.....', '.W........W......', BLANK17, BLANK17, BLANK17, BLANK17, BLANK17];
+/** Keep only the bitmap's edge (a lit cell with an off or missing 4-neighbour), painted `ch`. */
+function edgeOf(rows, ch) {
+  const on = (i, j) => Boolean(rows[j]?.[i]) && rows[j][i] !== '.';
+  return rows.map((row, j) => [...row].map((c, i) =>
+    (c !== '.' && (!on(i - 1, j) || !on(i + 1, j) || !on(i, j - 1) || !on(i, j + 1)) ? ch : '.')).join(''));
+}
+const SMILEY_B = { layers: [{ rows: edgeOf(SMILEY_DISC, 'C') }, { rows: SMILEY_MOUTH }, { rows: SMILEY_EYES, cls: 'blink' }],
+  pal: { C: RB.glow, E: RB.glow, M: RB.glow }, glow: RB.glow };
+const HEARTS_B = { layers: [{ rows: HEARTS_LEFT, cls: 'pixel-pulse' }, { rows: HEARTS_RIGHT, cls: 'pixel-pulse' }, { rows: HEARTS_MOUTH }],
+  pal: { H: RB.glow, W: '#d9fbff', M: RB.glow }, glow: RB.glow };
+const SHADES_B = { bg: RB.glow, layers: [{ rows: SHADES_MOUTH }, { rows: SHADES_FRAME, cls: 'scroll-in' }, { rows: SHADES_GLINT, cls: 'glint' }],
+  pal: { G: RB.dark, g: RB.dark, M: RB.dark, W: '#e9fdff' }, glow: RB.glow };
+/** A screen face for form fi: centred on the screen, pixel size fitted to it (4-unit margin), clipped to the glass. */
+function screenFace(fi, face, clipId) {
+  const sc = ROBOT_SCREEN[fi], cols = face.layers[0].rows[0].length, rows = face.layers[0].rows.length;
+  const p = Math.min((sc.w - 8) / cols, (sc.h - 8) / rows);
+  const x0 = sc.x + sc.w / 2 - (cols * p) / 2, y0 = sc.y + sc.h / 2 - (rows * p) / 2;
+  const cells = (r) => r.flatMap((row, j) => [...row].map((c, i) => c === '.' ? '' :
+    `<rect x="${(x0 + i * p).toFixed(2)}" y="${(y0 + j * p).toFixed(2)}" width="${(p + 0.06).toFixed(2)}" height="${(p + 0.06).toFixed(2)}" fill="${face.pal[c]}"/>`)).join('');
+  let s = face.bg ? `<rect x="${sc.x}" y="${sc.y}" width="${sc.w}" height="${sc.h}" fill="${face.bg}" opacity=".92"/>` : '';
+  s += `<g style="filter:drop-shadow(0 0 ${(p * 0.7).toFixed(1)}px ${face.glow})">`
+    + face.layers.map(l => l.cls ? fx(l.cls, cells(l.rows)) : cells(l.rows)).join('') + '</g>';
+  for (let y = sc.y + 3; y < sc.y + sc.h; y += 3) s += `<path d="M${sc.x} ${y} H${sc.x + sc.w}" stroke="${RB.screen}" stroke-width=".9" opacity="${face.bg ? '.35' : '.45'}"/>`;
+  s += `<path d="M${sc.x + 4} ${sc.y + 6} Q${sc.x + sc.w * 0.3} ${sc.y + 2} ${sc.x + sc.w * 0.55} ${sc.y + 3}" stroke="#fff" stroke-width="1.6" fill="none" opacity=".18" stroke-linecap="round"/>`;
+  return `<defs><clipPath id="${clipId}"><rect x="${sc.x + 2}" y="${sc.y + 2}" width="${sc.w - 4}" height="${sc.h - 4}" rx="${sc.r - 2}"/></clipPath></defs><g clip-path="url(#${clipId})">${s}</g>`;
+}
+
 function robotBack(fi, droop, f) {
   const h = ROBOT_HEAD[fi];
   // side dials on the monitor head
@@ -474,9 +536,8 @@ function robotLimbs(f, fi) {
       <circle cx="${ex}" cy="${ey}" r="3.4" fill="${RB.bolt}" stroke="${ROBOT_INK}" stroke-width="2"/><circle cx="${hx}" cy="${hy}" r="4.8" fill="${RB.plate}" stroke="${ROBOT_INK}" stroke-width="2.4"/>`;
   });
   f.feet.forEach(([r, t]) => {
-    const dir = t[0] < r[0] ? -1 : 1, d = `M${r[0]} ${r[1] - 4} L${t[0]} ${t[1] - 3}`;
-    s += `<path d="${d}" stroke="${ROBOT_INK}" stroke-width="10" stroke-linecap="round"/><path d="${d}" stroke="${RB.limb}" stroke-width="5" stroke-linecap="round"/>
-      <rect x="${t[0] - 8 + dir * 2}" y="${t[1] - 6}" width="16" height="8" rx="3" fill="${RB.plate}" stroke="${ROBOT_INK}" stroke-width="2.5"/>`;
+    const d = `M${r[0]} ${r[1] - 4} L${t[0]} ${t[1] - 3}`;
+    s += `<path d="${d}" stroke="${ROBOT_INK}" stroke-width="10" stroke-linecap="round"/><path d="${d}" stroke="${RB.limb}" stroke-width="5" stroke-linecap="round"/>`;
   });
   if (fi === 2) [-1, 1].forEach(dir => {
     const cx = 100 + dir * (f.side - 2), cy = f.neck - 6;
@@ -706,24 +767,9 @@ const ROBOT_WARDROBE = {
     } },
   },
   glasses: {
-    round: { label: 'Smiley.exe', note: 'the screen becomes an emoji face; blinks', replacesFace: true, draw: (L, R, y, s) => { const c = (L + R) / 2, r = (R - L) / 2 + 4 * s;
-      return `<g style="filter:drop-shadow(0 0 ${2 * s}px #ffd84d)"><circle cx="${c}" cy="${y}" r="${r}" fill="#ffd84d" stroke="#c99a12" stroke-width="${2 * s}"/>
-        ${fx('blink', `<ellipse cx="${c - r * 0.36}" cy="${y - r * 0.18}" rx="${r * 0.11}" ry="${r * 0.2}" fill="${RB.dark}"/><ellipse cx="${c + r * 0.36}" cy="${y - r * 0.18}" rx="${r * 0.11}" ry="${r * 0.2}" fill="${RB.dark}"/>`)}
-        <path d="M${c - r * 0.5} ${y + r * 0.18} Q${c} ${y + r * 0.78} ${c + r * 0.5} ${y + r * 0.18}" stroke="${RB.dark}" stroke-width="${2.6 * s}" fill="none" stroke-linecap="round"/></g>`;
-    } },
-    heart: { label: 'Heart eyes', note: 'pixel hearts pulse; replaces the face', replacesFace: true, draw: (L, R, y, s) => { const p = 2.6 * s;
-      const HEART = [[-2, -1], [-1, -1], [1, -1], [2, -1], [-2, 0], [-1, 0], [0, 0], [1, 0], [2, 0], [-1, 1], [0, 1], [1, 1], [0, 2]];
-      const SMILE = [[-3, -1], [-2, 0], [-1, 1], [0, 1], [1, 1], [2, 0], [3, -1]];
-      return [L, R].map(x => fx('pulse', pxCells(HEART, x, y - p * 0.5, p, RB.accent), `filter:drop-shadow(0 0 ${2 * s}px ${RB.accent})`)).join('')
-        + `<g style="filter:drop-shadow(0 0 ${2 * s}px ${RB.glow})">${pxCells(SMILE, (L + R) / 2, y + 15 * s, 3.2 * s, RB.glow)}</g>`;
-    } },
-    shades: { label: 'Shades.gif', note: 'pixel shades drop in', draw: (L, R, y, s) => { const p = 2.8 * s, lens = [];
-      for (let j = -1; j <= 1; j++) for (let i = -2; i <= 2; i++) if (!(j === 1 && Math.abs(i) === 2)) lens.push([i, j]);
-      let svg = pxCells(lens, L, y, p, '#05080b') + pxCells(lens, R, y, p, '#05080b');
-      for (let x = L + 2.5 * p; x <= R - 2.5 * p + 0.01; x += p) svg += pxCells([[0, 0]], x, y - p, p, '#05080b');
-      svg += pxCells([[-1, -1]], L, y, p, '#fff') + pxCells([[-1, -1]], R, y, p, '#fff');
-      return fx('drop', svg);
-    } },
+    round: { label: 'Smiley.exe', note: 'a cyan outline smiley on the screen; blinks', replacesFace: true, screenFace: SMILEY_B },
+    heart: { label: 'Heart eyes', note: 'cyan pixel hearts on the screen; pulse', replacesFace: true, screenFace: HEARTS_B },
+    shades: { label: 'Shades.gif', note: 'the screen lights up; dark shades scroll in, then a glint', replacesFace: true, screenFace: SHADES_B },
   },
   scarf: {
     red: { label: 'Cable coil', note: 'plug dangles', draw: (f) => { const c = curveOf(f), y = f.neck - 3, tx = 100 + f.side * 0.45, ty = arcY(tx, y, c);
@@ -782,10 +828,8 @@ const ROBOT_WARDROBE = {
     dungarees: { label: 'Maintenance overalls', note: 'hi-vis with a stencil', draw: (f) => ({ clip: overalls(f, '#e07a2e', RI, RB.bolt) + `<rect x="${100 + f.side * 0.12}" y="${f.waist + 4}" width="${f.side * 0.5}" height="5" fill="#1f2a33" opacity=".55"/>`, extra: '' }) },
   },
   shoes: {
-    sneakers: { label: 'Hover pads', note: 'thrusters pulse', draw: (root, [x, y]) => `${fx('hover', `<ellipse cx="${x}" cy="${y + 4}" rx="9" ry="3.2" fill="${RB.glow}" opacity=".75" style="filter:drop-shadow(0 0 3px ${RB.glow})"/>`)}<ellipse cx="${x}" cy="${y - 1}" rx="11" ry="4.5" fill="${RB.plate}" stroke="${RI}" stroke-width="2.5"/><path d="M${x - 6} ${y - 1} h12" stroke="${RB.glow}" stroke-width="1.6"/>` },
-    wellies: { label: 'Mag boots', note: 'hazard-striped', draw: (root, tip) => { const dir = tip[0] < root[0] ? -1 : 1, [x, y] = tip;
-      return `<path d="M${x - 9 * dir} ${y - 15} h${14 * dir} v9 q${8 * dir} 1 ${9 * dir} 8 h${-23 * dir} Z" fill="#3a4652" stroke="${RI}" stroke-width="3" stroke-linejoin="round"/>
-        <path d="M${x - 9 * dir} ${y - 10} h${14 * dir}" stroke="#ffd13b" stroke-width="2.5" stroke-dasharray="3 3"/><path d="M${x - 9 * dir} ${y + 1} h${23 * dir}" stroke="#ffd13b" stroke-width="2"/>`; } },
+    sneakers: { label: 'Hover pads', note: 'thrusters pulse', draw: (r, t) => footWear('robot', 'sneakers', r, t) },
+    wellies: { label: 'Mag boots', note: 'hazard-striped', draw: (r, t) => footWear('robot', 'wellies', r, t) },
   },
 };
 
@@ -886,10 +930,8 @@ const DRAGON_WARDROBE = {
     dungarees: { label: "Smith's overalls", note: 'leather with brass rivets', draw: (f) => ({ clip: overalls(f, '#5e3d26', DI, '#d9a62e'), extra: '' }) },
   },
   shoes: {
-    sneakers: { label: 'Talon wraps', note: 'claws stay out', draw: (root, tip) => { const dir = tip[0] < root[0] ? -1 : 1, [x, y] = tip;
-      return `<path d="M${x - 8 * dir} ${y - 10} h${10 * dir} l${2 * dir} 10 h${-13 * dir} Z" fill="#e9dcc0" stroke="${DI}" stroke-width="2.4" stroke-linejoin="round"/><path d="M${x - 8 * dir} ${y - 6} l${11 * dir} 2 M${x - 8 * dir} ${y - 2} l${11 * dir} 2" stroke="#b9a77f" stroke-width="1.5"/>`; } },
-    wellies: { label: 'Iron sabatons', note: 'plated armour', draw: (root, tip) => { const dir = tip[0] < root[0] ? -1 : 1, [x, y] = tip;
-      return `<path d="M${x - 9 * dir} ${y - 14} h${12 * dir} l${7 * dir} 9 q${2 * dir} 5 ${-2 * dir} 7 h${-17 * dir} Z" fill="#9aa5ae" stroke="${DI}" stroke-width="3" stroke-linejoin="round"/><path d="M${x - 9 * dir} ${y - 8} h${15 * dir} M${x - 9 * dir} ${y - 3} h${17 * dir}" stroke="#6c7780" stroke-width="1.6"/>`; } },
+    sneakers: { label: 'Fluffy fur boots', note: 'cream fur cuff, pom-pom tie', draw: (r, t) => footWear('dragon', 'sneakers', r, t) },
+    wellies: { label: 'Dragonscale boots', note: 'red scales, gold cuff, blue gem', draw: (r, t) => footWear('dragon', 'wellies', r, t) },
   },
 };
 
@@ -961,9 +1003,55 @@ const HERB_WARDROBE = {
   jacket: mapObj(JACKETS, v => ({ label: v.label, draw: f => ({ clip: drawJacket(v, f), extra: '' }) })),
   belt: mapObj(BELTS, v => ({ label: v.label, draw: f => drawBelt(v, f) })),
   pants: mapObj(PANTS, v => ({ label: v.label, draw: f => ({ clip: drawPants(v, f), extra: '' }) })),
-  shoes: mapObj(SHOES, v => ({ label: v.label, draw: (r, t) => drawShoe(v, r, t) })),
+  shoes: {
+    sneakers: { label: SHOES.sneakers.label, draw: (r, t) => footWear('herb', 'sneakers', r, t) },
+    wellies: { label: SHOES.wellies.label, draw: (r, t) => footWear('herb', 'wellies', r, t) },
+  },
 };
 HERB_WARDROBE.belt.champ = { label: 'Champion belt', note: 'gold title belt', draw: (f) => titleBelt('herb', 'champ', f) };
+/* ---------- Feet (2026-11-17, approved pip-dragon-shoes.html): ball feet + shoes that replace the whole foot.
+   Foot frame: origin = the foot tip, +x toward the toe (mirrored for a left foot), ground at y ~ +4. Drawn after the body. ---------- */
+const footG = (x, y, dir, inner) => `<g transform="translate(${x} ${y}) scale(${dir} 1)">${inner}</g>`;
+const footLn = (ink, w = 2.4) => `stroke="${ink}" stroke-width="${w}" stroke-linejoin="round"`;
+const FOOT_GOLD = '#e8b838';
+const BARE = {
+  herb: (f) => `<ellipse cx="1" cy="-0.5" rx="7" ry="4.8" fill="${f.fill[1]}" ${footLn(HERB_INK, 2.6)}/><ellipse cx="-1" cy="-2.6" rx="3" ry="1.4" fill="#fff" opacity=".35"/>`,
+  dragon: (f) => `<ellipse cx="1" cy="-0.5" rx="7.5" ry="5.2" fill="${f.fill[1]}" ${footLn(DRAGON_INK, 2.8)}/><ellipse cx="-1" cy="-2.8" rx="3.2" ry="1.5" fill="#fff" opacity=".35"/>`,
+  robot: () => `<ellipse cx="1" cy="-0.5" rx="7.5" ry="5" fill="${RB.plate}" ${footLn(ROBOT_INK, 2.6)}/><circle cx="1" cy="-0.5" r="1.4" fill="${RB.bolt}"/>`,
+};
+const FOOTWEAR = {
+  herb: {
+    sneakers: () =>
+      `<path d="M-11 4 Q-12 -7 -1 -7.5 Q9 -7.5 12.5 0 Q13.5 4 10 4 Z" fill="#fff" ${footLn(HERB_INK, 2.8)}/>
+       <path d="M-11 3 H12" stroke="#e8574a" stroke-width="2.2"/><path d="M-3 -6 l5 5" stroke="#e8574a" stroke-width="2.4" stroke-linecap="round"/>`,
+    wellies: () =>
+      `<path d="M-10 4 V-11 H3 V-3 Q11 -2 12.5 2 V4 Z" fill="#e8b830" ${footLn(HERB_INK, 2.8)}/><path d="M-10 -7 H3" stroke="#c98f1a" stroke-width="2.5"/>`,
+  },
+  robot: {
+    sneakers: () =>
+      `${fx('hover', `<ellipse cx="1" cy="5" rx="9" ry="3" fill="${RB.glow}" opacity=".75" style="filter:drop-shadow(0 0 3px ${RB.glow})"/>`)}
+       <rect x="-10" y="-7" width="22" height="9" rx="4.5" fill="${RB.plate}" ${footLn(ROBOT_INK, 2.5)}/><path d="M-5 -2.5 h12" stroke="${RB.glow}" stroke-width="1.6"/>`,
+    wellies: () =>
+      `<path d="M-10 4 V-11 H4 V-3 Q12 -2 13 2 V4 Z" fill="#3a4652" ${footLn(ROBOT_INK, 2.8)}/>
+       <path d="M-10 -7 H4" stroke="#ffd13b" stroke-width="2.5" stroke-dasharray="3 3"/><path d="M-10 2 H13" stroke="#ffd13b" stroke-width="2"/>`,
+  },
+  dragon: {
+    // Fluffy fur boots (Monster Hunter Rise Fluffy Fur Boots, Animal Crossing snow boots)
+    sneakers: () => `<path d="M-12 2.5 H15 Q16 4 15 6 H-12 Z" fill="#3d2416" ${footLn(DRAGON_INK, 2)}/>
+       <path d="M-11 3.5 V-5 H3 Q4 -1.5 10 -0.5 Q15 0.5 15 3.5 Z" fill="#7b4a2b" ${footLn(DRAGON_INK)}/>
+       ${[[-11, -5], [-6, -7], [-1, -7], [3.5, -5]].map(([cx, cy]) => `<circle cx="${cx}" cy="${cy}" r="4.2" fill="#fbf3e4" stroke="${DRAGON_INK}" stroke-width="2"/>`).join('')}
+       <ellipse cx="-3.8" cy="-5.3" rx="9" ry="3.3" fill="#fbf3e4"/>
+       <path d="M8 -0.6 v2" stroke="#d9b98a" stroke-width="1.2"/><circle cx="8" cy="2.6" r="1.8" fill="#fbf3e4" stroke="${DRAGON_INK}" stroke-width="1"/>`,
+    // Dragonscale boots (Stardew Valley Dragonscale Boots, Throne and Liberty drakeskin boots)
+    wellies: () => `<path d="M-12 3 H15 Q16.5 4.5 15 6 H-12 Z" fill="#3a1218" ${footLn(DRAGON_INK, 2)}/>
+       <path d="M-11 3.5 V-8 H2 V-4 Q10 -3.5 14 -0.5 Q16 2.5 14 3.5 Z" fill="#9c2f3a" ${footLn(DRAGON_INK)}/>
+       ${[-5, -1.5, 2].map((sy, r) => [-10, -6, -2, 2, 6].filter(sx => !(sy < -2 && sx > 0)).map(sx => `<path d="M${sx + (r % 2) * 2} ${sy} q2 2.6 4 0" stroke="#6b1c26" stroke-width="1.2" fill="none"/>`).join('')).join('')}
+       <rect x="-12.5" y="-11.5" width="16" height="4.4" rx="1.6" fill="${FOOT_GOLD}" ${footLn(DRAGON_INK, 2)}/>
+       <path d="M-4.5 -11.6 l2 2.2 l-2 2.2 l-2 -2.2 Z" fill="#4aa8e8" stroke="${DRAGON_INK}" stroke-width="1"/>`,
+  },
+};
+const footWear = (line, id, r, t) => footG(t[0], t[1], t[0] < r[0] ? -1 : 1, FOOTWEAR[line][id]());
+
 const WARDROBE = { herb: HERB_WARDROBE, dragon: DRAGON_WARDROBE, robot: ROBOT_WARDROBE };
 const TORSO_ORDER = ['pants', 'jacket', 'belt', 'scarf'];
 
@@ -973,7 +1061,7 @@ const TORSO_ORDER = ['pants', 'jacket', 'belt', 'scarf'];
 const LINES = {
   herb: { label: 'Herb', theme: 'Default', forms: HERB_FORMS, ink: HERB_INK,
     back: (fi, droop) => herbBack(fi, droop),
-    limbs: (f) => f.feet.map(([r, t]) => `<path d="M${r[0]} ${r[1]} Q${r[0]} ${t[1]} ${t[0]} ${t[1]}" stroke="${HERB_INK}" stroke-width="5.5" fill="none" stroke-linecap="round"/>`).join(''),
+    limbs: (f) => f.feet.map(([r, t]) => `<path d="M${r[0]} ${r[1]} Q${r[0]} ${t[1]} ${t[0]} ${t[1] - 2}" stroke="${HERB_INK}" stroke-width="5.5" fill="none" stroke-linecap="round"/>`).join(''),
     details: (f, fi) => fi === 0 ? `<path d="M90 118 l5 7 l5 -6 l5 7 l5 -6" stroke="${HERB_INK}" stroke-width="3" fill="none" stroke-linejoin="round" opacity=".7"/>` : '',
     face: (f, fi, mood) => fi === 4 ? basiliskFace(100, f.eyes.y, f.eyes.gap, mood) : face(100, f.eyes.y, f.eyes.gap, mood, f.eyes.s),
     crown: (fi, droop, base) => herbGrowth(fi, droop, base) },
@@ -1011,17 +1099,17 @@ function pipFigure(line, fi, mood, outfit = {}, { wilted = false } = {}) {
   s += L.back(fi, droop, f);
   s += torso.back;                                   // new layer: torso items drawn behind the body (cape)
   s += L.limbs(f, fi);
-  if (outfit.shoes) f.feet.forEach(([r, t]) => { s += W.shoes[outfit.shoes].draw(r, t); });
   s += `<path d="${f.body}" fill="url(#${id}g)"/>`;
   s += `<ellipse cx="${100 - f.side * 0.55}" cy="${f.hat.y + 10}" rx="11" ry="6" transform="rotate(-32 ${100 - f.side * 0.55} ${f.hat.y + 10})" fill="#fff" opacity=".45"/>`;
   s += L.details(f, fi);
   if (torso.clip) s += `<g clip-path="url(#${id}c)">${torso.clip}</g>`;
   s += `<path d="${f.body}" fill="none" stroke="${L.ink}" stroke-width="5" stroke-linejoin="round"/>`;
   s += torso.extra;
+  s += f.feet.map(([r, t]) => outfit.shoes ? W.shoes[outfit.shoes].draw(r, t) : footG(t[0], t[1], t[0] < r[0] ? -1 : 1, BARE[line](f))).join('');
   const picked = outfit.glasses ? W.glasses[outfit.glasses] : null;
   const glasses = picked && (mood !== 'sleep' || picked.staysAsleep) ? picked : null;   // a scar stays asleep
   if (!glasses?.replacesFace) s += L.face(f, fi, mood, { noL: glasses?.hidesEye === 'L' });
-  if (glasses) s += glasses.draw(100 - f.eyes.gap, 100 + f.eyes.gap, f.eyes.y, f.eyes.s);
+  if (glasses) s += glasses.screenFace ? `<g${droop ? ' opacity=".55"' : ''}>${screenFace(fi, glasses.screenFace, `${id}s`)}</g>` : glasses.draw(100 - f.eyes.gap, 100 + f.eyes.gap, f.eyes.y, f.eyes.s);
   let base = f.growTop, crownReplaced = false, crownAfter = true;
   if (outfit.hat) {
     const item = W.hat[outfit.hat], h = hatDraw(line, outfit.hat, f, droop);

@@ -1,15 +1,16 @@
 import { PIP_FOOT_X } from '../pip/pipSpace.js'
-import { arc, arcY, band, circle, curveOf, ellipse, fxGroup, group, overalls, path, pxCells, rect, titleBelt } from '../pip/wardrobeShapes.js'
+import { arc, arcY, band, circle, curveOf, ellipse, fxGroup, footFrame, group, overalls, path, pxCells, rect, titleBelt } from '../pip/wardrobeShapes.js'
 import { ROBOT_ANTENNAS } from './robotAntennas.js'
 import { RB, ROBOT_INK } from './robotForms.js'
+import { HEARTS_CYAN, SHADES_LCD, SMILEY_OUTLINE, screenFace } from './robotScreenFaces.js'
 
 /**
  * Themed Pip lines: the robot's wardrobe. The same 20 item ids, slots and unlocks as every line, drawn the
  * robot's way (hardware mods and screen faces), ported from the approved
  * foodbytes-app/mockup/pip-themed-lines.html (ROBOT_WARDROBE, 2026-11-15) as shape descriptors.
  * Each item reads only its slot's anchors (hat / eyes / neck + waist + side / feet). Animated parts are
- * fxGroup descriptors (Pip.css); an animated group never carries a positioning transform. Smiley.exe and
- * Heart eyes replace the screen face while worn (REPLACES_FACE).
+ * fxGroup descriptors (Pip.css); an animated group never carries a positioning transform. The three glasses are
+ * screen faces (robotScreenFaces.js) that replace the base face while worn (REPLACES_FACE).
  *
  * Names on the robot (WARDROBE_ITEM_LABELS): beanie Prop-top, cap Radar bar, chef-hat Toque charm,
  * straw-hat Boing spring, top-hat Neon bolt (antennas: robotAntennas.js, they replace the crown), round-specs Smiley.exe, heart-glasses Heart eyes,
@@ -24,43 +25,13 @@ const RI = ROBOT_INK
 
 const glowOf = (color, px) => ({ filter: `drop-shadow(0 0 ${px}px ${color})` })
 
-// ---- glasses: (L, R, y, s) = the two eye points and the face scale. Smiley.exe and Heart eyes replace the screen face. ----
-
-const HEART_CELLS = [[-2, -1], [-1, -1], [1, -1], [2, -1], [-2, 0], [-1, 0], [0, 0], [1, 0], [2, 0], [-1, 1], [0, 1], [1, 1], [0, 2]]
-const SMILE_CELLS = [[-3, -1], [-2, 0], [-1, 1], [0, 1], [1, 1], [2, 0], [3, -1]]
+// ---- glasses: screen faces (approved 2026-11-17, mockup/pip-robot-screen-faces.html, option B each). Drawers get
+// (L, R, y, s, screen) and read only the screen; every item replaces the base face and PipFigure clips it to the glass. ----
 
 const GLASSES = {
-  // Smiley.exe: the screen becomes an emoji face; it blinks
-  'round-specs': (L, R, y, s) => {
-    const c = (L + R) / 2
-    const r = (R - L) / 2 + 4 * s
-    return [group([
-      circle(c, y, r, { fill: '#ffd84d', stroke: '#c99a12', strokeWidth: 2 * s }),
-      fxGroup('blink', [
-        ellipse(c - r * 0.36, y - r * 0.18, r * 0.11, r * 0.2, { fill: RB.dark }),
-        ellipse(c + r * 0.36, y - r * 0.18, r * 0.11, r * 0.2, { fill: RB.dark })
-      ]),
-      path(`M${c - r * 0.5} ${y + r * 0.18} Q${c} ${y + r * 0.78} ${c + r * 0.5} ${y + r * 0.18}`, { stroke: RB.dark, strokeWidth: 2.6 * s, fill: 'none', strokeLinecap: 'round' })
-    ], { style: glowOf('#ffd84d', 2 * s) })]
-  },
-  // Heart eyes: pixel hearts pulse; replaces the face
-  'heart-glasses': (L, R, y, s) => {
-    const p = 2.6 * s
-    return [
-      ...[L, R].map(x => fxGroup('pulse', pxCells(HEART_CELLS, x, y - p * 0.5, p, RB.accent), glowOf(RB.accent, 2 * s))),
-      group(pxCells(SMILE_CELLS, (L + R) / 2, y + 15 * s, 3.2 * s, RB.glow), { style: glowOf(RB.glow, 2 * s) })
-    ]
-  },
-  // Shades.gif: pixel shades drop in
-  sunglasses: (L, R, y, s) => {
-    const p = 2.8 * s
-    const lens = []
-    for (let j = -1; j <= 1; j++) for (let i = -2; i <= 2; i++) if (!(j === 1 && Math.abs(i) === 2)) lens.push([i, j])
-    const shapes = [...pxCells(lens, L, y, p, '#05080b'), ...pxCells(lens, R, y, p, '#05080b')]
-    for (let x = L + 2.5 * p; x <= R - 2.5 * p + 0.01; x += p) shapes.push(...pxCells([[0, 0]], x, y - p, p, '#05080b'))
-    shapes.push(...pxCells([[-1, -1]], L, y, p, '#fff'), ...pxCells([[-1, -1]], R, y, p, '#fff'))
-    return [fxGroup('drop', shapes)]
-  }
+  'round-specs': (L, R, y, s, screen) => screenFace(screen, SMILEY_OUTLINE), // Smiley.exe
+  'heart-glasses': (L, R, y, s, screen) => screenFace(screen, HEARTS_CYAN), // Heart eyes
+  sunglasses: (L, R, y, s, screen) => screenFace(screen, SHADES_LCD) // Shades.gif
 }
 
 // ---- torso items between the neck and waist lines, curved like a smile; clip = inside the body, extra = outside it ----
@@ -216,33 +187,35 @@ const TORSO = {
   })
 }
 
-// ---- shoes on the two foot tips: (root, tip) ----
-
+// ---- shoes: each replaces the whole foot, drawn in the foot frame (mockup pip-dragon-shoes.html FOOTWEAR.robot) ----
 const SHOES = {
   // Hover pads: the thrusters pulse
-  sneakers: (root, [x, y]) => [
-    fxGroup('hover', [ellipse(x, y + 4, 9, 3.2, { fill: RB.glow, opacity: 0.75, style: glowOf(RB.glow, 3) })]),
-    ellipse(x, y - 1, 11, 4.5, { fill: RB.plate, stroke: RI, strokeWidth: 2.5 }),
-    path(`M${x - 6} ${y - 1} h12`, { stroke: RB.glow, strokeWidth: 1.6 })
-  ],
+  sneakers: (root, tip) => [footFrame(root, tip, [
+    fxGroup('hover', [ellipse(1, 5, 9, 3, { fill: RB.glow, opacity: 0.75, style: glowOf(RB.glow, 3) })]),
+    rect(-10, -7, 22, 9, { rx: 4.5, fill: RB.plate, stroke: RI, strokeWidth: 2.5 }),
+    path('M-5 -2.5 h12', { stroke: RB.glow, strokeWidth: 1.6 })
+  ])],
   // Mag boots: hazard-striped
-  wellies: (root, tip) => {
-    const dir = tip[0] < root[0] ? -1 : 1
-    const [x, y] = tip
-    return [
-      path(`M${x - 9 * dir} ${y - 15} h${14 * dir} v9 q${8 * dir} 1 ${9 * dir} 8 h${-23 * dir} Z`, { fill: '#3a4652', stroke: RI, strokeWidth: 3, strokeLinejoin: 'round' }),
-      path(`M${x - 9 * dir} ${y - 10} h${14 * dir}`, { stroke: '#ffd13b', strokeWidth: 2.5, strokeDasharray: '3 3' }),
-      path(`M${x - 9 * dir} ${y + 1} h${23 * dir}`, { stroke: '#ffd13b', strokeWidth: 2 })
-    ]
-  }
+  wellies: (root, tip) => [footFrame(root, tip, [
+    path('M-10 4 V-11 H4 V-3 Q12 -2 13 2 V4 Z', { fill: '#3a4652', stroke: RI, strokeWidth: 2.8, strokeLinejoin: 'round' }),
+    path('M-10 -7 H4', { stroke: '#ffd13b', strokeWidth: 2.5, strokeDasharray: '3 3' }),
+    path('M-10 2 H13', { stroke: '#ffd13b', strokeWidth: 2 })
+  ])]
 }
+
+// ---- the bare foot: a little plated ball with a bolt (mockup pip-dragon-shoes.html BARE.robot) ----
+const BARE_FOOT = (root, tip) => [footFrame(root, tip, [
+  ellipse(1, -0.5, 7.5, 5, { fill: RB.plate, stroke: RI, strokeWidth: 2.6 }),
+  circle(1, -0.5, 1.4, { fill: RB.bolt })
+])]
 
 /** The robot's wardrobe in the shape every line shares (pip/wardrobeArt.js dispatches on it). */
 export const ROBOT_WARDROBE = {
   HATS: ROBOT_ANTENNAS, // id → (x, base, rise, droop) → { top, shapes }
   HAT_ANCHOR: 'crown', // the hats are antennas: they replace the line's crown (wardrobeArt HAT_ANCHOR_CROWN)
-  GLASSES, // id → (L, R, y, s) → shapes
+  GLASSES, // id → (L, R, y, s, screen) → shapes (screen faces)
   TORSO, // id → (f) → { clip, extra, back? }
   SHOES, // id → (root, tip) → shapes
-  REPLACES_FACE: ['round-specs', 'heart-glasses'] // the screen shows the emoji / hearts instead of the face
+  BARE_FOOT, // (root, tip) → shapes: the foot when no shoe is worn
+  REPLACES_FACE: ['round-specs', 'heart-glasses', 'sunglasses'] // every robot face item is a screen face that replaces the base face
 }

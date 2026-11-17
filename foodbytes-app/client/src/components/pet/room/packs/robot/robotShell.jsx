@@ -342,8 +342,8 @@ const sky = (night) =>
     rectU(0, WIN.gv0, WIN.gv1, 107, 109, GUN_DK, { sw: 0.8 })
   )
 
-/** A metal ledge on two brackets, the live sill's size and place (v 158-238, h 68-74). */
-const sill = () =>
+/** A metal ledge on two brackets, the live sill's size and place (v 158-238, h 68-74). Drawn by PetRoom after the wall decor (roomPacks.packSill), not by the backdrop. */
+export const robotSill = () =>
   cat(
     box(0, 167, 9, 3, 58, 68, GUN_DK),
     box(0, 227, 9, 3, 58, 68, GUN_DK),
@@ -352,7 +352,7 @@ const sill = () =>
   )
 
 /**
- * Walls, wall pattern and fixtures, floor and its pattern, skirting and cable tray, corner lines, then the window and the sill,
+ * Walls, wall pattern and fixtures, floor and its pattern, skirting and cable tray, corner lines, then the window (the sill is robotSill),
  * in the mockup engine's order. `wall` / `floor` are the resolved ROBOT_STYLES entries.
  */
 export function robotBackdrop(night, wall, floor) {
@@ -370,7 +370,6 @@ export function robotBackdrop(night, wall, floor) {
     <polyline points={pts([P(ROOM_U, 0), P(0, 0), P(0, ROOM_V)])} fill="none" stroke={corner} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />,
     windowFrame(),
     glass(night),
-    sky(night),
-    sill()
+    sky(night)
   )
 }

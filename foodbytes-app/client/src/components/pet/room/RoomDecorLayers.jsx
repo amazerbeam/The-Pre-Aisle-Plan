@@ -11,7 +11,7 @@ const TAG_HEIGHT = 11
 const TAG_RADIUS = 5.5
 
 /**
- * MPP-27 / MPP-40: one draw layer of the room's decor (DECOR_LAYERS: rug, wall, backFloor,
+ * MPP-27 / MPP-40: one draw layer of the room's decor (DECOR_LAYERS: rug, wall, window, backFloor,
  * frontFloor) — each spot's placed item and, in edit mode, its dashed outline and name (AC 8).
  * PetRoom puts each layer at its depth among the stations. `selectedSpot` is the spot whose picker is open.
  */

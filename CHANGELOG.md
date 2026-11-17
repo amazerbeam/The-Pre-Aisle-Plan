@@ -2,6 +2,9 @@
 
 One line per ticket, newest first: `<version> — <ticket key>: <summary>`. Bump rules and how
 to check what is deployed: `CLAUDE.md` → Versioning & deploy verification.
+1.42.0 — 2026-11-17-pip-ball-feet-shoes: Pip ball feet + whole-foot shoes on every line, dragon Fluffy fur boots and Dragonscale boots, wall frames no longer float over the windowsill
+1.41.0 — 2026-11-17-day-kcal-buttons: day kcal back on recipe-card day buttons (all themes), with a hover/focus preview of the day total
+1.40.0 — 2026-11-17-robot-pip-screen-faces: robot Pip face items are pixels on the screen that replace the base face (Smiley.exe outline, cyan Heart eyes, LCD-invert Shades.gif); the screen changes channel when the face swaps
 1.39.0 — 2026-11-16-dragon-pip-fixes: dragon horns stay on the head under hats (over/under per hat), Wizard's hat and Jester's cap replace the Horn cosy and Bird's nest, the Battle scar takes the left eye; Dress Pip cards show the whole Pip on every line
 1.38.0 — 2026-11-16-robot-pip-antennas: robot Pip hats become antennas (Prop-top, Radar bar, Toque charm, Boing spring, Neon bolt; Hat tab reads Antenna); every Champion belt is a gold title belt
 1.37.0 — MPP-47: Robot workshop decor: all 55 items drawn and named as workshop counterparts on Cyberpunk

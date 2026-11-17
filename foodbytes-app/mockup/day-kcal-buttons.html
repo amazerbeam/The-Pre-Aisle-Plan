@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Day kcal buttons</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Space+Grotesk:wght@400..700&family=VT323&family=EB+Garamond:ital,wght@0,400..700;1,400..600&family=IM+Fell+English+SC&display=swap">
+<style>
+/* Proposal (2026-11-17): bring back FR-050, the day's kcal on each recipe-card day button,
+   in all three themes. Tokens copied from client/src/styles/themes/*.css. */
+body { margin: 0; background: #2a2a30; color: #eee; font: 14px/1.4 system-ui, sans-serif; }
+header.pg { padding: 16px; max-width: 1320px; margin: 0 auto; }
+header.pg h1 { margin: 0 0 4px; font-size: 18px; }
+header.pg p { margin: 4px 0; color: #bbb; max-width: 900px; }
+.bar { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.bar button { background: #3a3a44; color: #eee; border: 1px solid #555; border-radius: 6px; padding: 6px 10px; font: inherit; cursor: pointer; }
+.bar button[aria-pressed="true"] { background: #6b5fa0; border-color: #8b7fc0; }
+.cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 16px; padding: 0 16px 24px; max-width: 1320px; margin: 0 auto; }
+.mobile .cols { grid-template-columns: repeat(auto-fit, 320px); justify-content: center; }
+.col h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .08em; color: #aaa; margin: 0 0 8px; }
+.stage { padding: 16px; border-radius: 8px; }
+.notes { max-width: 1320px; margin: 0 auto; padding: 0 16px 32px; color: #ccc; }
+.notes li { margin: 4px 0; }
+
+/* ---------- theme tokens ---------- */
+.t-default { --bg: #f4f2fa; --card: #fff; --bg-primary: #fff; --bg-secondary: #f8f9fa; --border: #e9ecef;
+  --text: #2c3e50; --text-2: #6c757d; --faint: #9aa1a8; --brand: #4a3f80; --brand-dark: #3a3266; --brand-light: #6b5fa0;
+  --on-brand: #fff; --dot: #b8b2d6; --kcal: #6c757d; --kcal-sel: #fff; --preview: #4a3f80; --f-body: system-ui, sans-serif; }
+.t-cyber { --void: #05070b; --deep: #020305; --panel: #0b1119; --raised: #141d2b; --ink: #eaf6ff; --muted: #9db2c7;
+  --pink: #ff2a6d; --cyan: #05d9e8; --yellow: #f9f002; --lime: #39ff88; --orange: #ff9f1c; --line-soft: #22384a;
+  --bg: var(--void); --card: var(--panel); --text: var(--ink); --text-2: var(--muted); --f-body: 'Space Grotesk', system-ui, sans-serif; }
+.t-parch { --page: #f7eed6; --parchment: #ead9b1; --ink: #2b1d10; --ink-faded: #5e4a32; --ink-light: #6b5236;
+  --wax: #7a1f14; --wax-deep: #5a150d; --wax-bright: #9c3a2a; --leather: #3b2415; --border: #c9ad78; --dot: #b89a64;
+  --bg: var(--parchment); --card: var(--page); --text: var(--ink); --text-2: var(--ink-faded); --f-body: 'EB Garamond', Georgia, serif;
+  --wax-highlight: inset 0 1px 0 rgba(255,220,190,.25), 0 1px 2px rgba(40,10,0,.4); }
+
+.stage { background: var(--bg); color: var(--text); font-family: var(--f-body); }
+
+/* ---------- recipe card (simplified) ---------- */
+.card { background: var(--card); padding: 14px; }
+.t-default .card { border-radius: 14px; box-shadow: 0 2px 10px rgba(0,0,0,.08); }
+.t-cyber .card { border: 1px solid var(--pink); box-shadow: 0 0 14px rgba(255,42,109,.18); }
+.t-parch .card { border: 1px solid var(--border); border-radius: 3px; box-shadow: inset 0 0 22px rgba(160,120,60,.18), 0 8px 14px -10px rgba(60,35,10,.55); }
+.ttl { font-weight: 700; font-size: 16px; margin: 0 0 10px; }
+.t-cyber .ttl::before { content: "07 "; color: var(--pink); font-family: 'VT323', monospace; font-size: 18px; }
+.t-parch .ttl { font-family: 'IM Fell English SC', Georgia, serif; font-weight: 400; font-size: 18px; }
+.vars { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 10px; }
+.var { border: 1px solid var(--border, var(--line-soft)); background: transparent; color: inherit; font: inherit; padding: 6px 2px; cursor: pointer; text-align: center; }
+.var small { display: block; font-size: 10px; text-transform: uppercase; letter-spacing: .06em; opacity: .8; }
+.var b { font-size: 15px; }
+.t-default .var { border-radius: 8px; } .t-default .var.on { background: var(--brand); color: #fff; border-color: var(--brand); }
+.t-cyber .var { font-family: 'VT323', monospace; } .t-cyber .var small { font-family: 'Silkscreen', monospace; font-size: 8px; }
+.t-cyber .var b { font-size: 20px; font-weight: 400; } .t-cyber .var.on { background: var(--cyan); color: var(--void); border-color: var(--cyan); }
+.t-parch .var { border-radius: 3px; } .t-parch .var small { font-family: 'IM Fell English SC', serif; }
+.t-parch .var.on { background: linear-gradient(180deg, var(--wax-bright), var(--wax) 60%, var(--wax-deep)); color: var(--page); border-color: var(--wax-deep); }
+.dlabel { font-size: 11px; color: var(--text-2); margin: 6px 0 4px; display: flex; justify-content: space-between; }
+.t-cyber .dlabel { font-family: 'Silkscreen', monospace; font-size: 9px; text-transform: uppercase; }
+.t-parch .dlabel { font-family: 'IM Fell English SC', serif; font-size: 13px; }
+
+/* ---------- the proposal: day buttons with the day's kcal ---------- */
+.days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+.day-btn { min-height: 52px; padding: 2px 0; background: transparent; border: 0; font: inherit; cursor: pointer; color: inherit; }
+.day-btn-face { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
+  box-sizing: border-box; height: 48px; border: 1.5px solid; }
+.day-kcal { line-height: 1; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.day-name { line-height: 1.1; }
+.day-kcal.empty { opacity: .55; }
+.day-kcal .arrow { display: none; }
+.day-btn.preview .day-kcal .arrow { display: inline; }
+
+/* Default */
+.t-default .day-btn-face { background: var(--bg-primary); border-color: var(--border); border-radius: 10px; color: var(--text-2); }
+.t-default .day-name { font-size: 12.8px; font-weight: 600; }
+.t-default .day-kcal { font-size: 10.5px; font-weight: 600; color: var(--kcal); }
+.t-default .day-btn.already-selected .day-btn-face { background: var(--bg-secondary); color: var(--faint); }
+.t-default .day-btn.already-selected .day-btn-face::after { content: ""; position: absolute; right: 5px; top: 5px; width: 6px; height: 6px; border-radius: 50%; background: var(--dot); }
+.t-default .day-btn.selected .day-btn-face { background: var(--brand); border-color: var(--brand); color: var(--on-brand); }
+.t-default .day-btn.selected .day-kcal { color: var(--kcal-sel); opacity: .9; }
+.t-default .day-btn.selected .day-name::before { content: "✓ "; }
+.t-default .day-btn.preview .day-btn-face { border-color: var(--brand-light); color: var(--brand); }
+.t-default .day-btn.preview:not(.selected) .day-kcal { color: var(--brand); }
+
+/* Cyberpunk */
+.t-cyber .day-btn-face { background: var(--deep); border: 1px solid var(--line-soft); color: var(--muted); }
+.t-cyber .day-name { font-family: 'VT323', monospace; font-size: 18px; text-transform: uppercase; }
+.t-cyber .day-kcal { font-family: 'VT323', monospace; font-size: 15px; color: var(--cyan); }
+.t-cyber .day-btn.already-selected .day-btn-face { background: repeating-linear-gradient(135deg, var(--deep) 0 5px, var(--raised) 5px 10px); }
+.t-cyber .day-btn.already-selected .day-btn-face::after { content: ""; position: absolute; right: 4px; top: 4px; width: 6px; height: 6px; background: var(--orange); }
+.t-cyber .day-btn.selected .day-btn-face { background: var(--lime); border-color: var(--lime); color: var(--void); }
+.t-cyber .day-btn.selected .day-kcal { color: var(--void); }
+.t-cyber .day-btn.selected .day-name::before { content: "✓ "; }
+.t-cyber .day-btn.preview .day-btn-face { border-color: var(--cyan); color: var(--cyan); }
+.t-cyber .day-btn.preview:not(.selected) .day-kcal { color: var(--yellow); text-shadow: 0 0 6px rgba(249,240,2,.5); }
+
+/* Parchment */
+.t-parch .day-btn-face { background: var(--page); border: 1px solid var(--border); border-radius: 3px; color: var(--ink-faded); }
+.t-parch .day-name { font-family: 'IM Fell English SC', serif; font-size: 14px; }
+.t-parch .day-kcal { font-family: 'EB Garamond', serif; font-style: italic; font-size: 13px; color: var(--ink-light); }
+.t-parch .day-btn.already-selected .day-btn-face { border-style: dashed; background: var(--parchment); }
+.t-parch .day-btn.already-selected .day-btn-face::after { content: ""; position: absolute; right: 4px; top: 4px; width: 6px; height: 6px; border-radius: 50%; background: var(--dot); }
+.t-parch .day-btn.selected .day-btn-face { background: linear-gradient(180deg, var(--wax-bright), var(--wax) 60%, var(--wax-deep)); border-color: var(--wax-deep); box-shadow: var(--wax-highlight); color: var(--page); }
+.t-parch .day-btn.selected .day-kcal { color: var(--page); }
+.t-parch .day-btn.selected .day-name::before { content: "✓ "; }
+.t-parch .day-btn.preview .day-btn-face { border-color: var(--wax-bright); color: var(--wax); }
+.t-parch .day-btn.preview:not(.selected) .day-kcal { color: var(--wax); font-weight: 600; }
+
+@media (max-width: 480px) { .days-grid { gap: 4px; } .day-btn.preview .day-kcal .arrow { display: none; } }
+.mobile .day-btn.preview .day-kcal .arrow { display: none; }
+.mobile .days-grid { gap: 4px; }
+.mobile .t-default .day-name { font-size: 11.5px; }
+.mobile .t-cyber .day-name { font-size: 16px; }
+.mobile .t-cyber .day-kcal { font-size: 13px; }
+.mobile .t-parch .day-name { font-size: 12.5px; }
+.mobile .t-parch .day-kcal { font-size: 11.5px; }
+.mobile .t-default .day-kcal { font-size: 9.5px; }
+</style>
+</head>
+<body>
+<header class="pg">
+  <h1>Day kcal on recipe-card day buttons — proposal (FR-050 back)</h1>
+  <p>Each day button shows that day's planned kcal (per person, all meals) above the day name, as it did before the redesign. Hover a day (or Tab onto it) to preview what the day becomes with this recipe in the slot; if another breakfast is there, the preview swaps it out. Click to add / replace / remove, exactly as today.</p>
+  <p>Same card and the same week in all three themes. Switch the variant to see the preview change.</p>
+  <div class="bar">
+    <button id="wDesk" aria-pressed="true">Desktop width</button>
+    <button id="wMob" aria-pressed="false">Mobile 320px</button>
+  </div>
+</header>
+<div id="root"></div>
+<div class="notes">
+  <ul>
+    <li><b>Number:</b> whole kcal, no comma (fits 7 buttons at 320px). Empty day shows a faint <i>—</i>.</li>
+    <li><b>States kept:</b> planned here (brand / lime / wax fill + ✓), slot held by another recipe (dot / hazard + orange pip / dashed), free.</li>
+    <li><b>Preview:</b> hover shows <i>→ new total</i> in the theme accent (purple / glowing yellow / wax red). On a ✓ day the preview is the total without this recipe (what removing it leaves).</li>
+    <li><b>Touch:</b> no preview; the number updates straight after the tap.</li>
+    <li><b>Size:</b> the face grows from 40px to 48px tall (hit area 52px) to fit two lines.</li>
+    <li>Colours stay as theme tokens; no new literal colours in component CSS.</li>
+  </ul>
+</div>
+<script>
+const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const VARIANTS = [['Light',504],['Moderate',611],['Balanced',723]];
+const THEMES = [['t-default','Default'],['t-cyber','Cyberpunk'],['t-parch','Parchment']];
+// per-day planned meals (per person kcal); breakfast: null | {mine:bool, kcal}
+const plan = {
+  Mon: { b: { other: 'Protein Porridge', kcal: 642 }, rest: 1180 },
+  Tue: { b: null, rest: 1215 },
+  Wed: { b: { other: 'Reina Arepa', kcal: 471 }, rest: 1290 },
+  Thu: { b: null, rest: 0 },
+  Fri: { b: null, rest: 640 },
+  Sat: { b: { mine: true, kcal: 611 }, rest: 1105 },
+  Sun: { b: null, rest: 1320 },
+};
+const state = { variant: 1, hover: {} };
+const fmt = n => n ? String(Math.round(n)) : '—';
+const dayTotal = d => (plan[d].b ? plan[d].b.kcal : 0) + plan[d].rest;
+const previewTotal = d => {
+  const p = plan[d];
+  if (p.b && p.b.mine) return p.rest;               // removing it
+  return p.rest + VARIANTS[state.variant][1];       // adding or swapping
+};
+const cls = d => plan[d].b ? (plan[d].b.mine ? 'selected' : 'already-selected') : 'unselected';
+const title = d => {
+  const c = cls(d);
+  return c === 'selected' ? `Remove from ${d} (day → ${fmt(previewTotal(d))} kcal)`
+    : c === 'already-selected' ? `Replace ${plan[d].b.other} on ${d} (day → ${fmt(previewTotal(d))} kcal)`
+    : `Add to ${d} (day → ${fmt(previewTotal(d))} kcal)`;
+};
+function render() {
+  const root = document.getElementById('root');
+  root.innerHTML = `<div class="cols">${THEMES.map(([t, name]) => `
+    <div class="col"><h2>${name}</h2><div class="stage ${t}"><div class="card">
+      <div class="ttl">Scrambled Eggs, Chicken &amp; Toast</div>
+      <div class="vars">${VARIANTS.map(([l, k], i) => `<button class="var ${i === state.variant ? 'on' : ''}" data-v="${i}"><small>${l}</small><b>${k}</b></button>`).join('')}</div>
+      <div class="dlabel"><span>Add to a day</span><span>kcal / day</span></div>
+      <div class="days-grid">${DAYS.map(d => {
+        const pv = state.hover[t] === d;
+        const n = pv ? previewTotal(d) : dayTotal(d);
+        return `<button type="button" class="day-btn ${cls(d)} ${pv ? 'preview' : ''}" data-t="${t}" data-d="${d}" title="${title(d)}" aria-label="${title(d)}" aria-pressed="${cls(d) === 'selected'}">
+          <span class="day-btn-face"><span class="day-kcal ${n ? '' : 'empty'}"><span class="arrow">→</span>${fmt(n)}</span><span class="day-name">${d}</span></span></button>`;
+      }).join('')}</div>
+    </div></div></div>`).join('')}</div>`;
+}
+document.addEventListener('click', e => {
+  const v = e.target.closest('.var'); if (v) { state.variant = +v.dataset.v; for (const d of DAYS) if (plan[d].b?.mine) plan[d].b.kcal = VARIANTS[state.variant][1]; render(); return; }
+  const b = e.target.closest('.day-btn'); if (!b) return;
+  const d = b.dataset.d, p = plan[d];
+  if (p.b && p.b.mine) p.b = null; else p.b = { mine: true, kcal: VARIANTS[state.variant][1] };
+  state.hover = {}; render();
+});
+document.addEventListener('pointerover', e => {
+  const b = e.target.closest('.day-btn'); const t = b?.dataset.t;
+  const next = {}; if (b) next[t] = b.dataset.d;
+  if (JSON.stringify(next) !== JSON.stringify(state.hover)) { state.hover = next; render(); }
+});
+const setW = m => { document.body.classList.toggle('mobile', m); wDesk.setAttribute('aria-pressed', !m); wMob.setAttribute('aria-pressed', m); };
+wDesk.onclick = () => setW(false); wMob.onclick = () => setW(true);
+if (location.hash === '#mobile') setW(true);
+render();
+</script>
+</body>
+</html>

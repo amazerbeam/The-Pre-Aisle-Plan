@@ -100,6 +100,7 @@ function RecipeCard({
             servings={servings}
             currentMealType={currentMealType}
             selectedRecipeId={selectedVariantId}
+            assignKcal={currentVariantCalories}
             pickDate={pickDate}
             onAssigned={onAssigned}
           />

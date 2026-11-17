@@ -71,7 +71,7 @@ export const WARDROBE_ITEM_LABELS = {
     'round-specs': 'Battle scar', 'heart-glasses': 'Smitten', sunglasses: 'War paint',
     'red-scarf': "Knight's cape", 'striped-scarf': 'Ivy garland', 'chef-whites': "Baker's apron", 'denim-jacket': 'Leather jerkin', puffer: 'Scale mail',
     'leather-belt': 'Potion belt', 'champion-belt': 'Hoard belt', jeans: 'Patched breeches', joggers: 'Wool hose', dungarees: "Smith's overalls",
-    sneakers: 'Talon wraps', wellies: 'Iron sabatons'
+    sneakers: 'Fluffy fur boots', wellies: 'Dragonscale boots'
   },
   [PIP_LINE.ROBOT]: {
     beanie: 'Prop-top', cap: 'Radar bar', 'chef-hat': 'Toque charm', 'straw-hat': 'Boing spring', 'top-hat': 'Neon bolt',

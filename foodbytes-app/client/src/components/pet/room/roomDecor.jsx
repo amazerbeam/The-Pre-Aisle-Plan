@@ -67,23 +67,33 @@ function buildBackdrop(night, wall, floor) {
         {night ? NIGHT_SKY : DAY_SKY}
         <RectU up={0} v0={126.5} v1={129.5} h0={108} h1={160} fill="#ffffff" stroke="none" />
       </g>
-      {/* MPP-40 AC 6: the sill is twice as deep (7 → 14), thicker (h 68–74) and sits on two brackets. */}
-      <Box u={0} v={167} du={9} dv={3} h0={58} h1={68} color={SILL_BRACKET} />
-      <Box u={0} v={227} du={9} dv={3} h0={58} h1={68} color={SILL_BRACKET} />
-      <Box u={0} v={158} du={14} dv={80} h0={68} h1={74} color={SILL_TOP} />
     </>
   )
 }
 
 const backdrops = new Map()
 
-/** The room's walls, floor, window and sill for one (night, wall style, floor style). */
+/** The room's walls, floor and window (the sill is RoomSill) for one (night, wall style, floor style). */
 export function roomBackdrop(night, wallStyleId, floorStyleId) {
   const wallId = ROOM_STYLES[wallStyleId]?.spot === ROOM_SPOTS.WALL_STYLE ? wallStyleId : DEFAULT_WALL_STYLE
   const floorId = ROOM_STYLES[floorStyleId]?.spot === ROOM_SPOTS.FLOOR_STYLE ? floorStyleId : DEFAULT_FLOOR_STYLE
   const key = `${night ? 'night' : 'day'}|${wallId}|${floorId}`
   if (!backdrops.has(key)) backdrops.set(key, buildBackdrop(night, ROOM_STYLES[wallId], ROOM_STYLES[floorId]))
   return backdrops.get(key)
+}
+
+/**
+ * MPP-40 AC 6: the sill (twice as deep, 7 → 14, thicker, h 68–74, on two brackets). Drawn by PetRoom after the wall decor
+ * and before the window decor, so the nearer sill covers a low wall item beside it (frames, growth chart).
+ */
+export function RoomSill() {
+  return (
+    <>
+      <Box u={0} v={167} du={9} dv={3} h0={58} h1={68} color={SILL_BRACKET} />
+      <Box u={0} v={227} du={9} dv={3} h0={58} h1={68} color={SILL_BRACKET} />
+      <Box u={0} v={158} du={14} dv={80} h0={68} h1={74} color={SILL_TOP} />
+    </>
+  )
 }
 
 // Faint leaves on both walls (mockup wallsSvg), none where the window covers the right wall.

@@ -282,11 +282,11 @@ function sky(night) {
   return cat(...out)
 }
 
-/** A stone ledge on two corbels, the live sill's size and place (v 158-238, h 68-74). */
-const sill = () => cat(box(0, 167, 9, 3, 58, 68, '#8d8a98'), box(0, 227, 9, 3, 58, 68, '#8d8a98'), box(0, 158, 14, 80, 68, 74, '#aeabb9'))
+/** A stone ledge on two corbels, the live sill's size and place (v 158-238, h 68-74). Drawn by PetRoom after the wall decor (roomPacks.packSill), not by the backdrop. */
+export const dragonSill = () => cat(box(0, 167, 9, 3, 58, 68, '#8d8a98'), box(0, 227, 9, 3, 58, 68, '#8d8a98'), box(0, 158, 14, 80, 68, 74, '#aeabb9'))
 
 /**
- * Walls, wall pattern and fixtures, floor and its pattern, skirting and rubble, corner lines, then the cave mouth and the sill,
+ * Walls, wall pattern and fixtures, floor and its pattern, skirting and rubble, corner lines, then the cave mouth (the sill is dragonSill),
  * in the mockup engine's order. `wall` / `floor` are the resolved DRAGON_STYLES entries.
  */
 export function dragonBackdrop(night, wall, floor) {
@@ -304,7 +304,6 @@ export function dragonBackdrop(night, wall, floor) {
     <polyline points={pts([P(ROOM_U, 0), P(0, 0), P(0, ROOM_V)])} fill="none" stroke={corner} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />,
     windowFrame(),
     glass(night),
-    sky(night),
-    sill()
+    sky(night)
   )
 }

@@ -447,6 +447,48 @@
   }
 }
 
+/* FR-050: day kcal in cyan VT323; preview glows yellow */
+:root[data-theme="cyberpunk"] .day-kcal {
+  font-family: var(--f-num);
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--cyan);
+}
+
+:root[data-theme="cyberpunk"] .day-btn.selected .day-kcal {
+  color: var(--void);
+  opacity: 1;
+}
+
+:root[data-theme="cyberpunk"] .day-btn.preview .day-btn-face {
+  border-color: var(--cyan);
+  color: var(--cyan);
+}
+
+:root[data-theme="cyberpunk"] .day-btn.selected.preview .day-btn-face {
+  color: var(--void);
+}
+
+:root[data-theme="cyberpunk"] .day-btn.preview:not(.selected) .day-kcal {
+  color: var(--yellow);
+  text-shadow: 0 0 6px var(--yellow);
+}
+
+/* Low FX: no glow (this selector outranks the preview rule above) */
+:root[data-theme="cyberpunk"] body.lowfx .day-btn.preview:not(.selected) .day-kcal {
+  text-shadow: none;
+}
+
+@media (max-width: 480px) {
+  :root[data-theme="cyberpunk"] .day-btn-face {
+    font-size: 16px;
+  }
+
+  :root[data-theme="cyberpunk"] .day-kcal {
+    font-size: 13px;
+  }
+}
+
 :root[data-theme="cyberpunk"] .day-btn:focus-visible,
 :root[data-theme="cyberpunk"] .pick-btn:focus-visible {
   border-radius: 0;

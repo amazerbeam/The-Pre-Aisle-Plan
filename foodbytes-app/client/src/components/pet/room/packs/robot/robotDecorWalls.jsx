@@ -125,9 +125,10 @@ export const ROBOT_WALL_DECOR = {
       fxg('buzz', glowG('#bff6ff', bill(5, 144, 99.5, <circle r="3.2" fill="#eafcff" stroke="#9fe8f5" strokeWidth="1" />), 4))
     ),
   // three mini monitors, each running a trace with a scan sweep (animated)
+  // raised 12 so the bottom frame clears the windowsill (2026-11-17, mockup pip-dragon-shoes.html option C)
   'photo-strip': () =>
     cat(
-      ...[[64, NEON], [82, LIME], [100, PINK]].map(([h, c]) =>
+      ...[[76, NEON], [94, LIME], [112, PINK]].map(([h, c]) =>
         cat(
           box(0, 137, 1.6, 14, h, h + 14, GUN_DK),
           rectU(1.75, 139, 149, h + 2, h + 12, SCREEN, { stroke: null }),

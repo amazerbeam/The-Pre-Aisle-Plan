@@ -76,7 +76,7 @@ function Claws({ x, y, dir }) {
   ))
 }
 
-/** Small arms at the neck (reach grows with the form) and legs from each foot root to its tip, both clawed. */
+/** Small clawed arms at the neck (reach grows with the form) and legs from each foot root to just above its tip; the foot itself is the wardrobe's (ball or shoe). */
 export function DragonLimbs({ form, f }) {
   const len = ARM_LENGTH[form - 1] ?? ARM_LENGTH[0]
   const ay = f.neck + 6
@@ -96,12 +96,11 @@ export function DragonLimbs({ form, f }) {
         )
       })}
       {f.feet.map(([r, t]) => {
-        const d = `M${r[0]} ${r[1]} Q${r[0]} ${t[1]} ${t[0]} ${t[1]}`
+        const d = `M${r[0]} ${r[1]} Q${r[0]} ${t[1] - 2} ${t[0]} ${t[1] - 2}`
         return (
           <g key={t[0]}>
             <path d={d} stroke={DRAGON_INK} strokeWidth="12" fill="none" strokeLinecap="round" />
             <path d={d} stroke={f.fill[1]} strokeWidth="6.5" fill="none" strokeLinecap="round" />
-            <Claws x={t[0]} y={t[1]} dir={t[0] < r[0] ? -1 : 1} />
           </g>
         )
       })}

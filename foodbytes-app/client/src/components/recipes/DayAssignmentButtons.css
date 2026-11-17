@@ -1,4 +1,4 @@
-/* DayAssignmentButtons - day-name buttons (no kcal) or one picking-mode button.
+/* DayAssignmentButtons - day buttons (day kcal over day name, FR-050) or one picking-mode button.
  * States: selected (this recipe), already-selected (another recipe holds the slot), unselected.
  */
 
@@ -9,9 +9,9 @@
   gap: 5px;
 }
 
-/* The button is the 44px hit area; .day-btn-face is the 40px painted button inside it. */
+/* The button is the 52px hit area; .day-btn-face is the 48px painted button inside it. */
 .day-btn {
-  min-height: 44px;
+  min-height: 52px;
   padding: 2px 0;
   background: transparent;
   border: 0;
@@ -24,10 +24,12 @@
 .day-btn-face {
   position: relative;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 1px;
   box-sizing: border-box;
-  height: 40px;
+  height: 48px;
   background: var(--bg-primary);
   border: 1.5px solid var(--border-color);
   border-radius: 10px;
@@ -74,7 +76,7 @@
   color: var(--on-brand);
 }
 
-.day-btn.selected .day-btn-face::before {
+.day-btn.selected .day-name::before {
   content: "✓ ";
   white-space: pre;
 }
@@ -87,6 +89,44 @@
 
 .day-btn.selected:active .day-btn-face {
   background: var(--brand-primary-dark);
+}
+
+/* FR-050: the day's kcal above the day name */
+.day-kcal {
+  font-size: 0.66rem;
+  font-weight: 600;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  color: var(--text-secondary);
+}
+
+.day-kcal.empty {
+  opacity: 0.55;
+}
+
+.day-name {
+  line-height: 1.1;
+}
+
+.day-btn.selected .day-kcal {
+  color: inherit;
+  opacity: 0.9;
+}
+
+/* Preview: the projected total after the click (mouse hover or keyboard focus) */
+.day-btn.preview .day-btn-face {
+  border-color: var(--brand-primary-light);
+  color: var(--brand-primary);
+}
+
+.day-btn.preview:not(.selected) .day-kcal {
+  color: var(--brand-primary);
+  opacity: 1;
+}
+
+.day-btn.selected.preview .day-btn-face {
+  color: var(--on-brand);
 }
 
 .day-btn:focus-visible,
@@ -144,5 +184,13 @@
 
   .day-btn-face {
     font-size: 0.72rem;
+  }
+
+  .day-kcal {
+    font-size: 0.6rem;
+  }
+
+  .day-kcal .arrow {
+    display: none;
   }
 }

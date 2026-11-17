@@ -53,18 +53,22 @@ export function hatArt(line, id, f, { droop = false } = {}) {
 }
 
 /**
- * { shapes, replacesFace, hidesEye, staysAsleep } on the two eye points, or null for an id that isn't glasses.
- * hidesEye ('L' or null) drops that eye from the face; staysAsleep keeps the item on a sleeping Pip (a scar).
+ * { shapes, replacesFace, hidesEye, staysAsleep, screen } on the two eye points (and the form's screen, for lines that
+ * have one), or null for an id that isn't glasses. hidesEye ('L' or null) drops that eye from the face; staysAsleep keeps
+ * the item on a sleeping Pip (a scar); screen is the glass a face-replacing item is clipped to (null otherwise).
  */
 export function glassesArt(line, id, f) {
   const wardrobe = wardrobeOf(line)
   const draw = wardrobe.GLASSES[id]
   if (!draw) return null
+  const replacesFace = wardrobe.REPLACES_FACE.includes(id)
+  const screen = f.screen ?? null
   return {
-    shapes: draw(PIP_FOOT_X - f.eyes.gap, PIP_FOOT_X + f.eyes.gap, f.eyes.y, f.eyes.s),
-    replacesFace: wardrobe.REPLACES_FACE.includes(id),
+    shapes: draw(PIP_FOOT_X - f.eyes.gap, PIP_FOOT_X + f.eyes.gap, f.eyes.y, f.eyes.s, screen),
+    replacesFace,
     hidesEye: wardrobe.HIDES_EYE?.[id] ?? null,
-    staysAsleep: Boolean(wardrobe.STAYS_ASLEEP?.includes(id))
+    staysAsleep: Boolean(wardrobe.STAYS_ASLEEP?.includes(id)),
+    screen: replacesFace ? screen : null
   }
 }
 
@@ -74,10 +78,14 @@ export function torsoArt(line, id, f) {
   return { clip: part?.clip ?? [], extra: part?.extra ?? [], back: part?.back ?? [] }
 }
 
-/** Shapes for both feet. */
-export function shoeArt(line, id, f) {
-  const draw = wardrobeOf(line).SHOES[id]
-  return draw ? f.feet.flatMap(([root, tip]) => draw(root, tip)) : []
+/**
+ * Shapes for both feet: the worn shoe, or the line's bare ball feet when no shoe is worn (or the id is one this line
+ * can't draw). A shoe replaces the whole foot; PipFigure draws these in front of the body.
+ */
+export function footArt(line, id, f) {
+  const wardrobe = wardrobeOf(line)
+  const draw = (id && wardrobe.SHOES[id]) || wardrobe.BARE_FOOT
+  return f.feet.flatMap(([root, tip]) => draw(root, tip, f))
 }
 
 /** Every id a line can draw, for wardrobe.check.mjs. */

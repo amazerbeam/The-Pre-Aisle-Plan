@@ -6,7 +6,7 @@ import { HerbBack, HerbGrowth } from './herbParts'
 /** The herb line's parts for PipFigure: stalk feet, the seed's zigzag, leaves behind and growth on top (MPP-31). */
 function HerbLimbs({ f }) {
   return f.feet.map(([root, tip]) => (
-    <path key={tip[0]} d={`M${root[0]} ${root[1]} Q${root[0]} ${tip[1]} ${tip[0]} ${tip[1]}`}
+    <path key={tip[0]} d={`M${root[0]} ${root[1]} Q${root[0]} ${tip[1]} ${tip[0]} ${tip[1] - 2}`}
       stroke={HERB_INK} strokeWidth="5.5" fill="none" strokeLinecap="round" />
   ))
 }

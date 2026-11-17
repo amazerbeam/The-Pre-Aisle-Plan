@@ -23,6 +23,13 @@ export const group = (children, attrs) => ({ tag: 'g', ...attrs, children })
 /** An animated group: effect is one of the pip-fx--* names in Pip.css; style is a React style object (animationDelay, filter). */
 export const fxGroup = (effect, children, style) => ({ tag: 'g', className: `pip-fx pip-fx--${effect}`, ...(style ? { style } : {}), children })
 
+/**
+ * Foot-frame art (ball feet and shoes): children are drawn with the origin at the foot tip, +x toward the toe and the
+ * ground at about +4; a foot pointing left (tip left of its root) is mirrored.
+ */
+export const footFrame = (root, tip, children) =>
+  group(children, { transform: `translate(${tip[0]} ${tip[1]}) scale(${tip[0] < root[0] ? -1 : 1} 1)` })
+
 /** Square pixel cells (the robot's screen art), centred on (cx, cy), p units each. */
 export const pxCells = (cells, cx, cy, p, fill) =>
   cells.map(([i, j]) => ({ tag: 'rect', x: cx + i * p - p / 2, y: cy + j * p - p / 2, width: p, height: p, fill }))

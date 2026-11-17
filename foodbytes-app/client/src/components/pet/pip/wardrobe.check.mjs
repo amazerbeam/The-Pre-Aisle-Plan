@@ -11,13 +11,13 @@ import { headBarTop, headBarY, spokenLevelLabel } from './headBar.js'
 import { LINE_FORMS, lineFormCount, pipForm } from './lineForms.js'
 import { EYE_LEFT, PIP_FOOT_Y } from './pipSpace.js'
 import {
-  CROWN_LIFT, CROWN_OVER, CROWN_REPLACE, CROWN_UNDER, HAT_ANCHOR_CROWN, LINE_WARDROBE, drawnItemIds, glassesArt, hatAnchor, hatArt, shoeArt, torsoArt
+  CROWN_LIFT, CROWN_OVER, CROWN_REPLACE, CROWN_UNDER, HAT_ANCHOR_CROWN, LINE_WARDROBE, drawnItemIds, glassesArt, hatAnchor, hatArt, footArt, torsoArt
 } from './wardrobeArt.js'
 import { titleBelt } from './wardrobeShapes.js'
 import { HERB_TITLE_BELT } from '../herb/herbWardrobe.js'
 import { DRAGON_TITLE_BELT } from '../dragon/dragonWardrobe.js'
 import { ROBOT_TITLE_BELT } from '../robot/robotWardrobe.js'
-import { TORSO_ORDER, dressLayers, hatMiniViewBox, hatOnly } from './wardrobeLayers.js'
+import { SCREEN_FACE_DROOP_OPACITY, TORSO_ORDER, dressLayers, hatMiniViewBox, hatOnly } from './wardrobeLayers.js'
 import { FIT_MARGIN, fitViewBox, slotFitViewBox } from './cardFit.js'
 import { HEAD_BAR_GAP } from '../../../constants/pipGrowth.js'
 import { PIP_LINE_COPY } from '../../../constants/pipLines.js'
@@ -69,7 +69,8 @@ for (const { line, form, where: at } of EACH) {
   const f = pipForm(line, form)
   const elsewhere = {
     HAT: { neck: f.neck + 7, waist: f.waist + 7, side: f.side + 7, eyes: { ...f.eyes, gap: f.eyes.gap + 7 }, feet: [] },
-    GLASSES: { hat: { y: f.hat.y + 7, w: f.hat.w + 7 }, neck: f.neck + 7, side: f.side + 7, feet: [] },
+    GLASSES: { hat: { y: f.hat.y + 7, w: f.hat.w + 7 }, neck: f.neck + 7, side: f.side + 7, screen: { x: 1, y: 1, w: 40, h: 30, r: 4 }, feet: [] }, // glasses that aren't screen faces ignore a screen
+    SCREEN: { hat: { y: f.hat.y + 7, w: f.hat.w + 7 }, neck: f.neck + 7, side: f.side + 7, eyes: { ...f.eyes, gap: f.eyes.gap + 7, y: f.eyes.y + 7 }, feet: [] },
     TORSO: { hat: { y: f.hat.y + 7, w: f.hat.w + 7 }, eyes: { ...f.eyes, gap: f.eyes.gap + 7 }, feet: [] },
     SHOES: { hat: { y: f.hat.y + 7, w: f.hat.w + 7 }, neck: f.neck + 7, eyes: { ...f.eyes, gap: f.eyes.gap + 7 } },
     CROWN: { hat: { y: f.hat.y + 7, w: f.hat.w + 7 }, neck: f.neck + 7, waist: f.waist + 7, side: f.side + 7, eyes: { ...f.eyes, gap: f.eyes.gap + 7 }, feet: [] }
@@ -77,6 +78,7 @@ for (const { line, form, where: at } of EACH) {
   const own = {
     HAT: { hat: { y: f.hat.y + 7, w: f.hat.w } },
     GLASSES: { eyes: { ...f.eyes, gap: f.eyes.gap + 7 } },
+    SCREEN: { screen: f.screen && { ...f.screen, y: f.screen.y + 7 } },
     TORSO: { neck: f.neck - 7, waist: f.waist + 7 },
     SHOES: { feet: f.feet.map(([root, tip]) => [root, [tip[0] + 7, tip[1]]]) },
     CROWN: { growTop: f.growTop + 7 }
@@ -93,12 +95,12 @@ for (const { line, form, where: at } of EACH) {
       assertFinite(hat.shapes, where)
       assert.ok(hat.top < f.hat.y, `${where}: the crown must rise above the brim`)
     } else if (slot === 'GLASSES') {
-      group = 'GLASSES'
+      group = LINE_WARDROBE[line].REPLACES_FACE.includes(id) && f.screen ? 'SCREEN' : 'GLASSES' // a screen face reads only the screen
       draw = (g) => glassesArt(line, id, g)
       assertFinite(draw(f).shapes, where)
     } else if (slot === 'SHOES') {
       group = 'SHOES'
-      draw = (g) => shoeArt(line, id, g)
+      draw = (g) => footArt(line, id, g)
       assertFinite(draw(f), where)
     } else {
       group = 'TORSO'
@@ -113,7 +115,7 @@ for (const { line, form, where: at } of EACH) {
 }
 
 // No per-form branches anywhere in the wardrobe drawing.
-for (const file of ['./wardrobeArt.js', './wardrobeLayers.js', './wardrobeShapes.js', '../herb/herbWardrobe.js', '../dragon/dragonWardrobe.js', '../robot/robotWardrobe.js', '../robot/robotAntennas.js']) {
+for (const file of ['./wardrobeArt.js', './wardrobeLayers.js', './wardrobeShapes.js', '../herb/herbWardrobe.js', '../dragon/dragonWardrobe.js', '../robot/robotWardrobe.js', '../robot/robotAntennas.js', '../robot/robotScreenFaces.js']) {
   const source = readFileSync(new URL(file, import.meta.url), 'utf8')
   assert.doesNotMatch(source, /PIP_FORMS|form\s*===?|===?\s*form\b|switch\s*\(\s*form|\.name\b/, `${file} branches on a form`)
 }
@@ -128,7 +130,7 @@ for (const { line, form, where } of EACH) {
   const expectedExtra = TORSO_ORDER.flatMap(slot => torsoArt(line, FULL[slot], f).extra)
   assert.deepEqual(dress.clip, expectedClip, `${where}: clip is pants → jacket → belt → scarf`)
   assert.deepEqual(dress.extra, expectedExtra, `${where}: buckle then scarf tail`)
-  assert.deepEqual(dress.shoes, shoeArt(line, 'wellies', f))
+  assert.deepEqual(dress.feet, footArt(line, 'wellies', f))
   assert.equal(dressLayers({ HAT: 'chef-hat' }, line, form).hat.transform, null, `${where}: the chef hat stays straight`)
   if (crownHats(line)) {
     assert.equal(dress.hat.transform, null, `${where}: antennas stand straight`)
@@ -150,7 +152,14 @@ for (const { line, form, where } of EACH) {
   const scar = glassesArt(line, FULL.GLASSES, f).staysAsleep
   assert.deepEqual(dressLayers(FULL, line, form, { asleep: true }).glasses, scar ? dress.glasses : [], `${where}: glasses hidden asleep unless they stay asleep`)
   const empty = dressLayers(null, line, form)
-  assert.deepEqual([empty.back, empty.shoes, empty.clip, empty.extra, empty.glasses, empty.hat, empty.itemIds], [[], [], [], [], [], null, []])
+  assert.deepEqual([empty.back, empty.clip, empty.extra, empty.glasses, empty.hat, empty.itemIds], [[], [], [], [], null, []])
+  assert.deepEqual(empty.feet, footArt(line, null, f), `${where}: no shoes = bare ball feet`)
+  assert.equal(empty.feet.length, 2, `${where}: one bare foot per leg`)
+  assert.deepEqual(footArt(line, 'no-such-shoe', f), empty.feet, `${where}: an unknown shoe falls back to bare feet`)
+  assert.notDeepEqual(dress.feet, empty.feet, `${where}: a shoe replaces the bare foot`)
+  assert.equal(dress.feet.length, 2, `${where}: a shoe is one group per foot`)
+  const movedFeet = { ...f, feet: f.feet.map(([root, tip]) => [root, [tip[0] + 7, tip[1]]]) }
+  assert.notDeepEqual(footArt(line, null, movedFeet), empty.feet, `${where}: bare feet follow the foot anchors`)
 }
 
 // ---- AC 7: the same outfit on every form, and a wilt never touches it ----
@@ -165,7 +174,7 @@ for (const line of LINES) {
 }
 assert.deepEqual(outfit, FULL, 'dressLayers must not mutate the outfit')
 
-// ---- Antennas: droop redraws a crown-anchored hat and nothing else ----
+// ---- Antennas: droop redraws a crown-anchored hat and dims a screen face; nothing else changes ----
 for (const { line, form, where } of EACH) {
   for (const id of IDS) {
     const slot = WARDROBE_ITEMS[id].slot
@@ -175,6 +184,8 @@ for (const { line, form, where } of EACH) {
       assert.notDeepEqual(down.hat.shapes, up.hat.shapes, `${where} ${id}: an antenna wilts`)
       assertFinite(down.hat.shapes, `${where} ${id} drooped`)
       assert.deepEqual({ ...down, hat: null }, { ...up, hat: null }, `${where} ${id}: droop only touches the antenna`)
+    } else if (up.screen) {
+      assert.deepEqual({ ...down, glasses: null }, { ...up, glasses: null }, `${where} ${id}: droop only dims a screen face`)
     } else {
       assert.deepEqual(down, up, `${where} ${id}: droop changes nothing`)
     }
@@ -321,6 +332,32 @@ for (const { line, form, where } of EACH) {
   }
 }
 
+// ---- Robot screen faces (2026-11-17): every robot face item is pixels on the screen that replace the base face ----
+assert.deepEqual(LINE_WARDROBE.robot.REPLACES_FACE, ['round-specs', 'heart-glasses', 'sunglasses'], 'every robot glasses item is a screen face')
+for (const { line, form, where } of EACH) {
+  const f = pipForm(line, form)
+  for (const id of idsIn('GLASSES')) {
+    const g = glassesArt(line, id, f)
+    if (line !== 'robot') {
+      assert.equal(g.screen, null, `${where} ${id}: only screen faces get a screen`)
+      continue
+    }
+    const sc = f.screen
+    assert.ok(sc, `${where}: robot forms need a screen anchor`)
+    assert.equal(g.replacesFace, true, `${where} ${id}: replaces the base face`)
+    assert.deepEqual(g.screen, sc, `${where} ${id}: clipped to the form's screen`)
+    for (const r of shapesOf(g.shapes).filter(s => s.tag === 'rect')) {
+      const inside = r.x >= sc.x - 0.01 && r.y >= sc.y - 0.01 && r.x + r.width <= sc.x + sc.w + 0.01 && r.y + r.height <= sc.y + sc.h + 0.01
+      assert.ok(inside, `${where} ${id}: pixel at ${r.x},${r.y} is off the screen`)
+    }
+    assert.equal(dressLayers({ GLASSES: id }, line, form, { asleep: true }).screen, null, `${where} ${id}: asleep shows the base face`)
+    assert.deepEqual(dressLayers({ GLASSES: id }, line, form).screen, sc, `${where} ${id}: dress carries the screen`)
+    const dim = dressLayers({ GLASSES: id }, line, form, { droop: true }).glasses
+    assert.equal(dim.length, 1, `${where} ${id}: drooped face is one dimmed group`)
+    assert.equal(dim[0].opacity, SCREEN_FACE_DROOP_OPACITY, `${where} ${id}: drooped face dims`)
+  }
+}
+
 // ---- Title belts (2026-11-16): every creature's Champion belt is the shared gold title belt, on every form ----
 const TITLE_BELT_STYLE = { herb: HERB_TITLE_BELT, dragon: DRAGON_TITLE_BELT, robot: ROBOT_TITLE_BELT }
 assert.deepEqual(Object.keys(TITLE_BELT_STYLE).sort(), [...LINES].sort(), 'one title-belt style per line')
@@ -331,5 +368,12 @@ for (const { line, form, where } of EACH) {
   assert.equal(belt.clip.length, 4, `${where}: strap, two gilt edges and stitching`)
   assertFinite(shapesOf(belt.extra), `${where}: title belt plates`)
 }
+
+// Ball feet / shoes are their own layer, drawn after the torso extras (in front of the body) and before the face.
+const figure = readFileSync(new URL('./PipFigure.jsx', import.meta.url), 'utf8')
+assert.ok(!figure.includes('dress.shoes'), 'PipFigure: the shoes layer is now dress.feet')
+assert.ok(figure.indexOf('shapes={dress.extra}') < figure.indexOf('shapes={dress.feet}'), 'PipFigure: feet after the torso extras')
+assert.ok(figure.indexOf('shapes={dress.feet}') < figure.indexOf('{faceLayer}'), 'PipFigure: feet before the face')
+for (const line of LINES) assert.equal(typeof LINE_WARDROBE[line].BARE_FOOT, 'function', `${line}: needs BARE_FOOT`)
 
 console.log('wardrobe checks passed')

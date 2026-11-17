@@ -135,9 +135,10 @@ export const DRAGON_WALL_DECOR = {
       flame(4.8, 144, 99, 0.9, 0.4)
     ),
   // three framed gems, each with a twinkle (animated glints)
+  // raised 12 so the bottom frame clears the windowsill (2026-11-17, mockup pip-dragon-shoes.html option C)
   'photo-strip': () =>
     cat(
-      ...[[64, '#d63a4a'], [82, '#4aa8e8'], [100, '#5cc46a']].map(([h, c], i) =>
+      ...[[76, '#d63a4a'], [94, '#4aa8e8'], [112, '#5cc46a']].map(([h, c], i) =>
         cat(
           box(0, 137, 1.6, 14, h, h + 14, WOOD_DK),
           rectU(1.75, 139, 149, h + 2, h + 12, '#241f2b', { stroke: null }),

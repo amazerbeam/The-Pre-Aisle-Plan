@@ -68,4 +68,10 @@ export function packBackdrop(pack, night, wallStyleId, floorStyleId) {
   return backdropCache.get(key)
 }
 
+/** The pack's windowsill, drawn between the wall and window decor layers (null for a pack without one). */
+export function packSill(pack) {
+  const Sill = pack.sill
+  return Sill ? <Sill /> : null
+}
+
 export const packEffects = (pack) => ({ ...HERB_ROOM.effects, ...pack.effects })

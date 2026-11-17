@@ -1,0 +1,497 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pip Robot Screen Faces</title>
+<!-- Approved 2026-11-17: Glowing outline, All cyan, LCD invert. Proposed 2026-11-16: the robot (Cyberpunk) Pip's face items (glasses slot) are drawn as pixels ON the CRT screen
+     and swap out the base face, instead of sitting on the monitor like a sticker.
+     Robot geometry is copied verbatim from pip-robot-antennas.html / pip-themed-lines.html (ROBOT_FORMS, robot*, ROBOT_SCREEN).
+     The "Now" drawings are copied verbatim from pip-themed-lines.html ROBOT_WARDROBE.glasses. -->
+<style>
+  :root {
+    --brand: #4a3f80; --text: #2c3e50; --muted: #5f6b76;
+    --bg: #f3f5f0; --card: #ffffff; --line: #e1e6dc;
+    --stage: #0e1622; --stage-line: #1d2a3a; --pick: #ff5fa2;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; }
+  main { max-width: 1180px; margin: 0 auto; padding: 24px 16px 64px; }
+  h1 { color: var(--brand); margin: 0 0 4px; font-size: 1.7rem; }
+  h2 { color: var(--brand); margin: 36px 0 10px; font-size: 1.25rem; }
+  h3 { margin: 0; font-size: 1.05rem; }
+  .lede { color: var(--muted); margin: 0 0 16px; max-width: 860px; }
+  .note { font-size: .85rem; color: var(--muted); }
+  .card { background: var(--card); border-radius: 16px; padding: 16px; box-shadow: 0 4px 18px rgba(40,60,30,.08); margin-bottom: 18px; }
+  button { font: inherit; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chips button, .btn { min-height: 40px; border: 1px solid #c9d2c0; background: #fff; color: var(--text); border-radius: 999px; padding: 6px 14px; font-size: .88rem; font-weight: 600; cursor: pointer; touch-action: manipulation; }
+  .chips button.on { background: var(--brand); border-color: var(--brand); color: #fff; }
+  .controls { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; margin: 0 0 18px; position: sticky; top: 0; z-index: 2; background: var(--bg); padding: 8px 0; }
+  .controls > span { font-size: .88rem; font-weight: 700; }
+
+  .item-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; margin-bottom: 12px; }
+  .item-head .hint { font-size: .82rem; color: var(--muted); }
+  .opts { display: grid; grid-template-columns: minmax(150px, .8fr) 1.6fr 1.6fr; gap: 12px; }
+  @media (max-width: 860px) { .opts { grid-template-columns: 1fr; } }
+  .opt { border: 2px solid var(--line); border-radius: 14px; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+  .opt.now { background: #f7f8f5; }
+  .opt.picked { border-color: var(--pick); box-shadow: 0 0 0 3px #ff5fa233; }
+  .opt-title { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  .opt-title b { font-size: .95rem; }
+  .tag { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; padding: 2px 8px; border-radius: 999px; background: #e8ebf3; color: #3d4a63; }
+  .tag.old { background: #f3dede; color: #8b2020; }
+  .opt p { margin: 0; font-size: .84rem; color: var(--muted); }
+  .stage { background: var(--stage); background-image: linear-gradient(var(--stage-line) 1px, transparent 1px), linear-gradient(90deg, var(--stage-line) 1px, transparent 1px); background-size: 16px 16px; border-radius: 10px; display: flex; align-items: flex-end; justify-content: center; gap: 2px; padding: 4px; min-height: 120px; }
+  .stage svg { width: 33%; max-width: 130px; height: auto; display: block; }
+  .opt.now .stage svg { width: 80%; max-width: 150px; }
+  .zoom { display: flex; gap: 8px; align-items: center; }
+  .zoom svg { width: 96px; height: 72px; border-radius: 10px; background: var(--stage); flex: none; }
+  .zoom span { font-size: .78rem; color: var(--muted); }
+  .pick { align-self: flex-start; }
+  .opt.picked .pick { background: var(--pick); border-color: var(--pick); color: #fff; }
+
+  .swap { display: grid; grid-template-columns: 260px 1fr; gap: 16px; align-items: center; }
+  @media (max-width: 640px) { .swap { grid-template-columns: 1fr; } }
+  .swap .stage svg { width: 100%; max-width: 240px; }
+  .lineup { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .lineup figure { margin: 0; text-align: center; }
+  .lineup .stage svg { width: 100%; max-width: 170px; }
+  .lineup figcaption { font-size: .8rem; font-weight: 600; margin-top: 4px; }
+  .lineup figcaption small { display: block; font-weight: 400; color: var(--muted); }
+  ul { margin: 6px 0; padding-left: 20px; }
+  li { margin: 3px 0; }
+
+  /* ---- Pip idle animation (mirrors client Pip.css) ---- */
+  .anim { transform-box: fill-box; transform-origin: 50% 100%; }
+  .mood-content .anim { animation: bob 2.6s ease-in-out infinite; }
+  .mood-happy .anim { animation: bounce 1.1s ease-in-out infinite; }
+  .mood-bored .anim { animation: droop 4s ease-in-out infinite; }
+  @keyframes bob { 0%,100% { transform: translateY(0) scale(1,1); } 50% { transform: translateY(-5px) scale(.98,1.02); } }
+  @keyframes bounce { 0%,100% { transform: translateY(0) scale(1,1); } 40% { transform: translateY(-16px) scale(.95,1.05); } 70% { transform: translateY(0) scale(1.05,.95); } }
+  @keyframes droop { 0%,100% { transform: rotate(0); } 50% { transform: rotate(-3deg) translateY(2px); } }
+
+  /* ---- screen-face effects (blink / pulse / drop mirror Pip.css; NEW ones marked) ---- */
+  .fx { transform-box: fill-box; transform-origin: center; }
+  .blink { animation: blink 3.6s infinite; }
+  .pulse { animation: pulse 1s steps(2, jump-none) infinite; }                     /* pixel pulse: snaps between two sizes */
+  .drop { animation: drop 3.4s steps(6, end) infinite; }                            /* NEW loop: shades scroll down from the screen's top edge */
+  .glint { animation: glint 3.4s steps(1) infinite; }                               /* NEW: glint pixel blinks on once the shades land */
+  .tune { transform-origin: center; animation: tune .45s ease-out 1 both; }         /* NEW: CRT channel change when the face swaps */
+  @keyframes blink { 0%,92%,100% { transform: scaleY(1); } 95% { transform: scaleY(.1); } }
+  @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+  @keyframes drop { 0% { transform: translateY(-120%); } 30%,100% { transform: translateY(0); } }
+  @keyframes glint { 0%,34% { opacity: 0; } 36%,48% { opacity: 1; } 50%,100% { opacity: 0; } }
+  @keyframes tune { 0% { transform: scale(1, .04); filter: brightness(3); } 45% { transform: scale(1, .04); filter: brightness(3); } 100% { transform: scale(1, 1); filter: none; } }
+
+  body.lowfx .fx, body.lowfx .anim, body.lowfx .tune { animation: none !important; }
+  body.lowfx .glint { opacity: 1; }
+  body.lowfx .glowy { filter: none !important; }
+  @media (prefers-reduced-motion: reduce) { .fx, .anim, .tune { animation: none !important; } .glint { opacity: 1; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Pip robot: faces on the screen</h1>
+  <p class="lede">Cyberpunk only. The robot's three face items (glasses slot) are redrawn as <b>pixels the CRT screen is displaying</b>, on the screen's pixel grid, clipped to the glass and under the scanlines.
+    While one is worn it <b>replaces</b> the base face; take it off (or let Pip fall asleep) and the base face comes back.
+    Today Smiley.exe is a smooth yellow disc floating on the monitor, which reads as a sticker, and Shades.gif sits on top of the base eyes.
+    Each item has two options; pick one per row. Item ids, slots and unlocks don't change.</p>
+
+  <div class="controls">
+    <span>Mood</span>
+    <div class="chips" id="moods"></div>
+    <div class="chips"><button id="lowfx" type="button" aria-pressed="false">Low FX</button><button id="replay" type="button">Replay animations</button></div>
+  </div>
+
+  <div class="card">
+    <div class="item-head"><h3>Today: the base face</h3><span class="hint">What every option replaces (Bot-kid, Teen Unit, Android).</span></div>
+    <div class="stage" id="bare"></div>
+  </div>
+
+  <div id="items"></div>
+
+  <h2>The swap</h2>
+  <div class="card swap">
+    <div class="stage" id="swapStage"></div>
+    <div>
+      <p class="note" style="margin-top:0">Wearing an item doesn't stick anything on: the screen <b>changes channel</b> (it collapses to a bright line and opens on the new face). Taking it off plays the same flicker back to the base face. It stops under Low FX and reduced motion, so the face just swaps.</p>
+      <div class="chips" id="swapChips"></div>
+    </div>
+  </div>
+
+  <h2>Your picks</h2>
+  <div class="card">
+    <p class="note" style="margin-top:0">Approved 2026-11-17: Glowing outline, All cyan, LCD invert. Teen Unit, in the current mood. You can still try other options (remembered in this browser only).</p>
+    <div class="lineup" id="lineup"></div>
+    <p class="note" id="pickText"></p>
+  </div>
+
+  <h2>How it would build</h2>
+  <div class="card">
+    <ul>
+      <li><b>Every robot face item is a pixel bitmap</b> (rows of characters plus a palette) instead of free shapes. It is drawn centred on the form's screen (<code>ROBOT_SCREEN</code>), with a pixel size chosen so it fits that screen, so it lands on the screen's grid on all three forms.</li>
+      <li><b>Clipped to the glass.</b> A clip path of the screen's inner rect keeps the face on the screen (that's also what lets the shades scroll in from the top edge). The scanlines are drawn again on top so the face looks displayed, not printed.</li>
+      <li><b><code>REPLACES_FACE</code> covers all three</b> (<code>round-specs</code>, <code>heart-glasses</code>, <code>sunglasses</code>). Shades.gif stops layering over the base eyes. Asleep shows the base sleep face; bored dims the item's face like the base face.</li>
+      <li><b>Rule for later robot face items:</b> any new item that changes the face is a screen bitmap that replaces the base face, never a shape on top.</li>
+      <li>New effects (looped shades drop, glint, CRT channel change) go in <code>Pip.css</code> and stop under Low FX and reduced motion like the others.</li>
+    </ul>
+  </div>
+</main>
+
+<script>
+/* ======================================================================
+   Robot geometry — verbatim from pip-themed-lines.html (source of client robot/*Forms.js)
+   ====================================================================== */
+const ROBOT_INK = '#22303f', RI = ROBOT_INK;
+const FOOT_Y = 186;
+const ROBOT_FORMS = [
+  { name: 'Bot-kid', scale: 0.84, fill: ['#cfd6dc', '#7e8a96'],
+    body: 'M74 84 H126 Q140 84 140 98 V126 Q140 140 126 140 H122 V146 Q124 146 124 150 V174 Q124 182 116 182 H84 Q76 182 76 174 V150 Q76 146 78 146 V140 H74 Q60 140 60 126 V98 Q60 84 74 84Z',
+    hat: { y: 96, w: 60 }, eyes: { y: 112, gap: 14, s: 0.8 }, neck: 150, waist: 168, side: 23,
+    feet: [[[88, 180], [82, 185]], [[112, 180], [118, 185]]], growTop: 84, crownTop: 81, growthRise: 22 },
+  { name: 'Teen Unit', scale: 0.9, fill: ['#c6ced5', '#717e8b'],
+    body: 'M80 66 H120 Q132 66 132 78 V104 Q132 116 120 116 H108 V122 H118 Q130 122 130 134 V170 Q130 182 118 182 H82 Q70 182 70 170 V134 Q70 122 82 122 H92 V116 H80 Q68 116 68 104 V78 Q68 66 80 66Z',
+    hat: { y: 76, w: 56 }, eyes: { y: 92, gap: 13, s: 0.8 }, neck: 128, waist: 158, side: 30,
+    feet: [[[86, 180], [80, 186]], [[114, 180], [120, 186]]], growTop: 66, crownTop: 63, growthRise: 26 },
+  { name: 'Android', scale: 0.98, fill: ['#bcc5cd', '#65717e'],
+    body: 'M86 50 H114 Q126 50 126 62 V84 Q126 96 114 96 H108 V104 H128 Q142 104 142 118 L134 150 L134 172 Q134 182 124 182 H76 Q66 182 66 172 L66 150 L58 118 Q58 104 72 104 H92 V96 H86 Q74 96 74 84 V62 Q74 50 86 50Z',
+    hat: { y: 60, w: 48 }, eyes: { y: 74, gap: 11, s: 0.75 }, neck: 112, waist: 150, side: 42,
+    feet: [[[84, 180], [76, 186]], [[116, 180], [124, 186]]], growTop: 50, crownTop: 47, growthRise: 20 },
+];
+const RB = { dark: '#0b141c', screen: '#10202a', glow: '#37e6ff', glowSoft: '#37e6ff55', accent: '#ff5fa2', lime: '#9cff6a', limb: '#7f8c9a', plate: '#56616e', bolt: '#aeb8c2', dim: '#8d99a6', rust: '#b5653a', patch: '#6f7b86', cable: '#2b3a48' };
+const ROBOT_HEAD = [{ x0: 60, x1: 140, y0: 84, y1: 140, ym: 112 }, { x0: 68, x1: 132, y0: 66, y1: 116, ym: 91 }, { x0: 74, x1: 126, y0: 50, y1: 96, ym: 73 }];
+const ROBOT_SCREEN = [{ x: 67, y: 91, w: 66, h: 42, r: 9 }, { x: 74, y: 72, w: 52, h: 38, r: 8 }, { x: 79, y: 55, w: 42, h: 35, r: 7 }];
+const fx = (cls, svg, style = '') => `<g class="fx ${cls}"${style ? ` style="${style}"` : ''}>${svg}</g>`;
+
+function robotBack(fi, droop, f) {
+  const h = ROBOT_HEAD[fi];
+  let b = [h.x0 - 6, h.x1 + 6].map(x => `<circle cx="${x}" cy="${h.ym}" r="6" fill="${RB.bolt}" stroke="${RI}" stroke-width="2.6"/><path d="M${x} ${h.ym - 3.5} V${h.ym}" stroke="${RI}" stroke-width="2" stroke-linecap="round"/>`).join('');
+  if (fi >= 1) {
+    const sx = h.x1 - 4, sy = h.y1 - 4, ex = 100 + f.side + 14, ey = f.waist + 4;
+    const d = droop ? `M${sx} ${sy} C${sx + 14} ${sy + 22} ${ex + 6} ${ey + 18} ${ex} ${ey + 14}` : `M${sx} ${sy} C${sx + 22} ${sy + 6} ${ex + 10} ${ey - 20} ${ex} ${ey}`;
+    b += `<path d="${d}" stroke="${RI}" stroke-width="6.5" fill="none" stroke-linecap="round"/><path d="${d}" stroke="${RB.cable}" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+  }
+  return b;
+}
+function robotLimbs(f, fi) {
+  let s = '';
+  const L = [18, 24, 28][fi];
+  [-1, 1].forEach(dir => {
+    const sx = 100 + dir * (f.side - 3), sy = f.neck + 4, ex = 100 + dir * (f.side + 6), ey = sy + L * 0.5, hx = 100 + dir * (f.side + 9), hy = sy + L;
+    const d = `M${sx} ${sy} L${ex} ${ey} L${hx} ${hy}`;
+    s += `<path d="${d}" stroke="${RI}" stroke-width="10" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="${d}" stroke="${RB.limb}" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="${ex}" cy="${ey}" r="3.4" fill="${RB.bolt}" stroke="${RI}" stroke-width="2"/><circle cx="${hx}" cy="${hy}" r="4.8" fill="${RB.plate}" stroke="${RI}" stroke-width="2.4"/>`;
+  });
+  f.feet.forEach(([r, t]) => {
+    const dir = t[0] < r[0] ? -1 : 1, d = `M${r[0]} ${r[1] - 4} L${t[0]} ${t[1] - 3}`;
+    s += `<path d="${d}" stroke="${RI}" stroke-width="10" stroke-linecap="round"/><path d="${d}" stroke="${RB.limb}" stroke-width="5" stroke-linecap="round"/>
+      <rect x="${t[0] - 8 + dir * 2}" y="${t[1] - 6}" width="16" height="8" rx="3" fill="${RB.plate}" stroke="${RI}" stroke-width="2.5"/>`;
+  });
+  if (fi === 2) [-1, 1].forEach(dir => {
+    const cx = 100 + dir * (f.side - 2), cy = f.neck - 6;
+    s += `<ellipse cx="${cx}" cy="${cy}" rx="15" ry="11" fill="${RB.plate}" stroke="${RI}" stroke-width="3"/><path d="M${cx - 10} ${cy + 2} Q${cx} ${cy - 6} ${cx + 10} ${cy + 2}" stroke="${RB.glow}" stroke-width="2" fill="none"/>
+      <circle cx="${cx - 8 * dir}" cy="${cy - 4}" r="1.8" fill="${RB.bolt}"/><circle cx="${cx + 8 * dir}" cy="${cy + 3}" r="1.8" fill="${RB.bolt}"/>`;
+  });
+  return s;
+}
+function robotDetails(f, fi) {
+  const sc = ROBOT_SCREEN[fi], hd = ROBOT_HEAD[fi];
+  let d = `<rect x="${sc.x}" y="${sc.y}" width="${sc.w}" height="${sc.h}" rx="${sc.r}" fill="${RB.screen}" stroke="${RI}" stroke-width="3"/>`;
+  d += `<rect x="${sc.x + 2}" y="${sc.y + 2}" width="${sc.w - 4}" height="${sc.h - 4}" rx="${sc.r - 2}" fill="none" stroke="${RB.glowSoft}" stroke-width="2"/>`;
+  for (let y = sc.y + 5; y < sc.y + sc.h - 3; y += 4) d += `<path d="M${sc.x + 4} ${y} H${sc.x + sc.w - 4}" stroke="${RB.glow}" stroke-width=".8" opacity=".12"/>`;
+  d += `<circle cx="${sc.x + sc.w - 7}" cy="${(sc.y + sc.h + hd.y1) / 2}" r="1.8" fill="${RB.lime}"/>`;
+  d += `<path d="M${hd.x0 + 5} ${hd.y0 + 6} l7 2 M${hd.x1 - 12} ${hd.y1 - 4} l6 -2" stroke="${RI}" stroke-width="1.4" opacity=".35" stroke-linecap="round"/>`;
+  d += `<ellipse cx="${100 - f.side * 0.55}" cy="${f.waist + 6}" rx="4" ry="2.6" fill="${RB.rust}" opacity=".7"/><ellipse cx="${hd.x0 + 6}" cy="${hd.y1 - 6}" rx="3" ry="2" fill="${RB.rust}" opacity=".6"/>`;
+  const pw = f.side * 0.8, ph = (f.waist - f.neck) * 0.5, px = 100 + f.side * 0.05, py = f.neck + (f.waist - f.neck) * 0.22;
+  d += `<rect x="${px - pw / 2}" y="${py}" width="${pw}" height="${ph}" rx="3" fill="${RB.patch}" stroke="${RI}" stroke-width="2" transform="rotate(-4 ${px} ${py + ph / 2})"/>`;
+  d += [[-1, -1], [1, -1], [-1, 1], [1, 1]].map(([kx, ky]) => `<circle cx="${px + kx * (pw / 2 - 3)}" cy="${py + ph / 2 + ky * (ph / 2 - 3)}" r="1.3" fill="${RB.bolt}"/>`).join('');
+  if (fi === 2) d += `<path d="M${100 - f.side * 0.7} ${f.neck - 4} L100 ${f.neck + 2} L${100 + f.side * 0.7} ${f.neck - 4}" stroke="${RB.plate}" stroke-width="3" fill="none" stroke-linejoin="round"/>`;
+  return d;
+}
+function robotCrown(fi, droop, base) {
+  const h = ROBOT_FORMS[fi].growthRise, tipY = base - h + 6;
+  const stalk = droop ? `M100 ${base + 2} Q100 ${base - h * 0.45} ${112} ${base - h * 0.5}` : `M100 ${base + 2} V${tipY}`;
+  const [bx, by] = droop ? [114, base - h * 0.5] : [100, tipY];
+  return `<rect x="93" y="${base - 2}" width="14" height="6" rx="2" fill="${RB.plate}" stroke="${RI}" stroke-width="2.2"/>
+    <path d="${stalk}" stroke="${RI}" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+    ${droop ? '' : `<circle cx="${bx}" cy="${by}" r="9" fill="${RB.accent}" opacity=".25"/>`}
+    <circle cx="${bx}" cy="${by}" r="5" fill="${droop ? RB.dim : RB.accent}" stroke="${RI}" stroke-width="2.4"/>`;
+}
+function robotFace(f, mood) {
+  const { y: ey, gap, s } = f.eyes, L = 100 - gap, R = 100 + gap, my = ey + 15 * s, g = RB.glow, p = 3.2 * s;
+  const glow = (svg) => `<g class="glowy" style="filter:drop-shadow(0 0 ${2 * s}px ${g})">${svg}</g>`;
+  const px = (x, y) => `<rect x="${(x - p / 2).toFixed(2)}" y="${(y - p / 2).toFixed(2)}" width="${p.toFixed(2)}" height="${p.toFixed(2)}" fill="${g}"/>`;
+  const pixels = (cells, cx, cy) => cells.map(([i, j]) => px(cx + i * p, cy + j * p)).join('');
+  const BLOCK = [[-1, -1], [0, -1], [1, -1], [-1, 0], [0, 0], [1, 0], [-1, 1], [0, 1], [1, 1], [-1, -2], [0, -2], [1, -2]];
+  const CHEVRON = [[-2, 1], [-1, 0], [0, -1], [1, 0], [2, 1]];
+  const LINE = [[-2, 0], [-1, 0], [0, 0], [1, 0], [2, 0]];
+  const LID = [[-1, 0], [0, 0], [1, 0], [-1, 1], [0, 1], [1, 1]];
+  const SMILE = [[-3, -1], [-2, 0], [-1, 1], [0, 1], [1, 1], [2, 0], [3, -1]];
+  const GRIN = [[-3, -1], [-2, 0], [-1, 0], [0, 0], [1, 0], [2, 0], [3, -1], [-1, 1], [0, 1], [1, 1]];
+  const FLAT = [[-2, 0], [-1, 0], [0, 0], [1, 0], [2, 0]];
+  const blush = `<rect x="${L - 10 * s}" y="${ey + 7 * s}" width="${6 * s}" height="${2.4 * s}" fill="${RB.accent}" opacity=".85"/><rect x="${R + 4 * s}" y="${ey + 7 * s}" width="${6 * s}" height="${2.4 * s}" fill="${RB.accent}" opacity=".85"/>`;
+  switch (mood) {
+    case 'happy': return glow(pixels(CHEVRON, L, ey) + pixels(CHEVRON, R, ey) + pixels(GRIN, 100, my)) + blush;
+    case 'bored': return glow(pixels(LID, L, ey) + pixels(LID, R, ey) + pixels(FLAT, 100, my + p));
+    case 'sleep': return `<g opacity=".45">${pixels(LINE, L, ey + p) + pixels(LINE, R, ey + p) + px(100, my + p)}</g>`;
+    default: return glow(pixels(BLOCK, L, ey) + pixels(BLOCK, R, ey) + pixels(SMILE, 100, my));
+  }
+}
+
+/* ======================================================================
+   NOW: today's robot face items — verbatim from pip-themed-lines.html ROBOT_WARDROBE.glasses
+   ====================================================================== */
+const pxCells = (cells, cx, cy, p, fill) => cells.map(([i, j]) => `<rect x="${(cx + i * p - p / 2).toFixed(2)}" y="${(cy + j * p - p / 2).toFixed(2)}" width="${p.toFixed(2)}" height="${p.toFixed(2)}" fill="${fill}"/>`).join('');
+const NOW = {
+  'round-specs': { label: 'Smiley.exe', replacesFace: true, note: 'A smooth yellow disc drawn over the monitor. It hides the base face, but it reads as a sticker, not something the screen shows.',
+    draw: (L, R, y, s) => { const c = (L + R) / 2, r = (R - L) / 2 + 4 * s;
+      return `<g style="filter:drop-shadow(0 0 ${2 * s}px #ffd84d)"><circle cx="${c}" cy="${y}" r="${r}" fill="#ffd84d" stroke="#c99a12" stroke-width="${2 * s}"/>
+        ${fx('blink', `<ellipse cx="${c - r * 0.36}" cy="${y - r * 0.18}" rx="${r * 0.11}" ry="${r * 0.2}" fill="${RB.dark}"/><ellipse cx="${c + r * 0.36}" cy="${y - r * 0.18}" rx="${r * 0.11}" ry="${r * 0.2}" fill="${RB.dark}"/>`)}
+        <path d="M${c - r * 0.5} ${y + r * 0.18} Q${c} ${y + r * 0.78} ${c + r * 0.5} ${y + r * 0.18}" stroke="${RB.dark}" stroke-width="${2.6 * s}" fill="none" stroke-linecap="round"/></g>`; } },
+  'heart-glasses': { label: 'Heart eyes', replacesFace: true, note: 'Already pixels on the screen and already replaces the face. Only the colour is open: pink hearts beside a cyan mouth.',
+    draw: (L, R, y, s) => { const p = 2.6 * s;
+      const HEART = [[-2, -1], [-1, -1], [1, -1], [2, -1], [-2, 0], [-1, 0], [0, 0], [1, 0], [2, 0], [-1, 1], [0, 1], [1, 1], [0, 2]];
+      const SMILE = [[-3, -1], [-2, 0], [-1, 1], [0, 1], [1, 1], [2, 0], [3, -1]];
+      return [L, R].map(x => fx('pulse', pxCells(HEART, x, y - p * 0.5, p, RB.accent), `filter:drop-shadow(0 0 ${2 * s}px ${RB.accent})`)).join('')
+        + `<g style="filter:drop-shadow(0 0 ${2 * s}px ${RB.glow})">${pxCells(SMILE, (L + R) / 2, y + 15 * s, 3.2 * s, RB.glow)}</g>`; } },
+  sunglasses: { label: 'Shades.gif', replacesFace: false, note: 'Black pixel shades dropped over the base eyes, so the base face is still there underneath. Black is also nearly invisible on the dark screen.',
+    draw: (L, R, y, s) => { const p = 2.8 * s, lens = [];
+      for (let j = -1; j <= 1; j++) for (let i = -2; i <= 2; i++) if (!(j === 1 && Math.abs(i) === 2)) lens.push([i, j]);
+      let svg = pxCells(lens, L, y, p, '#05080b') + pxCells(lens, R, y, p, '#05080b');
+      for (let x = L + 2.5 * p; x <= R - 2.5 * p + 0.01; x += p) svg += pxCells([[0, 0]], x, y - p, p, '#05080b');
+      svg += pxCells([[-1, -1]], L, y, p, '#fff') + pxCells([[-1, -1]], R, y, p, '#fff');
+      return fx('drop', svg); } },
+};
+
+/* ======================================================================
+   PROPOSED: screen faces. A face is layers of same-sized bitmaps ('.' = pixel off) + a palette.
+   Each layer can carry an effect class. Drawn centred on ROBOT_SCREEN[fi], clipped to the glass.
+   ====================================================================== */
+const SMILEY_DISC = [
+  '....YYYYY....',
+  '..YYYYYYYYY..',
+  '.YYYYYYYYYYY.',
+  '.YYYYYYYYYYY.',
+  'YYYYYYYYYYYYY',
+  'YYYYYYYYYYYYY',
+  'YYYYYYYYYYYYY',
+  '.YYYYYYYYYYY.',
+  '.YYYYYYYYYYY.',
+  '..YYYYYYYYY..',
+  '....YYYYY....'];
+const SMILEY_EYES = [
+  '.............', '.............', '.............',
+  '....E...E....',
+  '....E...E....',
+  '.............', '.............', '.............', '.............', '.............', '.............'];
+const SMILEY_MOUTH = [
+  '.............', '.............', '.............', '.............', '.............', '.............',
+  '...M.....M...',
+  '....MMMMM....',
+  '.............', '.............', '.............'];
+const SMILEY_SHINE = [
+  '.............', '.............',
+  '...W.........',
+  '..W..........',
+  '.............', '.............', '.............', '.............', '.............', '.............', '.............'];
+/** Keep only the disc's edge (a cell with an off or missing 4-neighbour) and paint it `ch`. */
+function edgeOf(rows, ch) {
+  const on = (i, j) => rows[j]?.[i] && rows[j][i] !== '.';
+  return rows.map((r, j) => [...r].map((c, i) => (c !== '.' && (!on(i - 1, j) || !on(i + 1, j) || !on(i, j - 1) || !on(i, j + 1))) ? ch : '.').join(''));
+}
+/** Overlay b onto a (b wins where it's on). */
+const over = (a, b) => a.map((r, j) => [...r].map((c, i) => (b[j][i] !== '.' ? b[j][i] : c)).join(''));
+
+const HEART = ['.HH.HH.', 'HWHHHHH', 'HHHHHHH', '.HHHHH.', '..HHH..', '...H...'];
+const BLANK15 = '...............';
+const HEARTS_L = [...HEART.map(r => r + '.' + '.......'), BLANK15, BLANK15, BLANK15];
+const HEARTS_R = [...HEART.map(r => '.......' + '.' + r), BLANK15, BLANK15, BLANK15];
+const HEARTS_MOUTH = [BLANK15, BLANK15, BLANK15, BLANK15, BLANK15, BLANK15, BLANK15, '....M.....M....', '.....MMMMM.....'];
+
+const SHADES = [
+  'GGGGGGGGGGGGGGGGG',
+  'GggggggG.GggggggG',
+  'GggggggG.GggggggG',
+  '.GggggG...GggggG.',
+  '..GGGG.....GGGG..',
+  '.................',
+  '............M....',
+  '.......MMMMM.....'];
+const SHADES_FRAME = SHADES.map((r, j) => j < 5 ? r : '.................');
+const SHADES_MOUTH = SHADES.map((r, j) => j < 5 ? '.................' : r);
+const SHADES_GLINT = ['.................', '..W........W.....', '.W........W......', '.................', '.................', '.................', '.................', '.................'];
+
+const PROPOSED = {
+  'round-specs': [
+    { key: 'A', label: 'Pixel emoji', kind: 'full colour',
+      layers: [{ rows: over(SMILEY_DISC, edgeOf(SMILEY_DISC, 'O')) }, { rows: SMILEY_SHINE }, { rows: SMILEY_MOUTH }, { rows: SMILEY_EYES, cls: 'blink' }],
+      pal: { Y: '#ffd84d', O: '#e09a14', W: '#fff7cf', E: RB.dark, M: RB.dark }, glow: '#ffd84d',
+      note: 'The classic yellow smiley, built from screen pixels with a darker pixel rim and a shine. It fills the screen and blinks.',
+      ref: 'pixel-art emoji packs, and TV-head robots whose screen shows a picture rather than wearing one (Mike the TV in ReBoot).' },
+    { key: 'B', label: 'Glowing outline', kind: 'screen colour',
+      layers: [{ rows: edgeOf(SMILEY_DISC, 'C') }, { rows: SMILEY_MOUTH }, { rows: SMILEY_EYES, cls: 'blink' }],
+      pal: { C: RB.glow, E: RB.glow, M: RB.glow }, glow: RB.glow,
+      note: 'The same smiley drawn only in the screen\'s own cyan, as an outline. It looks like the monitor is showing a smiley icon, and it matches the base face.',
+      ref: 'BMO\'s screen face in Adventure Time, and one-colour robot screens that show emoji (VEX AIM).' },
+  ],
+  'heart-glasses': [
+    { key: 'A', label: 'Pink hearts', kind: 'today\'s colours',
+      layers: [{ rows: HEARTS_L, cls: 'pulse' }, { rows: HEARTS_R, cls: 'pulse' }, { rows: HEARTS_MOUTH }],
+      pal: { H: RB.accent, W: '#ffd6e8', M: RB.glow }, glow: RB.accent,
+      note: 'Today\'s look, moved onto the screen\'s grid: bigger pixel hearts with a shine pixel, clipped to the glass, with the cyan smile.',
+      ref: 'the heart-eyes emoji (😍) in pixel emoji packs.' },
+    { key: 'B', label: 'All cyan', kind: 'screen colour',
+      layers: [{ rows: HEARTS_L, cls: 'pulse' }, { rows: HEARTS_R, cls: 'pulse' }, { rows: HEARTS_MOUTH }],
+      pal: { H: RB.glow, W: '#d9fbff', M: RB.glow }, glow: RB.glow,
+      note: 'The same hearts in the screen\'s cyan, so the screen only ever shows one colour, like the base face.',
+      ref: 'one-colour LCD virtual pets, where every expression is drawn with the same pixels.' },
+  ],
+  sunglasses: [
+    { key: 'A', label: 'Lit shades', kind: 'screen colour',
+      layers: [{ rows: SHADES_MOUTH }, { rows: SHADES_FRAME, cls: 'drop' }, { rows: SHADES_GLINT, cls: 'glint' }],
+      pal: { G: RB.glow, g: '#37e6ff40', M: RB.glow, W: '#ffffff' }, glow: RB.glow,
+      note: 'A 😎 face. The shades are lit outlines with tinted lenses (a screen can\'t show black on black), they scroll down from the top edge of the screen, and a glint flashes once they land.',
+      ref: 'the 8-bit "deal with it" sunglasses GIF, redrawn as glowing screen pixels.' },
+    { key: 'B', label: 'LCD invert', kind: 'inverted screen', bg: '#37e6ff',
+      layers: [{ rows: SHADES_MOUTH }, { rows: SHADES_FRAME, cls: 'drop' }, { rows: SHADES_GLINT, cls: 'glint' }],
+      pal: { G: RB.dark, g: RB.dark, M: RB.dark, W: '#e9fdff' }, glow: RB.glow,
+      note: 'The whole screen lights up cyan and the shades and smirk are the dark pixels. It\'s the boldest, and it reads as cool even at the small card size.',
+      ref: 'original handheld and virtual-pet LCDs: dark pixels on a lit screen.' },
+  ],
+};
+const ITEMS = [
+  { id: 'round-specs', hint: 'Glasses slot · Smiley.exe' },
+  { id: 'heart-glasses', hint: 'Glasses slot · Heart eyes' },
+  { id: 'sunglasses', hint: 'Glasses slot · Shades.gif' },
+];
+
+/** Draw a screen face for form fi: centred on the screen, pixel size fitted to it, clipped to the glass. */
+function screenFace(fi, face, clipId) {
+  const sc = ROBOT_SCREEN[fi], cols = face.layers[0].rows[0].length, rows = face.layers[0].rows.length;
+  const p = Math.min((sc.w - 8) / cols, (sc.h - 8) / rows), cx = sc.x + sc.w / 2, cy = sc.y + sc.h / 2;
+  const x0 = cx - (cols * p) / 2, y0 = cy - (rows * p) / 2;
+  const cells = (r) => r.flatMap((row, j) => [...row].map((c, i) => c === '.' ? '' :
+    `<rect x="${(x0 + i * p).toFixed(2)}" y="${(y0 + j * p).toFixed(2)}" width="${(p + 0.06).toFixed(2)}" height="${(p + 0.06).toFixed(2)}" fill="${face.pal[c]}"/>`)).join('');
+  let s = face.bg ? `<rect x="${sc.x}" y="${sc.y}" width="${sc.w}" height="${sc.h}" fill="${face.bg}" opacity=".92"/>` : '';
+  s += `<g class="glowy" style="filter:drop-shadow(0 0 ${(p * 0.7).toFixed(1)}px ${face.glow})">`
+    + face.layers.map(l => l.cls ? fx(l.cls, cells(l.rows)) : cells(l.rows)).join('') + '</g>';
+  // scanlines over the face so it reads as displayed, then the glass sheen
+  for (let y = sc.y + 3; y < sc.y + sc.h; y += 3) s += `<path d="M${sc.x} ${y} H${sc.x + sc.w}" stroke="${RB.screen}" stroke-width=".9" opacity="${face.bg ? '.35' : '.45'}"/>`;
+  s += `<path d="M${sc.x + 4} ${sc.y + 6} Q${sc.x + sc.w * 0.3} ${sc.y + 2} ${sc.x + sc.w * 0.55} ${sc.y + 3}" stroke="#fff" stroke-width="1.6" fill="none" opacity=".18" stroke-linecap="round"/>`;
+  return `<defs><clipPath id="${clipId}"><rect x="${sc.x + 2}" y="${sc.y + 2}" width="${sc.w - 4}" height="${sc.h - 4}" rx="${sc.r - 2}"/></clipPath></defs><g clip-path="url(#${clipId})">${s}</g>`;
+}
+
+/* ======================================================================
+   Compose (mirrors PipFigure's layer order; only the face step changes)
+   ====================================================================== */
+let uid = 0;
+function robot(fi, mood, { now = null, face = null, tune = false } = {}) {
+  const f = ROBOT_FORMS[fi], id = `r${uid++}`, droop = mood === 'bored' || mood === 'sleep', k = f.scale;
+  let s = `<defs><linearGradient id="${id}g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${f.fill[0]}"/><stop offset="1" stop-color="${f.fill[1]}"/></linearGradient></defs>`;
+  s += robotBack(fi, droop, f) + robotLimbs(f, fi);
+  s += `<path d="${f.body}" fill="url(#${id}g)"/>`;
+  s += `<ellipse cx="${100 - f.side * 0.55}" cy="${f.hat.y + 10}" rx="11" ry="6" transform="rotate(-32 ${100 - f.side * 0.55} ${f.hat.y + 10})" fill="#fff" opacity=".45"/>`;
+  s += robotDetails(f, fi);
+  s += `<path d="${f.body}" fill="none" stroke="${RI}" stroke-width="5" stroke-linejoin="round"/>`;
+  let faceSvg;
+  if (now) {                                                      // today: drawn over the head, unclipped
+    const { y, gap, s: sc } = f.eyes;
+    faceSvg = (now.replacesFace ? '' : robotFace(f, mood)) + now.draw(100 - gap, 100 + gap, y, sc);
+  } else if (face && mood !== 'sleep') {                          // proposed: the screen shows the item instead of the face
+    faceSvg = `<g${mood === 'bored' ? ' opacity=".55"' : ''}>${screenFace(fi, face, `${id}c`)}</g>`;
+  } else faceSvg = robotFace(f, mood);                            // bare, or asleep: the base face
+  s += tune ? `<g class="tune">${faceSvg}</g>` : faceSvg;
+  s += robotCrown(fi, droop, f.growTop);
+  return `<ellipse cx="100" cy="189" rx="${56 * k}" ry="6" fill="rgba(0,0,0,.35)"/><g class="anim"><g transform="translate(100 ${FOOT_Y}) scale(${k}) translate(-100 -${FOOT_Y})">${s}</g></g>`;
+}
+function svg(fi, mood, opts, viewBox = '0 -14 200 212', label = '') {
+  const a11y = label ? `role="img" aria-label="${label}"` : 'aria-hidden="true" focusable="false"';
+  return `<svg viewBox="${viewBox}" class="mood-${mood}" xmlns="http://www.w3.org/2000/svg" ${a11y}>${robot(fi, mood, opts)}</svg>`;
+}
+/** A close crop of the Teen Unit's screen (in figure space after the scale). */
+function screenCrop(fi) {
+  const sc = ROBOT_SCREEN[fi], k = ROBOT_FORMS[fi].scale, cx = sc.x + sc.w / 2, cy = sc.y + sc.h / 2;
+  const X = 100 + (cx - 100) * k, Y = FOOT_Y + (cy - FOOT_Y) * k, w = (sc.w + 14) * k, h = w * 0.75;
+  return [X - w / 2, Y - h / 2, w, h].map(n => n.toFixed(1)).join(' ');
+}
+
+/* ======================================================================
+   UI
+   ====================================================================== */
+const MOODS = [['content', 'Content'], ['happy', 'Happy'], ['bored', 'Bored (dimmed)'], ['sleep', 'Asleep (base face returns)']];
+let mood = 'content';
+const PICK_KEY = 'fb.mockup.robotScreenFacePicks';
+const APPROVED = { 'round-specs': 'B', 'heart-glasses': 'B', sunglasses: 'B' };
+let picks = { ...APPROVED };
+try { picks = { ...APPROVED, ...(JSON.parse(localStorage.getItem(PICK_KEY) || '{}') || {}) }; } catch { picks = { ...APPROVED }; }
+const savePicks = () => { try { localStorage.setItem(PICK_KEY, JSON.stringify(picks)); } catch { /* private window */ } };
+const pickOf = (id) => PROPOSED[id].find(o => o.key === picks[id]) ?? PROPOSED[id][0];
+let swapItem = null;
+
+function renderMoods() {
+  document.getElementById('moods').innerHTML = MOODS.map(([m, l]) => `<button type="button" data-mood="${m}" class="${m === mood ? 'on' : ''}" aria-pressed="${m === mood}">${l}</button>`).join('');
+}
+function renderBare() {
+  document.getElementById('bare').innerHTML = [0, 1, 2].map(fi => svg(fi, mood, {}, undefined, `${ROBOT_FORMS[fi].name}, base face`)).join('');
+}
+function renderItems() {
+  document.getElementById('items').innerHTML = ITEMS.map(({ id, hint }) => {
+    const cur = NOW[id];
+    const opts = PROPOSED[id].map(o => {
+      const picked = picks[id] === o.key;
+      return `<div class="opt${picked ? ' picked' : ''}">
+        <div class="opt-title"><b>Option ${o.key} · ${o.label}</b><span class="tag">${APPROVED[id] === o.key ? 'approved · ' : ''}${o.kind}</span></div>
+        <div class="stage">${[0, 1, 2].map(fi => svg(fi, mood, { face: o }, undefined, `${ROBOT_FORMS[fi].name} showing ${o.label}`)).join('')}</div>
+        <p>${o.note}</p>
+        <p><i>Inspired by:</i> ${o.ref}</p>
+        <div class="zoom">${[0, 1, 2].map(fi => svg(fi, mood, { face: o }, screenCrop(fi))).join('')}<span>Close-up of each screen</span></div>
+        <button type="button" class="btn pick" data-item="${id}" data-key="${o.key}" aria-pressed="${picked}">${picked ? '✓ Picked' : `Pick ${o.key}`}</button>
+      </div>`;
+    }).join('');
+    return `<section class="card">
+      <div class="item-head"><h3>${cur.label}</h3><span class="hint">${hint}</span></div>
+      <div class="opts">
+        <div class="opt now">
+          <div class="opt-title"><b>Now</b><span class="tag old">${id === 'heart-glasses' ? 'colour only' : 'sticker'}</span></div>
+          <div class="stage">${svg(1, mood, { now: cur }, undefined, `Teen Unit wearing today's ${cur.label}`)}</div>
+          <p>${cur.note}</p>
+        </div>
+        ${opts}
+      </div>
+    </section>`;
+  }).join('');
+}
+function renderSwap(tune = false) {
+  const face = swapItem ? pickOf(swapItem) : null;
+  document.getElementById('swapStage').innerHTML = svg(1, mood, { face, tune }, '20 -6 160 196', face ? `Teen Unit showing ${face.label}` : 'Teen Unit, base face');
+  document.getElementById('swapChips').innerHTML = [[null, 'Base face'], ...ITEMS.map(({ id }) => [id, NOW[id].label])]
+    .map(([id, l]) => `<button type="button" data-swap="${id ?? ''}" class="${id === swapItem ? 'on' : ''}" aria-pressed="${id === swapItem}">${l}</button>`).join('');
+}
+function renderLineup() {
+  document.getElementById('lineup').innerHTML = ITEMS.map(({ id }) => {
+    const o = pickOf(id);
+    return `<figure><div class="stage">${svg(1, mood, { face: o }, '20 -6 160 196', `Teen Unit showing ${o.label}`)}</div>
+      <figcaption>${NOW[id].label}<small>option ${o.key} · ${o.label}${picks[id] ? '' : ' (not picked yet)'}</small></figcaption></figure>`;
+  }).join('');
+  document.getElementById('pickText').textContent = 'Picks: ' + ITEMS.map(({ id }) => `${NOW[id].label} → ${picks[id] ? `${picks[id]} ${pickOf(id).label}` : 'none'}`).join(', ') + '.';
+}
+function renderAll() { renderMoods(); renderBare(); renderItems(); renderSwap(); renderLineup(); }
+
+document.addEventListener('click', (e) => {
+  const m = e.target.closest('[data-mood]');
+  if (m) { mood = m.dataset.mood; renderAll(); return; }
+  const p = e.target.closest('[data-item]');
+  if (p) { picks[p.dataset.item] = p.dataset.key; savePicks(); renderItems(); renderSwap(); renderLineup(); return; }
+  const sw = e.target.closest('[data-swap]');
+  if (sw) { swapItem = sw.dataset.swap || null; renderSwap(true); return; }
+  if (e.target.id === 'replay') { renderAll(); return; }
+  if (e.target.id === 'lowfx') {
+    const on = document.body.classList.toggle('lowfx');
+    e.target.classList.toggle('on', on); e.target.setAttribute('aria-pressed', on);
+  }
+});
+renderAll();
+</script>
+</body>
+</html>

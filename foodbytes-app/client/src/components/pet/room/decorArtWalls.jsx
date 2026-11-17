@@ -210,9 +210,10 @@ export const WALL_BUILDERS = {
       <IsoLine points={[P(2.3, 144.9, 95), P(2.6, 144.9, 101)]} width={1} color={WHITE_HI} />
     </>
   ),
+  // raised 12 so the bottom frame clears the windowsill (2026-11-17, mockup pip-dragon-shoes.html option C)
   'photo-strip': () => (
     <>
-      {[[64, '#bde0fe'], [82, '#ffd6a5'], [100, '#caffbf']].map(([h, c]) => (
+      {[[76, '#bde0fe'], [94, '#ffd6a5'], [112, '#caffbf']].map(([h, c]) => (
         <g key={h}>
           <Box u={0} v={137} du={1.6} dv={14} h0={h} h1={h + 14} color="#ffffff" />
           <Flat points={rectUPoints(1.75, 139, 149, h + 2, h + 12)} fill={c} />

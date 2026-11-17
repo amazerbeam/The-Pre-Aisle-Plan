@@ -1,5 +1,5 @@
 import { PIP_FOOT_X } from '../pip/pipSpace.js'
-import { arc, arcY, band, curveOf, path, titleBelt } from '../pip/wardrobeShapes.js'
+import { arc, arcY, band, curveOf, footFrame, path, titleBelt } from '../pip/wardrobeShapes.js'
 import { HERB_INK } from './herbForms.js'
 
 /**
@@ -204,34 +204,31 @@ const TORSO = {
   dungarees: (f) => pants({ color: '#6f9a4a', seam: '#e3c35a', straps: true }, f)
 }
 
-// ---- shoes on the two foot tips ----
-
+// ---- shoes: each replaces the whole foot, drawn in the foot frame (mockup pip-dragon-shoes.html FOOTWEAR.herb) ----
 const SHOES = {
-  sneakers: { color: '#fff', trim: '#e8574a', tall: false },
-  wellies: { color: '#e8b830', trim: '#c98f1a', tall: true }
+  sneakers: (root, tip) => [footFrame(root, tip, [
+    fillPath('M-11 4 Q-12 -7 -1 -7.5 Q9 -7.5 12.5 0 Q13.5 4 10 4 Z', '#fff', 2.8),
+    strokePath('M-11 3 H12', '#e8574a', 2.2),
+    strokePath('M-3 -6 l5 5', '#e8574a', 2.4, { strokeLinecap: 'round' })
+  ])],
+  wellies: (root, tip) => [footFrame(root, tip, [
+    fillPath('M-10 4 V-11 H3 V-3 Q11 -2 12.5 2 V4 Z', '#e8b830', 2.8),
+    strokePath('M-10 -7 H3', '#c98f1a', 2.5)
+  ])]
 }
 
-function shoe({ color, trim, tall }, root, tip) {
-  const dir = tip[0] < root[0] ? -1 : 1
-  const [x, y] = tip
-  if (tall) {
-    return [
-      fillPath(`M${x - 8 * dir} ${y - 14} h${12 * dir} v9 q${7 * dir} 1 ${8 * dir} 7 h${-20 * dir} Z`, color, 3),
-      strokePath(`M${x - 8 * dir} ${y - 10} h${12 * dir}`, trim, 2.5)
-    ]
-  }
-  return [
-    fillPath(`M${x - 9 * dir} ${y + 2} q0 -10 ${9 * dir} -10 q${10 * dir} 0 ${12 * dir} 8 q0 3 -3 3 Z`, color, 3),
-    strokePath(`M${x - 2 * dir} ${y - 6} l${5 * dir} 5`, trim, 2.5, { strokeLinecap: 'round' }),
-    strokePath(`M${x - 9 * dir} ${y + 2} h${21 * dir}`, trim, 2)
-  ]
-}
+// ---- the bare foot: a little ball in the form's limb colour (mockup pip-dragon-shoes.html BARE.herb) ----
+const BARE_FOOT = (root, tip, f) => [footFrame(root, tip, [
+  { tag: 'ellipse', cx: 1, cy: -0.5, rx: 7, ry: 4.8, fill: f.fill[1], stroke: HERB_INK, strokeWidth: 2.6, strokeLinejoin: 'round' },
+  { tag: 'ellipse', cx: -1, cy: -2.6, rx: 3, ry: 1.4, fill: '#fff', opacity: 0.35 }
+])]
 
 /** The herb's wardrobe in the shape every line shares (pip/wardrobeArt.js dispatches on it). */
 export const HERB_WARDROBE = {
   HATS, // id → (x, y, w) → { top, shapes, straight? }
   GLASSES, // id → (L, R, y, s) → shapes
   TORSO, // id → (f) → { clip, extra, back? }
-  SHOES: Object.fromEntries(Object.entries(SHOES).map(([id, style]) => [id, (root, tip) => shoe(style, root, tip)])), // id → (root, tip) → shapes
+  SHOES, // id → (root, tip) → shapes: a shoe replaces the whole foot
+  BARE_FOOT, // (root, tip, f) → shapes: the foot when no shoe is worn
   REPLACES_FACE: [] // glasses ids that replace the face while worn
 }
