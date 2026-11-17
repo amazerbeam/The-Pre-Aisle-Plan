@@ -1,0 +1,156 @@
+/* MPP-49: Pip's Path — ported from mockup/pips-path.html. Chrome reads --pp-* / --pet-* tokens; skin art is JSX with its own palette. */
+
+/* ===== Picker ===== */
+.pp-head-spacer { width: 44px; height: 44px; flex: none; }
+.pp-game-card { display: grid; grid-template-columns: 120px 1fr; gap: 12px; align-items: center; width: 100%; min-height: 96px; margin: 0 0 10px; padding: 10px; border: 1px solid var(--pet-divider-border); border-radius: 12px; background: var(--pet-card-bg); color: var(--text-primary); font: inherit; text-align: left; cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+.pp-game-card:active { background: var(--pet-press-bg); }
+@media (hover: hover) { .pp-game-card:hover { background: var(--pet-hover-bg); } }
+.pp-game-card:focus-visible { outline: 3px solid var(--pip-focus-ring); outline-offset: 2px; }
+.pp-game-card:disabled { cursor: default; background: var(--pet-disabled-bg); color: var(--pet-disabled-text); }
+.pp-game-art { display: grid; place-items: center; width: 120px; height: 96px; }
+.pp-game-art--soon { font-size: 2rem; }
+.pp-mini-board { position: relative; display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; width: 96px; height: 96px; padding: 3px; border-radius: 8px; background: var(--pp-tile-border); }
+.pp-mini-cell { position: relative; display: block; min-width: 0; }
+.pp-mini-cell svg { display: block; width: 100%; height: 100%; }
+.pp-mini-cell > .pp-mini-over { position: absolute; inset: 0; }
+.pp-mini-pip { position: absolute; left: 50%; top: 50%; width: 46px; height: 46px; transform: translate(-50%, -60%); }
+.pp-mini-pip svg { display: block; width: 100%; height: 100%; }
+.pp-game-title, .pp-game-sub, .pp-bar { display: block; }
+.pp-game-title { margin: 0 0 2px; font-size: 1rem; font-weight: 800; }
+.pp-game-sub { margin: 0 0 8px; font-size: 0.8rem; color: var(--pet-soft-text); }
+.pp-game-card:disabled .pp-game-sub { color: var(--pet-disabled-text); }
+.pp-bar { height: 8px; border-radius: 999px; background: var(--pet-divider-border); overflow: hidden; }
+.pp-bar > i { display: block; height: 100%; background: var(--pp-node-cleared-bg); }
+
+/* ===== Full-width game screens (map, board): the shop sheet shell without the 480 px column ===== */
+.pip-shop.pp-screen { max-width: none; background: var(--pp-board-bg); color: var(--pp-hud-text); }
+.pp-screen .pip-shop-head { background: var(--bg-primary); color: var(--text-primary); }
+.pp-screen .pip-shop-body { padding: 10px 12px 18px; }
+.pp-screen-sub { margin: 0 0 10px; font-weight: 600; }
+.pp-board-area { padding-inline: 12px; }
+@media (max-width: 400px) { .pp-screen .pip-shop-body { padding-inline: 8px; } }
+
+/* ===== Chapter map ===== */
+.pp-map-path { position: relative; display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px 0; padding: 40px 0 8px; }
+.pp-map-cell { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 0; }
+.pp-map-cell:nth-child(odd) { justify-self: start; margin-left: 14%; }
+.pp-map-cell:nth-child(even) { justify-self: end; margin-right: 14%; }
+.pp-map-node { position: relative; z-index: 1; display: grid; place-items: center; width: 56px; height: 56px; padding: 0; border: 3px solid var(--pp-tile-border); border-radius: 50%; font: inherit; font-weight: 800; font-size: 1.05rem; line-height: 1; cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+.pp-map-node:disabled { cursor: default; }
+.pp-map-node:focus-visible { outline: 3px solid var(--pip-focus-ring); outline-offset: 3px; }
+.pp-map-node.is-cleared { background: var(--pp-node-cleared-bg); color: var(--pp-node-cleared-text); }
+.pp-map-node.is-current { background: var(--pp-board-bg); color: var(--pp-node-text); box-shadow: 0 0 0 4px var(--pp-node-current-ring); border-color: var(--pp-node-current-ring); }
+.pp-map-node.is-locked { background: var(--pp-node-locked-bg); color: var(--pp-node-text); border-style: dashed; }
+.pp-map-node.is-cleared:active, .pp-map-node.is-current:active { filter: brightness(0.92); }
+@media (hover: hover) { .pp-map-node.is-cleared:hover, .pp-map-node.is-current:hover { filter: brightness(1.08); } }
+.pp-node-check { font-size: 0.7rem; margin-top: 2px; }
+.pp-node-mark { position: absolute; right: -8px; bottom: -8px; width: 22px; height: 22px; border-radius: 50%; background: var(--pp-board-bg); }
+.pp-node-mark svg { display: block; width: 100%; height: 100%; }
+.pp-node-pip { position: absolute; left: 50%; bottom: 55%; width: 52px; height: 52px; transform: translateX(-50%); pointer-events: none; }
+.pp-node-pip svg { display: block; width: 100%; height: 100%; }
+.pp-node-badge { position: absolute; right: -6px; top: -6px; display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--pp-node-current-ring); color: var(--pp-board-bg); font-size: 0.8rem; font-weight: 800; }
+.pp-node-cap { margin: 0; font-size: 0.66rem; line-height: 1.2; text-align: center; max-width: 9em; }
+.pp-link { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.pp-link polyline { fill: none; stroke: var(--pp-trail); stroke-width: 3; stroke-dasharray: 2 8; stroke-linecap: round; stroke-linejoin: round; }
+@media (min-width: 720px) {
+  .pp-map-path { grid-template-columns: repeat(var(--n, 10), 1fr); padding-top: 52px; }
+  .pp-map-cell:nth-child(odd), .pp-map-cell:nth-child(even) { justify-self: center; margin: 0; }
+  .pp-map-cell:nth-child(even) { transform: translateY(28px); }
+}
+.pp-ch-row { margin: 0 0 8px; padding: 8px 12px; border-radius: 10px; background: var(--bg-primary); color: var(--text-primary); font-weight: 700; }
+.pp-ch2-title { margin: 14px 0 0; font-size: 1.05rem; }
+.pp-ch2-cap { margin: 4px 0 0; font-size: 0.82rem; }
+.pp-endless-card { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 64px; margin-top: 16px; padding: 10px 14px; border: 2px solid var(--pp-node-current-ring); border-radius: 12px; background: var(--bg-primary); color: var(--text-primary); font: inherit; text-align: left; cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+.pp-endless-card strong { display: block; font-size: 1rem; }
+.pp-endless-card small { display: block; font-size: 0.78rem; color: var(--pet-soft-text); }
+.pp-endless-card .pp-endless-icon { font-size: 1.6rem; }
+.pp-endless-card:active { filter: brightness(0.92); }
+@media (hover: hover) { .pp-endless-card:hover { filter: brightness(0.97); } }
+.pp-endless-card:focus-visible { outline: 3px solid var(--pip-focus-ring); outline-offset: 2px; }
+
+/* ===== Board screen ===== */
+.pp-hud { display: grid; gap: 4px; padding: 6px 12px 0; }
+.pp-hud-row { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.pp-hud-title { flex: 1; min-width: 0; margin: 0; font-size: 1rem; font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pp-hud-count { flex: 1; min-width: 0; margin: 0; font-size: 0.86rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.pp-chip { padding: 2px 10px; border-radius: 999px; background: var(--pp-node-current-ring); color: var(--pp-board-bg); font-size: 0.74rem; font-weight: 800; }
+.pp-pulse { box-shadow: 0 0 0 3px var(--pip-focus-ring); animation: pp-pulse 1.2s ease-out 3; }
+.pp-screen .pip-checkin-btn { color: var(--text-primary); }
+.pp-screen .pip-checkin-btn--primary { color: var(--on-brand); }
+.pp-screen .pip-checkin-btn--link { color: var(--pet-soft-text); }
+.pp-board-bubble.pet-bubble { position: relative; top: auto; right: auto; max-width: none; margin: 8px 0 34px; color: var(--text-primary); }
+.pp-board-wrap { position: relative; width: min(100%, calc(var(--cols) * 66px)); margin: 0 auto; }
+.pp-board { position: relative; display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); gap: 2px; padding: 3px; border-radius: 10px; background-color: var(--pp-tile-border); touch-action: none; user-select: none; -webkit-user-select: none; }
+.pp-board-art { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 10px; pointer-events: none; }
+.pp-tile { position: relative; display: block; min-width: 0; aspect-ratio: 1; padding: 0; border: 1px solid var(--pp-tile-border); border-radius: 6px; background: var(--pp-tile-bg); overflow: hidden; cursor: pointer; touch-action: none; -webkit-tap-highlight-color: transparent; }
+.pp-tile.is-on { background: var(--pp-tile-visited-bg); }
+.pp-tile.is-start { box-shadow: inset 0 0 0 2px var(--pp-start-ring); }
+.pp-tile--rock { background: var(--pp-rock); border-color: var(--pp-rock); cursor: default; } /* blocked tile: plain black in every skin */
+.pp-tile-art, .pp-tile-mark, .pp-tile-start { position: absolute; inset: 0; display: block; pointer-events: none; }
+.pp-tile-art svg, .pp-tile-mark svg, .pp-tile-start svg { display: block; width: 100%; height: 100%; }
+.pp-tile-mark { display: none; }
+.pp-tile.is-marked .pp-tile-mark { display: block; }
+.pp-tile.is-marked .pp-tile-mark svg { animation: pp-pop 0.18s ease-out; }
+.pp-tile.is-next { outline: 2px dashed var(--pp-trail); outline-offset: -4px; }
+.pp-tile:focus-visible { z-index: 5; outline: 3px solid var(--pip-focus-ring); outline-offset: -3px; }
+.pp-tile:active { filter: brightness(1.15); }
+@media (hover: hover) { .pp-tile:not(.pp-tile--rock):hover { filter: brightness(1.1); } }
+.pp-trail { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none; }
+.pp-trail-line, .pp-sol { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.pp-trail-line { stroke: var(--pp-trail); }
+.pp-trail--path .pp-trail-line { stroke-width: 5; stroke-dasharray: 1 9; }
+.pp-trail--ember .pp-trail-line { stroke-width: 5; opacity: 0.85; filter: drop-shadow(0 0 4px var(--pp-trail-glow)); }
+.pp-trail--trace .pp-trail-line { stroke-width: 3; filter: drop-shadow(0 0 5px var(--pp-trail-glow)); }
+.pp-sol { stroke: var(--pp-start-ring); stroke-width: 3; stroke-dasharray: 1 7; opacity: 0.9; }
+.pp-pip-token { position: absolute; left: 0; top: 0; z-index: 3; pointer-events: none; transform-origin: 50% 50%; transition: transform 180ms ease-out; will-change: transform; }
+.pp-pip-token.is-snap { transition: none; }
+.pp-pip-hop { width: 100%; height: 100%; }
+.pp-pip-hop svg { display: block; width: 100%; height: 100%; }
+.pp-board.is-cleared .pp-pip-hop { animation: pp-jump 0.3s ease-out 1; }
+.pp-fx-layer { position: absolute; inset: 0; z-index: 4; pointer-events: none; overflow: hidden; }
+/* Celebration bits are skin art, like the marks: they keep their own palette in every theme (colour set inline from the skin's fxColor). */
+.pp-fx-bit { position: absolute; left: calc(var(--x) * 1%); width: 10px; height: 10px; }
+.pp-fx--bloom .pp-fx-bit { top: -6%; border-radius: 80% 0; background: var(--fx-color); animation: pp-fall 2.4s ease-in var(--d) both; }
+.pp-fx--flare .pp-fx-bit { bottom: 0; width: 6px; height: 6px; border-radius: 50%; background: var(--fx-color); animation: pp-rise 2s ease-out var(--d) both; }
+
+/* Skin marks: Pip's visited-tile art. The final state is the base style, so with motion off the end frame shows. */
+.pp-mark { transform-box: fill-box; transform-origin: 50% 100%; }
+.pp-mark-bloom, .pp-mark-flame, .pp-mark-led { transform-box: fill-box; transform-origin: center; }
+.pp-mark-flame, .pp-mark-led { opacity: 0.9; }
+.is-cleared.pp-fx--bloom .pp-mark-bloom { opacity: 1; animation: pp-bloom 0.45s ease-out calc(var(--n, 0) * 40ms) backwards; }
+.is-cleared.pp-fx--flare .pp-mark-flame { opacity: 1; transform: scale(1.6); animation: pp-flare 0.5s ease-out calc(var(--n, 0) * 40ms) backwards; }
+.is-cleared.pp-fx--sweep .pp-mark-led { opacity: 1; filter: drop-shadow(0 0 3px var(--pp-node-cleared-bg)); animation: pp-led 0.5s ease-out calc(var(--n, 0) * 30ms) backwards; }
+.is-stuck.pp-fx--droop .pp-mark { transform: rotate(25deg); }
+.is-stuck.pp-fx--dim .pp-mark-flame { opacity: 0.4; }
+.is-stuck.pp-fx--flicker .pp-mark-led { opacity: 0.5; animation: pp-flicker 0.6s steps(2, end) 2; }
+
+.pp-clear-card { margin-top: 14px; padding: 12px; border: 1px solid var(--pet-divider-border); border-radius: 12px; background: var(--bg-primary); color: var(--text-primary); text-align: center; animation: pp-rise-in 0.35s ease-out both; }
+.pp-reward { margin: 0 0 4px; font-size: 1.05rem; font-weight: 800; }
+.pp-clear-line { margin: 0 0 10px; font-size: 0.86rem; }
+.pp-clear-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.pp-invalid { margin: 12px; padding: 12px; border: 2px solid var(--error); border-radius: 8px; background: var(--danger-hover-bg); color: var(--pet-error-text); font-weight: 700; }
+
+@keyframes pp-pop { from { transform: scale(0.3); } }
+@keyframes pp-bloom { from { opacity: 0; transform: scale(0.2); } }
+@keyframes pp-flare { from { opacity: 0.5; transform: scale(1); } }
+@keyframes pp-led { from { opacity: 0.15; } }
+@keyframes pp-flicker { 0%, 100% { opacity: 0.9; } 50% { opacity: 0.15; } }
+@keyframes pp-jump { 50% { transform: translateY(-12px); } }
+@keyframes pp-pulse { from { box-shadow: 0 0 0 3px var(--pip-focus-ring); } to { box-shadow: 0 0 0 12px transparent; } }
+@keyframes pp-fall { from { transform: translateY(0) rotate(0); opacity: 1; } to { transform: translateY(560px) rotate(300deg); opacity: 0; } }
+@keyframes pp-rise { from { transform: translateY(0); opacity: 1; } to { transform: translateY(-200px); opacity: 0; } }
+@keyframes pp-rise-in { from { opacity: 0; transform: translateY(10px); } }
+
+/* ===== Motion rules: Low FX and reduced motion stop every animation and show the final frame ===== */
+body.lowfx .pp-games *, body.lowfx .pp-games *::before, body.lowfx .pp-games *::after { animation: none !important; transition: none !important; }
+body.lowfx .pp-fx-bit { display: none; }
+body.lowfx .pp-trail-line, body.lowfx .pp-mark-led { filter: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  .pp-games *, .pp-games *::before, .pp-games *::after { animation: none !important; transition: none !important; }
+  .pp-fx-bit { display: none; }
+}
+
+/* ===== Loading and error lines ===== */
+.pp-status { margin: 12px 0; font-weight: 600; }
+.pp-error { margin: 8px 0; padding: 8px 12px; border-radius: 10px; background: var(--danger-hover-bg); color: var(--pet-error-text); font-weight: 700; }
+.pp-error .pip-checkin-btn { margin-left: 8px; }

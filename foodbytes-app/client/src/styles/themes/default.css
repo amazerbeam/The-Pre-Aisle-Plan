@@ -384,4 +384,19 @@
   --pet-wardrobe-worn-shadow: rgba(74, 63, 128, 0.15);
   --pet-warn-text: #b4531b;
   --pet-gold-ring-shadow: rgba(255, 211, 77, 0.35);
+  /* MPP-49: Pip's Path board and chapter map chrome (skin art keeps its own palette) */
+  --pp-board-bg: #f3efe6;
+  --pp-tile-bg: #7a4f30;
+  --pp-tile-border: #5b3a24;
+  --pp-tile-visited-bg: #8f6440;
+  --pp-trail: #d9c08a;
+  --pp-trail-glow: #d9c08a;
+  --pp-rock: #000000;
+  --pp-start-ring: #4a3f80;
+  --pp-node-cleared-bg: #1b6b2e;
+  --pp-node-cleared-text: #ffffff;
+  --pp-node-current-ring: #4a3f80;
+  --pp-node-locked-bg: #e9ecef;
+  --pp-node-text: #2c3e50;
+  --pp-hud-text: #2c3e50;
 }

@@ -140,7 +140,8 @@
 
 /* MPP-19 / MPP-23: a station button over its art (fridgeHitBox / cabinetHitBox, % of the
    viewBox); on the world layer, scaled with the art (MPP-39: no min size — it would outgrow the art when zoomed out). */
-.pip-station-btn {
+.pip-station-btn,
+.pip-tap-btn {
   position: absolute;
   padding: 0;
   border: 0;
@@ -151,17 +152,20 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.pip-station-btn:active {
+.pip-station-btn:active,
+.pip-tap-btn:active {
   background: var(--pet-hit-active-bg);
 }
 
 @media (hover: hover) {
-  .pip-station-btn:hover {
+  .pip-station-btn:hover,
+  .pip-tap-btn:hover {
     background: var(--pet-hit-hover-bg);
   }
 }
 
-.pip-station-btn:focus-visible {
+.pip-station-btn:focus-visible,
+.pip-tap-btn:focus-visible {
   outline: 3px solid var(--pip-focus-ring);
   outline-offset: 2px;
   box-shadow: 0 0 0 2px var(--pip-focus-halo);

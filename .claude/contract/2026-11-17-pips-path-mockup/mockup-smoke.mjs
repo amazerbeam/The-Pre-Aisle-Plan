@@ -12,7 +12,7 @@ for (const id of PURE) {
   assert.ok(id in blocks, `missing block ${id}`);
   assert.doesNotMatch(blocks[id], /\b(document|window|localStorage|matchMedia|requestAnimationFrame)\b/, `${id} must be pure`);
 }
-const names = ['GARDEN_PATH_LEVELS', 'LEVEL_MAX_COLS', 'validateLevel', 'parseLevel', 'neighbours', 'newRun', 'canStep', 'step', 'backtrackTo', 'undo', 'restart',
+const names = ['GARDEN_PATH_LEVELS', 'LEVEL_MAX_COLS', 'validateLevel', 'parseLevel', 'neighbours', 'newRun', 'canStep', 'step', 'moveTo', 'restart',
   'isCleared', 'isStuck', 'keyToDelta', 'countSolutions', 'FAMILIES', 'chapterQueue', 'nextPuzzle', 'REWARD', 'rewardFor'];
 const optional = ['THEME_LINE', 'SKIN_ART_KEYS', 'SKIN_LINE_KEYS', 'SKINS', 'lineFor', 'pipLineFor', 'pip'];
 const src = PURE.map(id => blocks[id]).join('\n;\n') + `\n;({ ${names.join(', ')}, ${optional.map(n => `${n}: typeof ${n} === 'undefined' ? undefined : ${n}`).join(', ')} })`;
@@ -45,9 +45,10 @@ for (const lv of X.GARDEN_PATH_LEVELS) {
   r = X.step(g, r, 9); r = X.step(g, r, 5);
   assert.deepEqual(r.path, [10, 9, 5]);
   assert.equal(X.step(g, r, 9), r, 'revisit refused');
-  assert.deepEqual(X.undo(r).path, [10, 9]);
-  assert.deepEqual(X.backtrackTo(r, 10).path, [10]);
-  assert.deepEqual(X.undo(X.newRun(g)).path, [10], 'undo never below start');
+  assert.deepEqual(X.moveTo(g, r, 9).path, [10], 'adjacent visited restarts');
+  assert.equal(X.moveTo(g, r, 9).reset, true);
+  assert.equal(X.moveTo(g, r, 5), r, 'head tap is a no-op');
+  assert.equal(X.moveTo(g, r, 10), r, 'non-adjacent visited is a no-op');
   assert.deepEqual(X.restart(g).path, [10]);
   // Stuck: walk into the top-left corner pocket: 10→9→8→4→0, whose only neighbour (1) is a rock.
   let s = X.newRun(g); for (const j of [9, 8, 4, 0]) s = X.step(g, s, j);

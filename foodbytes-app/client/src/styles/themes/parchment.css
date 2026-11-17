@@ -398,6 +398,21 @@
   --view-toggle-on-text: var(--gold);
   --folder-check-on-bg: var(--wax);
   --folder-check-on-text: var(--page);
+  /* MPP-49: Pip's Path board and chapter map chrome (skin art keeps its own palette) */
+  --pp-board-bg: #efe0c0;
+  --pp-tile-bg: #b9ad96;
+  --pp-tile-border: #8c8170;
+  --pp-tile-visited-bg: #cdb98f;
+  --pp-trail: #ff8a2a;
+  --pp-trail-glow: #ff8a2a;
+  --pp-rock: #000000;
+  --pp-start-ring: #8b1e1e;
+  --pp-node-cleared-bg: #3b2415;
+  --pp-node-cleared-text: #f3e6c8;
+  --pp-node-current-ring: #8b1e1e;
+  --pp-node-locked-bg: #d8c7a3;
+  --pp-node-text: #3b2415;
+  --pp-hud-text: #3b2415;
 }
 
 /* Low FX for Parchment is handled in parchment/shell.css (ambient layer, page-turn, ink-blot).

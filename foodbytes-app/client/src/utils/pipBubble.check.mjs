@@ -26,4 +26,13 @@ assert.deepEqual(pipBubble({ announcement: 'New trophy!', checkIn: REACTING }), 
 // The check-in outranks the fridge and the mood.
 assert.deepEqual(pipBubble({ checkIn: REACTING, fridgeLine: 'Fridge low', moodLine: 'x' }), { text: 'Nice!', actions: null })
 
+// MPP-49: the "play a game" offer sits below the check-in and above fridge and mood.
+const OFFER = 'Play a game with me? 🎲'
+assert.deepEqual(pipBubble({ offerLine: OFFER, fridgeLine: 'Fridge low', moodLine: 'Just vibing.' }), { text: OFFER, actions: null, offer: true })
+assert.deepEqual(pipBubble({ offerLine: OFFER, checkIn: ASKING }), { text: ASKING.text, actions: ACTIONS })
+assert.deepEqual(pipBubble({ offerLine: OFFER, cookLine: 'Cooking!' }), { text: 'Cooking!', actions: null })
+assert.deepEqual(pipBubble({ offerLine: OFFER, announcement: 'New trophy!' }), { text: 'New trophy!', actions: null })
+assert.deepEqual(pipBubble({ offerLine: OFFER, growthLine: 'I grew!' }), { text: 'I grew!', actions: null })
+assert.deepEqual(pipBubble({ offerLine: null, moodLine: 'Just vibing.' }), { text: 'Just vibing.', actions: null })
+
 console.log('pipBubble: all checks passed')

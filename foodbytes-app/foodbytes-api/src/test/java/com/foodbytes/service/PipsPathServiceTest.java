@@ -125,6 +125,65 @@ class PipsPathServiceTest {
         verify(maps, never()).save(any());
     }
 
+    private static PetGameMap openMap(long id, String layout, int w, int h, int difficulty, GameMode mode, Integer chapter) {
+        PetGameMap m = new PetGameMap();
+        m.setId(id); m.setUserId(USER); m.setFamily("garden-path"); m.setDifficulty(difficulty);
+        m.setMode(mode); m.setChapter(chapter); m.setSeed(1L); m.setWidth(w); m.setHeight(h); m.setLayout(layout);
+        return m;
+    }
+
+    @Test
+    void issue_nextSlotWithAnOpenMap_returnsItAndGeneratesNothing() {
+        when(maps.findFirstByUserIdAndFamilyAndDifficultyAndModeAndClearedAtIsNullOrderByIdDesc(USER, "garden-path", 1, GameMode.CHAPTER))
+                .thenReturn(Optional.of(openMap(41L, "S../.../...", 3, 3, 1, GameMode.CHAPTER, 1)));
+
+        PipsPathMapDTO dto = service.issue(USER, null, null);
+
+        assertThat(dto.getMapId()).isEqualTo(41L);
+        assertThat(dto.getRows()).containsExactly("S..", "...", "...");
+        assertThat(dto.getMode()).isEqualTo("CHAPTER");
+        verify(maps, never()).save(any(PetGameMap.class));
+    }
+
+    @Test
+    void issue_replayWithAnOpenMap_reusesIt() {
+        PetGameProgress p = new PetGameProgress(USER, "garden-path");
+        p.setHighestCleared(3);
+        when(progress.findByUserId(USER)).thenReturn(List.of(p));
+        when(maps.findFirstByUserIdAndFamilyAndDifficultyAndModeAndClearedAtIsNullOrderByIdDesc(USER, "garden-path", 2, GameMode.CHAPTER))
+                .thenReturn(Optional.of(openMap(42L, "..../..S./....", 4, 3, 2, GameMode.CHAPTER, 1)));
+
+        PipsPathMapDTO dto = service.issue(USER, "garden-path", 2);
+
+        assertThat(dto.getMapId()).isEqualTo(42L);
+        assertThat(dto.getWidth()).isEqualTo(4);
+        verify(maps, never()).save(any(PetGameMap.class));
+    }
+
+    @Test
+    void issue_endlessWithAnOpenEndlessMap_reusesIt() {
+        PetGameProgress p = new PetGameProgress(USER, "garden-path");
+        p.setHighestCleared(10);
+        when(progress.findByUserId(USER)).thenReturn(List.of(p));
+        when(maps.findFirstByUserIdAndModeAndClearedAtIsNullOrderByIdDesc(USER, GameMode.ENDLESS))
+                .thenReturn(Optional.of(openMap(43L, "S../.../...", 3, 3, 1, GameMode.ENDLESS, null)));
+
+        PipsPathMapDTO dto = service.issue(USER, null, null);
+
+        assertThat(dto.getMapId()).isEqualTo(43L);
+        assertThat(dto.getMode()).isEqualTo("ENDLESS");
+        verify(maps, never()).save(any(PetGameMap.class));
+    }
+
+    @Test
+    void issue_noOpenMap_generatesAndSavesAsBefore() {
+        PipsPathMapDTO dto = service.issue(USER, null, null);
+
+        assertThat(dto.getDifficulty()).isEqualTo(1);
+        verify(maps).save(any(PetGameMap.class));
+        verify(maps).findFirstByUserIdAndFamilyAndDifficultyAndModeAndClearedAtIsNullOrderByIdDesc(USER, "garden-path", 1, GameMode.CHAPTER);
+    }
+
     // ---- clear ----
 
     @Test

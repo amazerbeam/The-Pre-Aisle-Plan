@@ -47,6 +47,7 @@ const PetContext = createContext()
  *
  * MPP-25: `sprinkles` — your own balance from the pet payload (null until it loads); `refreshPet()` refetches just /pet.
  *
+ * MPP-49: applySprinkles(balance) — a game clear's new balance.
  * MPP-26: `room` (PetRoomDTO: stations, upgradeCosts) — your own room; `applyRoomWrite` swaps in a shop write's balance and room.
  *
  * MPP-27: `room` also carries decor + placements; `setRoom` swaps in an optimistic room while a placement is saving.
@@ -170,6 +171,13 @@ export const PetProvider = ({ children }) => {
     setPet(current => (current ? { ...current, room } : current))
   }, [])
 
+  // MPP-49: a Pip's Path clear returns the new balance; swap it in (and cancel a GET in flight, as applyRoomWrite does).
+  const applySprinkles = useCallback((sprinkles) => {
+    petControllerRef.current?.abort()
+    setPetLoading(false)
+    setPet(current => (current ? { ...current, sprinkles } : current))
+  }, [])
+
   const daysPlan = petDays?.start === petRange.start ? petDays.plan : null
   const pickDay = (iso) => findDay(weekPlan, iso) ?? findDay(daysPlan, iso)
   const moodInfo = derivePetMood({
@@ -199,6 +207,7 @@ export const PetProvider = ({ children }) => {
     room: pet?.room ?? null,
     applyRoomWrite,
     setRoom,
+    applySprinkles,
     sprinkles: pet?.sprinkles ?? null,
     refreshPet,
     mood: moodInfo.mood,

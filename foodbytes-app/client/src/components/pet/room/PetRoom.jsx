@@ -7,6 +7,9 @@ import { DEFAULT_ROOM_LEVELS, ROOM_CAMERA_LABEL, ROOM_PX_PER_UNIT, ROOM_STATIONS
 import usePipCamera from '../../../hooks/usePipCamera'
 import useRoomOverlay from '../../../hooks/useRoomOverlay'
 import { pipWalkMs } from '../../../utils/cookServe'
+import GameOfferActions from '../games/GameOfferActions'
+import PipGamesView from '../games/PipGamesView'
+import PipTapButton from '../games/PipTapButton'
 import DecorPicker from './DecorPicker'
 import DecorSpotButtons from './DecorSpotButtons'
 import EditRoomBar from './EditRoomBar'
@@ -17,7 +20,7 @@ import { DecorLayer } from './RoomDecorLayers'
 import { NightDim } from './roomEffects'
 import { RoomPackContext, useRoomPack } from './roomPackContext'
 import { packBackdrop, packEffects, packSill, packStationArt, roomPack } from './roomPacks'
-import { COOK_WALK_OFFSET, ROOM_DRAW_ORDER, STATION_SHIFT, cabinetHitBox, cookPose, fridgeHitBox, hitBoxStyle, pipFocusPoint, pipPose, resolveRoomLevels, shiftTransform, wardrobeHitBox } from './roomLayout'
+import { COOK_WALK_OFFSET, ROOM_DRAW_ORDER, STATION_SHIFT, cabinetHitBox, cookPose, fridgeHitBox, hitBoxStyle, pipFocusPoint, pipHitBox, pipPose, resolveRoomLevels, shiftTransform, wardrobeHitBox } from './roomLayout'
 import PipHeadBarStatus from './PipHeadBarStatus'
 import RecentreButton from './RecentreButton'
 import RoomPip from './RoomPip'
@@ -53,9 +56,10 @@ const BACK_STATIONS = ROOM_DRAW_ORDER.filter(station => station !== ROOM_STATION
  * MPP-27: `decor` ({ room, editing, selectedSpot, openSpot, closeSpot, place, toggle, done, error }) draws your own wall / floor styles and placed decor, and drives ✏️ Edit room.
  * MPP-40: 12 decor spots drawn in four layers among the stations (rug, wall, back floor, front floor), a wardrobe station whose button opens Dress Pip, and a 🧪 badge while the server's free mode is on.
  * MPP-45: `line` (theme.pipLine) picks the room pack (roomPacks.js); every leaf reads it through RoomPackContext, and a pack missing an item draws the herb one.
+ * MPP-49: `games` ({ offering, offer, dismissOffer, herb }) makes Pip tappable (he offers a game in the bubble) and opens Pip's games sheet.
  * MPP-26: `shop` ({ room, sprinkles, armed, busy, status, error, arm, upgrade, reset }) adds the 🛍 Shop pill beside Wardrobe and the Shop sheet; `levels` (from the pet's room) draws each station at its owned level.
  */
-function PetRoom({ name, mood, bubble, bubbleActions = null, position = PIP_POSITIONS.RUG, levels = DEFAULT_ROOM_LEVELS, serving = null, fridge = null, cabinet = null, herb, levelBar = null, wardrobe = null, shop = null, decor = null, line = PIP_DEFAULT_LINE }) {
+function PetRoom({ name, mood, bubble, bubbleActions = null, position = PIP_POSITIONS.RUG, levels = DEFAULT_ROOM_LEVELS, serving = null, fridge = null, cabinet = null, herb, levelBar = null, wardrobe = null, shop = null, decor = null, games = null, line = PIP_DEFAULT_LINE }) {
   const pack = roomPack(line)
   const resolved = resolveRoomLevels(levels)
   // MPP-27: `decor` = { room, editing, … } from useRoomEdit; null until the pet's room has loaded.
@@ -72,10 +76,12 @@ function PetRoom({ name, mood, bubble, bubbleActions = null, position = PIP_POSI
   const wardrobeOverlay = useRoomOverlay()
   const pickerOverlay = useRoomOverlay()
   const shopOverlay = useRoomOverlay()
+  const gamesOverlay = useRoomOverlay()
   const overlayId = useId().replace(/:/g, '')
   const fridgeTitleId = `pip-fridge-title-${overlayId}`
   const cabinetTitleId = `pip-cabinet-title-${overlayId}`
   const wardrobeTitleId = `pip-wardrobe-title-${overlayId}`
+  const gamesTitleId = `pip-games-title-${overlayId}`
   const shopTitleId = `pip-shop-title-${overlayId}`
   const pickerTitleId = `pip-decor-picker-title-${overlayId}`
   const editButtonRef = useRef(null)
@@ -86,7 +92,7 @@ function PetRoom({ name, mood, bubble, bubbleActions = null, position = PIP_POSI
   const fridgeFill = fridge?.fill ?? null
   const stationProps = { levels: resolved, position: scenePosition, phase, pose, herb, levelBar, fridgePct: fridgeFill?.pct ?? null }
   // MPP-19 / MPP-23 / MPP-26 / MPP-27 / MPP-32: the room behind an open overlay is out of the tab order and the a11y tree.
-  const anyOpen = fridgeOverlay.isOpen || cabinetOverlay.isOpen || wardrobeOverlay.isOpen || shopOverlay.isOpen || pickerOverlay.isOpen
+  const anyOpen = fridgeOverlay.isOpen || cabinetOverlay.isOpen || wardrobeOverlay.isOpen || shopOverlay.isOpen || pickerOverlay.isOpen || gamesOverlay.isOpen
   const behind = anyOpen ? { inert: '', 'aria-hidden': true } : {}
 
   // MPP-27: which spot's picker is open (highlighted in the room); the overlay owns open/closed.
@@ -120,6 +126,13 @@ function PetRoom({ name, mood, bubble, bubbleActions = null, position = PIP_POSI
     openShop(SHOP_TAB_KEYS.DECOR)
   }
 
+  // MPP-49: the offer's buttons when Pip is offering a game and no check-in owns the bubble.
+  const playGame = () => {
+    games.dismissOffer()
+    gamesOverlay.open()
+  }
+  const actions = bubbleActions ?? (games?.offering ? <GameOfferActions onPlay={playGame} onNotNow={games.dismissOffer} /> : null)
+
   return (
     <RoomPackContext.Provider value={pack}>
     <div className="pip-room">
@@ -151,6 +164,10 @@ function PetRoom({ name, mood, bubble, bubbleActions = null, position = PIP_POSI
             <PipWalker phase={phase}>{!asleep && <RoomPip pose={pose} herb={herb} levelBar={levelBar} />}</PipWalker>
             <DecorLayer layer="frontFloor" {...decorProps} />
           </svg>
+          {/* First in DOM so the station buttons (later siblings) win where Pip's box overlaps theirs. */}
+          {games && !serving && !editing && !asleep && (
+            <PipTapButton box={pipHitBox(pose, scenePosition)} label={`Play with ${name}`} buttonRef={gamesOverlay.triggerRef} onTap={games.offer} />
+          )}
           <StationButton
             box={fridgeHitBox(resolved.fridge)}
             label={fridgeLabel(name, fridgeFill)}
@@ -174,7 +191,7 @@ function PetRoom({ name, mood, bubble, bubbleActions = null, position = PIP_POSI
         </div>
         {asleep && <NightDim />}
         {levelBar && <PipHeadBarStatus levelBar={levelBar} />}
-        <SpeechBubble text={bubble} actions={bubbleActions} />
+        <SpeechBubble text={bubble} actions={actions} />
         <RecentreButton onRecentre={camera.recentre} />
       </div>
       {editing && <EditRoomBar error={decor.error} overlayOpen={anyOpen} behind={behind} onDone={finishEditing} />}
@@ -198,6 +215,9 @@ function PetRoom({ name, mood, bubble, bubbleActions = null, position = PIP_POSI
       )}
       {shop && shopOverlay.isOpen && (
         <ShopView shop={shop} titleId={shopTitleId} panelRef={shopOverlay.panelRef} onClose={shopOverlay.close} />
+      )}
+      {games && gamesOverlay.isOpen && (
+        <PipGamesView herb={games.herb} titleId={gamesTitleId} panelRef={gamesOverlay.panelRef} onClose={gamesOverlay.close} />
       )}
       {decor && pickerOverlay.isOpen && decor.selectedSpot && (
         <DecorPicker

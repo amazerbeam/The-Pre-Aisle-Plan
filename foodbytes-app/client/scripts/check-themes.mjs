@@ -107,6 +107,15 @@ const FOLDER_PAIRS = [
   ['folder-icon', 'bg-primary', 3],
 ]
 
+// MPP-49: Pip's Path chrome — HUD on the board, map node text, the current-node ring.
+const PP_PAIRS = [
+  ['pp-hud-text', 'pp-board-bg', 4.5],
+  ['pp-node-text', 'pp-board-bg', 4.5],
+  ['pp-node-text', 'pp-node-locked-bg', 4.5],
+  ['pp-node-cleared-text', 'pp-node-cleared-bg', 4.5],
+  ['pp-board-bg', 'pp-node-current-ring', 4.5],
+]
+
 const PAIRS = {
   default: [
     ...on(['text-primary', 'text-secondary'], ['bg-primary', 'bg-secondary'], 4.5),

@@ -9,8 +9,9 @@ import {
   COOK_WALK_OFFSET, cookPose, pipPose, resolveRoomLevels,
   STATION_SHIFT, DECOR_LEGACY_SHIFT, WINDOW_SHIFT, shiftPx, pipFocusPoint, WARDROBE_FOOTPRINT, wardrobeHitBox,
   FRIDGE_FOOTPRINT, FRIDGE_GAUGE_LIFT, FRIDGE_GAUGE_HALF_HEIGHT, fridgeHitBox, CABINET_FOOTPRINT, cabinetHitBox,
-  stationThumbBox, COOKER_FOOTPRINT, BED_FOOTPRINT, decorSpotHitBox, decorThumbBox, hitBoxStyle
+  stationThumbBox, COOKER_FOOTPRINT, BED_FOOTPRINT, decorSpotHitBox, decorThumbBox, hitBoxStyle, pipHitBox
 } from './roomLayout.js'
+import { PIP_POSITIONS } from '../../../constants/pet.js'
 import { DEFAULT_ROOM_LEVELS, PIP_FOCUS_LIFT, ROOM_MAX_LEVEL, ROOM_SIZE, ROOM_WORLD } from '../../../constants/petRoom.js'
 import {
   DECOR_ITEMS, DECOR_LAYERS, DECOR_SPOTS, DECOR_SPOT_LABELS, DECOR_SPOT_SHAPES, DEFAULT_FLOOR_STYLE, DEFAULT_PLACEMENTS, DEFAULT_RUG,
@@ -309,5 +310,31 @@ assert.equal(decorBoughtLine('rug-sheepskin', room, 'dragon'), 'Cave-bear pelt b
 assert.equal(decorBoughtLine('wall-mint', room, 'dragon'), 'Mossy stone bought and applied.')
 assert.equal(decorBoughtLine('bunting', room, 'robot'), 'Pennant lights bought. Swap it in with ✏️ Edit room.') // MPP-47: robot decor names
 assert.equal(decorBoughtLine('rug-stripe', room, 'robot'), 'Hazard mat bought and applied.')
+
+// MPP-49: the tap-Pip button covers his whole drawn figure (full viewBox 0 -40 200 240) at each pose.
+for (const position of [PIP_POSITIONS.RUG, PIP_POSITIONS.COOKER, PIP_POSITIONS.BED]) {
+  const pose = pipPose(position, 'content', DEFAULT_ROOM_LEVELS)
+  const box = pipHitBox(pose, position)
+  near([box.width, box.height], [200 * pose.scale, 240 * pose.scale])
+  const [fx, fy] = P(...pose.anchor)
+  const [sx, sy] = position === PIP_POSITIONS.BED ? shiftPx(STATION_SHIFT.bed) : [0, 0]
+  assert.ok(box.x < fx + sx && fx + sx < box.x + box.width, `${position}: feet inside the box horizontally`)
+  assert.ok(box.y < fy + sy + pose.dropPx && fy + sy + pose.dropPx < box.y + box.height, `${position}: feet inside the box vertically`)
+}
+
+// MPP-49: Pip's box legitimately overlaps the cabinet / wardrobe boxes (he stands in front of them), so PetRoom
+// renders the tap button before the station buttons and they win the overlap. What must hold here: his feet
+// never sit inside a station box, at any level.
+const inBox = (b, [px, py]) => px > b.x && px < b.x + b.width && py > b.y && py < b.y + b.height
+for (const position of [PIP_POSITIONS.RUG, PIP_POSITIONS.COOKER, PIP_POSITIONS.BED]) {
+  const pose = pipPose(position, 'content', DEFAULT_ROOM_LEVELS)
+  const [fx, fy] = P(...pose.anchor)
+  const feet = position === PIP_POSITIONS.BED ? [fx + shiftPx(STATION_SHIFT.bed)[0], fy + shiftPx(STATION_SHIFT.bed)[1] + pose.dropPx] : [fx, fy + pose.dropPx]
+  for (const level of [1, 2, 3, 4]) {
+    for (const [name, stationBox] of [['fridge', fridgeHitBox(level)], ['cabinet', cabinetHitBox(level)], ['wardrobe', wardrobeHitBox(level)]]) {
+      assert.ok(!inBox(stationBox, feet), `${position}: Pip's feet sit inside the ${name} L${level} box`)
+    }
+  }
+}
 
 console.log('room checks passed')

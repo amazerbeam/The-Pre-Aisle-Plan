@@ -8,7 +8,9 @@ import CheckInActions from './room/CheckInActions'
 import { PET_GUEST_MESSAGE } from '../../constants/pet'
 import { RECIPES_PATH } from '../../constants/appRoutes'
 import { formName } from '../../constants/pipLines'
+import { GAME_OFFER_LINE } from '../../constants/pipsPath'
 import useCookAndServe from '../../hooks/useCookAndServe'
+import useGameOffer from '../../hooks/useGameOffer'
 import useHabitCheckIn from '../../hooks/useHabitCheckIn'
 import usePetAwards from '../../hooks/usePetAwards'
 import useRoomEdit from '../../hooks/useRoomEdit'
@@ -37,6 +39,7 @@ import './PetView.css'
  * MPP-28: one pet read (habits + cabinet ride in /pet); the bubble order lives in pipBubble.
  * MPP-26: the room draws your own station levels; the 🛍 Shop sheet upgrades them (usePetShop), and Pip says one line after an upgrade.
  * MPP-27: your own decor and wall / floor styles in the room; ✏️ Edit room places them (useRoomEdit), the shop's Decor and Walls & floors tabs buy them, and Pip says one line after a purchase.
+ * MPP-49: tap Pip → "Play a game with me?" in the bubble → Pip's games sheet (Pip's Path).
  * MPP-42: the header's sprinkles count up when you come back with more, and Pip says what you earned after any award / outfit / shop line.
  */
 function PetView() {
@@ -62,6 +65,8 @@ function PetView() {
   const earning = useSprinkleCountUp({ userId: petUserId, sprinkles, hold: Boolean(serving) || Boolean(higherAnnouncement) })
   const announcement = higherAnnouncement ?? earning.line
   const growth = usePipGrowth({ userId: petUserId, growth: pet?.growth ?? null, line, petName: pet?.name ?? null, hold: Boolean(serving) || Boolean(announcement) })
+  // MPP-49: tapping Pip offers a game only when nothing above fridge / mood is speaking.
+  const gameOffer = useGameOffer({ canOffer: !serving && !announcement && !growth.bubble && !checkIn })
 
   if (!isAuthenticated) {
     return (
@@ -94,17 +99,19 @@ function PetView() {
     )
   }
 
-  // MPP-28 AC 2: cook > award/outfit > stage change > check-in > fridge-low > mood (pipBubble).
+  // MPP-28 AC 2: cook > award/outfit > stage change > check-in > game offer > fridge-low > mood (pipBubble).
   const said = pipBubble({
     cookLine: serving ? cookServeBubble(serving) : null,
     announcement,
     growthLine: growth.bubble,
     checkIn,
+    offerLine: gameOffer.offering ? GAME_OFFER_LINE : null,
     fridgeLine: fridgeBubble(fridge.fill, position),
     moodLine: petBubble(moodInfo)
   })
   const bubbleActions = said.actions ? <CheckInActions {...said.actions} /> : null
   const herb = { line, form: growth.displayForm, wilted: isWilted(pet.growth), phase: growth.phase, outfit: pet.wardrobe?.outfit ?? null }
+  const games = { offering: said.offer === true, offer: gameOffer.offer, dismissOffer: gameOffer.dismissOffer, herb }
   const wardrobe = pet.wardrobe
     ? { ...dressing, data: pet.wardrobe, peakForm: lineGrowth(pet.growth, line)?.peakForm ?? growth.displayForm }
     : null
@@ -143,6 +150,7 @@ function PetView() {
         levels={pet.room?.stations}
         shop={shop}
         decor={decor}
+        games={games}
         line={line}
       />
     </div>

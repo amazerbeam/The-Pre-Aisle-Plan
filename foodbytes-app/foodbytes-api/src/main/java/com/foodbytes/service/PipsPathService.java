@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
@@ -56,6 +57,7 @@ public class PipsPathService {
     }
 
     /**
+     * An open (uncleared) map for the same slot is handed back instead of generating a new one.
      * Deliberately not @Transactional: the reads and the single save each run in their repository's own short
      * transaction, so the CPU-bound generation never holds a DB connection.
      */
@@ -65,6 +67,10 @@ public class PipsPathService {
         Slot slot = familyId == null && difficulty == null
                 ? PipsPathSequencer.next(ordered, progress, ThreadLocalRandom.current())
                 : replaySlot(familyId, difficulty, ordered, progress);
+        // One open map per slot: coming back to a level hands back the map you left, never a reroll.
+        Optional<PetGameMap> open = openMap(userId, slot);
+        if (open.isPresent()) return toDto(open.get());
+
         PuzzleFamily family = family(slot.family());
         long seed = ThreadLocalRandom.current().nextLong();
         GridMap map;
@@ -88,9 +94,23 @@ public class PipsPathService {
         row.setWidth(map.width());
         row.setHeight(map.height());
         row.setLayout(map.layout());
-        PetGameMap saved = mapRepository.save(row);
-        return new PipsPathMapDTO(saved.getId(), saved.getFamily(), saved.getDifficulty(), saved.getMode().name(),
-                saved.getChapter(), map.width(), map.height(), map.rows());
+        return toDto(mapRepository.save(row));
+    }
+
+    private Optional<PetGameMap> openMap(Long userId, Slot slot) {
+        return switch (slot.mode()) {
+            case CHAPTER -> mapRepository.findFirstByUserIdAndFamilyAndDifficultyAndModeAndClearedAtIsNullOrderByIdDesc(
+                    userId, slot.family(), slot.difficulty(), GameMode.CHAPTER);
+            case REFRESHER -> mapRepository.findFirstByUserIdAndFamilyAndModeAndChapterAndClearedAtIsNullOrderByIdDesc(
+                    userId, slot.family(), GameMode.REFRESHER, slot.chapter());
+            case ENDLESS -> mapRepository.findFirstByUserIdAndModeAndClearedAtIsNullOrderByIdDesc(userId, GameMode.ENDLESS);
+        };
+    }
+
+    private static PipsPathMapDTO toDto(PetGameMap row) {
+        List<String> rows = GridMap.fromLayout(row.getLayout(), row.getWidth(), row.getHeight()).rows();
+        return new PipsPathMapDTO(row.getId(), row.getFamily(), row.getDifficulty(), row.getMode().name(),
+                row.getChapter(), row.getWidth(), row.getHeight(), rows);
     }
 
     @Transactional

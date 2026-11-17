@@ -2,6 +2,7 @@
 
 One line per ticket, newest first: `<version> — <ticket key>: <summary>`. Bump rules and how
 to check what is deployed: `CLAUDE.md` → Versioning & deploy verification.
+1.45.0 — 2026-11-17-pips-path-client: Pip's Path in the app — tap Pip to play, games picker, chapter map and Garden Path board in three skins, server-checked clears (5 ✨, 50/day); an open map is handed back per slot
 1.44.0 — 2026-11-17-pips-path-backend: Pip's Path backend — server-generated, solver-proven Garden Path maps (difficulty 1–10), path-checked clears, per-person progress, 5 sprinkles per clear capped at 50/day
 1.43.0 — 2026-11-17-pips-path-mockup: Pip's Path mockup (Play a game, picker, chapter map, 10 Garden Path levels in three skins)
 1.42.0 — 2026-11-17-pip-ball-feet-shoes: Pip ball feet + whole-foot shoes on every line, dragon Fluffy fur boots and Dragonscale boots, wall frames no longer float over the windowsill

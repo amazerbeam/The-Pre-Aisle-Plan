@@ -2,6 +2,7 @@ import { COOK_PHASES, PET_MOODS, PET_SLEEP_FACE, PIP_POSITIONS } from '../../../
 import { DEFAULT_ROOM_LEVELS, ROOM_MAX_LEVEL, ROOM_MIN_LEVEL, PIP_FOCUS_LIFT, ROOM_STATIONS, ROOM_WORLD } from '../../../constants/petRoom.js'
 import { DECOR_SPOT_SHAPES } from '../../../constants/petDecor.js'
 import { P } from './iso.js'
+import { PIP_FOOT_X, PIP_FOOT_Y } from '../pip/pipSpace.js'
 
 /**
  * MPP-16: where things sit in Pip's room (floor coords, see iso.js). Pure data so
@@ -247,6 +248,26 @@ export function pipPose(position, mood, levels) {
 /** MPP-18: Pip during the cook-and-serve scene — anchored on the rug (the walker moves him), happy, no props. */
 export function cookPose() {
   return { face: PET_MOODS.HAPPY, showProps: false, anchor: [...PIP_HOME, 0], scale: PIP_SCALE, dropPx: 0 }
+}
+
+// MPP-49: Pip's full drawing box in his own units (pipSpace PIP_FULL_VIEWBOX = '0 -40 200 240').
+const PIP_BOX = { x: 0, y: -40, width: 200, height: 240 }
+
+/**
+ * MPP-49: the world box of Pip's figure at a pose, for the tap-Pip button (same transform as RoomPip).
+ * In bed he is drawn inside the bed's shifted group, so the box takes the bed's shift too.
+ */
+export function pipHitBox(pose, position) {
+  const [x, y] = P(...pose.anchor)
+  const left = x - PIP_FOOT_X * pose.scale
+  const top = y + pose.dropPx - PIP_FOOT_Y * pose.scale
+  const box = {
+    x: left + PIP_BOX.x * pose.scale,
+    y: top + PIP_BOX.y * pose.scale,
+    width: PIP_BOX.width * pose.scale,
+    height: PIP_BOX.height * pose.scale
+  }
+  return position === PIP_POSITIONS.BED ? offsetBox(box, STATION_SHIFT[ROOM_STATIONS.BED]) : box
 }
 
 const COOKER_PHASES = [COOK_PHASES.WALKING, COOK_PHASES.COOKING, COOK_PHASES.SERVED]

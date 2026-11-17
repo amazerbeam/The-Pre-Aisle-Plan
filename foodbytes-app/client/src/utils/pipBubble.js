@@ -1,6 +1,6 @@
 /**
  * MPP-28 AC 2: what Pip says — one line, highest first:
- * cook sequence > new award / outfit (then a shop line) > stage change > check-in question > fridge-low > mood.
+ * cook sequence > new award / outfit (then a shop line) > stage change > check-in question > game offer (MPP-49, user tapped Pip) > fridge-low > mood.
  *
  * An announcement and an open check-in question share the bubble: the announcement leads and the
  * question keeps its buttons, so an answer that earns an award never hides the next question.
@@ -8,10 +8,10 @@
  *
  * @param {{ cookLine?: string|null, announcement?: string|null, growthLine?: string|null,
  *           checkIn?: { text: string, prompt: string|null, actions: Object|null }|null,
- *           fridgeLine?: string|null, moodLine?: string|null }} lines
- * @returns {{ text: string|null, actions: Object|null }}
+ *           offerLine?: string|null, fridgeLine?: string|null, moodLine?: string|null }} lines
+ * @returns {{ text: string|null, actions: Object|null, offer?: true }}
  */
-export function pipBubble({ cookLine = null, announcement = null, growthLine = null, checkIn = null, fridgeLine = null, moodLine = null }) {
+export function pipBubble({ cookLine = null, announcement = null, growthLine = null, checkIn = null, offerLine = null, fridgeLine = null, moodLine = null }) {
   if (cookLine) return say(cookLine)
   if (announcement) {
     return checkIn?.actions
@@ -20,6 +20,7 @@ export function pipBubble({ cookLine = null, announcement = null, growthLine = n
   }
   if (growthLine) return say(growthLine)
   if (checkIn) return { text: checkIn.text, actions: checkIn.actions }
+  if (offerLine) return { text: offerLine, actions: null, offer: true }
   return say(fridgeLine ?? moodLine)
 }
 

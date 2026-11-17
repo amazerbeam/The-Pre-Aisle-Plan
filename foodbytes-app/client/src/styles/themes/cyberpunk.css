@@ -417,6 +417,21 @@
   --view-toggle-on-text: var(--void);
   --folder-check-on-bg: var(--lime);
   --folder-check-on-text: var(--void);
+  /* MPP-49: Pip's Path board and chapter map chrome (skin art keeps its own palette) */
+  --pp-board-bg: #05070b;
+  --pp-tile-bg: #1b2a33;
+  --pp-tile-border: #2f4552;
+  --pp-tile-visited-bg: #10303a;
+  --pp-trail: #37e6ff;
+  --pp-trail-glow: #37e6ff;
+  --pp-rock: #000000;
+  --pp-start-ring: #ff5fa2;
+  --pp-node-cleared-bg: #9cff6a;
+  --pp-node-cleared-text: #05070b;
+  --pp-node-current-ring: #37e6ff;
+  --pp-node-locked-bg: #1b2a33;
+  --pp-node-text: #e6f7ff;
+  --pp-hud-text: #e6f7ff;
 }
 
 /* Low FX: no glow, rain or flicker; display font falls back to the body font. The glow tokens
