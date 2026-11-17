@@ -42,5 +42,5 @@ The tap-Pip button is not rendered while Pip is asleep (the plan assumed a sleep
 A new family adds a `PuzzleFamily` bean on the server and a skin entry plus art set per Pip line in `constants/pipsPath.js` / `pipsPathArt.jsx`.
 
 ## Branch
-`feature/MPP-49-pips-path-client`, stacked on `feature/MPP-49-pips-path-backend`; push both after Task 24 passes.
+`pip-games` (backend `Server side` + client `Games` commits, on top of `feature/MPP-15-pip-room`); push after Task 24 passes.
 Suggested commit subject: `MPP-49: Pip's Path client (tap Pip to play, picker, chapter map, Garden Path board) + reuse open maps`
