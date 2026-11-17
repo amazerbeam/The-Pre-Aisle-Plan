@@ -16,4 +16,6 @@ public class SprinkleRatesDTO {
     private int shoppingListGenerated;
     private int shoppingListCompleted;
     private int mealsPerWeek;
+    private int gameClear;      // MPP-49
+    private int gameDailyCap;   // MPP-49
 }

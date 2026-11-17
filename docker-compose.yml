@@ -50,7 +50,9 @@ services:
       db:
         condition: service_healthy
     networks:
-      - foodbytes-network
+      foodbytes-network:
+        aliases:
+          - backend
 
   # React Frontend (Production Build)
   client:

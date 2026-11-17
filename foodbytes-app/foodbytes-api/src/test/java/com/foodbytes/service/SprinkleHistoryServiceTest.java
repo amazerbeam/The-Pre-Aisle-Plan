@@ -107,4 +107,11 @@ class SprinkleHistoryServiceTest {
         assertThat(rates.getShoppingListCompleted()).isEqualTo(15);
         assertThat(rates.getMealsPerWeek()).isEqualTo(21);
     }
+
+    @Test
+    void rates_includeTheGameAmounts() {
+        var rates = SprinkleHistoryService.rates();
+        assertThat(rates.getGameClear()).isEqualTo(5);
+        assertThat(rates.getGameDailyCap()).isEqualTo(50);
+    }
 }

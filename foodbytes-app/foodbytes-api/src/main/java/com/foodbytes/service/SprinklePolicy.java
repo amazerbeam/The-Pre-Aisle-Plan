@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * MPP-25: what earns sprinkles, and how many. The amounts are illustrative and retunable (target
+ * MPP-25: what earns sprinkles (meals, shopping, MPP-49 games), and how many. The amounts are illustrative and retunable (target
  * about 300 a week from about 21 logged meals). Only consistency pays - never variety (MPP-11).
  * Days are Europe/Dublin (HabitStreakPolicy.ZONE) until a per-user zone exists.
  */
@@ -28,6 +28,10 @@ public final class SprinklePolicy {
     public static final int SHOPPING_LIST_COMPLETED = 15;
     /** MPP-42: GET /api/pet/sprinkles/recent looks back this many days. */
     public static final int RECENT_DAYS = 14;
+
+    /** MPP-49: each server-checked Pip's Path clear, capped per Dublin day. Every play is a new map, so no replay rate. */
+    public static final int GAME_CLEAR = 5;
+    public static final int GAME_DAILY_CAP = 50;
 
     private SprinklePolicy() {
     }
@@ -46,6 +50,19 @@ public final class SprinklePolicy {
     static boolean isOnTime(LocalDateTime eatenAtUtc, LocalDate planDate, LocalTime byTime) {
         ZonedDateTime local = eatenAtUtc.atZone(ZoneOffset.UTC).withZoneSameInstant(HabitStreakPolicy.ZONE);
         return local.toLocalDate().equals(planDate) && !local.toLocalTime().isAfter(byTime);
+    }
+
+    /** MPP-49: what the next game clear pays, given the person's GAME_CLEAR total so far today. */
+    static int gameClearAmount(long earnedToday) {
+        return (int) Math.max(0, Math.min(GAME_CLEAR, GAME_DAILY_CAP - earnedToday));
+    }
+
+    /** MPP-49: a Dublin day as [start, end) in UTC wall time - pet_sprinkles.created_at is UTC. */
+    static LocalDateTime[] dublinDayUtc(LocalDate day) {
+        return new LocalDateTime[] {
+            day.atStartOfDay(HabitStreakPolicy.ZONE).withZoneSameInstant(ZoneOffset.UTC).toLocalDateTime(),
+            day.plusDays(1).atStartOfDay(HabitStreakPolicy.ZONE).withZoneSameInstant(ZoneOffset.UTC).toLocalDateTime()
+        };
     }
 
     /** MPP-42: breakfast, lunch and dinner on all seven days - the meals a full week holds (the Earn tab's good week). */

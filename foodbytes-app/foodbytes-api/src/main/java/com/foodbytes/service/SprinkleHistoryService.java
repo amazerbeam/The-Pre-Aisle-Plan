@@ -64,7 +64,7 @@ public class SprinkleHistoryService {
         return new SprinkleRatesDTO(
                 SprinklePolicy.MEAL_EATEN, SprinklePolicy.ON_TIME_BONUS, SprinklePolicy.HOMEMADE_BONUS,
                 SprinklePolicy.FULL_WEEK, SprinklePolicy.SHOPPING_LIST_GENERATED, SprinklePolicy.SHOPPING_LIST_COMPLETED,
-                SprinklePolicy.mealsPerWeek());
+                SprinklePolicy.mealsPerWeek(), SprinklePolicy.GAME_CLEAR, SprinklePolicy.GAME_DAILY_CAP);
     }
 
     private static SprinkleEntryDTO toDto(PetSprinkle row, Map<Long, MealPlanEntryRepository.MealSlotContext> meals, Map<Long, PetDecorOwned> decor) {

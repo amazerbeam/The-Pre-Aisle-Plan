@@ -21,6 +21,14 @@ public interface PetSprinkleRepository extends JpaRepository<PetSprinkle, Long> 
     @Query("SELECT COALESCE(SUM(s.amount), 0) FROM PetSprinkle s WHERE s.userId = :userId")
     long sumAmountByUserId(@Param("userId") Long userId);
 
+    /** MPP-49: one source's payouts to the person in [from, to) (UTC wall time) - the games daily cap. */
+    @Query("SELECT COALESCE(SUM(s.amount), 0) FROM PetSprinkle s WHERE s.userId = :userId " +
+           "AND s.sourceType = :sourceType AND s.createdAt >= :from AND s.createdAt < :to")
+    long sumAmountByUserIdAndSourceTypeBetween(@Param("userId") Long userId,
+                                               @Param("sourceType") SprinkleSource sourceType,
+                                               @Param("from") LocalDateTime from,
+                                               @Param("to") LocalDateTime to);
+
     /** MPP-42: the person's own rows since a UTC time, newest first (uk_pet_sprinkles leads with user_id). */
     List<PetSprinkle> findByUserIdAndCreatedAtGreaterThanEqualOrderByCreatedAtDescIdDesc(Long userId, LocalDateTime since);
 

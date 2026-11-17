@@ -69,4 +69,23 @@ class SprinklePolicyTest {
     void mealsPerWeek_isSevenDaysOfBreakfastLunchAndDinner() {
         assertThat(SprinklePolicy.mealsPerWeek()).isEqualTo(21);
     }
+
+    @Test
+    void gameClearAmount_paysFiveUntilTheDailyCap() {
+        assertThat(SprinklePolicy.gameClearAmount(0)).isEqualTo(5);
+        assertThat(SprinklePolicy.gameClearAmount(45)).isEqualTo(5);
+        assertThat(SprinklePolicy.gameClearAmount(48)).isEqualTo(2);
+        assertThat(SprinklePolicy.gameClearAmount(50)).isZero();
+        assertThat(SprinklePolicy.gameClearAmount(60)).isZero();
+    }
+
+    @Test
+    void dublinDayUtc_summerAndWinter() {
+        // IST (UTC+1): 2026-07-01 Dublin = 2026-06-30T23:00 .. 2026-07-01T23:00 UTC
+        assertThat(SprinklePolicy.dublinDayUtc(LocalDate.of(2026, 7, 1)))
+                .containsExactly(LocalDateTime.of(2026, 6, 30, 23, 0), LocalDateTime.of(2026, 7, 1, 23, 0));
+        // GMT: 2026-11-17 Dublin = same wall times in UTC
+        assertThat(SprinklePolicy.dublinDayUtc(LocalDate.of(2026, 11, 17)))
+                .containsExactly(LocalDateTime.of(2026, 11, 17, 0, 0), LocalDateTime.of(2026, 11, 18, 0, 0));
+    }
 }

@@ -254,12 +254,13 @@ class SprinkleServiceTest {
     @Test
     void noRuleRewardsVariety() {
         // Earning sources only; STATION_UPGRADE (MPP-26) and DECOR_PURCHASE (MPP-27) are spends, not rewards;
-        // the two shopping sources (MPP-42) are consistency work, not variety.
+        // the two shopping sources (MPP-42) and the game clear (MPP-49) are consistency work, not variety.
         assertThat(SprinkleSource.values()).containsExactly(
                 SprinkleSource.MEAL_EATEN, SprinkleSource.MEAL_ON_TIME,
                 SprinkleSource.FULL_WEEK, SprinkleSource.HOMEMADE_EXTRA,
                 SprinkleSource.STATION_UPGRADE, SprinkleSource.DECOR_PURCHASE,
-                SprinkleSource.SHOPPING_LIST_GENERATED, SprinkleSource.SHOPPING_LIST_COMPLETED);
+                SprinkleSource.SHOPPING_LIST_GENERATED, SprinkleSource.SHOPPING_LIST_COMPLETED,
+                SprinkleSource.GAME_CLEAR);
     }
 
     // ---- MPP-26: spending ----
